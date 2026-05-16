@@ -3,7 +3,7 @@
 Updated: 2026-05-16 23:18 Europe/Stockholm
 Pane: PANE 2 / WORKER-A
 Branch: `backend-api/openapi-config`
-PR: pending at handoff write time
+PR: https://github.com/SzeChunYiu/GroceryView/pull/10
 
 ## Task taken
 - Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md`.
