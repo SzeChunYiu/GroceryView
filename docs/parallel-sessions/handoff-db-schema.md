@@ -115,3 +115,108 @@ Because the compose startup command cannot run, the migration/seed `psql` loop w
 ### Next task
 
 Run task 12 on a machine with Docker Compose available, capture the exact migration/seed output, and then update this handoff. No schema SQL changes were made in this WORKER-B pass.
+
+## Worker-B update — SQL validation via PostGIS container fallback
+
+Date: 2026-05-16
+Branch: `db-schema/initial-schema`
+Role: Pane 3 / WORKER-B
+
+### Required Docker Compose command result
+
+The requested Docker Compose validation command still cannot run on this host because the `docker` CLI is not installed:
+
+```text
+$ docker compose -f infra/docker-compose.yml up -d postgres
+/usr/bin/bash: line 4: docker: command not found
+exit=127
+```
+
+### Fallback real PostgreSQL/PostGIS validation
+
+To avoid relying only on parser validation, I pulled the same PostGIS image referenced by `infra/docker-compose.yml` with Apptainer (`docker://postgis/postgis:18-3.6`) and ran the migrations/seeds against a real PostgreSQL 18.4 + PostGIS database inside that container.
+
+Validation output:
+
+```text
+$ apptainer exec postgis_18_3.6.sif PostgreSQL 18/PostGIS validation
+initdb --auth=trust --username=groceryview
+postgres -D /tmp/groceryview-pgdata4 -h 127.0.0.1 -p 55435 -k /tmp/groceryview-pgsocket4
+127.0.0.1:55435 - accepting connections
+psql -v ON_ERROR_STOP=1 -f infra/db/migrations/001_extensions.sql
+CREATE EXTENSION
+CREATE EXTENSION
+CREATE EXTENSION
+psql -v ON_ERROR_STOP=1 -f infra/db/migrations/002_init.sql
+CREATE TYPE
+CREATE TYPE
+CREATE TYPE
+CREATE TYPE
+CREATE TYPE
+CREATE TYPE
+CREATE TYPE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+psql -v ON_ERROR_STOP=1 -f infra/db/migrations/003_indexes.sql
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+psql -v ON_ERROR_STOP=1 -f infra/db/seeds/001_stockholm_seed.sql
+INSERT 0 1
+INSERT 0 6
+INSERT 0 20
+smoke: extensions count (postgis, pg_trgm, btree_gist)
+3
+smoke: public table count
+29
+smoke: chain/product seed counts
+6|20
+```
+
+### Status
+
+- SQL migrations and seeds are validated against a real PostgreSQL 18.4/PostGIS database using the compose image via Apptainer.
+- The literal Docker Compose task remains unavailable on this host until Docker is installed, but the database-level validation itself passed.
