@@ -205,15 +205,14 @@ The manager objective is complete: required docs were read, unchecked tasks were
 ## Done this iteration
 - Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/data-worker.md` as required.
 - Confirmed the canonical task checklist because the local `codex-tasks/data-worker-tasks.md` file is absent; `git show ceo/roadmap-phase1:codex-tasks/data-worker-tasks.md` shows the second unchecked task is task 2, `Create a lane branch`.
-- Implemented task 2 by confirming the shared worktree is already on `data-worker/dagster-scaffold` at `26bd48d`, tracking `origin/data-worker/dagster-scaffold`; no duplicate branch was created.
+- Implemented task 2 by confirming the shared worktree is already on `data-worker/dagster-scaffold`, tracking `origin/data-worker/dagster-scaffold`; no duplicate branch was created.
 - Confirmed PR #4 is open from `data-worker/dagster-scaffold` to `main`: https://github.com/SzeChunYiu/GroceryView/pull/4
 - Did not implement product-code changes for this Pane 3 / WORKER-B iteration; this was limited to the branch/provenance task to avoid overlapping WORKER-A and the existing scaffold PR.
 
 ## Verification / evidence
 - `git branch --show-current` → `data-worker/dagster-scaffold`
-- `git rev-parse --short HEAD` → `26bd48d`
 - `git rev-parse --abbrev-ref --symbolic-full-name @{u}` → `origin/data-worker/dagster-scaffold`
-- GitHub PR view confirms PR #4 is `OPEN`, non-draft, `mergeStateStatus=CLEAN`, with head `data-worker/dagster-scaffold` and base `main`.
+- GitHub PR view confirms PR #4 is `OPEN`, non-draft, with head `data-worker/dagster-scaffold` and base `main`.
 
 ## Next task
 - External maintainer review/merge of PR #4. After merge, start any next data-worker implementation only from updated `main` and only after reconciling the canonical task checklist into the local worktree or explicitly sourcing it from the planning branch.
