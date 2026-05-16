@@ -83,3 +83,35 @@ Seed file contains 6 chains and 20 hero products.
   - `for f in infra/db/migrations/*.sql infra/db/seeds/*.sql; do docker compose -f infra/docker-compose.yml exec -T postgres psql -U groceryview -d groceryview -v ON_ERROR_STOP=1 -f - < "$f"; done`
   - `docker compose -f infra/docker-compose.yml down`
 - If validation passes, continue with DB packaging/ORM integration once the API lane confirms its choice.
+
+## Worker-B update — SQL validation task
+
+Date: 2026-05-16
+Branch: `db-schema/initial-schema`
+Role: Pane 3 / WORKER-B
+
+### Task attempted
+
+Manager handoff assigned WORKER-B to run the real Docker/Postgres SQL validation from `codex-tasks/db-schema-tasks.md` task 12:
+
+```bash
+docker compose -f infra/docker-compose.yml up -d postgres
+for f in infra/db/migrations/*.sql infra/db/seeds/*.sql; do docker compose -f infra/docker-compose.yml exec -T postgres psql -U groceryview -d groceryview -v ON_ERROR_STOP=1 -f - < "$f"; done
+docker compose -f infra/docker-compose.yml down
+```
+
+### Result
+
+The real Docker/Postgres validation remains blocked on this host because Docker is not installed:
+
+```text
+$ docker compose -f infra/docker-compose.yml up -d postgres
+/usr/bin/bash: line 4: docker: command not found
+exit_status=127
+```
+
+Because the compose startup command cannot run, the migration/seed `psql` loop was not executed and should not be claimed as complete.
+
+### Next task
+
+Run task 12 on a machine with Docker Compose available, capture the exact migration/seed output, and then update this handoff. No schema SQL changes were made in this WORKER-B pass.
