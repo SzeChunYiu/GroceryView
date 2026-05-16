@@ -346,3 +346,127 @@ OK infra/db/seeds/001_stockholm_seed.sql
 ### Next task
 
 - Add a future scheduled migration/job to create monthly `price_observations` partitions at least three months ahead and drain rows from `price_observations_default`.
+
+---
+
+# Worker-B update — SQL validation rerun on merged schema
+
+Date: 2026-05-16
+Branch: `db-schema/worker-b-validation-20260516`
+Role: Pane 3 / WORKER-B
+Task: checklist task 12, SQL validation, separate from WORKER-A task 11 (`packages/db`).
+
+## Context read
+
+- Read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/db-schema.md` from the shared session worktree before starting this branch.
+- This branch is based on `origin/main` at `6423ce0` (`feat(db): add partitioned GroceryView schema`). The context docs are not present on `origin/main`, but the DB handoff and schema artifacts are present.
+
+## Required Docker Compose validation attempt
+
+The literal checklist command still cannot run on this host because the Docker CLI is unavailable:
+
+```text
+$ docker compose -f infra/docker-compose.yml up -d postgres
+/usr/bin/bash: line 5: docker: command not found
+exit_status=127
+```
+
+Because the compose startup command failed before creating a PostgreSQL container, I did not claim the literal Docker Compose loop as complete.
+
+## Real PostgreSQL/PostGIS validation fallback
+
+I reran the merged SQL migrations and seed file against a real PostgreSQL/PostGIS database using the same image referenced by `infra/docker-compose.yml` (`postgis/postgis:18-3.6`) via Apptainer.
+
+```text
+$ APPTAINER_CACHEDIR=/tmp/apptainer-cache APPTAINER_TMPDIR=/tmp/apptainer-tmp apptainer exec --pwd /tmp/groceryview-db-worker-b docker://postgis/postgis:18-3.6 ./run-apptainer-validation.sh
+INFO:    Using cached SIF image
+PostgreSQL/PostGIS validation using postgis/postgis:18-3.6 via Apptainer
+postgres (PostgreSQL) 18.4 (Debian 18.4-1.pgdg13+1)
+initdb ok
+postgres started
+database created
+psql -v ON_ERROR_STOP=1 -f infra/db/migrations/001_extensions.sql
+CREATE EXTENSION
+CREATE EXTENSION
+CREATE EXTENSION
+psql -v ON_ERROR_STOP=1 -f infra/db/migrations/002_init.sql
+CREATE TYPE
+CREATE TYPE
+CREATE TYPE
+CREATE TYPE
+CREATE TYPE
+CREATE TYPE
+CREATE TYPE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+psql -v ON_ERROR_STOP=1 -f infra/db/migrations/003_indexes.sql
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+psql -v ON_ERROR_STOP=1 -f infra/db/seeds/001_stockholm_seed.sql
+INSERT 0 1
+INSERT 0 6
+INSERT 0 20
+smoke: postgis/pg_trgm/btree_gist extension count
+3
+smoke: price_observations relkind and partition count
+price_observations|p|5
+smoke: chain/product seed counts
+6|20
+postgres stopped
+exit_status=0
+```
+
+## Status / next
+
+- Task 12 is database-level validated: all migrations and seeds run successfully with `ON_ERROR_STOP=1` against PostgreSQL 18.4/PostGIS using the compose image.
+- The literal Docker Compose command remains host-blocked until a Docker-capable environment is available.
+- No schema SQL changes were made in this pass.
