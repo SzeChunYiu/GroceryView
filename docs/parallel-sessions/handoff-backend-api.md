@@ -81,3 +81,44 @@ Commands run from `/tmp/groceryview-pane5-repo/apps/api` with Node `v24.15.0`, `
 ### Blockers / notes
 - `codex-tasks/backend-api-tasks.md` is still absent from `main`; the checklist remains discoverable only from `origin/ceo/roadmap-phase1`.
 - This PR is stacked on the existing backend OpenAPI branch until earlier backend PRs merge to `main`.
+
+---
+
+## Worker update — 2026-05-17 00:41 Europe/Stockholm
+Pane: PANE 3 / WORKER-B
+Branch: `backend-api/api-contracts-worker-b`
+Base branch used: `origin/backend-api/products-crud`
+PR: https://github.com/SzeChunYiu/GroceryView/pull/19
+
+### Task taken
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md`.
+- Fetched current backend branches and found WORKER-A/WORKER-D had already opened PR #13 for the domain placeholder controller slice.
+- Closed my earlier duplicate PR #14 and moved to the next distinct unchecked backend checklist task: create `packages/api-contracts` with shared Zod schemas.
+
+### What changed
+- Added standalone package `packages/api-contracts` with package name `@groceryview/api-contracts`.
+- Exported strict Zod schemas and inferred TypeScript types for:
+  - `ProductSummarySchema`
+  - `StoreSummarySchema`
+  - `PriceObservationSchema`
+  - `DealScoreSchema`
+  - `WatchlistItemSchema`
+  - `WeeklyBasketSchema`
+  - `AlertSchema`
+- Added package TypeScript config and local package lock; generated build output and `node_modules` are ignored.
+
+### Verification
+Commands run from `/tmp/gv-worker-b-clone` with Node `v24.15.0`, `COREPACK_HOME=/tmp/scyiu-corepack`, and pnpm `10.21.0`:
+- `corepack pnpm@10.21.0 --dir packages/api-contracts install --frozen-lockfile` — passed.
+- `corepack pnpm@10.21.0 --dir packages/api-contracts build` — passed.
+- Node ESM smoke import from `packages/api-contracts/dist/index.js` parsed sample payloads with all exported checklist schemas — passed.
+- `corepack pnpm@10.21.0 --dir apps/api install --frozen-lockfile` — passed.
+- `corepack pnpm@10.21.0 --dir apps/api build` — passed.
+- `DATABASE_ENABLED=false corepack pnpm@10.21.0 --dir apps/api test:e2e` — passed (`Test Suites: 1 passed`, `Tests: 3 passed`).
+
+### Next task
+- Wire `@groceryview/api-contracts` into the API controllers without introducing a database dependency, then add contract validation tests around the seed/demo responses.
+
+### Blockers / notes
+- This PR is stacked on `origin/backend-api/products-crud` / PR #13, which is itself stacked on earlier backend PRs until they merge into `main`.
+- `codex-tasks/backend-api-tasks.md` is still absent from active backend branches/main; `origin/ceo/roadmap-phase1` remains the source for the numbered checklist.
