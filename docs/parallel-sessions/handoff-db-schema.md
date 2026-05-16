@@ -554,3 +554,28 @@ Implemented the next small non-duplicate DB package gap under the third-worker a
 
 - Keep SQL migrations as the source of truth; if new PostgreSQL enums are added later, update `packages/db/src/enums.ts` in the same PR as the migration or immediately after.
 
+
+---
+
+## Worker-A update — task 1 repo-state check
+
+Date: 2026-05-17
+Branch: `db-schema/worker-a-repo-state`
+Role: Pane 2 / WORKER-A
+
+### Task implemented
+
+Implemented the first unchecked item in `codex-tasks/db-schema-tasks.md`: check repository state before editing.
+
+### Repo-state evidence
+
+```text
+$ git status --short --branch
+## db-schema/worker-a-repo-state...origin/main
+```
+
+### Notes
+
+- No schema SQL changes were required for this repo-state gate.
+- Existing `origin/main` already contains the DB schema, indexes, seeds, compose file, package scaffold, partition maintenance migration, and prior validation handoff entries.
+- Next unchecked checklist work should start from the next task that is not already represented by current `origin/main` artifacts to avoid duplicating merged DB work.
