@@ -59,10 +59,9 @@ $ docker compose -f infra/docker-compose.yml up -d postgres
 /usr/bin/bash: line 1: docker: command not found
 ```
 
-Fallback validation performed:
+Fallback validation performed with the PostgreSQL parser exposed by `libpg-query` 17.7.3:
 
 ```text
-$ node validate.js  # pgsql-ast-parser 12.0.2 with PostGIS geography(Point,4326) type normalized for parser compatibility
 OK infra/db/migrations/001_extensions.sql
 OK infra/db/migrations/002_init.sql
 OK infra/db/migrations/003_indexes.sql
