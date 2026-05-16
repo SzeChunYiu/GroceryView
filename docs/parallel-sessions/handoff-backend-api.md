@@ -81,3 +81,47 @@ Commands run from `/tmp/groceryview-pane5-repo/apps/api` with Node `v24.15.0`, `
 ### Blockers / notes
 - `codex-tasks/backend-api-tasks.md` is still absent from `main`; the checklist remains discoverable only from `origin/ceo/roadmap-phase1`.
 - This PR is stacked on the existing backend OpenAPI branch until earlier backend PRs merge to `main`.
+
+---
+
+## Worker-D update — 2026-05-17 00:48 Europe/Stockholm
+Pane: PANE 5 / WORKER-D
+Branch: `backend-api/products-crud`
+PR: https://github.com/SzeChunYiu/GroceryView/pull/13
+
+### Task taken
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md` from the shared worktree.
+- Audited open backend PRs and found panes 2-4 already covered scaffold/database/OpenAPI and Worker-C already opened domain placeholder controllers.
+- Added the next distinct unchecked backend API checklist slice for Worker-D: shared API contracts package (`packages/api-contracts`) exporting Zod schemas.
+
+### What changed
+- Created `packages/api-contracts` with package name `@groceryview/api-contracts`.
+- Exported Zod schemas and inferred TypeScript types for:
+  - `ProductSummarySchema`
+  - `StoreSummarySchema`
+  - `PriceObservationSchema`
+  - `DealScoreSchema`
+  - `WatchlistItemSchema`
+  - `WeeklyBasketSchema`
+  - `AlertSchema`
+- Included shared currency, price-type, source-type, and weekly-basket item schemas to keep client/server DTOs consistent.
+- Kept contracts database-independent and explicit about demo/seed fields.
+
+### Verification
+Commands run from `/tmp/gv-worker-d-contracts-clone` with Node `v24.15.0`, `COREPACK_HOME=/tmp/scyiu-corepack`, and pnpm `10.21.0`:
+- `corepack pnpm@10.21.0 --dir packages/api-contracts install` — passed.
+- `corepack pnpm@10.21.0 --dir packages/api-contracts build` — passed.
+- `corepack pnpm@10.21.0 --dir packages/api-contracts typecheck` — passed.
+- `corepack pnpm@10.21.0 --dir apps/api install --frozen-lockfile` — passed.
+- `corepack pnpm@10.21.0 --dir apps/api build` — passed.
+- `corepack pnpm@10.21.0 --dir apps/api test:e2e` — passed (`Test Suites: 1 passed`, `Tests: 3 passed`).
+- Smoke after build with `PORT=3125 DATABASE_ENABLED=false node apps/api/dist/main.js`:
+  - `GET /health` returned HTTP 200 with `{ "status": "ok", "service": "api" }`.
+  - `GET /products` returned HTTP 200.
+
+### Next task
+- Wire API controllers to import/validate against `@groceryview/api-contracts` after the stacked backend scaffold/OpenAPI/domain PRs are reconciled.
+
+### Blockers / notes
+- PR #13 remains stacked on existing backend API work until earlier backend PRs merge to `main`.
+- The root monorepo workspace is not present on this backend stack yet, so the contracts package uses its own package manifest and lockfile like the existing standalone package pattern.
