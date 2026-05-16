@@ -579,3 +579,48 @@ $ git status --short --branch
 - No schema SQL changes were required for this repo-state gate.
 - Existing `origin/main` already contains the DB schema, indexes, seeds, compose file, package scaffold, partition maintenance migration, and prior validation handoff entries.
 - Next unchecked checklist work should start from the next task that is not already represented by current `origin/main` artifacts to avoid duplicating merged DB work.
+
+---
+
+# Handoff — DB Schema Worker B second checklist task
+
+Date: 2026-05-17
+Role: `WORKER-B` / Pane 3
+Branch: `db-schema/worker-b-second-task`
+
+## Inputs reviewed
+
+- Read `docs/parallel-sessions/shared.md`.
+- Read `docs/parallel-sessions/db-schema.md`.
+- Re-read `codex-tasks/db-schema-tasks.md` from `origin/main`.
+- Checked current repo state before this branch-specific handoff work.
+
+## Task implemented
+
+Implemented the second literal unchecked DB checklist item: **create a lane branch**.
+
+The checklist example names `db-schema/initial-schema`, but that historical branch/name has already been used by earlier DB schema work. To avoid repeating or colliding with completed work, this Worker-B iteration created and used the unique lane branch:
+
+```text
+db-schema/worker-b-second-task
+```
+
+Evidence from this worktree after branch creation:
+
+```text
+$ git status --short --branch
+## db-schema/worker-b-second-task
+
+$ git branch --show-current
+db-schema/worker-b-second-task
+```
+
+## Notes
+
+- No schema SQL, compose, seed, or package code was changed in this pass.
+- Existing DB schema/package/partition work is already present on `origin/main`; this pass intentionally did not repeat it.
+- This handoff entry is the only tracked artifact, so the branch/PR has a reviewable record of Worker-B completing checklist item 2 separately from Worker-A's repo-state check.
+
+## Next
+
+Continue with the next genuinely incomplete DB schema task only if a manager assigns one; do not duplicate the merged schema, package, validation, or partition-maintenance work already recorded in this handoff.
