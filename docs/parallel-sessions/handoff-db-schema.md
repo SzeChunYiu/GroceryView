@@ -450,3 +450,67 @@ Results: install, typecheck, and build passed. pnpm emitted the existing expecte
 ## Next
 
 After PR #3 lands, add `packages/db` to the root workspace lockfile/setup instead of keeping it package-local only.
+
+---
+
+# Handoff — DB Schema Worker D
+
+Date: 2026-05-17
+Role: `WORKER-D` / Pane 5
+Branch: `db-schema/partition-maintenance-worker-d`
+
+## Inputs reviewed
+
+- Read lane context from the supervisor worktree because `origin/main` does not yet contain `docs/parallel-sessions/shared.md` or `docs/parallel-sessions/db-schema.md`:
+  - `docs/parallel-sessions/shared.md`
+  - `docs/parallel-sessions/db-schema.md`
+- Re-read `codex-tasks/db-schema-tasks.md` from `origin/main`.
+- Checked merged DB work on `origin/main` and avoided repeating Pane 2 (`packages/db`), Pane 3 (`SQL validation`), or Pane 4 (`price_observations` base partitioning) work.
+
+## Task implemented
+
+Implemented the next non-duplicate DB schema follow-up from the Pane 4 handoff: partition maintenance for `price_observations`.
+
+## Changes made
+
+- Added `infra/db/migrations/004_partition_maintenance.sql`.
+  - Creates `ensure_price_observation_partitions(months_ahead, months_behind, anchor_date)`.
+  - Creates missing monthly child partitions around an anchor date.
+  - Leaves SQL migrations as the source of truth and uses the existing partitioned parent/index setup.
+  - Raises a clear exception if rows for a missing month already landed in `price_observations_default`, so operators drain/replay default rows in a controlled maintenance window instead of silently hiding data movement.
+  - Deterministically extends the MVP partition window through `price_observations_2026_11`.
+- Updated `infra/db/SCHEMA.md` to document migration `004`, the added September-November 2026 partitions, and the scheduled call pattern.
+
+## Validation
+
+Docker Compose remains unavailable on this host (`docker` is not installed). Real database validation was run with the same PostGIS image referenced by `infra/docker-compose.yml` via Apptainer (`/tmp/groceryview-apptainer/postgis_18_3.6.sif`, PostgreSQL 18.4/PostGIS). Output was saved to `/tmp/gv-worker-d-final-20260517-003615-2177740-validation.out`.
+
+Commands executed:
+
+```bash
+for f in infra/db/migrations/*.sql infra/db/seeds/*.sql; do
+  apptainer exec /tmp/groceryview-apptainer/postgis_18_3.6.sif \
+    psql -h 127.0.0.1 -p "$PORT" -U groceryview -d groceryview \
+    -v ON_ERROR_STOP=1 -f "$f"
+done
+```
+
+Validation results:
+
+- `001_extensions.sql`: passed.
+- `002_init.sql`: passed.
+- `003_indexes.sql`: passed.
+- `004_partition_maintenance.sql`: passed and created the missing September-November 2026 partitions.
+- `001_stockholm_seed.sql`: passed.
+- Smoke checks returned:
+  - `price_observations` relkind `p` (partitioned table).
+  - 8 total `price_observations` child partitions, including `price_observations_default`.
+  - migration `004` returned `created` for `price_observations_2026_09`, `price_observations_2026_10`, and `price_observations_2026_11`.
+  - rerunning the maintenance function for the same deterministic window returned 7 `exists` rows.
+  - seed counts `6|20` for chains/products.
+  - `function_exists=true` for `ensure_price_observation_partitions(integer, integer, date)`.
+
+## Next
+
+- Wire `SELECT * FROM ensure_price_observation_partitions(6, 1, CURRENT_DATE);` into the future Dagster/API ops maintenance cadence before production ingestion.
+- If rows appear in `price_observations_default`, drain/replay them during a controlled maintenance window before adding overlapping month partitions.

@@ -7,6 +7,7 @@ This directory contains the PostgreSQL/PostGIS schema for the Stockholm MVP. The
 - `001_extensions.sql` enables `postgis`, `pg_trgm`, and `btree_gist`.
 - `002_init.sql` creates enums and core tables.
 - `003_indexes.sql` creates spatial, search, time-series, and user-list indexes.
+- `004_partition_maintenance.sql` adds the reusable monthly `price_observations` partition maintenance function and extends the deterministic MVP partition window.
 - `seeds/001_stockholm_seed.sql` inserts Stockholm, MVP launch chains, and 20 hero products.
 
 ## Enum semantics
@@ -225,9 +226,12 @@ Important indexes include:
 - `price_observations_2026_06`: `2026-06-01` inclusive to `2026-07-01` exclusive.
 - `price_observations_2026_07`: `2026-07-01` inclusive to `2026-08-01` exclusive.
 - `price_observations_2026_08`: `2026-08-01` inclusive to `2026-09-01` exclusive.
+- `price_observations_2026_09`: `2026-09-01` inclusive to `2026-10-01` exclusive.
+- `price_observations_2026_10`: `2026-10-01` inclusive to `2026-11-01` exclusive.
+- `price_observations_2026_11`: `2026-11-01` inclusive to `2026-12-01` exclusive.
 - `price_observations_default`: fallback for backfills and future rows before scheduled maintenance creates the exact monthly child table.
 
-The parent indexes in `003_indexes.sql` create partitioned indexes for product/city history, store history, source-run lineage, and raw-record lineage. Before production ingestion, add a scheduled migration/job that creates future monthly partitions at least three months ahead and drains any rows from `price_observations_default` into their proper monthly partitions.
+The parent indexes in `003_indexes.sql` create partitioned indexes for product/city history, store history, source-run lineage, and raw-record lineage. Migration `004_partition_maintenance.sql` creates `ensure_price_observation_partitions(months_ahead, months_behind, anchor_date)`, which workers/operators can call from scheduled maintenance before each month starts. For example, call `SELECT * FROM ensure_price_observation_partitions(6, 1, CURRENT_DATE);` to ensure partitions from one month behind through six months ahead. The function raises if rows for a missing month have already landed in `price_observations_default`; in that case, first move the matching default rows into staging in a controlled maintenance window, create the month partition, and then reinsert/replay the staged rows through the partitioned parent.
 
 Apply the same pattern later to `promotion_observations` if campaign volume requires it.
 
