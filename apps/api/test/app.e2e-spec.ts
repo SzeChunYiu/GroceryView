@@ -135,6 +135,7 @@ describe('AppController (e2e)', () => {
         expect(body).toMatchObject({
           productSlug: 'zoegas-skane-mellanrost-450g',
           quantity: 2,
+          demo: true,
         });
       });
 
