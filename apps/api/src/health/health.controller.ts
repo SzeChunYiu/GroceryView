@@ -2,7 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 
 interface HealthResponse {
   status: 'ok';
-  service: 'groceryview-api';
+  service: 'api';
 }
 
 @Controller('health')
@@ -11,7 +11,7 @@ export class HealthController {
   getHealth(): HealthResponse {
     return {
       status: 'ok',
-      service: 'groceryview-api',
+      service: 'api',
     };
   }
 }

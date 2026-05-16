@@ -7,7 +7,7 @@ import { PricesModule } from './prices/prices.module';
 import { ProductsModule } from './products/products.module';
 import { StoresModule } from './stores/stores.module';
 import { UsersModule } from './users/users.module';
-import { validateEnvironment } from './env.validation';
+import { validateEnvironment } from './config/env.schema';
 
 @Module({
   imports: [

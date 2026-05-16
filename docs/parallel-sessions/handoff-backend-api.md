@@ -1,31 +1,39 @@
 # Handoff — backend-api lane
 
-Updated: 2026-05-16 23:01 Europe/Stockholm
-Pane: PANE 3 / WORKER-B
-Branch: `backend-api/database-connection`
-PR: https://github.com/SzeChunYiu/GroceryView/pull/7
+Updated: 2026-05-16 23:18 Europe/Stockholm
+Pane: PANE 2 / WORKER-A
+Branch: `backend-api/openapi-config`
+PR: pending at handoff write time
 
 ## Task taken
-- `codex-tasks/backend-api-tasks.md` was still missing, so there was no authoritative second unchecked checklist item to read.
-- Based on `docs/parallel-sessions/backend-api.md`, WORKER-A appeared to be on/near Phase 1 scaffold. WORKER-B implemented the next/default Phase 2 backend task: database connection and placeholder entities.
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md`.
+- Checked local repo state before editing: main shared worktree was on `data-worker/dagster-scaffold` with unrelated dirty/untracked files, so I used a clean git worktree at `/tmp/gv-backend-api-worker-a-openapi`.
+- `codex-tasks/backend-api-tasks.md` is still absent from the active backend branches/main; I inspected the checklist from `origin/ceo/roadmap-phase1` and implemented the first not-yet-covered API configuration slice after the existing scaffold/database work: required API packages, Zod env validation, global validation, Swagger docs, CORS defaults, and checklist-conformant health response.
 
 ## What changed
-- Added NestJS TypeORM/PostgreSQL database support in `apps/api`:
-  - `DatabaseModule` with env-driven TypeORM configuration.
-  - Optional DB initialization: disabled by default for local health/build checks unless `DATABASE_ENABLED=true`, `DATABASE_URL`, or `DB_HOST` is set.
-  - TypeORM CLI data source and migration scripts.
-  - Placeholder entities: `Product`, `Store`, `PriceEvent`.
-  - API `.env.example` and `.gitignore`.
-- Kept `/health` available without requiring a local PostgreSQL instance.
+- Added API dependencies: `@nestjs/swagger`, `swagger-ui-express`, `zod`, `@nestjs/terminus`, and `@types/swagger-ui-express`.
+- Replaced the old class-validator env file with `apps/api/src/config/env.schema.ts` using Zod for `NODE_ENV`, `PORT`, `DATABASE_URL`, `REDIS_URL`, `CORS_ORIGINS`, and existing DB toggles.
+- Updated `main.ts` to enable:
+  - global `ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true })`,
+  - CORS from `CORS_ORIGINS` with default `http://localhost:3000`,
+  - Swagger/OpenAPI UI at `/docs` titled `GroceryView API`, version `0.1.0`.
+- Updated `.env.example` to default API port `3001`, include `REDIS_URL` and `CORS_ORIGINS`, and use the GroceryView local PostgreSQL URL.
+- Updated `GET /health` and e2e expectation to return `{ "status": "ok", "service": "api" }` per the checklist.
 
 ## Verification
-- Re-run after PR creation with Node 24.15.0 and `COREPACK_HOME=/tmp/scyiu-corepack`:
-  - `corepack pnpm@10.21.0 install --frozen-lockfile`: passed.
-  - `corepack pnpm@10.21.0 build` from `apps/api`: passed.
-  - `corepack pnpm@10.21.0 test:e2e` from `apps/api`: passed (`/health` returned 200 with expected JSON).
+Commands run from `/tmp/gv-backend-api-worker-a-openapi/apps/api` with Node 24.15.0 on PATH and `COREPACK_HOME=/tmp/scyiu-corepack`:
+- `corepack pnpm@10.21.0 add @nestjs/swagger swagger-ui-express zod @nestjs/terminus`
+- `corepack pnpm@10.21.0 add -D @types/swagger-ui-express`
+- `corepack pnpm@10.21.0 install --frozen-lockfile` — passed.
+- `corepack pnpm@10.21.0 build` — passed.
+- `corepack pnpm@10.21.0 test:e2e` — passed, 1 suite / 1 test.
+- Smoke after build with `PORT=3109 DATABASE_ENABLED=false node dist/main.js`:
+  - `curl http://127.0.0.1:3109/health` returned HTTP 200 and `{ "status": "ok", "service": "api" }`.
+  - `curl http://127.0.0.1:3109/docs` returned HTTP 200.
 
-## Notes / blockers
-- `codex-tasks/backend-api-tasks.md` is still absent; manager should create/restore it before assigning future checklist work.
-- Node 24 was used explicitly via `/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin` because the default shell resolved Node 20.
-- `COREPACK_HOME=/tmp/scyiu-corepack` was used because `/home/scyiu/.cache/node/corepack` could not be created due disk quota/parent-cache issues.
-- App startup on this shared filesystem was slow during live curl checks, but the e2e health test passed.
+## Next task
+- Implement domain controllers and typed placeholder responses for products, stores, prices, watchlists, baskets, and alerts, then introduce `packages/api-contracts` Zod schemas if the checklist remains authoritative.
+
+## Blockers / notes
+- `codex-tasks/backend-api-tasks.md` remains absent on `main`, `backend-api/nestjs-scaffold`, and `backend-api/database-connection`; only `origin/ceo/roadmap-phase1` currently contains that checklist.
+- This branch is based on `origin/backend-api/database-connection`, so its PR to `main` will be stacked on existing backend scaffold/database commits until earlier backend PRs merge.
