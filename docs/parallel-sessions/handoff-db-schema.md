@@ -346,3 +346,107 @@ OK infra/db/seeds/001_stockholm_seed.sql
 ### Next task
 
 - Add a future scheduled migration/job to create monthly `price_observations` partitions at least three months ahead and drain rows from `price_observations_default`.
+
+---
+
+# Handoff — DB Schema Worker A
+
+Date: 2026-05-16
+Role: `WORKER-A` / Pane 2
+Branch: `db-schema/packages-db-typeorm`
+
+## Inputs reviewed
+
+- Read `docs/parallel-sessions/shared.md` from the supervisor worktree.
+- Read `docs/parallel-sessions/db-schema.md` from the supervisor worktree.
+- `codex-tasks/db-schema-tasks.md` is absent from `origin/main`; read it from planning branch `origin/ceo/roadmap-phase1`.
+- Avoided repeating schema/partition work now already merged to `origin/main`. The first still-actionable Worker-A item is checklist task 11: create optional `packages/db` if the API ORM choice is confirmed.
+
+## ORM/API choice confirmation
+
+- The active local API worktree currently contains `apps/api/package.json` with `@nestjs/typeorm`, `typeorm`, and `pg` dependencies plus TypeORM migration scripts.
+- The active local API source contains TypeORM imports under `apps/api/src/database/*`, `apps/api/src/products/*`, `apps/api/src/stores/*`, and `apps/api/src/prices/*`.
+- No backend API PR is open yet, so this package is compatible with the local API lane choice but should be rechecked when that lane opens/pushes its PR.
+
+## Work completed
+
+Created `packages/db` as a minimal shared TypeScript database package for the TypeORM/pg API direction:
+
+- `packages/db/package.json`
+  - name: `@groceryview/db`
+  - dependencies: `typeorm`, `pg`, `zod`
+  - scripts: `build`, `typecheck`
+  - pins package manager `pnpm@9.15.9` and Node engine `>=24 <25` per shared project standard
+- `packages/db/src/enums.ts`
+  - shared enum constants/types mirroring PostgreSQL enum values from the DB schema migration.
+- `packages/db/src/entities.ts`
+  - TypeORM `EntitySchema` definitions for core API tables: city, chain, store, product, product alias, source run/raw record, price observation, promotion observation, latest store price, user, favorite store, and watchlist item.
+  - Numeric money/bigint fields are typed as strings to match `pg`/TypeORM runtime behavior for PostgreSQL `numeric` and `bigint`.
+- `packages/db/src/data-source.ts`
+  - `createGroceryViewDataSourceOptions()` with PostgreSQL defaults, `synchronize: false`, robust boolean env parsing, and Zod env validation.
+- `packages/db/README.md`
+  - documents that SQL migrations remain the source of truth.
+
+## Validation
+
+Ran package-level validation using pnpm 9.15.9 under Node 20.20.2 available in this environment:
+
+```text
+cd packages/db
+COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@9.15.9 install --store-dir /tmp/pnpm-store --ignore-workspace
+COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@9.15.9 run typecheck
+COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@9.15.9 run build
+```
+
+Results:
+
+- `typecheck`: passed (`tsc -p tsconfig.json --noEmit`)
+- `build`: passed (`tsc -p tsconfig.json`)
+
+Notes:
+
+- The package pins Node `>=24 <25` per the shared project standard. The runner PATH currently resolves Node 20.20.2, so pnpm emitted an unsupported-engine warning before the commands passed. Rerun with Node 24 when the monorepo toolchain is consolidated.
+- Real PostgreSQL/Docker SQL validation is not claimed here.
+
+## Next task / blockers
+
+- Backend API lane should depend on `@groceryview/db` after its TypeORM PR is opened/merged and should decide whether to replace local duplicate entity definitions with these shared schemas.
+- Extend `packages/db` with remaining read-model/user tables (`weekly_baskets`, `basket_items`, `budgets`, alerts, receipts, shelf photos, moderation) when the API modules need them.
+- Keep SQL migrations in `infra/db/migrations/` as the schema source of truth; do not enable TypeORM `synchronize` in production or shared dev environments.
+
+---
+
+# Handoff — DB Schema Worker A package adjustment
+
+Date: 2026-05-16
+Role: `WORKER-A` / Pane 2
+Branch: `db-schema/packages-db-typeorm`
+PR: https://github.com/SzeChunYiu/GroceryView/pull/9
+
+## Update
+
+Reviewed current PR state after `origin/main` includes merged PR #8 and while PR #3 remains open for the root monorepo scaffold. `packages/db` is still implementable now as a package-local TypeScript package because it does not require root workspace files to exist on `main`; it should be wired into the root pnpm workspace after PR #3 lands.
+
+Adjusted `packages/db` to match checklist task 11 more conservatively:
+
+- Removed the duplicate TypeORM entity/schema model from `packages/db/src/entities.ts`.
+- Kept SQL migrations under `infra/db/migrations/` as the only schema source of truth.
+- Kept `createGroceryViewDataSourceOptions()` with TypeORM `synchronize: false` hard-coded.
+- Kept only safe shared exports: env validation, TypeORM DataSourceOptions helper, and enum constants/types matching the PostgreSQL enums.
+- Consumers can pass their own minimal TypeORM entities/migrations/subscribers into the helper when integrating the API lane.
+
+## Validation
+
+Ran package-level validation from `packages/db` with pnpm 9.15.9:
+
+```text
+COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@9.15.9 install --store-dir /tmp/pnpm-store --ignore-workspace
+COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@9.15.9 run typecheck
+COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@9.15.9 run build
+```
+
+Results: install, typecheck, and build passed. pnpm emitted the existing expected engine warning because this runner has Node v20.20.2 while the package declares Node `>=24 <25` per repo guidance.
+
+## Next
+
+After PR #3 lands, add `packages/db` to the root workspace lockfile/setup instead of keeping it package-local only.

@@ -1,0 +1,31 @@
+{
+  "name": "@groceryview/db",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Shared PostgreSQL/TypeORM access helpers for GroceryView services.",
+  "license": "UNLICENSED",
+  "type": "commonjs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "engines": {
+    "node": ">=24 <25"
+  },
+  "packageManager": "pnpm@9.15.9",
+  "dependencies": {
+    "pg": "^8.20.0",
+    "typeorm": "^0.3.29",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.7.3"
+  },
+  "peerDependencies": {
+    "typeorm": "^0.3.29"
+  }
+}
