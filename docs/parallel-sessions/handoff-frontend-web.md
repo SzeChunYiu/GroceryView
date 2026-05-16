@@ -50,3 +50,45 @@ All pnpm commands were run with Node `v24.15.0` and pnpm `10.11.0` using shared 
 ## Blockers / cautions
 - This branch intentionally stops after checklist item 8 per the compact-safe stop rule. Item 9 is left for the next frontend worker.
 - The shared worktree remains busy with other lane work; continue using isolated clones/worktrees and avoid editing other lanes' paths.
+
+---
+
+## WORKER-C update — 2026-05-17 01:02 CEST
+
+### Task implemented
+- Pane 4 / WORKER-C implemented the third active unchecked frontend task after Pane 2/WORKER-A and Pane 3/WORKER-B assignments: checklist item 10, add web UI/data packages.
+- Based branch: `origin/frontend-web/web-app-scaffold-worker-a` (PR #20), because item 10 requires the `apps/web` scaffold from item 8.
+- Working branch: `frontend-web/ui-data-packages-worker-c`.
+
+### Changes made
+- Updated `apps/web/package.json` dependencies with:
+  - `@tanstack/react-query`
+  - `lightweight-charts`
+  - `maplibre-gl`
+  - `lucide-react`
+  - `zod`
+- Updated `apps/web/package.json` dev dependencies with:
+  - `@types/maplibre-gl`
+- Updated `pnpm-lock.yaml` from pnpm 10.11.0.
+
+### Commands run
+```bash
+corepack pnpm@10.11.0 --filter web add @tanstack/react-query lightweight-charts maplibre-gl lucide-react zod
+corepack pnpm@10.11.0 --filter web add -D @types/maplibre-gl
+corepack pnpm@10.11.0 install
+corepack pnpm@10.11.0 --filter web lint
+corepack pnpm@10.11.0 --filter web build
+```
+
+### Verification
+- Node used: `v24.15.0`.
+- `pnpm install`: passed; lockfile was up to date after the package adds.
+- `pnpm --filter web lint`: passed.
+- `pnpm --filter web build`: passed; Next.js 16.2.6 compiled, typechecked, and generated static pages successfully.
+
+### Next unfinished checklist item
+- Item 11: initialize shadcn/ui in `apps/web` and add starter components (`button`, `card`, `badge`, `input`, `table`, `tabs`).
+
+### Blockers / notes
+- This branch intentionally depends on PR #20 (`frontend-web/web-app-scaffold-worker-a`) and PR #3 (`frontend-web/monorepo-scaffold`) until those branches are merged.
+- `@types/maplibre-gl@1.14.0` is deprecated upstream, but it was added because checklist item 10 explicitly requires `pnpm --filter web add -D @types/maplibre-gl`.
