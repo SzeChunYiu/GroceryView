@@ -5,6 +5,7 @@
 - Re-read the now-merged current plan in this clean worktree: `ROADMAP.md`, `docs/data-sources.md`, and `codex-tasks/data-worker-tasks.md`.
 - Implemented the fourth unchecked data-worker task only: Python project metadata at `workers/data-pipeline/pyproject.toml`.
 - Used a clean worktree/branch `data-worker/project-metadata-worker-d` from `origin/main` to avoid staging unrelated dirty files from the shared pane worktree.
+- Pushed branch and opened PR #17: https://github.com/SzeChunYiu/GroceryView/pull/17
 
 ## Verification
 - `python - <<'PY' ... PY` parsed `workers/data-pipeline/pyproject.toml` and checked the required project name, Python requirement, runtime dependencies, and dev dependencies.
