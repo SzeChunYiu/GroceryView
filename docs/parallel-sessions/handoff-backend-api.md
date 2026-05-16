@@ -106,3 +106,58 @@ git status --short --branch
 
 - Several older backend API PRs already exist for scaffold/config/contracts work. This branch intentionally does not duplicate those product-code changes.
 - `origin/main` does not currently contain `docs/parallel-sessions/shared.md` or `docs/parallel-sessions/backend-api.md`; those lane docs were read from the shared workspace checkout as requested by the objective.
+
+---
+
+## WORKER-C — Domain controller demo-response hardening
+
+Updated: 2026-05-17 01:42 Europe/Stockholm
+Pane: PANE 4 / WORKER-C
+Branch: `backend-api/domain-controllers-worker-c-current`
+Base: started from `github/backend-api/api-scaffold` (`69167de`); PR #27 has since merged to `main` as `c109af5`, so PR #29 now diffs only the WORKER-C files below.
+
+### Task taken
+
+- Read required lane docs:
+  - `docs/parallel-sessions/shared.md`
+  - `docs/parallel-sessions/backend-api.md`
+- Took the third non-procedural backend checklist task assigned to WORKER-C: domain modules/controllers with typed seed/demo placeholder responses.
+- Avoided duplicating the existing scaffold PR by branching from `backend-api/api-scaffold` and only tightening the domain placeholder response contract.
+
+### What changed
+
+- Updated `apps/api/src/baskets/baskets.controller.ts` so every weekly-basket item placeholder response, including `POST /me/weekly-basket/items`, carries `demo: true` like the other seed/demo domain responses.
+- Updated `apps/api/test/app.e2e-spec.ts` to assert the basket-item POST route returns the explicit demo marker.
+
+### Commands run
+
+```bash
+cd /projects/hep/fs10/shared/nnbar/billy/GroceryView
+git status --short --branch
+git fetch --all --prune
+# Isolated clone used because the shared checkout had unrelated lane files and worktree metadata was pruned by other concurrent panes.
+git clone /projects/hep/fs10/shared/nnbar/billy/GroceryView /tmp/groceryview-worker-c-clone
+cd /tmp/groceryview-worker-c-clone
+git fetch https://github.com/SzeChunYiu/GroceryView.git '+refs/heads/*:refs/remotes/github/*' --prune
+git checkout -b backend-api/domain-controllers-worker-c-current github/backend-api/api-scaffold
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH node --version
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH corepack pnpm@10.21.0 --version
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH PNPM_CONFIG_DANGEROUSLY_ALLOW_ALL_BUILDS=true corepack pnpm@10.21.0 install --frozen-lockfile
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH corepack pnpm@10.21.0 --filter api build
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH corepack pnpm@10.21.0 --filter @groceryview/api-contracts build
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH corepack pnpm@10.21.0 --filter api test:e2e
+```
+
+### Verification
+
+- Node: `v24.15.0`
+- pnpm: `10.21.0`
+- `corepack pnpm@10.21.0 install --frozen-lockfile`: passed. Warning: pnpm reported ignored build scripts for `@nestjs/core`, `@scarf/scarf`, `sharp`, and `unrs-resolver`; install exited 0.
+- `corepack pnpm@10.21.0 --filter api build`: passed.
+- `corepack pnpm@10.21.0 --filter @groceryview/api-contracts build`: passed.
+- `corepack pnpm@10.21.0 --filter api test:e2e`: passed (`1 suite`, `3 tests`).
+
+### Next task / blockers
+
+- No current blocker for this PR: PR #27 has merged and GitHub reports PR #29 as clean with only `apps/api/src/baskets/baskets.controller.ts`, `apps/api/test/app.e2e-spec.ts`, and this handoff in the file list.
+- Next backend lane task should continue from the remaining unchecked checklist items after this domain placeholder hardening is reviewed.

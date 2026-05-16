@@ -11,6 +11,7 @@ export class WeeklyBasketItemResponse {
   bestPrice!: number;
   bestStoreSlug!: string;
   currency!: 'SEK';
+  demo!: true;
 }
 
 export class WeeklyBasketResponse {
@@ -49,6 +50,7 @@ const DEMO_BASKET: WeeklyBasketResponse = {
       bestPrice: 49.9,
       bestStoreSlug: 'willys-odenplan',
       currency: 'SEK',
+      demo: true,
     },
     {
       id: 'demo-basket-item-oatly',
@@ -59,6 +61,7 @@ const DEMO_BASKET: WeeklyBasketResponse = {
       bestPrice: 17.5,
       bestStoreSlug: 'ica-kvantum-liljeholmen',
       currency: 'SEK',
+      demo: true,
     },
   ],
   demo: true,
@@ -85,6 +88,7 @@ export class BasketsController {
       bestPrice: 49.9,
       bestStoreSlug: 'willys-odenplan',
       currency: 'SEK',
+      demo: true,
     };
   }
 }
