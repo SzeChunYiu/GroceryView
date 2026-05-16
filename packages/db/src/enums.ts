@@ -12,3 +12,9 @@ export type AlertStatus = (typeof alertStatuses)[number];
 
 export const observationStatuses = ['pending', 'accepted', 'rejected', 'superseded'] as const;
 export type ObservationStatus = (typeof observationStatuses)[number];
+
+export const moderationStatuses = ['open', 'in_review', 'approved', 'rejected', 'merged'] as const;
+export type ModerationStatus = (typeof moderationStatuses)[number];
+
+export const receiptStatuses = ['uploaded', 'processing', 'parsed', 'failed', 'reviewed'] as const;
+export type ReceiptStatus = (typeof receiptStatuses)[number];

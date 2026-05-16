@@ -514,3 +514,43 @@ Validation results:
 
 - Wire `SELECT * FROM ensure_price_observation_partitions(6, 1, CURRENT_DATE);` into the future Dagster/API ops maintenance cadence before production ingestion.
 - If rows appear in `price_observations_default`, drain/replay them during a controlled maintenance window before adding overlapping month partitions.
+
+---
+
+# Handoff — DB Schema Worker C enum coverage
+
+Date: 2026-05-17
+Role: `WORKER-C` / Pane 4
+Branch: `db-schema/worker-c-third-task`
+
+## Inputs reviewed
+
+- Read required lane docs from the supervisor worktree because `origin/main` currently does not track `docs/parallel-sessions/shared.md` or `docs/parallel-sessions/db-schema.md`:
+  - `docs/parallel-sessions/shared.md`
+  - `docs/parallel-sessions/db-schema.md`
+- Re-read `codex-tasks/db-schema-tasks.md` from `origin/main`.
+- Checked existing DB handoff/PR state and avoided repeating Pane 2 (`packages/db` base TypeORM helper), Pane 3 (`SQL validation`), and the already-merged Pane 4 partition work.
+
+## Task implemented
+
+Implemented the next small non-duplicate DB package gap under the third-worker assignment: complete the shared enum coverage in `@groceryview/db` so it mirrors every PostgreSQL enum currently defined by `infra/db/migrations/002_init.sql`.
+
+## Changes made
+
+- Updated `packages/db/src/enums.ts` to export:
+  - `moderationStatuses` / `ModerationStatus` for `moderation_status`.
+  - `receiptStatuses` / `ReceiptStatus` for `receipt_status`.
+- Updated `packages/db/README.md` to document moderation and receipt workflow status enum coverage.
+
+## Validation
+
+- Ran package validation from `packages/db` with pnpm 9.15.9:
+  - `COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@9.15.9 install --store-dir /tmp/pnpm-store --ignore-workspace`
+  - `COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@9.15.9 run typecheck`
+  - `COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@9.15.9 run build`
+- Results: install, typecheck, and build passed. The runner still uses Node v20.20.2 while the package declares Node `>=24 <25`, so pnpm emitted the known unsupported-engine warning.
+
+## Next
+
+- Keep SQL migrations as the source of truth; if new PostgreSQL enums are added later, update `packages/db/src/enums.ts` in the same PR as the migration or immediately after.
+
