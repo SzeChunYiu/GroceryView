@@ -624,3 +624,46 @@ db-schema/worker-b-second-task
 ## Next
 
 Continue with the next genuinely incomplete DB schema task only if a manager assigns one; do not duplicate the merged schema, package, validation, or partition-maintenance work already recorded in this handoff.
+
+---
+
+# Handoff — DB Schema Worker A workspace lockfile integration
+
+Date: 2026-05-17
+Role: `WORKER-A` / Pane 2
+Branch: `db-schema/root-workspace-db-package-worker-a`
+
+## Inputs reviewed
+
+- Read required lane context from the supervisor worktree because `origin/main` does not currently track `docs/parallel-sessions/shared.md` or `docs/parallel-sessions/db-schema.md`:
+  - `docs/parallel-sessions/shared.md`
+  - `docs/parallel-sessions/db-schema.md`
+- Re-read `codex-tasks/db-schema-tasks.md` from this branch.
+- Checked current DB artifacts and prior handoff entries to avoid repeating merged schema, compose, seed, package, validation, partition, enum, repo-state, and branch-record work.
+
+## Task implemented
+
+Implemented the next non-duplicate DB package follow-up left by the earlier `packages/db` handoff now that the root monorepo scaffold has landed: wire `@groceryview/db` into the root pnpm workspace lockfile instead of keeping it package-local only.
+
+## Changes made
+
+- Updated root `pnpm-lock.yaml` so the workspace includes the `packages/db` importer and resolves its `pg`, `typeorm`, `zod`, TypeScript, and Node type dependencies under the root lockfile.
+- Removed `packages/db/pnpm-lock.yaml` so there is one workspace lockfile source of truth.
+- Removed the stale `packageManager: pnpm@9.15.9` field from `packages/db/package.json`; the root `package.json` now owns the pnpm version for the workspace.
+
+## Validation
+
+Ran workspace package validation with pnpm 10.11.0 via Corepack:
+
+```text
+COREPACK_ENABLE_DOWNLOAD_PROMPT=0 COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@10.11.0 install --ignore-scripts
+COREPACK_ENABLE_DOWNLOAD_PROMPT=0 COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@10.11.0 --filter @groceryview/db typecheck
+COREPACK_ENABLE_DOWNLOAD_PROMPT=0 COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@10.11.0 --filter @groceryview/db build
+```
+
+Results: install, typecheck, and build passed. The runner still uses Node v20.20.2 while the repo/package declare Node 24, so pnpm emitted the known unsupported-engine warning before successful completion.
+
+## Next
+
+- Backend/API lanes can consume `@groceryview/db` through the root pnpm workspace once this PR lands.
+- Keep SQL migrations in `infra/db/migrations/` as the schema source of truth; do not reintroduce package-local lockfiles under workspace packages.
