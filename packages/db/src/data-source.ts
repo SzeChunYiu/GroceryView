@@ -1,17 +1,18 @@
 import type { DataSourceOptions } from 'typeorm';
 import { z } from 'zod';
-import { groceryViewEntities } from './entities';
 
 const envBoolean = z.preprocess((value) => {
   if (typeof value !== 'string') {
     return value;
   }
 
-  if (['1', 'true', 'yes', 'on'].includes(value.toLowerCase())) {
+  const normalized = value.toLowerCase().trim();
+
+  if (['1', 'true', 'yes', 'on'].includes(normalized)) {
     return true;
   }
 
-  if (['0', 'false', 'no', 'off', ''].includes(value.toLowerCase())) {
+  if (['0', 'false', 'no', 'off', ''].includes(normalized)) {
     return false;
   }
 
@@ -31,15 +32,37 @@ export const groceryViewDatabaseEnvSchema = z.object({
 
 export type GroceryViewDatabaseEnv = z.infer<typeof groceryViewDatabaseEnvSchema>;
 
+export interface GroceryViewDataSourceOptionsInput {
+  /** Environment source to parse; defaults to process.env. */
+  env?: NodeJS.ProcessEnv;
+  /** TypeORM entities supplied by the consuming app/package. */
+  entities?: DataSourceOptions['entities'];
+  /** TypeORM migrations supplied by the consuming app/package, if needed. */
+  migrations?: DataSourceOptions['migrations'];
+  /** TypeORM subscribers supplied by the consuming app/package, if needed. */
+  subscribers?: DataSourceOptions['subscribers'];
+}
+
 export function parseGroceryViewDatabaseEnv(env: NodeJS.ProcessEnv = process.env): GroceryViewDatabaseEnv {
   return groceryViewDatabaseEnvSchema.parse(env);
 }
 
-export function createGroceryViewDataSourceOptions(env: NodeJS.ProcessEnv = process.env): DataSourceOptions {
-  const parsed = parseGroceryViewDatabaseEnv(env);
+/**
+ * Build safe PostgreSQL TypeORM options for GroceryView services.
+ *
+ * SQL files under infra/db/migrations remain the schema source of truth, so
+ * synchronize is intentionally hard-coded to false and this package does not
+ * define or generate migrations.
+ */
+export function createGroceryViewDataSourceOptions(
+  input: GroceryViewDataSourceOptionsInput = {},
+): DataSourceOptions {
+  const parsed = parseGroceryViewDatabaseEnv(input.env ?? process.env);
   const common = {
     type: 'postgres' as const,
-    entities: [...groceryViewEntities],
+    entities: input.entities ?? [],
+    migrations: input.migrations ?? [],
+    subscribers: input.subscribers ?? [],
     synchronize: false,
     logging: parsed.DB_LOGGING,
     ssl: parsed.DB_SSL ? { rejectUnauthorized: false } : false,

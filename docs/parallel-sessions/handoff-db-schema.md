@@ -413,3 +413,40 @@ Notes:
 - Backend API lane should depend on `@groceryview/db` after its TypeORM PR is opened/merged and should decide whether to replace local duplicate entity definitions with these shared schemas.
 - Extend `packages/db` with remaining read-model/user tables (`weekly_baskets`, `basket_items`, `budgets`, alerts, receipts, shelf photos, moderation) when the API modules need them.
 - Keep SQL migrations in `infra/db/migrations/` as the schema source of truth; do not enable TypeORM `synchronize` in production or shared dev environments.
+
+---
+
+# Handoff — DB Schema Worker A package adjustment
+
+Date: 2026-05-16
+Role: `WORKER-A` / Pane 2
+Branch: `db-schema/packages-db-typeorm`
+PR: https://github.com/SzeChunYiu/GroceryView/pull/9
+
+## Update
+
+Reviewed current PR state after `origin/main` includes merged PR #8 and while PR #3 remains open for the root monorepo scaffold. `packages/db` is still implementable now as a package-local TypeScript package because it does not require root workspace files to exist on `main`; it should be wired into the root pnpm workspace after PR #3 lands.
+
+Adjusted `packages/db` to match checklist task 11 more conservatively:
+
+- Removed the duplicate TypeORM entity/schema model from `packages/db/src/entities.ts`.
+- Kept SQL migrations under `infra/db/migrations/` as the only schema source of truth.
+- Kept `createGroceryViewDataSourceOptions()` with TypeORM `synchronize: false` hard-coded.
+- Kept only safe shared exports: env validation, TypeORM DataSourceOptions helper, and enum constants/types matching the PostgreSQL enums.
+- Consumers can pass their own minimal TypeORM entities/migrations/subscribers into the helper when integrating the API lane.
+
+## Validation
+
+Ran package-level validation from `packages/db` with pnpm 9.15.9:
+
+```text
+COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@9.15.9 install --store-dir /tmp/pnpm-store --ignore-workspace
+COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@9.15.9 run typecheck
+COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@9.15.9 run build
+```
+
+Results: install, typecheck, and build passed. pnpm emitted the existing expected engine warning because this runner has Node v20.20.2 while the package declares Node `>=24 <25` per repo guidance.
+
+## Next
+
+After PR #3 lands, add `packages/db` to the root workspace lockfile/setup instead of keeping it package-local only.
