@@ -119,7 +119,7 @@ CREATE TABLE source_records_raw (
 );
 
 CREATE TABLE price_observations (
-  id BIGSERIAL PRIMARY KEY,
+  id BIGSERIAL,
   product_id BIGINT NOT NULL REFERENCES products(id),
   store_id BIGINT REFERENCES stores(id),
   city_id BIGINT NOT NULL REFERENCES cities(id),
@@ -143,8 +143,22 @@ CREATE TABLE price_observations (
   confidence_band confidence_band NOT NULL,
   status observation_status NOT NULL DEFAULT 'accepted',
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (id, observed_at),
   CHECK (valid_to IS NULL OR valid_from IS NULL OR valid_to >= valid_from)
-);
+) PARTITION BY RANGE (observed_at);
+
+-- Seed partitions cover the initial MVP development window. The default partition
+-- prevents ingestion failures for backfilled or future observations until the
+-- monthly partition maintenance job is added.
+CREATE TABLE price_observations_2026_05 PARTITION OF price_observations
+  FOR VALUES FROM ('2026-05-01 00:00:00+00') TO ('2026-06-01 00:00:00+00');
+CREATE TABLE price_observations_2026_06 PARTITION OF price_observations
+  FOR VALUES FROM ('2026-06-01 00:00:00+00') TO ('2026-07-01 00:00:00+00');
+CREATE TABLE price_observations_2026_07 PARTITION OF price_observations
+  FOR VALUES FROM ('2026-07-01 00:00:00+00') TO ('2026-08-01 00:00:00+00');
+CREATE TABLE price_observations_2026_08 PARTITION OF price_observations
+  FOR VALUES FROM ('2026-08-01 00:00:00+00') TO ('2026-09-01 00:00:00+00');
+CREATE TABLE price_observations_default PARTITION OF price_observations DEFAULT;
 
 CREATE TABLE promotion_observations (
   id BIGSERIAL PRIMARY KEY,
@@ -179,7 +193,8 @@ CREATE TABLE latest_store_prices (
   store_id BIGINT NOT NULL REFERENCES stores(id),
   city_id BIGINT NOT NULL REFERENCES cities(id),
   chain_id BIGINT REFERENCES chains(id),
-  price_observation_id BIGINT REFERENCES price_observations(id) ON DELETE SET NULL,
+  price_observation_id BIGINT,
+  price_observation_observed_at TIMESTAMPTZ,
   price_type price_type NOT NULL,
   price_sek NUMERIC(12,2) NOT NULL CHECK (price_sek >= 0),
   regular_price_sek NUMERIC(12,2) CHECK (regular_price_sek IS NULL OR regular_price_sek >= 0),
@@ -195,7 +210,13 @@ CREATE TABLE latest_store_prices (
   confidence_score NUMERIC(5,4) NOT NULL CHECK (confidence_score >= 0 AND confidence_score <= 1),
   confidence_band confidence_band NOT NULL,
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-  UNIQUE (product_id, store_id)
+  UNIQUE (product_id, store_id),
+  FOREIGN KEY (price_observation_id, price_observation_observed_at)
+    REFERENCES price_observations(id, observed_at) ON DELETE SET NULL,
+  CHECK (
+    (price_observation_id IS NULL AND price_observation_observed_at IS NULL)
+    OR (price_observation_id IS NOT NULL AND price_observation_observed_at IS NOT NULL)
+  )
 );
 
 CREATE TABLE price_series_daily (

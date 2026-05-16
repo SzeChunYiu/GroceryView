@@ -85,11 +85,11 @@ Columns: `id`, `source_run_id`, `source_type`, `source_url`, `storage_uri`, `rec
 Stores raw or object-storage-backed source records. Canonical observations reference these rows via `raw_record_id`.
 
 ### `price_observations`
-Primary key: `id`. Foreign keys: `product_id -> products.id`, `store_id -> stores.id`, `city_id -> cities.id`, `chain_id -> chains.id`, `source_run_id -> source_runs.id`, `raw_record_id -> source_records_raw.id`.
+Primary key: `(id, observed_at)` so PostgreSQL can enforce uniqueness on the `observed_at` range-partitioned table. Foreign keys: `product_id -> products.id`, `store_id -> stores.id`, `city_id -> cities.id`, `chain_id -> chains.id`, `source_run_id -> source_runs.id`, `raw_record_id -> source_records_raw.id`.
 
 Columns: `id`, `product_id`, `store_id`, `city_id`, `chain_id`, `price_type`, `price_sek`, `regular_price_sek`, `member_price_sek`, `unit_price_sek`, `unit_price_unit`, `currency_code`, `observed_at`, `valid_from`, `valid_to`, `source_type`, `source_url`, `source_run_id`, `raw_record_id`, `parser_version`, `confidence_score`, `confidence_band`, `status`, `created_at`.
 
-Immutable event table for every observed price. SEK prices use `numeric(12,2)`. Unit prices are preserved separately in `unit_price_sek` and `unit_price_unit` so charts and comparisons can show package price and normalized unit price.
+Immutable event table for every observed price. SEK prices use `numeric(12,2)`. Unit prices are preserved separately in `unit_price_sek` and `unit_price_unit` so charts and comparisons can show package price and normalized unit price. The table is range-partitioned monthly by `observed_at` with seed partitions for May-August 2026 plus a default partition for backfills/future rows until automated partition maintenance exists.
 
 ### `promotion_observations`
 Primary key: `id`. Foreign keys mirror `price_observations`.
@@ -99,9 +99,9 @@ Columns: `id`, `product_id`, `store_id`, `city_id`, `chain_id`, `promo_price_sek
 Immutable promotion table for flyers, campaign pages, member offers, and shelf-photo promo reports.
 
 ### `latest_store_prices`
-Primary key: `id`. Foreign keys: product/store/city/chain plus optional source lineage and `price_observation_id`. Unique: `(product_id, store_id)`.
+Primary key: `id`. Foreign keys: product/store/city/chain plus optional source lineage and composite `price_observation_id`/`price_observation_observed_at -> price_observations(id, observed_at)`. Unique: `(product_id, store_id)`.
 
-Columns: `id`, `product_id`, `store_id`, `city_id`, `chain_id`, `price_observation_id`, `price_type`, `price_sek`, `regular_price_sek`, `member_price_sek`, `unit_price_sek`, `unit_price_unit`, `observed_at`, `source_type`, `source_url`, `source_run_id`, `raw_record_id`, `parser_version`, `confidence_score`, `confidence_band`, `updated_at`.
+Columns: `id`, `product_id`, `store_id`, `city_id`, `chain_id`, `price_observation_id`, `price_observation_observed_at`, `price_type`, `price_sek`, `regular_price_sek`, `member_price_sek`, `unit_price_sek`, `unit_price_unit`, `observed_at`, `source_type`, `source_url`, `source_run_id`, `raw_record_id`, `parser_version`, `confidence_score`, `confidence_band`, `updated_at`.
 
 Current-price read model updated from immutable observations. It is a table rather than a source of truth.
 
@@ -217,15 +217,17 @@ Important indexes include:
 - `watchlist_items_user_product_idx`: watchlist lookup by user and product.
 - `basket_items_basket_product_idx`: basket lookup by basket and product.
 
-## Partitioning plan
+## Partitioning
 
-Partitioning is deferred from the initial migration to keep the first PR compact and easy for all lanes to apply locally. The next migration pattern should be:
+`price_observations` is implemented as a native PostgreSQL range-partitioned table using `PARTITION BY RANGE (observed_at)`. The initial migration creates monthly partitions for the first MVP development window:
 
-1. Create a new partitioned replacement table for `price_observations` using `PARTITION BY RANGE (observed_at)`.
-2. Create monthly partitions, for example `price_observations_2026_05 FOR VALUES FROM ('2026-05-01') TO ('2026-06-01')`.
-3. Recreate the required per-partition indexes: `(product_id, city_id, observed_at DESC)`, `(store_id, observed_at DESC)`, source lineage indexes, and any future BRIN index on `observed_at`.
-4. Migrate data from the initial unpartitioned table during a maintenance window or before production launch.
-5. Add a scheduled migration/job to create future monthly partitions at least three months ahead.
+- `price_observations_2026_05`: `2026-05-01` inclusive to `2026-06-01` exclusive.
+- `price_observations_2026_06`: `2026-06-01` inclusive to `2026-07-01` exclusive.
+- `price_observations_2026_07`: `2026-07-01` inclusive to `2026-08-01` exclusive.
+- `price_observations_2026_08`: `2026-08-01` inclusive to `2026-09-01` exclusive.
+- `price_observations_default`: fallback for backfills and future rows before scheduled maintenance creates the exact monthly child table.
+
+The parent indexes in `003_indexes.sql` create partitioned indexes for product/city history, store history, source-run lineage, and raw-record lineage. Before production ingestion, add a scheduled migration/job that creates future monthly partitions at least three months ahead and drains any rows from `price_observations_default` into their proper monthly partitions.
 
 Apply the same pattern later to `promotion_observations` if campaign volume requires it.
 

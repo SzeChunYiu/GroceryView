@@ -220,3 +220,129 @@ smoke: chain/product seed counts
 
 - SQL migrations and seeds are validated against a real PostgreSQL 18.4/PostGIS database using the compose image via Apptainer.
 - The literal Docker Compose task remains unavailable on this host until Docker is installed, but the database-level validation itself passed.
+
+---
+
+## Worker-C update — price observation partitioning
+
+Date: 2026-05-16
+Branch: `db-schema/pane4-partitions`
+Role: Pane 4 / WORKER-C
+
+### Task implemented
+
+Implemented the partitioning option from `codex-tasks/db-schema-tasks.md` task 8 for the immutable price event table, separate from Pane 2 task 11 (`packages/db`) and Pane 3 task 12 (real Docker/Postgres validation).
+
+### Changes made
+
+- Updated `infra/db/migrations/002_init.sql` so `price_observations` is native PostgreSQL range-partitioned by `observed_at`.
+- Changed `price_observations` primary key to `(id, observed_at)` because PostgreSQL requires partitioned-table unique/primary keys to include the partition key.
+- Added initial monthly partitions:
+  - `price_observations_2026_05`
+  - `price_observations_2026_06`
+  - `price_observations_2026_07`
+  - `price_observations_2026_08`
+  - `price_observations_default` for backfills/future rows until automated partition maintenance exists.
+- Updated `latest_store_prices` to use a composite optional FK (`price_observation_id`, `price_observation_observed_at`) back to `price_observations(id, observed_at)`.
+- Updated `infra/db/SCHEMA.md` to document the implemented partition layout, composite price-observation key, and ongoing partition maintenance requirement.
+
+### Validation
+
+The literal Docker Compose command still cannot run on this host because Docker is not installed, but the same PostGIS image from `infra/docker-compose.yml` was executed with Apptainer and validated against a real PostgreSQL 18/PostGIS database after the partitioning change. Fallback parser validation with `libpg-query` 17.7.3 also passed.
+
+Real PostgreSQL/PostGIS validation output:
+
+```text
+$ apptainer exec docker://postgis/postgis:18-3.6 PostgreSQL 18/PostGIS validation
+psql -v ON_ERROR_STOP=1 -f infra/db/migrations/001_extensions.sql
+CREATE EXTENSION
+CREATE EXTENSION
+CREATE EXTENSION
+psql -v ON_ERROR_STOP=1 -f infra/db/migrations/002_init.sql
+CREATE TYPE
+CREATE TYPE
+CREATE TYPE
+CREATE TYPE
+CREATE TYPE
+CREATE TYPE
+CREATE TYPE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+CREATE TABLE
+psql -v ON_ERROR_STOP=1 -f infra/db/migrations/003_indexes.sql
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+CREATE INDEX
+psql -v ON_ERROR_STOP=1 -f infra/db/seeds/001_stockholm_seed.sql
+INSERT 0 1
+INSERT 0 6
+INSERT 0 20
+smoke: partitioned price_observations relkind
+p
+smoke: price observation partitions
+5
+smoke: table count
+32
+smoke: chain/product seed counts
+6|20
+```
+
+Parser validation output:
+
+```text
+OK infra/db/migrations/001_extensions.sql
+OK infra/db/migrations/002_init.sql
+OK infra/db/migrations/003_indexes.sql
+OK infra/db/seeds/001_stockholm_seed.sql
+```
+
+### Next task
+
+- Add a future scheduled migration/job to create monthly `price_observations` partitions at least three months ahead and drain rows from `price_observations_default`.
