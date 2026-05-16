@@ -26,7 +26,9 @@ export const EnvSchema = z
 
 export type EnvConfig = z.infer<typeof EnvSchema>;
 
-export function validateEnvironment(config: Record<string, unknown>): EnvConfig {
+export function validateEnvironment(
+  config: Record<string, unknown>,
+): EnvConfig {
   const parsed = EnvSchema.safeParse(config);
 
   if (!parsed.success) {
