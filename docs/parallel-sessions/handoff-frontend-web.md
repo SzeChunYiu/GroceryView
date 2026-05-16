@@ -92,3 +92,42 @@ corepack pnpm@10.11.0 --filter web build
 ### Blockers / notes
 - This branch intentionally depends on PR #20 (`frontend-web/web-app-scaffold-worker-a`) and PR #3 (`frontend-web/monorepo-scaffold`) until those branches are merged.
 - `@types/maplibre-gl@1.14.0` is deprecated upstream, but it was added because checklist item 10 explicitly requires `pnpm --filter web add -D @types/maplibre-gl`.
+
+---
+
+## WORKER-D update — 2026-05-17 01:40 CEST
+
+### Task implemented
+- Pane 5 / WORKER-D implemented the fourth active unchecked frontend task assigned after Panes 2-4: checklist item 14, create shared web layout components.
+- Based branch: `origin/main` after merged frontend scaffold/package work.
+- Working branch: `frontend-web/layout-components-worker-d`.
+
+### Changes made
+- Added `apps/web/src/components/site-header.tsx` with GroceryView branding, primary navigation, and terminal CTA.
+- Added `apps/web/src/components/site-footer.tsx` with lane-aware footer copy and navigation.
+- Added `apps/web/src/components/confidence-badge.tsx` for high/medium/low price confidence states.
+- Added `apps/web/src/components/deal-score-card.tsx` for reusable deal scoring, SEK price formatting, savings summary, and confidence display.
+
+### Commands run
+```bash
+git status --short --branch
+git fetch --all --prune
+git worktree add -b frontend-web/layout-components-worker-d /projects/hep/fs10/shared/nnbar/billy/GroceryView-frontend-web-worker-d-layout origin/main
+pnpm install --frozen-lockfile
+pnpm --filter web lint
+pnpm --filter web build
+```
+
+### Verification
+- Node used: `v24.15.0`.
+- pnpm used: `10.11.0` with shared cache/config directories.
+- `pnpm install --frozen-lockfile`: passed with lockfile up to date.
+- `pnpm --filter web lint`: passed after converting internal navigation anchors to `next/link`.
+- `pnpm --filter web build`: passed; Next.js 16.2.6 compiled and typechecked successfully.
+
+### Next unfinished checklist item
+- Item 15: add `apps/web/src/components/price-chart-placeholder.tsx` with 7D/30D/90D/1Y controls and a note that TradingView Lightweight Charts integration is next.
+
+### Blockers / notes
+- This branch intentionally avoids checklist items 11-13 because those were reserved for Panes 2-4 in the same parallel wave.
+- The shared root worktree remains dirty with unrelated lane files, so this work was done in an isolated worktree.
