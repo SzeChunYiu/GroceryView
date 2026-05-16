@@ -100,3 +100,7 @@ No completed data-worker work accepted in this pass. The current data-worker sca
 - Worker verification evidence remains green: `ruff check src tests`, `mypy src --cache-dir=/tmp/gv-mypy-cache`, and `pytest -q` passed under Python 3.13 with `PYTHONPATH=` cleared.
 - The previous manager note correctly described the pre-commit/pre-PR state at 22:50 CEST, but it is superseded for this branch by the committed worker scaffold.
 - Remaining dirty/untracked files in the shared worktree are unrelated lane artifacts and were intentionally not included in the data-worker commit.
+
+## 23:00 CEST PR opened
+
+- Opened PR #4: https://github.com/SzeChunYiu/GroceryView/pull/4
