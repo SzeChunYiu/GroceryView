@@ -14,7 +14,7 @@
 | DB schema | TODO | db-schema | P0 | `infra/db/migrations/*.sql` and `infra/db/SCHEMA.md` define PostgreSQL 18 + PostGIS/pg_trgm schema for chains, stores, products, aliases, observations, latest prices, users, watchlists, baskets, budgets, alerts, source runs, and raw records. |
 | Mobile scaffold | TODO | mobile | P1 | `apps/mobile` runs Expo SDK 55 + React Native 0.83 + Expo Router with TypeScript, TanStack Query, persisted cache, camera/notifications placeholders, and screens for Today, Search, Product, Basket, Budget. |
 | Data-worker scaffold | TODO | data-worker | P0 | `workers/data-pipeline` runs Python + Dagster with assets for seed stores/products, retailer fetch stubs, normalization, price observations, latest-price rollup, and quality checks; local Dagster webserver starts. |
-| Local infrastructure | TODO | db-schema | P0 | `infra/docker-compose.yml` starts PostgreSQL with PostGIS, Redis, and S3-compatible object storage; env examples document ports and secrets. |
+| Local infrastructure | TODO | db-schema | P0 | `infra/docker-compose.yml` starts `postgis/postgis:18-3.6` on port 5432, `redis:7-alpine` on port 6379, optional `dpage/pgadmin4` on port 5050, and S3-compatible object storage; root `.env.example` documents `DATABASE_URL` and `REDIS_URL`; worker docs point to this compose file for real local DB testing. |
 | Shared contracts | TODO | backend-api | P0 | `packages/api-contracts` exports Zod DTOs and generated/OpenAPI-compatible types for products, stores, prices, watchlists, baskets, and alerts. |
 | CI baseline | TODO | frontend-web | P1 | GitHub Actions or equivalent runs `pnpm install`, `pnpm build`, `pnpm lint`, API build, SQL validation, and worker smoke tests. |
 

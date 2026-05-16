@@ -13,8 +13,10 @@ Writable paths: `infra/db/`, `infra/docker-compose.yml`, `packages/db/`, db hand
    - Run: `mkdir -p infra/db/migrations infra/db/seeds packages/db/src`
 4. [ ] Create local database compose file.
    - Path: `infra/docker-compose.yml`
-   - Services: `postgres` using image `postgis/postgis:18-3.6`, `redis` using image `redis:8-alpine`, `minio` using image `minio/minio:latest`.
+   - Services: `postgres` using image `postgis/postgis:18-3.6` mapped to `5432:5432`, `redis` using image `redis:7-alpine` mapped to `6379:6379`, optional `pgadmin` using image `dpage/pgadmin4:latest` mapped to `5050:80`, and `minio` using image `minio/minio:latest` mapped to `9000:9000` and `9001:9001`.
    - Postgres env: `POSTGRES_DB=groceryview`, `POSTGRES_USER=groceryview`, `POSTGRES_PASSWORD=groceryview`.
+   - Create root `.env.example` with `DATABASE_URL=postgresql://groceryview:groceryview@localhost:5432/groceryview`, `REDIS_URL=redis://localhost:6379`, `PGADMIN_DEFAULT_EMAIL=admin@groceryview.local`, `PGADMIN_DEFAULT_PASSWORD=groceryview`, `S3_ENDPOINT=http://localhost:9000`, and `S3_BUCKET=groceryview-raw`.
+   - Add comments in `infra/docker-compose.yml` or `infra/README.md` telling worker lanes to use this compose file for local development against a real DB.
 5. [ ] Create initial extension migration.
    - Path: `infra/db/migrations/001_extensions.sql`
    - Include: `CREATE EXTENSION IF NOT EXISTS postgis;`, `CREATE EXTENSION IF NOT EXISTS pg_trgm;`, `CREATE EXTENSION IF NOT EXISTS btree_gist;`.

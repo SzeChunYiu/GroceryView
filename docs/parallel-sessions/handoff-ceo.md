@@ -36,6 +36,12 @@
 3. `backend-api` should scaffold NestJS after pnpm workspace exists, or include minimal workspace updates only if coordinated.
 4. `data-worker` should scaffold Dagster after `infra/docker-compose.yml` exists, or stub settings until DB is available.
 
+## Follow-up audit update
+
+- Re-read current research docs and parallel-session instructions after the initial PR was open.
+- Tightened the local infrastructure requirement so `infra/docker-compose.yml` must include PostgreSQL 18 with PostGIS on port 5432, Redis 7 on port 6379, optional pgAdmin4, and `.env.example` values for `DATABASE_URL` and `REDIS_URL`.
+- Rewrote `codex-tasks/data-worker-tasks.md` back into a numbered Dagster checklist while preserving the detailed Swedish-chain scraper research as later source-specific tasks and compliance-guarded stubs.
+
 ## Known caveats
 
 - The working tree already contained unrelated uncommitted/untracked research and parallel-session files before this CEO iteration. This lane should only commit `ROADMAP.md`, `codex-tasks/*.md`, and this handoff.
