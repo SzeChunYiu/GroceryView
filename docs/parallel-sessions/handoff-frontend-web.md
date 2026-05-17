@@ -351,3 +351,47 @@ PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PAT
 ### Blockers / notes
 - No blockers for item 15.
 - Earlier PR #41 for item 13 was closed after the current mainline manager handoff made item 15 the Pane 4 / WORKER-C task.
+
+---
+
+## WORKER-B update — 2026-05-17 03:31 CEST
+
+### Task implemented
+- Pane 3 / WORKER-B implemented checklist item 13: placeholder route structure.
+- Branch: `frontend-web/placeholder-routes-worker-b-20260517`.
+- Based on current `origin/main` at `c2ba793` after merged PR #44 (`price-chart-placeholder`) and backend/db manager updates.
+
+### Changes made
+- Replaced the default `apps/web/src/app/page.tsx` with a Today/market overview shell using existing shared components.
+- Updated `apps/web/src/app/layout.tsx` to use `SiteHeader` and `SiteFooter` around app content and refreshed GroceryView metadata.
+- Added placeholder pages:
+  - `apps/web/src/app/products/[slug]/page.tsx` — Product Price Terminal placeholder.
+  - `apps/web/src/app/stores/[slug]/page.tsx` — Store page placeholder.
+  - `apps/web/src/app/categories/[slug]/page.tsx` — Category page placeholder.
+  - `apps/web/src/app/weekly-basket/page.tsx` — Weekly Basket placeholder.
+  - `apps/web/src/app/budget/page.tsx` — Budget Tracker placeholder.
+
+### Commands run
+```bash
+git status --short --branch
+git fetch origin --prune
+git worktree add -b frontend-web/placeholder-routes-worker-b-20260517 /tmp/groceryview-workerb-placeholder-routes origin/main
+git rebase --autostash origin/main
+COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH corepack pnpm@10.11.0 install --frozen-lockfile --store-dir /tmp/pnpm-store-gv-workerb-routes
+COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH corepack pnpm@10.11.0 --filter web lint
+COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH corepack pnpm@10.11.0 --filter web build
+```
+
+### Verification
+- Node used: `v24.15.0`.
+- pnpm used: `10.11.0`.
+- `pnpm install --frozen-lockfile`: passed after rebasing on current `origin/main`.
+- `pnpm --filter web lint`: passed.
+- `pnpm --filter web build`: passed; Next.js 16.2.6 compiled/typechecked and generated `/`, `/budget`, dynamic product/category/store routes, and `/weekly-basket`.
+
+### Next unfinished checklist item
+- Item 11 (`shadcn/ui` init and starter components) still has no remote branch or PR and remains the main product-code blocker before integrated verification item 16.
+
+### Blockers / notes
+- Item 15 (`price-chart-placeholder`) is already merged via PR #44 and was preserved by rebasing onto current `origin/main`.
+- Work was done in an isolated `/tmp/groceryview-workerb-placeholder-routes` worktree to avoid dirty unrelated shared checkout files.
