@@ -161,3 +161,71 @@ PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PAT
 
 - No current blocker for this PR: PR #27 has merged and GitHub reports PR #29 as clean with only `apps/api/src/baskets/baskets.controller.ts`, `apps/api/test/app.e2e-spec.ts`, and this handoff in the file list.
 - Next backend lane task should continue from the remaining unchecked checklist items after this domain placeholder hardening is reviewed.
+
+---
+
+## WORKER-A — API contracts wiring
+
+Updated: 2026-05-17 02:05 Europe/Stockholm
+Pane: PANE 2 / WORKER-A
+Branch: `backend-api/worker-a-contracts`
+Base: `origin/main` at `9665fbe` (`Merge pull request #29 from SzeChunYiu/backend-api/domain-controllers-worker-c-current`)
+
+### Task taken
+
+- Read the required lane docs:
+  - `docs/parallel-sessions/shared.md`
+  - `docs/parallel-sessions/backend-api.md`
+- Audited `codex-tasks/backend-api-tasks.md` against the current `origin/main` backend state.
+- Avoided repeating the already-merged scaffold, package, config, health, domain-controller, CORS, env-example, and contracts-package work.
+- Implemented the next missing product-code item: checklist item 10, wiring shared API contracts into the API without adding a database dependency.
+
+### What changed
+
+- Added `@groceryview/api-contracts` as a workspace dependency of `apps/api` and updated `pnpm-lock.yaml`.
+- Updated API response classes for products, stores, prices, watchlists, baskets, and alerts to implement the exported contract types from `@groceryview/api-contracts`.
+- Kept placeholders explicit as seed/demo responses; no database dependency was introduced.
+- Added the missing `demo: true` flag to `WeeklyBasketItemSchema` so the shared contract matches the API's seed/demo basket item responses.
+- Pointed the contracts package type export at source for workspace type consumers while preserving the built runtime export.
+
+### Commands run
+
+```bash
+cd /projects/hep/fs10/shared/nnbar/billy/GroceryView
+git status --short --branch
+git fetch origin --prune
+# Isolated clone used because the shared checkout contains unrelated lane state.
+git clone /projects/hep/fs10/shared/nnbar/billy/GroceryView /tmp/groceryview-backend-worker-a-clone
+cd /tmp/groceryview-backend-worker-a-clone
+git checkout -B backend-api/worker-a-contracts 9665fbe
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH HOME=/tmp/groceryview-home-worker-a XDG_CACHE_HOME=/tmp/groceryview-xdg-worker-a PNPM_STORE_PATH=/tmp/groceryview-pnpm-store-worker-a pnpm install
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH HOME=/tmp/groceryview-home-worker-a XDG_CACHE_HOME=/tmp/groceryview-xdg-worker-a pnpm --filter api lint
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH HOME=/tmp/groceryview-home-worker-a XDG_CACHE_HOME=/tmp/groceryview-xdg-worker-a pnpm install --frozen-lockfile
+rm -rf apps/api/dist packages/api-contracts/dist
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH HOME=/tmp/groceryview-home-worker-a XDG_CACHE_HOME=/tmp/groceryview-xdg-worker-a pnpm --filter api build
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH HOME=/tmp/groceryview-home-worker-a XDG_CACHE_HOME=/tmp/groceryview-xdg-worker-a pnpm --filter @groceryview/api-contracts build
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH HOME=/tmp/groceryview-home-worker-a XDG_CACHE_HOME=/tmp/groceryview-xdg-worker-a pnpm --filter api test:e2e
+PORT=3001 CORS_ORIGINS=http://localhost:3000 PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH HOME=/tmp/groceryview-home-worker-a XDG_CACHE_HOME=/tmp/groceryview-xdg-worker-a pnpm --filter api start:prod
+curl -fsS http://127.0.0.1:3001/health
+```
+
+### Verification output
+
+- Node: `v24.15.0`
+- pnpm: `10.11.0`
+- `pnpm install`: succeeded. Warning: pnpm reported ignored build scripts for `@nestjs/core`, `@scarf/scarf`, `sharp`, and `unrs-resolver`; install exited 0.
+- `pnpm --filter api lint`: passed.
+- `pnpm install --frozen-lockfile`: passed and confirmed the lockfile is up to date.
+- `pnpm --filter api build`: passed from a clean `apps/api/dist` without requiring a prebuilt contracts package.
+- `pnpm --filter @groceryview/api-contracts build`: passed.
+- `pnpm --filter api test:e2e`: passed (`1 suite`, `3 tests`).
+- Smoke test: `curl http://127.0.0.1:3001/health` returned:
+
+```json
+{"status":"ok","service":"api"}
+```
+
+### Next task / blockers
+
+- No blocker for this PR.
+- Remaining backend task work should continue after the now-wired shared contracts, likely tightening CORS/config tests or moving toward database-backed repositories/services depending on supervisor assignment.

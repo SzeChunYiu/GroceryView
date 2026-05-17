@@ -1,7 +1,8 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import type { StoreSummary } from '@groceryview/api-contracts';
 
-export class StoreSummaryResponse {
+export class StoreSummaryResponse implements StoreSummary {
   id!: string;
   slug!: string;
   name!: string;
