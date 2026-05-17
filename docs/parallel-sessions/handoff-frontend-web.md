@@ -268,3 +268,24 @@ COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HO
 ### Next action
 - Reassign panes 2-4 to items 11, 13, and 15 when workers can run again.
 - Keep Pane 5 / item 16 queued until those product-code PRs are merged, then run `pnpm install`, `pnpm --filter web lint`, and `pnpm --filter web build` on the integrated frontend state.
+
+---
+
+## MANAGER update — 2026-05-17 02:52 CEST
+
+### New PR reviewed / blocker queued
+- PR #41 (`frontend-web/placeholder-routes-worker-c-20260517-0238`) appeared after the 02:44 manager handoff update.
+- Scope matches checklist item 13: placeholder routes for `/`, `/products/[slug]`, `/stores/[slug]`, `/categories/[slug]`, `/weekly-basket`, and `/budget`, plus app layout wrapping with existing `SiteHeader`/`SiteFooter`.
+- Independent manager verification on the PR branch with Node `v24.15.0` and pnpm `10.11.0` passed:
+  - `pnpm install --frozen-lockfile`
+  - `pnpm --filter web lint`
+  - `pnpm --filter web build`
+- Blocker queued on PR #41: GitHub merge state is `CONFLICTING`, likely due the handoff file after PR #40. Commented on the PR requesting a rebase onto current `origin/main`, preservation of existing handoff entries, rerun of verification, and push before merge.
+
+### Current open frontend PRs
+- PR #41 is open and conflicting; do not merge until rebased/mergeable.
+
+### Current next actions
+- Resume/reassign item 11 (`shadcn/ui`) to Pane 2 when worker quota is available; no open PR exists.
+- Resume/reassign item 15 (`price-chart-placeholder`) to Pane 4 when worker quota is available; no open PR exists.
+- Keep item 16 integrated verification queued behind item 11, item 13/PR #41, and item 15.
