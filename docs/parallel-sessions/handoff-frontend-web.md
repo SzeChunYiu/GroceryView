@@ -670,3 +670,20 @@ PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PAT
 
 ### Blockers / notes
 - The shared root checkout remains dirty with unrelated lane files; all Pane 5 work was performed in the isolated `/tmp/gv-pane5-item16-refresh` worktree.
+
+---
+
+## MANAGER closeout — 2026-05-17 06:03 CEST
+
+### PRs accepted / blockers queued
+- Accepted and merged PR #68 (`frontend-web/integrated-build-verify-worker-d-current`) as checklist item 16. Manager independently merged the PR head into current `origin/main` in `/tmp/gv-manager-pr68-verify-*` and reran Node `v24.15.0` / pnpm `10.11.0` verification: `pnpm install --frozen-lockfile`, `pnpm --filter web lint`, and `pnpm --filter web build`; all passed and the build generated `/`, `/budget`, `/weekly-basket`, and dynamic category/product/store routes.
+- Closed PR #69 (`frontend-web/worker-b-item16-blocked-20260517`) as stale and conflicted after item 11 landed via PR #67 and item 16 was accepted via PR #68.
+
+### Final frontend checklist audit
+- `codex-tasks/frontend-web-tasks.md` was checked and updated to mark items 1-18 complete based on merged artifacts and verification evidence.
+- Artifact checks on current `origin/main` confirmed root pnpm/Turbo/TypeScript/gitignore config; `apps/web` scaffold and pinned Next.js `16.2.6` / React `19.2.4`; UI/data packages; shadcn `components.json`, `src/lib/utils.ts`, and `button/card/badge/input/table/tabs`; standalone `next.config.ts`; placeholder routes; shared layout/status components; and the price chart placeholder with `7D/30D/90D/1Y` controls plus the TradingView Lightweight Charts note.
+- Open frontend PR audit after closeout: no open `frontend-web/*` PRs remain.
+
+### Worker queue
+- Panes 2-5 have no remaining frontend implementation task assigned from the current checklist. Stand by for a new frontend roadmap/task file revision.
+- No blockers remain in the frontend-web lane.
