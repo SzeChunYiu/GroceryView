@@ -289,3 +289,22 @@ COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HO
 - Resume/reassign item 11 (`shadcn/ui`) to Pane 2 when worker quota is available; no open PR exists.
 - Resume/reassign item 15 (`price-chart-placeholder`) to Pane 4 when worker quota is available; no open PR exists.
 - Keep item 16 integrated verification queued behind item 11, item 13/PR #41, and item 15.
+
+---
+
+## MANAGER correction — 2026-05-17 02:58 CEST
+
+### PR #41 state correction
+- Refreshed PR state after the 02:52 handoff entry.
+- PR #41 (`frontend-web/placeholder-routes-worker-c-20260517-0238`) is now `CLOSED` and unmerged, not open.
+- Reason recorded on PR #41: it was closed because the branch came from the wrong worker assignment context; current Pane 4 should take item 15, while item 13 should be reassigned to Pane 3.
+- No product code from PR #41 is on `origin/main`; item 13 remains unchecked.
+
+### Current frontend PR queue
+- No open frontend PRs at this refresh.
+
+### Current queued work
+- Pane 2 / item 11: shadcn/ui init — pending worker quota; no open PR.
+- Pane 3 / item 13: placeholder route structure — pending reassignment; previous PR #41 closed unmerged.
+- Pane 4 / item 15: price chart placeholder — pending worker quota; no open PR.
+- Pane 5 / item 16: integrated verification — queued behind items 11, 13, and 15.
