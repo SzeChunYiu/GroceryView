@@ -485,3 +485,27 @@ COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HO
 - **Pane 3 / WORKER-B:** item 13 is accepted/merged; available as backup for item 11 if Pane 2 remains blocked.
 - **Pane 4 / WORKER-C:** item 16 integrated verification after item 11 lands.
 - **Pane 5 / WORKER-D:** backup for item 16 only; do not reuse stale PR #53.
+
+---
+
+## MANAGER update — 2026-05-17 04:34 CEST
+
+### Inputs rechecked
+- Re-read/used required manager inputs: `docs/parallel-sessions/shared.md`, `docs/parallel-sessions/frontend-web.md`, and `codex-tasks/frontend-web-tasks.md` from current `origin/main`.
+- Refreshed GitHub/frontend state; no open `frontend-web/*` PRs were present at this check.
+
+### Current checklist state on `origin/main`
+- Accepted/merged frontend items remain: 1-10, 12-15.
+- Item 11 is still missing on `origin/main`: no `apps/web/components.json`, no `apps/web/src/lib/utils.ts`, and no `apps/web/src/components/ui/{button,card,badge,input,table,tabs}.tsx`.
+- Item 16 is still blocked until item 11 lands, because integrated verification must run on the final combined frontend state.
+
+### Assignments sent / queued
+- **Pane 2 / WORKER-A:** primary owner for item 11, shadcn/ui init and starter components from current `origin/main`; verify with Node 24 and pnpm 10.11.0; commit/push/open PR; update this handoff. A manager subagent retry for this same assignment failed with a Codex usage-limit error (try again at 9:11 AM), but the tmux Pane 2 worker has the assignment and was observed with an in-progress `frontend-web/shadcn-ui-worker-a-current` worktree.
+- **Pane 3 / WORKER-B:** item 13 is already accepted/merged via PR #49; stand by as backup for item 11 only if Pane 2 fails/unavailable.
+- **Pane 4 / WORKER-C:** item 16 integrated verification queued, but explicitly blocked until item 11 merges on `origin/main`; do not run stale verification.
+- **Pane 5 / WORKER-D:** backup for item 16 only; do not duplicate item 11 or reuse stale PR #53/worktrees.
+
+### Blockers / acceptance queue
+- No frontend PR is available to accept right now.
+- Item 11 remains the only product-code blocker; Pane 2 has partial/in-progress local shadcn artifacts but has not pushed a PR yet.
+- Item 16 remains queued behind item 11 and must be run fresh from current `origin/main` after item 11 is merged.
