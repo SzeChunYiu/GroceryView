@@ -901,3 +901,85 @@ No Worker-B, Worker-C, or Worker-D audit PRs were produced in this pass. Resume 
 ### Manager note
 
 Pane 1 performed coordination only: inspected docs/tasks/PRs, accepted the Worker-A audit PR, attempted to assign panes 3-5, and queued their usage-limit blockers. Pane 1 did not implement schema/application/package changes.
+
+---
+
+## Worker-B update — audit checklist items 5-7
+
+Date: 2026-05-17
+Branch: `db-schema/worker-b-audit-5-7-20260517`
+Role: Pane 3 / WORKER-B
+Base: `origin/main` at `d330ac4`
+
+### Inputs reviewed
+
+- Read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/db-schema.md` before selecting work.
+- Re-read `codex-tasks/db-schema-tasks.md` and the current DB handoff from `origin/main`.
+- Avoided repeating Worker-A's accepted audit of checklist items 1-4; this Worker-B pass covers the next assigned slice, checklist items 5-7.
+
+### Audit scope
+
+Pane 1 requested Pane 3 / WORKER-B to audit checklist items 5-7 against current `origin/main`:
+
+5. `infra/db/migrations/001_extensions.sql` extension migration.
+6. `infra/db/migrations/002_init.sql` core schema migration.
+7. `infra/db/migrations/003_indexes.sql` required indexes migration.
+
+### Evidence
+
+Real PostgreSQL/PostGIS validation using the same PostGIS image via Apptainer applied migrations 001-003 with `ON_ERROR_STOP=1`:
+
+```text
+workdir=/tmp/groceryview-pane3-worker-b-audit
+commit=d330ac41e09e
+--- applying infra/db/migrations/001_extensions.sql ---
+CREATE EXTENSION
+CREATE EXTENSION
+CREATE EXTENSION
+--- applying infra/db/migrations/002_init.sql ---
+CREATE TYPE ...
+CREATE TABLE ...
+--- applying infra/db/migrations/003_indexes.sql ---
+CREATE INDEX ...
+--- catalog checks ---
+extensions=btree_gist,pg_trgm,postgis
+enum_count=5
+required_table_count=26
+stores_location_type=geography
+required_index_count=9
+server stopped
+```
+
+Full local validation log: `/tmp/gv-worker-b-audit-5-7-20260517-050153-validation.out`.
+
+Static checklist assertion output:
+
+```text
+PASS db-schema checklist audit items 5-7
+extensions: postgis, pg_trgm, btree_gist
+enums: price_type, source_type, confidence_band, alert_status, observation_status
+tables: 26 required core tables present
+core schema: SEK numeric(12,2), unit price, geography(Point,4326), provenance columns verified
+indexes: 9 required indexes present
+```
+
+Manual artifact findings:
+
+- `001_extensions.sql` creates `postgis`, `pg_trgm`, and `btree_gist` with `IF NOT EXISTS`.
+- `002_init.sql` defines the required enum types/check-style domains as PostgreSQL enums for price type, source type, confidence band, alert status, and observation status.
+- `002_init.sql` defines all 26 required core tables from checklist item 6.
+- Price columns use `numeric(12,2)` for SEK prices and preserve separate unit-price fields.
+- `stores.location` uses `geography(Point, 4326)`.
+- Provenance fields (`source_type`, `source_url`, `source_run_id`, `raw_record_id`, `observed_at`, `parser_version`, `confidence_score`) are present on price/provenance-bearing tables.
+- `003_indexes.sql` defines the required GiST, trigram GIN, price observation, promotion, latest price, watchlist, and basket-item indexes.
+
+### Status
+
+- Checklist items 5-7 are covered by current `origin/main` artifacts and this independent Worker-B audit evidence.
+- No schema changes were needed.
+
+### Next
+
+- Pane 4 / WORKER-C audit can cover checklist items 8-10 if another independent closeout pass is still desired.
+- Pane 5 / WORKER-D audit can cover checklist items 11-14.
+- Do not recreate the already-merged extensions, core schema, indexes, compose/env/docs, seed, partition, package, validation, or handoff artifacts.
