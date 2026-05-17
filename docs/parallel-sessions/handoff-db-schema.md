@@ -901,3 +901,88 @@ No Worker-B, Worker-C, or Worker-D audit PRs were produced in this pass. Resume 
 ### Manager note
 
 Pane 1 performed coordination only: inspected docs/tasks/PRs, accepted the Worker-A audit PR, attempted to assign panes 3-5, and queued their usage-limit blockers. Pane 1 did not implement schema/application/package changes.
+
+---
+
+## Worker-D update — audit checklist items 11-14
+
+Date: 2026-05-17 05:45 CEST
+Branch: `db-schema/worker-d-audit-11-14-20260517`
+Role: Pane 5 / WORKER-D
+Base: `origin/main` at `8371992`
+
+### Inputs reviewed
+
+- Read the requested `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/db-schema.md` from the active supervisor workspace before creating the isolated `origin/main` worktree. Those coordination docs are not tracked in this clean `origin/main` checkout, so this PR does not add or rewrite them.
+- Re-read `codex-tasks/db-schema-tasks.md` in the isolated worktree.
+- Checked DB-schema PR state before choosing scope: Pane 2 / WORKER-A audit for items 1-4 is already merged as PR #57; Pane 3 / WORKER-B and Pane 4 / WORKER-C have separate open audit PRs for items 5-7 (#64) and 8-10 (#65). This Worker-D pass covers the distinct fourth audit slice, items 11-14.
+
+### Audit scope
+
+Pane 5 / WORKER-D covered checklist items 11-14:
+
+11. Optional `packages/db` shared SQL access package.
+12. SQL validation evidence.
+13. DB-schema handoff evidence.
+14. Branch/commit/PR closeout state.
+
+### Evidence for item 11 — `packages/db`
+
+- `packages/db/package.json` exists with name `@groceryview/db`.
+- Package dependencies match the backend-confirmed TypeORM direction: `typeorm`, `pg`, and `zod`.
+- `packages/db/src/data-source.ts` parses database environment with Zod and creates PostgreSQL TypeORM options with `synchronize: false`, keeping SQL migrations under `infra/db/migrations/` as the schema source of truth.
+- `packages/db/src/enums.ts` exports shared enum values rather than duplicating SQL table/entity definitions.
+- `packages/db/README.md` documents TypeORM/pg usage and warns consumers not to duplicate migration ownership.
+
+Package validation run from the isolated worktree:
+
+```text
+COREPACK_ENABLE_DOWNLOAD_PROMPT=0 COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@10.11.0 install --ignore-scripts
+COREPACK_ENABLE_DOWNLOAD_PROMPT=0 COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@10.11.0 --filter @groceryview/db typecheck
+COREPACK_ENABLE_DOWNLOAD_PROMPT=0 COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@10.11.0 --filter @groceryview/db build
+```
+
+Result: install, typecheck, and build passed. The runner uses Node v20.20.2 while the repo requires Node 24, so pnpm emitted the known unsupported-engine warning before successful completion.
+
+### Evidence for item 12 — SQL validation
+
+Literal Docker Compose validation remains host-blocked:
+
+```text
+$ docker --version
+/usr/bin/bash: line 5: docker: command not found
+```
+
+Equivalent real PostgreSQL/PostGIS validation was rerun with Apptainer using `/tmp/groceryview-apptainer/postgis_18_3.6.sif`, the same `postgis/postgis:18-3.6` image family specified by `infra/docker-compose.yml`:
+
+```text
+$ apply migrations and seeds with ON_ERROR_STOP=1
+APPLY infra/db/migrations/001_extensions.sql
+APPLY infra/db/migrations/002_init.sql
+APPLY infra/db/migrations/003_indexes.sql
+APPLY infra/db/migrations/004_partition_maintenance.sql
+APPLY infra/db/seeds/001_stockholm_seed.sql
+$ smoke checks
+extensions=3
+chains_products=6|20
+packages_db_marker=37
+price_observations_relkind=p
+price_observation_partitions=8
+$ pg_ctl stop
+```
+
+This confirms the current migration/seed set executes with `ON_ERROR_STOP=1` against real PostgreSQL/PostGIS. The literal `docker compose` command should still be rerun on a Docker-capable host if strict Docker evidence is required.
+
+### Evidence for item 13 — handoff
+
+This section records the Worker-D audit evidence, package validation output, SQL validation output, Docker blocker, and next status in `docs/parallel-sessions/handoff-db-schema.md`.
+
+### Evidence for item 14 — commit/PR closeout
+
+This branch is intended to be committed and opened as a DB-schema PR against `main` after this handoff update. The final PR URL is produced by the `gh pr create` command rather than hard-coded into the committed handoff.
+
+### Status / next
+
+- Checklist items 11-14 are covered by current `origin/main` artifacts plus this Worker-D audit evidence.
+- No schema, application, or package implementation changes were needed; this is an independent closeout/audit PR for the fourth worker slice and intentionally does not duplicate panes 2-4.
+- Remaining host blocker: Docker is unavailable on this runner; Apptainer/PostgreSQL/PostGIS validation passed.
