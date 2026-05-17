@@ -690,3 +690,62 @@ Manager: PANE 1 / MANAGER-backend-api
 ### Completion audit snapshot
 - Prompt-to-artifact requirements checked: docs read; backend task checklist inspected; top remaining unchecked task identified as item 10 contract wiring; pane 2 assigned/queued but blocked by usage limits; panes 3-5 accepted/no-duplicate; PR #72 blocker queued/commented; no backend product-code implementation by PANE 1.
 - Missing/incomplete: checklist item 10 remains absent from current main and no clean worker PR is available to accept. Goal remains active.
+
+---
+
+## WORKER-A — Contract wiring repair from current main
+
+Updated: 2026-05-17 06:20 Europe/Stockholm
+Pane: PANE 2 / WORKER-A
+Branch: `backend-api/worker-a-contract-wiring-clean`
+Base: GitHub `main` at `f679522` (`Merge pull request #78 from SzeChunYiu/backend-api/manager-status-20260517-0617`)
+
+### Task taken
+
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md` from the shared workspace.
+- Audited `codex-tasks/backend-api-tasks.md` against current `origin/main` and avoided duplicating already-merged scaffold/config/domain/database work.
+- Recreated the remaining WORKER-A contract-wiring delta from current GitHub `main` so stale PRs #32/#56 are not needed.
+
+### What changed
+
+- Added `@groceryview/api-contracts` as a workspace dependency of the `api` package.
+- Added an `api` `prebuild` script so `pnpm --filter api build` first builds the shared contracts package.
+- Updated products, stores, prices, watchlists, baskets, and alerts response classes to implement the exported contract types while preserving explicit seed/demo placeholder data.
+- Updated `pnpm-lock.yaml` only for the new API workspace dependency link.
+- Preserved frontend files, database/entity files, infra files, data-worker files, and other-lane handoffs.
+
+### Commands run
+
+```bash
+cd /projects/hep/fs10/shared/nnbar/billy/GroceryView
+git status --short --branch
+# shared checkout was dirty with unrelated lane work; used an isolated clone.
+git clone --shared /projects/hep/fs10/shared/nnbar/billy/GroceryView /tmp/gv-worker-a-contracts-clean
+cd /tmp/gv-worker-a-contracts-clean
+git fetch https://github.com/SzeChunYiu/GroceryView.git '+refs/heads/main:refs/remotes/github/main'
+git checkout -B backend-api/worker-a-contract-wiring-clean github/main
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/tmp/scyiu-corepack-pane2-contracts-clean PNPM_STORE_DIR=/tmp/scyiu-pnpm-store-pane2-clean PNPM_CONFIG_DANGEROUSLY_ALLOW_ALL_BUILDS=true corepack pnpm install --frozen-lockfile --filter api --filter @groceryview/api-contracts
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/tmp/scyiu-corepack-pane2-contracts-clean PNPM_STORE_DIR=/tmp/scyiu-pnpm-store-pane2-clean corepack pnpm --filter api verify:required-packages
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/tmp/scyiu-corepack-pane2-contracts-clean PNPM_STORE_DIR=/tmp/scyiu-pnpm-store-pane2-clean corepack pnpm --filter @groceryview/api-contracts build
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/tmp/scyiu-corepack-pane2-contracts-clean PNPM_STORE_DIR=/tmp/scyiu-pnpm-store-pane2-clean corepack pnpm --filter api build
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/tmp/scyiu-corepack-pane2-contracts-clean PNPM_STORE_DIR=/tmp/scyiu-pnpm-store-pane2-clean corepack pnpm --filter api test:e2e
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH PORT=3001 DATABASE_ENABLED=false REDIS_URL=redis://localhost:6379 CORS_ORIGINS=http://localhost:3000 node apps/api/dist/main.js
+curl -fsS http://127.0.0.1:3001/health
+curl -s -o /tmp/gv-pane2-docs.html -w '%{http_code}' http://127.0.0.1:3001/docs
+```
+
+### Verification output
+
+- `corepack pnpm install --frozen-lockfile --filter api --filter @groceryview/api-contracts`: passed.
+- `corepack pnpm --filter api verify:required-packages`: passed (`All required API packages are declared.`).
+- `corepack pnpm --filter @groceryview/api-contracts build`: passed.
+- `corepack pnpm --filter api build`: passed; `prebuild` built `@groceryview/api-contracts` first.
+- `corepack pnpm --filter api test:e2e`: passed (`1` suite, `3` tests).
+- Smoke with `DATABASE_ENABLED=false` because Docker/Postgres is unavailable in this runtime:
+  - `GET /health` returned `{"status":"ok","service":"api"}`.
+  - `GET /docs` returned HTTP `200`.
+
+### Next task / blockers
+
+- Next backend lane task should continue after the repaired contract-wiring PR lands; stale PRs #32/#56 remain superseded by this fresh branch.
+- No implementation blockers. A separate shared worktree install attempt hit a pnpm store/NFS copy issue, so final verification used a clean isolated clone and a `/tmp` pnpm store.

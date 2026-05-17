@@ -1,7 +1,8 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import type { Alert } from '@groceryview/api-contracts';
 
-export class AlertResponse {
+export class AlertResponse implements Alert {
   id!: string;
   type!: 'target_price' | 'basket_drop';
   title!: string;
