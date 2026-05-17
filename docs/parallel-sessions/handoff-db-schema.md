@@ -701,3 +701,62 @@ Implemented the fourth unchecked DB checklist item for WORKER-D: local database 
 ### Next
 
 Continue only with the next genuinely uncovered DB-schema checklist item after checking merged PR state. Do not recreate schema, indexes, partitions, seed data, package scaffold, validation handoffs, repo-state checks, or branch-record work already represented on `origin/main`.
+
+---
+
+## Manager update — Pane 1 DB-schema coordination
+
+Date: 2026-05-17
+Branch: `db-schema/manager-handoff-20260517-0329`
+Role: Pane 1 / MANAGER-db-schema
+
+### Inputs reviewed
+
+- Read `docs/parallel-sessions/shared.md`.
+- Read `docs/parallel-sessions/db-schema.md`.
+- Checked `codex-tasks/db-schema-tasks.md` and current GitHub PR state.
+
+### PRs accepted
+
+- Merged PR #30, `docs(db): clarify local compose usage`, into `main` at `2026-05-17T01:26:44Z`.
+  - This accepted the remaining open DB-schema PR for task-4 compose usage documentation.
+  - `origin/main` now contains `infra/README.md` in addition to the existing compose file and `.env.example`.
+
+### Worker assignments attempted
+
+After PR #30 merged, Pane 1 assigned audit/closeout work against current `origin/main`:
+
+- Pane 2 / WORKER-A: audit checklist items 1-4 (repo state/branch evidence, directories, compose, env/docs).
+- Pane 3 / WORKER-B: audit checklist items 5-7 (extensions, core schema, required indexes).
+- Pane 4 / WORKER-C: audit checklist items 8-10 (partitioning, seeds, schema documentation).
+- Pane 5 / WORKER-D: audit checklist items 11-14 (packages/db, validation evidence, handoff, PR/commit state).
+
+### Blockers queued
+
+All four newly assigned worker agents errored before producing artifacts due to the shared Codex usage limit:
+
+```text
+You've hit your usage limit. Visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 4:11 AM.
+```
+
+No worker closeout PRs were created from those assignments. Resume those worker audits after the usage window resets if another independent pass is required.
+
+### Manager evidence snapshot
+
+- `gh pr list --state open` showed no remaining open `db-schema/*` PRs after PR #30 merged.
+- `origin/main` contains DB-schema artifacts for migrations, seed data, schema docs, local compose docs, and the optional `packages/db` package:
+  - `.env.example`
+  - `infra/docker-compose.yml`
+  - `infra/README.md`
+  - `infra/db/migrations/001_extensions.sql`
+  - `infra/db/migrations/002_init.sql`
+  - `infra/db/migrations/003_indexes.sql`
+  - `infra/db/migrations/004_partition_maintenance.sql`
+  - `infra/db/seeds/001_stockholm_seed.sql`
+  - `infra/db/SCHEMA.md`
+  - `packages/db/`
+
+### Next
+
+- If supervisor wants another independent worker pass, reassign the four audit slices above after the Codex usage limit resets.
+- Otherwise DB-schema has no open lane PRs pending manager acceptance as of this handoff.
