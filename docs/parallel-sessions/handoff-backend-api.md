@@ -317,3 +317,39 @@ Manager: PANE 1 / MANAGER-backend-api
 - Top unchecked work assigned/queued: panes 2-5 assignments above avoid duplicated already-merged work and queue the remaining unique repair (#32) plus no-duplicate instructions for accepted panes.
 - PR acceptance/blockers: PR #35 accepted after direct diff/test/smoke audit; PR #32 blocker updated; older stale backend PRs remain queued as blocked/superseded.
 - Do-not-implement constraint: satisfied; PANE 1 only inspected docs/git/PR state, verified in isolated worktrees, posted blocker comments, merged an audited worker PR, and appended this handoff.
+
+---
+
+## Manager update — 2026-05-17 03:26 Europe/Stockholm
+Manager: PANE 1 / MANAGER-backend-api
+
+### Intake performed
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md` from the shared workspace for this manager turn.
+- Checked `codex-tasks/backend-api-tasks.md` from `origin/main`; checklist items 1-15 still display unchecked even though current `origin/main` includes the scaffold/config/domain/contracts/package/database artifacts merged through prior backend PRs.
+- Refreshed GitHub PR state after current `origin/main` advanced to `2f0a424` from frontend manager docs merges.
+
+### Current backend PR audit
+- Open backend PRs still present: #6, #7, #10, #12, #13, #19, #22, #28, and #32. GitHub reports all of these backend PRs as `DIRTY` against current `main`.
+- Re-audited PR #32 (`backend-api/worker-a-contracts`) because it is the only potentially unique remaining backend implementation PR. Fresh `git diff --name-status origin/main..origin/backend-api/worker-a-contracts` still shows it is unsafe:
+  - Deletes current backend database files from PR #35: `apps/api/src/database/*`, `apps/api/src/products/product.entity.ts`, `apps/api/src/stores/store.entity.ts`, and `apps/api/src/prices/price-event.entity.ts`.
+  - Deletes/modifies other-lane frontend files: `apps/web/src/components/*`, `apps/web/next.config.ts`, and `docs/parallel-sessions/handoff-frontend-web.md`.
+  - Rewinds parts of `apps/api/package.json`, env/config, and root `pnpm-lock.yaml` relative to current `main`.
+- Posted an updated blocker comment on PR #32 with this current evidence and the required recreate/rebase instructions.
+
+### Worker assignment / queue for panes 2-5
+- **PANE 2 / WORKER-A:** assigned to recreate PR #32 from current `origin/main` on a fresh backend-only branch. Scope: controller contract wiring and, only if required, `packages/api-contracts/**`, API package/lockfile changes, and this backend handoff. Must preserve `apps/web/**`, other-lane handoffs, database files/entities, `infra/**`, `packages/db/**`, root workspace files, and merged backend scaffold behavior. Worker launch failed immediately with the current usage-limit error before any work began; assignment remains queued.
+- **PANE 3 / WORKER-B:** database scaffold PR #35 is already accepted/merged; no duplicate database task should be started.
+- **PANE 4 / WORKER-C:** domain placeholder work is already accepted/merged via PR #29; no duplicate controller placeholder task should be started.
+- **PANE 5 / WORKER-D:** required package refresh is already accepted/merged via PR #34; no duplicate package-refresh task should be started.
+
+### Next manager action
+- Wait for worker capacity or a repaired PANE 2 branch, then re-audit with `git diff --name-status origin/main..origin/<branch>` before merge.
+- A safe repaired contract-wiring PR must be additive/backend-scoped and must pass `corepack pnpm install --frozen-lockfile`, `corepack pnpm --filter api build`, `corepack pnpm --filter @groceryview/api-contracts build`, `corepack pnpm --filter api test:e2e`, and smoke `/health` plus `/docs` if practical.
+- After PR #32 is repaired or superseded, consider a docs-only checklist-maintenance PR for `codex-tasks/backend-api-tasks.md`, because the file remains unchecked while current artifacts satisfy much of the original scaffold checklist.
+
+### Manager completion audit snapshot
+- Required docs read: `shared.md` and `backend-api.md` were read this turn.
+- Required checklist checked: `origin/main:codex-tasks/backend-api-tasks.md` was inspected and found stale/unchecked.
+- Top unchecked/remaining work assigned: PANE 2 has the only unique remaining backend repair assignment; panes 3-5 are explicitly marked accepted/no-duplicate for their already merged work.
+- PR acceptance/blockers: no safe backend PR was available to merge this turn; PR #32 blocker was refreshed with concrete current diff evidence; older backend PRs remain stale/superseded/blocked.
+- Do-not-implement constraint: satisfied; PANE 1 only inspected docs/git/PR state, attempted worker assignment, posted a blocker comment, and recorded this handoff.
