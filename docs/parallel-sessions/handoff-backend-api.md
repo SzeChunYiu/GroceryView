@@ -552,3 +552,28 @@ Manager: PANE 1 / MANAGER-backend-api
 - PANE 2 / WORKER-A repair of PR #56 remains queued; prior spawn failed with usage-limit before work began.
 - Panes 3-5 remain no-duplicate/accepted for database scaffold, contract-demo alignment, and required-package verifier respectively.
 - No backend implementation PR is currently safe to merge as-is.
+
+---
+
+## Manager update — 2026-05-17 05:45 Europe/Stockholm
+Manager: PANE 1 / MANAGER-backend-api
+
+### Intake performed
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md` in this manager turn.
+- Checked `codex-tasks/backend-api-tasks.md`; checklist items 1-15 remain unchecked in the file even though current `main` contains the merged backend scaffold/config/domain/contracts/database/package-verifier artifacts.
+- Refreshed open backend PR state; open backend PRs #6, #7, #10, #12, #13, #19, #22, #28, #32, #51, and #56 are all still reported conflicting/dirty.
+
+### Blockers queued
+- Added fresh manager blocker comments to stale/superseded backend PRs #6, #7, #10, #12, #13, #19, #22, #28, #32, and #51.
+- Those PRs should not merge as-is. Any useful remaining backend delta must be recreated from current `origin/main`, preserve all other-lane files/handoffs, keep only backend-owned changes, and rerun the backend verification gate.
+- PR #56 remains the only potentially useful remaining backend implementation delta, but it is still blocked by frontend file drift and backend handoff conflicts as recorded in the prior update.
+
+### Worker assignment / queue
+- PANE 2 / WORKER-A remains assigned/queued to repair or supersede PR #56 from current `origin/main`; previous worker spawn failed immediately with the usage-limit error before any changes.
+- PANE 3 / WORKER-B: database scaffold accepted/merged already; no duplicate task.
+- PANE 4 / WORKER-C: basket demo contract alignment accepted/merged already; no duplicate task.
+- PANE 5 / WORKER-D: required-package verifier accepted/merged already; no duplicate task.
+
+### Completion audit snapshot
+- Objective deliverables checked: required docs read, backend task checklist inspected, panes 2-5 assignment queue updated, all open backend PRs either stale-blocked or PR #56 repair-blocked, no product-code implementation by PANE 1.
+- Missing/incomplete: PANE 2 repair work is still blocked by worker capacity; no safe backend implementation PR is available to accept. Goal remains active.
