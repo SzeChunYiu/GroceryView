@@ -846,3 +846,58 @@ Worker-lane local DB guidance exists in both `infra/docker-compose.yml` comments
 
 - Pane 3 / WORKER-B audit can cover checklist items 5-7 if another independent closeout pass is still desired.
 - Do not recreate the already-merged initial schema, compose, seed, partition, package, validation, or handoff artifacts.
+
+---
+
+## Manager update — worker-a accepted, remaining audit workers blocked
+
+Date: 2026-05-17 04:58 CEST
+Branch: `db-schema/manager-blockers-20260517-0458`
+Role: Pane 1 / MANAGER-db-schema
+
+### Inputs rechecked
+
+- Re-read `docs/parallel-sessions/shared.md`.
+- Re-read `docs/parallel-sessions/db-schema.md`.
+- Rechecked `codex-tasks/db-schema-tasks.md` and current GitHub PR state.
+- Confirmed PR #57 (`docs(db): audit initial checklist artifacts`) merged to `main` at `2026-05-17T02:52:29Z`, merge commit `305344536420ab839fdd409c0f02522da6e37d90`.
+- Confirmed `gh pr list --base main --state open` shows no open `db-schema/*` PRs after #57 merged.
+
+### Manager acceptance
+
+Accepted PR #57 as independent Pane 2 / WORKER-A audit evidence for checklist items 1-4:
+
+1. Repo state / branch evidence.
+2. Lane branch evidence.
+3. Required DB directories.
+4. Local compose, root `.env.example`, and local real-DB guidance.
+
+This was a docs-only audit PR; no schema or application code was changed by the manager.
+
+### Worker assignments attempted this pass
+
+To continue the closeout audit without repeating already-merged implementation, Pane 1 assigned the remaining audit slices:
+
+- Pane 3 / WORKER-B: checklist items 5-7 (`001_extensions.sql`, `002_init.sql`, `003_indexes.sql`).
+- Pane 4 / WORKER-C: checklist items 8-10 (partitioning, seed data, schema documentation).
+- Pane 5 / WORKER-D: checklist items 11-14 (`packages/db`, validation evidence, handoff, commit/PR state).
+
+### Blockers queued
+
+All three worker assignments failed before producing artifacts due to the shared Codex usage-limit blocker:
+
+```text
+You've hit your usage limit. Visit https://chatgpt.com/codex/settings/usage to purchase more credits or try again at 9:11 AM.
+```
+
+No Worker-B, Worker-C, or Worker-D audit PRs were produced in this pass. Resume those audit slices after the usage limit clears if another independent worker-authored closeout pass is required.
+
+### Current DB-schema lane state
+
+- No open `db-schema/*` PRs are pending manager acceptance.
+- `origin/main` contains the DB schema artifacts, compose/env/docs, seed data, partition maintenance, optional `packages/db`, and accumulated DB handoff evidence.
+- Remaining issue is not missing implementation; it is worker capacity for extra independent audit slices 5-14.
+
+### Manager note
+
+Pane 1 performed coordination only: inspected docs/tasks/PRs, accepted the Worker-A audit PR, attempted to assign panes 3-5, and queued their usage-limit blockers. Pane 1 did not implement schema/application/package changes.
