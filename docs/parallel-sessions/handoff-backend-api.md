@@ -161,3 +161,64 @@ PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PAT
 
 - No current blocker for this PR: PR #27 has merged and GitHub reports PR #29 as clean with only `apps/api/src/baskets/baskets.controller.ts`, `apps/api/test/app.e2e-spec.ts`, and this handoff in the file list.
 - Next backend lane task should continue from the remaining unchecked checklist items after this domain placeholder hardening is reviewed.
+
+---
+
+## WORKER-D — Required API packages refresh
+
+Updated: 2026-05-17 02:01 Europe/Stockholm
+Pane: PANE 5 / WORKER-D
+Branch: `backend-api/worker-d-fourth-task`
+Base: `origin/main` at `f4736fd` (`Merge pull request #31 from SzeChunYiu/frontend-web/layout-components-worker-d`) after rebase
+
+### Task taken
+
+- Read required lane docs before implementation:
+  - `docs/parallel-sessions/shared.md`
+  - `docs/parallel-sessions/backend-api.md`
+- Took the fourth unchecked backend checklist task: `Add required API packages`.
+- Avoided duplicating panes 2-4 scaffold/domain work already merged to `main`; this PR only refreshes the required package specifiers/lock entries produced by the required `pnpm --filter api add ...` commands.
+
+### What changed
+
+- Ran the checklist's required package-add commands against the existing `api` workspace.
+- Updated `apps/api/package.json` dependency ranges to match the currently resolved required API packages:
+  - `@nestjs/config`, `@nestjs/mapped-types`, `@nestjs/platform-express`, `class-validator`, `rxjs`.
+- Updated `pnpm-lock.yaml` importer specifiers for the refreshed dependency ranges.
+
+### Commands run
+
+```bash
+cd /projects/hep/fs10/shared/nnbar/billy/GroceryView
+git status --short --branch
+# Isolated clone used because the shared checkout had unrelated lane files.
+git clone https://github.com/SzeChunYiu/GroceryView.git /tmp/groceryview-pane5-worker-d
+cd /tmp/groceryview-pane5-worker-d
+git checkout -b backend-api/worker-d-fourth-task origin/main
+# After origin/main advanced, rebased before push to avoid deleting current-main frontend files.
+git fetch origin main
+git rebase origin/main
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/tmp/scyiu-corepack-pane5 corepack pnpm --filter api add @nestjs/config @nestjs/swagger swagger-ui-express zod class-validator class-transformer @nestjs/mapped-types @nestjs/terminus
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/tmp/scyiu-corepack-pane5 corepack pnpm --filter api add @nestjs/platform-express reflect-metadata rxjs
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/tmp/scyiu-corepack-pane5 corepack pnpm --filter api add -D @types/swagger-ui-express
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/tmp/scyiu-corepack-pane5 PNPM_CONFIG_DANGEROUSLY_ALLOW_ALL_BUILDS=true corepack pnpm install --frozen-lockfile
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/tmp/scyiu-corepack-pane5 corepack pnpm --filter api build
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/tmp/scyiu-corepack-pane5 corepack pnpm --filter @groceryview/api-contracts build
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/tmp/scyiu-corepack-pane5 corepack pnpm --filter api test:e2e
+cd apps/api && PORT=3001 node dist/main.js & curl http://127.0.0.1:3001/health
+```
+
+### Verification
+
+- Node: `v24.15.0`
+- pnpm: `10.11.0` from repo `packageManager`.
+- `corepack pnpm install --frozen-lockfile`: passed. Warning: pnpm reported ignored build script for `sharp`; install exited 0.
+- `corepack pnpm --filter api build`: passed.
+- `corepack pnpm --filter @groceryview/api-contracts build`: passed.
+- Re-ran after rebasing onto `origin/main` `f4736fd`: `corepack pnpm install --frozen-lockfile`, `corepack pnpm --filter api build`, `corepack pnpm --filter @groceryview/api-contracts build`, and `corepack pnpm --filter api test:e2e` all passed (`1 suite`, `3 tests`).
+- Smoke: `curl http://127.0.0.1:3001/health` returned `{"status":"ok","service":"api"}`; `HEAD /docs` returned HTTP 200.
+
+### Next task / blockers
+
+- No blockers for this package-refresh PR.
+- The checklist file still contains unchecked boxes even though merged artifacts satisfy many items; manager may want a separate checklist-maintenance pass after implementation PRs settle.
