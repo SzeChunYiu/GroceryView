@@ -21,7 +21,8 @@
     "typeorm": "typeorm-ts-node-commonjs -d src/database/data-source.ts",
     "migration:generate": "pnpm typeorm migration:generate",
     "migration:run": "pnpm typeorm migration:run",
-    "migration:revert": "pnpm typeorm migration:revert"
+    "migration:revert": "pnpm typeorm migration:revert",
+    "verify:required-packages": "node scripts/verify-required-packages.mjs"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
