@@ -378,3 +378,50 @@ Branch: `backend-api/required-packages-worker-d-current`
 ### Next / blockers
 - The older PR #22 branch is stale and should not merge as-is; use this current-main branch/PR instead.
 
+
+---
+
+## Manager update — 2026-05-17 03:45 Europe/Stockholm
+Manager: PANE 1 / MANAGER-backend-api
+
+### Intake performed
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md` in the shared workspace at the start of the manager turn.
+- Checked `codex-tasks/backend-api-tasks.md`; checklist items still display unchecked even though current `origin/main` already contains scaffold/config/domain/contracts/database artifacts from prior backend PRs.
+- Refreshed GitHub PR state after `main` advanced through other lane manager docs and the backend package-verifier branch.
+
+### PR acceptance / verification
+- **Accepted and merged PR #47** `feat(api): verify required packages` (`backend-api/required-packages-worker-d-current`). Merge commit: `5b20165`.
+- Scope audit before merge:
+  - GitHub PR file list: `apps/api/package.json`, `apps/api/scripts/verify-required-packages.mjs`, and `docs/parallel-sessions/handoff-backend-api.md` only.
+  - Merge-base diff confirmed the same backend-owned scope; no `apps/web/**`, data-worker, db-schema, infra, or other-lane handoff changes in the PR patch.
+- Manager verification in isolated clone `/tmp/groceryview-pr47-audit` at PR #47 head:
+  - Node: `v24.15.0`; pnpm: `10.21.0`.
+  - `corepack pnpm@10.21.0 install --frozen-lockfile` — passed.
+  - `corepack pnpm@10.21.0 --filter api verify:required-packages` — passed with `All required API packages are declared.`
+  - `corepack pnpm@10.21.0 --filter api build` — passed.
+  - `corepack pnpm@10.21.0 --filter @groceryview/api-contracts build` — passed.
+  - `corepack pnpm@10.21.0 --filter api test:e2e` — passed (`1` suite, `3` tests).
+  - Runtime smoke with `PORT=3021 DATABASE_ENABLED=false node apps/api/dist/main.js`: `GET /health` returned `{ "status": "ok", "service": "api" }`; `HEAD /docs` returned HTTP `200`.
+
+### Current backend PR audit / queued blockers
+- **PR #48** `feat(api): align basket item contract demo marker` has a useful backend-owned merge-base diff (`packages/api-contracts/src/index.ts` and backend handoff only), but GitHub reports it conflicting after PR #47. Manager queued blocker comment requiring rebase/recreate from current `origin/main`, preserving PR #47 verifier files/scripts and all other-lane files, then rerunning install/contracts build/API build/e2e/contract smoke.
+- **PR #51** `feat(api): wire shared response contracts` appears to be the intended backend-only repair/superseder for stale PR #32 when audited from its merge base: it adds the API workspace dependency on `@groceryview/api-contracts`, type-only controller contract wiring, lockfile updates, and backend handoff. However GitHub reports it conflicting after PR #47; a direct `origin/main..branch` diff would remove `apps/api/scripts/verify-required-packages.mjs` and the verify script. Manager queued blocker comment requiring rebase/recreate from current `origin/main`, preserving PR #47 changes, database/entity files, and all non-backend lane files, then rerunning frozen install, package verifier, builds, e2e, and `/health` + `/docs` smoke.
+- **PR #32** remains stale/unsafe and superseded by PR #51 once PR #51 is rebased cleanly. Older backend PRs #6/#7/#10/#12/#13/#19/#22/#28 remain stale/superseded/blocked and should not be merged as-is.
+
+### Worker assignment / queue for panes 2-5
+- **PANE 2 / WORKER-A:** assigned to repair/supersede PR #32 from current `origin/main` with backend-only contract wiring. Spawned worker failed immediately with usage-limit error before work began, so the assignment remains queued; PR #51 may be the external repair candidate but needs rebase after PR #47.
+- **PANE 3 / WORKER-B:** database scaffold work was already accepted/merged via PR #35; no duplicate database task should be started.
+- **PANE 4 / WORKER-C:** contract-demo follow-up PR #48 is queued with the rebase blocker above.
+- **PANE 5 / WORKER-D:** required-package verifier PR #47 was accepted/merged; no duplicate package task should be started.
+
+### Next manager action
+- Re-audit any repaired PR with `git diff --name-status origin/main..origin/<branch>` and merge-base patch inspection before merge.
+- Prefer merging a clean PR #48 before the clean PR #51 if both are repaired, because PR #48 updates the shared basket-item contract that controller contract wiring should compile against.
+- Safe backend PRs must not delete or modify `apps/web/**`, frontend/data/db handoffs, `infra/**`, `packages/db/**`, or merged database/entity/verifier backend files unless explicitly in scope and verified.
+
+### Manager completion audit snapshot
+- Required docs read: `shared.md` and `backend-api.md` were read this turn.
+- Required checklist checked: `codex-tasks/backend-api-tasks.md` was inspected and remains stale/unchecked while many implementation artifacts are already on `main`.
+- Top unchecked/remaining work assigned: pane 2 contract wiring repair is queued but the spawned worker hit usage limits; pane 4 PR #48 and pane 2 PR #51 have concrete rebase blockers; panes 3 and 5 are accepted/no-duplicate.
+- PR acceptance/blockers: PR #47 accepted after direct diff/test/smoke audit; blocker comments posted on #48 and #51; stale backend PRs remain blocked/superseded.
+- Do-not-implement constraint: satisfied; PANE 1 only inspected docs/git/PR state, ran verification in an isolated PR clone, merged an audited worker PR, attempted worker assignment, posted blocker comments, and recorded this handoff.
