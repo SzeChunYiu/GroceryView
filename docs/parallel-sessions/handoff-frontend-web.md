@@ -154,3 +154,40 @@ pnpm --filter web build
 ### Blockers
 - Worker agent runs for panes 2, 4, and 5 errored before producing PRs due Codex usage limit. No remote branches/PRs exist for checklist items 11, 13, or 15 as of this manager pass.
 - PR #33 remains open but conflicting; do not merge until rebased.
+
+---
+
+## MANAGER update — 2026-05-17 02:25 CEST
+
+### Inputs rechecked
+- Re-read `docs/parallel-sessions/shared.md`, `docs/parallel-sessions/frontend-web.md`, and `codex-tasks/frontend-web-tasks.md` from current `origin/main`.
+- Refreshed `origin/main` and open PR state with `git fetch --prune origin` and `gh pr list --state all --base main`.
+
+### Current accepted frontend checklist evidence on `origin/main`
+- Items 1-7: merged via PR #3 (`frontend-web/monorepo-scaffold`).
+- Item 8: merged via PR #20 (`frontend-web/web-app-scaffold-worker-a`).
+- Item 9: satisfied in current `apps/web/package.json` from the merged scaffold/package state: `next` 16.2.6, React/React DOM 19.2.4, and required `typescript`, `tailwindcss`, `eslint`, `eslint-config-next` are present.
+- Item 10: merged via PR #23 (`frontend-web/ui-data-packages-worker-c`).
+- Item 14: merged via PR #31 (`frontend-web/layout-components-worker-d`).
+
+### Open PR review / queued blocker
+- PR #33 (`frontend-web/standalone-output-worker-b`) remains open for item 12 and still has GitHub merge state `CONFLICTING`.
+- The product change is still acceptable (`apps/web/next.config.ts` sets `output: "standalone"`), but it must not be merged until the branch is rebased on current `origin/main`, the handoff conflict is resolved without dropping existing entries, and `pnpm install`, `pnpm --filter web lint`, and `pnpm --filter web build` are rerun.
+
+### Top unchecked task assignments sent to panes 2-5
+- Pane 2 / WORKER-A: item 11 — initialize shadcn/ui and add `button`, `card`, `badge`, `input`, `table`, `tabs`.
+- Pane 3 / WORKER-B: item 12 — rebase/fix PR #33 or create a clean replacement PR for `output: "standalone"`.
+- Pane 4 / WORKER-C: item 13 — create placeholder route structure for home/products/stores/categories/weekly-basket/budget.
+- Pane 5 / WORKER-D: item 15 — add `apps/web/src/components/price-chart-placeholder.tsx` with 7D/30D/90D/1Y controls and Lightweight Charts-next note.
+
+### Worker results / blockers
+- Pane 2 / WORKER-A errored before producing a branch or PR due Codex usage limit (`try again at 4:11 AM`). Item 11 remains unchecked.
+- Pane 3 / WORKER-B errored before updating PR #33 due Codex usage limit (`try again at 4:11 AM`). Item 12 remains blocked by PR #33 conflict.
+- Pane 4 / WORKER-C completed without a usable final report; after refresh, no new remote frontend branch or PR for item 13 exists. Item 13 remains unchecked.
+- Pane 5 / WORKER-D errored before producing a branch or PR due Codex usage limit (`try again at 4:11 AM`). Item 15 remains unchecked.
+
+### Current next actions
+- Resume/reassign item 11 to Pane 2 when worker quota is available.
+- Resume/reassign item 12 to Pane 3 to clear PR #33 conflict, then manager can merge it after verification evidence is refreshed.
+- Resume/reassign item 13 to Pane 4; no PR exists yet.
+- Resume/reassign item 15 to Pane 5; no PR exists yet.
