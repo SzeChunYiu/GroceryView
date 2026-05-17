@@ -378,7 +378,6 @@ Branch: `backend-api/required-packages-worker-d-current`
 ### Next / blockers
 - The older PR #22 branch is stale and should not merge as-is; use this current-main branch/PR instead.
 
-
 ---
 
 ## Manager update — 2026-05-17 03:45 Europe/Stockholm
@@ -425,3 +424,81 @@ Manager: PANE 1 / MANAGER-backend-api
 - Top unchecked/remaining work assigned: pane 2 contract wiring repair is queued but the spawned worker hit usage limits; pane 4 PR #48 and pane 2 PR #51 have concrete rebase blockers; panes 3 and 5 are accepted/no-duplicate.
 - PR acceptance/blockers: PR #47 accepted after direct diff/test/smoke audit; blocker comments posted on #48 and #51; stale backend PRs remain blocked/superseded.
 - Do-not-implement constraint: satisfied; PANE 1 only inspected docs/git/PR state, ran verification in an isolated PR clone, merged an audited worker PR, attempted worker assignment, posted blocker comments, and recorded this handoff.
+
+---
+
+---
+
+## WORKER-A — Repaired API contract wiring
+
+Updated: 2026-05-17 03:33 Europe/Stockholm
+Pane: PANE 2 / WORKER-A
+Branch: `backend-api/worker-a-contract-wiring`
+Base: `origin/main` at `ab63e3a` (`Merge pull request #52 from SzeChunYiu/backend-api/manager-status-20260517-0345`)
+
+### Task taken
+
+- Re-read the required lane docs before implementation:
+  - `docs/parallel-sessions/shared.md`
+  - `docs/parallel-sessions/backend-api.md`
+- Audited `codex-tasks/backend-api-tasks.md`; the checklist remains unchecked but current `origin/main` already contains the scaffold/config/domain/contracts/database artifacts from prior merged backend work.
+- Followed the manager queue for PANE 2 / WORKER-A: supersede the unsafe/stale PR #32 by recreating the contract-wiring work from current `origin/main` and preserving frontend files, database files/entities, other-lane handoffs, and root workspace files.
+
+### What changed
+
+- Added the API workspace dependency on `@groceryview/api-contracts`.
+- Added an API `prebuild` lifecycle step so `pnpm --filter api build` builds the contracts package first and can resolve contract declarations from a clean install.
+- Wired API controller response classes to shared contract types with type-only imports:
+  - products: `ProductSummary`
+  - stores: `StoreSummary`
+  - prices: `PriceObservation`
+  - watchlists: `WatchlistItem`
+  - baskets: `WeeklyBasket` and `WeeklyBasketItem`
+  - alerts: `Alert`
+- Updated `pnpm-lock.yaml` only for the API workspace link to `packages/api-contracts`.
+- Preserved current `apps/web/**`, database scaffold files/entities, and other-lane handoff files.
+
+### Commands run
+
+```bash
+cd /projects/hep/fs10/shared/nnbar/billy/GroceryView
+git status --short --branch
+sed -n '1,220p' docs/parallel-sessions/shared.md
+sed -n '1,260p' docs/parallel-sessions/backend-api.md
+sed -n '1,260p' codex-tasks/backend-api-tasks.md
+GH_CONFIG_DIR=/projects/hep/fs10/shared/nnbar/billy/.config/gh /projects/hep/fs10/shared/nnbar/billy/bin/gh pr list --base main --state open --limit 50 --json number,title,headRefName,baseRefName,mergeStateStatus,isDraft,url
+git clone https://github.com/SzeChunYiu/GroceryView.git /tmp/groceryview-pane2-worker-a
+cd /tmp/groceryview-pane2-worker-a
+git fetch origin '+refs/heads/backend-api/worker-a-contracts:refs/remotes/origin/backend-api/worker-a-contracts'
+git diff --name-status origin/main..origin/backend-api/worker-a-contracts
+git checkout -B backend-api/worker-a-contract-wiring origin/main
+git fetch origin --prune
+git rebase origin/main
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH pnpm install --lockfile-only
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH PNPM_CONFIG_DANGEROUSLY_ALLOW_ALL_BUILDS=true pnpm install --frozen-lockfile
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH pnpm --filter @groceryview/api-contracts build
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH pnpm --filter api build
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH pnpm --filter api test:e2e
+PORT=3001 CORS_ORIGINS=http://localhost:3000 DATABASE_ENABLED=false \
+  PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH \
+  node apps/api/dist/main.js
+curl -fsS http://127.0.0.1:3001/health
+curl -fsSI http://127.0.0.1:3001/docs
+```
+
+### Verification output
+
+- Node: `v24.15.0`
+- pnpm: `10.11.0`
+- `pnpm install --frozen-lockfile`: passed. Warning: pnpm reported ignored build scripts for `@nestjs/core`, `@scarf/scarf`, `sharp`, and `unrs-resolver`; install exited 0.
+- `pnpm --filter @groceryview/api-contracts build`: passed.
+- `pnpm --filter api build`: passed; the API `prebuild` also rebuilt `@groceryview/api-contracts` successfully.
+- `pnpm --filter api test:e2e`: passed (`1 suite`, `3 tests`); re-runs after rebasing onto `origin/main` `1829b3a`, `5b20165`, and `ab63e3a` also passed.
+- Smoke with `node apps/api/dist/main.js`, `PORT=3001`, `DATABASE_ENABLED=false`:
+  - `GET /health` returned `{"status":"ok","service":"api"}`.
+  - `HEAD /docs` returned HTTP `200`; smoke was re-run after rebasing onto `origin/main` `1829b3a`, `5b20165`, and `ab63e3a` with the same `/health` JSON and `/docs` 200 results.
+
+### Next task / blockers
+
+- Open this repaired backend-only PR and request manager review as the safe replacement for stale PR #32.
+- No implementation blockers found. Note: invoking `pnpm --filter api start:prod` in this shell spent time bootstrapping Corepack, so the smoke test used the built `node apps/api/dist/main.js` entrypoint directly.
