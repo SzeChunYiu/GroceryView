@@ -509,3 +509,29 @@ COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HO
 - No frontend PR is available to accept right now.
 - Item 11 remains the only product-code blocker; Pane 2 has partial/in-progress local shadcn artifacts but has not pushed a PR yet.
 - Item 16 remains queued behind item 11 and must be run fresh from current `origin/main` after item 11 is merged.
+
+---
+
+## MANAGER update — 2026-05-17 04:45 CEST
+
+### Inputs rechecked
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/frontend-web.md` in the active manager session.
+- Rechecked `codex-tasks/frontend-web-tasks.md` and current `origin/main` artifacts.
+- Refreshed frontend PR/branch state: no open `frontend-web/*` PR is currently available for acceptance.
+
+### Current accepted checklist state on `origin/main`
+- Accepted/merged items: 1-10 and 12-15.
+- Verified missing item 11 artifacts on `origin/main`: `apps/web/components.json`, `apps/web/src/lib/utils.ts`, and `apps/web/src/components/ui/{button,card,badge,input,table,tabs}.tsx` are absent.
+- Item 16 remains blocked until item 11 merges, because integrated verification must run against the final combined frontend state.
+
+### Worker queue sent to panes 2-5
+- **Pane 2 / WORKER-A:** remains primary owner for item 11 (`shadcn/ui` init + starter components). Manager inspected `/projects/hep/fs10/shared/nnbar/billy/gv-shadcn-worker-a-clone-20260517`; it currently shows only `apps/web/components.json` plus `pnpm-lock.yaml` changes, with required `src/lib/utils.ts` and UI component files still missing. Pane 2 was instructed to complete item 11 from current `origin/main` or report the exact blocker; no item 16 work.
+- **Pane 3 / WORKER-B:** item 13 is already accepted/merged via PR #49. Pane 3 was told to stand by as backup for item 11 only if Pane 2 reports a blocker or no PR appears after reassignment; otherwise do not edit product code.
+- **Pane 4 / WORKER-C:** item 15 is already accepted/merged via PR #44. Pane 4 was told to stand by for item 16 integrated verification only after item 11 lands.
+- **Pane 5 / WORKER-D:** backup for item 16 only; do not duplicate item 11 and do not reuse stale PR #53/worktrees.
+
+### Blockers / PR queue
+- No open frontend PR exists to accept/merge at this checkpoint.
+- Item 11 is the only product-code blocker.
+- Item 16 is dependency-blocked behind item 11 and must be run fresh from current `origin/main` after item 11 merges.
+- Note: the live tmux messages sent in this pass accidentally used a placeholder timestamp (`05:XX CEST`); this handoff entry records the actual manager pass time, `04:45 CEST`.
