@@ -690,3 +690,32 @@ Manager: PANE 1 / MANAGER-backend-api
 ### Completion audit snapshot
 - Prompt-to-artifact requirements checked: docs read; backend task checklist inspected; top remaining unchecked task identified as item 10 contract wiring; pane 2 assigned/queued but blocked by usage limits; panes 3-5 accepted/no-duplicate; PR #72 blocker queued/commented; no backend product-code implementation by PANE 1.
 - Missing/incomplete: checklist item 10 remains absent from current main and no clean worker PR is available to accept. Goal remains active.
+
+---
+
+## Manager update — 2026-05-17 06:32 Europe/Stockholm
+Manager: PANE 1 / MANAGER-backend-api
+
+### Intake performed
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md` this turn.
+- Rechecked `origin/main:codex-tasks/backend-api-tasks.md` at `5c6527f`; checklist items 1-15 still display unchecked in the file.
+- Refreshed open backend PRs; all open backend implementation PRs still report `CONFLICTING`, including PR #72.
+
+### Evidence audit
+- Current-main artifact check in `/tmp/gv-backend-current-audit-0630` at `5c6527f`:
+  - `apps/api/package.json` package name is `api`.
+  - `apps/api/package.json` still has no `@groceryview/api-contracts` dependency.
+  - `grep -R "@groceryview/api-contracts" apps/api/src` returns no imports.
+  - `packages/api-contracts/src/index.ts` still exports the required schemas.
+- PR #72 direct diff against current main still includes non-backend drift (`codex-tasks/frontend-web-tasks.md` and `docs/parallel-sessions/handoff-frontend-web.md`), so it remains unsafe to merge.
+- PR #72 merge-base patch/file list still shows the useful backend-owned contract-wiring delta, so the blocker remains: recreate/rebase from current main and keep only backend-owned changes.
+
+### Worker assignment / queue
+- **PANE 2 / WORKER-A:** remains assigned to current-main contract wiring for checklist item 10; last attempted worker launch failed with usage-limit before changes, so no duplicate launch was attempted in this short refresh.
+- **PANE 3 / WORKER-B:** database scaffold accepted/merged via PR #35; no duplicate task.
+- **PANE 4 / WORKER-C:** basket demo contract alignment accepted/merged via PR #48; no duplicate task.
+- **PANE 5 / WORKER-D:** required-package verifier accepted/merged via PR #47; no duplicate task.
+
+### Completion audit snapshot
+- Objective requirements checked: required docs read, task checklist inspected, top remaining task identified, panes 2-5 queue recorded, PR #72 blocker verified, no backend product-code implementation by PANE 1.
+- Missing/incomplete: checklist item 10 remains absent from current main and no clean mergeable worker PR is available. Goal remains active.
