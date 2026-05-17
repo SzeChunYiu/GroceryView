@@ -901,3 +901,60 @@ No Worker-B, Worker-C, or Worker-D audit PRs were produced in this pass. Resume 
 ### Manager note
 
 Pane 1 performed coordination only: inspected docs/tasks/PRs, accepted the Worker-A audit PR, attempted to assign panes 3-5, and queued their usage-limit blockers. Pane 1 did not implement schema/application/package changes.
+
+---
+
+## Worker-C update — audit checklist items 8-10
+
+Date: 2026-05-17
+Branch: `db-schema/worker-c-audit-8-10-20260517`
+Role: Pane 4 / WORKER-C
+Base: `origin/main` at `2d0b028`
+
+### Inputs reviewed
+
+- Read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/db-schema.md` from the active supervisor workspace before creating this isolated `origin/main` worktree; those lane coordination docs are not tracked on current `origin/main`.
+- Re-read `codex-tasks/db-schema-tasks.md` and the current DB handoff from the isolated worktree.
+- Checked current PR state before editing: no open `db-schema/*` PRs were pending. Previously merged PR #57 covers Pane 2 / WORKER-A audit items 1-4, and PR #63 records manager blockers for the remaining audit panes.
+
+### Audit scope
+
+Pane 1 requested Pane 4 / WORKER-C to cover checklist items 8-10 without duplicating already-merged DB schema work:
+
+8. Partitioning notes or implementation for monthly `price_observations` partitions by `observed_at`.
+9. Stockholm seed data for launch city/chains and the 20 hero products.
+10. Schema documentation covering every table, keys/FKs, price/provenance semantics, confidence labels, and the Deal Score travel-time exclusion.
+
+### Evidence
+
+Static audit command:
+
+```text
+python3 /tmp/audit_db_8_10.py
+```
+
+Result summary:
+
+```text
+SUMMARY: 64/64 checks passed
+PARTITIONS: price_observations_2026_05, price_observations_2026_06, price_observations_2026_07, price_observations_2026_08
+PRODUCT_COUNT: 20
+```
+
+Key assertions verified:
+
+- `infra/db/migrations/002_init.sql` defines `price_observations` with `PARTITION BY RANGE (observed_at)`, monthly partitions for May-August 2026, and `price_observations_default`.
+- `infra/db/migrations/004_partition_maintenance.sql` defines `ensure_price_observation_partitions(...)` to create missing monthly partitions and documents the maintenance safety behavior for rows that landed in the default partition.
+- `infra/db/SCHEMA.md` has a `## Partitioning` section describing the partition layout, default partition, and maintenance call pattern.
+- `infra/db/seeds/001_stockholm_seed.sql` inserts Stockholm, chains `ICA`, `Willys`, `Coop`, `Hemköp`, `Lidl`, and `City Gross`, plus exactly 20 hero product seed rows covering milk, eggs, butter, coffee, chicken, minced beef, pasta, rice, bread, cheese, bananas, tomatoes, potatoes, toilet paper, detergent, diapers, oat milk, yogurt, olive oil, and frozen pizza.
+- `infra/db/SCHEMA.md` documents all 26 required tables, primary keys, important foreign keys, price/provenance semantics, confidence labels, and why travel time is not encoded as a Deal Score ranking factor.
+
+### Status
+
+- Checklist items 8-10 are covered by current `origin/main` artifacts and this independent Worker-C audit evidence.
+- No SQL/schema changes were needed; this pass only records the Worker-C audit evidence to avoid repeating completed implementation.
+
+### Next
+
+- Pane 5 / WORKER-D can audit checklist items 11-14 if another independent closeout pass is still desired.
+- Do not recreate the already-merged partitioning, seed data, schema docs, compose/env/docs, indexes, package scaffold, validation handoffs, repo-state checks, or branch-record work.
