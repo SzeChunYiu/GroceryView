@@ -470,3 +470,18 @@ COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HO
 ### Current PR queue / blockers
 - `gh pr list --state open --search frontend-web` shows no open frontend-web PRs after PR #49 merged.
 - Worker launches for item 11 and item 16 remain blocked by Codex usage limit until capacity returns.
+
+---
+
+## MANAGER update — 2026-05-17 03:48 CEST
+
+### PR #53 blocker / closure
+- PR #53 (`frontend-web/integrated-build-verify-worker-d-pane5`) appeared as an item 16 handoff-only verification PR.
+- Manager did **not** accept it. Diff against current `origin/main` was stale/unsafe: it would delete the just-merged item 13 route files (`budget`, `categories/[slug]`, `products/[slug]`, `stores/[slug]`, `weekly-basket`) and modify non-frontend handoff content.
+- Manager commented the blocker and closed PR #53. Item 16 remains queued until item 11 is merged, then a fresh verification branch must be recreated from current `origin/main`.
+
+### Current final queue for frontend-web
+- **Pane 2 / WORKER-A:** restart item 11 (`shadcn/ui` init and starter components) from current `origin/main` when usage capacity returns.
+- **Pane 3 / WORKER-B:** item 13 is accepted/merged; available as backup for item 11 if Pane 2 remains blocked.
+- **Pane 4 / WORKER-C:** item 16 integrated verification after item 11 lands.
+- **Pane 5 / WORKER-D:** backup for item 16 only; do not reuse stale PR #53.
