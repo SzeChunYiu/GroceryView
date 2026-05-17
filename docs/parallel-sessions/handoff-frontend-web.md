@@ -554,3 +554,21 @@ COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HO
 ### Current PR queue
 - No open `frontend-web/*` PR exists at this checkpoint.
 - Item 11 remains the only product-code blocker; item 16 remains blocked behind item 11.
+
+---
+
+## MANAGER update — 2026-05-17 04:54 CEST
+
+### Worker capacity / blocker refresh
+- After Pane 3 was activated as the item 11 backup, Pane 3 reported a Codex usage-limit blocker: retry after 09:11. No branch/PR was produced.
+- Pane 4 was then activated as a second backup for item 11, but the pane was in a stale/broken goal state and then exited/dead before accepting the reassignment. No branch/PR was produced.
+- Pane 5 could not be cleanly resumed from its paused state; activation text remained queued in the CLI and no item 11 work/PR was produced.
+
+### Current queue
+- **Item 11 (`shadcn/ui` init + starter components)** remains the only product-code blocker. Pane 2 has partial local work only; Pane 3 is usage-limited; Pane 4/5 are not currently usable for a clean item 11 PR.
+- **Item 16 integrated verification** remains blocked until item 11 is merged on `origin/main`.
+- No open `frontend-web/*` PR exists to accept/merge at this checkpoint.
+
+### Next manager action
+- When any worker pane becomes usable, restart exactly one worker from fresh current `origin/main` on item 11. Require a complete PR containing `apps/web/components.json`, `apps/web/src/lib/utils.ts`, and `apps/web/src/components/ui/{button,card,badge,input,table,tabs}.tsx`, with Node 24 / pnpm 10.11.0 install, lint, and build evidence.
+- After item 11 merges, assign exactly one worker to item 16 integrated verification from current `origin/main`.
