@@ -268,3 +268,50 @@ COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HO
 ### Next action
 - Reassign panes 2-4 to items 11, 13, and 15 when workers can run again.
 - Keep Pane 5 / item 16 queued until those product-code PRs are merged, then run `pnpm install`, `pnpm --filter web lint`, and `pnpm --filter web build` on the integrated frontend state.
+
+---
+
+## WORKER-C update — 2026-05-17 02:38 CEST
+
+### Task implemented
+- Pane 4 / WORKER-C implemented checklist item 13: create placeholder route structure for the GroceryView web app.
+- Branch: `frontend-web/placeholder-routes-worker-c-20260517-0238`.
+- Based on current `origin/main` after the item 12 standalone-output PR was merged.
+
+### Changes made
+- Replaced the generated home page at `apps/web/src/app/page.tsx` with a Today / Stockholm market overview shell.
+- Added placeholder route pages:
+  - `apps/web/src/app/products/[slug]/page.tsx` — Product Price Terminal placeholder.
+  - `apps/web/src/app/stores/[slug]/page.tsx` — Store page placeholder.
+  - `apps/web/src/app/categories/[slug]/page.tsx` — Category page placeholder.
+  - `apps/web/src/app/weekly-basket/page.tsx` — Weekly Basket placeholder.
+  - `apps/web/src/app/budget/page.tsx` — Budget Tracker placeholder.
+- Updated `apps/web/src/app/layout.tsx` metadata and wired the existing shared `SiteHeader` / `SiteFooter` around all routes.
+
+### Commands run
+```bash
+git status --short --branch
+git fetch --prune origin
+git clone --no-local /projects/hep/fs10/shared/nnbar/billy/GroceryView /tmp/groceryview-worker-c-routes-clone-1778978532
+git checkout -b frontend-web/placeholder-routes-worker-c-20260517 origin/main
+git branch -m frontend-web/placeholder-routes-worker-c-20260517-0238
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache PNPM_STORE_DIR=/projects/hep/fs10/shared/nnbar/billy/.cache/pnpm-store-worker-c-routes2 corepack pnpm@10.11.0 install --frozen-lockfile
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache PNPM_STORE_DIR=/projects/hep/fs10/shared/nnbar/billy/.cache/pnpm-store-worker-c-routes2 corepack pnpm@10.11.0 --filter web lint
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache PNPM_STORE_DIR=/projects/hep/fs10/shared/nnbar/billy/.cache/pnpm-store-worker-c-routes2 corepack pnpm@10.11.0 --filter web build
+```
+
+### Verification
+- Node used: `v24.15.0`.
+- pnpm used: `10.11.0` with shared cache/config directories.
+- `pnpm install --frozen-lockfile`: passed with lockfile up to date.
+- `pnpm --filter web lint`: passed.
+- `pnpm --filter web build`: passed; Next.js 16.2.6 compiled, typechecked, and generated `/`, `/budget`, `/weekly-basket`, plus dynamic `/products/[slug]`, `/stores/[slug]`, and `/categories/[slug]` routes.
+- After PR #40 merged a manager handoff update, rebased this branch onto `origin/main` at `0f9c3a9`, preserved both handoff entries, and reran the same install/lint/build verification successfully.
+
+### Next unfinished checklist items
+- Item 11: initialize shadcn/ui and add starter components (`button`, `card`, `badge`, `input`, `table`, `tabs`).
+- Item 15: add `apps/web/src/components/price-chart-placeholder.tsx` with 7D/30D/90D/1Y controls and a Lightweight Charts-next note.
+
+### Blockers / notes
+- No blockers for item 13.
+- Work was completed in an isolated `/tmp` clone after the shared checkout/worktree area was observed to be dirty and subject to concurrent worker cleanup.
