@@ -454,3 +454,37 @@ Base: `origin/main` at `d47f706` (`Merge pull request #55 from SzeChunYiu/fronte
 ### Next / blockers
 - No known blockers for this small contract-alignment PR.
 - Older stale/conflicting backend PRs should remain blocked/superseded unless recreated from current `origin/main`.
+
+---
+
+## Manager update — 2026-05-17 05:07 Europe/Stockholm
+Manager: PANE 1 / MANAGER-backend-api
+
+### Intake performed
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md` from the shared workspace for this manager turn.
+- Checked `codex-tasks/backend-api-tasks.md` from `origin/main`; items 1-15 still display unchecked, but current `origin/main` now contains the scaffold/config/domain/contracts/database/package-verifier artifacts from merged backend PRs including #27, #29, #34, #35, #47, and #48.
+- Refreshed GitHub PR state after current `origin/main` reached `2d0b028` (`Merge pull request #48 from SzeChunYiu/backend-api/worker-c-third-task-contract-demo`).
+
+### Current backend PR audit / blockers
+- **PR #48** is now merged on `origin/main`; no further action for the basket item demo contract alignment.
+- **PR #56** `feat(api): wire shared response contracts` (`backend-api/worker-a-contract-wiring-current`) is the only open backend PR with a potentially useful remaining implementation delta. Merge-base audit shows a backend-owned patch to `apps/api/package.json`, type-only response contract wiring in API controllers, `pnpm-lock.yaml`, and this handoff. However GitHub reports it `CONFLICTING`, and direct diff from current `origin/main` shows it would also rewind/delete current-main handoff/lockfile state after later merges. It is therefore **not accepted as-is**.
+- Posted blocker comment on PR #56 requiring recreate/rebase from current `origin/main`, preserving all frontend/db/data files, other-lane handoffs, merged database/entity files, and the required-package verifier, then rerunning frozen install, `api verify:required-packages`, contracts build, API build, API e2e, and `/health` + `/docs` smoke.
+- Older open backend PRs #6, #7, #10, #12, #13, #19, #22, #28, #32, and #51 remain `CONFLICTING`/stale/superseded and should not be merged as-is.
+
+### Worker assignment / queue for panes 2-5
+- **PANE 2 / WORKER-A:** assigned to repair/supersede PR #56 on a fresh branch from current `origin/main`, scoped to backend-owned contract wiring only. Attempted worker spawn failed immediately with the usage-limit error before work began, so the assignment remains queued.
+- **PANE 3 / WORKER-B:** database scaffold was accepted/merged via PR #35; no duplicate database scaffold work should start.
+- **PANE 4 / WORKER-C:** basket item demo contract alignment was accepted/merged via PR #48; no duplicate contract-demo work should start.
+- **PANE 5 / WORKER-D:** required-package verifier was accepted/merged via PR #47; no duplicate package-verifier work should start.
+
+### Next manager action
+- Wait for worker capacity or a repaired PR #56 superseder branch.
+- Re-audit any repaired branch with both `git diff --name-status origin/main..origin/<branch>` and a merge-base patch check before merge.
+- A safe contract-wiring PR must be backend-scoped and pass: `corepack pnpm@10.21.0 install --frozen-lockfile`, `corepack pnpm@10.21.0 --filter api verify:required-packages`, `corepack pnpm@10.21.0 --filter @groceryview/api-contracts build`, `corepack pnpm@10.21.0 --filter api build`, `corepack pnpm@10.21.0 --filter api test:e2e`, plus `/health` and `/docs` smoke if practical.
+
+### Manager completion audit snapshot
+- Required docs read: `shared.md` and `backend-api.md` were read this turn.
+- Required checklist checked: `codex-tasks/backend-api-tasks.md` was inspected and remains stale/unchecked while current artifacts satisfy most listed scaffold tasks.
+- Top unchecked/remaining work assigned: PANE 2 has the only unique remaining repair assignment; panes 3-5 are explicitly accepted/no-duplicate for already merged work.
+- PR acceptance/blockers: no safe backend PR was available to merge this turn; PR #56 blocker was queued/commented; older backend PRs remain stale/superseded/blocked.
+- Do-not-implement constraint: satisfied; PANE 1 only inspected docs/git/PR state, posted a blocker comment, attempted worker assignment, and recorded this handoff.
