@@ -228,3 +228,43 @@ COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HO
 ### Blockers / notes
 - No blockers for item 12 after this rebase.
 - Work was completed in an isolated `/tmp/groceryview-workerb-rebase` clone to avoid the dirty shared GroceryView checkout and unrelated lane work.
+
+---
+
+## MANAGER update — 2026-05-17 02:44 CEST
+
+### Inputs rechecked
+- Re-read `docs/parallel-sessions/shared.md`, `docs/parallel-sessions/frontend-web.md`, and `codex-tasks/frontend-web-tasks.md` in this manager pass.
+- Refreshed remote state with `git fetch origin --prune` and checked GitHub PR state with `gh pr view` / `gh pr list`.
+
+### PR accepted / merged
+- Accepted and merged PR #33 (`frontend-web/standalone-output-worker-b`) for checklist item 12.
+- Review evidence: PR #33 was rebased and GitHub reported `MERGEABLE`; diff only changed `apps/web/next.config.ts` to `output: "standalone"` plus handoff text.
+- Independent manager verification on the PR branch:
+  - `pnpm install --frozen-lockfile` passed (first local run used default Node v20 and produced only engine warnings).
+  - Re-ran `pnpm --filter web lint` with Node `v24.15.0`: passed.
+  - Re-ran `pnpm --filter web build` with Node `v24.15.0`: passed.
+- Post-merge evidence: `origin/main` at `2a2a1ce` contains `apps/web/next.config.ts` with `output: "standalone"`.
+
+### Current accepted frontend checklist evidence on `origin/main`
+- Items 1-7: merged via PR #3 (`frontend-web/monorepo-scaffold`).
+- Item 8: merged via PR #20 (`frontend-web/web-app-scaffold-worker-a`).
+- Item 9: satisfied in current `apps/web/package.json` (`next` 16.2.6, React/React DOM 19.2.4, required `typescript`, `tailwindcss`, `eslint`, `eslint-config-next`).
+- Item 10: merged via PR #23 (`frontend-web/ui-data-packages-worker-c`).
+- Item 12: merged via PR #33 (`frontend-web/standalone-output-worker-b`).
+- Item 14: merged via PR #31 (`frontend-web/layout-components-worker-d`).
+
+### Top unchecked task assignments sent to panes 2-5
+- Pane 2 / WORKER-A: item 11 — initialize shadcn/ui and add `button`, `card`, `badge`, `input`, `table`, `tabs`.
+- Pane 3 / WORKER-B: item 13 — create placeholder route structure for home/products/stores/categories/weekly-basket/budget.
+- Pane 4 / WORKER-C: item 15 — add `apps/web/src/components/price-chart-placeholder.tsx` with 7D/30D/90D/1Y controls and Lightweight Charts-next note.
+- Pane 5 / WORKER-D: item 16 — verify integrated web build after items 11, 13, and 15 are available; currently dependency-blocked.
+
+### Worker results / blockers
+- All four worker agent attempts errored before producing branches or PRs due Codex usage limit (`try again at 4:11 AM`).
+- No open frontend PRs remain after merging PR #33.
+- Items 11, 13, 15, and integrated verification item 16 remain unchecked and should be resumed/reassigned when worker quota is available.
+
+### Next action
+- Reassign panes 2-4 to items 11, 13, and 15 when workers can run again.
+- Keep Pane 5 / item 16 queued until those product-code PRs are merged, then run `pnpm install`, `pnpm --filter web lint`, and `pnpm --filter web build` on the integrated frontend state.
