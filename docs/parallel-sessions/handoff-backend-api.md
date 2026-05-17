@@ -248,3 +248,34 @@ Manager: PANE 1 / MANAGER-backend-api
 ### Next manager action
 - Re-audit any repaired PR with `git diff --name-status origin/main..origin/<branch>` before merge. Safe backend PRs must not delete/modify `apps/web/**`, frontend handoff, infra/db, data-worker files, or other lane-owned paths.
 - If PR #32 and #35 are repaired, merge contract wiring before database wiring only if the database branch has been rebased on the contracts merge; otherwise require the later PR to rebase again.
+
+---
+
+## Worker update — 2026-05-17 02:03 Europe/Stockholm
+Pane: PANE 3 / WORKER-B
+Branch: `backend-api/database-connection-current`
+
+### Task taken
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md`.
+- Avoided stale/superseded PR #7 and recreated the backend Phase 2 database-connection task from current `origin/main`; rebased again after `main` advanced to `b389f64`.
+
+### What changed
+- Added NestJS TypeORM/PostgreSQL support in `apps/api`:
+  - `DatabaseModule` and TypeORM config/data-source files.
+  - Dependencies: `@nestjs/typeorm`, `typeorm`, `pg`, `@types/pg`.
+  - Placeholder entities: `Product`, `Store`, `PriceEvent`.
+  - Migration CLI scripts in `apps/api/package.json`.
+  - Optional database initialization via `DATABASE_ENABLED`; disabled mode keeps `/health` and demo routes usable without local PostgreSQL.
+- Extended API env validation and `.env.example` with optional DB settings.
+
+### Verification run
+- `corepack pnpm install --frozen-lockfile` — passed.
+- `corepack pnpm --filter api build` — passed.
+- `corepack pnpm --filter @groceryview/api-contracts build` — passed.
+- `corepack pnpm --filter api test:e2e` — passed (`1` suite, `3` tests).
+- TypeORM metadata smoke: built entity metadata for `Product`, `Store`, and `PriceEvent`; verified `price_events` uses `product_id` and `store_id` without duplicate join columns.
+- Runtime smoke: `PORT=3015 DATABASE_ENABLED=false node dist/main.js`; `curl http://127.0.0.1:3015/health` returned `200` and `{ "status": "ok", "service": "api" }`.
+
+### Next / blockers
+- PR should be audited for scope against current `origin/main`; intended diff is limited to `apps/api/**`, root `pnpm-lock.yaml`, and this handoff.
+- Next backend task after merge: add real repository/service methods and migrations once the DB schema package is aligned with API entities.

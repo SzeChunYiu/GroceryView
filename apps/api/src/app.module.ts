@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AlertsModule } from './alerts/alerts.module';
 import { BasketsModule } from './baskets/baskets.module';
+import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
 import { PricesModule } from './prices/prices.module';
 import { ProductsModule } from './products/products.module';
@@ -17,6 +18,7 @@ import { validateEnvironment } from './config/env.schema';
       isGlobal: true,
       validate: validateEnvironment,
     }),
+    DatabaseModule,
     HealthModule,
     AlertsModule,
     BasketsModule,

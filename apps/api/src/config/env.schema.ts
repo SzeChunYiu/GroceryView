@@ -9,6 +9,13 @@ export const EnvSchema = z
       .default('development'),
     PORT: z.coerce.number().int().min(1).max(65535).default(3001),
     DATABASE_URL: optionalUrl,
+    DATABASE_ENABLED: z.string().optional(),
+    DB_HOST: z.string().optional(),
+    DB_PORT: z.coerce.number().int().min(1).max(65535).optional(),
+    DB_USER: z.string().optional(),
+    DB_PASSWORD: z.string().optional(),
+    DB_NAME: z.string().optional(),
+    TYPEORM_LOGGING: z.string().optional(),
     REDIS_URL: optionalUrl.default('redis://localhost:6379'),
     CORS_ORIGINS: z.string().default('http://localhost:3000'),
   })
