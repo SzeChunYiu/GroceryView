@@ -535,3 +535,22 @@ COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HO
 - Item 11 is the only product-code blocker.
 - Item 16 is dependency-blocked behind item 11 and must be run fresh from current `origin/main` after item 11 merges.
 - Note: the live tmux messages sent in this pass accidentally used a placeholder timestamp (`05:XX CEST`); this handoff entry records the actual manager pass time, `04:45 CEST`.
+
+---
+
+## MANAGER update — 2026-05-17 04:49 CEST
+
+### Item 11 blocker / backup activation
+- After the 04:45 queue update, the Pane 2 item 11 attempt showed a failed/dead background shadcn command (`signal 9`) and a partial local state in `/projects/hep/fs10/shared/nnbar/billy/gv-shadcn-worker-a-clone-20260517`.
+- Partial Pane 2 artifacts observed: `apps/web/components.json`, `apps/web/src/lib/utils.ts`, and `apps/web/src/components/ui/button.tsx` existed, but required `card.tsx`, `badge.tsx`, `input.tsx`, `table.tsx`, and `tabs.tsx` were still missing; no PR was opened.
+- Pane 2 was instructed not to push partial item 11 work and to treat the state as a blocker unless it can safely recover to a complete, verified PR.
+
+### Updated worker queue
+- **Pane 3 / WORKER-B:** activated as backup owner for checklist item 11 from a fresh current `origin/main` branch; explicitly instructed not to use Pane 2 or Pane 5 partial shadcn worktrees. Required deliverables remain `components.json`, `src/lib/utils.ts`, UI components `button`, `card`, `badge`, `input`, `table`, `tabs`, verification, handoff, commit, push, and PR.
+- **Pane 2 / WORKER-A:** may continue only if it can recover to a complete item 11 PR safely; otherwise stand down to avoid duplicate/partial PRs.
+- **Pane 4 / WORKER-C:** remains queued for item 16 integrated verification after item 11 merges.
+- **Pane 5 / WORKER-D:** remains item 16 backup only; do not resume or push partial shadcn work.
+
+### Current PR queue
+- No open `frontend-web/*` PR exists at this checkpoint.
+- Item 11 remains the only product-code blocker; item 16 remains blocked behind item 11.
