@@ -279,3 +279,41 @@ Branch: `backend-api/database-connection-current`
 ### Next / blockers
 - PR should be audited for scope against current `origin/main`; intended diff is limited to `apps/api/**`, root `pnpm-lock.yaml`, and this handoff.
 - Next backend task after merge: add real repository/service methods and migrations once the DB schema package is aligned with API entities.
+
+---
+
+## Manager update — 2026-05-17 02:22 Europe/Stockholm
+Manager: PANE 1 / MANAGER-backend-api
+
+### Intake performed
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md` at the start of this manager turn.
+- Checked `codex-tasks/backend-api-tasks.md` from `origin/main`; the checklist file still shows items 1-15 unchecked even though current merged artifacts satisfy the scaffold/config/domain/contracts checklist and PR #35 now adds the database scaffold.
+- Refreshed open PR state after `origin/main` advanced to `86848dc` (`Merge pull request #35 from SzeChunYiu/backend-api/database-connection-current`).
+
+### PR acceptance / verification
+- **Accepted and merged PR #35** `feat(api): add database connection scaffold` (`backend-api/database-connection-current`). Merge commit: `86848dc`.
+- Scope audit before merge: diff was limited to `apps/api/**`, root `pnpm-lock.yaml`, and `docs/parallel-sessions/handoff-backend-api.md`; no other-lane deletions.
+- Manager verification in isolated worktree `/tmp/groceryview-pr35-audit` at PR head `bae373a`:
+  - `corepack pnpm@10.21.0 install --frozen-lockfile` — passed.
+  - `corepack pnpm@10.21.0 --filter api build` — passed.
+  - `corepack pnpm@10.21.0 --filter @groceryview/api-contracts build` — passed.
+  - `corepack pnpm@10.21.0 --filter api test:e2e` — passed (`1` suite, `3` tests).
+  - Runtime smoke with `PORT=3012 DATABASE_ENABLED=false node dist/main.js`: `GET /health` returned `{ "status": "ok", "service": "api" }`; `/docs` returned HTTP `200`.
+
+### Worker assignment / queue for panes 2-5
+- **PANE 2 / WORKER-A:** PR #32 `backend-api/worker-a-contracts` remains blocked. Recreate/rebase from current `origin/main` and keep only additive backend-owned contract-wiring changes. Preserve `apps/web/**`, other-lane handoffs, `apps/api/src/database/**`, entity files, `infra/**`, `packages/db/**`, and root workspace files. Re-run install/build/contracts-build/e2e/smoke before review. Updated blocker comment posted on PR #32.
+- **PANE 3 / WORKER-B:** PR #35 database scaffold is accepted/merged. No duplicate database task should be started.
+- **PANE 4 / WORKER-C:** Domain placeholder work was accepted earlier via PR #29. No duplicate domain placeholder task should be started.
+- **PANE 5 / WORKER-D:** Required package refresh was accepted earlier via PR #34. No duplicate package-refresh task should be started.
+
+### Remaining blockers / stale PRs
+- PR #32 is the only potentially unique open backend implementation PR, but it is unsafe as-is because it deletes/modifies other-lane files and would remove the newly merged database scaffold.
+- Older backend PRs #6, #7, #10, #12, #13, #19, #22, and #28 remain stale/superseded/blocked and should not be merged as-is.
+- `codex-tasks/backend-api-tasks.md` is now stale: checkboxes remain unchecked while artifacts on `origin/main` cover the listed scaffold/domain/contracts/build tasks. A future docs-only checklist-maintenance PR may mark completed items or replace the file with the next backend task list (repositories/services/migrations), but PANE 1 did not change it this turn.
+
+### Manager completion audit snapshot
+- Required docs read: `shared.md` and `backend-api.md` were read this turn.
+- Required checklist checked: `origin/main:codex-tasks/backend-api-tasks.md` was read and found stale/unchecked.
+- Top unchecked work assigned/queued: panes 2-5 assignments above avoid duplicated already-merged work and queue the remaining unique repair (#32) plus no-duplicate instructions for accepted panes.
+- PR acceptance/blockers: PR #35 accepted after direct diff/test/smoke audit; PR #32 blocker updated; older stale backend PRs remain queued as blocked/superseded.
+- Do-not-implement constraint: satisfied; PANE 1 only inspected docs/git/PR state, verified in isolated worktrees, posted blocker comments, merged an audited worker PR, and appended this handoff.
