@@ -604,3 +604,31 @@ Manager: PANE 1 / MANAGER-backend-api
 - PANE 2 repair is active but needs one more rebase of PR #72 before merge.
 - Panes 3-5 remain accepted/no-duplicate for already merged database scaffold, contract-demo alignment, and required-package verifier.
 - No backend implementation PR is currently mergeable and safe as-is.
+
+---
+
+## Manager update — 2026-05-17 06:06 Europe/Stockholm
+Manager: PANE 1 / MANAGER-backend-api
+
+### Intake performed
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md` at the start of this manager turn.
+- Rechecked `codex-tasks/backend-api-tasks.md` from current `origin/main` (`7eba7ff`); items 1-15 still display unchecked even though current main contains the previously merged backend scaffold/config/domain/contracts/database/package-verifier artifacts.
+- Refreshed PR #72 and open backend PR state.
+
+### PR #72 refresh / blocker
+- PR #72 (`backend-api/worker-a-contract-wiring-repair-20260517`) remains open and GitHub reports it `CONFLICTING`.
+- Direct diff from current `origin/main` now includes non-backend drift in addition to the backend contract-wiring files:
+  - `codex-tasks/frontend-web-tasks.md`
+  - `docs/parallel-sessions/handoff-frontend-web.md`
+- Merge-base diff still shows the intended backend-owned product delta (`apps/api` controllers/package, `pnpm-lock.yaml`, backend handoff), but the branch must be recreated/rebased from current `origin/main` and preserve all frontend/codex-task/other-lane files.
+- Posted an updated blocker comment on PR #72: keep only backend-owned contract-wiring changes, rerun the full backend verification gate, and request review.
+
+### Worker assignment / queue
+- **PANE 2 / WORKER-A:** attempted to launch a fresh worker for the PR #72 repair/superseder branch, but agent `019e341c-919b-79f1-92dd-fb77a64dfc24` failed immediately with the usage-limit error before making changes. Assignment remains queued.
+- **PANE 3 / WORKER-B:** database scaffold already accepted/merged via PR #35; no duplicate task.
+- **PANE 4 / WORKER-C:** basket demo contract alignment already accepted/merged via PR #48; no duplicate task.
+- **PANE 5 / WORKER-D:** required-package verifier already accepted/merged via PR #47; no duplicate task.
+
+### Completion audit snapshot
+- Objective deliverables checked: required docs read; backend checklist inspected; pane 2 repair assignment attempted/queued; panes 3-5 are accepted/no-duplicate; PR #72 and stale backend PRs remain blocked; no backend product-code implementation by PANE 1.
+- Missing/incomplete: the remaining contract-wiring delta is not merged because PR #72 is conflicting and currently includes non-backend drift. Goal remains active until a clean repaired PR is accepted or the queue is otherwise resolved.
