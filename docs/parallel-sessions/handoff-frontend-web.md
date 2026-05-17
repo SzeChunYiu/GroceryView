@@ -131,3 +131,26 @@ pnpm --filter web build
 ### Blockers / notes
 - This branch intentionally avoids checklist items 11-13 because those were reserved for Panes 2-4 in the same parallel wave.
 - The shared root worktree remains dirty with unrelated lane files, so this work was done in an isolated worktree.
+
+---
+
+## MANAGER update — 2026-05-17 02:06 CEST
+
+### Current mainline accepted work
+- Accepted and merged PR #31 (`frontend-web/layout-components-worker-d`): checklist item 14 shared layout components.
+- Previously merged frontend PRs on `main`: #3 items 1-7, #20 item 8, #23 item 10.
+
+### PR review / queued blocker
+- Reviewed PR #33 (`frontend-web/standalone-output-worker-b`) for checklist item 12.
+- Substance accepted: `apps/web/next.config.ts` sets `output: "standalone"`, and the PR reports successful `pnpm install --frozen-lockfile`, `pnpm --filter web lint`, and `pnpm --filter web build`.
+- Blocker queued on PR #33: merge conflict after PR #31 updated this handoff. Worker must rebase onto current `origin/main`, preserve the WORKER-D handoff entry, rerun verification, and push before merge.
+
+### Top unchecked task assignments attempted
+- Pane 2 / WORKER-A: checklist item 11, initialize shadcn/ui and add `button`, `card`, `badge`, `input`, `table`, `tabs`.
+- Pane 3 / WORKER-B: checklist item 12, configure standalone output. PR #33 opened but is blocked by conflict as above.
+- Pane 4 / WORKER-C: checklist item 13, create placeholder route structure.
+- Pane 5 / WORKER-D: checklist item 15, add `price-chart-placeholder.tsx` with 7D/30D/90D/1Y controls and Lightweight Charts-next note.
+
+### Blockers
+- Worker agent runs for panes 2, 4, and 5 errored before producing PRs due Codex usage limit. No remote branches/PRs exist for checklist items 11, 13, or 15 as of this manager pass.
+- PR #33 remains open but conflicting; do not merge until rebased.
