@@ -488,3 +488,39 @@ Manager: PANE 1 / MANAGER-backend-api
 - Top unchecked/remaining work assigned: PANE 2 has the only unique remaining repair assignment; panes 3-5 are explicitly accepted/no-duplicate for already merged work.
 - PR acceptance/blockers: no safe backend PR was available to merge this turn; PR #56 blocker was queued/commented; older backend PRs remain stale/superseded/blocked.
 - Do-not-implement constraint: satisfied; PANE 1 only inspected docs/git/PR state, posted a blocker comment, attempted worker assignment, and recorded this handoff.
+
+---
+
+## Manager update — 2026-05-17 05:24 Europe/Stockholm
+Manager: PANE 1 / MANAGER-backend-api
+
+### Intake performed
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md` at the start of this manager turn.
+- Checked `codex-tasks/backend-api-tasks.md`; the file still shows items 1-15 unchecked even though current `origin/main` contains the scaffold/config/domain/contracts/database/package-verifier artifacts from merged backend PRs.
+- Refreshed open backend PR state against current `origin/main` (`20efcb6`, merge of backend manager status #66).
+
+### Current backend PR audit / blockers
+- Open backend PRs remain #6, #7, #10, #12, #13, #19, #22, #28, #32, #51, and #56; GitHub reports all as `CONFLICTING`/`DIRTY`.
+- PR #56 (`backend-api/worker-a-contract-wiring-current`) remains the only potentially useful remaining implementation PR. Direct diff from current main is backend-owned (`apps/api` controllers/package, `pnpm-lock.yaml`, and this backend handoff), but GitHub still reports it conflicting, so it was not accepted.
+- Posted a corrected blocker/update comment on PR #56: recreate/rebase from current `origin/main`, preserve all merged database/entity/verifier files and other lanes, keep only backend contract-wiring delta, then rerun frozen install, package verifier, contracts build, API build, e2e, and `/health` + `/docs` smoke.
+- Older backend PRs remain stale/superseded/blocked and should not be merged as-is.
+
+### Worker assignment / queue for panes 2-5
+- **PANE 2 / WORKER-A:** assigned to repair/supersede PR #56 from current `origin/main` with backend-only contract wiring. Spawned worker `019e33f3-2fe9-7420-9ea9-eb7d993a8050` failed immediately with the usage-limit error before making changes, so the assignment remains queued.
+- **PANE 3 / WORKER-B:** database scaffold already accepted/merged via PR #35; no duplicate database task should start.
+- **PANE 4 / WORKER-C:** basket item demo contract alignment already accepted/merged via PR #48; no duplicate contract-demo task should start.
+- **PANE 5 / WORKER-D:** required-package verifier already accepted/merged via PR #47; no duplicate package-verifier task should start.
+
+### Verification evidence on current main
+- In isolated worktree `/tmp/groceryview-main-audit` at `origin/main`:
+  - `corepack pnpm@10.21.0 install --frozen-lockfile` — passed.
+  - `corepack pnpm@10.21.0 --filter api verify:required-packages` — passed (`All required API packages are declared.`).
+  - `corepack pnpm@10.21.0 --filter @groceryview/api-contracts build` — passed.
+  - `corepack pnpm@10.21.0 --filter api build` — passed.
+  - `corepack pnpm@10.21.0 --filter api test:e2e` — passed (`1` suite, `3` tests).
+  - Runtime smoke with `PORT=3023 DATABASE_ENABLED=false node apps/api/dist/main.js`: `GET /health` returned `{"status":"ok","service":"api"}` and `HEAD /docs` returned HTTP `200`.
+
+### Completion audit snapshot
+- Objective deliverables audited: required docs read; backend checklist inspected; panes 2-5 assignments/queue updated; current open backend PRs audited; safe PRs accepted where available; blockers queued where unsafe; no product-code implementation done by PANE 1.
+- Missing/incomplete: the only remaining unique backend implementation delta, contract-wiring PR #56, is still blocked by GitHub conflicts and worker capacity. Therefore the backend manager objective is not complete.
+- Next manager action: wait for worker capacity or a repaired PR #56 superseder, then re-audit with `gh pr view`, `git diff --name-status origin/main..origin/<branch>`, merge-base patch inspection, and the verification commands above before accepting.
