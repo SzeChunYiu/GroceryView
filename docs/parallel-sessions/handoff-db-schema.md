@@ -667,3 +667,37 @@ Results: install, typecheck, and build passed. The runner still uses Node v20.20
 
 - Backend/API lanes can consume `@groceryview/db` through the root pnpm workspace once this PR lands.
 - Keep SQL migrations in `infra/db/migrations/` as the schema source of truth; do not reintroduce package-local lockfiles under workspace packages.
+
+---
+
+## Worker-D update — task 4 local compose documentation
+
+Date: 2026-05-17
+Branch: `db-schema/worker-d-compose-docs`
+Role: Pane 5 / WORKER-D
+
+### Inputs reviewed
+
+- Read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/db-schema.md` from the active supervisor workspace.
+- Re-read `docs/tech-stack.md`, `docs/architecture.md`, `ROADMAP.md`, and `codex-tasks/db-schema-tasks.md` for DB-lane context.
+- Checked `origin/main` before editing to avoid duplicating panes 2-4 and prior merged DB-schema work.
+
+### Task implemented
+
+Implemented the fourth unchecked DB checklist item for WORKER-D: local database compose usage/docs.
+
+`origin/main` already contains the required `infra/docker-compose.yml` services and root `.env.example`, so this pass preserved those artifacts and added `infra/README.md` with explicit worker/API/DB-schema lane commands for real local PostgreSQL/PostGIS, Redis, MinIO, and optional pgAdmin usage.
+
+### Verification
+
+- `infra/docker-compose.yml` contains `postgres` using `postgis/postgis:18-3.6` on `5432:5432`, `redis:7-alpine` on `6379:6379`, optional `dpage/pgadmin4:latest` on `5050:80`, and `minio/minio:latest` on `9000:9000` and `9001:9001`.
+- `.env.example` contains `DATABASE_URL`, `REDIS_URL`, `PGADMIN_DEFAULT_EMAIL`, `PGADMIN_DEFAULT_PASSWORD`, `S3_ENDPOINT`, and `S3_BUCKET` defaults.
+- `infra/docker-compose.yml` already includes worker/API lane comments; `infra/README.md` now provides the expanded local-development instructions allowed by task 4.
+- Ran grep checks for required images, port mappings, and root `.env.example` keys.
+- Parsed `infra/docker-compose.yml` with Python/PyYAML and asserted the task-4 services/images/ports match.
+- `docker compose -f infra/docker-compose.yml config` could not run in this container because `docker` is not installed (`docker: command not found`).
+- Documentation-only change; no SQL or application build was required.
+
+### Next
+
+Continue only with the next genuinely uncovered DB-schema checklist item after checking merged PR state. Do not recreate schema, indexes, partitions, seed data, package scaffold, validation handoffs, repo-state checks, or branch-record work already represented on `origin/main`.
