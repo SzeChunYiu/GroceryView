@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import type { WatchlistItem } from '@groceryview/api-contracts';
 
 export class CreateWatchlistItemDto {
   @IsString()
@@ -16,7 +17,7 @@ export class CreateWatchlistItemDto {
   note?: string;
 }
 
-export class WatchlistItemResponse {
+export class WatchlistItemResponse implements WatchlistItem {
   id!: string;
   productSlug!: string;
   productName!: string;
