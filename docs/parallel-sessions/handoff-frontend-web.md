@@ -398,3 +398,50 @@ PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PAT
 ### Next manager action
 - When worker capacity returns, restart Pane 2 on item 11 and Pane 3 on item 13 from current `origin/main`.
 - After those PRs are merged, assign exactly one of Pane 4 or Pane 5 to run item 16 integrated verification (`pnpm install`, `pnpm --filter web lint`, `pnpm --filter web build`) with Node 24/pnpm 10.11.0 and record the evidence.
+
+---
+
+## WORKER-D update — 2026-05-17 03:42 CEST
+
+### Task status
+- Pane 5 / WORKER-D checked the fourth active frontend assignment from the queue: checklist item 16, integrated web verification.
+- Branch: `frontend-web/integrated-build-verify-worker-d-pane5`.
+- Base after rebase: current `origin/main` at `5b20165`; product-code state is unchanged from `c2ba793` for frontend files, and includes merged PR #44 for checklist item 15.
+- Result: current mainline verification passes, but item 16 remains dependency-blocked as a *final integrated* verification because manager evidence shows checklist items 11 and 13 are still missing on `origin/main`.
+
+### Verification commands run
+```bash
+git status --short --branch
+git fetch origin --prune
+git worktree add -b frontend-web/integrated-build-verify-worker-d-pane5 /tmp/groceryview-pane5-frontend-web-task4 origin/main
+git reset --hard origin/main
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH \
+  COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack \
+  XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache \
+  corepack pnpm@10.11.0 install
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH \
+  COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack \
+  XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache \
+  corepack pnpm@10.11.0 --filter web lint
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH \
+  COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack \
+  XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache \
+  corepack pnpm@10.11.0 --filter web build
+```
+
+### Results
+- Node used: `v24.15.0`.
+- pnpm used: `10.11.0` via Corepack.
+- `pnpm install`: passed for all 5 workspace projects with the lockfile already up to date.
+- `pnpm --filter web lint`: passed.
+- `pnpm --filter web build`: passed; Next.js `16.2.6` compiled, typechecked, and generated the current app routes successfully.
+
+### Files changed
+- `docs/parallel-sessions/handoff-frontend-web.md` only; this records current-state verification and the remaining dependency blocker.
+
+### Current frontend blockers / next unfinished items
+- Item 11 (`shadcn/ui` init) remains unchecked; no open frontend PR found for it.
+- Item 13 (`placeholder route structure`) remains unchecked on `origin/main`; the earlier PR #41 was closed unmerged.
+- Item 15 (`price-chart-placeholder`) is merged via PR #44 and present on `origin/main`.
+- Do not treat this as the final item 16 integrated verification until items 11 and 13 are merged and exactly one verification worker reruns `pnpm install`, `pnpm --filter web lint`, and `pnpm --filter web build` on that final integrated state.
+
