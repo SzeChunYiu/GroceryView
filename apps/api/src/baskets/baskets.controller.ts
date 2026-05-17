@@ -1,8 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import type { WeeklyBasket, WeeklyBasketItem } from '@groceryview/api-contracts';
 import { IsInt, IsOptional, IsString, Min } from 'class-validator';
 
-export class WeeklyBasketItemResponse {
+export class WeeklyBasketItemResponse implements WeeklyBasketItem {
   id!: string;
   productSlug!: string;
   productName!: string;
@@ -14,7 +15,7 @@ export class WeeklyBasketItemResponse {
   demo!: true;
 }
 
-export class WeeklyBasketResponse {
+export class WeeklyBasketResponse implements WeeklyBasket {
   id!: string;
   weekStartsOn!: string;
   currency!: 'SEK';
