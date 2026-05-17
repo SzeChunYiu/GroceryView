@@ -491,7 +491,7 @@ COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HO
 ## MANAGER update — 2026-05-17 04:34 CEST
 
 ### Inputs rechecked
-- Re-read/used required manager inputs: `docs/parallel-sessions/shared.md`, `docs/parallel-sessions/frontend-web.md`, and `codex-tasks/frontend-web-tasks.md` from current `origin/main`.
+- Re-read/used required manager inputs from the active local worktree: `docs/parallel-sessions/shared.md`, `docs/parallel-sessions/frontend-web.md`, and `codex-tasks/frontend-web-tasks.md`; the task file and this handoff were also checked against current `origin/main`.
 - Refreshed GitHub/frontend state; no open `frontend-web/*` PRs were present at this check.
 
 ### Current checklist state on `origin/main`
