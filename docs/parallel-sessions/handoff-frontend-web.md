@@ -351,3 +351,50 @@ PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PAT
 ### Blockers / notes
 - No blockers for item 15.
 - Earlier PR #41 for item 13 was closed after the current mainline manager handoff made item 15 the Pane 4 / WORKER-C task.
+
+---
+
+## MANAGER update — 2026-05-17 03:38 CEST
+
+### Inputs rechecked
+- Re-read/used the required manager inputs for this pass: `docs/parallel-sessions/shared.md`, `docs/parallel-sessions/frontend-web.md`, and `codex-tasks/frontend-web-tasks.md`.
+- Refreshed/inspected current GitHub state. Current `origin/main` evidence at this pass: `c2ba793` with PR #44 merged (`d819ef2`) and no open frontend-web PRs.
+
+### PR accepted / merged this pass
+- Accepted and merged PR #44 (`frontend-web/price-chart-placeholder-worker-c-20260517`) for checklist item 15.
+- Manager audit before merge used an isolated worktree merge of PR head `d2247a7` into current main. The effective merge added `apps/web/src/components/price-chart-placeholder.tsx` and updated this handoff only.
+- Verified the item 15 artifact contains the required `7D`, `30D`, `90D`, `1Y` controls and the required “TradingView Lightweight Charts integration is next” note.
+- Independent manager verification with Node `v24.15.0` and pnpm `10.11.0` passed:
+  - `corepack pnpm@10.11.0 install --frozen-lockfile`
+  - `corepack pnpm@10.11.0 --filter web lint`
+  - `corepack pnpm@10.11.0 --filter web build`
+
+### Current accepted frontend checklist evidence on `origin/main`
+- Items 1-7: monorepo scaffold merged via PR #3.
+- Item 8: web app scaffold merged via PR #20.
+- Item 9: current `apps/web/package.json` includes `next` 16.2.6, `react`/`react-dom` 19.2.4, and required TypeScript/Tailwind/ESLint packages.
+- Item 10: web UI/data packages merged via PR #23.
+- Item 12: standalone output config merged via PR #33; current `apps/web/next.config.ts` sets `output: "standalone"`.
+- Item 14: shared layout components merged via PR #31.
+- Item 15: price chart placeholder merged via PR #44; current main has `apps/web/src/components/price-chart-placeholder.tsx`.
+
+### Current missing artifacts / unchecked work
+- Item 11 is still missing on `origin/main`: no `apps/web/components.json`, no `apps/web/src/lib/utils.ts`, and no `apps/web/src/components/ui/{button,card,badge,input,table,tabs}.tsx`.
+- Item 13 is still missing on `origin/main`: no `apps/web/src/app/products/[slug]/page.tsx`, `stores/[slug]/page.tsx`, `categories/[slug]/page.tsx`, `weekly-basket/page.tsx`, or `budget/page.tsx`.
+- Item 16 integrated verification is blocked until items 11 and 13 are merged. The last manager verification covered current main plus item 15, but cannot validate the future integrated final state containing items 11 and 13.
+
+### Top unchecked task assignments / queue for panes 2-5
+- **Pane 2 / WORKER-A:** assigned item 11 — initialize shadcn/ui for `apps/web`, choose Tailwind/CSS variables/neutral/components path `src/components/ui`, and add `button`, `card`, `badge`, `input`, `table`, `tabs`.
+- **Pane 3 / WORKER-B:** assigned item 13 — create placeholder route structure for `/`, `/products/[slug]`, `/stores/[slug]`, `/categories/[slug]`, `/weekly-basket`, and `/budget`.
+- **Pane 4 / WORKER-C:** queued item 16 integrated frontend verification after items 11 and 13 are present on `origin/main`; do not implement product-code fixes as part of verification.
+- **Pane 5 / WORKER-D:** backup/standby for item 16 integrated verification after items 11 and 13 are present; do not duplicate Pane 4 if Pane 4 has an active verification PR.
+
+### Worker results / blockers
+- Pane 2 worker launch for item 11 failed before work began with Codex usage-limit error: “try again at 4:11 AM.” No PR/branch was produced.
+- Pane 3 worker launch for item 13 failed before work began with the same usage-limit error. No PR/branch was produced.
+- Pane 4 and Pane 5 verification worker launches also failed before work began with the same usage-limit error; verification remains dependency-blocked anyway because items 11 and 13 are missing.
+- Current GitHub PR queue has no open frontend-web PRs. Existing open PRs are backend/data-worker lanes and are out of this lane’s acceptance scope.
+
+### Next manager action
+- When worker capacity returns, restart Pane 2 on item 11 and Pane 3 on item 13 from current `origin/main`.
+- After those PRs are merged, assign exactly one of Pane 4 or Pane 5 to run item 16 integrated verification (`pnpm install`, `pnpm --filter web lint`, `pnpm --filter web build`) with Node 24/pnpm 10.11.0 and record the evidence.
