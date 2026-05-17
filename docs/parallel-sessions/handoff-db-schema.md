@@ -760,3 +760,89 @@ No worker closeout PRs were created from those assignments. Resume those worker 
 
 - If supervisor wants another independent worker pass, reassign the four audit slices above after the Codex usage limit resets.
 - Otherwise DB-schema has no open lane PRs pending manager acceptance as of this handoff.
+
+---
+
+## Worker-A update — audit checklist items 1-4
+
+Date: 2026-05-17
+Branch: `db-schema/worker-a-audit-20260517`
+Role: Pane 2 / WORKER-A
+Base: `origin/main` at `d47f706`
+
+### Inputs reviewed
+
+- Read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/db-schema.md` from the supervisor workspace before creating this isolated worktree.
+- Re-read `codex-tasks/db-schema-tasks.md` and the current DB handoff on `origin/main`.
+- Checked merged DB PR state to avoid duplicating completed work. The literal task-1 repo-state check is already represented by merged PR #21, and task-4 compose docs by merged PR #30.
+
+### Audit scope
+
+Pane 1 requested Pane 2 / WORKER-A to audit checklist items 1-4 against current `origin/main`:
+
+1. Check repo state before editing.
+2. Create a lane branch.
+3. Create database directories.
+4. Create local database compose/env/docs.
+
+### Evidence
+
+Repo state before editing in the isolated worktree:
+
+```text
+$ git status --short --branch
+## db-schema/worker-a-audit-20260517...origin/main
+
+$ git branch --show-current
+db-schema/worker-a-audit-20260517
+```
+
+Directory checks:
+
+```text
+OK dir infra/db/migrations
+OK dir infra/db/seeds
+OK dir packages/db/src
+```
+
+Compose/env/docs assertion output:
+
+```text
+PASS db-schema checklist audit items 1-4
+directories: infra/db/migrations, infra/db/seeds, packages/db/src
+compose: postgres/postgis 18, redis 7, pgadmin profile, minio ports verified
+env: DATABASE_URL, REDIS_URL, pgAdmin, S3 defaults verified
+docs: worker-lane real local DB compose guidance verified
+```
+
+Manual compose spot-check from `infra/docker-compose.yml`:
+
+```text
+postgres: image=postgis/postgis:18-3.6 ports=['5432:5432'] env={POSTGRES_DB, POSTGRES_USER, POSTGRES_PASSWORD}=groceryview
+redis: image=redis:7-alpine ports=['6379:6379']
+pgadmin: image=dpage/pgadmin4:latest ports=['5050:80'] profiles=['admin']
+minio: image=minio/minio:latest ports=['9000:9000', '9001:9001']
+```
+
+`.env.example` contains the required defaults:
+
+```text
+DATABASE_URL=postgresql://groceryview:groceryview@localhost:5432/groceryview
+REDIS_URL=redis://localhost:6379
+PGADMIN_DEFAULT_EMAIL=admin@groceryview.local
+PGADMIN_DEFAULT_PASSWORD=groceryview
+S3_ENDPOINT=http://localhost:9000
+S3_BUCKET=groceryview-raw
+```
+
+Worker-lane local DB guidance exists in both `infra/docker-compose.yml` comments and `infra/README.md`, including `docker compose -f infra/docker-compose.yml` commands for real local PostgreSQL/PostGIS development.
+
+### Status
+
+- Checklist items 1-4 are covered by current `origin/main` artifacts and this independent Worker-A audit evidence.
+- No SQL/schema changes were needed.
+
+### Next
+
+- Pane 3 / WORKER-B audit can cover checklist items 5-7 if another independent closeout pass is still desired.
+- Do not recreate the already-merged initial schema, compose, seed, partition, package, validation, or handoff artifacts.
