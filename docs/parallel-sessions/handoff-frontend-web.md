@@ -191,3 +191,40 @@ pnpm --filter web build
 - Resume/reassign item 12 to Pane 3 to clear PR #33 conflict, then manager can merge it after verification evidence is refreshed.
 - Resume/reassign item 13 to Pane 4; no PR exists yet.
 - Resume/reassign item 15 to Pane 5; no PR exists yet.
+
+---
+
+## WORKER-B update — 2026-05-17 02:30 CEST
+
+### Task implemented
+- Pane 3 / WORKER-B implemented checklist item 12, configure `apps/web/next.config.ts` with standalone output.
+- Branch: `frontend-web/standalone-output-worker-b`.
+- Rebased onto current `origin/main` at `e0f1323` (`Merge pull request #39 from SzeChunYiu/frontend-web/manager-blockers-20260517022511`) to clear PR #33's handoff conflict.
+- Preserved the merged WORKER-D and MANAGER handoff entries while resolving the conflict.
+
+### Changes made
+- Updated `apps/web/next.config.ts` to use a minimal TypeScript-valid Next.js config with `output: "standalone"`.
+
+### Commands run
+```bash
+git status --short --branch
+git fetch origin --prune
+git rebase origin/main
+COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH corepack pnpm@10.11.0 install --frozen-lockfile --store-dir /tmp/pnpm-store-gv-workerb-rebase
+COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH corepack pnpm@10.11.0 --filter web lint
+COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH corepack pnpm@10.11.0 --filter web build
+```
+
+### Verification
+- Node used: `v24.15.0`.
+- `pnpm install --frozen-lockfile`: passed after rebase.
+- `pnpm --filter web lint`: passed after rebase.
+- `pnpm --filter web build`: passed after rebase; Next.js 16.2.6 compiled, typechecked, and generated pages successfully with the standalone output config.
+
+### Next unfinished checklist items
+- Item 11 (`shadcn/ui` init) and item 13 (`placeholder route structure`) remain pending from the manager assignment wave.
+- Item 15 (`price-chart-placeholder`) remains pending after the already-merged Worker-D layout component work.
+
+### Blockers / notes
+- No blockers for item 12 after this rebase.
+- Work was completed in an isolated `/tmp/groceryview-workerb-rebase` clone to avoid the dirty shared GroceryView checkout and unrelated lane work.
