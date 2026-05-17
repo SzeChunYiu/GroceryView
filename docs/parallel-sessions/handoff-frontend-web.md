@@ -572,3 +572,59 @@ COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HO
 ### Next manager action
 - When any worker pane becomes usable, restart exactly one worker from fresh current `origin/main` on item 11. Require a complete PR containing `apps/web/components.json`, `apps/web/src/lib/utils.ts`, and `apps/web/src/components/ui/{button,card,badge,input,table,tabs}.tsx`, with Node 24 / pnpm 10.11.0 install, lint, and build evidence.
 - After item 11 merges, assign exactly one worker to item 16 integrated verification from current `origin/main`.
+
+---
+
+## WORKER-A update — 2026-05-17 05:04 CEST
+
+### Task implemented
+- Pane 2 / WORKER-A implemented checklist item 11: initialize shadcn/ui for `apps/web` and add starter components.
+- Branch: `frontend-web/shadcn-ui-worker-a-current`.
+- Based on current `origin/main` at `2d0b028` after rebasing before final verification.
+
+### Changes made
+- Added `apps/web/components.json` configured for Tailwind, CSS variables, neutral base color, and aliases with UI components at `src/components/ui`.
+- Added `apps/web/src/lib/utils.ts` with the shadcn `cn` helper.
+- Added starter shadcn UI components:
+  - `apps/web/src/components/ui/button.tsx`
+  - `apps/web/src/components/ui/card.tsx`
+  - `apps/web/src/components/ui/badge.tsx`
+  - `apps/web/src/components/ui/input.tsx`
+  - `apps/web/src/components/ui/table.tsx`
+  - `apps/web/src/components/ui/tabs.tsx`
+- Updated `apps/web/src/app/globals.css` with shadcn/Tailwind CSS variable theme tokens.
+- Updated `apps/web/package.json` and `pnpm-lock.yaml` with shadcn component dependencies (`class-variance-authority`, `clsx`, `radix-ui`, `shadcn`, `tailwind-merge`, `tw-animate-css`).
+
+### Commands run
+```bash
+git status --short --branch
+git fetch origin --prune
+git stash push -u -m 'wip shadcn item11 before rebase'
+git rebase origin/main
+git stash pop
+cd apps/web && corepack pnpm@10.11.0 dlx shadcn@latest add card badge input table tabs --yes
+corepack pnpm@10.11.0 install --frozen-lockfile
+corepack pnpm@10.11.0 --filter web lint
+corepack pnpm@10.11.0 --filter web build
+git fetch origin --prune
+git stash push -u -m 'wip shadcn item11 before latest rebase'
+git rebase origin/main
+git stash pop
+corepack pnpm@10.11.0 install --frozen-lockfile
+corepack pnpm@10.11.0 --filter web lint
+corepack pnpm@10.11.0 --filter web build
+```
+
+All pnpm commands were run with Node `v24.15.0` and pnpm `10.11.0` using shared cache/config directories.
+
+### Verification
+- `pnpm install --frozen-lockfile`: passed after rebasing onto current `origin/main`; lockfile was up to date.
+- `pnpm --filter web lint`: passed.
+- `pnpm --filter web build`: passed; Next.js 16.2.6 compiled, typechecked, and generated `/`, `/budget`, `/weekly-basket`, and dynamic category/product/store routes.
+
+### Next unfinished checklist item
+- Item 16: run integrated frontend verification from current `origin/main` after this item 11 PR is merged (`pnpm install`, `pnpm --filter web lint`, `pnpm --filter web build`) and record the evidence.
+
+### Blockers / notes
+- No blockers for item 11 after this update.
+- Item 16 should be run fresh only after the item 11 PR lands on `origin/main`.
