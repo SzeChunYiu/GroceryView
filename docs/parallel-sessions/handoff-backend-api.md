@@ -524,3 +524,31 @@ Manager: PANE 1 / MANAGER-backend-api
 - Objective deliverables audited: required docs read; backend checklist inspected; panes 2-5 assignments/queue updated; current open backend PRs audited; safe PRs accepted where available; blockers queued where unsafe; no product-code implementation done by PANE 1.
 - Missing/incomplete: the only remaining unique backend implementation delta, contract-wiring PR #56, is still blocked by GitHub conflicts and worker capacity. Therefore the backend manager objective is not complete.
 - Next manager action: wait for worker capacity or a repaired PR #56 superseder, then re-audit with `gh pr view`, `git diff --name-status origin/main..origin/<branch>`, merge-base patch inspection, and the verification commands above before accepting.
+
+---
+
+## Manager update — 2026-05-17 05:34 Europe/Stockholm
+Manager: PANE 1 / MANAGER-backend-api
+
+### Intake refresh after main advanced
+- After the previous manager-status PR #70 merged, `main` advanced again to `bd96339` via frontend PR #67 (`frontend-web/shadcn-ui-worker-a-current`).
+- Rechecked the backend queue against this new `origin/main`.
+
+### Updated PR #56 blocker
+- PR #56 (`backend-api/worker-a-contract-wiring-current`) remains blocked and is now unsafe by direct diff against `origin/main` because it would delete/modify newly merged frontend shadcn files (`apps/web/components.json`, `apps/web/package.json`, `apps/web/src/app/globals.css`, `apps/web/src/components/ui/*`, `apps/web/src/lib/utils.ts`) and modify `docs/parallel-sessions/handoff-frontend-web.md`.
+- Local merge test from `origin/main` into PR #56 also conflicts in `docs/parallel-sessions/handoff-backend-api.md`.
+- Posted an updated blocker comment on PR #56 with this evidence. Required action is still a fresh rebase/recreate from current `origin/main`, preserving all other lanes and keeping only backend contract-wiring changes.
+
+### Current-main backend verification after frontend merge
+- In isolated worktree `/tmp/gv-current-audit2` at `bd96339`:
+  - `corepack pnpm@10.21.0 install --frozen-lockfile` — passed.
+  - `corepack pnpm@10.21.0 --filter api verify:required-packages` — passed.
+  - `corepack pnpm@10.21.0 --filter @groceryview/api-contracts build` — passed.
+  - `corepack pnpm@10.21.0 --filter api build` — passed.
+  - `corepack pnpm@10.21.0 --filter api test:e2e` — passed (`1` suite, `3` tests).
+  - Runtime smoke with `PORT=3024 DATABASE_ENABLED=false node apps/api/dist/main.js`: `GET /health` returned `{"status":"ok","service":"api"}` and `HEAD /docs` returned HTTP `200`.
+
+### Queue status
+- PANE 2 / WORKER-A repair of PR #56 remains queued; prior spawn failed with usage-limit before work began.
+- Panes 3-5 remain no-duplicate/accepted for database scaffold, contract-demo alignment, and required-package verifier respectively.
+- No backend implementation PR is currently safe to merge as-is.
