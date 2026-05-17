@@ -904,6 +904,88 @@ Pane 1 performed coordination only: inspected docs/tasks/PRs, accepted the Worke
 
 ---
 
+## Worker-B update — audit checklist items 5-7
+
+Date: 2026-05-17
+Branch: `db-schema/worker-b-audit-5-7-20260517`
+Role: Pane 3 / WORKER-B
+Base: `origin/main` at `d330ac4`
+
+### Inputs reviewed
+
+- Read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/db-schema.md` before selecting work.
+- Re-read `codex-tasks/db-schema-tasks.md` and the current DB handoff from `origin/main`.
+- Avoided repeating Worker-A's accepted audit of checklist items 1-4; this Worker-B pass covers the next assigned slice, checklist items 5-7.
+
+### Audit scope
+
+Pane 1 requested Pane 3 / WORKER-B to audit checklist items 5-7 against current `origin/main`:
+
+5. `infra/db/migrations/001_extensions.sql` extension migration.
+6. `infra/db/migrations/002_init.sql` core schema migration.
+7. `infra/db/migrations/003_indexes.sql` required indexes migration.
+
+### Evidence
+
+Real PostgreSQL/PostGIS validation using the same PostGIS image via Apptainer applied migrations 001-003 with `ON_ERROR_STOP=1`:
+
+```text
+workdir=/tmp/groceryview-pane3-worker-b-audit
+commit=d330ac41e09e
+--- applying infra/db/migrations/001_extensions.sql ---
+CREATE EXTENSION
+CREATE EXTENSION
+CREATE EXTENSION
+--- applying infra/db/migrations/002_init.sql ---
+CREATE TYPE ...
+CREATE TABLE ...
+--- applying infra/db/migrations/003_indexes.sql ---
+CREATE INDEX ...
+--- catalog checks ---
+extensions=btree_gist,pg_trgm,postgis
+enum_count=5
+required_table_count=26
+stores_location_type=geography
+required_index_count=9
+server stopped
+```
+
+Full local validation log: `/tmp/gv-worker-b-audit-5-7-20260517-050153-validation.out`.
+
+Static checklist assertion output:
+
+```text
+PASS db-schema checklist audit items 5-7
+extensions: postgis, pg_trgm, btree_gist
+enums: price_type, source_type, confidence_band, alert_status, observation_status
+tables: 26 required core tables present
+core schema: SEK numeric(12,2), unit price, geography(Point,4326), provenance columns verified
+indexes: 9 required indexes present
+```
+
+Manual artifact findings:
+
+- `001_extensions.sql` creates `postgis`, `pg_trgm`, and `btree_gist` with `IF NOT EXISTS`.
+- `002_init.sql` defines the required enum types/check-style domains as PostgreSQL enums for price type, source type, confidence band, alert status, and observation status.
+- `002_init.sql` defines all 26 required core tables from checklist item 6.
+- Price columns use `numeric(12,2)` for SEK prices and preserve separate unit-price fields.
+- `stores.location` uses `geography(Point, 4326)`.
+- Provenance fields (`source_type`, `source_url`, `source_run_id`, `raw_record_id`, `observed_at`, `parser_version`, `confidence_score`) are present on price/provenance-bearing tables.
+- `003_indexes.sql` defines the required GiST, trigram GIN, price observation, promotion, latest price, watchlist, and basket-item indexes.
+
+### Status
+
+- Checklist items 5-7 are covered by current `origin/main` artifacts and this independent Worker-B audit evidence.
+- No schema changes were needed.
+
+### Next
+
+- Pane 4 / WORKER-C audit can cover checklist items 8-10 if another independent closeout pass is still desired.
+- Pane 5 / WORKER-D audit can cover checklist items 11-14.
+- Do not recreate the already-merged extensions, core schema, indexes, compose/env/docs, seed, partition, package, validation, or handoff artifacts.
+
+---
+
 ## Worker-D update — audit checklist items 11-14
 
 Date: 2026-05-17 05:45 CEST
@@ -986,3 +1068,44 @@ This branch is intended to be committed and opened as a DB-schema PR against `ma
 - Checklist items 11-14 are covered by current `origin/main` artifacts plus this Worker-D audit evidence.
 - No schema, application, or package implementation changes were needed; this is an independent closeout/audit PR for the fourth worker slice and intentionally does not duplicate panes 2-4.
 - Remaining host blocker: Docker is unavailable on this runner; Apptainer/PostgreSQL/PostGIS validation passed.
+
+---
+
+## Worker-D merge refresh — audit checklist items 11-14
+
+Date: 2026-05-17 06:50 CEST
+Branch: `db-schema/worker-d-audit-11-14-20260517`
+Role: Pane 5 / WORKER-D
+Base refreshed to: `origin/main` at `ab6dfb5`
+
+### Refresh reason
+
+`origin/main` advanced after the original Worker-D PR opened, so this branch was merged forward and the DB handoff conflict was resolved by preserving both the newer Worker-B audit evidence from `main` and the Worker-D audit evidence for the distinct fourth slice, checklist items 11-14.
+
+### Verification rerun after refresh
+
+Package validation in the refreshed branch:
+
+```text
+COREPACK_ENABLE_DOWNLOAD_PROMPT=0 COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@10.11.0 install --ignore-scripts
+COREPACK_ENABLE_DOWNLOAD_PROMPT=0 COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@10.11.0 --filter @groceryview/db typecheck
+COREPACK_ENABLE_DOWNLOAD_PROMPT=0 COREPACK_HOME=/tmp/corepack npm_config_cache=/tmp/npm-cache corepack pnpm@10.11.0 --filter @groceryview/db build
+```
+
+Result: install, typecheck, and build passed. Node on this runner is still v20.20.2, so the known Node 24 engine warning was emitted but did not fail the commands.
+
+Real PostgreSQL/PostGIS validation in the refreshed branch using `/tmp/groceryview-apptainer/postgis_18_3.6.sif`:
+
+```text
+APPLY infra/db/migrations/001_extensions.sql
+APPLY infra/db/migrations/002_init.sql
+APPLY infra/db/migrations/003_indexes.sql
+APPLY infra/db/migrations/004_partition_maintenance.sql
+APPLY infra/db/seeds/001_stockholm_seed.sql
+extensions=3
+chains_products=6|20
+price_observations_relkind=p
+price_observation_partitions=8
+```
+
+Literal Docker Compose validation remains host-blocked because `docker` is not installed on this runner. The refreshed branch remains a docs-only audit/closeout PR and does not duplicate panes 2-4 or change schema/package implementation artifacts.

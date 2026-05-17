@@ -628,3 +628,62 @@ All pnpm commands were run with Node `v24.15.0` and pnpm `10.11.0` using shared 
 ### Blockers / notes
 - No blockers for item 11 after this update.
 - Item 16 should be run fresh only after the item 11 PR lands on `origin/main`.
+
+---
+
+## WORKER-D / Pane 5 refresh — 2026-05-17 05:33 CEST
+
+### Task implemented
+- Pane 5 / WORKER-D reran the fourth assigned frontend task from the current parallel wave: checklist item 16, integrated web verification.
+- Branch: `frontend-web/integrated-build-verify-worker-d-current`.
+- Base: current `origin/main` after PR #67 (`frontend-web/shadcn-ui-worker-a-current`) was independently verified and merged, so item 11 shadcn/ui artifacts are present together with items 13 and 15. Final refresh was rebased onto `origin/main` at `8371992` after backend handoff PR #71; that intervening change was documentation-only outside the web app.
+- Scope: verification/handoff only; no product code was changed.
+
+### Integrated artifacts confirmed before verification
+- Item 11: `apps/web/components.json`, `apps/web/src/lib/utils.ts`, and `apps/web/src/components/ui/{button,card,badge,input,table,tabs}.tsx` exist on the verified state.
+- Item 13: placeholder routes for `/`, `/products/[slug]`, `/stores/[slug]`, `/categories/[slug]`, `/weekly-basket`, and `/budget` exist on the verified state.
+- Item 15: `apps/web/src/components/price-chart-placeholder.tsx` exists on the verified state.
+
+### Commands run
+```bash
+git status --short --branch
+git fetch origin --prune
+git reset --hard origin/main
+git rebase origin/main
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache corepack pnpm@10.11.0 install --frozen-lockfile --store-dir /tmp/pnpm-store-pane5-item16-refresh
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache corepack pnpm@10.11.0 --filter web lint
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache corepack pnpm@10.11.0 --filter web build
+```
+
+### Verification
+- Node used: `v24.15.0`.
+- pnpm used: `10.11.0`.
+- `pnpm install --frozen-lockfile`: passed; lockfile was up to date.
+- `pnpm --filter web lint`: passed.
+- `pnpm --filter web build`: passed; Next.js 16.2.6 compiled/typechecked and generated `/`, `/budget`, `/weekly-basket`, and dynamic `/categories/[slug]`, `/products/[slug]`, `/stores/[slug]` routes.
+
+### Files changed
+- `docs/parallel-sessions/handoff-frontend-web.md` only.
+
+### Next unfinished checklist item
+- Product/checklist items 1-16 now have merged artifacts or verification evidence on the current integrated frontend state. Next step is manager review/merge of this verification PR.
+
+### Blockers / notes
+- The shared root checkout remains dirty with unrelated lane files; all Pane 5 work was performed in the isolated `/tmp/gv-pane5-item16-refresh` worktree.
+
+---
+
+## MANAGER closeout — 2026-05-17 06:03 CEST
+
+### PRs accepted / blockers queued
+- Accepted and merged PR #68 (`frontend-web/integrated-build-verify-worker-d-current`) as checklist item 16. Manager independently merged the PR head into current `origin/main` in `/tmp/gv-manager-pr68-verify-*` and reran Node `v24.15.0` / pnpm `10.11.0` verification: `pnpm install --frozen-lockfile`, `pnpm --filter web lint`, and `pnpm --filter web build`; all passed and the build generated `/`, `/budget`, `/weekly-basket`, and dynamic category/product/store routes.
+- Closed PR #69 (`frontend-web/worker-b-item16-blocked-20260517`) as stale and conflicted after item 11 landed via PR #67 and item 16 was accepted via PR #68.
+
+### Final frontend checklist audit
+- `codex-tasks/frontend-web-tasks.md` was checked and updated to mark items 1-18 complete based on merged artifacts and verification evidence.
+- Artifact checks on current `origin/main` confirmed root pnpm/Turbo/TypeScript/gitignore config; `apps/web` scaffold and pinned Next.js `16.2.6` / React `19.2.4`; UI/data packages; shadcn `components.json`, `src/lib/utils.ts`, and `button/card/badge/input/table/tabs`; standalone `next.config.ts`; placeholder routes; shared layout/status components; and the price chart placeholder with `7D/30D/90D/1Y` controls plus the TradingView Lightweight Charts note.
+- Open frontend PR audit after closeout: no open `frontend-web/*` PRs remain.
+
+### Worker queue
+- Panes 2-5 have no remaining frontend implementation task assigned from the current checklist. Stand by for a new frontend roadmap/task file revision.
+- No blockers remain in the frontend-web lane.
