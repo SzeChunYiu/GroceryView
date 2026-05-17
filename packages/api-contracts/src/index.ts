@@ -90,6 +90,7 @@ export const WeeklyBasketItemSchema = z
     bestPrice: z.number().nonnegative(),
     bestStoreSlug: z.string().min(1),
     currency: CurrencyCodeSchema,
+    demo: ApiDemoFlagSchema,
   })
   .strict();
 

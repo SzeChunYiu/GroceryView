@@ -425,3 +425,32 @@ Manager: PANE 1 / MANAGER-backend-api
 - Top unchecked/remaining work assigned: pane 2 contract wiring repair is queued but the spawned worker hit usage limits; pane 4 PR #48 and pane 2 PR #51 have concrete rebase blockers; panes 3 and 5 are accepted/no-duplicate.
 - PR acceptance/blockers: PR #47 accepted after direct diff/test/smoke audit; blocker comments posted on #48 and #51; stale backend PRs remain blocked/superseded.
 - Do-not-implement constraint: satisfied; PANE 1 only inspected docs/git/PR state, ran verification in an isolated PR clone, merged an audited worker PR, attempted worker assignment, posted blocker comments, and recorded this handoff.
+
+---
+
+## Worker update — 2026-05-17 03:41 Europe/Stockholm
+Pane: PANE 4 / WORKER-C
+Branch: `backend-api/worker-c-third-task-contract-demo`
+Base: `origin/main` at `d47f706` (`Merge pull request #55 from SzeChunYiu/frontend-web/manager-pr53-closed-20260517-0348`)
+
+### Task taken
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md`.
+- Continued the PANE 4 / WORKER-C third-task PR without duplicating already-merged panes 2-3 work.
+- Recreated the open Worker-C branch from current `origin/main` because the previous PR branch had become conflicting after later main merges.
+
+### What changed
+- Added `demo: ApiDemoFlagSchema` to `WeeklyBasketItemSchema` in `packages/api-contracts/src/index.ts`.
+- This keeps the strict shared weekly basket item contract aligned with the already-merged seed/demo basket controller responses, which include `demo: true` on basket items.
+
+### Verification
+- `corepack pnpm install --frozen-lockfile` — passed with pnpm `10.11.0`; warning only for ignored dependency build scripts.
+- `corepack pnpm --filter api verify:required-packages` — passed (`All required API packages are declared.`).
+- `corepack pnpm --filter @groceryview/api-contracts build` — passed.
+- `corepack pnpm --filter api build` — passed.
+- `corepack pnpm --filter api test:e2e` — passed (`1` suite, `3` tests).
+- Contract smoke parse: `WeeklyBasketSchema.parse(...)` accepted a basket item with `demo: true` and printed `{"items":1,"itemDemo":true}`.
+- Runtime smoke with `PORT=3019 DATABASE_ENABLED=false node dist/main.js`: `GET /health` returned `{"status":"ok","service":"api"}` and `HEAD /docs` returned HTTP `200`.
+
+### Next / blockers
+- No known blockers for this small contract-alignment PR.
+- Older stale/conflicting backend PRs should remain blocked/superseded unless recreated from current `origin/main`.
