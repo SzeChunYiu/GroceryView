@@ -632,3 +632,36 @@ Manager: PANE 1 / MANAGER-backend-api
 ### Completion audit snapshot
 - Objective deliverables checked: required docs read; backend checklist inspected; pane 2 repair assignment attempted/queued; panes 3-5 are accepted/no-duplicate; PR #72 and stale backend PRs remain blocked; no backend product-code implementation by PANE 1.
 - Missing/incomplete: the remaining contract-wiring delta is not merged because PR #72 is conflicting and currently includes non-backend drift. Goal remains active until a clean repaired PR is accepted or the queue is otherwise resolved.
+
+---
+
+## Manager update — 2026-05-17 06:17 Europe/Stockholm
+Manager: PANE 1 / MANAGER-backend-api
+
+### Intake performed
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md` this manager turn.
+- Rechecked `origin/main:codex-tasks/backend-api-tasks.md` at `a3292c0`; checklist items 1-15 still display unchecked in the file.
+- Refreshed open backend PRs; all open backend implementation PRs remain reported `CONFLICTING`, including PR #72.
+
+### Artifact audit against the unchecked checklist
+- Current `origin/main` already contains the scaffold/config/domain/contracts/database/package-verifier work from prior merged backend PRs.
+- Verified current main still lacks the actual checklist item 10 wiring:
+  - `apps/api/package.json` has package name `api` but no `@groceryview/api-contracts` dependency.
+  - `packages/api-contracts/src/index.ts` exports the required schemas (`ProductSummarySchema`, `StoreSummarySchema`, `PriceObservationSchema`, `DealScoreSchema`, `WatchlistItemSchema`, `WeeklyBasketSchema`, `AlertSchema`).
+  - `grep -R "@groceryview/api-contracts" apps/api/src` finds no API controller imports.
+- Therefore the remaining unique backend work is still PANE 2's contract-wiring repair/superseder from current main.
+
+### PR / blocker queue
+- PR #72 (`backend-api/worker-a-contract-wiring-repair-20260517`) remains open and `CONFLICTING`; it is not accepted.
+- Earlier blocker comments on PR #72 remain accurate: recreate/rebase from current `origin/main`, preserve all frontend/codex-task/other-lane files, keep only backend-owned contract-wiring changes, rerun frozen install, `api verify:required-packages`, contracts build, API build, API e2e, and `/health` + `/docs` smoke.
+- Older backend PRs #6, #7, #10, #12, #13, #19, #22, #28, #32, #51, and #56 remain stale/conflicting/superseded and should not merge as-is.
+
+### Worker assignment / queue
+- **PANE 2 / WORKER-A:** remains assigned to the current-main contract-wiring repair/superseder for checklist item 10. No new worker launch was attempted this turn because the previous PANE 2 agent failed immediately with the usage-limit reset message.
+- **PANE 3 / WORKER-B:** database scaffold accepted/merged via PR #35; no duplicate task.
+- **PANE 4 / WORKER-C:** basket demo contract alignment accepted/merged via PR #48; no duplicate task.
+- **PANE 5 / WORKER-D:** required-package verifier accepted/merged via PR #47; no duplicate task.
+
+### Completion audit snapshot
+- Objective deliverables checked: required docs read, backend task checklist inspected, pane assignments/queue recorded, open PRs audited, blockers queued, and no backend product-code implementation by PANE 1.
+- Missing/incomplete: checklist item 10 remains unwired on current main and PR #72 is still conflicting. Goal remains active.
