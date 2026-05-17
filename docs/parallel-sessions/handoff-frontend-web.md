@@ -572,3 +572,29 @@ COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HO
 ### Next manager action
 - When any worker pane becomes usable, restart exactly one worker from fresh current `origin/main` on item 11. Require a complete PR containing `apps/web/components.json`, `apps/web/src/lib/utils.ts`, and `apps/web/src/components/ui/{button,card,badge,input,table,tabs}.tsx`, with Node 24 / pnpm 10.11.0 install, lint, and build evidence.
 - After item 11 merges, assign exactly one worker to item 16 integrated verification from current `origin/main`.
+
+---
+
+## WORKER-B update — 2026-05-17 05:20 CEST
+
+### Assignment checked
+- Pane 3 / WORKER-B resumed after the latest manager queue.
+- Required docs were read from the active shared checkout earlier in this session: `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/frontend-web.md`. Note: those two lane-control docs are not present on current `origin/main`, so this branch is based on `origin/main` and records status in this handoff only.
+- Current effective frontend checklist state from this handoff/current `origin/main`: items 1-10 and 12-15 are accepted/merged; item 11 is Worker-A's active shadcn task; item 16 is the next distinct WORKER-B-eligible task after item 11.
+
+### Evidence refreshed
+- Current branch for this status PR: `frontend-web/worker-b-item16-blocked-20260517`, based on `origin/main` at `20efcb6`.
+- Open frontend PR found: PR #67, `frontend-web/shadcn-ui-worker-a-current`, titled `feat(web): initialize shadcn ui`.
+- PR #67 is `OPEN`, non-draft, and reports `mergeStateStatus: CLEAN`.
+- PR #67 contains the item 11 artifacts (`apps/web/components.json`, `apps/web/src/lib/utils.ts`, and `apps/web/src/components/ui/{button,card,badge,input,table,tabs}.tsx`) plus package/lockfile and handoff updates.
+- `origin/main` does not yet contain PR #67's head commit, so item 11 has not landed on main.
+
+### Status / blocker
+- WORKER-B did not duplicate item 11 because Worker-A already has PR #67 open for that task.
+- WORKER-B did not run or record item 16 integrated verification because the manager queue explicitly requires item 16 to run only after item 11 lands on `origin/main`; running it now would recreate the stale verification problem previously closed in PR #53.
+- This PR is therefore a blocker/status handoff only, not product-code implementation.
+
+### Next action when unblocked
+- After PR #67 merges to `main`, start a fresh branch from updated `origin/main` for item 16.
+- Run with Node 24 / pnpm 10.11.0: `pnpm install`, `pnpm --filter web lint`, and `pnpm --filter web build`.
+- Record the evidence in this handoff, then commit, push, and open the item 16 verification PR.
