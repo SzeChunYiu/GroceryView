@@ -353,3 +353,28 @@ Manager: PANE 1 / MANAGER-backend-api
 - Top unchecked/remaining work assigned: PANE 2 has the only unique remaining backend repair assignment; panes 3-5 are explicitly marked accepted/no-duplicate for their already merged work.
 - PR acceptance/blockers: no safe backend PR was available to merge this turn; PR #32 blocker was refreshed with concrete current diff evidence; older backend PRs remain stale/superseded/blocked.
 - Do-not-implement constraint: satisfied; PANE 1 only inspected docs/git/PR state, attempted worker assignment, posted a blocker comment, and recorded this handoff.
+
+---
+
+## Worker update — 2026-05-17 03:16 Europe/Stockholm
+Pane: PANE 5 / WORKER-D
+Branch: `backend-api/required-packages-worker-d-current`
+
+### Task taken
+- Read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md`.
+- Took the fourth unchecked backend checklist item: add/verify required API packages.
+- Avoided repeating prior scaffold work because current `origin/main` already declares all required item-4 runtime and dev packages in `apps/api/package.json`.
+
+### What changed
+- Added `apps/api/scripts/verify-required-packages.mjs`, a manifest guard that fails if any item-4 package is missing from the API package manifest.
+- Added `pnpm --filter api verify:required-packages` as the repeatable verification command.
+
+### Verification
+- `corepack pnpm@10.21.0 install --frozen-lockfile`
+- `corepack pnpm@10.21.0 --filter api verify:required-packages`
+- `corepack pnpm@10.21.0 --filter api build`
+- `corepack pnpm@10.21.0 --filter api test:e2e`
+
+### Next / blockers
+- The older PR #22 branch is stale and should not merge as-is; use this current-main branch/PR instead.
+
