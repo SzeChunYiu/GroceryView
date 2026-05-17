@@ -442,3 +442,31 @@ COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HO
 ### Blockers / notes
 - Item 15 (`price-chart-placeholder`) is already merged via PR #44 and was preserved by rebasing onto current `origin/main`.
 - Work was done in an isolated `/tmp/groceryview-workerb-placeholder-routes` worktree to avoid dirty unrelated shared checkout files.
+
+---
+
+## MANAGER update — 2026-05-17 03:43 CEST
+
+### PR accepted / merged this pass
+- Accepted and merged PR #49 (`frontend-web/placeholder-routes-worker-b-20260517`) for checklist item 13.
+- Initial PR #49 was blocked by a handoff-only merge conflict after PR #50 landed. Manager resolved the conflict by preserving the `origin/main` manager queue entry and the WORKER-B item 13 handoff entry; no product-code conflict or product-code edit was made by the manager.
+- Effective PR #49 scope after repair/merge: `apps/web/src/app/{page.tsx,layout.tsx}`, new `products/[slug]`, `stores/[slug]`, `categories/[slug]`, `weekly-basket`, and `budget` route pages, plus this handoff.
+- Independent manager verification on the repaired PR branch with Node `v24.15.0` and pnpm `10.11.0` passed:
+  - `corepack pnpm@10.11.0 install --frozen-lockfile`
+  - `corepack pnpm@10.11.0 --filter web lint`
+  - `corepack pnpm@10.11.0 --filter web build`
+- Build output included `/`, `/budget`, `/weekly-basket`, and dynamic `/categories/[slug]`, `/products/[slug]`, `/stores/[slug]`, matching checklist item 13.
+
+### Current remaining unchecked frontend work
+- Item 11 remains missing on current `origin/main`: no shadcn `components.json`, no `src/lib/utils.ts`, and no UI components `button`, `card`, `badge`, `input`, `table`, `tabs` under `apps/web/src/components/ui/`.
+- Item 16 remains blocked until item 11 is merged, then one integrated verification pass must run from current `origin/main` with `pnpm install`, `pnpm --filter web lint`, and `pnpm --filter web build`.
+
+### Updated worker queue for panes 2-5
+- **Pane 2 / WORKER-A:** item 11 remains the only product-code task to restart when usage capacity returns.
+- **Pane 3 / WORKER-B:** item 13 is accepted/merged via PR #49; stand by unless reassigned to item 11 if Pane 2 remains unavailable.
+- **Pane 4 / WORKER-C:** item 16 integrated verification remains queued behind item 11.
+- **Pane 5 / WORKER-D:** backup for item 16; do not duplicate Pane 4 if Pane 4 has an active verification PR.
+
+### Current PR queue / blockers
+- `gh pr list --state open --search frontend-web` shows no open frontend-web PRs after PR #49 merged.
+- Worker launches for item 11 and item 16 remain blocked by Codex usage limit until capacity returns.
