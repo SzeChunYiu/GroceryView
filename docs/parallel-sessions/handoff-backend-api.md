@@ -222,3 +222,29 @@ cd apps/api && PORT=3001 node dist/main.js & curl http://127.0.0.1:3001/health
 
 - No blockers for this package-refresh PR.
 - The checklist file still contains unchecked boxes even though merged artifacts satisfy many items; manager may want a separate checklist-maintenance pass after implementation PRs settle.
+
+---
+
+## Manager update — 2026-05-17 02:12 Europe/Stockholm
+Manager: PANE 1 / MANAGER-backend-api
+
+### Intake performed
+- Re-read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md` in this manager turn.
+- Checked `codex-tasks/backend-api-tasks.md`; the checklist file still displays items 1-15 unchecked, but current `origin/main` contains the scaffold/contracts/domain placeholder artifacts merged via PRs #27/#29 and package refresh from PR #34.
+- Refreshed backend PR state after `origin/main` advanced to `2742d6a` (`Merge pull request #34 from SzeChunYiu/backend-api/worker-d-fourth-task`).
+
+### PR acceptance / blockers
+- **Accepted and merged PR #34** `feat(api): refresh required package specs` (`backend-api/worker-d-fourth-task`). Manager diff audit showed scope limited to `apps/api/package.json`, `pnpm-lock.yaml`, and `docs/parallel-sessions/handoff-backend-api.md`. Worker verification in pane 5 showed: `corepack pnpm install --frozen-lockfile`, `corepack pnpm --filter api build`, `corepack pnpm --filter @groceryview/api-contracts build`, `corepack pnpm --filter api test:e2e`, smoke `/health`, and `HEAD /docs` passing.
+- **Blocked PR #32** `feat(api): wire shared API contracts`. Diff against current `origin/main` includes out-of-scope frontend deletions (`apps/web/src/components/confidence-badge.tsx`, `deal-score-card.tsx`, `site-footer.tsx`, `site-header.tsx`) and `docs/parallel-sessions/handoff-frontend-web.md` edits. Posted corrected blocker comment on PR #32.
+- **Blocked PR #35** `feat(api): add database connection scaffold`. Diff against current `origin/main` includes the same out-of-scope frontend deletions and frontend handoff edit. Posted corrected blocker comment on PR #35.
+- Older backend PRs #6/#7/#10/#12/#13/#19/#22/#28 remain stale/superseded/blocked; do not merge as-is.
+
+### Worker assignment / queue for panes 2-5
+- **PANE 2 / WORKER-A:** Rebase/recreate PR #32 from current `origin/main`, preserve frontend files and other-lane handoffs, keep only backend-owned contract wiring changes, rerun install/build/contracts build/e2e/smoke, then request review.
+- **PANE 3 / WORKER-B:** Rebase/recreate PR #35 from current `origin/main`, preserve frontend files and other-lane handoffs, keep only backend-owned database scaffold changes, rerun install/build/contracts build/e2e/smoke, then request review.
+- **PANE 4 / WORKER-C:** Previous domain placeholder work was accepted through PR #29; current pane hit usage limits on restart. No duplicate domain placeholder task should be started.
+- **PANE 5 / WORKER-D:** PR #34 accepted/merged. No further required action unless a new backend checklist item is assigned.
+
+### Next manager action
+- Re-audit any repaired PR with `git diff --name-status origin/main..origin/<branch>` before merge. Safe backend PRs must not delete/modify `apps/web/**`, frontend handoff, infra/db, data-worker files, or other lane-owned paths.
+- If PR #32 and #35 are repaired, merge contract wiring before database wiring only if the database branch has been rebased on the contracts merge; otherwise require the later PR to rebase again.
