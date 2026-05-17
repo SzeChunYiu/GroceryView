@@ -124,6 +124,7 @@ pnpm --filter web build
 - `pnpm install --frozen-lockfile`: passed with lockfile up to date.
 - `pnpm --filter web lint`: passed after converting internal navigation anchors to `next/link`.
 - `pnpm --filter web build`: passed; Next.js 16.2.6 compiled and typechecked successfully.
+- After rebasing onto `origin/main` at `2f0a424`, the handoff-only conflict was resolved by preserving both manager and worker entries.
 
 ### Next unfinished checklist item
 - Item 15: add `apps/web/src/components/price-chart-placeholder.tsx` with 7D/30D/90D/1Y controls and a note that TradingView Lightweight Charts integration is next.
@@ -308,3 +309,45 @@ COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HO
 - Pane 3 / item 13: placeholder route structure — pending reassignment; previous PR #41 closed unmerged.
 - Pane 4 / item 15: price chart placeholder — pending worker quota; no open PR.
 - Pane 5 / item 16: integrated verification — queued behind items 11, 13, and 15.
+
+---
+
+## WORKER-C update — 2026-05-17 02:58 CEST
+
+### Task implemented
+- Pane 4 / WORKER-C implemented the current third unchecked frontend task after item 12 merged: checklist item 15, add the chart placeholder component.
+- Branch: `frontend-web/price-chart-placeholder-worker-c-20260517`.
+- Based on current `origin/main`; after manager handoff PR #43 merged, rebased onto `origin/main` at `2f0a424` and preserved the manager entries.
+
+### Changes made
+- Added `apps/web/src/components/price-chart-placeholder.tsx`.
+- Component includes interactive 7D / 30D / 90D / 1Y range controls with `aria-pressed` state.
+- Component explicitly states: "TradingView Lightweight Charts integration is next."
+- Uses a mocked bar chart area and mock SEK movement copy so it can be dropped into product routes later without live data.
+
+### Commands run
+```bash
+git status --short --branch
+git fetch origin --prune
+git checkout -b frontend-web/price-chart-placeholder-worker-c-20260517 origin/main
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache PNPM_STORE_DIR=/projects/hep/fs10/shared/nnbar/billy/.cache/pnpm-store-worker-c-chart corepack pnpm@10.11.0 install --frozen-lockfile
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache PNPM_STORE_DIR=/projects/hep/fs10/shared/nnbar/billy/.cache/pnpm-store-worker-c-chart corepack pnpm@10.11.0 --filter web lint
+PATH=/projects/hep/fs10/shared/codex-tooling/nvm/versions/node/v24.15.0/bin:$PATH COREPACK_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache/corepack XDG_CACHE_HOME=/projects/hep/fs10/shared/nnbar/billy/.cache PNPM_STORE_DIR=/projects/hep/fs10/shared/nnbar/billy/.cache/pnpm-store-worker-c-chart corepack pnpm@10.11.0 --filter web build
+```
+
+### Verification
+- Node used: `v24.15.0`.
+- pnpm used: `10.11.0` with shared cache/config directories.
+- `pnpm install --frozen-lockfile`: passed with lockfile up to date.
+- `pnpm --filter web lint`: passed.
+- `pnpm --filter web build`: passed; Next.js 16.2.6 compiled and typechecked successfully.
+- After rebasing onto `origin/main` at `2f0a424`, the handoff-only conflict was resolved by preserving both manager and worker entries.
+
+### Next unfinished checklist items
+- Item 11: initialize shadcn/ui and add starter components (`button`, `card`, `badge`, `input`, `table`, `tabs`).
+- Item 13: create placeholder route structure for home/products/stores/categories/weekly-basket/budget.
+- Item 16: integrated frontend verification remains queued until items 11, 13, and 15 are merged.
+
+### Blockers / notes
+- No blockers for item 15.
+- Earlier PR #41 for item 13 was closed after the current mainline manager handoff made item 15 the Pane 4 / WORKER-C task.
