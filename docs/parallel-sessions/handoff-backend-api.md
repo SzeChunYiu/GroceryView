@@ -552,3 +552,41 @@ Manager: PANE 1 / MANAGER-backend-api
 - PANE 2 / WORKER-A repair of PR #56 remains queued; prior spawn failed with usage-limit before work began.
 - Panes 3-5 remain no-duplicate/accepted for database scaffold, contract-demo alignment, and required-package verifier respectively.
 - No backend implementation PR is currently safe to merge as-is.
+
+---
+
+## Worker update — 2026-05-17 05:49 Europe/Stockholm
+Pane: PANE 2 / WORKER-A
+Branch: backend-api/worker-a-contract-wiring-repair-20260517
+Base: origin/main at 8371992 (Merge pull request #71 from SzeChunYiu/backend-api/manager-status-20260517-0534)
+
+### Task taken
+- Read docs/parallel-sessions/shared.md and docs/parallel-sessions/backend-api.md before editing.
+- Checked codex-tasks/backend-api-tasks.md; the visible checklist remains unchecked/stale while current origin/main already contains the scaffold, domain controllers, shared contracts, database scaffold, required-package verifier, and basket-item demo contract alignment.
+- Avoided duplicating merged scaffold/domain/contracts work and repaired/superseded the remaining PANE 2 contract-wiring PR (#56) from current origin/main.
+
+### What changed
+- Added the API workspace dependency on @groceryview/api-contracts and a prebuild step that builds shared contracts before apps/api.
+- Wired API response classes to shared contract types with type-only imports:
+  - ProductSummaryResponse implements ProductSummary
+  - StoreSummaryResponse implements StoreSummary
+  - PriceObservationResponse implements PriceObservation
+  - WatchlistItemResponse implements WatchlistItem
+  - WeeklyBasketItemResponse implements WeeklyBasketItem
+  - WeeklyBasketResponse implements WeeklyBasket
+  - AlertResponse implements Alert
+- Updated the root pnpm-lock.yaml workspace importer for the new API package dependency only.
+
+### Verification
+- Node: v24.15.0; pnpm: 10.21.0 via corepack with COREPACK_HOME=/tmp/scyiu-corepack and PNPM_STORE_DIR=/tmp/gv-pane2-pnpm-store.
+- corepack pnpm@10.21.0 install --frozen-lockfile --store-dir /tmp/gv-pane2-pnpm-store — passed.
+- corepack pnpm@10.21.0 --filter api verify:required-packages — passed (All required API packages are declared.).
+- corepack pnpm@10.21.0 --filter @groceryview/api-contracts build — passed.
+- corepack pnpm@10.21.0 --filter api build — passed; prebuild built contracts first.
+- corepack pnpm@10.21.0 --filter api test:e2e — passed (1 suite, 3 tests).
+- Runtime smoke: PORT=3026 DATABASE_ENABLED=false node apps/api/dist/main.js; curl http://127.0.0.1:3026/health returned {"status":"ok","service":"api"} and HEAD /docs returned HTTP 200.
+
+### Next / blockers
+- Branch is intended to supersede stale/conflicting PR #56.
+- No known implementation blockers; manager should audit that the PR diff is limited to backend-owned contract-wiring changes plus this handoff.
+
