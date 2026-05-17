@@ -665,3 +665,28 @@ Manager: PANE 1 / MANAGER-backend-api
 ### Completion audit snapshot
 - Objective deliverables checked: required docs read, backend task checklist inspected, pane assignments/queue recorded, open PRs audited, blockers queued, and no backend product-code implementation by PANE 1.
 - Missing/incomplete: checklist item 10 remains unwired on current main and PR #72 is still conflicting. Goal remains active.
+
+---
+
+## Manager update — 2026-05-17 06:26 Europe/Stockholm
+Manager: PANE 1 / MANAGER-backend-api
+
+### Intake performed
+- Required docs were re-read this manager iteration: `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md`.
+- Rechecked `origin/main:codex-tasks/backend-api-tasks.md` at `f679522`; checklist items 1-15 still display unchecked in the file.
+- Rechecked PR #72; it remains open and `CONFLICTING` against current main.
+
+### Current artifact / PR audit
+- Current main still lacks the actual checklist item 10 API-contract wiring: `apps/api/package.json` does not declare `@groceryview/api-contracts`, and `apps/api/src` has no imports from `@groceryview/api-contracts`.
+- PR #72 still contains the useful backend contract-wiring delta by PR file list/merge-base patch, but remains unsafe to merge because it is conflicting and its direct diff from current main includes non-backend drift recorded in prior manager notes.
+- Posted a fresh PR #72 queue comment noting current main `f679522`, required clean superseder/rebase, and worker-capacity blocker.
+
+### Worker assignment / queue
+- **PANE 2 / WORKER-A:** attempted to launch another fresh worker for the clean current-main contract-wiring superseder. Agent `019e342e-6193-71b3-83f4-cc7ece7fd9e6` failed immediately with the usage-limit reset message before making changes. Assignment remains queued/blocked on worker capacity.
+- **PANE 3 / WORKER-B:** database scaffold already accepted/merged via PR #35; no duplicate task.
+- **PANE 4 / WORKER-C:** basket demo contract alignment already accepted/merged via PR #48; no duplicate task.
+- **PANE 5 / WORKER-D:** required-package verifier already accepted/merged via PR #47; no duplicate task.
+
+### Completion audit snapshot
+- Prompt-to-artifact requirements checked: docs read; backend task checklist inspected; top remaining unchecked task identified as item 10 contract wiring; pane 2 assigned/queued but blocked by usage limits; panes 3-5 accepted/no-duplicate; PR #72 blocker queued/commented; no backend product-code implementation by PANE 1.
+- Missing/incomplete: checklist item 10 remains absent from current main and no clean worker PR is available to accept. Goal remains active.
