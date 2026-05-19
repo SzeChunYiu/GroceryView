@@ -4,11 +4,13 @@ import { createPostgresRepository, type QueryExecutor } from '../index.js';
 
 class RecordingQueryExecutor implements QueryExecutor {
   calls: Array<{ sql: string; params: unknown[] }> = [];
+  basketId: string | number | undefined = 'basket-1';
 
   async query<T>(sql: string, params: unknown[] = []) {
     this.calls.push({ sql, params });
     if (sql.includes('select store_id')) return [{ store_id: 'willys-odenplan' }] as T[];
     if (sql.includes('select weekly_budget')) return [{ weekly_budget: '800', monthly_budget: '3200' }] as T[];
+    if (sql.includes('insert into weekly_baskets')) return this.basketId === undefined ? ([] as T[]) : ([{ id: this.basketId }] as T[]);
     if (sql.includes('from human_reviewers')) {
       return [{ id: 'moderator-1', role: 'moderator', active: true }] as T[];
     }
@@ -86,6 +88,32 @@ describe('createPostgresRepository', () => {
 
     assert.equal(executor.calls.every((call) => call.sql.includes('$') || call.sql.startsWith('select')), true);
     assert.deepEqual(executor.calls[0].params, ['user-1', 'shopper@example.com']);
+  });
+
+  it('reuses the current weekly basket and inserts basket items with the returned id', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.addBasketItem('user-1', { productId: 'coffee', quantity: 2 });
+
+    const weeklyBasketCall = executor.calls.find((call) => call.sql.includes('insert into weekly_baskets'));
+    assert.match(weeklyBasketCall?.sql ?? '', /on conflict \(user_id, week_start\) do update/);
+    assert.match(weeklyBasketCall?.sql ?? '', /returning id/);
+
+    const basketItemCall = executor.calls.find((call) => call.sql.includes('insert into basket_items'));
+    assert.deepEqual(basketItemCall?.params, ['basket-1', 'coffee', 2]);
+  });
+
+  it('fails instead of writing basket items against a missing basket id', async () => {
+    const executor = new RecordingQueryExecutor();
+    executor.basketId = undefined;
+    const repo = createPostgresRepository(executor);
+
+    await assert.rejects(
+      repo.addBasketItem('user-1', { productId: 'coffee', quantity: 2 }),
+      /Weekly basket was not returned for user: user-1/
+    );
+    assert.equal(executor.calls.some((call) => call.sql.includes('insert into basket_items')), false);
   });
 
   it('persists and lists open human review assignments', async () => {

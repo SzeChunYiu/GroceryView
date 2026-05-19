@@ -8,6 +8,7 @@ import {
   formatNotificationOperationsMetrics,
   planHumanReviewSlaNotifications,
   processNotificationSuppressionEvent,
+  runRepositoryNotificationWorkerCycle,
   runNotificationWorkerTick
 } from '../index.js';
 
@@ -583,5 +584,107 @@ describe('planNotificationOperationsAlerts', () => {
     });
 
     assert.deepEqual(alerts, []);
+  });
+});
+
+describe('runRepositoryNotificationWorkerCycle', () => {
+  it('loads due tasks and suppressions, persists acknowledgements, and returns report plus alerts', async () => {
+    const sent: string[] = [];
+    const updates: unknown[] = [];
+    const result = await runRepositoryNotificationWorkerCycle({
+      now: '2026-05-19T12:00:00.000Z',
+      retryDelayMinutes: 30,
+      staleAfterMinutes: 20,
+      alertRecipients: [{ channel: 'email', recipient: 'ops@example.com' }],
+      repository: {
+        listDueNotificationTasks: async () => [
+          {
+            id: 'deliver-task',
+            channel: 'push',
+            type: 'target_price',
+            title: 'Coffee deal',
+            body: 'Below target',
+            priority: 'high',
+            sendAt: '2026-05-19T11:55:00.000Z',
+            recipient: 'device-1',
+            attemptCount: 0,
+            maxAttempts: 3,
+            status: 'queued'
+          },
+          {
+            id: 'suppressed-task',
+            channel: 'email',
+            type: 'weekly_report',
+            title: 'Weekly report',
+            body: 'Summary',
+            priority: 'normal',
+            sendAt: '2026-05-19T11:00:00.000Z',
+            recipient: 'unsubscribed@example.com',
+            attemptCount: 0,
+            maxAttempts: 3,
+            status: 'queued'
+          },
+          {
+            id: 'retry-task',
+            channel: 'email',
+            type: 'budget_alert',
+            title: 'Budget',
+            body: 'Check basket',
+            priority: 'high',
+            sendAt: '2026-05-19T11:20:00.000Z',
+            recipient: 'user@example.com',
+            attemptCount: 1,
+            maxAttempts: 3,
+            status: 'queued'
+          }
+        ],
+        listActiveNotificationSuppressions: async () => [
+          { recipient: 'unsubscribed@example.com', channel: 'email', reason: 'unsubscribed', active: true }
+        ],
+        upsertNotificationTask: async (task) => {
+          updates.push(task);
+        }
+      },
+      providers: {
+        push: { send: async (message) => { sent.push(`push:${message.recipient}`); return 'push-1'; } }
+      }
+    });
+
+    assert.deepEqual(sent, ['push:device-1']);
+    assert.deepEqual(updates.map((task) => ({
+      id: (task as { id: string }).id,
+      status: (task as { status: string }).status,
+      attemptCount: (task as { attemptCount: number }).attemptCount,
+      sendAt: (task as { sendAt: string }).sendAt
+    })), [
+      { id: 'deliver-task', status: 'delivered', attemptCount: 0, sendAt: '2026-05-19T11:55:00.000Z' },
+      { id: 'suppressed-task', status: 'suppressed', attemptCount: 0, sendAt: '2026-05-19T11:00:00.000Z' },
+      { id: 'retry-task', status: 'queued', attemptCount: 2, sendAt: '2026-05-19T12:30:00.000Z' }
+    ]);
+    assert.deepEqual(result.report.status, 'blocked');
+    assert.deepEqual(result.report.blockers, ['notification_provider_failures_present', 'notification_due_queue_stale']);
+    assert.deepEqual(result.alerts.map((alert) => alert.recipient), ['ops@example.com']);
+    assert.deepEqual(result.persistedTaskUpdates.map((task) => task.id), ['deliver-task', 'suppressed-task', 'retry-task']);
+  });
+
+  it('returns a healthy no-op cycle when no due tasks exist', async () => {
+    const result = await runRepositoryNotificationWorkerCycle({
+      now: '2026-05-19T12:00:00.000Z',
+      retryDelayMinutes: 30,
+      staleAfterMinutes: 20,
+      repository: {
+        listDueNotificationTasks: async () => [],
+        listActiveNotificationSuppressions: async () => [],
+        upsertNotificationTask: async () => {
+          throw new Error('No updates expected.');
+        }
+      },
+      providers: {}
+    });
+
+    assert.deepEqual(result.worker.summary, { delivered: 0, notDue: 0, retryScheduled: 0, deadLettered: 0, suppressed: 0 });
+    assert.equal(result.report.status, 'healthy');
+    assert.deepEqual(result.alerts, []);
+    assert.deepEqual(result.persistedTaskUpdates, []);
   });
 });
