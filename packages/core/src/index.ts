@@ -599,3 +599,96 @@ export function reviewReceiptScan(input: ReceiptReviewInput): ReceiptReview {
     }
   };
 }
+
+export type HouseholdMember = {
+  userId: string;
+  displayName: string;
+};
+
+export type HouseholdBasketItem = {
+  productId: string;
+  quantity: number;
+  addedBy: string;
+};
+
+export type HouseholdWatchlistItem = {
+  productId: string;
+  addedBy: string;
+  targetPrice?: number;
+};
+
+export type HouseholdSnapshot = {
+  id: string;
+  name: string;
+  weeklyBudget: number;
+  members: HouseholdMember[];
+  basketItems: HouseholdBasketItem[];
+  watchlistItems: HouseholdWatchlistItem[];
+  sharedFavoriteStoreIds: string[];
+};
+
+export function createHouseholdState(input: {
+  id: string;
+  name: string;
+  weeklyBudget: number;
+  members: HouseholdMember[];
+}) {
+  const basketItems: HouseholdBasketItem[] = [];
+  const watchlistItems: HouseholdWatchlistItem[] = [];
+  let sharedFavoriteStoreIds: string[] = [];
+  const memberIds = new Set(input.members.map((member) => member.userId));
+
+  const requireMember = (userId: string): void => {
+    if (!memberIds.has(userId)) throw new Error(`Household member not found: ${userId}`);
+  };
+
+  return {
+    addBasketItem(item: HouseholdBasketItem) {
+      requireMember(item.addedBy);
+      basketItems.push({ ...item });
+    },
+    addWatchlistItem(item: HouseholdWatchlistItem) {
+      requireMember(item.addedBy);
+      watchlistItems.push({ ...item });
+    },
+    setSharedFavoriteStores(storeIds: string[]) {
+      sharedFavoriteStoreIds = [...new Set(storeIds)].sort();
+    },
+    snapshot(): HouseholdSnapshot {
+      return {
+        id: input.id,
+        name: input.name,
+        weeklyBudget: input.weeklyBudget,
+        members: input.members.map((member) => ({ ...member })),
+        basketItems: basketItems.map((item) => ({ ...item })),
+        watchlistItems: watchlistItems.map((item) => ({ ...item })),
+        sharedFavoriteStoreIds: [...sharedFavoriteStoreIds]
+      };
+    }
+  };
+}
+
+export type HouseholdSummary = {
+  householdId: string;
+  estimatedTotal: number;
+  remainingBudget: number;
+  memberContributions: Array<{ userId: string; displayName: string; itemCount: number }>;
+  sharedFavoriteStoreIds: string[];
+};
+
+export function summarizeHousehold(snapshot: HouseholdSnapshot, priceByProductId: Record<string, number>): HouseholdSummary {
+  const estimatedTotal = Math.round(
+    snapshot.basketItems.reduce((sum, item) => sum + (priceByProductId[item.productId] ?? 0) * item.quantity, 0) * 100
+  ) / 100;
+  return {
+    householdId: snapshot.id,
+    estimatedTotal,
+    remainingBudget: Math.round((snapshot.weeklyBudget - estimatedTotal) * 100) / 100,
+    memberContributions: snapshot.members.map((member) => ({
+      userId: member.userId,
+      displayName: member.displayName,
+      itemCount: snapshot.basketItems.filter((item) => item.addedBy === member.userId).length
+    })),
+    sharedFavoriteStoreIds: [...snapshot.sharedFavoriteStoreIds]
+  };
+}
