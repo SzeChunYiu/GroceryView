@@ -9,6 +9,6 @@ describe('deployment manifest', () => {
     assert.deepEqual(manifest.services.map((service) => service.name), ['groceryview-server', 'groceryview-web']);
     const server = manifest.services[0];
     assert.equal(server.healthCheck.path, '/api/health');
-    assert.deepEqual(server.requiredEnv, ['AUTH_SECRET', 'DATABASE_URL', 'PUBLIC_WEB_URL']);
+    assert.deepEqual(server.requiredEnv, ['AUTH_SECRET', 'DATABASE_URL', 'PUBLIC_WEB_URL', 'NOTIFICATION_WEBHOOK_SECRET']);
   });
 });

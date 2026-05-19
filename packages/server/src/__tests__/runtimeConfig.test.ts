@@ -9,7 +9,8 @@ describe('runtime config', () => {
       PORT: '8080',
       AUTH_SECRET: 'super-secret',
       DATABASE_URL: 'postgres://example',
-      PUBLIC_WEB_URL: 'https://groceryview.example'
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret'
     });
 
     assert.deepEqual(config, {
@@ -17,17 +18,32 @@ describe('runtime config', () => {
       port: 8080,
       authSecret: 'super-secret',
       databaseUrl: 'postgres://example',
-      publicWebUrl: 'https://groceryview.example'
+      publicWebUrl: 'https://groceryview.example',
+      notificationWebhookSecret: 'webhook-secret'
     });
   });
 
   it('fails closed when production secrets are missing', () => {
     assert.throws(() => loadRuntimeConfig({ NODE_ENV: 'production', PORT: '8080' }), /AUTH_SECRET is required/);
+    assert.throws(() => loadRuntimeConfig({
+      NODE_ENV: 'production',
+      PORT: '8080',
+      AUTH_SECRET: 'super-secret',
+      DATABASE_URL: 'postgres://example',
+      PUBLIC_WEB_URL: 'https://groceryview.example'
+    }), /NOTIFICATION_WEBHOOK_SECRET is required/);
   });
 
   it('builds a health report without exposing secrets', () => {
     const report = buildHealthReport(loadRuntimeConfig({ NODE_ENV: 'development', PORT: '3000' }));
 
-    assert.deepEqual(report, { status: 'ok', service: 'groceryview-server', environment: 'development', hasDatabase: false, hasAuthSecret: false });
+    assert.deepEqual(report, {
+      status: 'ok',
+      service: 'groceryview-server',
+      environment: 'development',
+      hasDatabase: false,
+      hasAuthSecret: false,
+      hasNotificationWebhookSecret: false
+    });
   });
 });
