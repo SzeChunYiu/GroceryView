@@ -10,7 +10,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 
 | Requirement / deliverable | Evidence | Status |
 | --- | --- | --- |
-| Iterative PR + merge workflow | PR #1 through PR #36 merged to `main`; current release-validation repair is in progress | Done for shipped iterations |
+| Iterative PR + merge workflow | PR #1 through PR #36 merged to `main`; PR #88 covers the current release-validation repair | Done for shipped iterations |
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
@@ -49,7 +49,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Retailer compliance gate | PR #34, `planRetailerSourceAccess` | Source-access gate shipped |
 | Deployment ops foundation | PR #35, `packages/ops` | Readiness/rollback gates shipped |
 | Catalog coverage reporting | PR #36, `packages/catalog` | Coverage/backfill accounting shipped |
-| Release validation workflow repair | Current iteration, `.github/workflows/release-validation.yml`, `tests/schema/release-workflow.test.mjs` | In progress |
+| Release validation workflow repair | PR #88, `.github/workflows/release-validation.yml`, `tests/schema/release-workflow.test.mjs` | Shipped after merge |
 
 ## Verification gates
 

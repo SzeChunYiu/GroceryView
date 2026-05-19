@@ -14,7 +14,7 @@ Continue completing GroceryView proposal deliverables iteratively, with each inc
 | Secret scan retained | workflow keeps the committed-secret scan and excludes package lockfiles to avoid false positives | Verified |
 | Regression coverage | `tests/schema/release-workflow.test.mjs` fails if the workflow drifts away from the repository package manager or calls missing root scripts | Verified |
 | Completion audit update | `docs/status/completion-audit.md` records PR #36 and this release-validation repair round | Verified |
-| PR and merge after iteration | GitHub PR evidence to be added after merge | Pending until PR step |
+| PR and merge after iteration | PR #88 | Completed after merge |
 
 ## Verification commands
 
