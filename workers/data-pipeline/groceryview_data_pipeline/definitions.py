@@ -1,0 +1,23 @@
+from dagster import Definitions
+
+from .assets import (
+    latest_price_rollup,
+    normalized_products,
+    price_observations,
+    quality_checks,
+    retailer_fetch_stubs,
+    seed_products,
+    seed_stores,
+)
+
+defs = Definitions(
+    assets=[
+        seed_stores,
+        seed_products,
+        retailer_fetch_stubs,
+        normalized_products,
+        price_observations,
+        latest_price_rollup,
+        quality_checks,
+    ]
+)
