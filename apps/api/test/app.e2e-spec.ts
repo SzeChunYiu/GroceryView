@@ -3,6 +3,12 @@ import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { AppModule } from './../src/app.module';
+import {
+  LatestStorePriceSchema,
+  PriceObservationSchema,
+  ProductTerminalDataSchema,
+  PromotionObservationSchema,
+} from '@groceryview/api-contracts';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication<App>;
@@ -73,10 +79,69 @@ describe('AppController (e2e)', () => {
       .expect(200)
       .expect(({ body }) => {
         const prices = body as Array<Record<string, unknown>>;
+        expect(() => PriceObservationSchema.parse(prices[0])).not.toThrow();
         expect(prices[0]).toMatchObject({
           productSlug: 'zoegas-skane-mellanrost-450g',
           currency: 'SEK',
+          priceType: 'promotion',
+          confidenceLabel: 'high',
+          provenance: expect.stringContaining('https://'),
           demo: true,
+        });
+      });
+
+    await request(app.getHttpServer())
+      .get('/products/zoegas-skane-mellanrost-450g/latest-prices')
+      .expect(200)
+      .expect(({ body }) => {
+        const latestPrices = body as Array<Record<string, unknown>>;
+        expect(() =>
+          LatestStorePriceSchema.parse(latestPrices[0]),
+        ).not.toThrow();
+        expect(latestPrices[0]).toMatchObject({
+          productSlug: 'zoegas-skane-mellanrost-450g',
+          storeSlug: 'willys-odenplan',
+          unitPriceUnit: 'kg',
+          priceType: 'promotion',
+          confidenceLabel: 'high',
+        });
+      });
+
+    await request(app.getHttpServer())
+      .get('/products/zoegas-skane-mellanrost-450g/promotions')
+      .expect(200)
+      .expect(({ body }) => {
+        const promotions = body as Array<Record<string, unknown>>;
+        expect(() =>
+          PromotionObservationSchema.parse(promotions[0]),
+        ).not.toThrow();
+        expect(promotions[0]).toMatchObject({
+          productSlug: 'zoegas-skane-mellanrost-450g',
+          discountPercent: 16.69,
+          confidenceLabel: 'high',
+        });
+      });
+
+    await request(app.getHttpServer())
+      .get('/products/zoegas-skane-mellanrost-450g/terminal')
+      .expect(200)
+      .expect(({ body }) => {
+        expect(() => ProductTerminalDataSchema.parse(body)).not.toThrow();
+        expect(body).toMatchObject({
+          product: {
+            slug: 'zoegas-skane-mellanrost-450g',
+          },
+          latestPrices: [
+            {
+              priceType: 'promotion',
+              confidenceLabel: 'high',
+            },
+          ],
+          promotionObservations: [
+            {
+              confidenceLabel: 'high',
+            },
+          ],
         });
       });
 

@@ -38,6 +38,12 @@ export const StoreSummarySchema = z
   .strict();
 
 export const PriceTypeSchema = z.enum(['regular', 'promotion', 'member']);
+export const ConfidenceLabelSchema = z.enum([
+  'verified',
+  'high',
+  'medium',
+  'low',
+]);
 
 export const PriceObservationSchema = z
   .object({
@@ -50,7 +56,61 @@ export const PriceObservationSchema = z
     priceType: PriceTypeSchema,
     observedAt: IsoDateTimeSchema,
     sourceType: z.string().min(1),
+    provenance: z.string().min(1),
     confidenceScore: z.number().min(0).max(1),
+    confidenceLabel: ConfidenceLabelSchema,
+    demo: ApiDemoFlagSchema,
+  })
+  .strict();
+
+export const LatestStorePriceSchema = z
+  .object({
+    productSlug: z.string().min(1),
+    storeSlug: z.string().min(1),
+    storeName: z.string().min(1),
+    priceAmount: z.number().nonnegative(),
+    currency: CurrencyCodeSchema,
+    unit: z.string().min(1),
+    unitPriceAmount: z.number().nonnegative(),
+    unitPriceUnit: z.string().min(1),
+    priceType: PriceTypeSchema,
+    observedAt: IsoDateTimeSchema,
+    sourceType: z.string().min(1),
+    provenance: z.string().min(1),
+    confidenceScore: z.number().min(0).max(1),
+    confidenceLabel: ConfidenceLabelSchema,
+    demo: ApiDemoFlagSchema,
+  })
+  .strict();
+
+export const PromotionObservationSchema = z
+  .object({
+    id: z.string().min(1),
+    productSlug: z.string().min(1),
+    storeSlug: z.string().min(1),
+    priceAmount: z.number().nonnegative(),
+    regularPriceAmount: z.number().nonnegative(),
+    discountPercent: z.number().min(0).max(100),
+    currency: CurrencyCodeSchema,
+    unit: z.string().min(1),
+    startsAt: IsoDateTimeSchema.nullable(),
+    endsAt: IsoDateTimeSchema.nullable(),
+    observedAt: IsoDateTimeSchema,
+    sourceType: z.string().min(1),
+    provenance: z.string().min(1),
+    confidenceScore: z.number().min(0).max(1),
+    confidenceLabel: ConfidenceLabelSchema,
+    demo: ApiDemoFlagSchema,
+  })
+  .strict();
+
+export const ProductTerminalDataSchema = z
+  .object({
+    product: ProductSummarySchema,
+    latestPrices: z.array(LatestStorePriceSchema),
+    priceObservations: z.array(PriceObservationSchema),
+    promotionObservations: z.array(PromotionObservationSchema),
+    generatedAt: IsoDateTimeSchema,
     demo: ApiDemoFlagSchema,
   })
   .strict();
@@ -122,7 +182,11 @@ export const AlertSchema = z
 
 export type ProductSummary = z.infer<typeof ProductSummarySchema>;
 export type StoreSummary = z.infer<typeof StoreSummarySchema>;
+export type ConfidenceLabel = z.infer<typeof ConfidenceLabelSchema>;
 export type PriceObservation = z.infer<typeof PriceObservationSchema>;
+export type LatestStorePrice = z.infer<typeof LatestStorePriceSchema>;
+export type PromotionObservation = z.infer<typeof PromotionObservationSchema>;
+export type ProductTerminalData = z.infer<typeof ProductTerminalDataSchema>;
 export type DealScore = z.infer<typeof DealScoreSchema>;
 export type WatchlistItem = z.infer<typeof WatchlistItemSchema>;
 export type WeeklyBasketItem = z.infer<typeof WeeklyBasketItemSchema>;
