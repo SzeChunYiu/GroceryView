@@ -1,4 +1,4 @@
-import { calculateDealScore, calculateFixedBasketIndex, compareBasketStrategies, scoreBand } from '@groceryview/core';
+import { buildWatchlistAlerts, calculateDealScore, calculateFixedBasketIndex, compareBasketStrategies, scoreBand, searchProducts, summarizeBudget } from '@groceryview/core';
 
 type ProductRow = {
   ticker: string;
@@ -19,6 +19,17 @@ const products: ProductRow[] = [
   { ticker: 'EGGS-12P', name: 'Eggs 12-pack', price: 34.9, sevenDay: -4.2, cityPercentile: 22, historyPercentile: 28, unitPercentile: 24, discountDepthPercent: 10, confidence: 0.82 }
 ];
 
+const searchableProducts = products.map((product) => ({
+  id: product.ticker.toLowerCase().split('-')[0],
+  ticker: product.ticker,
+  name: product.name,
+  category: product.name.toLowerCase().includes('coffee') ? 'coffee' : product.name.toLowerCase().includes('milk') || product.name.toLowerCase().includes('butter') ? 'dairy' : 'eggs',
+  brandTier: 'national' as const,
+  availableChains: ['willys', 'lidl', 'coop']
+}));
+
+const searchHits = searchProducts(searchableProducts, 'willys coffee');
+
 const scoredProducts = products.map((product) => {
   const score = calculateDealScore({
     currentCityPercentile: product.cityPercentile,
@@ -37,6 +48,27 @@ const basket = compareBasketStrategies({
     { productId: 'milk', quantity: 2, prices: [{ storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 14.9 }, { storeId: 'lidl-sveavagen', storeName: 'Lidl Sveavägen', price: 13.9 }] },
     { productId: 'eggs', quantity: 1, prices: [{ storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 36.9 }, { storeId: 'lidl-sveavagen', storeName: 'Lidl Sveavägen', price: 34.9 }] }
   ]
+});
+
+
+const alerts = buildWatchlistAlerts({
+  watchlist: [
+    { productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, favoriteStoresOnly: true },
+    { productId: 'butter', targetPrice: 45, alertDealScoreAt: 80, favoriteStoresOnly: false }
+  ],
+  products: [
+    { productId: 'coffee', productName: 'Zoégas Coffee 450g', bestPrice: 49.9, bestStoreId: 'willys-odenplan', dealScore: 82, isNew52WeekLow: true },
+    { productId: 'butter', productName: 'Butter 600g', bestPrice: 54.9, bestStoreId: 'coop-odenplan', dealScore: 42, isNew52WeekLow: false }
+  ],
+  favoriteStoreIds: ['willys-odenplan', 'lidl-sveavagen']
+});
+
+const budget = summarizeBudget({
+  weeklyBudget: 800,
+  monthlyBudget: 3200,
+  estimatedBasketTotal: 742,
+  receiptTotalsThisWeek: [321, 180],
+  receiptTotalsThisMonth: [321, 180, 760, 690]
 });
 
 const index = calculateFixedBasketIndex({
@@ -70,7 +102,7 @@ app.innerHTML = `
         </div>
         <div class="grid">
           <div class="metric"><strong>${index.value}</strong><span>${index.label}</span></div>
-          <div class="metric"><strong>${index.movementPercent}%</strong><span>vs base basket</span></div>
+          <div class="metric"><strong>${budget.weeklyRemainingAfterEstimate} SEK</strong><span>weekly budget left after plan</span></div>
           <div class="metric"><strong>${basket.cheapestByProduct.total} SEK</strong><span>favorite-store basket</span></div>
         </div>
       </div>
@@ -109,6 +141,28 @@ app.innerHTML = `
             ${basket.cheapestByProduct.assignments.map((item) => `<tr><td>${item.productId}</td><td>${item.storeName}</td><td>${item.lineTotal.toFixed(2)} SEK</td></tr>`).join('')}
           </tbody>
         </table>
+      </div>
+    </section>
+
+
+    <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Watchlist alerts</h2>
+        <table class="table">
+          <thead><tr><th>Type</th><th>Message</th></tr></thead>
+          <tbody>
+            ${alerts.map((alert) => `<tr><td>${alert.type.replaceAll('_', ' ')}</td><td>${alert.message}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Search and budget readiness</h2>
+        <p class="lede">Query <strong>willys coffee</strong> returns ${searchHits.length} product ticker match. Weekly actual spend is ${budget.weeklyActualSpend} SEK, with ${budget.weeklyRemainingActual} SEK remaining.</p>
+        <div class="grid">
+          <div class="metric"><strong>${budget.weeklyStatus}</strong><span>weekly status</span></div>
+          <div class="metric"><strong>${budget.monthlyRemainingActual}</strong><span>monthly SEK left</span></div>
+          <div class="metric"><strong>${searchHits[0]?.ticker ?? '—'}</strong><span>top search match</span></div>
+        </div>
       </div>
     </section>
   </main>

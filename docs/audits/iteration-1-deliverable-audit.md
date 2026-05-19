@@ -27,3 +27,7 @@ Ship all GroceryView deliverables iteratively, checking tasks and merging each i
 ## Known remaining product gaps
 
 The proposal is much larger than iteration 1. Remaining major gaps include auth, persistent database, real price ingestion, mobile apps, product/store/category routes, watchlist persistence, barcode/receipt scan, household sharing, alerts, ad integration, SEO pages, community verification, and advanced indices.
+
+## Iteration 2 update
+
+Iteration 2 targets more P0/P1 foundations: product search, watchlist alerts, budget summaries, and generated artifact cleanup. Evidence will be recorded in `docs/audits/iteration-2-deliverable-audit.md`.

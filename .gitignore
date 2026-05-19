@@ -8,3 +8,7 @@ coverage/
 ._*
 .codex-supervisor.toml
 codex-tasks/
+packages/*/dist/
+packages/*/dist-test/
+apps/*/dist/
+packages/core/src/*.js
