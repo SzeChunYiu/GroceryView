@@ -8,8 +8,8 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build -w @groceryview/core && npm run build -w @groceryview/web",
-    "test": "npm run test -w @groceryview/core",
+    "build": "npm run build -w @groceryview/core && npm run build -w @groceryview/api && npm run build -w @groceryview/web",
+    "test": "npm run test -w @groceryview/core && npm run test -w @groceryview/api",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "devDependencies": {
