@@ -4,6 +4,7 @@ import {
   applyNotificationSuppressions,
   buildNotificationOperationsReport,
   deliverDueNotifications,
+  planNotificationOperationsAlerts,
   formatNotificationOperationsMetrics,
   planHumanReviewSlaNotifications,
   processNotificationSuppressionEvent,
@@ -513,5 +514,74 @@ describe('formatNotificationOperationsMetrics', () => {
       formatNotificationOperationsMetrics(report, { service: 'groceryview"server\\prod' }),
       /service="groceryview\\"server\\\\prod"/
     );
+  });
+});
+
+describe('planNotificationOperationsAlerts', () => {
+  it('routes blocked notification operations reports to configured recipients', () => {
+    const report = buildNotificationOperationsReport({
+      now: '2026-05-19T12:00:00.000Z',
+      staleAfterMinutes: 30,
+      dueTasks: [{ id: 'task-stale', sendAt: '2026-05-19T11:00:00.000Z' }],
+      workerSummary: { delivered: 4, notDue: 1, retryScheduled: 2, deadLettered: 1, suppressed: 3 },
+      deliveries: [
+        { status: 'failed_provider_error', channel: 'push', recipient: 'device-2', reason: 'provider down' }
+      ]
+    });
+
+    const alerts = planNotificationOperationsAlerts({
+      now: '2026-05-19T12:05:00.000Z',
+      report,
+      recipients: [
+        { channel: 'email', recipient: 'ops@example.com' },
+        { channel: 'push', recipient: 'ops-device' }
+      ]
+    });
+
+    assert.deepEqual(alerts.map((alert) => ({
+      channel: alert.channel,
+      recipient: alert.recipient,
+      type: alert.type,
+      title: alert.title,
+      priority: alert.priority,
+      sendAt: alert.sendAt
+    })), [
+      {
+        channel: 'email',
+        recipient: 'ops@example.com',
+        type: 'notification_operations_blocked',
+        title: 'Notification operations blocked',
+        priority: 'high',
+        sendAt: '2026-05-19T12:05:00.000Z'
+      },
+      {
+        channel: 'push',
+        recipient: 'ops-device',
+        type: 'notification_operations_blocked',
+        title: 'Notification operations blocked',
+        priority: 'high',
+        sendAt: '2026-05-19T12:05:00.000Z'
+      }
+    ]);
+    assert.match(alerts[0].body, /notification_dead_letters_present/);
+    assert.match(alerts[0].body, /notification_provider_failures_present/);
+    assert.match(alerts[0].body, /task-stale/);
+    assert.match(alerts[0].body, /notification_retries_scheduled/);
+  });
+
+  it('does not alert when notification operations are healthy', () => {
+    const alerts = planNotificationOperationsAlerts({
+      now: '2026-05-19T12:05:00.000Z',
+      report: buildNotificationOperationsReport({
+        now: '2026-05-19T12:00:00.000Z',
+        staleAfterMinutes: 30,
+        dueTasks: [],
+        workerSummary: { delivered: 1, notDue: 0, retryScheduled: 0, deadLettered: 0, suppressed: 0 },
+        deliveries: []
+      }),
+      recipients: [{ channel: 'email', recipient: 'ops@example.com' }]
+    });
+
+    assert.deepEqual(alerts, []);
   });
 });
