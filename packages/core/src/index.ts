@@ -258,6 +258,16 @@ export type StorePrice = {
   storeId: string;
   storeName: string;
   price: number;
+  unitPrice?: number;
+  priceType?: 'regular' | 'promotion' | 'member' | 'estimated';
+  confidence?: 'verified' | 'high' | 'medium' | 'low' | 'estimated';
+  observedAt?: string;
+  sourceType?: 'retailer_page' | 'retailer_api' | 'flyer' | 'receipt' | 'shelf_photo' | 'manual_admin' | 'estimated';
+  provenance?: {
+    sourceName: string;
+    sourceUrl?: string;
+    rawRecordId?: string;
+  };
   distanceKm?: number;
 };
 

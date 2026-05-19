@@ -348,9 +348,49 @@ const products: ProductDetail[] = [
     brandTier: 'national',
     availableChains: ['willys', 'lidl', 'coop'],
     currentPrices: [
-      { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 49.9 },
-      { storeId: 'lidl-sveavagen', storeName: 'Lidl Sveavägen', price: 59.9 },
-      { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', price: 64.9 }
+      {
+        storeId: 'willys-odenplan',
+        storeName: 'Willys Odenplan',
+        price: 49.9,
+        unitPrice: 110.89,
+        priceType: 'promotion',
+        confidence: 'verified',
+        observedAt: '2026-05-19T08:30:00.000Z',
+        sourceType: 'retailer_page',
+        provenance: {
+          sourceName: 'Willys campaign page',
+          sourceUrl: 'https://www.willys.se/',
+          rawRecordId: 'demo-price-coffee-willys-20260519'
+        }
+      },
+      {
+        storeId: 'lidl-sveavagen',
+        storeName: 'Lidl Sveavägen',
+        price: 59.9,
+        unitPrice: 133.11,
+        priceType: 'regular',
+        confidence: 'medium',
+        observedAt: '2026-05-19T08:30:00.000Z',
+        sourceType: 'manual_admin',
+        provenance: {
+          sourceName: 'Demo admin seed',
+          rawRecordId: 'demo-price-coffee-lidl-20260519'
+        }
+      },
+      {
+        storeId: 'coop-odenplan',
+        storeName: 'Coop Odenplan',
+        price: 64.9,
+        unitPrice: 144.22,
+        priceType: 'estimated',
+        confidence: 'estimated',
+        observedAt: '2026-05-19T08:30:00.000Z',
+        sourceType: 'estimated',
+        provenance: {
+          sourceName: 'Demo estimated fallback',
+          rawRecordId: 'demo-price-coffee-coop-20260519'
+        }
+      }
     ],
     dealScore: calculateDealScore({ currentCityPercentile: 8, knownPromoHistoryPercentile: 12, equivalentUnitPricePercentile: 18, discountDepthPercent: 25, sourceConfidence: 0.9 }),
     verdict: 'Buy',
@@ -370,8 +410,35 @@ const products: ProductDetail[] = [
     brandTier: 'national',
     availableChains: ['ica', 'willys', 'lidl'],
     currentPrices: [
-      { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 14.9 },
-      { storeId: 'lidl-sveavagen', storeName: 'Lidl Sveavägen', price: 13.9 }
+      {
+        storeId: 'willys-odenplan',
+        storeName: 'Willys Odenplan',
+        price: 14.9,
+        unitPrice: 14.9,
+        priceType: 'regular',
+        confidence: 'verified',
+        observedAt: '2026-05-19T08:30:00.000Z',
+        sourceType: 'retailer_page',
+        provenance: {
+          sourceName: 'Willys product page',
+          sourceUrl: 'https://www.willys.se/',
+          rawRecordId: 'demo-price-milk-willys-20260519'
+        }
+      },
+      {
+        storeId: 'lidl-sveavagen',
+        storeName: 'Lidl Sveavägen',
+        price: 13.9,
+        unitPrice: 13.9,
+        priceType: 'member',
+        confidence: 'medium',
+        observedAt: '2026-05-19T08:30:00.000Z',
+        sourceType: 'flyer',
+        provenance: {
+          sourceName: 'Lidl weekly flyer',
+          rawRecordId: 'demo-price-milk-lidl-20260519'
+        }
+      }
     ],
     dealScore: calculateDealScore({ currentCityPercentile: 18, knownPromoHistoryPercentile: 12, equivalentUnitPricePercentile: 35, discountDepthPercent: 8, sourceConfidence: 0.86 }),
     verdict: 'Buy',
@@ -391,8 +458,34 @@ const products: ProductDetail[] = [
     brandTier: 'national',
     availableChains: ['willys', 'coop'],
     currentPrices: [
-      { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', price: 54.9 },
-      { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 56.9 }
+      {
+        storeId: 'coop-odenplan',
+        storeName: 'Coop Odenplan',
+        price: 54.9,
+        unitPrice: 91.5,
+        priceType: 'regular',
+        confidence: 'medium',
+        observedAt: '2026-05-19T08:30:00.000Z',
+        sourceType: 'manual_admin',
+        provenance: {
+          sourceName: 'Demo admin seed',
+          rawRecordId: 'demo-price-butter-coop-20260519'
+        }
+      },
+      {
+        storeId: 'willys-odenplan',
+        storeName: 'Willys Odenplan',
+        price: 56.9,
+        unitPrice: 94.83,
+        priceType: 'regular',
+        confidence: 'medium',
+        observedAt: '2026-05-19T08:30:00.000Z',
+        sourceType: 'manual_admin',
+        provenance: {
+          sourceName: 'Demo admin seed',
+          rawRecordId: 'demo-price-butter-willys-20260519'
+        }
+      }
     ],
     dealScore: calculateDealScore({ currentCityPercentile: 58, knownPromoHistoryPercentile: 61, equivalentUnitPricePercentile: 52, discountDepthPercent: 2, sourceConfidence: 0.72 }),
     verdict: 'Wait',
