@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 
 const compose = readFileSync(new URL('../../../../infra/docker-compose.yml', import.meta.url), 'utf8');
 const envExample = readFileSync(new URL('../../../../.env.example', import.meta.url), 'utf8');
+const smokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-local-services.sh', import.meta.url), 'utf8');
 
 describe('local infrastructure compose', () => {
   it('defines the required development backing services and ports', () => {
@@ -25,5 +26,13 @@ describe('local infrastructure compose', () => {
     assert.match(envExample, /^S3_ENDPOINT=http:\/\/localhost:9000$/m);
     assert.match(envExample, /^S3_BUCKET=groceryview-raw$/m);
     assert.match(envExample, /^S3_ACCESS_KEY_ID=groceryview$/m);
+  });
+
+  it('ships a smoke script for the local development stack', () => {
+    assert.match(smokeScript, /docker compose -f "\$COMPOSE_FILE"/);
+    assert.match(smokeScript, /compose up -d "\$POSTGRES_SERVICE" "\$REDIS_SERVICE" "\$OBJECT_STORAGE_SERVICE" "\$OBJECT_STORAGE_INIT_SERVICE"/);
+    assert.match(smokeScript, /pg_isready -U "\$POSTGRES_USER" -d "\$POSTGRES_DB"/);
+    assert.match(smokeScript, /redis-cli ping/);
+    assert.match(smokeScript, /mc ls "local\/\$S3_BUCKET"/);
   });
 });
