@@ -8,3 +8,7 @@ build/
 !.env.example
 coverage/
 .DS_Store
+
+# operator factory guard token (never commit)
+codex-tasks/.pr-guard-token
+.pr-guard-token

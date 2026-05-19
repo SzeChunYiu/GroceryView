@@ -1,0 +1,13 @@
+# GroceryView research backlog (RESEARCH-label panes only). Take the FIRST
+# unclaimed line. Output: a sourced docs/research/<area>/<topic>.md (real URLs,
+# honest uncertainty, no invented APIs/partnerships/prices) + 1-3 BUILD tasks
+# bound to it appended to open.txt. Self-replenish with deeper follow-ups.
+
+R1 stockholm-grocery-chains: structure of ICA / Willys / Coop / Hemköp / Lidl / City Gross — store locators, online stores, public price/flyer surfaces, robots/ToS posture; what is lawfully observable and how to record provenance | area: data-sources
+R2 retailer-flyer-formats: how Swedish grocery weekly ads/erbjudanden are published (web, PDF, app APIs) and what a provenance-preserving fetch STUB should model per chain | area: data-sources
+R3 open-price-data-sweden: official statistics / open datasets relevant to grocery price indices (SCB etc.) usable for an index baseline; licensing | area: data-sources
+R4 competitor-teardown-keepa-camelcamelcamel: price-history UX, alert model, confidence display — concretely what GroceryView should match/beat | area: competitor
+R5 competitor-teardown-flipp-matspar-prisjakt: local-offer and basket-comparison UX patterns to adopt for Stockholm groceries | area: competitor
+R6 tradingview-lightweight-charts: best-practice config for multi-series price history with promo markers and confidence (solid/dotted) styling | area: charting
+R7 deal-score-methodology: defensible discount-vs-median + historical-percentile scoring that explicitly excludes distance; how comparable tools justify a "buy/wait" verdict | area: domain
+R8 price-provenance-model: canonical schema for distinct price types (online/flyer/member/in-store/receipt/shelf-photo/manual/estimated) + confidence + raw snapshot reference | area: data-model

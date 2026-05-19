@@ -1,0 +1,55 @@
+# GroceryView release gate. The job name below is the required status check
+# the FLAT protocol, branch protection, and the operator pr-merger all key on.
+# Scoped to PRs + main + manual; concurrency cancels superseded runs so the
+# high worker push-rate cannot spam CI minutes. No untrusted event input is
+# referenced in any run: step (injection-safe by construction).
+name: Release validation
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release-validation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate release-safe candidate
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable Corepack + pnpm
+        run: |
+          corepack enable
+          corepack prepare pnpm@latest --activate
+          pnpm --version
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Secret scan (no committed credentials)
+        run: |
+          if git grep -nE "(SUPABASE_SERVICE_ROLE|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----)" \
+              -- ':!*.example' ':!**/*.md'; then
+            echo "::error::potential committed secret"; exit 1
+          fi
