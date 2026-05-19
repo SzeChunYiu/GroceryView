@@ -4,6 +4,7 @@ import {
   applyNotificationSuppressions,
   deliverDueNotifications,
   planHumanReviewSlaNotifications,
+  processNotificationSuppressionEvent,
   runNotificationWorkerTick
 } from '../index.js';
 
@@ -283,5 +284,87 @@ describe('applyNotificationSuppressions', () => {
 
     assert.equal(result.sendable.length, 1);
     assert.deepEqual(result.suppressed, []);
+  });
+});
+
+describe('processNotificationSuppressionEvent', () => {
+  it('turns unsubscribe, bounce, and complaint provider events into active suppression records', () => {
+    const records = [
+      processNotificationSuppressionEvent({
+        provider: 'ses',
+        eventType: 'unsubscribe',
+        recipient: 'unsubscribed@example.com',
+        channel: 'email',
+        occurredAt: '2026-05-19T20:30:00.000Z',
+        providerEventId: 'evt-unsub'
+      }),
+      processNotificationSuppressionEvent({
+        provider: 'ses',
+        eventType: 'bounce',
+        recipient: 'bounced@example.com',
+        channel: 'email',
+        occurredAt: '2026-05-19T20:31:00.000Z',
+        providerEventId: 'evt-bounce'
+      }),
+      processNotificationSuppressionEvent({
+        provider: 'fcm',
+        eventType: 'complaint',
+        recipient: 'device-1',
+        channel: 'push',
+        occurredAt: '2026-05-19T20:32:00.000Z',
+        providerEventId: 'evt-complaint'
+      })
+    ];
+
+    assert.deepEqual(records, [
+      {
+        id: 'suppression-ses-evt-unsub',
+        recipient: 'unsubscribed@example.com',
+        channel: 'email',
+        reason: 'unsubscribed',
+        active: true,
+        updatedAt: '2026-05-19T20:30:00.000Z',
+        source: { provider: 'ses', providerEventId: 'evt-unsub', eventType: 'unsubscribe' }
+      },
+      {
+        id: 'suppression-ses-evt-bounce',
+        recipient: 'bounced@example.com',
+        channel: 'email',
+        reason: 'bounce',
+        active: true,
+        updatedAt: '2026-05-19T20:31:00.000Z',
+        source: { provider: 'ses', providerEventId: 'evt-bounce', eventType: 'bounce' }
+      },
+      {
+        id: 'suppression-fcm-evt-complaint',
+        recipient: 'device-1',
+        channel: 'push',
+        reason: 'complaint',
+        active: true,
+        updatedAt: '2026-05-19T20:32:00.000Z',
+        source: { provider: 'fcm', providerEventId: 'evt-complaint', eventType: 'complaint' }
+      }
+    ]);
+  });
+
+  it('deactivates an unsubscribe suppression on resubscribe events', () => {
+    const record = processNotificationSuppressionEvent({
+      provider: 'ses',
+      eventType: 'resubscribe',
+      recipient: 'user@example.com',
+      channel: 'email',
+      occurredAt: '2026-05-19T20:40:00.000Z',
+      providerEventId: 'evt-resub'
+    });
+
+    assert.deepEqual(record, {
+      id: 'suppression-ses-evt-resub',
+      recipient: 'user@example.com',
+      channel: 'email',
+      reason: 'unsubscribed',
+      active: false,
+      updatedAt: '2026-05-19T20:40:00.000Z',
+      source: { provider: 'ses', providerEventId: 'evt-resub', eventType: 'resubscribe' }
+    });
   });
 });
