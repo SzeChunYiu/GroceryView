@@ -327,3 +327,70 @@ export function summarizeBudget(input: BudgetInput): BudgetSummary {
     monthlyStatus: monthlyRemainingActual >= 0 ? 'under' : 'over'
   };
 }
+
+export type NotificationType =
+  | 'target_price'
+  | 'favorite_store_deal'
+  | 'budget_alert'
+  | 'weekly_report'
+  | 'receipt_summary'
+  | 'stock_up_opportunity';
+
+export type NotificationChannel = 'push' | 'email';
+
+export type NotificationPreferences = {
+  channels: NotificationChannel[];
+  enabledTypes: NotificationType[];
+  quietHours?: {
+    startHour: number;
+    endHour: number;
+    timezone: string;
+  };
+};
+
+export type NotificationEvent = {
+  type: NotificationType;
+  title: string;
+  body: string;
+  priority: 'normal' | 'high';
+};
+
+export type PlannedNotification = NotificationEvent & {
+  channel: NotificationChannel;
+  sendAt: string;
+};
+
+function isQuietHour(date: Date, quietHours: NonNullable<NotificationPreferences['quietHours']>): boolean {
+  void quietHours.timezone;
+  const hour = date.getUTCHours();
+  if (quietHours.startHour <= quietHours.endHour) return hour >= quietHours.startHour && hour < quietHours.endHour;
+  return hour >= quietHours.startHour || hour < quietHours.endHour;
+}
+
+function nextQuietEnd(date: Date, quietHours: NonNullable<NotificationPreferences['quietHours']>): string {
+  const sendAt = new Date(date);
+  if (date.getUTCHours() >= quietHours.startHour) sendAt.setUTCDate(sendAt.getUTCDate() + 1);
+  sendAt.setUTCHours(quietHours.endHour, 0, 0, 0);
+  return sendAt.toISOString();
+}
+
+export function planNotifications(input: {
+  now: string;
+  preferences: NotificationPreferences;
+  events: NotificationEvent[];
+}): PlannedNotification[] {
+  const now = new Date(input.now);
+  const enabled = new Set(input.preferences.enabledTypes);
+  const planned: PlannedNotification[] = [];
+
+  for (const event of input.events) {
+    if (!enabled.has(event.type)) continue;
+    const inQuietHours = input.preferences.quietHours ? isQuietHour(now, input.preferences.quietHours) : false;
+    const sendAt = inQuietHours && event.priority !== 'high' && input.preferences.quietHours ? nextQuietEnd(now, input.preferences.quietHours) : now.toISOString();
+    for (const channel of input.preferences.channels) {
+      planned.push({ ...event, channel, sendAt });
+    }
+  }
+
+  return planned;
+}
