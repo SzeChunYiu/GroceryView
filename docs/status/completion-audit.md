@@ -10,7 +10,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 
 | Requirement / deliverable | Evidence | Status |
 | --- | --- | --- |
-| Iterative PR + merge workflow | PR #1 through PR #35 merged to `main` | Done for shipped iterations |
+| Iterative PR + merge workflow | PR #1 through PR #36 merged to `main`; PR #88 covers the current release-validation repair | Done for shipped iterations |
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
@@ -48,6 +48,8 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Monetization foundation | PR #33, `packages/monetization` | Provider-neutral ad/billing contracts shipped |
 | Retailer compliance gate | PR #34, `planRetailerSourceAccess` | Source-access gate shipped |
 | Deployment ops foundation | PR #35, `packages/ops` | Readiness/rollback gates shipped |
+| Catalog coverage reporting | PR #36, `packages/catalog` | Coverage/backfill accounting shipped |
+| Release validation workflow repair | PR #88, `.github/workflows/release-validation.yml`, `tests/schema/release-workflow.test.mjs` | Shipped after merge |
 
 ## Verification gates
 
@@ -75,6 +77,6 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 - Push/email provider adapters and scheduled notification workers. Provider-neutral delivery interface is being added; real provider credentials/workers still missing.
 - AdMob/AdSense and subscription billing integration. Provider-neutral monetization contracts are being added; real provider credentials/webhooks still missing.
 - Hosting provider selection, real deployment, secrets, DNS, observability, smoke tests, and rollback. Deployment readiness/rollback gates are being added; real provider deployment still missing.
-- Full catalog/data coverage beyond seed products/stores. Catalog coverage reporting is being added; real backfill data still missing.
+- Full catalog/data coverage beyond seed products/stores. Catalog coverage reporting exists; real retailer/feed backfill data still missing.
 - Human review queue UI and operations for low-confidence product matching and community reports. Core queue planning is being added; moderation tooling still missing.
 - Branch protection policy documented in .github/repository-ruleset.json; still needs applying in GitHub repository settings.

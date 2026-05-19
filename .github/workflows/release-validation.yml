@@ -24,37 +24,28 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Enable Corepack + pnpm
-        # Use the version pinned in package.json "packageManager" — NOT
-        # @latest — so CI, the lockfile, and every dev/worker resolve the
-        # identical pnpm. @latest was a nondeterministic-CI footgun.
-        run: |
-          corepack enable
-          corepack prepare pnpm@10.11.0 --activate
-          pnpm --version
-
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: pnpm
+          node-version: 22
+          cache: npm
 
       - name: Install
-        run: pnpm install --frozen-lockfile
+        run: npm ci
+
+      - name: Test
+        run: npm test
 
       - name: Build
-        run: pnpm build
-
-      - name: Lint
-        run: pnpm lint
+        run: npm run build
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: npm run typecheck
 
       - name: Secret scan (no committed credentials)
         run: |
           # Exclude this workflow (contains the patterns literally), examples,
           # markdown, and lockfiles to avoid self-match false positives.
           if git grep -nE "(SUPABASE_SERVICE_ROLE|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----)" \
-              -- ':!*.example' ':!**/*.md' ':!.github/**' ':!**/pnpm-lock.yaml'; then
+              -- ':!*.example' ':!**/*.md' ':!.github/**' ':!**/package-lock.json'; then
             echo "::error::potential committed secret"; exit 1
           fi
