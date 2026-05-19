@@ -192,6 +192,10 @@ export type NotificationOperationsReportInput = {
   deliveries: DeliveryResult[];
 };
 
+export type NotificationMetricsOptions = {
+  service: string;
+};
+
 function buildMessage(notification: DeliveryNotification): DeliveryMessage {
   return {
     recipient: notification.recipient,
@@ -459,4 +463,37 @@ export function buildNotificationOperationsReport(input: NotificationOperationsR
     warnings,
     staleTaskIds
   };
+}
+
+function metricLabelValue(value: string): string {
+  return value.replaceAll('\\', '\\\\').replaceAll('"', '\\"').replaceAll('\n', '\\n');
+}
+
+function serviceLabel(options: NotificationMetricsOptions): string {
+  return `service="${metricLabelValue(options.service)}"`;
+}
+
+export function formatNotificationOperationsMetrics(
+  report: NotificationOperationsReport,
+  options: NotificationMetricsOptions
+): string {
+  const label = serviceLabel(options);
+  return [
+    '# HELP groceryview_notification_worker_events_total Notification worker event counts by status.',
+    '# TYPE groceryview_notification_worker_events_total gauge',
+    `groceryview_notification_worker_events_total{${label},status="delivered"} ${report.metrics.delivered}`,
+    `groceryview_notification_worker_events_total{${label},status="not_due"} ${report.metrics.notDue}`,
+    `groceryview_notification_worker_events_total{${label},status="retry_scheduled"} ${report.metrics.retryScheduled}`,
+    `groceryview_notification_worker_events_total{${label},status="dead_lettered"} ${report.metrics.deadLettered}`,
+    `groceryview_notification_worker_events_total{${label},status="suppressed"} ${report.metrics.suppressed}`,
+    '# HELP groceryview_notification_provider_failures_total Notification provider failures in the worker cycle.',
+    '# TYPE groceryview_notification_provider_failures_total gauge',
+    `groceryview_notification_provider_failures_total{${label}} ${report.metrics.providerFailures}`,
+    '# HELP groceryview_notification_stale_due_tasks_total Notification tasks already due beyond the stale threshold.',
+    '# TYPE groceryview_notification_stale_due_tasks_total gauge',
+    `groceryview_notification_stale_due_tasks_total{${label}} ${report.metrics.staleDueTasks}`,
+    '# HELP groceryview_notification_operations_blocked Notification operations blocked status, 1 when blocked.',
+    '# TYPE groceryview_notification_operations_blocked gauge',
+    `groceryview_notification_operations_blocked{${label}} ${report.status === 'blocked' ? 1 : 0}`
+  ].join('\n');
 }
