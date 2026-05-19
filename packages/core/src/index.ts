@@ -394,3 +394,110 @@ export function planNotifications(input: {
 
   return planned;
 }
+
+export type ProductMatchInput = {
+  id: string;
+  barcode?: string;
+  brand: string;
+  category: string;
+  packageSize: number;
+  packageUnit: string;
+  brandTier: BrandTier;
+  unitPrice?: number;
+};
+
+export type MatchMode = 'exact' | 'equivalent' | 'smart_swap' | 'not_recommended';
+export type MatchConfidence = 'high' | 'medium' | 'medium-low' | 'low';
+export type QualityRisk = 'low' | 'medium' | 'high';
+
+export type ProductMatchResult = {
+  mode: MatchMode;
+  confidence: MatchConfidence;
+  qualityRisk: QualityRisk;
+  reason: string;
+};
+
+const highConfidenceCategories = new Set(['pasta', 'rice', 'sugar', 'flour', 'milk']);
+const mediumConfidenceCategories = new Set(['coffee', 'butter', 'yogurt', 'toilet_paper']);
+const lowConfidenceCategories = new Set(['meat', 'fish', 'fruit', 'vegetables']);
+const doNotAutoSubstituteCategories = new Set(['baby_formula', 'medical_diet', 'pet_food_sensitive']);
+
+function samePackage(a: ProductMatchInput, b: ProductMatchInput): boolean {
+  return a.packageUnit.toLowerCase() === b.packageUnit.toLowerCase() && Math.abs(a.packageSize - b.packageSize) <= Math.max(1, a.packageSize * 0.05);
+}
+
+function confidenceForCategory(category: string): MatchConfidence {
+  if (highConfidenceCategories.has(category)) return 'high';
+  if (mediumConfidenceCategories.has(category)) return 'medium';
+  if (lowConfidenceCategories.has(category)) return 'low';
+  return 'medium-low';
+}
+
+function riskForConfidence(confidence: MatchConfidence): QualityRisk {
+  if (confidence === 'high') return 'low';
+  if (confidence === 'medium') return 'medium';
+  return 'high';
+}
+
+export function classifyProductMatch(input: { source: ProductMatchInput; candidate: ProductMatchInput }): ProductMatchResult {
+  const { source, candidate } = input;
+  if (source.barcode && candidate.barcode && source.barcode === candidate.barcode && samePackage(source, candidate)) {
+    return { mode: 'exact', confidence: 'high', qualityRisk: 'low', reason: 'Barcode and package size match.' };
+  }
+
+  if (source.category !== candidate.category) {
+    return { mode: 'not_recommended', confidence: 'low', qualityRisk: 'high', reason: 'Different categories are not comparable.' };
+  }
+
+  if (doNotAutoSubstituteCategories.has(source.category)) {
+    return { mode: 'not_recommended', confidence: 'low', qualityRisk: 'high', reason: 'Category should not be auto-substituted.' };
+  }
+
+  if (samePackage(source, candidate)) {
+    const confidence = confidenceForCategory(source.category);
+    return { mode: 'equivalent', confidence, qualityRisk: riskForConfidence(confidence), reason: 'Same category and comparable package size.' };
+  }
+
+  return { mode: 'not_recommended', confidence: 'low', qualityRisk: 'high', reason: 'Package sizes are not comparable.' };
+}
+
+export type SmartSwapInput = {
+  source: ProductMatchInput & { unitPrice: number };
+  candidates: Array<ProductMatchInput & { unitPrice: number }>;
+  acceptPrivateLabel: 'yes' | 'no' | 'maybe';
+  minimumSavingsPercent: number;
+};
+
+export type SmartSwapRecommendation = {
+  productId: string;
+  savingsPercent: number;
+  confidence: MatchConfidence;
+  qualityRisk: QualityRisk;
+  reason: string;
+};
+
+function isPrivateLabel(tier: BrandTier): boolean {
+  return tier === 'standard_private_label' || tier === 'budget_private_label' || tier === 'organic_private_label' || tier === 'discount_chain_label';
+}
+
+export function recommendSmartSwaps(input: SmartSwapInput): SmartSwapRecommendation[] {
+  if (input.acceptPrivateLabel === 'no') return [];
+  const recommendations: SmartSwapRecommendation[] = [];
+
+  for (const candidate of input.candidates) {
+    if (isPrivateLabel(candidate.brandTier) && input.acceptPrivateLabel === 'maybe' && candidate.brandTier === 'budget_private_label') continue;
+    const match = classifyProductMatch({ source: input.source, candidate });
+    if (match.mode === 'not_recommended') continue;
+    const savingsPercent = Math.round(((input.source.unitPrice - candidate.unitPrice) / input.source.unitPrice) * 10000) / 100;
+    if (savingsPercent < input.minimumSavingsPercent) continue;
+    recommendations.push({
+      productId: candidate.id,
+      savingsPercent,
+      confidence: match.confidence,
+      qualityRisk: match.qualityRisk,
+      reason: match.reason
+    });
+  }
+
+  return recommendations.sort((a, b) => b.savingsPercent - a.savingsPercent);
+}
