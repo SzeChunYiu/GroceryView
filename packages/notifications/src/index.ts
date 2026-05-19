@@ -10,6 +10,23 @@ export type DeliveryNotification = {
   recipient: string;
 };
 
+export type NotificationSuppressionReason = 'unsubscribed' | 'bounce' | 'complaint';
+
+export type NotificationSuppression = {
+  recipient: string;
+  channel?: DeliveryChannel;
+  reason: NotificationSuppressionReason;
+  active: boolean;
+};
+
+export type NotificationSuppressionResult = {
+  sendable: DeliveryNotification[];
+  suppressed: Array<{
+    notification: DeliveryNotification;
+    reason: NotificationSuppressionReason;
+  }>;
+};
+
 export type HumanReviewSlaAssignment = {
   reviewId: string;
   subjectType: 'product_match' | 'community_report';
@@ -189,6 +206,31 @@ export function planHumanReviewSlaNotifications(input: PlanHumanReviewSlaNotific
   }
 
   return notifications;
+}
+
+function suppressionMatches(notification: DeliveryNotification, suppression: NotificationSuppression): boolean {
+  if (!suppression.active) return false;
+  if (suppression.recipient !== notification.recipient) return false;
+  return suppression.channel === undefined || suppression.channel === notification.channel;
+}
+
+export function applyNotificationSuppressions(input: {
+  notifications: DeliveryNotification[];
+  suppressions: NotificationSuppression[];
+}): NotificationSuppressionResult {
+  const sendable: DeliveryNotification[] = [];
+  const suppressed: NotificationSuppressionResult['suppressed'] = [];
+
+  for (const notification of input.notifications) {
+    const suppression = input.suppressions.find((candidate) => suppressionMatches(notification, candidate));
+    if (suppression) {
+      suppressed.push({ notification, reason: suppression.reason });
+      continue;
+    }
+    sendable.push(notification);
+  }
+
+  return { sendable, suppressed };
 }
 
 export async function deliverDueNotifications(input: DeliverDueNotificationsInput): Promise<DeliveryResult[]> {
