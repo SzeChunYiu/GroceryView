@@ -15,7 +15,7 @@ Continue completing GroceryView proposal deliverables iteratively, with each inc
 | Delivery summary | worker returns delivered/not-due/retry/dead-letter counts for operations monitoring | Verified |
 | Regression coverage | `packages/notifications/src/__tests__/delivery.test.ts` covers delivery, future queueing, retry, and dead-letter behavior | Verified |
 | Completion audit update | `docs/status/completion-audit.md` narrows the notification-worker gap | Verified |
-| PR and merge after iteration | GitHub PR evidence to be added after PR creation | Pending until PR step |
+| PR and merge after iteration | PR #90 | Completed after merge |
 
 ## Verification commands
 
