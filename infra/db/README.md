@@ -8,6 +8,8 @@ infra/db/scripts/verify-migrations.sh
 
 The script starts a temporary `postgis/postgis:18-3.6` container, waits for PostgreSQL readiness, and applies every `*.sql` file in `infra/db/migrations` in lexical order with `psql -v ON_ERROR_STOP=1`.
 
+The `Release validation` GitHub Actions workflow runs the same verifier after build/typecheck, so migration and seed SQL are checked continuously before product PRs can merge.
+
 When `infra/db/seeds/*.sql` exists, the script applies seed files after migrations and asserts the starter data surface:
 
 - at least 6 chains,

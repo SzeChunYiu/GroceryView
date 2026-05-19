@@ -41,6 +41,9 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Verify database migrations
+        run: infra/db/scripts/verify-migrations.sh
+
       - name: Secret scan (no committed credentials)
         run: |
           # Exclude this workflow (contains the patterns literally), examples,
