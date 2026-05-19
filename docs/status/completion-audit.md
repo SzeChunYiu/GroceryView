@@ -37,6 +37,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Deploy workflow skeleton | PR #22, `.github/workflows/deploy.yml` | Provider-neutral skeleton shipped |
 | Completion audit | PR #23, `docs/status/completion-audit.md` | Shipped |
 | PostgreSQL repository adapter | PR #24, `createPostgresRepository` | Adapter skeleton shipped |
+| PostgreSQL integration readiness contract | Iteration 60, `buildPostgresIntegrationReadinessReport` | Schema/migration/probe gate ready for live DB wiring |
 | Repository governance policy | PR #25, `.github/repository-ruleset.json`; GitHub ruleset #16607866 active on `main` | Applied in GitHub |
 | PostgreSQL query executor | PR #26, `createPgQueryExecutor` | Client adapter shipped |
 | Static web flow scaffolds | PR #27, `apps/web/scripts/pages.mjs` | Static route scaffolds shipped |
@@ -91,7 +92,7 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 
 ## Remaining blocking gaps
 
-- PostgreSQL query-executor wiring, repository adapter skeleton, and human-review assignment persistence exist; live database integration tests still missing.
+- PostgreSQL query-executor wiring, repository adapter skeleton, human-review assignment persistence, and a schema/migration/probe readiness contract exist; live database integration tests still need a provisioned PostgreSQL service and probe runner.
 - Real retailer/API/crawler connectors and legal/robots review. Retailer source access gates are being added; real retailer connectors and completed legal reviews still missing.
 - Real OCR/camera/upload pipeline for barcode and receipt scanning. Provider-neutral scan pipeline exists; real camera/OCR providers still missing.
 - Real Expo/React Native screens and device builds. Expo route/readiness config is being added; real React Native component screens and store builds still missing.
