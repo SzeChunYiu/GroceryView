@@ -739,6 +739,26 @@ export type PostgresIntegrationProbe = {
   }>;
 };
 
+export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
+  'app_users',
+  'favorite_stores',
+  'human_review_assignments',
+  'human_reviewers',
+  'community_reporter_trust',
+  'notification_tasks',
+  'notification_suppressions'
+] as const;
+
+export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
+  '001_initial_schema',
+  '003_human_review_assignments',
+  '004_human_reviewers',
+  '005_community_reporter_trust',
+  '006_notification_tasks',
+  '007_notification_suppressions',
+  '008_notification_task_suppressed_status'
+] as const;
+
 export type PostgresIntegrationReadinessReport = {
   status: 'ready' | 'blocked';
   blockers: string[];

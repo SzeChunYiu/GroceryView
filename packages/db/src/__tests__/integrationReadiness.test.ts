@@ -1,33 +1,17 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPostgresIntegrationReadinessReport } from '../index.js';
-
-const requiredTables = [
-  'app_users',
-  'favorite_stores',
-  'human_review_assignments',
-  'human_reviewers',
-  'community_reporter_trust',
-  'notification_tasks',
-  'notification_suppressions'
-];
-
-const requiredMigrationVersions = [
-  '001_initial_schema',
-  '003_human_review_assignments',
-  '004_human_reviewers',
-  '005_community_reporter_trust',
-  '006_notification_tasks',
-  '007_notification_suppressions',
-  '008_notification_task_suppressed_status'
-];
+import {
+  POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS,
+  POSTGRES_INTEGRATION_REQUIRED_TABLES,
+  buildPostgresIntegrationReadinessReport
+} from '../index.js';
 
 describe('buildPostgresIntegrationReadinessReport', () => {
   it('fails closed with concrete blockers for missing schema, migrations, and repository probes', () => {
     const report = buildPostgresIntegrationReadinessReport({
-      requiredTables,
+      requiredTables: [...POSTGRES_INTEGRATION_REQUIRED_TABLES],
       existingTables: ['app_users', 'favorite_stores', 'notification_tasks'],
-      requiredMigrationVersions,
+      requiredMigrationVersions: [...POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS],
       appliedMigrationVersions: ['001_initial_schema', '006_notification_tasks'],
       repositoryChecks: [
         { name: 'upsert_user', status: 'pass' },
@@ -62,10 +46,10 @@ describe('buildPostgresIntegrationReadinessReport', () => {
 
   it('marks the integration contract ready only when every probe passes', () => {
     const report = buildPostgresIntegrationReadinessReport({
-      requiredTables,
-      existingTables: [...requiredTables],
-      requiredMigrationVersions,
-      appliedMigrationVersions: [...requiredMigrationVersions],
+      requiredTables: [...POSTGRES_INTEGRATION_REQUIRED_TABLES],
+      existingTables: [...POSTGRES_INTEGRATION_REQUIRED_TABLES],
+      requiredMigrationVersions: [...POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS],
+      appliedMigrationVersions: [...POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS],
       repositoryChecks: [
         { name: 'upsert_user', status: 'pass' },
         { name: 'favorite_store_round_trip', status: 'pass' },
