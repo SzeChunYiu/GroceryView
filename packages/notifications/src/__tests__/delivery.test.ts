@@ -4,6 +4,7 @@ import {
   applyNotificationSuppressions,
   buildNotificationOperationsReport,
   deliverDueNotifications,
+  formatNotificationOperationsMetrics,
   planHumanReviewSlaNotifications,
   processNotificationSuppressionEvent,
   runNotificationWorkerTick
@@ -464,5 +465,53 @@ describe('buildNotificationOperationsReport', () => {
       warnings: [],
       staleTaskIds: []
     });
+  });
+});
+
+describe('formatNotificationOperationsMetrics', () => {
+  it('exports notification operations reports as labeled metrics text', () => {
+    const report = buildNotificationOperationsReport({
+      now: '2026-05-19T12:00:00.000Z',
+      staleAfterMinutes: 30,
+      dueTasks: [{ id: 'task-stale', sendAt: '2026-05-19T11:00:00.000Z' }],
+      workerSummary: { delivered: 4, notDue: 1, retryScheduled: 2, deadLettered: 1, suppressed: 3 },
+      deliveries: [
+        { status: 'failed_no_provider', channel: 'email', recipient: 'ops@example.com', reason: 'No email provider configured.' }
+      ]
+    });
+
+    assert.equal(formatNotificationOperationsMetrics(report, { service: 'groceryview-server' }), [
+      '# HELP groceryview_notification_worker_events_total Notification worker event counts by status.',
+      '# TYPE groceryview_notification_worker_events_total gauge',
+      'groceryview_notification_worker_events_total{service="groceryview-server",status="delivered"} 4',
+      'groceryview_notification_worker_events_total{service="groceryview-server",status="not_due"} 1',
+      'groceryview_notification_worker_events_total{service="groceryview-server",status="retry_scheduled"} 2',
+      'groceryview_notification_worker_events_total{service="groceryview-server",status="dead_lettered"} 1',
+      'groceryview_notification_worker_events_total{service="groceryview-server",status="suppressed"} 3',
+      '# HELP groceryview_notification_provider_failures_total Notification provider failures in the worker cycle.',
+      '# TYPE groceryview_notification_provider_failures_total gauge',
+      'groceryview_notification_provider_failures_total{service="groceryview-server"} 1',
+      '# HELP groceryview_notification_stale_due_tasks_total Notification tasks already due beyond the stale threshold.',
+      '# TYPE groceryview_notification_stale_due_tasks_total gauge',
+      'groceryview_notification_stale_due_tasks_total{service="groceryview-server"} 1',
+      '# HELP groceryview_notification_operations_blocked Notification operations blocked status, 1 when blocked.',
+      '# TYPE groceryview_notification_operations_blocked gauge',
+      'groceryview_notification_operations_blocked{service="groceryview-server"} 1'
+    ].join('\n'));
+  });
+
+  it('escapes metric labels for safe scraping', () => {
+    const report = buildNotificationOperationsReport({
+      now: '2026-05-19T12:00:00.000Z',
+      staleAfterMinutes: 30,
+      dueTasks: [],
+      workerSummary: { delivered: 0, notDue: 0, retryScheduled: 0, deadLettered: 0, suppressed: 0 },
+      deliveries: []
+    });
+
+    assert.match(
+      formatNotificationOperationsMetrics(report, { service: 'groceryview"server\\prod' }),
+      /service="groceryview\\"server\\\\prod"/
+    );
   });
 });
