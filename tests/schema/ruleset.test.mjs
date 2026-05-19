@@ -9,7 +9,9 @@ describe('repository ruleset policy', () => {
     assert.equal(ruleset.name, 'main protection');
     assert.deepEqual(ruleset.targetBranches, ['main']);
     assert.equal(ruleset.rules.requirePullRequest, true);
-    assert.deepEqual(ruleset.rules.requiredStatusChecks, ['Test, build, and typecheck']);
+    assert.equal(ruleset.enforcement, 'active');
+    assert.deepEqual(ruleset.rules.requiredStatusChecks, ['Test, build, and typecheck', 'Validate release-safe candidate']);
     assert.equal(ruleset.rules.blockForcePushes, true);
+    assert.equal(ruleset.appliedInGitHub, true);
   });
 });
