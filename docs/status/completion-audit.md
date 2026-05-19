@@ -10,7 +10,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 
 | Requirement / deliverable | Evidence | Status |
 | --- | --- | --- |
-| Iterative PR + merge workflow | PR #1 through PR #32 merged to `main` | Done for shipped iterations |
+| Iterative PR + merge workflow | PR #1 through PR #33 merged to `main` | Done for shipped iterations |
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
@@ -45,6 +45,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Scanning pipeline foundation | PR #30, `packages/scanning` | Provider-neutral scan pipeline shipped |
 | Completion audit refresh | PR #31, `docs/status/completion-audit.md` | Audit reconciled after scanning |
 | Mobile Expo readiness | PR #32, `apps/mobile/app.config.json`, `apps/mobile/eas.json` | Device-build metadata shipped |
+| Monetization foundation | PR #33, `packages/monetization` | Provider-neutral ad/billing contracts shipped |
 
 ## Verification gates
 
@@ -65,7 +66,7 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 ## Remaining blocking gaps
 
 - PostgreSQL query-executor wiring and repository adapter skeleton exist; live database integration tests still missing.
-- Real retailer/API/crawler connectors and legal/robots review.
+- Real retailer/API/crawler connectors and legal/robots review. Retailer source access gates are being added; real retailer connectors and completed legal reviews still missing.
 - Real OCR/camera/upload pipeline for barcode and receipt scanning. Provider-neutral scan pipeline exists; real camera/OCR providers still missing.
 - Real Expo/React Native screens and device builds. Expo route/readiness config is being added; real React Native component screens and store builds still missing.
 - Real interactive web UI for login, account, household, privacy, basket, and scanner flows. Static page scaffolds are being added before full interactivity.

@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { confidenceForSource, ingestRetailerProduct, normalizeUnitPrice, planIngestionBatch } from '../index.js';
+import { confidenceForSource, ingestRetailerProduct, normalizeUnitPrice, planIngestionBatch, planRetailerSourceAccess } from '../index.js';
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
@@ -66,5 +66,43 @@ describe('planIngestionBatch', () => {
     assert.equal(plan.accepted.length, 1);
     assert.equal(plan.rejected.length, 1);
     assert.match(plan.rejected[0].reason, /rawName is required/);
+  });
+});
+
+describe('planRetailerSourceAccess', () => {
+  it('allows official API access only with an active agreement and approved legal review', () => {
+    const access = planRetailerSourceAccess({
+      chainId: 'willys',
+      sourceType: 'official_api',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true
+    });
+
+    assert.deepEqual(access, {
+      status: 'allowed',
+      chainId: 'willys',
+      sourceType: 'official_api',
+      reason: 'Official API access has legal approval and a data agreement.',
+      requiredActions: []
+    });
+  });
+
+  it('blocks retailer page crawling when robots or legal review are not approved', () => {
+    const access = planRetailerSourceAccess({
+      chainId: 'ica',
+      sourceType: 'retailer_online_page',
+      robotsTxtStatus: 'disallow',
+      legalReviewStatus: 'pending',
+      hasDataAgreement: false
+    });
+
+    assert.deepEqual(access, {
+      status: 'blocked',
+      chainId: 'ica',
+      sourceType: 'retailer_online_page',
+      reason: 'Retailer page ingestion requires robots.txt allow and approved legal review.',
+      requiredActions: ['robots_txt_allow_required', 'legal_review_approval_required']
+    });
   });
 });
