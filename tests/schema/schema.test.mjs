@@ -20,6 +20,7 @@ const requiredTables = [
   'receipt_uploads',
   'receipt_items',
   'community_price_reports',
+  'human_review_assignments',
   'grocery_indices',
   'grocery_index_components'
 ];
@@ -39,6 +40,8 @@ const requiredColumns = [
   'accept_private_label',
   'target_price',
   'alert_deal_score_at',
+  'assignee_id',
+  'due_at',
   'base_date',
   'weight'
 ];

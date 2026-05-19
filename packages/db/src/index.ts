@@ -56,6 +56,19 @@ export type BasketRecord = {
   quantity: number;
 };
 
+export type HumanReviewAssignmentRecord = {
+  id: string;
+  reviewId: string;
+  subjectType: 'product_match' | 'community_report';
+  subjectId: string;
+  priority: 'high' | 'medium' | 'low';
+  reason: string;
+  assigneeId: string;
+  assignedAt: string;
+  dueAt: string;
+  status: 'assigned' | 'in_progress' | 'completed';
+};
+
 export type GroceryViewRepository = {
   upsertUser(user: UserRecord): Promise<void>;
   addFavoriteStore(userId: string, storeId: string): Promise<void>;
@@ -66,6 +79,8 @@ export type GroceryViewRepository = {
   getWatchlist(userId: string): Promise<WatchlistRecord[]>;
   addBasketItem(userId: string, item: BasketRecord): Promise<void>;
   getBasket(userId: string): Promise<BasketRecord[]>;
+  saveHumanReviewAssignment(assignment: HumanReviewAssignmentRecord): Promise<void>;
+  listOpenHumanReviewAssignments(): Promise<HumanReviewAssignmentRecord[]>;
 };
 
 function requireUser(users: Map<string, UserRecord>, userId: string): void {
@@ -78,6 +93,7 @@ export function createMemoryRepository(): GroceryViewRepository {
   const budgets = new Map<string, BudgetRecord>();
   const watchlists = new Map<string, WatchlistRecord[]>();
   const baskets = new Map<string, BasketRecord[]>();
+  const humanReviewAssignments = new Map<string, HumanReviewAssignmentRecord>();
 
   return {
     async upsertUser(user) {
@@ -125,6 +141,17 @@ export function createMemoryRepository(): GroceryViewRepository {
     async getBasket(userId) {
       requireUser(users, userId);
       return (baskets.get(userId) ?? []).map((item) => ({ ...item }));
+    },
+
+    async saveHumanReviewAssignment(assignment) {
+      humanReviewAssignments.set(assignment.id, { ...assignment });
+    },
+
+    async listOpenHumanReviewAssignments() {
+      return [...humanReviewAssignments.values()]
+        .filter((assignment) => assignment.status !== 'completed')
+        .sort((a, b) => a.dueAt.localeCompare(b.dueAt) || a.id.localeCompare(b.id))
+        .map((assignment) => ({ ...assignment }));
     }
   };
 }
@@ -137,6 +164,37 @@ type FavoriteStoreRow = { store_id: string };
 type BudgetRow = { weekly_budget: string | number; monthly_budget: string | number };
 type WatchlistRow = { product_id: string; target_price: string | number | null; alert_deal_score_at: number | null; favorite_stores_only: boolean };
 type BasketRow = { product_id: string; quantity: string | number };
+type HumanReviewAssignmentRow = {
+  id: string;
+  review_id: string;
+  subject_type: HumanReviewAssignmentRecord['subjectType'];
+  subject_id: string;
+  priority: HumanReviewAssignmentRecord['priority'];
+  reason: string;
+  assignee_id: string;
+  assigned_at: string | Date;
+  due_at: string | Date;
+  status: HumanReviewAssignmentRecord['status'];
+};
+
+function asIso(value: string | Date): string {
+  return value instanceof Date ? value.toISOString() : value;
+}
+
+function mapHumanReviewAssignment(row: HumanReviewAssignmentRow): HumanReviewAssignmentRecord {
+  return {
+    id: row.id,
+    reviewId: row.review_id,
+    subjectType: row.subject_type,
+    subjectId: row.subject_id,
+    priority: row.priority,
+    reason: row.reason,
+    assigneeId: row.assignee_id,
+    assignedAt: asIso(row.assigned_at),
+    dueAt: asIso(row.due_at),
+    status: row.status
+  };
+}
 
 export function createPostgresRepository(executor: QueryExecutor): GroceryViewRepository {
   return {
@@ -216,6 +274,47 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
         [userId]
       );
       return rows.map((row) => ({ productId: row.product_id, quantity: Number(row.quantity) }));
+    },
+
+    async saveHumanReviewAssignment(assignment) {
+      await executor.query(
+        `insert into human_review_assignments(
+           id, review_id, subject_type, subject_id, priority, reason, assignee_id, assigned_at, due_at, status
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+         on conflict (id) do update set
+           review_id = excluded.review_id,
+           subject_type = excluded.subject_type,
+           subject_id = excluded.subject_id,
+           priority = excluded.priority,
+           reason = excluded.reason,
+           assignee_id = excluded.assignee_id,
+           assigned_at = excluded.assigned_at,
+           due_at = excluded.due_at,
+           status = excluded.status,
+           updated_at = now()`,
+        [
+          assignment.id,
+          assignment.reviewId,
+          assignment.subjectType,
+          assignment.subjectId,
+          assignment.priority,
+          assignment.reason,
+          assignment.assigneeId,
+          assignment.assignedAt,
+          assignment.dueAt,
+          assignment.status
+        ]
+      );
+    },
+
+    async listOpenHumanReviewAssignments() {
+      const rows = await executor.query<HumanReviewAssignmentRow>(
+        `select id, review_id, subject_type, subject_id, priority, reason, assignee_id, assigned_at, due_at, status
+         from human_review_assignments
+         where status in ('assigned', 'in_progress')
+         order by due_at, id`
+      );
+      return rows.map(mapHumanReviewAssignment);
     }
   };
 }

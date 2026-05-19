@@ -10,7 +10,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 
 | Requirement / deliverable | Evidence | Status |
 | --- | --- | --- |
-| Iterative PR + merge workflow | PR #1 through PR #36 and PR #88 through PR #94 merged to `main` after this iteration | Done for shipped iterations |
+| Iterative PR + merge workflow | PR #1 through PR #36 and PR #88 through PR #95 merged to `main` after this iteration | Done for shipped iterations |
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
@@ -47,6 +47,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Human review assignment planning | PR #92, `planHumanReviewAssignments` | Shipped after merge |
 | Human review SLA summary | PR #93, `summarizeHumanReviewSla` | Shipped after merge |
 | Community report abuse controls | PR #94, `planCommunityReportAbuseControls` | Shipped after merge |
+| Human review assignment persistence | PR #95, `human_review_assignments`, repository methods | Shipped after merge |
 | Scanning pipeline foundation | PR #30, `packages/scanning` | Provider-neutral scan pipeline shipped |
 | Completion audit refresh | PR #31, `docs/status/completion-audit.md` | Audit reconciled after scanning |
 | Mobile Expo readiness | PR #32, `apps/mobile/app.config.json`, `apps/mobile/eas.json` | Device-build metadata shipped |
@@ -75,7 +76,7 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 
 ## Remaining blocking gaps
 
-- PostgreSQL query-executor wiring and repository adapter skeleton exist; live database integration tests still missing.
+- PostgreSQL query-executor wiring, repository adapter skeleton, and human-review assignment persistence exist; live database integration tests still missing.
 - Real retailer/API/crawler connectors and legal/robots review. Retailer source access gates are being added; real retailer connectors and completed legal reviews still missing.
 - Real OCR/camera/upload pipeline for barcode and receipt scanning. Provider-neutral scan pipeline exists; real camera/OCR providers still missing.
 - Real Expo/React Native screens and device builds. Expo route/readiness config is being added; real React Native component screens and store builds still missing.
@@ -84,4 +85,4 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 - AdMob/AdSense and subscription billing integration. Provider-neutral monetization contracts are being added; real provider credentials/webhooks still missing.
 - Hosting provider selection, real deployment, secrets, DNS, observability, smoke tests, and rollback. Deployment readiness/rollback gates are being added; real provider deployment still missing.
 - Full catalog/data coverage beyond seed products/stores. Catalog coverage reporting exists; real retailer/feed backfill data still missing.
-- Human review queue UI and operations for low-confidence product matching and community reports. Core queue planning, auditable decision writeback primitives, reviewer assignment/SLA planning, SLA summary primitives, and community reporter abuse-control planning exist; persisted assignment storage, admin UI, SLA alert delivery, reviewer permissions, account enforcement, and trust-state persistence still missing.
+- Human review queue UI and operations for low-confidence product matching and community reports. Core queue planning, auditable decision writeback primitives, reviewer assignment/SLA planning, SLA summary primitives, community reporter abuse-control planning, and assignment persistence exist; admin UI, SLA alert delivery, reviewer permissions, account enforcement, trust-state persistence, and live PostgreSQL proof still missing.

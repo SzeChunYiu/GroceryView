@@ -9,6 +9,22 @@ class RecordingQueryExecutor implements QueryExecutor {
     this.calls.push({ sql, params });
     if (sql.includes('select store_id')) return [{ store_id: 'willys-odenplan' }] as T[];
     if (sql.includes('select weekly_budget')) return [{ weekly_budget: '800', monthly_budget: '3200' }] as T[];
+    if (sql.includes('from human_review_assignments')) {
+      return [
+        {
+          id: 'assignment-review-match-1-moderator-1',
+          review_id: 'review-match-1',
+          subject_type: 'product_match',
+          subject_id: 'match-1',
+          priority: 'high',
+          reason: 'Low-confidence produce match.',
+          assignee_id: 'moderator-1',
+          assigned_at: '2026-05-19T10:00:00.000Z',
+          due_at: '2026-05-19T14:00:00.000Z',
+          status: 'assigned'
+        }
+      ] as T[];
+    }
     return [] as T[];
   }
 }
@@ -26,5 +42,50 @@ describe('createPostgresRepository', () => {
 
     assert.equal(executor.calls.every((call) => call.sql.includes('$') || call.sql.startsWith('select')), true);
     assert.deepEqual(executor.calls[0].params, ['user-1', 'shopper@example.com']);
+  });
+
+  it('persists and lists open human review assignments', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.saveHumanReviewAssignment({
+      id: 'assignment-review-match-1-moderator-1',
+      reviewId: 'review-match-1',
+      subjectType: 'product_match',
+      subjectId: 'match-1',
+      priority: 'high',
+      reason: 'Low-confidence produce match.',
+      assigneeId: 'moderator-1',
+      assignedAt: '2026-05-19T10:00:00.000Z',
+      dueAt: '2026-05-19T14:00:00.000Z',
+      status: 'assigned'
+    });
+
+    assert.deepEqual(await repo.listOpenHumanReviewAssignments(), [
+      {
+        id: 'assignment-review-match-1-moderator-1',
+        reviewId: 'review-match-1',
+        subjectType: 'product_match',
+        subjectId: 'match-1',
+        priority: 'high',
+        reason: 'Low-confidence produce match.',
+        assigneeId: 'moderator-1',
+        assignedAt: '2026-05-19T10:00:00.000Z',
+        dueAt: '2026-05-19T14:00:00.000Z',
+        status: 'assigned'
+      }
+    ]);
+    assert.deepEqual(executor.calls[0].params, [
+      'assignment-review-match-1-moderator-1',
+      'review-match-1',
+      'product_match',
+      'match-1',
+      'high',
+      'Low-confidence produce match.',
+      'moderator-1',
+      '2026-05-19T10:00:00.000Z',
+      '2026-05-19T14:00:00.000Z',
+      'assigned'
+    ]);
   });
 });
