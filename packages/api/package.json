@@ -6,7 +6,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "test": "tsc -p tsconfig.test.json && node --test dist-test/__tests__/*.test.js"
+    "test": "npm run build -w @groceryview/core && tsc -p tsconfig.test.json && node --test dist-test/__tests__/*.test.js"
   },
   "dependencies": {
     "@groceryview/core": "0.1.0"

@@ -7,7 +7,7 @@
       "workspace": "@groceryview/server",
       "startCommand": "node packages/server/dist/index.js",
       "healthCheck": { "path": "/api/health", "expectedStatus": 200 },
-      "requiredEnv": ["AUTH_SECRET", "DATABASE_URL", "PUBLIC_WEB_URL"]
+      "requiredEnv": ["AUTH_SECRET", "DATABASE_URL", "PUBLIC_WEB_URL", "NOTIFICATION_WEBHOOK_SECRET", "METRICS_TOKEN"]
     },
     {
       "name": "groceryview-web",

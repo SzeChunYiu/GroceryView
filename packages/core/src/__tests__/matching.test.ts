@@ -1,6 +1,15 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { classifyProductMatch, planHumanReviewQueue, recommendSmartSwaps } from '../index.js';
+import {
+  applyHumanReviewDecision,
+  authorizeHumanReviewAction,
+  classifyProductMatch,
+  planCommunityReportAbuseControls,
+  planHumanReviewAssignments,
+  planHumanReviewQueue,
+  recommendSmartSwaps,
+  summarizeHumanReviewSla
+} from '../index.js';
 
 describe('classifyProductMatch', () => {
   it('detects exact matches by barcode and size', () => {
@@ -79,5 +88,421 @@ describe('planHumanReviewQueue', () => {
         reason: 'Community report wrong_price for coffee has low confidence score 0.4.'
       }
     ]);
+  });
+});
+
+
+describe('applyHumanReviewDecision', () => {
+  it('approves a product-match review with an auditable writeback action', () => {
+    const result = applyHumanReviewDecision({
+      item: {
+        id: 'review-match-1',
+        subjectType: 'product_match',
+        subjectId: 'match-1',
+        priority: 'high',
+        reason: 'Product match tomato-a → tomato-b has low confidence and high quality risk: Produce sizes vary.'
+      },
+      decision: 'approve',
+      reviewerId: 'moderator-1',
+      decidedAt: '2026-05-19T12:00:00.000Z',
+      notes: 'Package sizes verified from shelf photo.'
+    });
+
+    assert.deepEqual(result, {
+      reviewId: 'review-match-1',
+      subjectType: 'product_match',
+      subjectId: 'match-1',
+      status: 'approved',
+      reviewerId: 'moderator-1',
+      decidedAt: '2026-05-19T12:00:00.000Z',
+      notes: 'Package sizes verified from shelf photo.',
+      writeback: { action: 'approve_product_match', subjectId: 'match-1', reviewedByHuman: true }
+    });
+  });
+
+  it('rejects community reports or keeps them in review with explicit operations actions', () => {
+    const reportItem = {
+      id: 'review-report-1',
+      subjectType: 'community_report' as const,
+      subjectId: 'report-1',
+      priority: 'medium' as const,
+      reason: 'Community report wrong_price for coffee has low confidence score 0.4.'
+    };
+
+    assert.deepEqual(
+      applyHumanReviewDecision({
+        item: reportItem,
+        decision: 'reject',
+        reviewerId: 'moderator-2',
+        decidedAt: '2026-05-19T12:05:00.000Z'
+      }).writeback,
+      { action: 'dismiss_community_report', subjectId: 'report-1', reviewedByHuman: true }
+    );
+
+    assert.deepEqual(
+      applyHumanReviewDecision({
+        item: reportItem,
+        decision: 'needs_more_info',
+        reviewerId: 'moderator-2',
+        decidedAt: '2026-05-19T12:10:00.000Z',
+        notes: 'Ask reporter for shelf photo.'
+      }).writeback,
+      { action: 'keep_in_review', subjectId: 'report-1', reviewedByHuman: false }
+    );
+  });
+});
+
+describe('planHumanReviewAssignments', () => {
+  it('assigns open review tasks to active moderators with SLA due dates', () => {
+    const result = planHumanReviewAssignments({
+      assignedAt: '2026-05-19T10:00:00.000Z',
+      queue: [
+        {
+          id: 'review-match-1',
+          subjectType: 'product_match',
+          subjectId: 'match-1',
+          priority: 'high',
+          reason: 'Low-confidence produce match.'
+        },
+        {
+          id: 'review-report-1',
+          subjectType: 'community_report',
+          subjectId: 'report-1',
+          priority: 'medium',
+          reason: 'Low-confidence community price report.'
+        }
+      ],
+      reviewers: [
+        { id: 'moderator-1', active: true, openAssignmentCount: 0, maxOpenAssignments: 1 },
+        { id: 'moderator-2', active: true, openAssignmentCount: 1, maxOpenAssignments: 3, specialties: ['community_report'] },
+        { id: 'moderator-paused', active: false, openAssignmentCount: 0, maxOpenAssignments: 5 }
+      ]
+    });
+
+    assert.deepEqual(result.assignments, [
+      {
+        id: 'assignment-review-match-1-moderator-1',
+        reviewId: 'review-match-1',
+        subjectType: 'product_match',
+        subjectId: 'match-1',
+        priority: 'high',
+        reason: 'Low-confidence produce match.',
+        assigneeId: 'moderator-1',
+        assignedAt: '2026-05-19T10:00:00.000Z',
+        dueAt: '2026-05-19T14:00:00.000Z',
+        status: 'assigned'
+      },
+      {
+        id: 'assignment-review-report-1-moderator-2',
+        reviewId: 'review-report-1',
+        subjectType: 'community_report',
+        subjectId: 'report-1',
+        priority: 'medium',
+        reason: 'Low-confidence community price report.',
+        assigneeId: 'moderator-2',
+        assignedAt: '2026-05-19T10:00:00.000Z',
+        dueAt: '2026-05-20T10:00:00.000Z',
+        status: 'assigned'
+      }
+    ]);
+    assert.deepEqual(result.unassigned, []);
+  });
+
+  it('does not double-assign existing open tasks and reports capacity blockers', () => {
+    const result = planHumanReviewAssignments({
+      assignedAt: '2026-05-19T10:00:00.000Z',
+      queue: [
+        {
+          id: 'review-match-1',
+          subjectType: 'product_match',
+          subjectId: 'match-1',
+          priority: 'high',
+          reason: 'Already assigned.'
+        },
+        {
+          id: 'review-match-2',
+          subjectType: 'product_match',
+          subjectId: 'match-2',
+          priority: 'low',
+          reason: 'No remaining capacity.'
+        }
+      ],
+      reviewers: [{ id: 'moderator-1', active: true, openAssignmentCount: 1, maxOpenAssignments: 1 }],
+      existingAssignments: [
+        {
+          id: 'assignment-review-match-1-moderator-1',
+          reviewId: 'review-match-1',
+          subjectType: 'product_match',
+          subjectId: 'match-1',
+          priority: 'high',
+          reason: 'Already assigned.',
+          assigneeId: 'moderator-1',
+          assignedAt: '2026-05-19T09:00:00.000Z',
+          dueAt: '2026-05-19T13:00:00.000Z',
+          status: 'assigned'
+        }
+      ]
+    });
+
+    assert.deepEqual(result.assignments, []);
+    assert.deepEqual(result.unassigned, [
+      { reviewId: 'review-match-1', reason: 'already_assigned' },
+      { reviewId: 'review-match-2', reason: 'no_active_reviewer_capacity' }
+    ]);
+  });
+});
+
+describe('summarizeHumanReviewSla', () => {
+  it('counts overdue and due-soon open assignments for operations dashboards', () => {
+    const summary = summarizeHumanReviewSla({
+      now: '2026-05-19T12:00:00.000Z',
+      dueSoonHours: 2,
+      assignments: [
+        {
+          id: 'assignment-review-match-1-moderator-1',
+          reviewId: 'review-match-1',
+          subjectType: 'product_match',
+          subjectId: 'match-1',
+          priority: 'high',
+          reason: 'Overdue.',
+          assigneeId: 'moderator-1',
+          assignedAt: '2026-05-19T08:00:00.000Z',
+          dueAt: '2026-05-19T11:00:00.000Z',
+          status: 'assigned'
+        },
+        {
+          id: 'assignment-review-report-1-moderator-2',
+          reviewId: 'review-report-1',
+          subjectType: 'community_report',
+          subjectId: 'report-1',
+          priority: 'medium',
+          reason: 'Due soon.',
+          assigneeId: 'moderator-2',
+          assignedAt: '2026-05-19T10:00:00.000Z',
+          dueAt: '2026-05-19T13:30:00.000Z',
+          status: 'in_progress'
+        },
+        {
+          id: 'assignment-review-match-3-moderator-3',
+          reviewId: 'review-match-3',
+          subjectType: 'product_match',
+          subjectId: 'match-3',
+          priority: 'low',
+          reason: 'Completed work should not count.',
+          assigneeId: 'moderator-3',
+          assignedAt: '2026-05-18T10:00:00.000Z',
+          dueAt: '2026-05-19T10:00:00.000Z',
+          status: 'completed'
+        }
+      ]
+    });
+
+    assert.deepEqual(summary, {
+      status: 'breached',
+      openAssignments: 2,
+      overdueAssignments: 1,
+      dueSoonAssignments: 1,
+      openByPriority: { high: 1, medium: 1, low: 0 },
+      breachedReviewIds: ['review-match-1'],
+      dueSoonReviewIds: ['review-report-1']
+    });
+  });
+
+  it('reports healthy SLA status when open assignments are not near their due date', () => {
+    const summary = summarizeHumanReviewSla({
+      now: '2026-05-19T12:00:00.000Z',
+      assignments: [
+        {
+          id: 'assignment-review-match-1-moderator-1',
+          reviewId: 'review-match-1',
+          subjectType: 'product_match',
+          subjectId: 'match-1',
+          priority: 'low',
+          reason: 'Plenty of time left.',
+          assigneeId: 'moderator-1',
+          assignedAt: '2026-05-19T10:00:00.000Z',
+          dueAt: '2026-05-21T12:00:00.000Z',
+          status: 'assigned'
+        }
+      ]
+    });
+
+    assert.deepEqual(summary, {
+      status: 'healthy',
+      openAssignments: 1,
+      overdueAssignments: 0,
+      dueSoonAssignments: 0,
+      openByPriority: { high: 0, medium: 0, low: 1 },
+      breachedReviewIds: [],
+      dueSoonReviewIds: []
+    });
+  });
+});
+
+describe('planCommunityReportAbuseControls', () => {
+  it('plans moderation controls for bursty, low-trust, and healthy reporters', () => {
+    const controls = planCommunityReportAbuseControls({
+      reporters: [
+        {
+          reporterId: 'trusted-reporter',
+          reportsLast24Hours: 3,
+          pendingReports: 1,
+          acceptedReportsLast30Days: 18,
+          rejectedReportsLast30Days: 1
+        },
+        {
+          reporterId: 'bursty-reporter',
+          reportsLast24Hours: 27,
+          pendingReports: 2,
+          acceptedReportsLast30Days: 4,
+          rejectedReportsLast30Days: 1
+        },
+        {
+          reporterId: 'low-trust-reporter',
+          reportsLast24Hours: 4,
+          pendingReports: 1,
+          acceptedReportsLast30Days: 1,
+          rejectedReportsLast30Days: 12
+        },
+        {
+          reporterId: 'backlogged-reporter',
+          reportsLast24Hours: 5,
+          pendingReports: 8,
+          acceptedReportsLast30Days: 6,
+          rejectedReportsLast30Days: 2
+        }
+      ]
+    });
+
+    assert.deepEqual(controls, [
+      {
+        reporterId: 'trusted-reporter',
+        action: 'allow',
+        reason: 'Reporter history is within trust limits.'
+      },
+      {
+        reporterId: 'bursty-reporter',
+        action: 'throttle',
+        reason: 'Reporter exceeded 20 community reports in the last 24 hours.'
+      },
+      {
+        reporterId: 'low-trust-reporter',
+        action: 'suspend_reporting',
+        reason: 'Reporter has high rejected-report volume and a low acceptance ratio.'
+      },
+      {
+        reporterId: 'backlogged-reporter',
+        action: 'require_manual_review',
+        reason: 'Reporter has more than 5 unresolved community reports.'
+      }
+    ]);
+  });
+
+  it('uses caller-provided burst and pending thresholds', () => {
+    const controls = planCommunityReportAbuseControls({
+      maxReportsPer24Hours: 5,
+      maxPendingReports: 2,
+      reporters: [
+        {
+          reporterId: 'custom-burst',
+          reportsLast24Hours: 6,
+          pendingReports: 0,
+          acceptedReportsLast30Days: 2,
+          rejectedReportsLast30Days: 0
+        },
+        {
+          reporterId: 'custom-pending',
+          reportsLast24Hours: 1,
+          pendingReports: 3,
+          acceptedReportsLast30Days: 2,
+          rejectedReportsLast30Days: 0
+        }
+      ]
+    });
+
+    assert.deepEqual(controls.map((control) => control.action), ['throttle', 'require_manual_review']);
+  });
+});
+
+describe('authorizeHumanReviewAction', () => {
+  const assignment = {
+    id: 'assignment-review-match-1-moderator-1',
+    reviewId: 'review-match-1',
+    subjectType: 'product_match' as const,
+    subjectId: 'match-1',
+    priority: 'high' as const,
+    reason: 'Low-confidence produce match.',
+    assigneeId: 'moderator-1',
+    assignedAt: '2026-05-19T10:00:00.000Z',
+    dueAt: '2026-05-19T14:00:00.000Z',
+    status: 'assigned' as const
+  };
+
+  it('allows leads to manage queue assignments and abuse controls', () => {
+    assert.deepEqual(
+      authorizeHumanReviewAction({
+        reviewer: { id: 'lead-1', role: 'lead', active: true },
+        action: 'assign_review'
+      }),
+      { allowed: true, reason: 'Lead reviewers can perform human-review operations.' }
+    );
+    assert.deepEqual(
+      authorizeHumanReviewAction({
+        reviewer: { id: 'lead-1', role: 'lead', active: true },
+        action: 'manage_abuse_controls'
+      }).allowed,
+      true
+    );
+  });
+
+  it('limits moderators to viewing and deciding their own open assignments', () => {
+    assert.deepEqual(
+      authorizeHumanReviewAction({
+        reviewer: { id: 'moderator-1', role: 'moderator', active: true },
+        action: 'decide_review',
+        assignment
+      }),
+      { allowed: true, reason: 'Moderator is assigned to this open review.' }
+    );
+    assert.deepEqual(
+      authorizeHumanReviewAction({
+        reviewer: { id: 'moderator-2', role: 'moderator', active: true },
+        action: 'decide_review',
+        assignment
+      }),
+      { allowed: false, reason: 'Moderators can only decide reviews assigned to them.' }
+    );
+    assert.deepEqual(
+      authorizeHumanReviewAction({
+        reviewer: { id: 'moderator-1', role: 'moderator', active: true },
+        action: 'assign_review'
+      }).allowed,
+      false
+    );
+  });
+
+  it('allows viewers to view only and blocks inactive reviewers', () => {
+    assert.deepEqual(
+      authorizeHumanReviewAction({
+        reviewer: { id: 'viewer-1', role: 'viewer', active: true },
+        action: 'view_queue'
+      }),
+      { allowed: true, reason: 'Viewer can inspect the review queue.' }
+    );
+    assert.deepEqual(
+      authorizeHumanReviewAction({
+        reviewer: { id: 'viewer-1', role: 'viewer', active: true },
+        action: 'decide_review',
+        assignment
+      }).allowed,
+      false
+    );
+    assert.deepEqual(
+      authorizeHumanReviewAction({
+        reviewer: { id: 'inactive-lead', role: 'lead', active: false },
+        action: 'assign_review'
+      }),
+      { allowed: false, reason: 'Reviewer is inactive.' }
+    );
   });
 });
