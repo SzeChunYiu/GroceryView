@@ -20,6 +20,7 @@ const requiredTables = [
   'receipt_uploads',
   'receipt_items',
   'community_price_reports',
+  'community_reporter_trust',
   'human_reviewers',
   'human_review_assignments',
   'grocery_indices',
@@ -44,6 +45,8 @@ const requiredColumns = [
   'assignee_id',
   'due_at',
   'role',
+  'reports_last_24_hours',
+  'accepted_reports_last_30_days',
   'base_date',
   'weight'
 ];

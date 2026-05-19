@@ -82,4 +82,27 @@ describe('createMemoryRepository', () => {
     });
     assert.equal(await repo.getHumanReviewer('missing-reviewer'), null);
   });
+
+  it('persists community reporter trust state for abuse controls', async () => {
+    const repo = createMemoryRepository();
+
+    await repo.upsertCommunityReporterTrust({
+      reporterId: 'reporter-1',
+      reportsLast24Hours: 7,
+      pendingReports: 2,
+      acceptedReportsLast30Days: 11,
+      rejectedReportsLast30Days: 1,
+      updatedAt: '2026-05-19T20:00:00.000Z'
+    });
+
+    assert.deepEqual(await repo.getCommunityReporterTrust('reporter-1'), {
+      reporterId: 'reporter-1',
+      reportsLast24Hours: 7,
+      pendingReports: 2,
+      acceptedReportsLast30Days: 11,
+      rejectedReportsLast30Days: 1,
+      updatedAt: '2026-05-19T20:00:00.000Z'
+    });
+    assert.equal(await repo.getCommunityReporterTrust('missing-reporter'), null);
+  });
 });
