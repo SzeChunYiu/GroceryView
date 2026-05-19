@@ -10,7 +10,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 
 | Requirement / deliverable | Evidence | Status |
 | --- | --- | --- |
-| Iterative PR + merge workflow | PR #1 through PR #36 merged to `main`; PR #88 covers the current release-validation repair | Done for shipped iterations |
+| Iterative PR + merge workflow | PR #1 through PR #36, PR #88, and PR #89 merged to `main` after this iteration | Done for shipped iterations |
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
@@ -37,7 +37,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Deploy workflow skeleton | PR #22, `.github/workflows/deploy.yml` | Provider-neutral skeleton shipped |
 | Completion audit | PR #23, `docs/status/completion-audit.md` | Shipped |
 | PostgreSQL repository adapter | PR #24, `createPostgresRepository` | Adapter skeleton shipped |
-| Repository governance policy | PR #25, `.github/repository-ruleset.json` | Documented, not applied |
+| Repository governance policy | PR #25, `.github/repository-ruleset.json`; GitHub ruleset #16607866 active on `main` | Applied in GitHub |
 | PostgreSQL query executor | PR #26, `createPgQueryExecutor` | Client adapter shipped |
 | Static web flow scaffolds | PR #27, `apps/web/scripts/pages.mjs` | Static route scaffolds shipped |
 | Notification delivery foundation | PR #28, `packages/notifications` | Provider-neutral delivery shipped |
@@ -49,7 +49,8 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Retailer compliance gate | PR #34, `planRetailerSourceAccess` | Source-access gate shipped |
 | Deployment ops foundation | PR #35, `packages/ops` | Readiness/rollback gates shipped |
 | Catalog coverage reporting | PR #36, `packages/catalog` | Coverage/backfill accounting shipped |
-| Release validation workflow repair | PR #88, `.github/workflows/release-validation.yml`, `tests/schema/release-workflow.test.mjs` | Shipped after merge |
+| Release validation workflow repair | PR #88, `.github/workflows/release-validation.yml`, `tests/schema/release-workflow.test.mjs` | Shipped |
+| Main branch ruleset application | PR #89, GitHub ruleset #16607866, `.github/repository-ruleset.json` | Applied in GitHub |
 
 ## Verification gates
 
@@ -79,4 +80,3 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 - Hosting provider selection, real deployment, secrets, DNS, observability, smoke tests, and rollback. Deployment readiness/rollback gates are being added; real provider deployment still missing.
 - Full catalog/data coverage beyond seed products/stores. Catalog coverage reporting exists; real retailer/feed backfill data still missing.
 - Human review queue UI and operations for low-confidence product matching and community reports. Core queue planning is being added; moderation tooling still missing.
-- Branch protection policy documented in .github/repository-ruleset.json; still needs applying in GitHub repository settings.
