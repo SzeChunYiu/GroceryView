@@ -3,11 +3,32 @@ export type Migration = {
   sql: string;
 };
 
+export type SqlMigrationFile = {
+  path: string;
+  sql: string;
+};
+
 export type SqlExecutor = {
   getAppliedMigrationVersions(): Promise<string[]>;
   execute(sql: string): Promise<void>;
   recordMigration(version: string): Promise<void>;
 };
+
+export function migrationVersionFromPath(path: string): string {
+  const filename = path.split(/[\\/]/).filter(Boolean).at(-1);
+  if (!filename || !filename.endsWith('.sql')) throw new Error(`Migration path must end in .sql: ${path}`);
+  return filename.slice(0, -'.sql'.length);
+}
+
+export function createMigrationPlan(files: SqlMigrationFile[]): Migration[] {
+  return files
+    .filter((file) => file.path.endsWith('.sql'))
+    .sort((a, b) => a.path.localeCompare(b.path))
+    .map((file) => ({
+      version: migrationVersionFromPath(file.path),
+      sql: file.sql
+    }));
+}
 
 export function parseSqlStatements(sql: string): string[] {
   return sql
