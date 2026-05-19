@@ -501,3 +501,101 @@ export function recommendSmartSwaps(input: SmartSwapInput): SmartSwapRecommendat
 
   return recommendations.sort((a, b) => b.savingsPercent - a.savingsPercent);
 }
+
+export type ReceiptRowInput = {
+  rawName: string;
+  quantity: number;
+  itemTotal: number;
+};
+
+export type ReceiptScanInput = {
+  storeId: string;
+  purchasedAt: string;
+  totalAmount: number;
+  ocrConfidence: number;
+  rows: ReceiptRowInput[];
+};
+
+export type ReceiptAlias = {
+  rawName: string;
+  productId: string;
+  canonicalName: string;
+  matchConfidence: number;
+};
+
+export type ReceiptReviewInput = {
+  receipt: ReceiptScanInput;
+  aliases: ReceiptAlias[];
+  localMedians: Record<string, number>;
+  weeklyBudget: number;
+  weekSpendBeforeReceipt: number;
+};
+
+export type ReceiptReviewItem = {
+  rawName: string;
+  productId: string | null;
+  canonicalName: string | null;
+  itemTotal: number;
+  matchConfidence: number;
+  deltaVsMedian: number;
+};
+
+export type ReceiptReview = {
+  storeId: string;
+  purchasedAt: string;
+  confidenceLabel: 'high' | 'medium-high' | 'medium' | 'low';
+  matchedItems: ReceiptReviewItem[];
+  goodBuys: ReceiptReviewItem[];
+  overspend: ReceiptReviewItem[];
+  comparedWithLocalMedianDelta: number;
+  budget: {
+    weeklyBudget: number;
+    beforeReceiptSpend: number;
+    afterReceiptSpend: number;
+    remaining: number;
+    status: 'under' | 'over';
+  };
+};
+
+function confidenceLabel(confidence: number): ReceiptReview['confidenceLabel'] {
+  if (confidence >= 0.9) return 'high';
+  if (confidence >= 0.75) return 'medium-high';
+  if (confidence >= 0.5) return 'medium';
+  return 'low';
+}
+
+export function reviewReceiptScan(input: ReceiptReviewInput): ReceiptReview {
+  const aliasesByRaw = new Map(input.aliases.map((alias) => [alias.rawName.toLowerCase(), alias]));
+  const matchedItems = input.receipt.rows.map((row) => {
+    const alias = aliasesByRaw.get(row.rawName.toLowerCase());
+    const median = alias ? input.localMedians[alias.productId] : undefined;
+    return {
+      rawName: row.rawName,
+      productId: alias?.productId ?? null,
+      canonicalName: alias?.canonicalName ?? null,
+      itemTotal: row.itemTotal,
+      matchConfidence: alias?.matchConfidence ?? 0,
+      deltaVsMedian: median === undefined ? 0 : Math.round((row.itemTotal - median) * 100) / 100
+    };
+  });
+  const comparedWithLocalMedianDelta = Math.round(matchedItems.reduce((sum, item) => sum + item.deltaVsMedian, 0) * 100) / 100;
+  const afterReceiptSpend = Math.round((input.weekSpendBeforeReceipt + input.receipt.totalAmount) * 100) / 100;
+  const remaining = Math.round((input.weeklyBudget - afterReceiptSpend) * 100) / 100;
+
+  return {
+    storeId: input.receipt.storeId,
+    purchasedAt: input.receipt.purchasedAt,
+    confidenceLabel: confidenceLabel(input.receipt.ocrConfidence),
+    matchedItems,
+    goodBuys: matchedItems.filter((item) => item.productId !== null && item.deltaVsMedian < 0),
+    overspend: matchedItems.filter((item) => item.productId !== null && item.deltaVsMedian > 0),
+    comparedWithLocalMedianDelta,
+    budget: {
+      weeklyBudget: input.weeklyBudget,
+      beforeReceiptSpend: input.weekSpendBeforeReceipt,
+      afterReceiptSpend,
+      remaining,
+      status: remaining >= 0 ? 'under' : 'over'
+    }
+  };
+}
