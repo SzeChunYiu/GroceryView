@@ -12,3 +12,4 @@ packages/*/dist/
 packages/*/dist-test/
 apps/*/dist/
 packages/core/src/*.js
+apps/*/dist-test/
