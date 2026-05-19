@@ -10,7 +10,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 
 | Requirement / deliverable | Evidence | Status |
 | --- | --- | --- |
-| Iterative PR + merge workflow | PR #1 through PR #36 and PR #88 through PR #99 merged to `main` after this iteration | Done for shipped iterations |
+| Iterative PR + merge workflow | PR #1 through PR #36 and PR #88 through PR #100 merged to `main` after this iteration | Done for shipped iterations |
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
@@ -42,6 +42,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Static web flow scaffolds | PR #27, `apps/web/scripts/pages.mjs` | Static route scaffolds shipped |
 | Notification delivery foundation | PR #28, `packages/notifications` | Provider-neutral delivery shipped |
 | Notification worker orchestration | PR #90, `runNotificationWorkerTick` | Shipped after merge |
+| Notification task persistence | PR #100, `notification_tasks`, repository methods | Shipped after merge |
 | Human review queue planning | PR #29, `planHumanReviewQueue` | Core queue planning shipped |
 | Human review decision application | PR #91, `applyHumanReviewDecision` | Shipped after merge |
 | Human review assignment planning | PR #92, `planHumanReviewAssignments` | Shipped after merge |
@@ -85,8 +86,8 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 - Real OCR/camera/upload pipeline for barcode and receipt scanning. Provider-neutral scan pipeline exists; real camera/OCR providers still missing.
 - Real Expo/React Native screens and device builds. Expo route/readiness config is being added; real React Native component screens and store builds still missing.
 - Real interactive web UI for login, account, household, privacy, basket, and scanner flows. Static page scaffolds are being added before full interactivity.
-- Push/email provider adapters and production notification workers. Provider-neutral delivery and worker tick orchestration exist; real provider credentials, persisted schedules, deployed workers, unsubscribe/bounce handling, and observability still missing.
+- Push/email provider adapters and production notification workers. Provider-neutral delivery, worker tick orchestration, and persisted task schedules exist; real provider credentials, deployed workers, unsubscribe/bounce handling, and observability still missing.
 - AdMob/AdSense and subscription billing integration. Provider-neutral monetization contracts are being added; real provider credentials/webhooks still missing.
 - Hosting provider selection, real deployment, secrets, DNS, observability, smoke tests, and rollback. Deployment readiness/rollback gates are being added; real provider deployment still missing.
 - Full catalog/data coverage beyond seed products/stores. Catalog coverage reporting exists; real retailer/feed backfill data still missing.
-- Human review queue UI and operations for low-confidence product matching and community reports. Core queue planning, auditable decision writeback primitives, reviewer assignment/SLA planning, SLA summary primitives, community reporter abuse-control planning, assignment persistence, reviewer permission checks, persisted reviewer roles, reporter trust-state persistence, and provider-neutral SLA alert planning exist; admin UI enforcement, persisted alert schedules, real provider credentials, session-to-reviewer mapping, account enforcement, and live PostgreSQL proof still missing.
+- Human review queue UI and operations for low-confidence product matching and community reports. Core queue planning, auditable decision writeback primitives, reviewer assignment/SLA planning, SLA summary primitives, community reporter abuse-control planning, assignment persistence, reviewer permission checks, persisted reviewer roles, reporter trust-state persistence, provider-neutral SLA alert planning, and persisted notification task schedules exist; admin UI enforcement, real provider credentials, session-to-reviewer mapping, account enforcement, and live PostgreSQL proof still missing.

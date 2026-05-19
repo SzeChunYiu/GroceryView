@@ -21,6 +21,7 @@ const requiredTables = [
   'receipt_items',
   'community_price_reports',
   'community_reporter_trust',
+  'notification_tasks',
   'human_reviewers',
   'human_review_assignments',
   'grocery_indices',
@@ -47,6 +48,9 @@ const requiredColumns = [
   'role',
   'reports_last_24_hours',
   'accepted_reports_last_30_days',
+  'send_at',
+  'attempt_count',
+  'max_attempts',
   'base_date',
   'weight'
 ];
