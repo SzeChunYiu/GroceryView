@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 MIGRATIONS_DIR="${MIGRATIONS_DIR:-${ROOT_DIR}/infra/db/migrations}"
+SEEDS_DIR="${SEEDS_DIR:-${ROOT_DIR}/infra/db/seeds}"
 POSTGIS_IMAGE="${POSTGIS_IMAGE:-postgis/postgis:18-3.6}"
 POSTGRES_DB="${POSTGRES_DB:-groceryview}"
 POSTGRES_USER="${POSTGRES_USER:-groceryview}"
@@ -54,3 +55,31 @@ for migration in "${MIGRATIONS[@]}"; do
 done
 
 echo "applied ${#MIGRATIONS[@]} migration(s) successfully"
+
+if [ -d "$SEEDS_DIR" ]; then
+  mapfile -t SEEDS < <(find "$SEEDS_DIR" -maxdepth 1 -type f -name '*.sql' | sort)
+else
+  SEEDS=()
+fi
+
+if [ "${#SEEDS[@]}" -gt 0 ]; then
+  for seed in "${SEEDS[@]}"; do
+    echo "applying $(basename "$seed")"
+    docker exec -i "$CONTAINER_NAME" \
+      psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 \
+      < "$seed"
+  done
+
+  chains_count="$(docker exec "$CONTAINER_NAME" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select count(*) from chains")"
+  positioned_stores_count="$(docker exec "$CONTAINER_NAME" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select count(*) from stores where position is not null")"
+  products_count="$(docker exec "$CONTAINER_NAME" psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc "select count(*) from products")"
+
+  if [ "$chains_count" -lt 6 ] || [ "$positioned_stores_count" -lt 6 ] || [ "$products_count" -lt 20 ]; then
+    echo "seed assertion failed: chains=$chains_count positioned_stores=$positioned_stores_count products=$products_count" >&2
+    exit 1
+  fi
+
+  echo "applied ${#SEEDS[@]} seed file(s); seed counts ok"
+else
+  echo "no seed files found in $SEEDS_DIR; skipped seed verification"
+fi
