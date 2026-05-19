@@ -817,3 +817,68 @@ export function suggestDealBasedMeals(input: { deals: MealDeal[]; maxMealCost: n
     }
   ];
 }
+
+export type PrivacyExportInput = {
+  userId: string;
+  favoriteStoreIds: string[];
+  watchlistProductIds: string[];
+  receiptIds: string[];
+  householdIds: string[];
+};
+
+export type PrivacyExport = {
+  userId: string;
+  generatedAt: string;
+  sections: Array<{ name: string; records: unknown[] }>;
+};
+
+export function buildPrivacyExport(input: PrivacyExportInput, generatedAt = '2026-05-19T00:00:00.000Z'): PrivacyExport {
+  return {
+    userId: input.userId,
+    generatedAt,
+    sections: [
+      { name: 'profile', records: [{ userId: input.userId }] },
+      { name: 'favorite_stores', records: input.favoriteStoreIds.map((storeId) => ({ storeId })) },
+      { name: 'watchlist', records: input.watchlistProductIds.map((productId) => ({ productId })) },
+      { name: 'receipts', records: input.receiptIds.map((receiptId) => ({ receiptId })) },
+      { name: 'households', records: input.householdIds.map((householdId) => ({ householdId })) }
+    ]
+  };
+}
+
+export type AccountDeletionPlan = {
+  userId: string;
+  deleteFromTables: string[];
+  anonymizeTables: string[];
+  reason: string;
+};
+
+export function planAccountDeletion(userId: string): AccountDeletionPlan {
+  return {
+    userId,
+    deleteFromTables: ['watchlist_items', 'favorite_stores', 'basket_items', 'weekly_baskets', 'receipt_items', 'receipt_uploads', 'user_preferences', 'app_users'],
+    anonymizeTables: ['community_price_reports'],
+    reason: 'Delete personal account, budget, basket, watchlist, and receipt data; anonymize community observations that may still support aggregate price quality.'
+  };
+}
+
+export type AdvertiserInput = {
+  userId: string;
+  district?: string;
+  categoryInterest?: string;
+  weeklyBudget?: number;
+  receiptTotal?: number;
+  receiptImageUrl?: string;
+};
+
+export type AdvertiserPayload = {
+  district?: string;
+  categoryInterest?: string;
+};
+
+export function redactForAdvertisers(input: AdvertiserInput): AdvertiserPayload {
+  return {
+    district: input.district,
+    categoryInterest: input.categoryInterest
+  };
+}
