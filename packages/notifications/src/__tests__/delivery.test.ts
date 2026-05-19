@@ -1,6 +1,11 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { deliverDueNotifications, planHumanReviewSlaNotifications, runNotificationWorkerTick } from '../index.js';
+import {
+  applyNotificationSuppressions,
+  deliverDueNotifications,
+  planHumanReviewSlaNotifications,
+  runNotificationWorkerTick
+} from '../index.js';
 
 describe('deliverDueNotifications', () => {
   it('sends due push and email notifications through provider adapters and records results', async () => {
@@ -205,5 +210,78 @@ describe('planHumanReviewSlaNotifications', () => {
     });
 
     assert.deepEqual(notifications, []);
+  });
+});
+
+describe('applyNotificationSuppressions', () => {
+  it('removes actively unsubscribed and bounced recipients before delivery', () => {
+    const result = applyNotificationSuppressions({
+      notifications: [
+        {
+          channel: 'email',
+          type: 'weekly_report',
+          title: 'Weekly report',
+          body: 'Summary',
+          priority: 'normal',
+          sendAt: '2026-05-19T12:00:00.000Z',
+          recipient: 'unsubscribed@example.com'
+        },
+        {
+          channel: 'email',
+          type: 'human_review_sla_breach',
+          title: 'SLA breached',
+          body: 'Review overdue',
+          priority: 'high',
+          sendAt: '2026-05-19T12:00:00.000Z',
+          recipient: 'bounced@example.com'
+        },
+        {
+          channel: 'push',
+          type: 'target_price',
+          title: 'Coffee deal',
+          body: 'Below target',
+          priority: 'high',
+          sendAt: '2026-05-19T12:00:00.000Z',
+          recipient: 'device-1'
+        }
+      ],
+      suppressions: [
+        { recipient: 'unsubscribed@example.com', channel: 'email', reason: 'unsubscribed', active: true },
+        { recipient: 'bounced@example.com', reason: 'bounce', active: true },
+        { recipient: 'device-1', channel: 'push', reason: 'complaint', active: false }
+      ]
+    });
+
+    assert.deepEqual(result.sendable.map((notification) => notification.recipient), ['device-1']);
+    assert.deepEqual(result.suppressed.map((item) => ({
+      recipient: item.notification.recipient,
+      channel: item.notification.channel,
+      reason: item.reason
+    })), [
+      { recipient: 'unsubscribed@example.com', channel: 'email', reason: 'unsubscribed' },
+      { recipient: 'bounced@example.com', channel: 'email', reason: 'bounce' }
+    ]);
+  });
+
+  it('keeps a recipient sendable when suppression is for another channel', () => {
+    const result = applyNotificationSuppressions({
+      notifications: [
+        {
+          channel: 'push',
+          type: 'target_price',
+          title: 'Coffee deal',
+          body: 'Below target',
+          priority: 'high',
+          sendAt: '2026-05-19T12:00:00.000Z',
+          recipient: 'same-user-device'
+        }
+      ],
+      suppressions: [
+        { recipient: 'same-user-device', channel: 'email', reason: 'unsubscribed', active: true }
+      ]
+    });
+
+    assert.equal(result.sendable.length, 1);
+    assert.deepEqual(result.suppressed, []);
   });
 });
