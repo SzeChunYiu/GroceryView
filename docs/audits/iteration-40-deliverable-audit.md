@@ -14,7 +14,7 @@ Continue completing GroceryView proposal deliverables iteratively, with each inc
 | Needs-more-info handling | decision result can keep an item in review without marking it reviewed by a human | Verified |
 | Regression coverage | `packages/core/src/__tests__/matching.test.ts` covers product-match approval, community-report dismissal, and needs-more-info behavior | Verified |
 | Completion audit update | `docs/status/completion-audit.md` narrows the human-review operations gap | Verified |
-| PR and merge after iteration | GitHub PR evidence to be added after PR creation | Pending until PR step |
+| PR and merge after iteration | PR #91 | Completed after merge |
 
 ## Verification commands
 
