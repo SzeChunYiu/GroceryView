@@ -530,6 +530,25 @@ export type HumanReviewQueueItem = {
   reason: string;
 };
 
+export type HumanReviewDecision = 'approve' | 'reject' | 'needs_more_info';
+
+export type HumanReviewWriteback = {
+  action: 'approve_product_match' | 'reject_product_match' | 'accept_community_report' | 'dismiss_community_report' | 'keep_in_review';
+  subjectId: string;
+  reviewedByHuman: boolean;
+};
+
+export type HumanReviewDecisionResult = {
+  reviewId: string;
+  subjectType: HumanReviewQueueItem['subjectType'];
+  subjectId: string;
+  status: 'approved' | 'rejected' | 'needs_more_info';
+  reviewerId: string;
+  decidedAt: string;
+  notes?: string;
+  writeback: HumanReviewWriteback;
+};
+
 export function planHumanReviewQueue(input: {
   productMatches: ProductMatchReviewCandidate[];
   communityReports: CommunityReportReviewCandidate[];
@@ -560,6 +579,48 @@ export function planHumanReviewQueue(input: {
 
   const priorityRank: Record<HumanReviewQueueItem['priority'], number> = { high: 0, medium: 1, low: 2 };
   return queue.sort((a, b) => priorityRank[a.priority] - priorityRank[b.priority] || a.id.localeCompare(b.id));
+}
+
+function writebackFor(item: HumanReviewQueueItem, decision: HumanReviewDecision): HumanReviewWriteback {
+  if (decision === 'needs_more_info') {
+    return { action: 'keep_in_review', subjectId: item.subjectId, reviewedByHuman: false };
+  }
+
+  if (item.subjectType === 'product_match') {
+    return {
+      action: decision === 'approve' ? 'approve_product_match' : 'reject_product_match',
+      subjectId: item.subjectId,
+      reviewedByHuman: true
+    };
+  }
+
+  return {
+    action: decision === 'approve' ? 'accept_community_report' : 'dismiss_community_report',
+    subjectId: item.subjectId,
+    reviewedByHuman: true
+  };
+}
+
+export function applyHumanReviewDecision(input: {
+  item: HumanReviewQueueItem;
+  decision: HumanReviewDecision;
+  reviewerId: string;
+  decidedAt: string;
+  notes?: string;
+}): HumanReviewDecisionResult {
+  if (!input.reviewerId.trim()) throw new Error('reviewerId is required.');
+  if (Number.isNaN(Date.parse(input.decidedAt))) throw new Error('decidedAt must be an ISO date.');
+
+  return {
+    reviewId: input.item.id,
+    subjectType: input.item.subjectType,
+    subjectId: input.item.subjectId,
+    status: input.decision === 'approve' ? 'approved' : input.decision === 'reject' ? 'rejected' : 'needs_more_info',
+    reviewerId: input.reviewerId,
+    decidedAt: input.decidedAt,
+    ...(input.notes ? { notes: input.notes } : {}),
+    writeback: writebackFor(input.item, input.decision)
+  };
 }
 
 export type ReceiptRowInput = {

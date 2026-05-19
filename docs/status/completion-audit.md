@@ -10,7 +10,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 
 | Requirement / deliverable | Evidence | Status |
 | --- | --- | --- |
-| Iterative PR + merge workflow | PR #1 through PR #36 and PR #88 through PR #90 merged to `main` after this iteration | Done for shipped iterations |
+| Iterative PR + merge workflow | PR #1 through PR #36 and PR #88 through PR #91 merged to `main` after this iteration | Done for shipped iterations |
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
@@ -43,6 +43,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Notification delivery foundation | PR #28, `packages/notifications` | Provider-neutral delivery shipped |
 | Notification worker orchestration | PR #90, `runNotificationWorkerTick` | Shipped after merge |
 | Human review queue planning | PR #29, `planHumanReviewQueue` | Core queue planning shipped |
+| Human review decision application | PR #91, `applyHumanReviewDecision` | Shipped after merge |
 | Scanning pipeline foundation | PR #30, `packages/scanning` | Provider-neutral scan pipeline shipped |
 | Completion audit refresh | PR #31, `docs/status/completion-audit.md` | Audit reconciled after scanning |
 | Mobile Expo readiness | PR #32, `apps/mobile/app.config.json`, `apps/mobile/eas.json` | Device-build metadata shipped |
@@ -80,4 +81,4 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 - AdMob/AdSense and subscription billing integration. Provider-neutral monetization contracts are being added; real provider credentials/webhooks still missing.
 - Hosting provider selection, real deployment, secrets, DNS, observability, smoke tests, and rollback. Deployment readiness/rollback gates are being added; real provider deployment still missing.
 - Full catalog/data coverage beyond seed products/stores. Catalog coverage reporting exists; real retailer/feed backfill data still missing.
-- Human review queue UI and operations for low-confidence product matching and community reports. Core queue planning is being added; moderation tooling still missing.
+- Human review queue UI and operations for low-confidence product matching and community reports. Core queue planning and auditable decision writeback primitives exist; persisted assignments, admin UI, SLA monitoring, and abuse controls still missing.

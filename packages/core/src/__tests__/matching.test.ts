@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { classifyProductMatch, planHumanReviewQueue, recommendSmartSwaps } from '../index.js';
+import { applyHumanReviewDecision, classifyProductMatch, planHumanReviewQueue, recommendSmartSwaps } from '../index.js';
 
 describe('classifyProductMatch', () => {
   it('detects exact matches by barcode and size', () => {
@@ -79,5 +79,66 @@ describe('planHumanReviewQueue', () => {
         reason: 'Community report wrong_price for coffee has low confidence score 0.4.'
       }
     ]);
+  });
+});
+
+
+describe('applyHumanReviewDecision', () => {
+  it('approves a product-match review with an auditable writeback action', () => {
+    const result = applyHumanReviewDecision({
+      item: {
+        id: 'review-match-1',
+        subjectType: 'product_match',
+        subjectId: 'match-1',
+        priority: 'high',
+        reason: 'Product match tomato-a → tomato-b has low confidence and high quality risk: Produce sizes vary.'
+      },
+      decision: 'approve',
+      reviewerId: 'moderator-1',
+      decidedAt: '2026-05-19T12:00:00.000Z',
+      notes: 'Package sizes verified from shelf photo.'
+    });
+
+    assert.deepEqual(result, {
+      reviewId: 'review-match-1',
+      subjectType: 'product_match',
+      subjectId: 'match-1',
+      status: 'approved',
+      reviewerId: 'moderator-1',
+      decidedAt: '2026-05-19T12:00:00.000Z',
+      notes: 'Package sizes verified from shelf photo.',
+      writeback: { action: 'approve_product_match', subjectId: 'match-1', reviewedByHuman: true }
+    });
+  });
+
+  it('rejects community reports or keeps them in review with explicit operations actions', () => {
+    const reportItem = {
+      id: 'review-report-1',
+      subjectType: 'community_report' as const,
+      subjectId: 'report-1',
+      priority: 'medium' as const,
+      reason: 'Community report wrong_price for coffee has low confidence score 0.4.'
+    };
+
+    assert.deepEqual(
+      applyHumanReviewDecision({
+        item: reportItem,
+        decision: 'reject',
+        reviewerId: 'moderator-2',
+        decidedAt: '2026-05-19T12:05:00.000Z'
+      }).writeback,
+      { action: 'dismiss_community_report', subjectId: 'report-1', reviewedByHuman: true }
+    );
+
+    assert.deepEqual(
+      applyHumanReviewDecision({
+        item: reportItem,
+        decision: 'needs_more_info',
+        reviewerId: 'moderator-2',
+        decidedAt: '2026-05-19T12:10:00.000Z',
+        notes: 'Ask reporter for shelf photo.'
+      }).writeback,
+      { action: 'keep_in_review', subjectId: 'report-1', reviewedByHuman: false }
+    );
   });
 });
