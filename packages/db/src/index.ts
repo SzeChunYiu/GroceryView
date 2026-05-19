@@ -128,3 +128,94 @@ export function createMemoryRepository(): GroceryViewRepository {
     }
   };
 }
+
+export type QueryExecutor = {
+  query<T>(sql: string, params?: unknown[]): Promise<T[]>;
+};
+
+type FavoriteStoreRow = { store_id: string };
+type BudgetRow = { weekly_budget: string | number; monthly_budget: string | number };
+type WatchlistRow = { product_id: string; target_price: string | number | null; alert_deal_score_at: number | null; favorite_stores_only: boolean };
+type BasketRow = { product_id: string; quantity: string | number };
+
+export function createPostgresRepository(executor: QueryExecutor): GroceryViewRepository {
+  return {
+    async upsertUser(user) {
+      await executor.query(
+        'insert into app_users(id, email) values ($1, $2) on conflict (id) do update set email = excluded.email',
+        [user.id, user.email ?? null]
+      );
+    },
+
+    async addFavoriteStore(userId, storeId) {
+      await executor.query(
+        'insert into favorite_stores(user_id, store_id) values ($1, $2) on conflict (user_id, store_id) do nothing',
+        [userId, storeId]
+      );
+    },
+
+    async getFavoriteStoreIds(userId) {
+      const rows = await executor.query<FavoriteStoreRow>('select store_id from favorite_stores where user_id = $1 order by store_id', [userId]);
+      return rows.map((row) => row.store_id);
+    },
+
+    async upsertBudget(userId, budget) {
+      await executor.query(
+        `insert into user_preferences(user_id, weekly_budget, monthly_budget) values ($1, $2, $3)
+         on conflict (user_id) do update set weekly_budget = excluded.weekly_budget, monthly_budget = excluded.monthly_budget`,
+        [userId, budget.weeklyBudget, budget.monthlyBudget]
+      );
+    },
+
+    async getBudget(userId) {
+      const rows = await executor.query<BudgetRow>('select weekly_budget, monthly_budget from user_preferences where user_id = $1', [userId]);
+      const row = rows[0];
+      return row ? { weeklyBudget: Number(row.weekly_budget), monthlyBudget: Number(row.monthly_budget) } : null;
+    },
+
+    async addWatchlistItem(userId, item) {
+      await executor.query(
+        `insert into watchlist_items(user_id, product_id, target_price, alert_deal_score_at, favorite_stores_only)
+         values ($1, $2, $3, $4, $5)`,
+        [userId, item.productId, item.targetPrice ?? null, item.alertDealScoreAt ?? null, item.favoriteStoresOnly]
+      );
+    },
+
+    async getWatchlist(userId) {
+      const rows = await executor.query<WatchlistRow>(
+        'select product_id, target_price, alert_deal_score_at, favorite_stores_only from watchlist_items where user_id = $1 order by id',
+        [userId]
+      );
+      return rows.map((row) => ({
+        productId: row.product_id,
+        targetPrice: row.target_price === null ? undefined : Number(row.target_price),
+        alertDealScoreAt: row.alert_deal_score_at ?? undefined,
+        favoriteStoresOnly: row.favorite_stores_only
+      }));
+    },
+
+    async addBasketItem(userId, item) {
+      const basketRows = await executor.query<{ id: string | number }>(
+        `insert into weekly_baskets(user_id, week_start)
+         values ($1, date_trunc('week', current_date)::date)
+         on conflict do nothing
+         returning id`,
+        [userId]
+      );
+      const basketId = basketRows[0]?.id ?? 0;
+      await executor.query('insert into basket_items(basket_id, product_id, quantity) values ($1, $2, $3)', [basketId, item.productId, item.quantity]);
+    },
+
+    async getBasket(userId) {
+      const rows = await executor.query<BasketRow>(
+        `select bi.product_id, bi.quantity
+         from basket_items bi
+         join weekly_baskets wb on wb.id = bi.basket_id
+         where wb.user_id = $1
+         order by bi.id`,
+        [userId]
+      );
+      return rows.map((row) => ({ productId: row.product_id, quantity: Number(row.quantity) }));
+    }
+  };
+}
