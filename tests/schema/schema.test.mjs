@@ -22,6 +22,7 @@ const requiredTables = [
   'community_price_reports',
   'community_reporter_trust',
   'notification_tasks',
+  'notification_suppressions',
   'human_reviewers',
   'human_review_assignments',
   'grocery_indices',
@@ -51,6 +52,7 @@ const requiredColumns = [
   'send_at',
   'attempt_count',
   'max_attempts',
+  'reason',
   'base_date',
   'weight'
 ];

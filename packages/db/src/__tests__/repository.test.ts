@@ -153,4 +153,50 @@ describe('createMemoryRepository', () => {
       'task-due'
     ]);
   });
+
+  it('persists active notification suppressions for unsubscribe and bounce handling', async () => {
+    const repo = createMemoryRepository();
+
+    await repo.upsertNotificationSuppression({
+      id: 'suppress-email-unsub',
+      recipient: 'unsubscribed@example.com',
+      channel: 'email',
+      reason: 'unsubscribed',
+      active: true,
+      updatedAt: '2026-05-19T20:30:00.000Z'
+    });
+    await repo.upsertNotificationSuppression({
+      id: 'suppress-global-bounce',
+      recipient: 'bounced@example.com',
+      reason: 'bounce',
+      active: true,
+      updatedAt: '2026-05-19T20:31:00.000Z'
+    });
+    await repo.upsertNotificationSuppression({
+      id: 'inactive-complaint',
+      recipient: 'device-1',
+      channel: 'push',
+      reason: 'complaint',
+      active: false,
+      updatedAt: '2026-05-19T20:32:00.000Z'
+    });
+
+    assert.deepEqual(await repo.listActiveNotificationSuppressions(), [
+      {
+        id: 'suppress-global-bounce',
+        recipient: 'bounced@example.com',
+        reason: 'bounce',
+        active: true,
+        updatedAt: '2026-05-19T20:31:00.000Z'
+      },
+      {
+        id: 'suppress-email-unsub',
+        recipient: 'unsubscribed@example.com',
+        channel: 'email',
+        reason: 'unsubscribed',
+        active: true,
+        updatedAt: '2026-05-19T20:30:00.000Z'
+      }
+    ]);
+  });
 });
