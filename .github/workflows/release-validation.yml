@@ -49,7 +49,9 @@ jobs:
 
       - name: Secret scan (no committed credentials)
         run: |
+          # Exclude this workflow (contains the patterns literally), examples,
+          # markdown, and lockfiles to avoid self-match false positives.
           if git grep -nE "(SUPABASE_SERVICE_ROLE|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----)" \
-              -- ':!*.example' ':!**/*.md'; then
+              -- ':!*.example' ':!**/*.md' ':!.github/**' ':!**/pnpm-lock.yaml'; then
             echo "::error::potential committed secret"; exit 1
           fi
