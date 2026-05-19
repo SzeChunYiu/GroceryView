@@ -1,0 +1,22 @@
+{
+  "expo": {
+    "name": "GroceryView",
+    "slug": "groceryview",
+    "scheme": "groceryview",
+    "orientation": "portrait",
+    "ios": {
+      "bundleIdentifier": "com.groceryview.app",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "GroceryView uses the camera to scan grocery barcodes and receipts."
+      }
+    },
+    "android": {
+      "package": "com.groceryview.app",
+      "permissions": ["CAMERA", "POST_NOTIFICATIONS"]
+    },
+    "extra": {
+      "failClosedWithoutProviders": true
+    }
+  }
+}

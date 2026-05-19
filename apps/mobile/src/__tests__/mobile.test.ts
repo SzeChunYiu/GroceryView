@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildMobileShell, buildScanResult, createMobileViewModel } from '../index.js';
+import { readFileSync } from 'node:fs';
+import { buildExpoReadinessPlan, buildMobileShell, buildScanResult, createMobileViewModel } from '../index.js';
 
 describe('mobile app foundation', () => {
   it('defines the proposal bottom navigation and Today dashboard modules', () => {
@@ -33,5 +34,34 @@ describe('mobile app foundation', () => {
     assert.equal(result.product, null);
     assert.equal(result.confidenceLabel, 'medium-high after OCR review');
     assert.deepEqual(result.actions, ['extract_receipt_items', 'review_budget_impact', 'confirm_matches']);
+  });
+
+  it('defines Expo route and device-build readiness for proposal-critical screens', () => {
+    const plan = buildExpoReadinessPlan();
+
+    assert.deepEqual(plan.routes.map((route) => route.path), [
+      '/today',
+      '/stores',
+      '/basket',
+      '/scan/barcode',
+      '/scan/receipt',
+      '/profile',
+      '/household',
+      '/privacy'
+    ]);
+    assert.deepEqual(plan.requiredDeviceCapabilities, ['camera', 'secure-storage', 'push-notifications']);
+    assert.equal(plan.buildProfiles.production.distribution, 'store');
+    assert.equal(plan.failClosedWithoutProviders, true);
+  });
+
+  it('ships Expo and EAS config placeholders for device builds', () => {
+    const appConfig = JSON.parse(readFileSync(new URL('../../app.config.json', import.meta.url), 'utf8'));
+    const easConfig = JSON.parse(readFileSync(new URL('../../eas.json', import.meta.url), 'utf8'));
+
+    assert.equal(appConfig.expo.name, 'GroceryView');
+    assert.equal(appConfig.expo.ios.infoPlist.NSCameraUsageDescription.includes('barcodes and receipts'), true);
+    assert.deepEqual(appConfig.expo.android.permissions, ['CAMERA', 'POST_NOTIFICATIONS']);
+    assert.equal(appConfig.expo.extra.failClosedWithoutProviders, true);
+    assert.equal(easConfig.build.production.distribution, 'store');
   });
 });
