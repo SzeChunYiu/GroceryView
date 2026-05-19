@@ -21,6 +21,88 @@ export function confidenceForSource(sourceType: SourceType): number {
   return SOURCE_CONFIDENCE[sourceType];
 }
 
+export type RobotsTxtStatus = 'allow' | 'disallow' | 'unknown' | 'not_applicable';
+export type LegalReviewStatus = 'approved' | 'pending' | 'rejected';
+
+export type RetailerSourceAccessInput = {
+  chainId: string;
+  sourceType: Extract<SourceType, 'official_api' | 'retailer_online_page' | 'flyer_campaign'>;
+  robotsTxtStatus: RobotsTxtStatus;
+  legalReviewStatus: LegalReviewStatus;
+  hasDataAgreement: boolean;
+};
+
+export type RetailerSourceAccessPlan = {
+  status: 'allowed' | 'blocked';
+  chainId: string;
+  sourceType: RetailerSourceAccessInput['sourceType'];
+  reason: string;
+  requiredActions: string[];
+};
+
+export function planRetailerSourceAccess(input: RetailerSourceAccessInput): RetailerSourceAccessPlan {
+  if (!input.chainId.trim()) throw new Error('chainId is required.');
+
+  if (input.sourceType === 'official_api') {
+    const requiredActions: string[] = [];
+    if (input.legalReviewStatus !== 'approved') requiredActions.push('legal_review_approval_required');
+    if (!input.hasDataAgreement) requiredActions.push('data_agreement_required');
+    return requiredActions.length === 0
+      ? {
+          status: 'allowed',
+          chainId: input.chainId,
+          sourceType: input.sourceType,
+          reason: 'Official API access has legal approval and a data agreement.',
+          requiredActions
+        }
+      : {
+          status: 'blocked',
+          chainId: input.chainId,
+          sourceType: input.sourceType,
+          reason: 'Official API ingestion requires legal approval and a data agreement.',
+          requiredActions
+        };
+  }
+
+  if (input.sourceType === 'retailer_online_page') {
+    const requiredActions: string[] = [];
+    if (input.robotsTxtStatus !== 'allow') requiredActions.push('robots_txt_allow_required');
+    if (input.legalReviewStatus !== 'approved') requiredActions.push('legal_review_approval_required');
+    return requiredActions.length === 0
+      ? {
+          status: 'allowed',
+          chainId: input.chainId,
+          sourceType: input.sourceType,
+          reason: 'Retailer page ingestion has robots.txt allow and approved legal review.',
+          requiredActions
+        }
+      : {
+          status: 'blocked',
+          chainId: input.chainId,
+          sourceType: input.sourceType,
+          reason: 'Retailer page ingestion requires robots.txt allow and approved legal review.',
+          requiredActions
+        };
+  }
+
+  const requiredActions = input.legalReviewStatus === 'approved' ? [] : ['legal_review_approval_required'];
+  return requiredActions.length === 0
+    ? {
+        status: 'allowed',
+        chainId: input.chainId,
+        sourceType: input.sourceType,
+        reason: 'Flyer campaign ingestion has approved legal review.',
+        requiredActions
+      }
+    : {
+        status: 'blocked',
+        chainId: input.chainId,
+        sourceType: input.sourceType,
+        reason: 'Flyer campaign ingestion requires approved legal review.',
+        requiredActions
+      };
+}
+
 export type UnitInput = {
   price: number;
   packageSize: number;
