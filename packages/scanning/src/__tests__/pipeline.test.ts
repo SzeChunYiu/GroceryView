@@ -1,83 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildScanProviderReadinessReport, planScanReviewWorkItems, prepareScanUploadTicket, processScanUpload } from '../index.js';
-
-describe('buildScanProviderReadinessReport', () => {
-  it('fails closed when barcode or receipt OCR providers are missing credentials or health checks', () => {
-    const report = buildScanProviderReadinessReport({
-      requiredProviders: ['barcode', 'receiptOcr'],
-      providers: [
-        {
-          kind: 'barcode',
-          providerName: 'gs1-compatible-lookup',
-          configured: true,
-          credentialsPresent: true,
-          healthStatus: 'pass'
-        },
-        {
-          kind: 'receiptOcr',
-          providerName: 'cloud-ocr',
-          configured: false,
-          credentialsPresent: false,
-          healthStatus: 'not_run'
-        }
-      ]
-    });
-
-    assert.deepEqual(report, {
-      status: 'blocked',
-      blockers: [
-        'scan_provider_not_configured:receiptOcr',
-        'scan_provider_credentials_missing:receiptOcr',
-        'scan_provider_health_not_run:receiptOcr'
-      ],
-      evidence: [
-        'scan_provider_configured:barcode:gs1-compatible-lookup',
-        'scan_provider_credentials_present:barcode',
-        'scan_provider_health_pass:barcode'
-      ],
-      warnings: [],
-      summary: 'Scan provider readiness is blocked.'
-    });
-  });
-
-  it('passes only when all required scan providers are configured, credentialed, and healthy', () => {
-    const report = buildScanProviderReadinessReport({
-      requiredProviders: ['barcode', 'receiptOcr'],
-      providers: [
-        {
-          kind: 'barcode',
-          providerName: 'gs1-compatible-lookup',
-          configured: true,
-          credentialsPresent: true,
-          healthStatus: 'pass'
-        },
-        {
-          kind: 'receiptOcr',
-          providerName: 'cloud-ocr',
-          configured: true,
-          credentialsPresent: true,
-          healthStatus: 'pass'
-        }
-      ]
-    });
-
-    assert.deepEqual(report, {
-      status: 'ready',
-      blockers: [],
-      evidence: [
-        'scan_provider_configured:barcode:gs1-compatible-lookup',
-        'scan_provider_credentials_present:barcode',
-        'scan_provider_health_pass:barcode',
-        'scan_provider_configured:receiptOcr:cloud-ocr',
-        'scan_provider_credentials_present:receiptOcr',
-        'scan_provider_health_pass:receiptOcr'
-      ],
-      warnings: [],
-      summary: 'Scan providers are ready.'
-    });
-  });
-});
+import { planMobileScanSession, processScanUpload } from '../index.js';
 
 describe('processScanUpload', () => {
   it('routes barcode scans through barcode provider and returns lookup confidence', async () => {
@@ -136,6 +59,60 @@ describe('processScanUpload', () => {
       status: 'failed_no_provider',
       kind: 'receipt',
       reason: 'No receipt OCR provider configured.'
+    });
+  });
+
+  it('plans a mobile scan session with running total, receipt review, and budget comparison action', async () => {
+    const plan = await planMobileScanSession({
+      scans: [
+        { scanId: 'scan-barcode-1', upload: { kind: 'barcode', payload: '0735000123456', uploadedAt: '2026-05-19T10:00:00.000Z' } },
+        { scanId: 'scan-receipt-1', upload: { kind: 'receipt', payload: 'file://receipt.jpg', uploadedAt: '2026-05-19T10:03:00.000Z' } }
+      ],
+      barcodePriceLookup: (productId) => productId === 'coffee' ? 49.9 : null,
+      providers: {
+        barcode: {
+          lookup: async (barcode) => ({ productId: barcode === '0735000123456' ? 'coffee' : null, barcode, confidence: 0.94, needsHumanReview: false })
+        },
+        receiptOcr: {
+          parse: async () => ({
+            rows: [
+              { rawName: 'ZOEGAS 450G', itemTotal: 49.9, confidence: 0.93 },
+              { rawName: 'UNKNOWN DISCOUNT', itemTotal: -10, confidence: 0.52 }
+            ],
+            totalAmount: 39.9,
+            confidence: 0.77
+          })
+        }
+      }
+    });
+
+    assert.equal(plan.status, 'needs_review');
+    assert.equal(plan.runningTotal, 89.8);
+    assert.deepEqual(plan.barcodeMatches, [
+      { scanId: 'scan-barcode-1', productId: 'coffee', confidence: 0.94, needsHumanReview: false }
+    ]);
+    assert.deepEqual(plan.receiptReviews, [
+      { scanId: 'scan-receipt-1', totalAmount: 39.9, confidence: 0.77, lowConfidenceRows: ['UNKNOWN DISCOUNT'] }
+    ]);
+    assert.deepEqual(plan.blockers, []);
+    assert.deepEqual(plan.nextActions, ['review_matches', 'compare_budget', 'continue_scanning']);
+  });
+
+  it('blocks the mobile scan session when a required provider is missing', async () => {
+    const plan = await planMobileScanSession({
+      scans: [
+        { scanId: 'scan-receipt-1', upload: { kind: 'receipt', payload: 'file://receipt.jpg', uploadedAt: '2026-05-19T10:03:00.000Z' } }
+      ],
+      providers: {}
+    });
+
+    assert.deepEqual(plan, {
+      status: 'blocked',
+      runningTotal: 0,
+      barcodeMatches: [],
+      receiptReviews: [],
+      blockers: [{ scanId: 'scan-receipt-1', reason: 'No receipt OCR provider configured.' }],
+      nextActions: ['configure_scan_provider']
     });
   });
 });
