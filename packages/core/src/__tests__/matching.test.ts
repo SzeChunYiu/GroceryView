@@ -5,7 +5,8 @@ import {
   classifyProductMatch,
   planHumanReviewAssignments,
   planHumanReviewQueue,
-  recommendSmartSwaps
+  recommendSmartSwaps,
+  summarizeHumanReviewSla
 } from '../index.js';
 
 describe('classifyProductMatch', () => {
@@ -246,5 +247,92 @@ describe('planHumanReviewAssignments', () => {
       { reviewId: 'review-match-1', reason: 'already_assigned' },
       { reviewId: 'review-match-2', reason: 'no_active_reviewer_capacity' }
     ]);
+  });
+});
+
+describe('summarizeHumanReviewSla', () => {
+  it('counts overdue and due-soon open assignments for operations dashboards', () => {
+    const summary = summarizeHumanReviewSla({
+      now: '2026-05-19T12:00:00.000Z',
+      dueSoonHours: 2,
+      assignments: [
+        {
+          id: 'assignment-review-match-1-moderator-1',
+          reviewId: 'review-match-1',
+          subjectType: 'product_match',
+          subjectId: 'match-1',
+          priority: 'high',
+          reason: 'Overdue.',
+          assigneeId: 'moderator-1',
+          assignedAt: '2026-05-19T08:00:00.000Z',
+          dueAt: '2026-05-19T11:00:00.000Z',
+          status: 'assigned'
+        },
+        {
+          id: 'assignment-review-report-1-moderator-2',
+          reviewId: 'review-report-1',
+          subjectType: 'community_report',
+          subjectId: 'report-1',
+          priority: 'medium',
+          reason: 'Due soon.',
+          assigneeId: 'moderator-2',
+          assignedAt: '2026-05-19T10:00:00.000Z',
+          dueAt: '2026-05-19T13:30:00.000Z',
+          status: 'in_progress'
+        },
+        {
+          id: 'assignment-review-match-3-moderator-3',
+          reviewId: 'review-match-3',
+          subjectType: 'product_match',
+          subjectId: 'match-3',
+          priority: 'low',
+          reason: 'Completed work should not count.',
+          assigneeId: 'moderator-3',
+          assignedAt: '2026-05-18T10:00:00.000Z',
+          dueAt: '2026-05-19T10:00:00.000Z',
+          status: 'completed'
+        }
+      ]
+    });
+
+    assert.deepEqual(summary, {
+      status: 'breached',
+      openAssignments: 2,
+      overdueAssignments: 1,
+      dueSoonAssignments: 1,
+      openByPriority: { high: 1, medium: 1, low: 0 },
+      breachedReviewIds: ['review-match-1'],
+      dueSoonReviewIds: ['review-report-1']
+    });
+  });
+
+  it('reports healthy SLA status when open assignments are not near their due date', () => {
+    const summary = summarizeHumanReviewSla({
+      now: '2026-05-19T12:00:00.000Z',
+      assignments: [
+        {
+          id: 'assignment-review-match-1-moderator-1',
+          reviewId: 'review-match-1',
+          subjectType: 'product_match',
+          subjectId: 'match-1',
+          priority: 'low',
+          reason: 'Plenty of time left.',
+          assigneeId: 'moderator-1',
+          assignedAt: '2026-05-19T10:00:00.000Z',
+          dueAt: '2026-05-21T12:00:00.000Z',
+          status: 'assigned'
+        }
+      ]
+    });
+
+    assert.deepEqual(summary, {
+      status: 'healthy',
+      openAssignments: 1,
+      overdueAssignments: 0,
+      dueSoonAssignments: 0,
+      openByPriority: { high: 0, medium: 0, low: 1 },
+      breachedReviewIds: [],
+      dueSoonReviewIds: []
+    });
   });
 });

@@ -10,7 +10,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 
 | Requirement / deliverable | Evidence | Status |
 | --- | --- | --- |
-| Iterative PR + merge workflow | PR #1 through PR #36 and PR #88 through PR #92 merged to `main` after this iteration | Done for shipped iterations |
+| Iterative PR + merge workflow | PR #1 through PR #36 and PR #88 through PR #93 merged to `main` after this iteration | Done for shipped iterations |
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
@@ -45,6 +45,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Human review queue planning | PR #29, `planHumanReviewQueue` | Core queue planning shipped |
 | Human review decision application | PR #91, `applyHumanReviewDecision` | Shipped after merge |
 | Human review assignment planning | PR #92, `planHumanReviewAssignments` | Shipped after merge |
+| Human review SLA summary | PR #93, `summarizeHumanReviewSla` | Shipped after merge |
 | Scanning pipeline foundation | PR #30, `packages/scanning` | Provider-neutral scan pipeline shipped |
 | Completion audit refresh | PR #31, `docs/status/completion-audit.md` | Audit reconciled after scanning |
 | Mobile Expo readiness | PR #32, `apps/mobile/app.config.json`, `apps/mobile/eas.json` | Device-build metadata shipped |
@@ -82,4 +83,4 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 - AdMob/AdSense and subscription billing integration. Provider-neutral monetization contracts are being added; real provider credentials/webhooks still missing.
 - Hosting provider selection, real deployment, secrets, DNS, observability, smoke tests, and rollback. Deployment readiness/rollback gates are being added; real provider deployment still missing.
 - Full catalog/data coverage beyond seed products/stores. Catalog coverage reporting exists; real retailer/feed backfill data still missing.
-- Human review queue UI and operations for low-confidence product matching and community reports. Core queue planning, auditable decision writeback primitives, and reviewer assignment/SLA planning exist; persisted assignment storage, admin UI, SLA dashboards, reviewer permissions, and abuse controls still missing.
+- Human review queue UI and operations for low-confidence product matching and community reports. Core queue planning, auditable decision writeback primitives, reviewer assignment/SLA planning, and SLA summary primitives exist; persisted assignment storage, admin UI, SLA alert delivery, reviewer permissions, and abuse controls still missing.
