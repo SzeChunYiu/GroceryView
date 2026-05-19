@@ -42,7 +42,16 @@ jobs:
         run: npm run typecheck
 
       - name: Verify database migrations
-        run: infra/db/scripts/verify-migrations.sh
+        run: |
+          if [ ! -x infra/db/scripts/verify-migrations.sh ]; then
+            echo "::error::infra/db/scripts/verify-migrations.sh is missing or not executable"
+            exit 1
+          fi
+          if [ -d infra/db/migrations ]; then
+            infra/db/scripts/verify-migrations.sh
+          else
+            echo "No infra/db/migrations directory present; migration verification will run when migrations are added."
+          fi
 
       - name: Secret scan (no committed credentials)
         run: |
