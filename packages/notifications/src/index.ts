@@ -202,6 +202,44 @@ export type NotificationOperationsAlertInput = {
   recipients: HumanReviewSlaAlertRecipient[];
 };
 
+export type PersistedNotificationTask = {
+  id: string;
+  channel: DeliveryChannel;
+  type: string;
+  title: string;
+  body: string;
+  priority: 'normal' | 'high';
+  sendAt: string;
+  recipient: string;
+  attemptCount: number;
+  maxAttempts: number;
+  status: 'queued' | 'delivered' | 'dead_lettered' | 'suppressed';
+};
+
+export type NotificationTaskRepository = {
+  listDueNotificationTasks(now: string): Promise<PersistedNotificationTask[]>;
+  listActiveNotificationSuppressions(): Promise<NotificationSuppression[]>;
+  upsertNotificationTask(task: PersistedNotificationTask): Promise<void>;
+};
+
+export type RepositoryNotificationWorkerCycleInput = {
+  now: string;
+  retryDelayMinutes: number;
+  staleAfterMinutes: number;
+  repository: NotificationTaskRepository;
+  providers: NotificationProviders;
+  alertRecipients?: HumanReviewSlaAlertRecipient[];
+};
+
+export type RepositoryNotificationWorkerCycleResult = {
+  dueTasks: PersistedNotificationTask[];
+  suppressions: NotificationSuppression[];
+  worker: NotificationWorkerTickResult;
+  persistedTaskUpdates: PersistedNotificationTask[];
+  report: NotificationOperationsReport;
+  alerts: DeliveryNotification[];
+};
+
 function buildMessage(notification: DeliveryNotification): DeliveryMessage {
   return {
     recipient: notification.recipient,
@@ -429,6 +467,96 @@ export async function runNotificationWorkerTick(input: NotificationWorkerTickInp
   }
 
   return { deliveries, acknowledgements, summary };
+}
+
+function persistedTaskToWorkerTask(task: PersistedNotificationTask): NotificationWorkerTask {
+  return {
+    id: task.id,
+    notification: {
+      channel: task.channel,
+      type: task.type,
+      title: task.title,
+      body: task.body,
+      priority: task.priority,
+      sendAt: task.sendAt,
+      recipient: task.recipient
+    },
+    attemptCount: task.attemptCount,
+    maxAttempts: task.maxAttempts
+  };
+}
+
+function applyWorkerAcknowledgementsToPersistedTasks(
+  tasks: PersistedNotificationTask[],
+  acknowledgements: NotificationWorkerAcknowledgement[]
+): PersistedNotificationTask[] {
+  const tasksById = new Map(tasks.map((task) => [task.id, task]));
+  const updates: PersistedNotificationTask[] = [];
+
+  for (const acknowledgement of acknowledgements) {
+    const task = tasksById.get(acknowledgement.taskId);
+    if (!task) throw new Error(`Unknown notification task acknowledgement: ${acknowledgement.taskId}.`);
+
+    if (acknowledgement.status === 'not_due') continue;
+
+    if (acknowledgement.status === 'delivered') {
+      updates.push({ ...task, status: 'delivered' });
+      continue;
+    }
+
+    if (acknowledgement.status === 'retry_scheduled') {
+      updates.push({
+        ...task,
+        status: 'queued',
+        attemptCount: acknowledgement.attemptCount,
+        sendAt: acknowledgement.nextAttemptAt
+      });
+      continue;
+    }
+
+    if (acknowledgement.status === 'dead_lettered') {
+      updates.push({ ...task, status: 'dead_lettered', attemptCount: acknowledgement.attemptCount });
+      continue;
+    }
+
+    updates.push({ ...task, status: 'suppressed' });
+  }
+
+  return updates;
+}
+
+export async function runRepositoryNotificationWorkerCycle(
+  input: RepositoryNotificationWorkerCycleInput
+): Promise<RepositoryNotificationWorkerCycleResult> {
+  const dueTasks = await input.repository.listDueNotificationTasks(input.now);
+  const suppressions = await input.repository.listActiveNotificationSuppressions();
+  const worker = await runNotificationWorkerTick({
+    now: input.now,
+    retryDelayMinutes: input.retryDelayMinutes,
+    tasks: dueTasks.map(persistedTaskToWorkerTask),
+    suppressions,
+    providers: input.providers
+  });
+
+  const persistedTaskUpdates = applyWorkerAcknowledgementsToPersistedTasks(dueTasks, worker.acknowledgements);
+  for (const task of persistedTaskUpdates) {
+    await input.repository.upsertNotificationTask(task);
+  }
+
+  const report = buildNotificationOperationsReport({
+    now: input.now,
+    staleAfterMinutes: input.staleAfterMinutes,
+    dueTasks: dueTasks.map((task) => ({ id: task.id, sendAt: task.sendAt })),
+    workerSummary: worker.summary,
+    deliveries: worker.deliveries
+  });
+  const alerts = planNotificationOperationsAlerts({
+    now: input.now,
+    report,
+    recipients: input.alertRecipients ?? []
+  });
+
+  return { dueTasks, suppressions, worker, persistedTaskUpdates, report, alerts };
 }
 
 export function buildNotificationOperationsReport(input: NotificationOperationsReportInput): NotificationOperationsReport {

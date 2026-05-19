@@ -73,4 +73,8 @@ describe('db/schema.sql', () => {
   it('allows suppressed notification task state for terminal unsubscribe handling', () => {
     assert.match(schema, /status in \('queued', 'delivered', 'dead_lettered', 'suppressed'\)/);
   });
+
+  it('keeps one weekly basket per user and week for deterministic basket item writes', () => {
+    assert.match(schema, /unique\s*\(\s*user_id\s*,\s*week_start\s*\)/);
+  });
 });

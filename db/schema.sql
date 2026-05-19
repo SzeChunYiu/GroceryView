@@ -150,7 +150,8 @@ create table if not exists weekly_baskets (
   week_start date not null,
   budget numeric(12, 2),
   status text not null default 'planning',
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  unique (user_id, week_start)
 );
 
 create table if not exists basket_items (
