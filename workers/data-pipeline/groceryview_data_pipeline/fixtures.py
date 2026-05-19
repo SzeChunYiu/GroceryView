@@ -168,3 +168,4 @@ RETAILER_PRICE_SNAPSHOT = {
         "spaghetti-500g": {"price_amount": 17.9, "confidence": 0.86, "price_type": "regular", "label": "medium"},
     },
 }
+

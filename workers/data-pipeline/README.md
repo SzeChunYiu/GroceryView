@@ -16,7 +16,7 @@ Dagster scaffold for the GroceryView data-worker lane.
 cd workers/data-pipeline
 python3 -m venv .venv
 . .venv/bin/activate
-scripts/verify_dagster_definitions.sh
+pip install -e .[dev]
 dagster dev -m groceryview_data_pipeline.definitions
 ```
 
@@ -34,8 +34,3 @@ Example Dagster assets in this lane:
 ```bash
 pytest
 ```
-
-`scripts/verify_dagster_definitions.sh` is the CI-safe definitions load test.
-It installs the worker package, imports `groceryview_data_pipeline.definitions`,
-lists the seven expected assets, and exits nonzero if Dagster cannot load the
-module.
