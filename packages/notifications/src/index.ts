@@ -136,6 +136,11 @@ export type NotificationWorkerAcknowledgement =
     }
   | {
       taskId: string;
+      status: 'suppressed';
+      reason: NotificationSuppressionReason;
+    }
+  | {
+      taskId: string;
       status: 'retry_scheduled';
       attemptCount: number;
       nextAttemptAt: string;
@@ -152,6 +157,7 @@ export type NotificationWorkerTickInput = {
   now: string;
   tasks: NotificationWorkerTask[];
   providers: NotificationProviders;
+  suppressions?: NotificationSuppression[];
   retryDelayMinutes: number;
 };
 
@@ -163,6 +169,7 @@ export type NotificationWorkerTickResult = {
     notDue: number;
     retryScheduled: number;
     deadLettered: number;
+    suppressed: number;
   };
 };
 
@@ -335,11 +342,26 @@ function deliveryReason(result: DeliveryResult): string {
 }
 
 export async function runNotificationWorkerTick(input: NotificationWorkerTickInput): Promise<NotificationWorkerTickResult> {
+  const now = Date.parse(input.now);
+  if (Number.isNaN(now)) throw new Error('now must be an ISO date.');
+
   const deliveries: DeliveryResult[] = [];
   const acknowledgements: NotificationWorkerAcknowledgement[] = [];
-  const summary = { delivered: 0, notDue: 0, retryScheduled: 0, deadLettered: 0 };
+  const summary = { delivered: 0, notDue: 0, retryScheduled: 0, deadLettered: 0, suppressed: 0 };
 
   for (const task of input.tasks) {
+    const sendAt = Date.parse(task.notification.sendAt);
+    if (Number.isNaN(sendAt)) throw new Error('notification sendAt must be an ISO date.');
+
+    if (sendAt <= now) {
+      const suppression = (input.suppressions ?? []).find((candidate) => suppressionMatches(task.notification, candidate));
+      if (suppression) {
+        acknowledgements.push({ taskId: task.id, status: 'suppressed', reason: suppression.reason });
+        summary.suppressed += 1;
+        continue;
+      }
+    }
+
     const [delivery] = await deliverDueNotifications({
       now: input.now,
       notifications: [task.notification],

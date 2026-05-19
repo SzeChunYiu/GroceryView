@@ -68,7 +68,34 @@ describe('runNotificationWorkerTick', () => {
       { taskId: 'task-1', status: 'delivered', providerMessageId: 'push-1' },
       { taskId: 'task-2', status: 'not_due' }
     ]);
-    assert.deepEqual(result.summary, { delivered: 1, notDue: 1, retryScheduled: 0, deadLettered: 0 });
+    assert.deepEqual(result.summary, { delivered: 1, notDue: 1, retryScheduled: 0, deadLettered: 0, suppressed: 0 });
+  });
+
+  it('suppresses due worker tasks before invoking providers', async () => {
+    const sent: string[] = [];
+    const result = await runNotificationWorkerTick({
+      now: '2026-05-19T10:00:00.000Z',
+      retryDelayMinutes: 15,
+      suppressions: [
+        { recipient: 'unsubscribed@example.com', channel: 'email', reason: 'unsubscribed', active: true },
+        { recipient: 'device-2', channel: 'push', reason: 'complaint', active: false }
+      ],
+      tasks: [
+        { id: 'suppressed-email', attemptCount: 0, maxAttempts: 3, notification: { channel: 'email', type: 'weekly_report', title: 'Weekly report', body: 'Summary', priority: 'normal', sendAt: '2026-05-19T09:00:00.000Z', recipient: 'unsubscribed@example.com' } },
+        { id: 'sendable-push', attemptCount: 0, maxAttempts: 3, notification: { channel: 'push', type: 'target_price', title: 'Coffee deal', body: 'Below target', priority: 'high', sendAt: '2026-05-19T09:00:00.000Z', recipient: 'device-2' } }
+      ],
+      providers: {
+        email: { send: async (message) => { sent.push(`email:${message.recipient}`); return 'email-1'; } },
+        push: { send: async (message) => { sent.push(`push:${message.recipient}`); return 'push-1'; } }
+      }
+    });
+
+    assert.deepEqual(sent, ['push:device-2']);
+    assert.deepEqual(result.acknowledgements, [
+      { taskId: 'suppressed-email', status: 'suppressed', reason: 'unsubscribed' },
+      { taskId: 'sendable-push', status: 'delivered', providerMessageId: 'push-1' }
+    ]);
+    assert.deepEqual(result.summary, { delivered: 1, notDue: 0, retryScheduled: 0, deadLettered: 0, suppressed: 1 });
   });
 
   it('schedules retries before max attempts and dead-letters exhausted tasks', async () => {
@@ -99,7 +126,7 @@ describe('runNotificationWorkerTick', () => {
         reason: 'provider down'
       }
     ]);
-    assert.deepEqual(result.summary, { delivered: 0, notDue: 0, retryScheduled: 1, deadLettered: 1 });
+    assert.deepEqual(result.summary, { delivered: 0, notDue: 0, retryScheduled: 1, deadLettered: 1, suppressed: 0 });
   });
 });
 
