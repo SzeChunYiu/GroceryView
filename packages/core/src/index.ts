@@ -743,3 +743,77 @@ export function rankOrganicDeals(deals: OrganicDealRankInput[]): OrganicDealRank
     return b.dealScore - a.dealScore;
   });
 }
+
+export type NutritionProduct = {
+  productId: string;
+  name: string;
+  price: number;
+  nutritionPerPackage: {
+    proteinGrams: number;
+    calories: number;
+    fiberGrams: number;
+    sugarGrams: number;
+    saltGrams: number;
+  };
+};
+
+export type NutritionMetric = 'protein' | 'calories' | 'fiber';
+
+export type NutritionRank = NutritionProduct & {
+  metric: NutritionMetric;
+  valuePer10Sek: number;
+  sugarPerPackage: number;
+  saltWarning: boolean;
+};
+
+export function rankNutritionPerKrona(products: NutritionProduct[], metric: NutritionMetric): NutritionRank[] {
+  const metricKey = metric === 'protein' ? 'proteinGrams' : metric === 'calories' ? 'calories' : 'fiberGrams';
+  return products
+    .map((product) => ({
+      ...product,
+      metric,
+      valuePer10Sek: Math.round((product.nutritionPerPackage[metricKey] / product.price) * 1000) / 100,
+      sugarPerPackage: product.nutritionPerPackage.sugarGrams,
+      saltWarning: product.nutritionPerPackage.saltGrams > 2
+    }))
+    .sort((a, b) => b.valuePer10Sek - a.valuePer10Sek);
+}
+
+export type MealDeal = {
+  productId: string;
+  name: string;
+  category: 'protein' | 'pantry' | 'vegetables' | 'dairy' | 'fruit' | 'other';
+  price: number;
+  dealScore: number;
+};
+
+export type MealSuggestion = {
+  title: string;
+  ingredientProductIds: string[];
+  estimatedCost: number;
+  estimatedCostPerServing: number;
+  reason: string;
+};
+
+export function suggestDealBasedMeals(input: { deals: MealDeal[]; maxMealCost: number; servings: number }): MealSuggestion[] {
+  const bestByCategory = new Map<MealDeal['category'], MealDeal>();
+  for (const deal of [...input.deals].sort((a, b) => b.dealScore - a.dealScore)) {
+    if (!bestByCategory.has(deal.category)) bestByCategory.set(deal.category, deal);
+  }
+  const protein = bestByCategory.get('protein');
+  const pantry = bestByCategory.get('pantry');
+  const vegetable = bestByCategory.get('vegetables');
+  if (!protein || !pantry || !vegetable) return [];
+  const ingredients = [protein, pantry, vegetable];
+  const estimatedCost = Math.round(ingredients.reduce((sum, deal) => sum + deal.price, 0) * 100) / 100;
+  if (estimatedCost > input.maxMealCost) return [];
+  return [
+    {
+      title: `${protein.name} ${pantry.name.toLowerCase()} bowl`,
+      ingredientProductIds: ingredients.map((deal) => deal.productId),
+      estimatedCost,
+      estimatedCostPerServing: Math.round((estimatedCost / input.servings) * 100) / 100,
+      reason: 'Uses high-scoring current deals across protein, pantry, and vegetables.'
+    }
+  ];
+}
