@@ -1,6 +1,12 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { applyHumanReviewDecision, classifyProductMatch, planHumanReviewQueue, recommendSmartSwaps } from '../index.js';
+import {
+  applyHumanReviewDecision,
+  classifyProductMatch,
+  planHumanReviewAssignments,
+  planHumanReviewQueue,
+  recommendSmartSwaps
+} from '../index.js';
 
 describe('classifyProductMatch', () => {
   it('detects exact matches by barcode and size', () => {
@@ -140,5 +146,105 @@ describe('applyHumanReviewDecision', () => {
       }).writeback,
       { action: 'keep_in_review', subjectId: 'report-1', reviewedByHuman: false }
     );
+  });
+});
+
+describe('planHumanReviewAssignments', () => {
+  it('assigns open review tasks to active moderators with SLA due dates', () => {
+    const result = planHumanReviewAssignments({
+      assignedAt: '2026-05-19T10:00:00.000Z',
+      queue: [
+        {
+          id: 'review-match-1',
+          subjectType: 'product_match',
+          subjectId: 'match-1',
+          priority: 'high',
+          reason: 'Low-confidence produce match.'
+        },
+        {
+          id: 'review-report-1',
+          subjectType: 'community_report',
+          subjectId: 'report-1',
+          priority: 'medium',
+          reason: 'Low-confidence community price report.'
+        }
+      ],
+      reviewers: [
+        { id: 'moderator-1', active: true, openAssignmentCount: 0, maxOpenAssignments: 1 },
+        { id: 'moderator-2', active: true, openAssignmentCount: 1, maxOpenAssignments: 3, specialties: ['community_report'] },
+        { id: 'moderator-paused', active: false, openAssignmentCount: 0, maxOpenAssignments: 5 }
+      ]
+    });
+
+    assert.deepEqual(result.assignments, [
+      {
+        id: 'assignment-review-match-1-moderator-1',
+        reviewId: 'review-match-1',
+        subjectType: 'product_match',
+        subjectId: 'match-1',
+        priority: 'high',
+        reason: 'Low-confidence produce match.',
+        assigneeId: 'moderator-1',
+        assignedAt: '2026-05-19T10:00:00.000Z',
+        dueAt: '2026-05-19T14:00:00.000Z',
+        status: 'assigned'
+      },
+      {
+        id: 'assignment-review-report-1-moderator-2',
+        reviewId: 'review-report-1',
+        subjectType: 'community_report',
+        subjectId: 'report-1',
+        priority: 'medium',
+        reason: 'Low-confidence community price report.',
+        assigneeId: 'moderator-2',
+        assignedAt: '2026-05-19T10:00:00.000Z',
+        dueAt: '2026-05-20T10:00:00.000Z',
+        status: 'assigned'
+      }
+    ]);
+    assert.deepEqual(result.unassigned, []);
+  });
+
+  it('does not double-assign existing open tasks and reports capacity blockers', () => {
+    const result = planHumanReviewAssignments({
+      assignedAt: '2026-05-19T10:00:00.000Z',
+      queue: [
+        {
+          id: 'review-match-1',
+          subjectType: 'product_match',
+          subjectId: 'match-1',
+          priority: 'high',
+          reason: 'Already assigned.'
+        },
+        {
+          id: 'review-match-2',
+          subjectType: 'product_match',
+          subjectId: 'match-2',
+          priority: 'low',
+          reason: 'No remaining capacity.'
+        }
+      ],
+      reviewers: [{ id: 'moderator-1', active: true, openAssignmentCount: 1, maxOpenAssignments: 1 }],
+      existingAssignments: [
+        {
+          id: 'assignment-review-match-1-moderator-1',
+          reviewId: 'review-match-1',
+          subjectType: 'product_match',
+          subjectId: 'match-1',
+          priority: 'high',
+          reason: 'Already assigned.',
+          assigneeId: 'moderator-1',
+          assignedAt: '2026-05-19T09:00:00.000Z',
+          dueAt: '2026-05-19T13:00:00.000Z',
+          status: 'assigned'
+        }
+      ]
+    });
+
+    assert.deepEqual(result.assignments, []);
+    assert.deepEqual(result.unassigned, [
+      { reviewId: 'review-match-1', reason: 'already_assigned' },
+      { reviewId: 'review-match-2', reason: 'no_active_reviewer_capacity' }
+    ]);
   });
 });
