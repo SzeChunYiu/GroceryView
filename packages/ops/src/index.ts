@@ -7,6 +7,7 @@ export type DeploymentReadinessInput = {
   dnsConfigured: boolean;
   healthChecks: Array<{ name: string; status: GateStatus }>;
   smokeTests: Array<{ name: string; status: GateStatus }>;
+  scheduledJobs?: Array<{ name: string; scheduleConfigured: boolean; status: GateStatus }>;
   observabilityConfigured: boolean;
 };
 
@@ -36,6 +37,12 @@ export function buildDeploymentReadinessReport(input: DeploymentReadinessInput):
   for (const smoke of input.smokeTests) {
     if (smoke.status === 'fail') blockers.push(`smoke_test_failed:${smoke.name}`);
     if (smoke.status === 'not_run') blockers.push(`smoke_test_not_run:${smoke.name}`);
+  }
+
+  for (const job of input.scheduledJobs ?? []) {
+    if (!job.scheduleConfigured) blockers.push(`scheduled_job_schedule_not_configured:${job.name}`);
+    if (job.status === 'fail') blockers.push(`scheduled_job_failed:${job.name}`);
+    if (job.status === 'not_run') blockers.push(`scheduled_job_not_run:${job.name}`);
   }
 
   if (!input.observabilityConfigured) blockers.push('observability_not_configured');
