@@ -10,7 +10,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 
 | Requirement / deliverable | Evidence | Status |
 | --- | --- | --- |
-| Iterative PR + merge workflow | PR #1 through PR #36, PR #88, and PR #89 merged to `main` after this iteration | Done for shipped iterations |
+| Iterative PR + merge workflow | PR #1 through PR #36 and PR #88 through PR #90 merged to `main` after this iteration | Done for shipped iterations |
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
@@ -41,6 +41,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | PostgreSQL query executor | PR #26, `createPgQueryExecutor` | Client adapter shipped |
 | Static web flow scaffolds | PR #27, `apps/web/scripts/pages.mjs` | Static route scaffolds shipped |
 | Notification delivery foundation | PR #28, `packages/notifications` | Provider-neutral delivery shipped |
+| Notification worker orchestration | PR #90, `runNotificationWorkerTick` | Shipped after merge |
 | Human review queue planning | PR #29, `planHumanReviewQueue` | Core queue planning shipped |
 | Scanning pipeline foundation | PR #30, `packages/scanning` | Provider-neutral scan pipeline shipped |
 | Completion audit refresh | PR #31, `docs/status/completion-audit.md` | Audit reconciled after scanning |
@@ -75,7 +76,7 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 - Real OCR/camera/upload pipeline for barcode and receipt scanning. Provider-neutral scan pipeline exists; real camera/OCR providers still missing.
 - Real Expo/React Native screens and device builds. Expo route/readiness config is being added; real React Native component screens and store builds still missing.
 - Real interactive web UI for login, account, household, privacy, basket, and scanner flows. Static page scaffolds are being added before full interactivity.
-- Push/email provider adapters and scheduled notification workers. Provider-neutral delivery interface is being added; real provider credentials/workers still missing.
+- Push/email provider adapters and production notification workers. Provider-neutral delivery and worker tick orchestration exist; real provider credentials, persisted schedules, deployed workers, unsubscribe/bounce handling, and observability still missing.
 - AdMob/AdSense and subscription billing integration. Provider-neutral monetization contracts are being added; real provider credentials/webhooks still missing.
 - Hosting provider selection, real deployment, secrets, DNS, observability, smoke tests, and rollback. Deployment readiness/rollback gates are being added; real provider deployment still missing.
 - Full catalog/data coverage beyond seed products/stores. Catalog coverage reporting exists; real retailer/feed backfill data still missing.

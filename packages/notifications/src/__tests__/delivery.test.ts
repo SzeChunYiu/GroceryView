@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { deliverDueNotifications } from '../index.js';
+import { deliverDueNotifications, runNotificationWorkerTick } from '../index.js';
 
 describe('deliverDueNotifications', () => {
   it('sends due push and email notifications through provider adapters and records results', async () => {
@@ -38,5 +38,61 @@ describe('deliverDueNotifications', () => {
     assert.deepEqual(results, [
       { status: 'failed_no_provider', channel: 'email', recipient: 'user@example.com', reason: 'No email provider configured.' }
     ]);
+  });
+});
+
+
+describe('runNotificationWorkerTick', () => {
+  it('delivers due worker tasks and keeps future tasks queued', async () => {
+    const sent: string[] = [];
+    const result = await runNotificationWorkerTick({
+      now: '2026-05-19T10:00:00.000Z',
+      retryDelayMinutes: 15,
+      tasks: [
+        { id: 'task-1', attemptCount: 0, maxAttempts: 3, notification: { channel: 'push', type: 'target_price', title: 'Coffee deal', body: 'Zoegas below 50 SEK', priority: 'high', sendAt: '2026-05-19T09:59:00.000Z', recipient: 'device-1' } },
+        { id: 'task-2', attemptCount: 0, maxAttempts: 3, notification: { channel: 'email', type: 'weekly_report', title: 'Weekly report', body: 'Summary later', priority: 'normal', sendAt: '2026-05-19T11:00:00.000Z', recipient: 'user@example.com' } }
+      ],
+      providers: {
+        push: { send: async (message) => { sent.push(`${message.recipient}:${message.title}`); return 'push-1'; } }
+      }
+    });
+
+    assert.deepEqual(sent, ['device-1:Coffee deal']);
+    assert.deepEqual(result.acknowledgements, [
+      { taskId: 'task-1', status: 'delivered', providerMessageId: 'push-1' },
+      { taskId: 'task-2', status: 'not_due' }
+    ]);
+    assert.deepEqual(result.summary, { delivered: 1, notDue: 1, retryScheduled: 0, deadLettered: 0 });
+  });
+
+  it('schedules retries before max attempts and dead-letters exhausted tasks', async () => {
+    const result = await runNotificationWorkerTick({
+      now: '2026-05-19T10:00:00.000Z',
+      retryDelayMinutes: 30,
+      tasks: [
+        { id: 'retry-me', attemptCount: 1, maxAttempts: 3, notification: { channel: 'email', type: 'budget_alert', title: 'Budget', body: 'Check basket', priority: 'high', sendAt: '2026-05-19T09:00:00.000Z', recipient: 'user@example.com' } },
+        { id: 'dead-letter-me', attemptCount: 2, maxAttempts: 3, notification: { channel: 'push', type: 'target_price', title: 'Coffee', body: 'Still due', priority: 'normal', sendAt: '2026-05-19T09:00:00.000Z', recipient: 'device-2' } }
+      ],
+      providers: {
+        push: { send: async () => { throw new Error('provider down'); } }
+      }
+    });
+
+    assert.deepEqual(result.acknowledgements, [
+      {
+        taskId: 'retry-me',
+        status: 'retry_scheduled',
+        attemptCount: 2,
+        nextAttemptAt: '2026-05-19T10:30:00.000Z',
+        reason: 'No email provider configured.'
+      },
+      {
+        taskId: 'dead-letter-me',
+        status: 'dead_lettered',
+        attemptCount: 3,
+        reason: 'provider down'
+      }
+    ]);
+    assert.deepEqual(result.summary, { delivered: 0, notDue: 0, retryScheduled: 1, deadLettered: 1 });
   });
 });
