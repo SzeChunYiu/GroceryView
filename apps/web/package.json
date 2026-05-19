@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "build": "tsc -p tsconfig.json && node scripts/copy-assets.mjs"
+    "build": "tsc -p tsconfig.json && node scripts/copy-assets.mjs",
+    "test": "node --test scripts/*.test.mjs"
   },
   "dependencies": {
     "@groceryview/core": "0.1.0"

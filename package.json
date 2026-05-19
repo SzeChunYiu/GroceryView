@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "build": "npm run build -w @groceryview/core && npm run build -w @groceryview/api && npm run build -w @groceryview/server && npm run build -w @groceryview/web",
-    "test": "npm run test -w @groceryview/core && npm run test -w @groceryview/api && npm run test -w @groceryview/server && node --test tests/schema/*.test.mjs",
+    "test": "npm run test -w @groceryview/core && npm run test -w @groceryview/api && npm run test -w @groceryview/server && npm run test -w @groceryview/web && node --test tests/schema/*.test.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "devDependencies": {
