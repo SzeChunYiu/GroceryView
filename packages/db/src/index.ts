@@ -62,6 +62,15 @@ export type HumanReviewerRecord = {
   active: boolean;
 };
 
+export type CommunityReporterTrustRecord = {
+  reporterId: string;
+  reportsLast24Hours: number;
+  pendingReports: number;
+  acceptedReportsLast30Days: number;
+  rejectedReportsLast30Days: number;
+  updatedAt: string;
+};
+
 export type HumanReviewAssignmentRecord = {
   id: string;
   reviewId: string;
@@ -87,6 +96,8 @@ export type GroceryViewRepository = {
   getBasket(userId: string): Promise<BasketRecord[]>;
   upsertHumanReviewer(reviewer: HumanReviewerRecord): Promise<void>;
   getHumanReviewer(reviewerId: string): Promise<HumanReviewerRecord | null>;
+  upsertCommunityReporterTrust(trust: CommunityReporterTrustRecord): Promise<void>;
+  getCommunityReporterTrust(reporterId: string): Promise<CommunityReporterTrustRecord | null>;
   saveHumanReviewAssignment(assignment: HumanReviewAssignmentRecord): Promise<void>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignmentRecord[]>;
 };
@@ -102,6 +113,7 @@ export function createMemoryRepository(): GroceryViewRepository {
   const watchlists = new Map<string, WatchlistRecord[]>();
   const baskets = new Map<string, BasketRecord[]>();
   const humanReviewers = new Map<string, HumanReviewerRecord>();
+  const communityReporterTrust = new Map<string, CommunityReporterTrustRecord>();
   const humanReviewAssignments = new Map<string, HumanReviewAssignmentRecord>();
 
   return {
@@ -170,6 +182,15 @@ export function createMemoryRepository(): GroceryViewRepository {
     async getHumanReviewer(reviewerId) {
       const reviewer = humanReviewers.get(reviewerId);
       return reviewer ? { ...reviewer } : null;
+    },
+
+    async upsertCommunityReporterTrust(trust) {
+      communityReporterTrust.set(trust.reporterId, { ...trust });
+    },
+
+    async getCommunityReporterTrust(reporterId) {
+      const trust = communityReporterTrust.get(reporterId);
+      return trust ? { ...trust } : null;
     }
   };
 }
@@ -183,6 +204,14 @@ type BudgetRow = { weekly_budget: string | number; monthly_budget: string | numb
 type WatchlistRow = { product_id: string; target_price: string | number | null; alert_deal_score_at: number | null; favorite_stores_only: boolean };
 type BasketRow = { product_id: string; quantity: string | number };
 type HumanReviewerRow = { id: string; role: HumanReviewerRecord['role']; active: boolean };
+type CommunityReporterTrustRow = {
+  reporter_id: string;
+  reports_last_24_hours: string | number;
+  pending_reports: string | number;
+  accepted_reports_last_30_days: string | number;
+  rejected_reports_last_30_days: string | number;
+  updated_at: string | Date;
+};
 type HumanReviewAssignmentRow = {
   id: string;
   review_id: string;
@@ -217,6 +246,17 @@ function mapHumanReviewAssignment(row: HumanReviewAssignmentRow): HumanReviewAss
 
 function mapHumanReviewer(row: HumanReviewerRow): HumanReviewerRecord {
   return { id: row.id, role: row.role, active: row.active };
+}
+
+function mapCommunityReporterTrust(row: CommunityReporterTrustRow): CommunityReporterTrustRecord {
+  return {
+    reporterId: row.reporter_id,
+    reportsLast24Hours: Number(row.reports_last_24_hours),
+    pendingReports: Number(row.pending_reports),
+    acceptedReportsLast30Days: Number(row.accepted_reports_last_30_days),
+    rejectedReportsLast30Days: Number(row.rejected_reports_last_30_days),
+    updatedAt: asIso(row.updated_at)
+  };
 }
 
 export function createPostgresRepository(executor: QueryExecutor): GroceryViewRepository {
@@ -356,6 +396,49 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
       const rows = await executor.query<HumanReviewerRow>('select id, role, active from human_reviewers where id = $1', [reviewerId]);
       const row = rows[0];
       return row ? mapHumanReviewer(row) : null;
+    },
+
+    async upsertCommunityReporterTrust(trust) {
+      await executor.query(
+        `insert into community_reporter_trust(
+           reporter_id,
+           reports_last_24_hours,
+           pending_reports,
+           accepted_reports_last_30_days,
+           rejected_reports_last_30_days,
+           updated_at
+         ) values ($1, $2, $3, $4, $5, $6)
+         on conflict (reporter_id) do update set
+           reports_last_24_hours = excluded.reports_last_24_hours,
+           pending_reports = excluded.pending_reports,
+           accepted_reports_last_30_days = excluded.accepted_reports_last_30_days,
+           rejected_reports_last_30_days = excluded.rejected_reports_last_30_days,
+           updated_at = excluded.updated_at`,
+        [
+          trust.reporterId,
+          trust.reportsLast24Hours,
+          trust.pendingReports,
+          trust.acceptedReportsLast30Days,
+          trust.rejectedReportsLast30Days,
+          trust.updatedAt
+        ]
+      );
+    },
+
+    async getCommunityReporterTrust(reporterId) {
+      const rows = await executor.query<CommunityReporterTrustRow>(
+        `select reporter_id,
+                reports_last_24_hours,
+                pending_reports,
+                accepted_reports_last_30_days,
+                rejected_reports_last_30_days,
+                updated_at
+         from community_reporter_trust
+         where reporter_id = $1`,
+        [reporterId]
+      );
+      const row = rows[0];
+      return row ? mapCommunityReporterTrust(row) : null;
     }
   };
 }

@@ -12,6 +12,18 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('from human_reviewers')) {
       return [{ id: 'moderator-1', role: 'moderator', active: true }] as T[];
     }
+    if (sql.includes('from community_reporter_trust')) {
+      return [
+        {
+          reporter_id: 'reporter-1',
+          reports_last_24_hours: 7,
+          pending_reports: 2,
+          accepted_reports_last_30_days: 11,
+          rejected_reports_last_30_days: 1,
+          updated_at: '2026-05-19T20:00:00.000Z'
+        }
+      ] as T[];
+    }
     if (sql.includes('from human_review_assignments')) {
       return [
         {
@@ -105,5 +117,37 @@ describe('createPostgresRepository', () => {
     });
     assert.deepEqual(executor.calls[0].params, ['moderator-1', 'moderator', true]);
     assert.deepEqual(executor.calls[1].params, ['moderator-1']);
+  });
+
+  it('persists and reads community reporter trust state', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertCommunityReporterTrust({
+      reporterId: 'reporter-1',
+      reportsLast24Hours: 7,
+      pendingReports: 2,
+      acceptedReportsLast30Days: 11,
+      rejectedReportsLast30Days: 1,
+      updatedAt: '2026-05-19T20:00:00.000Z'
+    });
+
+    assert.deepEqual(await repo.getCommunityReporterTrust('reporter-1'), {
+      reporterId: 'reporter-1',
+      reportsLast24Hours: 7,
+      pendingReports: 2,
+      acceptedReportsLast30Days: 11,
+      rejectedReportsLast30Days: 1,
+      updatedAt: '2026-05-19T20:00:00.000Z'
+    });
+    assert.deepEqual(executor.calls[0].params, [
+      'reporter-1',
+      7,
+      2,
+      11,
+      1,
+      '2026-05-19T20:00:00.000Z'
+    ]);
+    assert.deepEqual(executor.calls[1].params, ['reporter-1']);
   });
 });
