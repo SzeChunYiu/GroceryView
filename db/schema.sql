@@ -232,7 +232,7 @@ create table if not exists notification_tasks (
   recipient text not null,
   attempt_count integer not null default 0 check (attempt_count >= 0),
   max_attempts integer not null check (max_attempts > 0),
-  status text not null check (status in ('queued', 'delivered', 'dead_lettered')),
+  status text not null check (status in ('queued', 'delivered', 'dead_lettered', 'suppressed')),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createMemoryRepository } from '../index.js';
+import { applyNotificationTaskAcknowledgements, createMemoryRepository } from '../index.js';
 
 describe('createMemoryRepository', () => {
   it('persists users, favorite stores, budgets, watchlist items, and baskets', async () => {
@@ -148,6 +148,19 @@ describe('createMemoryRepository', () => {
       maxAttempts: 3,
       status: 'delivered'
     });
+    await repo.upsertNotificationTask({
+      id: 'task-suppressed',
+      channel: 'email',
+      type: 'weekly_report',
+      title: 'Weekly report',
+      body: 'Suppressed.',
+      priority: 'normal',
+      sendAt: '2026-05-19T10:00:00.000Z',
+      recipient: 'unsubscribed@example.com',
+      attemptCount: 0,
+      maxAttempts: 3,
+      status: 'suppressed'
+    });
 
     assert.deepEqual((await repo.listDueNotificationTasks('2026-05-19T12:00:00.000Z')).map((task) => task.id), [
       'task-due'
@@ -198,5 +211,96 @@ describe('createMemoryRepository', () => {
         updatedAt: '2026-05-19T20:30:00.000Z'
       }
     ]);
+  });
+});
+
+describe('applyNotificationTaskAcknowledgements', () => {
+  it('turns worker acknowledgements into persisted task updates', () => {
+    const updates = applyNotificationTaskAcknowledgements({
+      tasks: [
+        {
+          id: 'delivered-task',
+          channel: 'push',
+          type: 'target_price',
+          title: 'Coffee deal',
+          body: 'Below target',
+          priority: 'high',
+          sendAt: '2026-05-19T10:00:00.000Z',
+          recipient: 'device-1',
+          attemptCount: 0,
+          maxAttempts: 3,
+          status: 'queued'
+        },
+        {
+          id: 'retry-task',
+          channel: 'email',
+          type: 'weekly_report',
+          title: 'Weekly report',
+          body: 'Summary',
+          priority: 'normal',
+          sendAt: '2026-05-19T10:00:00.000Z',
+          recipient: 'user@example.com',
+          attemptCount: 1,
+          maxAttempts: 3,
+          status: 'queued'
+        },
+        {
+          id: 'suppressed-task',
+          channel: 'email',
+          type: 'weekly_report',
+          title: 'Weekly report',
+          body: 'Summary',
+          priority: 'normal',
+          sendAt: '2026-05-19T10:00:00.000Z',
+          recipient: 'unsubscribed@example.com',
+          attemptCount: 0,
+          maxAttempts: 3,
+          status: 'queued'
+        },
+        {
+          id: 'not-due-task',
+          channel: 'push',
+          type: 'target_price',
+          title: 'Future deal',
+          body: 'Later',
+          priority: 'normal',
+          sendAt: '2026-05-19T11:00:00.000Z',
+          recipient: 'device-2',
+          attemptCount: 0,
+          maxAttempts: 3,
+          status: 'queued'
+        }
+      ],
+      acknowledgements: [
+        { taskId: 'delivered-task', status: 'delivered', providerMessageId: 'provider-1' },
+        {
+          taskId: 'retry-task',
+          status: 'retry_scheduled',
+          attemptCount: 2,
+          nextAttemptAt: '2026-05-19T10:30:00.000Z',
+          reason: 'provider down'
+        },
+        { taskId: 'suppressed-task', status: 'suppressed', reason: 'unsubscribed' },
+        { taskId: 'not-due-task', status: 'not_due' }
+      ]
+    });
+
+    assert.deepEqual(updates.map((task) => ({
+      id: task.id,
+      status: task.status,
+      attemptCount: task.attemptCount,
+      sendAt: task.sendAt
+    })), [
+      { id: 'delivered-task', status: 'delivered', attemptCount: 0, sendAt: '2026-05-19T10:00:00.000Z' },
+      { id: 'retry-task', status: 'queued', attemptCount: 2, sendAt: '2026-05-19T10:30:00.000Z' },
+      { id: 'suppressed-task', status: 'suppressed', attemptCount: 0, sendAt: '2026-05-19T10:00:00.000Z' }
+    ]);
+  });
+
+  it('fails closed when an acknowledgement references an unknown task', () => {
+    assert.throws(() => applyNotificationTaskAcknowledgements({
+      tasks: [],
+      acknowledgements: [{ taskId: 'missing-task', status: 'not_due' }]
+    }), /Unknown notification task acknowledgement: missing-task/);
   });
 });
