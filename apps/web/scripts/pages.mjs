@@ -20,6 +20,42 @@ const layout = ({ title, description, body }) => `<!doctype html>
 
 const pages = [
   {
+    path: 'login/index.html',
+    title: 'Sign in to GroceryView — GroceryView',
+    description: 'Secure GroceryView sign-in entry point for personalized watchlists, baskets, budgets, and household features.',
+    body: `<section class="card"><div class="eyebrow">Account access</div><h1>Sign in to GroceryView</h1><p class="lede">Passkey or magic link authentication keeps personal grocery budgets and watchlists protected.</p><div class="grid"><div class="metric"><strong>Fail closed</strong><span>protected routes require a valid session</span></div><div class="metric"><strong>Bearer auth</strong><span>API contract already documents user-scoped routes</span></div><div class="metric"><strong>No password reuse</strong><span>passwordless sign-in target</span></div></div></section>`
+  },
+  {
+    path: 'account/index.html',
+    title: 'Account settings — GroceryView',
+    description: 'GroceryView account page scaffold for favorite stores, notification preferences, and personal price alerts.',
+    body: `<section class="card"><div class="eyebrow">Settings</div><h1>Account settings</h1><p class="lede">Manage favorite stores, watchlist alerts, quiet hours, and grocery budget preferences from one account view.</p><div class="grid"><div class="metric"><strong>Stores</strong><span>favorite-store basket scope</span></div><div class="metric"><strong>Alerts</strong><span>target price and 52-week-low notifications</span></div><div class="metric"><strong>Budget</strong><span>weekly and monthly guardrails</span></div></div></section>`
+  },
+  {
+    path: 'household/index.html',
+    title: 'Household basket — GroceryView',
+    description: 'Shared GroceryView household basket page scaffold with member attribution and shared budget signals.',
+    body: `<section class="card"><div class="eyebrow">Household</div><h1>Shared household basket</h1><p class="lede">Coordinate a shared grocery basket with member attribution, merged quantities, and shared budget tracking.</p><div class="grid"><div class="metric"><strong>Member attribution</strong><span>who added each item</span></div><div class="metric"><strong>Shared budget</strong><span>household weekly plan</span></div><div class="metric"><strong>Roles</strong><span>owner and member controls</span></div></div></section>`
+  },
+  {
+    path: 'privacy/index.html',
+    title: 'Privacy controls — GroceryView',
+    description: 'GroceryView privacy controls for data export, account deletion, receipt redaction, and ad payload minimization.',
+    body: `<section class="card"><div class="eyebrow">Privacy</div><h1>Export or delete your data</h1><p class="lede">Download personal data, plan account deletion, and verify advertiser payloads stay aggregated and receipt-safe.</p><div class="grid"><div class="metric"><strong>Export</strong><span>watchlists, budgets, and baskets</span></div><div class="metric"><strong>Delete</strong><span>sensitive rows removed by plan</span></div><div class="metric"><strong>Ads</strong><span>no raw receipt leakage</span></div></div></section>`
+  },
+  {
+    path: 'basket/index.html',
+    title: 'Weekly basket — GroceryView',
+    description: 'GroceryView basket page scaffold for favorite-store comparison, smart swaps, and budget review.',
+    body: `<section class="card"><div class="eyebrow">Basket</div><h1>Weekly basket planner</h1><p class="lede">Compare favorite-store totals, review smart swaps, and keep the weekly grocery plan under budget.</p><div class="grid"><div class="metric"><strong>742 SEK</strong><span>estimated basket total</span></div><div class="metric"><strong>58 SEK</strong><span>weekly budget left</span></div><div class="metric"><strong>3 swaps</strong><span>private-label opportunities</span></div></div></section>`
+  },
+  {
+    path: 'scanner/index.html',
+    title: 'Barcode and receipt scanner — GroceryView',
+    description: 'GroceryView scanner page scaffold for barcode lookup, receipt parsing, confidence, and manual review.',
+    body: `<section class="card"><div class="eyebrow">Scanner</div><h1>Barcode and receipt scanner</h1><p class="lede">Scan products and receipts, surface confidence levels, and send uncertain matches to the manual review queue.</p><div class="grid"><div class="metric"><strong>Barcode</strong><span>product lookup and smart swaps</span></div><div class="metric"><strong>Receipt</strong><span>budget impact review</span></div><div class="metric"><strong>Confidence</strong><span>low-confidence review routing</span></div></div></section>`
+  },
+  {
     path: 'market/index.html',
     title: 'Stockholm Grocery Market — GroceryView',
     description: 'Stockholm grocery market overview with indices, top movers, and true deals.',
