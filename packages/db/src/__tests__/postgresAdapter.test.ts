@@ -41,6 +41,18 @@ class RecordingQueryExecutor implements QueryExecutor {
         }
       ] as T[];
     }
+    if (sql.includes('from notification_suppressions')) {
+      return [
+        {
+          id: 'suppress-global-bounce',
+          recipient: 'bounced@example.com',
+          channel: null,
+          reason: 'bounce',
+          active: true,
+          updated_at: '2026-05-19T20:31:00.000Z'
+        }
+      ] as T[];
+    }
     if (sql.includes('from human_review_assignments')) {
       return [
         {
@@ -215,5 +227,36 @@ describe('createPostgresRepository', () => {
       'queued'
     ]);
     assert.deepEqual(executor.calls[1].params, ['2026-05-19T12:00:00.000Z']);
+  });
+
+  it('persists and lists active notification suppressions', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertNotificationSuppression({
+      id: 'suppress-global-bounce',
+      recipient: 'bounced@example.com',
+      reason: 'bounce',
+      active: true,
+      updatedAt: '2026-05-19T20:31:00.000Z'
+    });
+
+    assert.deepEqual(await repo.listActiveNotificationSuppressions(), [
+      {
+        id: 'suppress-global-bounce',
+        recipient: 'bounced@example.com',
+        reason: 'bounce',
+        active: true,
+        updatedAt: '2026-05-19T20:31:00.000Z'
+      }
+    ]);
+    assert.deepEqual(executor.calls[0].params, [
+      'suppress-global-bounce',
+      'bounced@example.com',
+      null,
+      'bounce',
+      true,
+      '2026-05-19T20:31:00.000Z'
+    ]);
   });
 });

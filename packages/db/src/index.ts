@@ -85,6 +85,15 @@ export type NotificationTaskRecord = {
   status: 'queued' | 'delivered' | 'dead_lettered';
 };
 
+export type NotificationSuppressionRecord = {
+  id: string;
+  recipient: string;
+  channel?: 'push' | 'email';
+  reason: 'unsubscribed' | 'bounce' | 'complaint';
+  active: boolean;
+  updatedAt: string;
+};
+
 export type HumanReviewAssignmentRecord = {
   id: string;
   reviewId: string;
@@ -114,6 +123,8 @@ export type GroceryViewRepository = {
   getCommunityReporterTrust(reporterId: string): Promise<CommunityReporterTrustRecord | null>;
   upsertNotificationTask(task: NotificationTaskRecord): Promise<void>;
   listDueNotificationTasks(now: string): Promise<NotificationTaskRecord[]>;
+  upsertNotificationSuppression(suppression: NotificationSuppressionRecord): Promise<void>;
+  listActiveNotificationSuppressions(): Promise<NotificationSuppressionRecord[]>;
   saveHumanReviewAssignment(assignment: HumanReviewAssignmentRecord): Promise<void>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignmentRecord[]>;
 };
@@ -131,6 +142,7 @@ export function createMemoryRepository(): GroceryViewRepository {
   const humanReviewers = new Map<string, HumanReviewerRecord>();
   const communityReporterTrust = new Map<string, CommunityReporterTrustRecord>();
   const notificationTasks = new Map<string, NotificationTaskRecord>();
+  const notificationSuppressions = new Map<string, NotificationSuppressionRecord>();
   const humanReviewAssignments = new Map<string, HumanReviewAssignmentRecord>();
 
   return {
@@ -219,6 +231,17 @@ export function createMemoryRepository(): GroceryViewRepository {
         .filter((task) => task.status === 'queued' && task.sendAt <= now)
         .sort((a, b) => a.sendAt.localeCompare(b.sendAt) || a.id.localeCompare(b.id))
         .map((task) => ({ ...task }));
+    },
+
+    async upsertNotificationSuppression(suppression) {
+      notificationSuppressions.set(suppression.id, { ...suppression });
+    },
+
+    async listActiveNotificationSuppressions() {
+      return [...notificationSuppressions.values()]
+        .filter((suppression) => suppression.active)
+        .sort((a, b) => a.recipient.localeCompare(b.recipient) || (a.channel ?? '').localeCompare(b.channel ?? '') || a.id.localeCompare(b.id))
+        .map((suppression) => ({ ...suppression }));
     }
   };
 }
@@ -244,6 +267,14 @@ type NotificationTaskRow = {
   attempt_count: string | number;
   max_attempts: string | number;
   status: NotificationTaskRecord['status'];
+};
+type NotificationSuppressionRow = {
+  id: string;
+  recipient: string;
+  channel: NotificationSuppressionRecord['channel'] | null;
+  reason: NotificationSuppressionRecord['reason'];
+  active: boolean;
+  updated_at: string | Date;
 };
 type CommunityReporterTrustRow = {
   reporter_id: string;
@@ -313,6 +344,17 @@ function mapNotificationTask(row: NotificationTaskRow): NotificationTaskRecord {
     attemptCount: Number(row.attempt_count),
     maxAttempts: Number(row.max_attempts),
     status: row.status
+  };
+}
+
+function mapNotificationSuppression(row: NotificationSuppressionRow): NotificationSuppressionRecord {
+  return {
+    id: row.id,
+    recipient: row.recipient,
+    ...(row.channel ? { channel: row.channel } : {}),
+    reason: row.reason,
+    active: row.active,
+    updatedAt: asIso(row.updated_at)
   };
 }
 
@@ -540,6 +582,37 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
         [now]
       );
       return rows.map(mapNotificationTask);
+    },
+
+    async upsertNotificationSuppression(suppression) {
+      await executor.query(
+        `insert into notification_suppressions(id, recipient, channel, reason, active, updated_at)
+         values ($1, $2, $3, $4, $5, $6)
+         on conflict (id) do update set
+           recipient = excluded.recipient,
+           channel = excluded.channel,
+           reason = excluded.reason,
+           active = excluded.active,
+           updated_at = excluded.updated_at`,
+        [
+          suppression.id,
+          suppression.recipient,
+          suppression.channel ?? null,
+          suppression.reason,
+          suppression.active,
+          suppression.updatedAt
+        ]
+      );
+    },
+
+    async listActiveNotificationSuppressions() {
+      const rows = await executor.query<NotificationSuppressionRow>(
+        `select id, recipient, channel, reason, active, updated_at
+         from notification_suppressions
+         where active = true
+         order by recipient, coalesce(channel, ''), id`
+      );
+      return rows.map(mapNotificationSuppression);
     }
   };
 }

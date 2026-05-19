@@ -237,6 +237,15 @@ create table if not exists notification_tasks (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists notification_suppressions (
+  id text primary key,
+  recipient text not null,
+  channel text check (channel in ('push', 'email')),
+  reason text not null check (reason in ('unsubscribed', 'bounce', 'complaint')),
+  active boolean not null default true,
+  updated_at timestamptz not null
+);
+
 create table if not exists human_reviewers (
   id text primary key,
   role text not null check (role in ('viewer', 'moderator', 'lead')),
@@ -285,6 +294,7 @@ create index if not exists promotion_observations_product_dates_idx on promotion
 create index if not exists products_category_idx on products(category_id);
 create index if not exists community_reporter_trust_pending_idx on community_reporter_trust(pending_reports desc);
 create index if not exists notification_tasks_status_send_idx on notification_tasks(status, send_at);
+create index if not exists notification_suppressions_active_recipient_idx on notification_suppressions(active, recipient);
 create index if not exists human_reviewers_role_active_idx on human_reviewers(role, active);
 create index if not exists human_review_assignments_status_due_idx on human_review_assignments(status, due_at);
 create index if not exists human_review_assignments_assignee_status_idx on human_review_assignments(assignee_id, status);
