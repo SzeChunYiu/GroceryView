@@ -10,7 +10,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 
 | Requirement / deliverable | Evidence | Status |
 | --- | --- | --- |
-| Iterative PR + merge workflow | PR #1 through PR #26 merged to `main` | Done for shipped iterations |
+| Iterative PR + merge workflow | PR #1 through PR #27 merged to `main` | Done for shipped iterations |
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
@@ -39,6 +39,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | PostgreSQL repository adapter | PR #24, `createPostgresRepository` | Adapter skeleton shipped |
 | Repository governance policy | PR #25, `.github/repository-ruleset.json` | Documented, not applied |
 | PostgreSQL query executor | PR #26, `createPgQueryExecutor` | Client adapter shipped |
+| Static web flow scaffolds | PR #27, `apps/web/scripts/pages.mjs` | Static route scaffolds shipped |
 
 ## Verification gates
 
@@ -63,7 +64,7 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 - Real OCR/camera/upload pipeline for barcode and receipt scanning.
 - Real Expo/React Native screens and device builds.
 - Real interactive web UI for login, account, household, privacy, basket, and scanner flows. Static page scaffolds are being added before full interactivity.
-- Push/email provider integrations and scheduled notification workers.
+- Push/email provider adapters and scheduled notification workers. Provider-neutral delivery interface is being added; real provider credentials/workers still missing.
 - AdMob/AdSense and subscription billing integration.
 - Hosting provider selection, real deployment, secrets, DNS, observability, smoke tests, and rollback.
 - Full catalog/data coverage beyond seed products/stores.
