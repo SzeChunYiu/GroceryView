@@ -1,0 +1,41 @@
+import { createGroceryViewApi, type ProductDetail, type Store } from '@groceryview/api';
+
+export const groceryApi = createGroceryViewApi();
+
+export type ProductPriceDto = ProductDetail['currentPrices'][number] & {
+  productId: string;
+  currency: 'SEK';
+  priceType: 'shelf';
+  confidence: 'high' | 'medium' | 'low';
+  observedAt: string;
+  sourceType: 'demo_seed';
+  provenance: string;
+};
+
+export function productPrices(productId: string): ProductPriceDto[] {
+  const product = groceryApi.getProduct(productId);
+  if (!product) return [];
+  return product.currentPrices.map((price, index) => ({
+    ...price,
+    productId,
+    currency: 'SEK',
+    priceType: 'shelf',
+    confidence: index === 0 ? 'high' : 'medium',
+    observedAt: '2026-05-19T09:00:00Z',
+    sourceType: 'demo_seed',
+    provenance: `demo://prices/${productId}/${price.storeId}`
+  }));
+}
+
+export function allProducts(query = '') {
+  const products = query ? groceryApi.searchProducts(query) : groceryApi.searchProducts('');
+  return products.map((product) => ({
+    ...product,
+    currentPrices: productPrices(product.id),
+    demo: true
+  }));
+}
+
+export function allStores(): Array<Store & { demo: true }> {
+  return groceryApi.getStores().map((store) => ({ ...store, demo: true }));
+}
