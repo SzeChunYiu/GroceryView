@@ -2,6 +2,11 @@ import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 import type { PriceObservation } from '@groceryview/api-contracts';
 
+type PriceConfidence = PriceObservation['confidence'];
+type PriceProvenance = PriceObservation['provenance'];
+type PriceSourceType = PriceObservation['sourceType'];
+type PriceType = PriceObservation['priceType'];
+
 export class PriceObservationResponse implements PriceObservation {
   id!: string;
   productSlug!: string;
@@ -9,10 +14,11 @@ export class PriceObservationResponse implements PriceObservation {
   priceAmount!: number;
   currency!: 'SEK';
   unit!: string;
-  priceType!: 'regular' | 'promotion' | 'member';
+  priceType!: PriceType;
   observedAt!: string;
-  sourceType!: string;
-  confidenceScore!: number;
+  sourceType!: PriceSourceType;
+  confidence!: PriceConfidence;
+  provenance!: PriceProvenance;
   demo!: true;
 }
 
@@ -37,6 +43,8 @@ export class ProductPriceSeriesResponse {
 function demoPriceObservations(
   productSlug: string,
 ): PriceObservationResponse[] {
+  const observedAt = '2026-05-16T09:30:00.000Z';
+
   return [
     {
       id: `demo-price-${productSlug}-willys-odenplan`,
@@ -46,9 +54,19 @@ function demoPriceObservations(
       currency: 'SEK',
       unit: 'package',
       priceType: 'promotion',
-      observedAt: '2026-05-16T09:30:00.000Z',
+      observedAt,
       sourceType: 'retailer_page',
-      confidenceScore: 0.89,
+      confidence: {
+        score: 0.89,
+        label: 'high',
+      },
+      provenance: {
+        sourceUrl: 'https://example.test/willys/zoegas-skane-mellanrost-450g',
+        sourceType: 'retailer_page',
+        observedAt,
+        parserVersion: 'demo-parser-v1',
+        rawSnapshotRef: `demo://retailer/willys/${productSlug}/2026-05-16T09:30:00.000Z`,
+      },
       demo: true,
     },
     {
@@ -61,7 +79,17 @@ function demoPriceObservations(
       priceType: 'regular',
       observedAt: '2026-05-16T08:45:00.000Z',
       sourceType: 'retailer_page',
-      confidenceScore: 0.86,
+      confidence: {
+        score: 0.86,
+        label: 'high',
+      },
+      provenance: {
+        sourceUrl: 'https://example.test/ica/zoegas-skane-mellanrost-450g',
+        sourceType: 'retailer_page',
+        observedAt: '2026-05-16T08:45:00.000Z',
+        parserVersion: 'demo-parser-v1',
+        rawSnapshotRef: `demo://retailer/ica/${productSlug}/2026-05-16T08:45:00.000Z`,
+      },
       demo: true,
     },
   ];

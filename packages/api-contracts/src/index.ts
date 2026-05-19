@@ -37,7 +37,46 @@ export const StoreSummarySchema = z
   })
   .strict();
 
-export const PriceTypeSchema = z.enum(['regular', 'promotion', 'member']);
+export const PriceTypeSchema = z.enum([
+  'regular',
+  'promotion',
+  'member',
+  'online',
+  'in_store',
+  'flyer',
+  'receipt',
+  'shelf_photo',
+  'manual',
+  'estimated',
+]);
+
+export const SourceTypeSchema = z.enum([
+  'retailer_page',
+  'retailer_api',
+  'flyer',
+  'receipt',
+  'shelf_photo',
+  'manual_admin',
+  'open_data',
+  'estimated',
+]);
+
+export const PriceConfidenceSchema = z
+  .object({
+    score: z.number().min(0).max(1),
+    label: z.enum(['high', 'medium', 'low', 'unverified']),
+  })
+  .strict();
+
+export const PriceProvenanceSchema = z
+  .object({
+    sourceUrl: z.string().url().nullable(),
+    sourceType: SourceTypeSchema,
+    observedAt: IsoDateTimeSchema,
+    parserVersion: z.string().min(1),
+    rawSnapshotRef: z.string().min(1),
+  })
+  .strict();
 
 export const PriceObservationSchema = z
   .object({
@@ -49,11 +88,25 @@ export const PriceObservationSchema = z
     unit: z.string().min(1),
     priceType: PriceTypeSchema,
     observedAt: IsoDateTimeSchema,
-    sourceType: z.string().min(1),
-    confidenceScore: z.number().min(0).max(1),
+    sourceType: SourceTypeSchema,
+    confidence: PriceConfidenceSchema,
+    provenance: PriceProvenanceSchema,
     demo: ApiDemoFlagSchema,
   })
   .strict();
+
+export const LatestPriceSchema = PriceObservationSchema.extend({
+  validFrom: IsoDateTimeSchema,
+  validTo: IsoDateTimeSchema.nullable(),
+}).strict();
+
+export const PromotionObservationSchema = PriceObservationSchema.extend({
+  priceType: z.enum(['promotion', 'member', 'flyer']),
+  promotionLabel: z.string().min(1),
+  compareAtPriceAmount: z.number().nonnegative().nullable(),
+  startsAt: IsoDateTimeSchema.nullable(),
+  endsAt: IsoDateTimeSchema.nullable(),
+}).strict();
 
 export const DealScoreSchema = z
   .object({
@@ -122,7 +175,13 @@ export const AlertSchema = z
 
 export type ProductSummary = z.infer<typeof ProductSummarySchema>;
 export type StoreSummary = z.infer<typeof StoreSummarySchema>;
+export type PriceType = z.infer<typeof PriceTypeSchema>;
+export type SourceType = z.infer<typeof SourceTypeSchema>;
+export type PriceConfidence = z.infer<typeof PriceConfidenceSchema>;
+export type PriceProvenance = z.infer<typeof PriceProvenanceSchema>;
 export type PriceObservation = z.infer<typeof PriceObservationSchema>;
+export type LatestPrice = z.infer<typeof LatestPriceSchema>;
+export type PromotionObservation = z.infer<typeof PromotionObservationSchema>;
 export type DealScore = z.infer<typeof DealScoreSchema>;
 export type WatchlistItem = z.infer<typeof WatchlistItemSchema>;
 export type WeeklyBasketItem = z.infer<typeof WeeklyBasketItemSchema>;
