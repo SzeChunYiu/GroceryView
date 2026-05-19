@@ -10,7 +10,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 
 | Requirement / deliverable | Evidence | Status |
 | --- | --- | --- |
-| Iterative PR + merge workflow | PR #1 through PR #31 merged to `main` | Done for shipped iterations |
+| Iterative PR + merge workflow | PR #1 through PR #32 merged to `main` | Done for shipped iterations |
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
@@ -44,6 +44,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Human review queue planning | PR #29, `planHumanReviewQueue` | Core queue planning shipped |
 | Scanning pipeline foundation | PR #30, `packages/scanning` | Provider-neutral scan pipeline shipped |
 | Completion audit refresh | PR #31, `docs/status/completion-audit.md` | Audit reconciled after scanning |
+| Mobile Expo readiness | PR #32, `apps/mobile/app.config.json`, `apps/mobile/eas.json` | Device-build metadata shipped |
 
 ## Verification gates
 
@@ -69,7 +70,7 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 - Real Expo/React Native screens and device builds. Expo route/readiness config is being added; real React Native component screens and store builds still missing.
 - Real interactive web UI for login, account, household, privacy, basket, and scanner flows. Static page scaffolds are being added before full interactivity.
 - Push/email provider adapters and scheduled notification workers. Provider-neutral delivery interface is being added; real provider credentials/workers still missing.
-- AdMob/AdSense and subscription billing integration.
+- AdMob/AdSense and subscription billing integration. Provider-neutral monetization contracts are being added; real provider credentials/webhooks still missing.
 - Hosting provider selection, real deployment, secrets, DNS, observability, smoke tests, and rollback.
 - Full catalog/data coverage beyond seed products/stores.
 - Human review queue UI and operations for low-confidence product matching and community reports. Core queue planning is being added; moderation tooling still missing.

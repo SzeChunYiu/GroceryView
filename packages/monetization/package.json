@@ -1,0 +1,11 @@
+{
+  "name": "@groceryview/monetization",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "test": "tsc -p tsconfig.test.json && node --test dist-test/__tests__/*.test.js"
+  }
+}
