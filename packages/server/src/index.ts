@@ -216,3 +216,52 @@ export function createNodeServer(handler: HttpHandler = createHttpHandler()) {
     outgoing.end(Buffer.from(await response.arrayBuffer()));
   });
 }
+
+export type OpenApiOperation = {
+  summary: string;
+  security?: Array<{ bearerAuth: never[] }>;
+};
+
+export type OpenApiPathItem = Partial<Record<'get' | 'post' | 'patch' | 'delete', OpenApiOperation>>;
+
+export type OpenApiDocument = {
+  openapi: '3.1.0';
+  info: { title: string; version: string };
+  paths: Record<string, OpenApiPathItem>;
+  components: { securitySchemes: { bearerAuth: { type: 'http'; scheme: 'bearer' } } };
+};
+
+const protectedOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ bearerAuth: [] }] });
+const publicOperation = (summary: string): OpenApiOperation => ({ summary });
+
+export function buildOpenApiDocument(): OpenApiDocument {
+  return {
+    openapi: '3.1.0',
+    info: { title: 'GroceryView API', version: '0.1.0' },
+    components: { securitySchemes: { bearerAuth: { type: 'http', scheme: 'bearer' } } },
+    paths: {
+      '/api/market/overview': { get: publicOperation('Get Stockholm grocery market overview.') },
+      '/api/stores': { get: publicOperation('List stores.') },
+      '/api/stores/{id}': { get: publicOperation('Get store profile.') },
+      '/api/products/search': { get: publicOperation('Search products.') },
+      '/api/products/{id}': { get: publicOperation('Get product detail.') },
+      '/api/products/{id}/prices': { get: publicOperation('Get product prices by store.') },
+      '/api/products/{id}/history': { get: publicOperation('Get product price history.') },
+      '/api/users/{userId}/favorite-stores': {
+        get: protectedOperation('List favorite stores.'),
+        post: protectedOperation('Add favorite store.')
+      },
+      '/api/watchlist': {
+        get: protectedOperation('Get watchlist and alerts.'),
+        post: protectedOperation('Add watchlist item.')
+      },
+      '/api/basket/current': { get: protectedOperation('Get current weekly basket.') },
+      '/api/basket/items': { post: protectedOperation('Add basket item.') },
+      '/api/basket/compare': { post: protectedOperation('Compare basket strategies.') },
+      '/api/budget': { patch: protectedOperation('Update budget.') },
+      '/api/budget/summary': { get: protectedOperation('Get budget summary.') },
+      '/api/indices': { get: publicOperation('List grocery indices.') },
+      '/api/indices/{id}': { get: publicOperation('Get grocery index detail.') }
+    }
+  };
+}
