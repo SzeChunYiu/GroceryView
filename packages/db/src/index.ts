@@ -82,8 +82,37 @@ export type NotificationTaskRecord = {
   recipient: string;
   attemptCount: number;
   maxAttempts: number;
-  status: 'queued' | 'delivered' | 'dead_lettered';
+  status: 'queued' | 'delivered' | 'dead_lettered' | 'suppressed';
 };
+
+export type NotificationTaskAcknowledgement =
+  | {
+      taskId: string;
+      status: 'delivered';
+      providerMessageId: string;
+    }
+  | {
+      taskId: string;
+      status: 'not_due';
+    }
+  | {
+      taskId: string;
+      status: 'retry_scheduled';
+      attemptCount: number;
+      nextAttemptAt: string;
+      reason: string;
+    }
+  | {
+      taskId: string;
+      status: 'dead_lettered';
+      attemptCount: number;
+      reason: string;
+    }
+  | {
+      taskId: string;
+      status: 'suppressed';
+      reason: 'unsubscribed' | 'bounce' | 'complaint';
+    };
 
 export type NotificationSuppressionRecord = {
   id: string;
@@ -128,6 +157,45 @@ export type GroceryViewRepository = {
   saveHumanReviewAssignment(assignment: HumanReviewAssignmentRecord): Promise<void>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignmentRecord[]>;
 };
+
+export function applyNotificationTaskAcknowledgements(input: {
+  tasks: NotificationTaskRecord[];
+  acknowledgements: NotificationTaskAcknowledgement[];
+}): NotificationTaskRecord[] {
+  const tasksById = new Map(input.tasks.map((task) => [task.id, task]));
+  const updates: NotificationTaskRecord[] = [];
+
+  for (const acknowledgement of input.acknowledgements) {
+    const task = tasksById.get(acknowledgement.taskId);
+    if (!task) throw new Error(`Unknown notification task acknowledgement: ${acknowledgement.taskId}`);
+
+    if (acknowledgement.status === 'not_due') continue;
+
+    if (acknowledgement.status === 'delivered') {
+      updates.push({ ...task, status: 'delivered' });
+      continue;
+    }
+
+    if (acknowledgement.status === 'retry_scheduled') {
+      updates.push({
+        ...task,
+        status: 'queued',
+        attemptCount: acknowledgement.attemptCount,
+        sendAt: acknowledgement.nextAttemptAt
+      });
+      continue;
+    }
+
+    if (acknowledgement.status === 'dead_lettered') {
+      updates.push({ ...task, status: 'dead_lettered', attemptCount: acknowledgement.attemptCount });
+      continue;
+    }
+
+    updates.push({ ...task, status: 'suppressed' });
+  }
+
+  return updates;
+}
 
 function requireUser(users: Map<string, UserRecord>, userId: string): void {
   if (!users.has(userId)) throw new Error(`User not found: ${userId}`);

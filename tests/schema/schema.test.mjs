@@ -69,4 +69,8 @@ describe('db/schema.sql', () => {
       assert.match(schema, new RegExp(`\\b${column}\\b`), `${column} column missing`);
     }
   });
+
+  it('allows suppressed notification task state for terminal unsubscribe handling', () => {
+    assert.match(schema, /status in \('queued', 'delivered', 'dead_lettered', 'suppressed'\)/);
+  });
 });
