@@ -1,0 +1,87 @@
+export type GateStatus = 'pass' | 'fail' | 'not_run';
+
+export type DeploymentReadinessInput = {
+  providerSelected: boolean;
+  requiredSecretsPresent: string[];
+  requiredSecrets: string[];
+  dnsConfigured: boolean;
+  healthChecks: Array<{ name: string; status: GateStatus }>;
+  smokeTests: Array<{ name: string; status: GateStatus }>;
+  observabilityConfigured: boolean;
+};
+
+export type DeploymentReadinessReport = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  warnings: string[];
+  summary: string;
+};
+
+export function buildDeploymentReadinessReport(input: DeploymentReadinessInput): DeploymentReadinessReport {
+  const blockers: string[] = [];
+  const warnings: string[] = [];
+  const present = new Set(input.requiredSecretsPresent);
+
+  if (!input.providerSelected) blockers.push('hosting_provider_not_selected');
+  for (const secret of input.requiredSecrets) {
+    if (!present.has(secret)) blockers.push(`missing_secret:${secret}`);
+  }
+  if (!input.dnsConfigured) blockers.push('dns_not_configured');
+
+  for (const check of input.healthChecks) {
+    if (check.status === 'fail') blockers.push(`health_check_failed:${check.name}`);
+    if (check.status === 'not_run') blockers.push(`health_check_not_run:${check.name}`);
+  }
+
+  for (const smoke of input.smokeTests) {
+    if (smoke.status === 'fail') blockers.push(`smoke_test_failed:${smoke.name}`);
+    if (smoke.status === 'not_run') blockers.push(`smoke_test_not_run:${smoke.name}`);
+  }
+
+  if (!input.observabilityConfigured) blockers.push('observability_not_configured');
+  if (input.healthChecks.length === 0) warnings.push('no_health_checks_defined');
+  if (input.smokeTests.length === 0) warnings.push('no_smoke_tests_defined');
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    warnings,
+    summary: blockers.length === 0 ? 'Deployment readiness gates passed.' : 'Deployment is blocked until required gates pass.'
+  };
+}
+
+export type RollbackPlanInput = {
+  currentRelease: string;
+  previousRelease: string;
+  databaseMigration?: string;
+  reversibleMigration: boolean;
+};
+
+export type RollbackPlan = {
+  currentRelease: string;
+  targetRelease: string;
+  steps: string[];
+  requiresManualDatabaseRecovery: boolean;
+};
+
+export function buildRollbackPlan(input: RollbackPlanInput): RollbackPlan {
+  const steps = [`Disable new traffic to release ${input.currentRelease}.`, `Restore application artifact ${input.previousRelease}.`];
+  let requiresManualDatabaseRecovery = false;
+
+  if (input.databaseMigration) {
+    if (input.reversibleMigration) {
+      steps.push(`Run down migration for ${input.databaseMigration}.`);
+    } else {
+      requiresManualDatabaseRecovery = true;
+      steps.push(`Do not auto-revert irreversible migration ${input.databaseMigration}; run manual database recovery playbook.`);
+    }
+  }
+
+  steps.push('Run smoke tests before re-enabling traffic.');
+  return {
+    currentRelease: input.currentRelease,
+    targetRelease: input.previousRelease,
+    steps,
+    requiresManualDatabaseRecovery
+  };
+}
