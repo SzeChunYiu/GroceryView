@@ -579,6 +579,16 @@ export type HumanReviewAssignmentPlan = {
   unassigned: Array<{ reviewId: string; reason: HumanReviewUnassignedReason }>;
 };
 
+export type HumanReviewSlaSummary = {
+  status: 'healthy' | 'attention' | 'breached';
+  openAssignments: number;
+  overdueAssignments: number;
+  dueSoonAssignments: number;
+  openByPriority: Record<HumanReviewQueueItem['priority'], number>;
+  breachedReviewIds: string[];
+  dueSoonReviewIds: string[];
+};
+
 export function planHumanReviewQueue(input: {
   productMatches: ProductMatchReviewCandidate[];
   communityReports: CommunityReportReviewCandidate[];
@@ -672,6 +682,47 @@ export function planHumanReviewAssignments(input: {
   }
 
   return { assignments, unassigned };
+}
+
+export function summarizeHumanReviewSla(input: {
+  assignments: HumanReviewAssignment[];
+  now: string;
+  dueSoonHours?: number;
+}): HumanReviewSlaSummary {
+  if (Number.isNaN(Date.parse(input.now))) throw new Error('now must be an ISO date.');
+
+  const nowMs = Date.parse(input.now);
+  const dueSoonMs = (input.dueSoonHours ?? 2) * 60 * 60 * 1000;
+  const openByPriority: HumanReviewSlaSummary['openByPriority'] = { high: 0, medium: 0, low: 0 };
+  const breachedReviewIds: string[] = [];
+  const dueSoonReviewIds: string[] = [];
+
+  for (const assignment of input.assignments) {
+    if (assignment.status === 'completed') continue;
+    openByPriority[assignment.priority] += 1;
+
+    const dueAtMs = Date.parse(assignment.dueAt);
+    if (Number.isNaN(dueAtMs)) throw new Error(`dueAt must be an ISO date for ${assignment.reviewId}.`);
+    if (dueAtMs < nowMs) {
+      breachedReviewIds.push(assignment.reviewId);
+      continue;
+    }
+    if (dueAtMs - nowMs <= dueSoonMs) dueSoonReviewIds.push(assignment.reviewId);
+  }
+
+  const openAssignments = openByPriority.high + openByPriority.medium + openByPriority.low;
+  const overdueAssignments = breachedReviewIds.length;
+  const dueSoonAssignments = dueSoonReviewIds.length;
+
+  return {
+    status: overdueAssignments > 0 ? 'breached' : dueSoonAssignments > 0 ? 'attention' : 'healthy',
+    openAssignments,
+    overdueAssignments,
+    dueSoonAssignments,
+    openByPriority,
+    breachedReviewIds,
+    dueSoonReviewIds
+  };
 }
 
 function writebackFor(item: HumanReviewQueueItem, decision: HumanReviewDecision): HumanReviewWriteback {
