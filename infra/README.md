@@ -18,6 +18,8 @@ infra/scripts/smoke-local-services.sh
 
 The script starts the core services, waits for healthy Postgres, Redis, and MinIO containers, verifies `pg_isready`, verifies `redis-cli ping`, and checks that the configured MinIO bucket exists.
 
+GitHub Actions also runs this smoke check in `Local infrastructure smoke` for pull requests that change local infrastructure files.
+
 ## Optional pgAdmin
 
 ```bash

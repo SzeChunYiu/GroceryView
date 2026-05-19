@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 const compose = readFileSync(new URL('../../../../infra/docker-compose.yml', import.meta.url), 'utf8');
 const envExample = readFileSync(new URL('../../../../.env.example', import.meta.url), 'utf8');
 const smokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-local-services.sh', import.meta.url), 'utf8');
+const smokeWorkflow = readFileSync(new URL('../../../../.github/workflows/local-infra-smoke.yml', import.meta.url), 'utf8');
 
 describe('local infrastructure compose', () => {
   it('defines the required development backing services and ports', () => {
@@ -34,5 +35,12 @@ describe('local infrastructure compose', () => {
     assert.match(smokeScript, /pg_isready -U "\$POSTGRES_USER" -d "\$POSTGRES_DB"/);
     assert.match(smokeScript, /redis-cli ping/);
     assert.match(smokeScript, /mc ls "local\/\$S3_BUCKET"/);
+  });
+
+  it('runs the local services smoke check in CI for infra changes', () => {
+    assert.match(smokeWorkflow, /name: Local infrastructure smoke/);
+    assert.match(smokeWorkflow, /pull_request:/);
+    assert.match(smokeWorkflow, /infra\/scripts\/smoke-local-services\.sh/);
+    assert.match(smokeWorkflow, /docker compose -f infra\/docker-compose\.yml down -v --remove-orphans/);
   });
 });
