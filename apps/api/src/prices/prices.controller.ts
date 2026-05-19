@@ -1,7 +1,8 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import type { PriceObservation } from '@groceryview/api-contracts';
 
-export class PriceObservationResponse {
+export class PriceObservationResponse implements PriceObservation {
   id!: string;
   productSlug!: string;
   storeSlug!: string;

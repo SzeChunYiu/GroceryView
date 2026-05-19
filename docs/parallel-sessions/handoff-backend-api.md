@@ -719,3 +719,50 @@ Manager: PANE 1 / MANAGER-backend-api
 ### Completion audit snapshot
 - Objective requirements checked: required docs read, task checklist inspected, top remaining task identified, panes 2-5 queue recorded, PR #72 blocker verified, no backend product-code implementation by PANE 1.
 - Missing/incomplete: checklist item 10 remains absent from current main and no clean mergeable worker PR is available. Goal remains active.
+
+---
+
+## Worker update — 2026-05-17 06:36 Europe/Stockholm
+Pane: PANE 4 / WORKER-C
+Branch: `backend-api/worker-c-contract-wiring-20260517`
+
+### Intake performed
+- Read `docs/parallel-sessions/shared.md` and `docs/parallel-sessions/backend-api.md` as requested.
+- Also checked the backend lane supporting docs (`docs/tech-stack.md` API/NestJS sections and `docs/architecture.md`) before editing.
+- Started from current `origin/main` (`ab6dfb5`) after rebasing the worker branch in an isolated worktree to avoid the dirty shared data-worker worktree.
+- Rechecked `codex-tasks/backend-api-tasks.md`; the file still marks items unchecked, but artifact audit showed scaffold/domain/contracts/database/verifier work is already merged and the remaining useful unchecked backend delta is item 10 contract wiring.
+
+### Task taken
+- Implemented the remaining contract-wiring slice for checklist item 10 without adding any database dependency.
+- This supersedes the conflicting PR #72 delta from a fresh current-main branch while preserving other lanes.
+
+### What changed
+- Added `@groceryview/api-contracts` as a workspace dependency of `apps/api`.
+- Updated `apps/api` build script to build the contracts package before `nest build`, so `pnpm --filter api build` works from a clean checkout.
+- Wired API placeholder response classes to the shared contract types with type-only imports:
+  - `ProductSummaryResponse implements ProductSummary`
+  - `StoreSummaryResponse implements StoreSummary`
+  - `PriceObservationResponse implements PriceObservation`
+  - `WatchlistItemResponse implements WatchlistItem`
+  - `WeeklyBasketItemResponse implements WeeklyBasketItem`
+  - `WeeklyBasketResponse implements WeeklyBasket`
+  - `AlertResponse implements Alert`
+- Kept all placeholder data explicitly marked with `demo: true` and did not add DB reads.
+
+### Verification
+Commands run with Node `v24.15.0`, `COREPACK_HOME=/tmp/scyiu-corepack`, pnpm `10.21.0`:
+- `corepack pnpm@10.21.0 install --frozen-lockfile` — passed.
+- `corepack pnpm@10.21.0 --filter api verify:required-packages` — passed (`All required API packages are declared.`).
+- `corepack pnpm@10.21.0 --filter @groceryview/api-contracts build` — passed.
+- `corepack pnpm@10.21.0 --filter api build` — passed; this also rebuilt `@groceryview/api-contracts` via the API build script.
+- `corepack pnpm@10.21.0 --filter api test:e2e` — passed (`1` suite, `3` tests).
+- Runtime smoke with `PORT=3026 DATABASE_ENABLED=false node apps/api/dist/main.js`:
+  - `GET http://127.0.0.1:3026/health` returned `{"status":"ok","service":"api"}`.
+  - `HEAD http://127.0.0.1:3026/docs` returned HTTP `200`.
+- Reverified after the final rebase/clone recovery with `PORT=3027 DATABASE_ENABLED=false node apps/api/dist/main.js`:
+  - `GET http://127.0.0.1:3027/health` returned `{"status":"ok","service":"api"}`.
+  - `HEAD http://127.0.0.1:3027/docs` returned HTTP `200`.
+
+### Next / blockers
+- Open a PR from `backend-api/worker-c-contract-wiring-20260517` to `main` after commit/push.
+- Older backend contract-wiring PRs (#51, #56, #72) should remain superseded/blocked because they are dirty/conflicting against current main.
