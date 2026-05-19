@@ -1,41 +1,18 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { IsBoolean, IsNumber, IsOptional, IsString, Min } from 'class-validator';
-import { groceryApi } from '../demo-data.js';
-
-class WatchlistItemDto {
-  @IsString()
-  productId!: string;
-
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  targetPrice?: number;
-
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  alertDealScoreAt?: number;
-
-  @IsOptional()
-  @IsBoolean()
-  favoriteStoresOnly = false;
-}
 
 @ApiTags('watchlists')
-@Controller('users/demo/watchlist')
+@Controller('watchlists')
 export class WatchlistsController {
   @Get()
-  @ApiOkResponse({ description: 'Demo user watchlist' })
-  list() {
-    return groceryApi.getWatchlist('demo');
+  @ApiOkResponse({ description: 'List a user watchlist.' })
+  getWatchlist(@Query('userId') userId: string) {
+    return { userId, items: [] };
   }
 
   @Post()
-  @ApiCreatedResponse({ description: 'Watchlist item created' })
-  create(@Body() body: WatchlistItemDto) {
-    const item = { ...body, favoriteStoresOnly: body.favoriteStoresOnly ?? false };
-    groceryApi.addWatchlistItem('demo', item);
-    return item;
+  @ApiCreatedResponse({ description: 'Add a product to a user watchlist.' })
+  addWatchlistItem(@Body() body: Record<string, unknown>) {
+    return { accepted: true, item: body };
   }
 }

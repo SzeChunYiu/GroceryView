@@ -8,6 +8,8 @@
     "emitDecoratorMetadata": true,
     "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "baseUrl": ".",

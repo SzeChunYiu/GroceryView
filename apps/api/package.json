@@ -1,14 +1,15 @@
 {
-  "name": "@groceryview/api-app",
+  "name": "@groceryview/api-service",
   "version": "0.1.0",
-  "type": "module",
+  "private": true,
+  "type": "commonjs",
   "main": "dist/main.js",
+  "types": "dist/main.d.ts",
   "scripts": {
-    "build": "npm run build -w @groceryview/core && npm run build -w @groceryview/api && tsc -p tsconfig.build.json",
-    "test": "npm run build && tsc -p tsconfig.test.json && node --test dist-test/test/*.js"
+    "build": "tsc -p tsconfig.build.json",
+    "test": "tsc -p tsconfig.test.json && node --test dist-test/test/*.test.js"
   },
   "dependencies": {
-    "@groceryview/api": "0.1.0",
     "@nestjs/common": "^11.1.9",
     "@nestjs/config": "^4.0.2",
     "@nestjs/core": "^11.1.9",
