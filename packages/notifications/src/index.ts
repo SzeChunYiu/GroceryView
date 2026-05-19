@@ -196,6 +196,12 @@ export type NotificationMetricsOptions = {
   service: string;
 };
 
+export type NotificationOperationsAlertInput = {
+  now: string;
+  report: NotificationOperationsReport;
+  recipients: HumanReviewSlaAlertRecipient[];
+};
+
 function buildMessage(notification: DeliveryNotification): DeliveryMessage {
   return {
     recipient: notification.recipient,
@@ -496,4 +502,30 @@ export function formatNotificationOperationsMetrics(
     '# TYPE groceryview_notification_operations_blocked gauge',
     `groceryview_notification_operations_blocked{${label}} ${report.status === 'blocked' ? 1 : 0}`
   ].join('\n');
+}
+
+function notificationOperationsAlertBody(report: NotificationOperationsReport): string {
+  const parts = [
+    `Blockers: ${report.blockers.join(', ') || 'none'}.`,
+    `Warnings: ${report.warnings.join(', ') || 'none'}.`,
+    `Metrics: delivered=${report.metrics.delivered}, retryScheduled=${report.metrics.retryScheduled}, deadLettered=${report.metrics.deadLettered}, suppressed=${report.metrics.suppressed}, providerFailures=${report.metrics.providerFailures}, staleDueTasks=${report.metrics.staleDueTasks}.`
+  ];
+  if (report.staleTaskIds.length > 0) parts.push(`Stale task ids: ${report.staleTaskIds.join(', ')}.`);
+  return parts.join(' ');
+}
+
+export function planNotificationOperationsAlerts(input: NotificationOperationsAlertInput): DeliveryNotification[] {
+  if (Number.isNaN(Date.parse(input.now))) throw new Error('now must be an ISO date.');
+  if (input.report.status === 'healthy') return [];
+
+  const body = notificationOperationsAlertBody(input.report);
+  return input.recipients.map((recipient) => ({
+    channel: recipient.channel,
+    type: 'notification_operations_blocked',
+    title: 'Notification operations blocked',
+    body,
+    priority: 'high',
+    sendAt: input.now,
+    recipient: recipient.recipient
+  }));
 }
