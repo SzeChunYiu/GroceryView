@@ -19,6 +19,27 @@ export type NotificationSuppression = {
   active: boolean;
 };
 
+export type NotificationSuppressionEventType = 'unsubscribe' | 'bounce' | 'complaint' | 'resubscribe';
+
+export type NotificationSuppressionEvent = {
+  provider: string;
+  providerEventId: string;
+  eventType: NotificationSuppressionEventType;
+  recipient: string;
+  channel?: DeliveryChannel;
+  occurredAt: string;
+};
+
+export type NotificationSuppressionMutation = NotificationSuppression & {
+  id: string;
+  updatedAt: string;
+  source: {
+    provider: string;
+    providerEventId: string;
+    eventType: NotificationSuppressionEventType;
+  };
+};
+
 export type NotificationSuppressionResult = {
   sendable: DeliveryNotification[];
   suppressed: Array<{
@@ -231,6 +252,30 @@ export function applyNotificationSuppressions(input: {
   }
 
   return { sendable, suppressed };
+}
+
+function suppressionReasonForEvent(eventType: NotificationSuppressionEventType): NotificationSuppressionReason {
+  if (eventType === 'unsubscribe' || eventType === 'resubscribe') return 'unsubscribed';
+  if (eventType === 'bounce') return 'bounce';
+  return 'complaint';
+}
+
+export function processNotificationSuppressionEvent(event: NotificationSuppressionEvent): NotificationSuppressionMutation {
+  if (Number.isNaN(Date.parse(event.occurredAt))) throw new Error('occurredAt must be an ISO date.');
+
+  return {
+    id: `suppression-${event.provider}-${event.providerEventId}`,
+    recipient: event.recipient,
+    ...(event.channel ? { channel: event.channel } : {}),
+    reason: suppressionReasonForEvent(event.eventType),
+    active: event.eventType !== 'resubscribe',
+    updatedAt: event.occurredAt,
+    source: {
+      provider: event.provider,
+      providerEventId: event.providerEventId,
+      eventType: event.eventType
+    }
+  };
 }
 
 export async function deliverDueNotifications(input: DeliverDueNotificationsInput): Promise<DeliveryResult[]> {
