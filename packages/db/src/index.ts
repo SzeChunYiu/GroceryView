@@ -698,3 +698,59 @@ export function createPgQueryExecutor(client: PgLikeClient): QueryExecutor {
     }
   };
 }
+
+export type PostgresIntegrationProbe = {
+  requiredTables: string[];
+  existingTables: string[];
+  requiredMigrationVersions: string[];
+  appliedMigrationVersions: string[];
+  repositoryChecks: Array<{
+    name: string;
+    status: 'pass' | 'fail' | 'not_run';
+  }>;
+};
+
+export type PostgresIntegrationReadinessReport = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  evidence: string[];
+  summary: string;
+};
+
+export function buildPostgresIntegrationReadinessReport(input: PostgresIntegrationProbe): PostgresIntegrationReadinessReport {
+  const existingTables = new Set(input.existingTables);
+  const appliedMigrations = new Set(input.appliedMigrationVersions);
+  const blockers: string[] = [];
+  const evidence: string[] = [];
+
+  for (const table of [...new Set(input.requiredTables)].sort()) {
+    if (existingTables.has(table)) {
+      evidence.push(`table:${table}`);
+    } else {
+      blockers.push(`missing_table:${table}`);
+    }
+  }
+
+  for (const version of [...new Set(input.requiredMigrationVersions)].sort()) {
+    if (appliedMigrations.has(version)) {
+      evidence.push(`migration:${version}`);
+    } else {
+      blockers.push(`missing_migration:${version}`);
+    }
+  }
+
+  for (const check of [...input.repositoryChecks].sort((a, b) => a.name.localeCompare(b.name))) {
+    if (check.status === 'pass') {
+      evidence.push(`repository_check:${check.name}`);
+    } else {
+      blockers.push(`repository_check_${check.status}:${check.name}`);
+    }
+  }
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    evidence,
+    summary: blockers.length === 0 ? 'PostgreSQL integration contract is ready.' : 'PostgreSQL integration contract is blocked.'
+  };
+}
