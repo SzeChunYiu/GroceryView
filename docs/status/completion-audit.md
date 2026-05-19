@@ -54,7 +54,7 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 
 ## Remaining blocking gaps
 
-- Real PostgreSQL connection wiring and integration tests against a live database. A parameterized repository adapter skeleton exists.
+- PostgreSQL query-executor wiring and repository adapter skeleton exist; live database integration tests still missing.
 - Real retailer/API/crawler connectors and legal/robots review.
 - Real OCR/camera/upload pipeline for barcode and receipt scanning.
 - Real Expo/React Native screens and device builds.
