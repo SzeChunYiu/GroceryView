@@ -219,3 +219,16 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
     }
   };
 }
+
+export type PgLikeClient = {
+  query(text: string, values: unknown[]): Promise<{ rows: unknown[] }>;
+};
+
+export function createPgQueryExecutor(client: PgLikeClient): QueryExecutor {
+  return {
+    async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
+      const result = await client.query(sql, params);
+      return result.rows as T[];
+    }
+  };
+}
