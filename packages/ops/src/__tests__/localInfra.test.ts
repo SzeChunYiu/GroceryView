@@ -1,0 +1,29 @@
+import { readFileSync } from 'node:fs';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+
+const compose = readFileSync(new URL('../../../../infra/docker-compose.yml', import.meta.url), 'utf8');
+const envExample = readFileSync(new URL('../../../../.env.example', import.meta.url), 'utf8');
+
+describe('local infrastructure compose', () => {
+  it('defines the required development backing services and ports', () => {
+    assert.match(compose, /postgres:\n\s+image: postgis\/postgis:18-3\.6/);
+    assert.match(compose, /redis:\n\s+image: redis:7-alpine/);
+    assert.match(compose, /pgadmin:\n\s+image: dpage\/pgadmin4:latest/);
+    assert.match(compose, /object-storage:\n\s+image: minio\/minio:latest/);
+    assert.match(compose, /object-storage-init:\n\s+image: minio\/mc:latest/);
+    assert.match(compose, /"5432:5432"/);
+    assert.match(compose, /"6379:6379"/);
+    assert.match(compose, /"5050:80"/);
+    assert.match(compose, /"9000:9000"/);
+    assert.match(compose, /http:\/\/localhost:9000\/minio\/health\/live/);
+  });
+
+  it('documents connection URLs and S3-compatible object storage settings', () => {
+    assert.match(envExample, /^DATABASE_URL=postgresql:\/\/groceryview:groceryview@localhost:5432\/groceryview$/m);
+    assert.match(envExample, /^REDIS_URL=redis:\/\/localhost:6379$/m);
+    assert.match(envExample, /^S3_ENDPOINT=http:\/\/localhost:9000$/m);
+    assert.match(envExample, /^S3_BUCKET=groceryview-raw$/m);
+    assert.match(envExample, /^S3_ACCESS_KEY_ID=groceryview$/m);
+  });
+});
