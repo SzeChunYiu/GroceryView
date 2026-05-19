@@ -51,6 +51,49 @@ describe('deployment ops foundation', () => {
     ]);
   });
 
+  it('gates production readiness on scheduled background workers', () => {
+    const report = buildDeploymentReadinessReport({
+      providerSelected: true,
+      requiredSecretsPresent: ['DATABASE_URL', 'SESSION_SECRET', 'PUBLIC_APP_URL'],
+      requiredSecrets: ['DATABASE_URL', 'SESSION_SECRET', 'PUBLIC_APP_URL'],
+      dnsConfigured: true,
+      healthChecks: [{ name: 'api', status: 'pass' }],
+      smokeTests: [{ name: 'health-endpoint', status: 'pass' }],
+      scheduledJobs: [
+        { name: 'notification-worker', scheduleConfigured: false, status: 'not_run' },
+        { name: 'catalog-backfill', scheduleConfigured: true, status: 'fail' }
+      ],
+      observabilityConfigured: true
+    });
+
+    assert.deepEqual(report.status, 'blocked');
+    assert.deepEqual(report.blockers, [
+      'scheduled_job_schedule_not_configured:notification-worker',
+      'scheduled_job_not_run:notification-worker',
+      'scheduled_job_failed:catalog-backfill'
+    ]);
+  });
+
+  it('accepts ready scheduled background workers as deployment evidence', () => {
+    const report = buildDeploymentReadinessReport({
+      providerSelected: true,
+      requiredSecretsPresent: ['DATABASE_URL', 'SESSION_SECRET', 'PUBLIC_APP_URL'],
+      requiredSecrets: ['DATABASE_URL', 'SESSION_SECRET', 'PUBLIC_APP_URL'],
+      dnsConfigured: true,
+      healthChecks: [{ name: 'api', status: 'pass' }],
+      smokeTests: [{ name: 'health-endpoint', status: 'pass' }],
+      scheduledJobs: [{ name: 'notification-worker', scheduleConfigured: true, status: 'pass' }],
+      observabilityConfigured: true
+    });
+
+    assert.deepEqual(report, {
+      status: 'ready',
+      blockers: [],
+      warnings: [],
+      summary: 'Deployment readiness gates passed.'
+    });
+  });
+
   it('builds rollback instructions pinned to previous artifact and database state', () => {
     const plan = buildRollbackPlan({
       currentRelease: '2026-05-19.3',

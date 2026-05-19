@@ -10,13 +10,14 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 
 | Requirement / deliverable | Evidence | Status |
 | --- | --- | --- |
-| Iterative PR + merge workflow | PR #1 through PR #36, PR #88 through PR #110, PR #119, PR #120, PR #123, and PR #127 merged to `main` after this iteration | Done for shipped iterations |
+| Iterative PR + merge workflow | PR #1 through PR #36, PR #88 through PR #111, PR #119, PR #120, PR #123, PR #127, and PR #134 merged to `main` after this iteration | Done for shipped iterations |
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
 | Watchlist, alerts, budget summaries | PR #2, PR #11 | Foundation shipped |
 | API foundation | PR #3, `packages/api` | Foundation shipped |
 | SQL data schema | PR #4, `db/schema.sql` | Foundation shipped |
+| PostgreSQL provenance schema | PR #111, `infra/db/SCHEMA.md`, `infra/db/migrations/001_groceryview_schema.sql` | Shipped after merge |
 | HTTP server | PR #5, `packages/server` | Foundation shipped |
 | SEO pages | PR #6, `apps/web/scripts/pages.mjs` | Foundation shipped |
 | Persistence/migrations | PR #7, `packages/db`, `db/migrations` | Contract/in-memory shipped |
@@ -71,6 +72,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Monetization foundation | PR #33, `packages/monetization` | Provider-neutral ad/billing contracts shipped |
 | Retailer compliance gate | PR #34, `planRetailerSourceAccess` | Source-access gate shipped |
 | Deployment ops foundation | PR #35, `packages/ops` | Readiness/rollback gates shipped |
+| Scheduled background worker deployment gates | PR #134, `buildDeploymentReadinessReport` scheduled job checks | Shipped after merge |
 | Catalog coverage reporting | PR #36, `packages/catalog` | Coverage/backfill accounting shipped |
 | Release validation workflow repair | PR #88, `.github/workflows/release-validation.yml`, `tests/schema/release-workflow.test.mjs` | Shipped |
 | Main branch ruleset application | PR #89, GitHub ruleset #16607866, `.github/repository-ruleset.json` | Applied in GitHub |
@@ -98,8 +100,8 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 - Real OCR/camera/upload pipeline for barcode and receipt scanning. Provider-neutral scan pipeline exists; real camera/OCR providers still missing.
 - Real Expo/React Native screens and device builds. Expo route/readiness config is being added; real React Native component screens and store builds still missing.
 - Real interactive web UI for login, account, household, privacy, basket, and scanner flows. Static page scaffolds are being added before full interactivity.
-- Push/email provider adapters and production notification workers. Provider-neutral delivery, worker tick orchestration, persisted task schedules, acknowledgement application, suppression filtering, persisted suppression records, suppression event normalization, a signed suppression webhook route, worker-level suppression enforcement, delivery health reporting, Prometheus-style metric export, a token-protected metrics endpoint, blocked-report alert planning, and repository-backed worker cycle orchestration exist; real provider credentials, deployed worker/cron runtime, provider-specific signature adapters, production metrics scraping, and live alert delivery still missing.
+- Push/email provider adapters and production notification workers. Provider-neutral delivery, worker tick orchestration, persisted task schedules, acknowledgement application, suppression filtering, persisted suppression records, suppression event normalization, a signed suppression webhook route, worker-level suppression enforcement, delivery health reporting, Prometheus-style metric export, a token-protected metrics endpoint, blocked-report alert planning, and repository-backed worker cycle orchestration exist; real provider credentials, configured worker/cron runtime, provider-specific signature adapters, production metrics scraping, and live alert delivery still missing.
 - AdMob/AdSense and subscription billing integration. Provider-neutral monetization contracts are being added; real provider credentials/webhooks still missing.
-- Hosting provider selection, real deployment, secrets, DNS, observability, smoke tests, and rollback. Deployment readiness/rollback gates are being added; real provider deployment still missing.
+- Hosting provider selection, real deployment, secrets, DNS, observability, smoke tests, and rollback. Deployment readiness/rollback gates and scheduled-worker checks are being added; real provider deployment, configured cron runtime, and live smoke proof still missing.
 - Full catalog/data coverage beyond seed products/stores. Catalog coverage reporting exists; real retailer/feed backfill data still missing.
 - Human review queue UI and operations for low-confidence product matching and community reports. Core queue planning, auditable decision writeback primitives, reviewer assignment/SLA planning, SLA summary primitives, community reporter abuse-control planning, assignment persistence, reviewer permission checks, persisted reviewer roles, reporter trust-state persistence, provider-neutral SLA alert planning, and persisted notification task schedules exist; admin UI enforcement, real provider credentials, session-to-reviewer mapping, account enforcement, and live PostgreSQL proof still missing.
