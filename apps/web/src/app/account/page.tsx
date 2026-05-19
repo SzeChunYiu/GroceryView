@@ -8,14 +8,6 @@ const alertRules = [
   { label: "Receipt needs review", channel: "Push", threshold: "Low confidence", status: "Paused" },
 ];
 
-const subscriptionAccess = {
-  tier: "Premium",
-  summary: "Premium access is active.",
-  source: "/api/account/subscription-access",
-  action: "Manage subscription",
-  details: ["Ads removed", "Checkout prompts hidden", "Billing portal ready"],
-};
-
 export default function AccountPage() {
   const watchTotal = basketItems.slice(0, 3).reduce((sum, item) => sum + item.currentPrice, 0);
 
@@ -33,30 +25,6 @@ export default function AccountPage() {
           <Metric icon={Bell} label="Rules" value={String(alertRules.length)} />
           <Metric icon={Smartphone} label="Push" value="2" />
           <Metric icon={Mail} label="Email" value="1" />
-        </div>
-      </section>
-
-      <section className="rounded-lg border border-emerald-200 bg-emerald-50 p-5 shadow-sm">
-        <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-wide text-emerald-700">Subscription access</p>
-            <h2 className="mt-2 text-2xl font-semibold tracking-tight text-emerald-950">{subscriptionAccess.summary}</h2>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-emerald-900">
-              Loaded from <code className="rounded bg-white/70 px-1 py-0.5 text-emerald-950">{subscriptionAccess.source}</code> so account UI can
-              enforce premium features without exposing provider billing identifiers.
-            </p>
-          </div>
-          <Link className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800" href="/account">
-            {subscriptionAccess.action}
-          </Link>
-        </div>
-        <div className="mt-5 grid gap-3 md:grid-cols-3">
-          {subscriptionAccess.details.map((detail) => (
-            <div className="rounded-lg bg-white/80 p-3 text-sm font-semibold text-emerald-950" key={detail}>
-              <CheckCircle2 className="mr-2 inline h-4 w-4 text-emerald-700" aria-hidden="true" />
-              {detail}
-            </div>
-          ))}
         </div>
       </section>
 
