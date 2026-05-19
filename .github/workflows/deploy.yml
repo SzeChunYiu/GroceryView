@@ -1,0 +1,32 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Verify and deploy from manifest
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+      - name: Build workspaces
+        run: npm run build
+      - name: Typecheck
+        run: npm run typecheck
+      - name: Validate deployment manifest
+        run: test -f deploy/groceryview.manifest.json && cat deploy/groceryview.manifest.json
+      - name: Deployment handoff
+        run: |
+          echo "Deployment manifest verified."
+          echo "Provider-specific deploy command intentionally not wired until hosting target is selected."
