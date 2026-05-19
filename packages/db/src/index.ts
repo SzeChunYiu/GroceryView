@@ -710,12 +710,58 @@ export type PostgresIntegrationProbe = {
   }>;
 };
 
+export type PostgresRepositoryProbe = {
+  name: string;
+  run(executor: QueryExecutor): Promise<void>;
+};
+
+export type CollectPostgresIntegrationProbeInput = {
+  executor: QueryExecutor;
+  requiredTables: string[];
+  requiredMigrationVersions: string[];
+  repositoryProbes: PostgresRepositoryProbe[];
+};
+
 export type PostgresIntegrationReadinessReport = {
   status: 'ready' | 'blocked';
   blockers: string[];
   evidence: string[];
   summary: string;
 };
+
+type TableNameRow = { table_name: string };
+type MigrationVersionRow = { version: string };
+
+export async function collectPostgresIntegrationProbe(input: CollectPostgresIntegrationProbeInput): Promise<PostgresIntegrationProbe> {
+  const [tableRows, migrationRows] = await Promise.all([
+    input.executor.query<TableNameRow>(
+      `select table_name
+       from information_schema.tables
+       where table_schema = 'public' and table_name = any($1::text[])
+       order by table_name`,
+      [input.requiredTables]
+    ),
+    input.executor.query<MigrationVersionRow>('select version from schema_migrations order by version')
+  ]);
+
+  const repositoryChecks: PostgresIntegrationProbe['repositoryChecks'] = [];
+  for (const probe of input.repositoryProbes) {
+    try {
+      await probe.run(input.executor);
+      repositoryChecks.push({ name: probe.name, status: 'pass' });
+    } catch {
+      repositoryChecks.push({ name: probe.name, status: 'fail' });
+    }
+  }
+
+  return {
+    requiredTables: input.requiredTables,
+    existingTables: tableRows.map((row) => row.table_name),
+    requiredMigrationVersions: input.requiredMigrationVersions,
+    appliedMigrationVersions: migrationRows.map((row) => row.version),
+    repositoryChecks
+  };
+}
 
 export function buildPostgresIntegrationReadinessReport(input: PostgresIntegrationProbe): PostgresIntegrationReadinessReport {
   const existingTables = new Set(input.existingTables);
