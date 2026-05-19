@@ -1,0 +1,11 @@
+{
+  "name": "@groceryview/data-pipeline",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Workspace placeholder for the GroceryView data pipeline worker.",
+  "scripts": {
+    "build": "node -e \"require('fs').mkdirSync('dist', { recursive: true })\"",
+    "lint": "node -e \"process.exit(0)\"",
+    "typecheck": "node -e \"process.exit(0)\""
+  }
+}
