@@ -58,6 +58,55 @@ export type DeliverDueNotificationsInput = {
   providers: NotificationProviders;
 };
 
+export type NotificationWorkerTask = {
+  id: string;
+  notification: DeliveryNotification;
+  attemptCount: number;
+  maxAttempts: number;
+};
+
+export type NotificationWorkerAcknowledgement =
+  | {
+      taskId: string;
+      status: 'delivered';
+      providerMessageId: string;
+    }
+  | {
+      taskId: string;
+      status: 'not_due';
+    }
+  | {
+      taskId: string;
+      status: 'retry_scheduled';
+      attemptCount: number;
+      nextAttemptAt: string;
+      reason: string;
+    }
+  | {
+      taskId: string;
+      status: 'dead_lettered';
+      attemptCount: number;
+      reason: string;
+    };
+
+export type NotificationWorkerTickInput = {
+  now: string;
+  tasks: NotificationWorkerTask[];
+  providers: NotificationProviders;
+  retryDelayMinutes: number;
+};
+
+export type NotificationWorkerTickResult = {
+  deliveries: DeliveryResult[];
+  acknowledgements: NotificationWorkerAcknowledgement[];
+  summary: {
+    delivered: number;
+    notDue: number;
+    retryScheduled: number;
+    deadLettered: number;
+  };
+};
+
 function buildMessage(notification: DeliveryNotification): DeliveryMessage {
   return {
     recipient: notification.recipient,
@@ -111,4 +160,64 @@ export async function deliverDueNotifications(input: DeliverDueNotificationsInpu
   }
 
   return results;
+}
+
+function nextAttemptAt(now: string, retryDelayMinutes: number): string {
+  const nowMs = Date.parse(now);
+  if (Number.isNaN(nowMs)) throw new Error('now must be an ISO date.');
+  if (!Number.isFinite(retryDelayMinutes) || retryDelayMinutes <= 0) {
+    throw new Error('retryDelayMinutes must be positive.');
+  }
+  return new Date(nowMs + retryDelayMinutes * 60_000).toISOString();
+}
+
+function deliveryReason(result: DeliveryResult): string {
+  if (result.status === 'failed_no_provider' || result.status === 'failed_provider_error') return result.reason;
+  return 'Notification was not delivered.';
+}
+
+export async function runNotificationWorkerTick(input: NotificationWorkerTickInput): Promise<NotificationWorkerTickResult> {
+  const deliveries: DeliveryResult[] = [];
+  const acknowledgements: NotificationWorkerAcknowledgement[] = [];
+  const summary = { delivered: 0, notDue: 0, retryScheduled: 0, deadLettered: 0 };
+
+  for (const task of input.tasks) {
+    const [delivery] = await deliverDueNotifications({
+      now: input.now,
+      notifications: [task.notification],
+      providers: input.providers
+    });
+    deliveries.push(delivery);
+
+    if (delivery.status === 'sent') {
+      acknowledgements.push({ taskId: task.id, status: 'delivered', providerMessageId: delivery.providerMessageId });
+      summary.delivered += 1;
+      continue;
+    }
+
+    if (delivery.status === 'skipped_not_due') {
+      acknowledgements.push({ taskId: task.id, status: 'not_due' });
+      summary.notDue += 1;
+      continue;
+    }
+
+    const attemptCount = task.attemptCount + 1;
+    const reason = deliveryReason(delivery);
+    if (attemptCount >= task.maxAttempts) {
+      acknowledgements.push({ taskId: task.id, status: 'dead_lettered', attemptCount, reason });
+      summary.deadLettered += 1;
+      continue;
+    }
+
+    acknowledgements.push({
+      taskId: task.id,
+      status: 'retry_scheduled',
+      attemptCount,
+      nextAttemptAt: nextAttemptAt(input.now, input.retryDelayMinutes),
+      reason
+    });
+    summary.retryScheduled += 1;
+  }
+
+  return { deliveries, acknowledgements, summary };
 }
