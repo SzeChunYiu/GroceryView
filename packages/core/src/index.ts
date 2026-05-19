@@ -692,3 +692,54 @@ export function summarizeHousehold(snapshot: HouseholdSnapshot, priceByProductId
     sharedFavoriteStoreIds: [...snapshot.sharedFavoriteStoreIds]
   };
 }
+
+export type AdSurface =
+  | 'market_feed'
+  | 'product_page_bottom'
+  | 'weekly_report_inline'
+  | 'article_display'
+  | 'receipt_summary_bottom'
+  | 'barcode_scan_top'
+  | 'budget_warning'
+  | 'deal_score_explanation'
+  | 'checkout_decision';
+
+export type AdCandidate = {
+  id: string;
+  surface: AdSurface;
+  sponsor: string;
+};
+
+export type AdPlacement = AdCandidate & {
+  label: 'Sponsored';
+  allowed: boolean;
+  reason: string;
+};
+
+const allowedAdSurfaces = new Set<AdSurface>(['market_feed', 'product_page_bottom', 'weekly_report_inline', 'article_display', 'receipt_summary_bottom']);
+
+export function applyAdPolicy(input: { premiumUser: boolean; candidates: AdCandidate[] }): AdPlacement[] {
+  if (input.premiumUser) return [];
+  return input.candidates.map((candidate) => {
+    const allowed = allowedAdSurfaces.has(candidate.surface);
+    return {
+      ...candidate,
+      label: 'Sponsored',
+      allowed,
+      reason: allowed ? 'Allowed non-critical sponsored placement.' : 'Ads are blocked from critical decision surfaces.'
+    };
+  });
+}
+
+export type OrganicDealRankInput = {
+  productId: string;
+  dealScore: number;
+  sponsored: boolean;
+};
+
+export function rankOrganicDeals(deals: OrganicDealRankInput[]): OrganicDealRankInput[] {
+  return [...deals].sort((a, b) => {
+    if (a.sponsored !== b.sponsored) return a.sponsored ? 1 : -1;
+    return b.dealScore - a.dealScore;
+  });
+}
