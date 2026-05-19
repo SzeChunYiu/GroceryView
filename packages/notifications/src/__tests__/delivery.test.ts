@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { deliverDueNotifications, runNotificationWorkerTick } from '../index.js';
+import { deliverDueNotifications, planHumanReviewSlaNotifications, runNotificationWorkerTick } from '../index.js';
 
 describe('deliverDueNotifications', () => {
   it('sends due push and email notifications through provider adapters and records results', async () => {
@@ -94,5 +94,116 @@ describe('runNotificationWorkerTick', () => {
       }
     ]);
     assert.deepEqual(result.summary, { delivered: 0, notDue: 0, retryScheduled: 1, deadLettered: 1 });
+  });
+});
+
+describe('planHumanReviewSlaNotifications', () => {
+  it('plans high-priority SLA breach and due-soon alerts for review leads', () => {
+    const notifications = planHumanReviewSlaNotifications({
+      now: '2026-05-19T12:00:00.000Z',
+      dueSoonHours: 2,
+      recipients: [
+        { channel: 'email', recipient: 'ops-lead@example.com' },
+        { channel: 'push', recipient: 'ops-lead-device' }
+      ],
+      assignments: [
+        {
+          reviewId: 'review-overdue',
+          subjectType: 'product_match',
+          priority: 'high',
+          assigneeId: 'moderator-1',
+          dueAt: '2026-05-19T11:00:00.000Z',
+          status: 'assigned'
+        },
+        {
+          reviewId: 'review-due-soon',
+          subjectType: 'community_report',
+          priority: 'medium',
+          assigneeId: 'moderator-2',
+          dueAt: '2026-05-19T13:30:00.000Z',
+          status: 'in_progress'
+        },
+        {
+          reviewId: 'review-later',
+          subjectType: 'product_match',
+          priority: 'low',
+          assigneeId: 'moderator-3',
+          dueAt: '2026-05-20T12:00:00.000Z',
+          status: 'assigned'
+        },
+        {
+          reviewId: 'review-completed',
+          subjectType: 'community_report',
+          priority: 'high',
+          assigneeId: 'moderator-4',
+          dueAt: '2026-05-19T10:00:00.000Z',
+          status: 'completed'
+        }
+      ]
+    });
+
+    assert.deepEqual(notifications.map((notification) => ({
+      channel: notification.channel,
+      type: notification.type,
+      title: notification.title,
+      priority: notification.priority,
+      sendAt: notification.sendAt,
+      recipient: notification.recipient
+    })), [
+      {
+        channel: 'email',
+        type: 'human_review_sla_breach',
+        title: 'Human review SLA breached',
+        priority: 'high',
+        sendAt: '2026-05-19T12:00:00.000Z',
+        recipient: 'ops-lead@example.com'
+      },
+      {
+        channel: 'push',
+        type: 'human_review_sla_breach',
+        title: 'Human review SLA breached',
+        priority: 'high',
+        sendAt: '2026-05-19T12:00:00.000Z',
+        recipient: 'ops-lead-device'
+      },
+      {
+        channel: 'email',
+        type: 'human_review_sla_due_soon',
+        title: 'Human review SLA due soon',
+        priority: 'high',
+        sendAt: '2026-05-19T12:00:00.000Z',
+        recipient: 'ops-lead@example.com'
+      },
+      {
+        channel: 'push',
+        type: 'human_review_sla_due_soon',
+        title: 'Human review SLA due soon',
+        priority: 'high',
+        sendAt: '2026-05-19T12:00:00.000Z',
+        recipient: 'ops-lead-device'
+      }
+    ]);
+    assert.match(notifications[0].body, /review-overdue/);
+    assert.match(notifications[2].body, /review-due-soon/);
+  });
+
+  it('returns no alerts when all open assignments are outside the due-soon window', () => {
+    const notifications = planHumanReviewSlaNotifications({
+      now: '2026-05-19T12:00:00.000Z',
+      dueSoonHours: 2,
+      recipients: [{ channel: 'email', recipient: 'ops-lead@example.com' }],
+      assignments: [
+        {
+          reviewId: 'review-later',
+          subjectType: 'product_match',
+          priority: 'low',
+          assigneeId: 'moderator-3',
+          dueAt: '2026-05-20T12:00:00.000Z',
+          status: 'assigned'
+        }
+      ]
+    });
+
+    assert.deepEqual(notifications, []);
   });
 });

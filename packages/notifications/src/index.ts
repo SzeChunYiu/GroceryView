@@ -10,6 +10,27 @@ export type DeliveryNotification = {
   recipient: string;
 };
 
+export type HumanReviewSlaAssignment = {
+  reviewId: string;
+  subjectType: 'product_match' | 'community_report';
+  priority: 'high' | 'medium' | 'low';
+  assigneeId: string;
+  dueAt: string;
+  status: 'assigned' | 'in_progress' | 'completed';
+};
+
+export type HumanReviewSlaAlertRecipient = {
+  channel: DeliveryChannel;
+  recipient: string;
+};
+
+export type PlanHumanReviewSlaNotificationsInput = {
+  now: string;
+  assignments: HumanReviewSlaAssignment[];
+  recipients: HumanReviewSlaAlertRecipient[];
+  dueSoonHours?: number;
+};
+
 export type DeliveryMessage = {
   recipient: string;
   title: string;
@@ -118,6 +139,56 @@ function buildMessage(notification: DeliveryNotification): DeliveryMessage {
       sendAt: notification.sendAt
     }
   };
+}
+
+function humanizeSubjectType(subjectType: HumanReviewSlaAssignment['subjectType']): string {
+  return subjectType.replace('_', ' ');
+}
+
+function slaAlertBody(assignment: HumanReviewSlaAssignment, status: 'breached' | 'due soon'): string {
+  return `Review ${assignment.reviewId} (${humanizeSubjectType(assignment.subjectType)}, ${assignment.priority} priority) assigned to ${assignment.assigneeId} is ${status}; due at ${assignment.dueAt}.`;
+}
+
+function slaNotification(
+  assignment: HumanReviewSlaAssignment,
+  recipient: HumanReviewSlaAlertRecipient,
+  now: string,
+  status: 'breached' | 'due soon'
+): DeliveryNotification {
+  return {
+    channel: recipient.channel,
+    type: status === 'breached' ? 'human_review_sla_breach' : 'human_review_sla_due_soon',
+    title: status === 'breached' ? 'Human review SLA breached' : 'Human review SLA due soon',
+    body: slaAlertBody(assignment, status),
+    priority: 'high',
+    sendAt: now,
+    recipient: recipient.recipient
+  };
+}
+
+export function planHumanReviewSlaNotifications(input: PlanHumanReviewSlaNotificationsInput): DeliveryNotification[] {
+  const nowMs = Date.parse(input.now);
+  if (Number.isNaN(nowMs)) throw new Error('now must be an ISO date.');
+  const dueSoonHours = input.dueSoonHours ?? 2;
+  if (!Number.isFinite(dueSoonHours) || dueSoonHours <= 0) throw new Error('dueSoonHours must be positive.');
+
+  const dueSoonMs = dueSoonHours * 60 * 60 * 1000;
+  const notifications: DeliveryNotification[] = [];
+
+  for (const assignment of input.assignments) {
+    if (assignment.status === 'completed') continue;
+    const dueAtMs = Date.parse(assignment.dueAt);
+    if (Number.isNaN(dueAtMs)) throw new Error(`dueAt must be an ISO date for ${assignment.reviewId}.`);
+
+    const status = dueAtMs < nowMs ? 'breached' : dueAtMs - nowMs <= dueSoonMs ? 'due soon' : null;
+    if (status === null) continue;
+
+    for (const recipient of input.recipients) {
+      notifications.push(slaNotification(assignment, recipient, input.now, status));
+    }
+  }
+
+  return notifications;
 }
 
 export async function deliverDueNotifications(input: DeliverDueNotificationsInput): Promise<DeliveryResult[]> {
