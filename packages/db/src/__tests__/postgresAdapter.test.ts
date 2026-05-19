@@ -9,6 +9,66 @@ class RecordingQueryExecutor implements QueryExecutor {
     this.calls.push({ sql, params });
     if (sql.includes('select store_id')) return [{ store_id: 'willys-odenplan' }] as T[];
     if (sql.includes('select weekly_budget')) return [{ weekly_budget: '800', monthly_budget: '3200' }] as T[];
+    if (sql.includes('from human_reviewers')) {
+      return [{ id: 'moderator-1', role: 'moderator', active: true }] as T[];
+    }
+    if (sql.includes('from community_reporter_trust')) {
+      return [
+        {
+          reporter_id: 'reporter-1',
+          reports_last_24_hours: 7,
+          pending_reports: 2,
+          accepted_reports_last_30_days: 11,
+          rejected_reports_last_30_days: 1,
+          updated_at: '2026-05-19T20:00:00.000Z'
+        }
+      ] as T[];
+    }
+    if (sql.includes('from notification_tasks')) {
+      return [
+        {
+          id: 'task-due',
+          channel: 'email',
+          type: 'human_review_sla_breach',
+          title: 'Human review SLA breached',
+          body: 'Review review-1 is overdue.',
+          priority: 'high',
+          send_at: '2026-05-19T11:55:00.000Z',
+          recipient: 'ops@example.com',
+          attempt_count: 1,
+          max_attempts: 3,
+          status: 'queued'
+        }
+      ] as T[];
+    }
+    if (sql.includes('from notification_suppressions')) {
+      return [
+        {
+          id: 'suppress-global-bounce',
+          recipient: 'bounced@example.com',
+          channel: null,
+          reason: 'bounce',
+          active: true,
+          updated_at: '2026-05-19T20:31:00.000Z'
+        }
+      ] as T[];
+    }
+    if (sql.includes('from human_review_assignments')) {
+      return [
+        {
+          id: 'assignment-review-match-1-moderator-1',
+          review_id: 'review-match-1',
+          subject_type: 'product_match',
+          subject_id: 'match-1',
+          priority: 'high',
+          reason: 'Low-confidence produce match.',
+          assignee_id: 'moderator-1',
+          assigned_at: '2026-05-19T10:00:00.000Z',
+          due_at: '2026-05-19T14:00:00.000Z',
+          status: 'assigned'
+        }
+      ] as T[];
+    }
     return [] as T[];
   }
 }
@@ -26,5 +86,177 @@ describe('createPostgresRepository', () => {
 
     assert.equal(executor.calls.every((call) => call.sql.includes('$') || call.sql.startsWith('select')), true);
     assert.deepEqual(executor.calls[0].params, ['user-1', 'shopper@example.com']);
+  });
+
+  it('persists and lists open human review assignments', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.saveHumanReviewAssignment({
+      id: 'assignment-review-match-1-moderator-1',
+      reviewId: 'review-match-1',
+      subjectType: 'product_match',
+      subjectId: 'match-1',
+      priority: 'high',
+      reason: 'Low-confidence produce match.',
+      assigneeId: 'moderator-1',
+      assignedAt: '2026-05-19T10:00:00.000Z',
+      dueAt: '2026-05-19T14:00:00.000Z',
+      status: 'assigned'
+    });
+
+    assert.deepEqual(await repo.listOpenHumanReviewAssignments(), [
+      {
+        id: 'assignment-review-match-1-moderator-1',
+        reviewId: 'review-match-1',
+        subjectType: 'product_match',
+        subjectId: 'match-1',
+        priority: 'high',
+        reason: 'Low-confidence produce match.',
+        assigneeId: 'moderator-1',
+        assignedAt: '2026-05-19T10:00:00.000Z',
+        dueAt: '2026-05-19T14:00:00.000Z',
+        status: 'assigned'
+      }
+    ]);
+    assert.deepEqual(executor.calls[0].params, [
+      'assignment-review-match-1-moderator-1',
+      'review-match-1',
+      'product_match',
+      'match-1',
+      'high',
+      'Low-confidence produce match.',
+      'moderator-1',
+      '2026-05-19T10:00:00.000Z',
+      '2026-05-19T14:00:00.000Z',
+      'assigned'
+    ]);
+  });
+
+  it('persists and reads reviewer roles for permission checks', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertHumanReviewer({ id: 'moderator-1', role: 'moderator', active: true });
+
+    assert.deepEqual(await repo.getHumanReviewer('moderator-1'), {
+      id: 'moderator-1',
+      role: 'moderator',
+      active: true
+    });
+    assert.deepEqual(executor.calls[0].params, ['moderator-1', 'moderator', true]);
+    assert.deepEqual(executor.calls[1].params, ['moderator-1']);
+  });
+
+  it('persists and reads community reporter trust state', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertCommunityReporterTrust({
+      reporterId: 'reporter-1',
+      reportsLast24Hours: 7,
+      pendingReports: 2,
+      acceptedReportsLast30Days: 11,
+      rejectedReportsLast30Days: 1,
+      updatedAt: '2026-05-19T20:00:00.000Z'
+    });
+
+    assert.deepEqual(await repo.getCommunityReporterTrust('reporter-1'), {
+      reporterId: 'reporter-1',
+      reportsLast24Hours: 7,
+      pendingReports: 2,
+      acceptedReportsLast30Days: 11,
+      rejectedReportsLast30Days: 1,
+      updatedAt: '2026-05-19T20:00:00.000Z'
+    });
+    assert.deepEqual(executor.calls[0].params, [
+      'reporter-1',
+      7,
+      2,
+      11,
+      1,
+      '2026-05-19T20:00:00.000Z'
+    ]);
+    assert.deepEqual(executor.calls[1].params, ['reporter-1']);
+  });
+
+  it('persists and lists due notification worker tasks', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertNotificationTask({
+      id: 'task-due',
+      channel: 'email',
+      type: 'human_review_sla_breach',
+      title: 'Human review SLA breached',
+      body: 'Review review-1 is overdue.',
+      priority: 'high',
+      sendAt: '2026-05-19T11:55:00.000Z',
+      recipient: 'ops@example.com',
+      attemptCount: 1,
+      maxAttempts: 3,
+      status: 'queued'
+    });
+
+    assert.deepEqual(await repo.listDueNotificationTasks('2026-05-19T12:00:00.000Z'), [
+      {
+        id: 'task-due',
+        channel: 'email',
+        type: 'human_review_sla_breach',
+        title: 'Human review SLA breached',
+        body: 'Review review-1 is overdue.',
+        priority: 'high',
+        sendAt: '2026-05-19T11:55:00.000Z',
+        recipient: 'ops@example.com',
+        attemptCount: 1,
+        maxAttempts: 3,
+        status: 'queued'
+      }
+    ]);
+    assert.deepEqual(executor.calls[0].params, [
+      'task-due',
+      'email',
+      'human_review_sla_breach',
+      'Human review SLA breached',
+      'Review review-1 is overdue.',
+      'high',
+      '2026-05-19T11:55:00.000Z',
+      'ops@example.com',
+      1,
+      3,
+      'queued'
+    ]);
+    assert.deepEqual(executor.calls[1].params, ['2026-05-19T12:00:00.000Z']);
+  });
+
+  it('persists and lists active notification suppressions', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertNotificationSuppression({
+      id: 'suppress-global-bounce',
+      recipient: 'bounced@example.com',
+      reason: 'bounce',
+      active: true,
+      updatedAt: '2026-05-19T20:31:00.000Z'
+    });
+
+    assert.deepEqual(await repo.listActiveNotificationSuppressions(), [
+      {
+        id: 'suppress-global-bounce',
+        recipient: 'bounced@example.com',
+        reason: 'bounce',
+        active: true,
+        updatedAt: '2026-05-19T20:31:00.000Z'
+      }
+    ]);
+    assert.deepEqual(executor.calls[0].params, [
+      'suppress-global-bounce',
+      'bounced@example.com',
+      null,
+      'bounce',
+      true,
+      '2026-05-19T20:31:00.000Z'
+    ]);
   });
 });

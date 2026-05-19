@@ -20,6 +20,11 @@ const requiredTables = [
   'receipt_uploads',
   'receipt_items',
   'community_price_reports',
+  'community_reporter_trust',
+  'notification_tasks',
+  'notification_suppressions',
+  'human_reviewers',
+  'human_review_assignments',
   'grocery_indices',
   'grocery_index_components'
 ];
@@ -39,6 +44,15 @@ const requiredColumns = [
   'accept_private_label',
   'target_price',
   'alert_deal_score_at',
+  'assignee_id',
+  'due_at',
+  'role',
+  'reports_last_24_hours',
+  'accepted_reports_last_30_days',
+  'send_at',
+  'attempt_count',
+  'max_attempts',
+  'reason',
   'base_date',
   'weight'
 ];
@@ -54,5 +68,9 @@ describe('db/schema.sql', () => {
     for (const column of requiredColumns) {
       assert.match(schema, new RegExp(`\\b${column}\\b`), `${column} column missing`);
     }
+  });
+
+  it('allows suppressed notification task state for terminal unsubscribe handling', () => {
+    assert.match(schema, /status in \('queued', 'delivered', 'dead_lettered', 'suppressed'\)/);
   });
 });

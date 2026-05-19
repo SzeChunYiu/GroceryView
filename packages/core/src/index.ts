@@ -522,11 +522,97 @@ export type CommunityReportReviewCandidate = {
   createdAt: string;
 };
 
+export type CommunityReporterActivity = {
+  reporterId: string;
+  reportsLast24Hours: number;
+  pendingReports: number;
+  acceptedReportsLast30Days: number;
+  rejectedReportsLast30Days: number;
+};
+
+export type CommunityReportAbuseControl = {
+  reporterId: string;
+  action: 'allow' | 'throttle' | 'require_manual_review' | 'suspend_reporting';
+  reason: string;
+};
+
 export type HumanReviewQueueItem = {
   id: string;
   subjectType: 'product_match' | 'community_report';
   subjectId: string;
   priority: 'high' | 'medium' | 'low';
+  reason: string;
+};
+
+export type HumanReviewDecision = 'approve' | 'reject' | 'needs_more_info';
+
+export type HumanReviewWriteback = {
+  action: 'approve_product_match' | 'reject_product_match' | 'accept_community_report' | 'dismiss_community_report' | 'keep_in_review';
+  subjectId: string;
+  reviewedByHuman: boolean;
+};
+
+export type HumanReviewDecisionResult = {
+  reviewId: string;
+  subjectType: HumanReviewQueueItem['subjectType'];
+  subjectId: string;
+  status: 'approved' | 'rejected' | 'needs_more_info';
+  reviewerId: string;
+  decidedAt: string;
+  notes?: string;
+  writeback: HumanReviewWriteback;
+};
+
+export type HumanReviewerProfile = {
+  id: string;
+  active: boolean;
+  openAssignmentCount: number;
+  maxOpenAssignments: number;
+  specialties?: HumanReviewQueueItem['subjectType'][];
+};
+
+export type HumanReviewAssignmentStatus = 'assigned' | 'in_progress' | 'completed';
+
+export type HumanReviewAssignment = {
+  id: string;
+  reviewId: string;
+  subjectType: HumanReviewQueueItem['subjectType'];
+  subjectId: string;
+  priority: HumanReviewQueueItem['priority'];
+  reason: string;
+  assigneeId: string;
+  assignedAt: string;
+  dueAt: string;
+  status: HumanReviewAssignmentStatus;
+};
+
+export type HumanReviewUnassignedReason = 'already_assigned' | 'no_active_reviewer_capacity';
+
+export type HumanReviewAssignmentPlan = {
+  assignments: HumanReviewAssignment[];
+  unassigned: Array<{ reviewId: string; reason: HumanReviewUnassignedReason }>;
+};
+
+export type HumanReviewSlaSummary = {
+  status: 'healthy' | 'attention' | 'breached';
+  openAssignments: number;
+  overdueAssignments: number;
+  dueSoonAssignments: number;
+  openByPriority: Record<HumanReviewQueueItem['priority'], number>;
+  breachedReviewIds: string[];
+  dueSoonReviewIds: string[];
+};
+
+export type HumanReviewOperator = {
+  id: string;
+  role: 'viewer' | 'moderator' | 'lead';
+  active: boolean;
+};
+
+export type HumanReviewAction = 'view_queue' | 'assign_review' | 'decide_review' | 'manage_abuse_controls';
+
+export type HumanReviewAuthorization = {
+  allowed: boolean;
   reason: string;
 };
 
@@ -560,6 +646,236 @@ export function planHumanReviewQueue(input: {
 
   const priorityRank: Record<HumanReviewQueueItem['priority'], number> = { high: 0, medium: 1, low: 2 };
   return queue.sort((a, b) => priorityRank[a.priority] - priorityRank[b.priority] || a.id.localeCompare(b.id));
+}
+
+export function planCommunityReportAbuseControls(input: {
+  reporters: CommunityReporterActivity[];
+  maxReportsPer24Hours?: number;
+  maxPendingReports?: number;
+}): CommunityReportAbuseControl[] {
+  const maxReportsPer24Hours = input.maxReportsPer24Hours ?? 20;
+  const maxPendingReports = input.maxPendingReports ?? 5;
+
+  return input.reporters.map((reporter) => {
+    const resolvedReports = reporter.acceptedReportsLast30Days + reporter.rejectedReportsLast30Days;
+    const acceptanceRatio = resolvedReports === 0 ? 1 : reporter.acceptedReportsLast30Days / resolvedReports;
+
+    if (reporter.rejectedReportsLast30Days >= 10 && acceptanceRatio < 0.2) {
+      return {
+        reporterId: reporter.reporterId,
+        action: 'suspend_reporting',
+        reason: 'Reporter has high rejected-report volume and a low acceptance ratio.'
+      };
+    }
+
+    if (reporter.reportsLast24Hours > maxReportsPer24Hours) {
+      return {
+        reporterId: reporter.reporterId,
+        action: 'throttle',
+        reason: `Reporter exceeded ${maxReportsPer24Hours} community reports in the last 24 hours.`
+      };
+    }
+
+    if (reporter.pendingReports > maxPendingReports) {
+      return {
+        reporterId: reporter.reporterId,
+        action: 'require_manual_review',
+        reason: `Reporter has more than ${maxPendingReports} unresolved community reports.`
+      };
+    }
+
+    if (reporter.rejectedReportsLast30Days >= 3) {
+      return {
+        reporterId: reporter.reporterId,
+        action: 'require_manual_review',
+        reason: 'Reporter has repeated rejected community reports.'
+      };
+    }
+
+    return {
+      reporterId: reporter.reporterId,
+      action: 'allow',
+      reason: 'Reporter history is within trust limits.'
+    };
+  });
+}
+
+export function authorizeHumanReviewAction(input: {
+  reviewer: HumanReviewOperator;
+  action: HumanReviewAction;
+  assignment?: HumanReviewAssignment;
+}): HumanReviewAuthorization {
+  if (!input.reviewer.active) return { allowed: false, reason: 'Reviewer is inactive.' };
+
+  if (input.reviewer.role === 'lead') {
+    return { allowed: true, reason: 'Lead reviewers can perform human-review operations.' };
+  }
+
+  if (input.reviewer.role === 'viewer') {
+    return input.action === 'view_queue'
+      ? { allowed: true, reason: 'Viewer can inspect the review queue.' }
+      : { allowed: false, reason: 'Viewers cannot mutate human-review work.' };
+  }
+
+  if (input.action === 'view_queue') return { allowed: true, reason: 'Moderator can inspect the review queue.' };
+
+  if (input.action === 'decide_review') {
+    if (!input.assignment || input.assignment.assigneeId !== input.reviewer.id) {
+      return { allowed: false, reason: 'Moderators can only decide reviews assigned to them.' };
+    }
+    if (input.assignment.status === 'completed') {
+      return { allowed: false, reason: 'Completed reviews cannot be decided again.' };
+    }
+    return { allowed: true, reason: 'Moderator is assigned to this open review.' };
+  }
+
+  return { allowed: false, reason: 'Moderators cannot manage assignment or abuse-control settings.' };
+}
+
+const humanReviewPriorityRank: Record<HumanReviewQueueItem['priority'], number> = { high: 0, medium: 1, low: 2 };
+const humanReviewSlaHours: Record<HumanReviewQueueItem['priority'], number> = { high: 4, medium: 24, low: 72 };
+
+function reviewerCanHandle(reviewer: HumanReviewerProfile, item: HumanReviewQueueItem, openCounts: Map<string, number>): boolean {
+  if (!reviewer.active) return false;
+  if ((openCounts.get(reviewer.id) ?? reviewer.openAssignmentCount) >= reviewer.maxOpenAssignments) return false;
+  return reviewer.specialties === undefined || reviewer.specialties.length === 0 || reviewer.specialties.includes(item.subjectType);
+}
+
+export function planHumanReviewAssignments(input: {
+  queue: HumanReviewQueueItem[];
+  reviewers: HumanReviewerProfile[];
+  assignedAt: string;
+  existingAssignments?: HumanReviewAssignment[];
+}): HumanReviewAssignmentPlan {
+  if (Number.isNaN(Date.parse(input.assignedAt))) throw new Error('assignedAt must be an ISO date.');
+
+  const assignedAt = new Date(input.assignedAt);
+  const openCounts = new Map(input.reviewers.map((reviewer) => [reviewer.id, reviewer.openAssignmentCount]));
+  const alreadyAssigned = new Set(
+    (input.existingAssignments ?? [])
+      .filter((assignment) => assignment.status === 'assigned' || assignment.status === 'in_progress')
+      .map((assignment) => assignment.reviewId)
+  );
+  const assignments: HumanReviewAssignment[] = [];
+  const unassigned: HumanReviewAssignmentPlan['unassigned'] = [];
+  const queue = [...input.queue].sort(
+    (a, b) => humanReviewPriorityRank[a.priority] - humanReviewPriorityRank[b.priority] || a.id.localeCompare(b.id)
+  );
+
+  for (const item of queue) {
+    if (alreadyAssigned.has(item.id)) {
+      unassigned.push({ reviewId: item.id, reason: 'already_assigned' });
+      continue;
+    }
+
+    const reviewer = input.reviewers
+      .filter((candidate) => reviewerCanHandle(candidate, item, openCounts))
+      .sort((a, b) => (openCounts.get(a.id) ?? a.openAssignmentCount) - (openCounts.get(b.id) ?? b.openAssignmentCount) || a.id.localeCompare(b.id))[0];
+
+    if (!reviewer) {
+      unassigned.push({ reviewId: item.id, reason: 'no_active_reviewer_capacity' });
+      continue;
+    }
+
+    openCounts.set(reviewer.id, (openCounts.get(reviewer.id) ?? reviewer.openAssignmentCount) + 1);
+    assignments.push({
+      id: `assignment-${item.id}-${reviewer.id}`,
+      reviewId: item.id,
+      subjectType: item.subjectType,
+      subjectId: item.subjectId,
+      priority: item.priority,
+      reason: item.reason,
+      assigneeId: reviewer.id,
+      assignedAt: assignedAt.toISOString(),
+      dueAt: new Date(assignedAt.getTime() + humanReviewSlaHours[item.priority] * 60 * 60 * 1000).toISOString(),
+      status: 'assigned'
+    });
+  }
+
+  return { assignments, unassigned };
+}
+
+export function summarizeHumanReviewSla(input: {
+  assignments: HumanReviewAssignment[];
+  now: string;
+  dueSoonHours?: number;
+}): HumanReviewSlaSummary {
+  if (Number.isNaN(Date.parse(input.now))) throw new Error('now must be an ISO date.');
+
+  const nowMs = Date.parse(input.now);
+  const dueSoonMs = (input.dueSoonHours ?? 2) * 60 * 60 * 1000;
+  const openByPriority: HumanReviewSlaSummary['openByPriority'] = { high: 0, medium: 0, low: 0 };
+  const breachedReviewIds: string[] = [];
+  const dueSoonReviewIds: string[] = [];
+
+  for (const assignment of input.assignments) {
+    if (assignment.status === 'completed') continue;
+    openByPriority[assignment.priority] += 1;
+
+    const dueAtMs = Date.parse(assignment.dueAt);
+    if (Number.isNaN(dueAtMs)) throw new Error(`dueAt must be an ISO date for ${assignment.reviewId}.`);
+    if (dueAtMs < nowMs) {
+      breachedReviewIds.push(assignment.reviewId);
+      continue;
+    }
+    if (dueAtMs - nowMs <= dueSoonMs) dueSoonReviewIds.push(assignment.reviewId);
+  }
+
+  const openAssignments = openByPriority.high + openByPriority.medium + openByPriority.low;
+  const overdueAssignments = breachedReviewIds.length;
+  const dueSoonAssignments = dueSoonReviewIds.length;
+
+  return {
+    status: overdueAssignments > 0 ? 'breached' : dueSoonAssignments > 0 ? 'attention' : 'healthy',
+    openAssignments,
+    overdueAssignments,
+    dueSoonAssignments,
+    openByPriority,
+    breachedReviewIds,
+    dueSoonReviewIds
+  };
+}
+
+function writebackFor(item: HumanReviewQueueItem, decision: HumanReviewDecision): HumanReviewWriteback {
+  if (decision === 'needs_more_info') {
+    return { action: 'keep_in_review', subjectId: item.subjectId, reviewedByHuman: false };
+  }
+
+  if (item.subjectType === 'product_match') {
+    return {
+      action: decision === 'approve' ? 'approve_product_match' : 'reject_product_match',
+      subjectId: item.subjectId,
+      reviewedByHuman: true
+    };
+  }
+
+  return {
+    action: decision === 'approve' ? 'accept_community_report' : 'dismiss_community_report',
+    subjectId: item.subjectId,
+    reviewedByHuman: true
+  };
+}
+
+export function applyHumanReviewDecision(input: {
+  item: HumanReviewQueueItem;
+  decision: HumanReviewDecision;
+  reviewerId: string;
+  decidedAt: string;
+  notes?: string;
+}): HumanReviewDecisionResult {
+  if (!input.reviewerId.trim()) throw new Error('reviewerId is required.');
+  if (Number.isNaN(Date.parse(input.decidedAt))) throw new Error('decidedAt must be an ISO date.');
+
+  return {
+    reviewId: input.item.id,
+    subjectType: input.item.subjectType,
+    subjectId: input.item.subjectId,
+    status: input.decision === 'approve' ? 'approved' : input.decision === 'reject' ? 'rejected' : 'needs_more_info',
+    reviewerId: input.reviewerId,
+    decidedAt: input.decidedAt,
+    ...(input.notes ? { notes: input.notes } : {}),
+    writeback: writebackFor(input.item, input.decision)
+  };
 }
 
 export type ReceiptRowInput = {

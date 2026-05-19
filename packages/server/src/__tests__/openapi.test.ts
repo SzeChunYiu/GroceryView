@@ -16,6 +16,8 @@ describe('buildOpenApiDocument', () => {
       '/api/indices',
       '/api/indices/{id}',
       '/api/market/overview',
+      '/api/metrics/notifications',
+      '/api/notifications/suppression-events',
       '/api/products/search',
       '/api/products/{id}',
       '/api/products/{id}/history',
@@ -27,7 +29,11 @@ describe('buildOpenApiDocument', () => {
     ]);
 
     assert.deepEqual(doc.components.securitySchemes.bearerAuth, { type: 'http', scheme: 'bearer' });
+    assert.deepEqual(doc.components.securitySchemes.metricsToken, { type: 'apiKey', in: 'header', name: 'x-groceryview-metrics-token' });
+    assert.deepEqual(doc.components.securitySchemes.webhookSignature, { type: 'apiKey', in: 'header', name: 'x-groceryview-signature' });
     assert.deepEqual(doc.paths['/api/watchlist'].get?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/metrics/notifications'].get?.security, [{ metricsToken: [] }]);
+    assert.deepEqual(doc.paths['/api/notifications/suppression-events'].post?.security, [{ webhookSignature: [] }]);
     assert.equal(doc.paths['/api/market/overview'].get?.security, undefined);
   });
 });

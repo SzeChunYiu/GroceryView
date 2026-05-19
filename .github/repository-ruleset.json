@@ -1,12 +1,21 @@
 {
   "name": "main protection",
-  "targetBranches": ["main"],
+  "targetBranches": [
+    "main"
+  ],
+  "enforcement": "active",
+  "appliedInGitHub": true,
   "rules": {
     "requirePullRequest": true,
-    "requiredStatusChecks": ["Test, build, and typecheck"],
+    "requiredStatusChecks": [
+      "Test, build, and typecheck",
+      "Validate release-safe candidate"
+    ],
     "blockForcePushes": true,
     "blockDeletions": true,
     "requireLinearHistory": false
   },
-  "notes": "Apply this policy in GitHub repository settings/rulesets. It documents the required governance for GroceryView main."
+  "notes": "Active GitHub repository ruleset for GroceryView main. Keep this artifact in sync with the GitHub ruleset verified through the repository rulesets API.",
+  "githubRulesetId": 16607866,
+  "verifiedAt": "2026-05-19T21:33:46+02:00"
 }

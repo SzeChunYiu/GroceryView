@@ -212,6 +212,63 @@ create table if not exists community_price_reports (
   review_status text not null default 'pending'
 );
 
+create table if not exists community_reporter_trust (
+  reporter_id text primary key,
+  reports_last_24_hours integer not null default 0 check (reports_last_24_hours >= 0),
+  pending_reports integer not null default 0 check (pending_reports >= 0),
+  accepted_reports_last_30_days integer not null default 0 check (accepted_reports_last_30_days >= 0),
+  rejected_reports_last_30_days integer not null default 0 check (rejected_reports_last_30_days >= 0),
+  updated_at timestamptz not null
+);
+
+create table if not exists notification_tasks (
+  id text primary key,
+  channel text not null check (channel in ('push', 'email')),
+  type text not null,
+  title text not null,
+  body text not null,
+  priority text not null check (priority in ('normal', 'high')),
+  send_at timestamptz not null,
+  recipient text not null,
+  attempt_count integer not null default 0 check (attempt_count >= 0),
+  max_attempts integer not null check (max_attempts > 0),
+  status text not null check (status in ('queued', 'delivered', 'dead_lettered', 'suppressed')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists notification_suppressions (
+  id text primary key,
+  recipient text not null,
+  channel text check (channel in ('push', 'email')),
+  reason text not null check (reason in ('unsubscribed', 'bounce', 'complaint')),
+  active boolean not null default true,
+  updated_at timestamptz not null
+);
+
+create table if not exists human_reviewers (
+  id text primary key,
+  role text not null check (role in ('viewer', 'moderator', 'lead')),
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists human_review_assignments (
+  id text primary key,
+  review_id text not null unique,
+  subject_type text not null check (subject_type in ('product_match', 'community_report')),
+  subject_id text not null,
+  priority text not null check (priority in ('high', 'medium', 'low')),
+  reason text not null,
+  assignee_id text not null,
+  assigned_at timestamptz not null,
+  due_at timestamptz not null,
+  status text not null check (status in ('assigned', 'in_progress', 'completed')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists grocery_indices (
   id text primary key,
   label text not null,
@@ -235,3 +292,9 @@ create index if not exists price_observations_product_time_idx on price_observat
 create index if not exists price_observations_store_time_idx on price_observations(store_id, observed_at desc);
 create index if not exists promotion_observations_product_dates_idx on promotion_observations(product_id, promo_start, promo_end);
 create index if not exists products_category_idx on products(category_id);
+create index if not exists community_reporter_trust_pending_idx on community_reporter_trust(pending_reports desc);
+create index if not exists notification_tasks_status_send_idx on notification_tasks(status, send_at);
+create index if not exists notification_suppressions_active_recipient_idx on notification_suppressions(active, recipient);
+create index if not exists human_reviewers_role_active_idx on human_reviewers(role, active);
+create index if not exists human_review_assignments_status_due_idx on human_review_assignments(status, due_at);
+create index if not exists human_review_assignments_assignee_status_idx on human_review_assignments(assignee_id, status);
