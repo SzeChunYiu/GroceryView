@@ -113,3 +113,52 @@ export function buildScanResult(request: ScanRequest, api = createGroceryViewApi
     actions: product ? ['add_to_weekly_basket', 'add_to_watchlist', 'compare_stores'] : ['search_product', 'report_unknown_barcode']
   };
 }
+
+export type ExpoRoute = {
+  path: '/today' | '/stores' | '/basket' | '/scan/barcode' | '/scan/receipt' | '/profile' | '/household' | '/privacy';
+  screen: string;
+  purpose: string;
+  requiresAuth: boolean;
+};
+
+export type ExpoBuildProfile = {
+  distribution: 'internal' | 'store';
+  channel: string;
+};
+
+export type ExpoReadinessPlan = {
+  appName: string;
+  slug: string;
+  scheme: string;
+  routes: ExpoRoute[];
+  requiredDeviceCapabilities: Array<'camera' | 'secure-storage' | 'push-notifications'>;
+  buildProfiles: {
+    preview: ExpoBuildProfile;
+    production: ExpoBuildProfile;
+  };
+  failClosedWithoutProviders: boolean;
+};
+
+export function buildExpoReadinessPlan(): ExpoReadinessPlan {
+  return {
+    appName: 'GroceryView',
+    slug: 'groceryview',
+    scheme: 'groceryview',
+    routes: [
+      { path: '/today', screen: 'TodayScreen', purpose: 'Daily market overview, deals, budget, alerts, and recommendations', requiresAuth: true },
+      { path: '/stores', screen: 'StoresScreen', purpose: 'Favorite and selected supermarket profiles', requiresAuth: true },
+      { path: '/basket', screen: 'BasketScreen', purpose: 'Weekly basket planning and smart swaps', requiresAuth: true },
+      { path: '/scan/barcode', screen: 'BarcodeScanScreen', purpose: 'Barcode lookup and product comparison', requiresAuth: true },
+      { path: '/scan/receipt', screen: 'ReceiptScanScreen', purpose: 'Receipt OCR review and budget impact', requiresAuth: true },
+      { path: '/profile', screen: 'ProfileScreen', purpose: 'Account, budget, notification, and favorite-store settings', requiresAuth: true },
+      { path: '/household', screen: 'HouseholdScreen', purpose: 'Shared basket and household member controls', requiresAuth: true },
+      { path: '/privacy', screen: 'PrivacyScreen', purpose: 'Data export, deletion, and ad privacy controls', requiresAuth: true }
+    ],
+    requiredDeviceCapabilities: ['camera', 'secure-storage', 'push-notifications'],
+    buildProfiles: {
+      preview: { distribution: 'internal', channel: 'preview' },
+      production: { distribution: 'store', channel: 'production' }
+    },
+    failClosedWithoutProviders: true
+  };
+}
