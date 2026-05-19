@@ -502,6 +502,66 @@ export function recommendSmartSwaps(input: SmartSwapInput): SmartSwapRecommendat
   return recommendations.sort((a, b) => b.savingsPercent - a.savingsPercent);
 }
 
+export type ProductMatchReviewCandidate = {
+  id: string;
+  sourceProductId: string;
+  candidateProductId: string;
+  confidence: MatchConfidence;
+  qualityRisk: QualityRisk;
+  reason: string;
+};
+
+export type CommunityReportType = 'wrong_price' | 'missing_product' | 'wrong_product_match' | 'store_closed' | 'other';
+
+export type CommunityReportReviewCandidate = {
+  id: string;
+  productId: string;
+  reporterId: string;
+  reportType: CommunityReportType;
+  confidenceScore: number;
+  createdAt: string;
+};
+
+export type HumanReviewQueueItem = {
+  id: string;
+  subjectType: 'product_match' | 'community_report';
+  subjectId: string;
+  priority: 'high' | 'medium' | 'low';
+  reason: string;
+};
+
+export function planHumanReviewQueue(input: {
+  productMatches: ProductMatchReviewCandidate[];
+  communityReports: CommunityReportReviewCandidate[];
+}): HumanReviewQueueItem[] {
+  const queue: HumanReviewQueueItem[] = [];
+
+  for (const match of input.productMatches) {
+    if (match.confidence === 'high' && match.qualityRisk === 'low') continue;
+    queue.push({
+      id: `review-${match.id}`,
+      subjectType: 'product_match',
+      subjectId: match.id,
+      priority: match.qualityRisk === 'high' || match.confidence === 'low' ? 'high' : 'medium',
+      reason: `Product match ${match.sourceProductId} → ${match.candidateProductId} has ${match.confidence} confidence and ${match.qualityRisk} quality risk: ${match.reason}`
+    });
+  }
+
+  for (const report of input.communityReports) {
+    if (report.confidenceScore >= 0.8) continue;
+    queue.push({
+      id: `review-${report.id}`,
+      subjectType: 'community_report',
+      subjectId: report.id,
+      priority: report.confidenceScore < 0.3 ? 'high' : 'medium',
+      reason: `Community report ${report.reportType} for ${report.productId} has low confidence score ${report.confidenceScore}.`
+    });
+  }
+
+  const priorityRank: Record<HumanReviewQueueItem['priority'], number> = { high: 0, medium: 1, low: 2 };
+  return queue.sort((a, b) => priorityRank[a.priority] - priorityRank[b.priority] || a.id.localeCompare(b.id));
+}
+
 export type ReceiptRowInput = {
   rawName: string;
   quantity: number;

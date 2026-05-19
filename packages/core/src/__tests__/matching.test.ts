@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { classifyProductMatch, recommendSmartSwaps } from '../index.js';
+import { classifyProductMatch, planHumanReviewQueue, recommendSmartSwaps } from '../index.js';
 
 describe('classifyProductMatch', () => {
   it('detects exact matches by barcode and size', () => {
@@ -46,6 +46,38 @@ describe('recommendSmartSwaps', () => {
 
     assert.deepEqual(swaps.map((swap) => ({ productId: swap.productId, savingsPercent: swap.savingsPercent, confidence: swap.confidence })), [
       { productId: 'garant-500', savingsPercent: 28.57, confidence: 'high' }
+    ]);
+  });
+});
+
+describe('planHumanReviewQueue', () => {
+  it('prioritizes low-confidence product matches and community reports for human review', () => {
+    const queue = planHumanReviewQueue({
+      productMatches: [
+        { id: 'match-1', sourceProductId: 'tomato-a', candidateProductId: 'tomato-b', confidence: 'low', qualityRisk: 'high', reason: 'Produce sizes vary.' },
+        { id: 'match-2', sourceProductId: 'pasta-a', candidateProductId: 'pasta-b', confidence: 'high', qualityRisk: 'low', reason: 'Barcode match.' }
+      ],
+      communityReports: [
+        { id: 'report-1', productId: 'coffee', reporterId: 'user-1', reportType: 'wrong_price', confidenceScore: 0.4, createdAt: '2026-05-19T09:00:00.000Z' },
+        { id: 'report-2', productId: 'milk', reporterId: 'user-2', reportType: 'missing_product', confidenceScore: 0.95, createdAt: '2026-05-19T08:00:00.000Z' }
+      ]
+    });
+
+    assert.deepEqual(queue, [
+      {
+        id: 'review-match-1',
+        subjectType: 'product_match',
+        subjectId: 'match-1',
+        priority: 'high',
+        reason: 'Product match tomato-a → tomato-b has low confidence and high quality risk: Produce sizes vary.'
+      },
+      {
+        id: 'review-report-1',
+        subjectType: 'community_report',
+        subjectId: 'report-1',
+        priority: 'medium',
+        reason: 'Community report wrong_price for coffee has low confidence score 0.4.'
+      }
     ]);
   });
 });
