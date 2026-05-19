@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "moduleResolution": "NodeNext",
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@groceryview/core": ["packages/core/src/index.ts"]
+    }
+  },
+  "include": ["apps/**/*.ts", "packages/**/*.ts"]
+}
