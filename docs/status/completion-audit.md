@@ -10,7 +10,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 
 | Requirement / deliverable | Evidence | Status |
 | --- | --- | --- |
-| Iterative PR + merge workflow | PR #1 through PR #29 merged to `main` | Done for shipped iterations |
+| Iterative PR + merge workflow | PR #1 through PR #30 merged to `main` | Done for shipped iterations |
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
@@ -42,6 +42,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Static web flow scaffolds | PR #27, `apps/web/scripts/pages.mjs` | Static route scaffolds shipped |
 | Notification delivery foundation | PR #28, `packages/notifications` | Provider-neutral delivery shipped |
 | Human review queue planning | PR #29, `planHumanReviewQueue` | Core queue planning shipped |
+| Scanning pipeline foundation | PR #30, `packages/scanning` | Provider-neutral scan pipeline shipped |
 
 ## Verification gates
 
@@ -63,7 +64,7 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 
 - PostgreSQL query-executor wiring and repository adapter skeleton exist; live database integration tests still missing.
 - Real retailer/API/crawler connectors and legal/robots review.
-- Real OCR/camera/upload pipeline for barcode and receipt scanning. Provider-neutral scan pipeline is being added; real camera/OCR providers still missing.
+- Real OCR/camera/upload pipeline for barcode and receipt scanning. Provider-neutral scan pipeline exists; real camera/OCR providers still missing.
 - Real Expo/React Native screens and device builds.
 - Real interactive web UI for login, account, household, privacy, basket, and scanner flows. Static page scaffolds are being added before full interactivity.
 - Push/email provider adapters and scheduled notification workers. Provider-neutral delivery interface is being added; real provider credentials/workers still missing.
