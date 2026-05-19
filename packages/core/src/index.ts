@@ -522,6 +522,20 @@ export type CommunityReportReviewCandidate = {
   createdAt: string;
 };
 
+export type CommunityReporterActivity = {
+  reporterId: string;
+  reportsLast24Hours: number;
+  pendingReports: number;
+  acceptedReportsLast30Days: number;
+  rejectedReportsLast30Days: number;
+};
+
+export type CommunityReportAbuseControl = {
+  reporterId: string;
+  action: 'allow' | 'throttle' | 'require_manual_review' | 'suspend_reporting';
+  reason: string;
+};
+
 export type HumanReviewQueueItem = {
   id: string;
   subjectType: 'product_match' | 'community_report';
@@ -619,6 +633,58 @@ export function planHumanReviewQueue(input: {
 
   const priorityRank: Record<HumanReviewQueueItem['priority'], number> = { high: 0, medium: 1, low: 2 };
   return queue.sort((a, b) => priorityRank[a.priority] - priorityRank[b.priority] || a.id.localeCompare(b.id));
+}
+
+export function planCommunityReportAbuseControls(input: {
+  reporters: CommunityReporterActivity[];
+  maxReportsPer24Hours?: number;
+  maxPendingReports?: number;
+}): CommunityReportAbuseControl[] {
+  const maxReportsPer24Hours = input.maxReportsPer24Hours ?? 20;
+  const maxPendingReports = input.maxPendingReports ?? 5;
+
+  return input.reporters.map((reporter) => {
+    const resolvedReports = reporter.acceptedReportsLast30Days + reporter.rejectedReportsLast30Days;
+    const acceptanceRatio = resolvedReports === 0 ? 1 : reporter.acceptedReportsLast30Days / resolvedReports;
+
+    if (reporter.rejectedReportsLast30Days >= 10 && acceptanceRatio < 0.2) {
+      return {
+        reporterId: reporter.reporterId,
+        action: 'suspend_reporting',
+        reason: 'Reporter has high rejected-report volume and a low acceptance ratio.'
+      };
+    }
+
+    if (reporter.reportsLast24Hours > maxReportsPer24Hours) {
+      return {
+        reporterId: reporter.reporterId,
+        action: 'throttle',
+        reason: `Reporter exceeded ${maxReportsPer24Hours} community reports in the last 24 hours.`
+      };
+    }
+
+    if (reporter.pendingReports > maxPendingReports) {
+      return {
+        reporterId: reporter.reporterId,
+        action: 'require_manual_review',
+        reason: `Reporter has more than ${maxPendingReports} unresolved community reports.`
+      };
+    }
+
+    if (reporter.rejectedReportsLast30Days >= 3) {
+      return {
+        reporterId: reporter.reporterId,
+        action: 'require_manual_review',
+        reason: 'Reporter has repeated rejected community reports.'
+      };
+    }
+
+    return {
+      reporterId: reporter.reporterId,
+      action: 'allow',
+      reason: 'Reporter history is within trust limits.'
+    };
+  });
 }
 
 const humanReviewPriorityRank: Record<HumanReviewQueueItem['priority'], number> = { high: 0, medium: 1, low: 2 };

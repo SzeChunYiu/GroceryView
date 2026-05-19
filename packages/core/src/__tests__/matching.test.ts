@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   applyHumanReviewDecision,
   classifyProductMatch,
+  planCommunityReportAbuseControls,
   planHumanReviewAssignments,
   planHumanReviewQueue,
   recommendSmartSwaps,
@@ -334,5 +335,90 @@ describe('summarizeHumanReviewSla', () => {
       breachedReviewIds: [],
       dueSoonReviewIds: []
     });
+  });
+});
+
+describe('planCommunityReportAbuseControls', () => {
+  it('plans moderation controls for bursty, low-trust, and healthy reporters', () => {
+    const controls = planCommunityReportAbuseControls({
+      reporters: [
+        {
+          reporterId: 'trusted-reporter',
+          reportsLast24Hours: 3,
+          pendingReports: 1,
+          acceptedReportsLast30Days: 18,
+          rejectedReportsLast30Days: 1
+        },
+        {
+          reporterId: 'bursty-reporter',
+          reportsLast24Hours: 27,
+          pendingReports: 2,
+          acceptedReportsLast30Days: 4,
+          rejectedReportsLast30Days: 1
+        },
+        {
+          reporterId: 'low-trust-reporter',
+          reportsLast24Hours: 4,
+          pendingReports: 1,
+          acceptedReportsLast30Days: 1,
+          rejectedReportsLast30Days: 12
+        },
+        {
+          reporterId: 'backlogged-reporter',
+          reportsLast24Hours: 5,
+          pendingReports: 8,
+          acceptedReportsLast30Days: 6,
+          rejectedReportsLast30Days: 2
+        }
+      ]
+    });
+
+    assert.deepEqual(controls, [
+      {
+        reporterId: 'trusted-reporter',
+        action: 'allow',
+        reason: 'Reporter history is within trust limits.'
+      },
+      {
+        reporterId: 'bursty-reporter',
+        action: 'throttle',
+        reason: 'Reporter exceeded 20 community reports in the last 24 hours.'
+      },
+      {
+        reporterId: 'low-trust-reporter',
+        action: 'suspend_reporting',
+        reason: 'Reporter has high rejected-report volume and a low acceptance ratio.'
+      },
+      {
+        reporterId: 'backlogged-reporter',
+        action: 'require_manual_review',
+        reason: 'Reporter has more than 5 unresolved community reports.'
+      }
+    ]);
+  });
+
+  it('uses caller-provided burst and pending thresholds', () => {
+    const controls = planCommunityReportAbuseControls({
+      maxReportsPer24Hours: 5,
+      maxPendingReports: 2,
+      reporters: [
+        {
+          reporterId: 'custom-burst',
+          reportsLast24Hours: 6,
+          pendingReports: 0,
+          acceptedReportsLast30Days: 2,
+          rejectedReportsLast30Days: 0
+        },
+        {
+          reporterId: 'custom-pending',
+          reportsLast24Hours: 1,
+          pendingReports: 3,
+          acceptedReportsLast30Days: 2,
+          rejectedReportsLast30Days: 0
+        }
+      ]
+    });
+
+    assert.deepEqual(controls.map((control) => control.action), ['throttle', 'require_manual_review']);
   });
 });
