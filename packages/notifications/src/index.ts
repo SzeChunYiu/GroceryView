@@ -173,6 +173,25 @@ export type NotificationWorkerTickResult = {
   };
 };
 
+export type NotificationOperationsReport = {
+  status: 'healthy' | 'blocked';
+  metrics: NotificationWorkerTickResult['summary'] & {
+    providerFailures: number;
+    staleDueTasks: number;
+  };
+  blockers: string[];
+  warnings: string[];
+  staleTaskIds: string[];
+};
+
+export type NotificationOperationsReportInput = {
+  now: string;
+  staleAfterMinutes: number;
+  dueTasks: Array<{ id: string; sendAt: string }>;
+  workerSummary: NotificationWorkerTickResult['summary'];
+  deliveries: DeliveryResult[];
+};
+
 function buildMessage(notification: DeliveryNotification): DeliveryMessage {
   return {
     recipient: notification.recipient,
@@ -400,4 +419,44 @@ export async function runNotificationWorkerTick(input: NotificationWorkerTickInp
   }
 
   return { deliveries, acknowledgements, summary };
+}
+
+export function buildNotificationOperationsReport(input: NotificationOperationsReportInput): NotificationOperationsReport {
+  const nowMs = Date.parse(input.now);
+  if (Number.isNaN(nowMs)) throw new Error('now must be an ISO date.');
+  if (!Number.isFinite(input.staleAfterMinutes) || input.staleAfterMinutes <= 0) {
+    throw new Error('staleAfterMinutes must be positive.');
+  }
+
+  const staleAfterMs = input.staleAfterMinutes * 60_000;
+  const staleTaskIds: string[] = [];
+  for (const task of input.dueTasks) {
+    const sendAtMs = Date.parse(task.sendAt);
+    if (Number.isNaN(sendAtMs)) throw new Error(`sendAt must be an ISO date for ${task.id}.`);
+    if (nowMs - sendAtMs > staleAfterMs) staleTaskIds.push(task.id);
+  }
+
+  const providerFailures = input.deliveries.filter(
+    (delivery) => delivery.status === 'failed_no_provider' || delivery.status === 'failed_provider_error'
+  ).length;
+  const blockers: string[] = [];
+  const warnings: string[] = [];
+
+  if (input.workerSummary.deadLettered > 0) blockers.push('notification_dead_letters_present');
+  if (providerFailures > 0) blockers.push('notification_provider_failures_present');
+  if (staleTaskIds.length > 0) blockers.push('notification_due_queue_stale');
+  if (input.workerSummary.retryScheduled > 0) warnings.push('notification_retries_scheduled');
+  if (input.workerSummary.suppressed > 0) warnings.push('notification_suppressions_applied');
+
+  return {
+    status: blockers.length === 0 ? 'healthy' : 'blocked',
+    metrics: {
+      ...input.workerSummary,
+      providerFailures,
+      staleDueTasks: staleTaskIds.length
+    },
+    blockers,
+    warnings,
+    staleTaskIds
+  };
 }
