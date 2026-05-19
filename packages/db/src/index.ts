@@ -486,11 +486,12 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
       const basketRows = await executor.query<{ id: string | number }>(
         `insert into weekly_baskets(user_id, week_start)
          values ($1, date_trunc('week', current_date)::date)
-         on conflict do nothing
+         on conflict (user_id, week_start) do update set user_id = excluded.user_id
          returning id`,
         [userId]
       );
-      const basketId = basketRows[0]?.id ?? 0;
+      const basketId = basketRows[0]?.id;
+      if (basketId === undefined) throw new Error(`Weekly basket was not returned for user: ${userId}`);
       await executor.query('insert into basket_items(basket_id, product_id, quantity) values ($1, $2, $3)', [basketId, item.productId, item.quantity]);
     },
 
