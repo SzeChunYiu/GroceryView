@@ -21,6 +21,22 @@ Price and ingestion records expose provenance directly:
 
 Every price-bearing row carries `price_type`, `confidence`, `observed_at`, and `provenance` either directly or through its referenced observation.
 
+## Partitioning Plan
+
+`observations` is intentionally kept as a single table for the first migration so early API and worker lanes can integrate without partition-management code. When write volume requires partitioning, add a follow-up migration that:
+
+1. creates `observations_v2 partition by range (observed_at)`,
+2. creates monthly partitions named `observations_YYYY_MM`,
+3. recreates the product/time, store/time, price type/time, and provenance indexes on each partition,
+4. backfills from `observations`,
+5. swaps read/write code to `observations_v2`.
+
+The same pattern can be reused for long-term raw payload retention in `raw_records` if retailer capture volume grows faster than normalized observations.
+
+## Deal Score Boundary
+
+The schema stores store location in `stores.position` for map and trip-planning features. Distance or travel time must not be stored as an input to default Deal Score ranking. Deal Score should use price history, discount depth, confidence, and provenance; distance can be applied later as an explicit user-side filter or trip-planning sort.
+
 ## Tables
 
 ### `chains`
