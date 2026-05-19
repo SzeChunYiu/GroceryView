@@ -486,11 +486,12 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
       const basketRows = await executor.query<{ id: string | number }>(
         `insert into weekly_baskets(user_id, week_start)
          values ($1, date_trunc('week', current_date)::date)
-         on conflict do nothing
+         on conflict (user_id, week_start) do update set user_id = excluded.user_id
          returning id`,
         [userId]
       );
-      const basketId = basketRows[0]?.id ?? 0;
+      const basketId = basketRows[0]?.id;
+      if (basketId === undefined) throw new Error(`Weekly basket was not returned for user: ${userId}`);
       await executor.query('insert into basket_items(basket_id, product_id, quantity) values ($1, $2, $3)', [basketId, item.productId, item.quantity]);
     },
 
@@ -695,5 +696,61 @@ export function createPgQueryExecutor(client: PgLikeClient): QueryExecutor {
       const result = await client.query(sql, params);
       return result.rows as T[];
     }
+  };
+}
+
+export type PostgresIntegrationProbe = {
+  requiredTables: string[];
+  existingTables: string[];
+  requiredMigrationVersions: string[];
+  appliedMigrationVersions: string[];
+  repositoryChecks: Array<{
+    name: string;
+    status: 'pass' | 'fail' | 'not_run';
+  }>;
+};
+
+export type PostgresIntegrationReadinessReport = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  evidence: string[];
+  summary: string;
+};
+
+export function buildPostgresIntegrationReadinessReport(input: PostgresIntegrationProbe): PostgresIntegrationReadinessReport {
+  const existingTables = new Set(input.existingTables);
+  const appliedMigrations = new Set(input.appliedMigrationVersions);
+  const blockers: string[] = [];
+  const evidence: string[] = [];
+
+  for (const table of [...new Set(input.requiredTables)].sort()) {
+    if (existingTables.has(table)) {
+      evidence.push(`table:${table}`);
+    } else {
+      blockers.push(`missing_table:${table}`);
+    }
+  }
+
+  for (const version of [...new Set(input.requiredMigrationVersions)].sort()) {
+    if (appliedMigrations.has(version)) {
+      evidence.push(`migration:${version}`);
+    } else {
+      blockers.push(`missing_migration:${version}`);
+    }
+  }
+
+  for (const check of [...input.repositoryChecks].sort((a, b) => a.name.localeCompare(b.name))) {
+    if (check.status === 'pass') {
+      evidence.push(`repository_check:${check.name}`);
+    } else {
+      blockers.push(`repository_check_${check.status}:${check.name}`);
+    }
+  }
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    evidence,
+    summary: blockers.length === 0 ? 'PostgreSQL integration contract is ready.' : 'PostgreSQL integration contract is blocked.'
   };
 }
