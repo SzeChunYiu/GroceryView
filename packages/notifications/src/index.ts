@@ -219,79 +219,110 @@ export type NotificationOperationsAlertInput = {
   recipients: HumanReviewSlaAlertRecipient[];
 };
 
-export type NotificationProviderHealthStatus = 'pass' | 'fail' | 'not_run';
+export type MobileNotificationTopic =
+  | 'target_price_alerts'
+  | 'favorite_store_deals'
+  | 'watchlist_alerts'
+  | 'budget_alerts'
+  | 'weekly_report'
+  | 'receipt_summary'
+  | 'stock_up_opportunities';
 
-export type NotificationProviderReadinessInput = {
-  requiredChannels: DeliveryChannel[];
-  providers: Array<{
-    channel: DeliveryChannel;
-    providerName: string;
-    configured: boolean;
-    credentialsPresent: boolean;
-    healthStatus: NotificationProviderHealthStatus;
-  }>;
+export type MobileNotificationSettings = {
+  pushEnabled: boolean;
+  emailEnabled: boolean;
+  deviceToken?: string;
+  email?: string;
+  topics: Partial<Record<MobileNotificationTopic, boolean>>;
+  quietHours?: {
+    startHour: number;
+    endHour: number;
+    timezone: string;
+  };
 };
 
-export type NotificationProviderReadinessReport = {
-  status: 'ready' | 'blocked';
+export type MobileNotificationPreferencePlan = {
+  channels: DeliveryChannel[];
+  recipients: HumanReviewSlaAlertRecipient[];
+  enabledTopics: MobileNotificationTopic[];
+  disabledTopics: MobileNotificationTopic[];
+  quietHours?: MobileNotificationSettings['quietHours'];
   blockers: string[];
-  evidence: string[];
-  warnings: string[];
-  summary: string;
+  readyForDelivery: boolean;
 };
 
-export type PersistedNotificationTask = {
-  id: string;
-  channel: DeliveryChannel;
-  type: string;
-  title: string;
-  body: string;
-  priority: 'normal' | 'high';
-  sendAt: string;
-  recipient: string;
-  attemptCount: number;
-  maxAttempts: number;
-  status: 'queued' | 'delivered' | 'dead_lettered' | 'suppressed';
-};
+const mobileNotificationTopics: MobileNotificationTopic[] = [
+  'target_price_alerts',
+  'favorite_store_deals',
+  'watchlist_alerts',
+  'budget_alerts',
+  'weekly_report',
+  'receipt_summary',
+  'stock_up_opportunities'
+];
 
-export type DeadLetterReplayPlanInput = {
-  now: string;
-  replayAt?: string;
-  maxReplayAttempts: number;
-  tasks: PersistedNotificationTask[];
-};
+function validateQuietHours(quietHours: NonNullable<MobileNotificationSettings['quietHours']>): string[] {
+  const blockers: string[] = [];
+  if (!Number.isInteger(quietHours.startHour) || quietHours.startHour < 0 || quietHours.startHour > 23) {
+    blockers.push('quietHours.startHour must be an integer from 0 to 23.');
+  }
+  if (!Number.isInteger(quietHours.endHour) || quietHours.endHour < 0 || quietHours.endHour > 23) {
+    blockers.push('quietHours.endHour must be an integer from 0 to 23.');
+  }
+  if (quietHours.startHour === quietHours.endHour) {
+    blockers.push('quietHours must define a non-empty quiet window.');
+  }
+  if (quietHours.timezone.trim() === '') {
+    blockers.push('quietHours.timezone is required.');
+  }
+  return blockers;
+}
 
-export type DeadLetterReplayPlan = {
-  replayable: PersistedNotificationTask[];
-  skipped: Array<{
-    taskId: string;
-    reason: 'not_dead_lettered' | 'attempt_limit_reached' | 'invalid_send_at';
-  }>;
-};
+export function planMobileNotificationPreferences(settings: MobileNotificationSettings): MobileNotificationPreferencePlan {
+  const blockers: string[] = [];
+  const channels: DeliveryChannel[] = [];
+  const recipients: HumanReviewSlaAlertRecipient[] = [];
 
-export type NotificationTaskRepository = {
-  listDueNotificationTasks(now: string): Promise<PersistedNotificationTask[]>;
-  listActiveNotificationSuppressions(): Promise<NotificationSuppression[]>;
-  upsertNotificationTask(task: PersistedNotificationTask): Promise<void>;
-};
+  if (settings.pushEnabled) {
+    channels.push('push');
+    if (settings.deviceToken) {
+      recipients.push({ channel: 'push', recipient: settings.deviceToken });
+    } else {
+      blockers.push('Push notifications are enabled but no device token is registered.');
+    }
+  }
 
-export type RepositoryNotificationWorkerCycleInput = {
-  now: string;
-  retryDelayMinutes: number;
-  staleAfterMinutes: number;
-  repository: NotificationTaskRepository;
-  providers: NotificationProviders;
-  alertRecipients?: HumanReviewSlaAlertRecipient[];
-};
+  if (settings.emailEnabled) {
+    channels.push('email');
+    if (settings.email) {
+      recipients.push({ channel: 'email', recipient: settings.email });
+    } else {
+      blockers.push('Email notifications are enabled but no email recipient is configured.');
+    }
+  }
 
-export type RepositoryNotificationWorkerCycleResult = {
-  dueTasks: PersistedNotificationTask[];
-  suppressions: NotificationSuppression[];
-  worker: NotificationWorkerTickResult;
-  persistedTaskUpdates: PersistedNotificationTask[];
-  report: NotificationOperationsReport;
-  alerts: DeliveryNotification[];
-};
+  if (channels.length === 0) {
+    blockers.push('At least one notification channel must be enabled.');
+  }
+
+  const enabledTopics = mobileNotificationTopics.filter((topic) => settings.topics[topic] === true);
+  const disabledTopics = mobileNotificationTopics.filter((topic) => settings.topics[topic] !== true);
+  if (enabledTopics.length === 0) {
+    blockers.push('At least one notification topic must be enabled.');
+  }
+
+  if (settings.quietHours) blockers.push(...validateQuietHours(settings.quietHours));
+
+  return {
+    channels,
+    recipients,
+    enabledTopics,
+    disabledTopics,
+    quietHours: settings.quietHours,
+    blockers,
+    readyForDelivery: blockers.length === 0
+  };
+}
 
 function buildMessage(notification: DeliveryNotification): DeliveryMessage {
   return {
