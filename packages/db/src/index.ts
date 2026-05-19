@@ -56,6 +56,12 @@ export type BasketRecord = {
   quantity: number;
 };
 
+export type HumanReviewerRecord = {
+  id: string;
+  role: 'viewer' | 'moderator' | 'lead';
+  active: boolean;
+};
+
 export type HumanReviewAssignmentRecord = {
   id: string;
   reviewId: string;
@@ -79,6 +85,8 @@ export type GroceryViewRepository = {
   getWatchlist(userId: string): Promise<WatchlistRecord[]>;
   addBasketItem(userId: string, item: BasketRecord): Promise<void>;
   getBasket(userId: string): Promise<BasketRecord[]>;
+  upsertHumanReviewer(reviewer: HumanReviewerRecord): Promise<void>;
+  getHumanReviewer(reviewerId: string): Promise<HumanReviewerRecord | null>;
   saveHumanReviewAssignment(assignment: HumanReviewAssignmentRecord): Promise<void>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignmentRecord[]>;
 };
@@ -93,6 +101,7 @@ export function createMemoryRepository(): GroceryViewRepository {
   const budgets = new Map<string, BudgetRecord>();
   const watchlists = new Map<string, WatchlistRecord[]>();
   const baskets = new Map<string, BasketRecord[]>();
+  const humanReviewers = new Map<string, HumanReviewerRecord>();
   const humanReviewAssignments = new Map<string, HumanReviewAssignmentRecord>();
 
   return {
@@ -152,6 +161,15 @@ export function createMemoryRepository(): GroceryViewRepository {
         .filter((assignment) => assignment.status !== 'completed')
         .sort((a, b) => a.dueAt.localeCompare(b.dueAt) || a.id.localeCompare(b.id))
         .map((assignment) => ({ ...assignment }));
+    },
+
+    async upsertHumanReviewer(reviewer) {
+      humanReviewers.set(reviewer.id, { ...reviewer });
+    },
+
+    async getHumanReviewer(reviewerId) {
+      const reviewer = humanReviewers.get(reviewerId);
+      return reviewer ? { ...reviewer } : null;
     }
   };
 }
@@ -164,6 +182,7 @@ type FavoriteStoreRow = { store_id: string };
 type BudgetRow = { weekly_budget: string | number; monthly_budget: string | number };
 type WatchlistRow = { product_id: string; target_price: string | number | null; alert_deal_score_at: number | null; favorite_stores_only: boolean };
 type BasketRow = { product_id: string; quantity: string | number };
+type HumanReviewerRow = { id: string; role: HumanReviewerRecord['role']; active: boolean };
 type HumanReviewAssignmentRow = {
   id: string;
   review_id: string;
@@ -194,6 +213,10 @@ function mapHumanReviewAssignment(row: HumanReviewAssignmentRow): HumanReviewAss
     dueAt: asIso(row.due_at),
     status: row.status
   };
+}
+
+function mapHumanReviewer(row: HumanReviewerRow): HumanReviewerRecord {
+  return { id: row.id, role: row.role, active: row.active };
 }
 
 export function createPostgresRepository(executor: QueryExecutor): GroceryViewRepository {
@@ -315,6 +338,24 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
          order by due_at, id`
       );
       return rows.map(mapHumanReviewAssignment);
+    },
+
+    async upsertHumanReviewer(reviewer) {
+      await executor.query(
+        `insert into human_reviewers(id, role, active)
+         values ($1, $2, $3)
+         on conflict (id) do update set
+           role = excluded.role,
+           active = excluded.active,
+           updated_at = now()`,
+        [reviewer.id, reviewer.role, reviewer.active]
+      );
+    },
+
+    async getHumanReviewer(reviewerId) {
+      const rows = await executor.query<HumanReviewerRow>('select id, role, active from human_reviewers where id = $1', [reviewerId]);
+      const row = rows[0];
+      return row ? mapHumanReviewer(row) : null;
     }
   };
 }

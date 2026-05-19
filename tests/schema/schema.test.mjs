@@ -20,6 +20,7 @@ const requiredTables = [
   'receipt_uploads',
   'receipt_items',
   'community_price_reports',
+  'human_reviewers',
   'human_review_assignments',
   'grocery_indices',
   'grocery_index_components'
@@ -42,6 +43,7 @@ const requiredColumns = [
   'alert_deal_score_at',
   'assignee_id',
   'due_at',
+  'role',
   'base_date',
   'weight'
 ];
