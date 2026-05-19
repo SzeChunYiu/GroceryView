@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ConfidenceBadge } from "@/components/confidence-badge";
-import { PriceChartPlaceholder } from "@/components/price-chart-placeholder";
+import { ProductPriceChart } from "@/components/product-price-chart";
 
 const sekFormatter = new Intl.NumberFormat("sv-SE", {
   currency: "SEK",
@@ -98,7 +98,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
       </div>
 
       <section className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
-        <PriceChartPlaceholder />
+        <ProductPriceChart />
 
         <aside className="rounded-[2rem] border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-zinc-500">
