@@ -182,3 +182,148 @@ export function calculateFixedBasketIndex(input: FixedBasketIndexInput): FixedBa
     components: input.components
   };
 }
+
+export type BrandTier = 'national' | 'premium' | 'standard_private_label' | 'budget_private_label' | 'organic_private_label' | 'discount_chain_label';
+
+export type SearchableProduct = {
+  id: string;
+  ticker: string;
+  name: string;
+  category: string;
+  brandTier: BrandTier;
+  availableChains: string[];
+};
+
+export function searchProducts(products: SearchableProduct[], query: string): SearchableProduct[] {
+  const terms = query
+    .toLowerCase()
+    .split(/\s+/)
+    .map((term) => term.trim())
+    .filter(Boolean);
+
+  if (terms.length === 0) return products;
+
+  return products.filter((product) => {
+    const haystack = [product.ticker, product.name, product.category, product.brandTier, ...product.availableChains]
+      .join(' ')
+      .toLowerCase();
+    return terms.every((term) => haystack.includes(term));
+  });
+}
+
+export type WatchlistItem = {
+  productId: string;
+  targetPrice?: number;
+  alertDealScoreAt?: number;
+  favoriteStoresOnly: boolean;
+};
+
+export type WatchlistProductSnapshot = {
+  productId: string;
+  productName: string;
+  bestPrice: number;
+  bestStoreId: string;
+  dealScore: number;
+  isNew52WeekLow: boolean;
+};
+
+export type WatchlistAlert = {
+  productId: string;
+  productName: string;
+  type: 'target_price' | 'deal_score' | 'new_52_week_low';
+  message: string;
+};
+
+const formatSek = (value: number): string => `${value.toFixed(2)} SEK`;
+const storeNameFromId = (storeId: string): string =>
+  storeId
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+
+export function buildWatchlistAlerts(input: {
+  watchlist: WatchlistItem[];
+  products: WatchlistProductSnapshot[];
+  favoriteStoreIds: string[];
+}): WatchlistAlert[] {
+  const productById = new Map(input.products.map((product) => [product.productId, product]));
+  const favoriteStoreSet = new Set(input.favoriteStoreIds);
+  const alerts: WatchlistAlert[] = [];
+
+  for (const item of input.watchlist) {
+    const product = productById.get(item.productId);
+    if (!product) continue;
+    if (item.favoriteStoresOnly && !favoriteStoreSet.has(product.bestStoreId)) continue;
+
+    if (item.targetPrice !== undefined && product.bestPrice <= item.targetPrice) {
+      alerts.push({
+        productId: product.productId,
+        productName: product.productName,
+        type: 'target_price',
+        message: `${product.productName} is ${formatSek(product.bestPrice)} at ${storeNameFromId(product.bestStoreId)}, below your ${formatSek(item.targetPrice)} target.`
+      });
+    }
+
+    if (item.alertDealScoreAt !== undefined && product.dealScore >= item.alertDealScoreAt) {
+      alerts.push({
+        productId: product.productId,
+        productName: product.productName,
+        type: 'deal_score',
+        message: `${product.productName} has Deal Score ${product.dealScore}, meeting your ${item.alertDealScoreAt}+ alert.`
+      });
+    }
+
+    if (product.isNew52WeekLow) {
+      alerts.push({
+        productId: product.productId,
+        productName: product.productName,
+        type: 'new_52_week_low',
+        message: `${product.productName} is at a new 52-week low.`
+      });
+    }
+  }
+
+  return alerts;
+}
+
+export type BudgetInput = {
+  weeklyBudget: number;
+  monthlyBudget: number;
+  estimatedBasketTotal: number;
+  receiptTotalsThisWeek: number[];
+  receiptTotalsThisMonth: number[];
+};
+
+export type BudgetSummary = {
+  weeklyBudget: number;
+  monthlyBudget: number;
+  estimatedBasketTotal: number;
+  weeklyActualSpend: number;
+  monthlyActualSpend: number;
+  weeklyRemainingAfterEstimate: number;
+  weeklyRemainingActual: number;
+  monthlyRemainingActual: number;
+  weeklyStatus: 'under' | 'over';
+  monthlyStatus: 'under' | 'over';
+};
+
+export function summarizeBudget(input: BudgetInput): BudgetSummary {
+  const weeklyActualSpend = roundMoney(input.receiptTotalsThisWeek.reduce((sum, value) => sum + value, 0));
+  const monthlyActualSpend = roundMoney(input.receiptTotalsThisMonth.reduce((sum, value) => sum + value, 0));
+  const weeklyRemainingAfterEstimate = roundMoney(input.weeklyBudget - input.estimatedBasketTotal);
+  const weeklyRemainingActual = roundMoney(input.weeklyBudget - weeklyActualSpend);
+  const monthlyRemainingActual = roundMoney(input.monthlyBudget - monthlyActualSpend);
+
+  return {
+    weeklyBudget: input.weeklyBudget,
+    monthlyBudget: input.monthlyBudget,
+    estimatedBasketTotal: input.estimatedBasketTotal,
+    weeklyActualSpend,
+    monthlyActualSpend,
+    weeklyRemainingAfterEstimate,
+    weeklyRemainingActual,
+    monthlyRemainingActual,
+    weeklyStatus: weeklyRemainingActual >= 0 ? 'under' : 'over',
+    monthlyStatus: monthlyRemainingActual >= 0 ? 'under' : 'over'
+  };
+}
