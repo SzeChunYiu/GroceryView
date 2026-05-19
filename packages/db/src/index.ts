@@ -21,13 +21,21 @@ export function migrationVersionFromPath(path: string): string {
 }
 
 export function createMigrationPlan(files: SqlMigrationFile[]): Migration[] {
-  return files
+  const migrations = files
     .filter((file) => file.path.endsWith('.sql'))
     .sort((a, b) => a.path.localeCompare(b.path))
     .map((file) => ({
       version: migrationVersionFromPath(file.path),
       sql: file.sql
     }));
+
+  const seenVersions = new Set<string>();
+  for (const migration of migrations) {
+    if (seenVersions.has(migration.version)) throw new Error(`Duplicate migration version: ${migration.version}`);
+    seenVersions.add(migration.version);
+  }
+
+  return migrations;
 }
 
 export function parseSqlStatements(sql: string): string[] {

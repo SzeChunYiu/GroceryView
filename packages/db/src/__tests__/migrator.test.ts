@@ -54,6 +54,17 @@ describe('createMigrationPlan', () => {
       { version: '010_indexes', sql: 'create index products_name_idx on products(name);' }
     ]);
   });
+
+  it('rejects duplicate derived migration versions', () => {
+    assert.throws(
+      () =>
+        createMigrationPlan([
+          { path: 'infra/db/migrations/001_init.sql', sql: 'create table chains(id uuid primary key);' },
+          { path: 'db/migrations/001_init.sql', sql: 'create table stores(id uuid primary key);' }
+        ]),
+      /Duplicate migration version: 001_init/
+    );
+  });
 });
 
 describe('applyMigrations', () => {
