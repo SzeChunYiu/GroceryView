@@ -51,8 +51,7 @@ create table if not exists products (
   nutrition jsonb not null default '{}'::jsonb,
   image_url text,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  unique nulls not distinct (barcode)
+  updated_at timestamptz not null default now()
 );
 
 create table if not exists aliases (
@@ -203,6 +202,7 @@ create table if not exists alerts (
 );
 
 create index if not exists stores_position_gix on stores using gist (position);
+create unique index if not exists products_barcode_unique_idx on products (barcode) where barcode is not null;
 create index if not exists products_name_trgm_idx on products using gin (canonical_name gin_trgm_ops);
 create index if not exists aliases_normalized_trgm_idx on aliases using gin (normalized_alias gin_trgm_ops);
 create index if not exists observations_product_observed_idx on observations (product_id, observed_at desc);
