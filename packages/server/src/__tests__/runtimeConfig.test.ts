@@ -10,7 +10,8 @@ describe('runtime config', () => {
       AUTH_SECRET: 'super-secret',
       DATABASE_URL: 'postgres://example',
       PUBLIC_WEB_URL: 'https://groceryview.example',
-      NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret'
+      NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      METRICS_TOKEN: 'metrics-token'
     });
 
     assert.deepEqual(config, {
@@ -19,7 +20,8 @@ describe('runtime config', () => {
       authSecret: 'super-secret',
       databaseUrl: 'postgres://example',
       publicWebUrl: 'https://groceryview.example',
-      notificationWebhookSecret: 'webhook-secret'
+      notificationWebhookSecret: 'webhook-secret',
+      metricsToken: 'metrics-token'
     });
   });
 
@@ -32,6 +34,14 @@ describe('runtime config', () => {
       DATABASE_URL: 'postgres://example',
       PUBLIC_WEB_URL: 'https://groceryview.example'
     }), /NOTIFICATION_WEBHOOK_SECRET is required/);
+    assert.throws(() => loadRuntimeConfig({
+      NODE_ENV: 'production',
+      PORT: '8080',
+      AUTH_SECRET: 'super-secret',
+      DATABASE_URL: 'postgres://example',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret'
+    }), /METRICS_TOKEN is required/);
   });
 
   it('builds a health report without exposing secrets', () => {
@@ -43,7 +53,8 @@ describe('runtime config', () => {
       environment: 'development',
       hasDatabase: false,
       hasAuthSecret: false,
-      hasNotificationWebhookSecret: false
+      hasNotificationWebhookSecret: false,
+      hasMetricsToken: false
     });
   });
 });

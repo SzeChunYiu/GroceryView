@@ -3,8 +3,10 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { createGroceryViewApi } from '@groceryview/api';
 import { parseBearerToken, verifySessionToken } from '@groceryview/auth';
 import {
+  formatNotificationOperationsMetrics,
   processNotificationSuppressionEvent,
   type DeliveryChannel,
+  type NotificationOperationsReport,
   type NotificationSuppressionEventType,
   type NotificationSuppressionMutation
 } from '@groceryview/notifications';
@@ -18,6 +20,8 @@ export type AuthOptions = {
   notificationSuppressionSink?: {
     upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
   };
+  notificationMetricsToken?: string;
+  notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
 };
 
 type JsonRecord = Record<string, unknown>;
@@ -100,6 +104,14 @@ function hasValidNotificationWebhookSignature(request: Request, body: string, se
   return providedBuffer.length === expectedBuffer.length && timingSafeEqual(providedBuffer, expectedBuffer);
 }
 
+function hasValidMetricsToken(request: Request, token: string): boolean {
+  const provided = request.headers.get('x-groceryview-metrics-token');
+  if (!provided) return false;
+  const providedBuffer = Buffer.from(provided);
+  const expectedBuffer = Buffer.from(token);
+  return providedBuffer.length === expectedBuffer.length && timingSafeEqual(providedBuffer, expectedBuffer);
+}
+
 export function createHttpHandler(api = createGroceryViewApi(), authOptions: AuthOptions = {}): HttpHandler {
   const authorizeUser = async (request: Request, userId: string): Promise<Response | null> => {
     if (!authOptions.authSecret) return null;
@@ -118,6 +130,19 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     try {
       if (method === 'GET' && path === '/api/market/overview') return jsonResponse(api.getMarketOverview());
       if (method === 'GET' && path === '/api/stores') return jsonResponse(api.getStores());
+
+      if (method === 'GET' && path === '/api/metrics/notifications') {
+        if (!authOptions.notificationMetricsToken) return errorResponse(503, 'Notification metrics token is not configured.');
+        if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
+          return errorResponse(401, 'A valid notification metrics token is required.');
+        }
+        if (!authOptions.notificationMetricsProvider) return errorResponse(503, 'Notification metrics provider is not configured.');
+
+        return new Response(
+          formatNotificationOperationsMetrics(await authOptions.notificationMetricsProvider(), { service: 'groceryview-server' }),
+          { status: 200, headers: { 'content-type': 'text/plain; version=0.0.4; charset=utf-8' } }
+        );
+      }
 
       if (method === 'POST' && path === '/api/notifications/suppression-events') {
         if (!authOptions.notificationWebhookSecret) return errorResponse(503, 'Notification webhook secret is not configured.');
@@ -291,6 +316,7 @@ export type OpenApiOperation = {
 
 export type OpenApiSecurityRequirement = {
   bearerAuth?: never[];
+  metricsToken?: never[];
   webhookSignature?: never[];
 };
 
@@ -303,6 +329,7 @@ export type OpenApiDocument = {
   components: {
     securitySchemes: {
       bearerAuth: { type: 'http'; scheme: 'bearer' };
+      metricsToken: { type: 'apiKey'; in: 'header'; name: 'x-groceryview-metrics-token' };
       webhookSignature: { type: 'apiKey'; in: 'header'; name: 'x-groceryview-signature' };
     };
   };
@@ -310,6 +337,7 @@ export type OpenApiDocument = {
 
 const protectedOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ bearerAuth: [] }] });
 const publicOperation = (summary: string): OpenApiOperation => ({ summary });
+const metricsOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ metricsToken: [] }] });
 const webhookOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ webhookSignature: [] }] });
 
 export function buildOpenApiDocument(): OpenApiDocument {
@@ -319,6 +347,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
     components: {
       securitySchemes: {
         bearerAuth: { type: 'http', scheme: 'bearer' },
+        metricsToken: { type: 'apiKey', in: 'header', name: 'x-groceryview-metrics-token' },
         webhookSignature: { type: 'apiKey', in: 'header', name: 'x-groceryview-signature' }
       }
     },
@@ -345,6 +374,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/budget/summary': { get: protectedOperation('Get budget summary.') },
       '/api/indices': { get: publicOperation('List grocery indices.') },
       '/api/indices/{id}': { get: publicOperation('Get grocery index detail.') },
+      '/api/metrics/notifications': { get: metricsOperation('Export notification operations metrics.') },
       '/api/notifications/suppression-events': { post: webhookOperation('Accept signed notification suppression provider events.') }
     }
   };
@@ -357,6 +387,7 @@ export type RuntimeConfig = {
   databaseUrl?: string;
   publicWebUrl?: string;
   notificationWebhookSecret?: string;
+  metricsToken?: string;
 };
 
 export function loadRuntimeConfig(env: Record<string, string | undefined>): RuntimeConfig {
@@ -369,6 +400,7 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     if (!env.DATABASE_URL) throw new Error('DATABASE_URL is required in production.');
     if (!env.PUBLIC_WEB_URL) throw new Error('PUBLIC_WEB_URL is required in production.');
     if (!env.NOTIFICATION_WEBHOOK_SECRET) throw new Error('NOTIFICATION_WEBHOOK_SECRET is required in production.');
+    if (!env.METRICS_TOKEN) throw new Error('METRICS_TOKEN is required in production.');
   }
   return {
     nodeEnv,
@@ -376,7 +408,8 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     authSecret: env.AUTH_SECRET,
     databaseUrl: env.DATABASE_URL,
     publicWebUrl: env.PUBLIC_WEB_URL,
-    notificationWebhookSecret: env.NOTIFICATION_WEBHOOK_SECRET
+    notificationWebhookSecret: env.NOTIFICATION_WEBHOOK_SECRET,
+    metricsToken: env.METRICS_TOKEN
   };
 }
 
@@ -387,6 +420,7 @@ export type HealthReport = {
   hasDatabase: boolean;
   hasAuthSecret: boolean;
   hasNotificationWebhookSecret: boolean;
+  hasMetricsToken: boolean;
 };
 
 export function buildHealthReport(config: RuntimeConfig): HealthReport {
@@ -396,6 +430,7 @@ export function buildHealthReport(config: RuntimeConfig): HealthReport {
     environment: config.nodeEnv,
     hasDatabase: Boolean(config.databaseUrl),
     hasAuthSecret: Boolean(config.authSecret),
-    hasNotificationWebhookSecret: Boolean(config.notificationWebhookSecret)
+    hasNotificationWebhookSecret: Boolean(config.notificationWebhookSecret),
+    hasMetricsToken: Boolean(config.metricsToken)
   };
 }
