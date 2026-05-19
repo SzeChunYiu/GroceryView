@@ -7,6 +7,7 @@ const envExample = readFileSync(new URL('../../../../.env.example', import.meta.
 const infraReadme = readFileSync(new URL('../../../../infra/README.md', import.meta.url), 'utf8');
 const smokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-local-services.sh', import.meta.url), 'utf8');
 const smokeWorkflow = readFileSync(new URL('../../../../.github/workflows/local-infra-smoke.yml', import.meta.url), 'utf8');
+const smokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-local-services.sh', import.meta.url), 'utf8');
 
 describe('local infrastructure compose', () => {
   it('defines the required development backing services and ports', () => {

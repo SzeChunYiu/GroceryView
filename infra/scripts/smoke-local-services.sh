@@ -57,6 +57,8 @@ wait_healthy() {
   id="$(container_id "$service")"
   if [ -z "$id" ]; then
     fail_with_diagnostics "service did not start: $service"
+    echo "service did not start: $service" >&2
+    exit 1
   fi
 
   for _ in $(seq 1 "$WAIT_SECONDS"); do
@@ -67,6 +69,9 @@ wait_healthy() {
   done
 
   fail_with_diagnostics "service did not become healthy within ${WAIT_SECONDS}s: $service"
+  echo "service did not become healthy within ${WAIT_SECONDS}s: $service" >&2
+  compose ps "$service" >&2 || true
+  exit 1
 }
 
 compose up -d "$POSTGRES_SERVICE" "$REDIS_SERVICE" "$OBJECT_STORAGE_SERVICE" "$OBJECT_STORAGE_INIT_SERVICE"
@@ -82,5 +87,12 @@ compose run --rm --entrypoint /bin/sh "$OBJECT_STORAGE_INIT_SERVICE" -c '
   mc alias set local http://object-storage:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" >/dev/null
   mc ls "local/$S3_BUCKET" >/dev/null
 ' || fail_with_diagnostics "object storage bucket verification failed"
+compose exec -T "$POSTGRES_SERVICE" pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" >/dev/null
+compose exec -T "$REDIS_SERVICE" redis-cli ping | grep -qx "PONG"
+compose run --rm "$OBJECT_STORAGE_INIT_SERVICE" >/dev/null
+compose run --rm --entrypoint /bin/sh "$OBJECT_STORAGE_INIT_SERVICE" -c '
+  mc alias set local http://object-storage:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" >/dev/null
+  mc ls "local/$S3_BUCKET" >/dev/null
+'
 
 echo "Local services ready: postgres redis object-storage bucket=$S3_BUCKET"
