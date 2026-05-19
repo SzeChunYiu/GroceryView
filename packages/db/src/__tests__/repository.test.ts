@@ -105,4 +105,52 @@ describe('createMemoryRepository', () => {
     });
     assert.equal(await repo.getCommunityReporterTrust('missing-reporter'), null);
   });
+
+  it('persists due notification worker tasks separately from future and completed tasks', async () => {
+    const repo = createMemoryRepository();
+
+    await repo.upsertNotificationTask({
+      id: 'task-due',
+      channel: 'email',
+      type: 'human_review_sla_breach',
+      title: 'Human review SLA breached',
+      body: 'Review review-1 is overdue.',
+      priority: 'high',
+      sendAt: '2026-05-19T11:55:00.000Z',
+      recipient: 'ops@example.com',
+      attemptCount: 1,
+      maxAttempts: 3,
+      status: 'queued'
+    });
+    await repo.upsertNotificationTask({
+      id: 'task-future',
+      channel: 'push',
+      type: 'human_review_sla_due_soon',
+      title: 'Human review SLA due soon',
+      body: 'Review review-2 is due soon.',
+      priority: 'high',
+      sendAt: '2026-05-19T13:00:00.000Z',
+      recipient: 'ops-device',
+      attemptCount: 0,
+      maxAttempts: 3,
+      status: 'queued'
+    });
+    await repo.upsertNotificationTask({
+      id: 'task-delivered',
+      channel: 'email',
+      type: 'weekly_report',
+      title: 'Weekly report',
+      body: 'Already delivered.',
+      priority: 'normal',
+      sendAt: '2026-05-19T10:00:00.000Z',
+      recipient: 'user@example.com',
+      attemptCount: 1,
+      maxAttempts: 3,
+      status: 'delivered'
+    });
+
+    assert.deepEqual((await repo.listDueNotificationTasks('2026-05-19T12:00:00.000Z')).map((task) => task.id), [
+      'task-due'
+    ]);
+  });
 });

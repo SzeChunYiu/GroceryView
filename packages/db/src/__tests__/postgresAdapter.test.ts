@@ -24,6 +24,23 @@ class RecordingQueryExecutor implements QueryExecutor {
         }
       ] as T[];
     }
+    if (sql.includes('from notification_tasks')) {
+      return [
+        {
+          id: 'task-due',
+          channel: 'email',
+          type: 'human_review_sla_breach',
+          title: 'Human review SLA breached',
+          body: 'Review review-1 is overdue.',
+          priority: 'high',
+          send_at: '2026-05-19T11:55:00.000Z',
+          recipient: 'ops@example.com',
+          attempt_count: 1,
+          max_attempts: 3,
+          status: 'queued'
+        }
+      ] as T[];
+    }
     if (sql.includes('from human_review_assignments')) {
       return [
         {
@@ -149,5 +166,54 @@ describe('createPostgresRepository', () => {
       '2026-05-19T20:00:00.000Z'
     ]);
     assert.deepEqual(executor.calls[1].params, ['reporter-1']);
+  });
+
+  it('persists and lists due notification worker tasks', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertNotificationTask({
+      id: 'task-due',
+      channel: 'email',
+      type: 'human_review_sla_breach',
+      title: 'Human review SLA breached',
+      body: 'Review review-1 is overdue.',
+      priority: 'high',
+      sendAt: '2026-05-19T11:55:00.000Z',
+      recipient: 'ops@example.com',
+      attemptCount: 1,
+      maxAttempts: 3,
+      status: 'queued'
+    });
+
+    assert.deepEqual(await repo.listDueNotificationTasks('2026-05-19T12:00:00.000Z'), [
+      {
+        id: 'task-due',
+        channel: 'email',
+        type: 'human_review_sla_breach',
+        title: 'Human review SLA breached',
+        body: 'Review review-1 is overdue.',
+        priority: 'high',
+        sendAt: '2026-05-19T11:55:00.000Z',
+        recipient: 'ops@example.com',
+        attemptCount: 1,
+        maxAttempts: 3,
+        status: 'queued'
+      }
+    ]);
+    assert.deepEqual(executor.calls[0].params, [
+      'task-due',
+      'email',
+      'human_review_sla_breach',
+      'Human review SLA breached',
+      'Review review-1 is overdue.',
+      'high',
+      '2026-05-19T11:55:00.000Z',
+      'ops@example.com',
+      1,
+      3,
+      'queued'
+    ]);
+    assert.deepEqual(executor.calls[1].params, ['2026-05-19T12:00:00.000Z']);
   });
 });

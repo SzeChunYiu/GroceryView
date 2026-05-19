@@ -71,6 +71,20 @@ export type CommunityReporterTrustRecord = {
   updatedAt: string;
 };
 
+export type NotificationTaskRecord = {
+  id: string;
+  channel: 'push' | 'email';
+  type: string;
+  title: string;
+  body: string;
+  priority: 'normal' | 'high';
+  sendAt: string;
+  recipient: string;
+  attemptCount: number;
+  maxAttempts: number;
+  status: 'queued' | 'delivered' | 'dead_lettered';
+};
+
 export type HumanReviewAssignmentRecord = {
   id: string;
   reviewId: string;
@@ -98,6 +112,8 @@ export type GroceryViewRepository = {
   getHumanReviewer(reviewerId: string): Promise<HumanReviewerRecord | null>;
   upsertCommunityReporterTrust(trust: CommunityReporterTrustRecord): Promise<void>;
   getCommunityReporterTrust(reporterId: string): Promise<CommunityReporterTrustRecord | null>;
+  upsertNotificationTask(task: NotificationTaskRecord): Promise<void>;
+  listDueNotificationTasks(now: string): Promise<NotificationTaskRecord[]>;
   saveHumanReviewAssignment(assignment: HumanReviewAssignmentRecord): Promise<void>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignmentRecord[]>;
 };
@@ -114,6 +130,7 @@ export function createMemoryRepository(): GroceryViewRepository {
   const baskets = new Map<string, BasketRecord[]>();
   const humanReviewers = new Map<string, HumanReviewerRecord>();
   const communityReporterTrust = new Map<string, CommunityReporterTrustRecord>();
+  const notificationTasks = new Map<string, NotificationTaskRecord>();
   const humanReviewAssignments = new Map<string, HumanReviewAssignmentRecord>();
 
   return {
@@ -191,6 +208,17 @@ export function createMemoryRepository(): GroceryViewRepository {
     async getCommunityReporterTrust(reporterId) {
       const trust = communityReporterTrust.get(reporterId);
       return trust ? { ...trust } : null;
+    },
+
+    async upsertNotificationTask(task) {
+      notificationTasks.set(task.id, { ...task });
+    },
+
+    async listDueNotificationTasks(now) {
+      return [...notificationTasks.values()]
+        .filter((task) => task.status === 'queued' && task.sendAt <= now)
+        .sort((a, b) => a.sendAt.localeCompare(b.sendAt) || a.id.localeCompare(b.id))
+        .map((task) => ({ ...task }));
     }
   };
 }
@@ -204,6 +232,19 @@ type BudgetRow = { weekly_budget: string | number; monthly_budget: string | numb
 type WatchlistRow = { product_id: string; target_price: string | number | null; alert_deal_score_at: number | null; favorite_stores_only: boolean };
 type BasketRow = { product_id: string; quantity: string | number };
 type HumanReviewerRow = { id: string; role: HumanReviewerRecord['role']; active: boolean };
+type NotificationTaskRow = {
+  id: string;
+  channel: NotificationTaskRecord['channel'];
+  type: string;
+  title: string;
+  body: string;
+  priority: NotificationTaskRecord['priority'];
+  send_at: string | Date;
+  recipient: string;
+  attempt_count: string | number;
+  max_attempts: string | number;
+  status: NotificationTaskRecord['status'];
+};
 type CommunityReporterTrustRow = {
   reporter_id: string;
   reports_last_24_hours: string | number;
@@ -256,6 +297,22 @@ function mapCommunityReporterTrust(row: CommunityReporterTrustRow): CommunityRep
     acceptedReportsLast30Days: Number(row.accepted_reports_last_30_days),
     rejectedReportsLast30Days: Number(row.rejected_reports_last_30_days),
     updatedAt: asIso(row.updated_at)
+  };
+}
+
+function mapNotificationTask(row: NotificationTaskRow): NotificationTaskRecord {
+  return {
+    id: row.id,
+    channel: row.channel,
+    type: row.type,
+    title: row.title,
+    body: row.body,
+    priority: row.priority,
+    sendAt: asIso(row.send_at),
+    recipient: row.recipient,
+    attemptCount: Number(row.attempt_count),
+    maxAttempts: Number(row.max_attempts),
+    status: row.status
   };
 }
 
@@ -439,6 +496,50 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
       );
       const row = rows[0];
       return row ? mapCommunityReporterTrust(row) : null;
+    },
+
+    async upsertNotificationTask(task) {
+      await executor.query(
+        `insert into notification_tasks(
+           id, channel, type, title, body, priority, send_at, recipient, attempt_count, max_attempts, status
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+         on conflict (id) do update set
+           channel = excluded.channel,
+           type = excluded.type,
+           title = excluded.title,
+           body = excluded.body,
+           priority = excluded.priority,
+           send_at = excluded.send_at,
+           recipient = excluded.recipient,
+           attempt_count = excluded.attempt_count,
+           max_attempts = excluded.max_attempts,
+           status = excluded.status,
+           updated_at = now()`,
+        [
+          task.id,
+          task.channel,
+          task.type,
+          task.title,
+          task.body,
+          task.priority,
+          task.sendAt,
+          task.recipient,
+          task.attemptCount,
+          task.maxAttempts,
+          task.status
+        ]
+      );
+    },
+
+    async listDueNotificationTasks(now) {
+      const rows = await executor.query<NotificationTaskRow>(
+        `select id, channel, type, title, body, priority, send_at, recipient, attempt_count, max_attempts, status
+         from notification_tasks
+         where status = 'queued' and send_at <= $1
+         order by send_at, id`,
+        [now]
+      );
+      return rows.map(mapNotificationTask);
     }
   };
 }
