@@ -64,4 +64,4 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 - Hosting provider selection, real deployment, secrets, DNS, observability, smoke tests, and rollback.
 - Full catalog/data coverage beyond seed products/stores.
 - Human review queue for low-confidence product matching and community reports.
-- Branch protection / required CI settings in GitHub repository settings.
+- Branch protection policy documented in .github/repository-ruleset.json; still needs applying in GitHub repository settings.

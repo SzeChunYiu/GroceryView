@@ -1,0 +1,12 @@
+{
+  "name": "main protection",
+  "targetBranches": ["main"],
+  "rules": {
+    "requirePullRequest": true,
+    "requiredStatusChecks": ["Test, build, and typecheck"],
+    "blockForcePushes": true,
+    "blockDeletions": true,
+    "requireLinearHistory": false
+  },
+  "notes": "Apply this policy in GitHub repository settings/rulesets. It documents the required governance for GroceryView main."
+}
