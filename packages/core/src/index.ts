@@ -603,6 +603,19 @@ export type HumanReviewSlaSummary = {
   dueSoonReviewIds: string[];
 };
 
+export type HumanReviewOperator = {
+  id: string;
+  role: 'viewer' | 'moderator' | 'lead';
+  active: boolean;
+};
+
+export type HumanReviewAction = 'view_queue' | 'assign_review' | 'decide_review' | 'manage_abuse_controls';
+
+export type HumanReviewAuthorization = {
+  allowed: boolean;
+  reason: string;
+};
+
 export function planHumanReviewQueue(input: {
   productMatches: ProductMatchReviewCandidate[];
   communityReports: CommunityReportReviewCandidate[];
@@ -685,6 +698,38 @@ export function planCommunityReportAbuseControls(input: {
       reason: 'Reporter history is within trust limits.'
     };
   });
+}
+
+export function authorizeHumanReviewAction(input: {
+  reviewer: HumanReviewOperator;
+  action: HumanReviewAction;
+  assignment?: HumanReviewAssignment;
+}): HumanReviewAuthorization {
+  if (!input.reviewer.active) return { allowed: false, reason: 'Reviewer is inactive.' };
+
+  if (input.reviewer.role === 'lead') {
+    return { allowed: true, reason: 'Lead reviewers can perform human-review operations.' };
+  }
+
+  if (input.reviewer.role === 'viewer') {
+    return input.action === 'view_queue'
+      ? { allowed: true, reason: 'Viewer can inspect the review queue.' }
+      : { allowed: false, reason: 'Viewers cannot mutate human-review work.' };
+  }
+
+  if (input.action === 'view_queue') return { allowed: true, reason: 'Moderator can inspect the review queue.' };
+
+  if (input.action === 'decide_review') {
+    if (!input.assignment || input.assignment.assigneeId !== input.reviewer.id) {
+      return { allowed: false, reason: 'Moderators can only decide reviews assigned to them.' };
+    }
+    if (input.assignment.status === 'completed') {
+      return { allowed: false, reason: 'Completed reviews cannot be decided again.' };
+    }
+    return { allowed: true, reason: 'Moderator is assigned to this open review.' };
+  }
+
+  return { allowed: false, reason: 'Moderators cannot manage assignment or abuse-control settings.' };
 }
 
 const humanReviewPriorityRank: Record<HumanReviewQueueItem['priority'], number> = { high: 0, medium: 1, low: 2 };

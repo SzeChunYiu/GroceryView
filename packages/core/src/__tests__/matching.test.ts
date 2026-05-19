@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   applyHumanReviewDecision,
+  authorizeHumanReviewAction,
   classifyProductMatch,
   planCommunityReportAbuseControls,
   planHumanReviewAssignments,
@@ -420,5 +421,88 @@ describe('planCommunityReportAbuseControls', () => {
     });
 
     assert.deepEqual(controls.map((control) => control.action), ['throttle', 'require_manual_review']);
+  });
+});
+
+describe('authorizeHumanReviewAction', () => {
+  const assignment = {
+    id: 'assignment-review-match-1-moderator-1',
+    reviewId: 'review-match-1',
+    subjectType: 'product_match' as const,
+    subjectId: 'match-1',
+    priority: 'high' as const,
+    reason: 'Low-confidence produce match.',
+    assigneeId: 'moderator-1',
+    assignedAt: '2026-05-19T10:00:00.000Z',
+    dueAt: '2026-05-19T14:00:00.000Z',
+    status: 'assigned' as const
+  };
+
+  it('allows leads to manage queue assignments and abuse controls', () => {
+    assert.deepEqual(
+      authorizeHumanReviewAction({
+        reviewer: { id: 'lead-1', role: 'lead', active: true },
+        action: 'assign_review'
+      }),
+      { allowed: true, reason: 'Lead reviewers can perform human-review operations.' }
+    );
+    assert.deepEqual(
+      authorizeHumanReviewAction({
+        reviewer: { id: 'lead-1', role: 'lead', active: true },
+        action: 'manage_abuse_controls'
+      }).allowed,
+      true
+    );
+  });
+
+  it('limits moderators to viewing and deciding their own open assignments', () => {
+    assert.deepEqual(
+      authorizeHumanReviewAction({
+        reviewer: { id: 'moderator-1', role: 'moderator', active: true },
+        action: 'decide_review',
+        assignment
+      }),
+      { allowed: true, reason: 'Moderator is assigned to this open review.' }
+    );
+    assert.deepEqual(
+      authorizeHumanReviewAction({
+        reviewer: { id: 'moderator-2', role: 'moderator', active: true },
+        action: 'decide_review',
+        assignment
+      }),
+      { allowed: false, reason: 'Moderators can only decide reviews assigned to them.' }
+    );
+    assert.deepEqual(
+      authorizeHumanReviewAction({
+        reviewer: { id: 'moderator-1', role: 'moderator', active: true },
+        action: 'assign_review'
+      }).allowed,
+      false
+    );
+  });
+
+  it('allows viewers to view only and blocks inactive reviewers', () => {
+    assert.deepEqual(
+      authorizeHumanReviewAction({
+        reviewer: { id: 'viewer-1', role: 'viewer', active: true },
+        action: 'view_queue'
+      }),
+      { allowed: true, reason: 'Viewer can inspect the review queue.' }
+    );
+    assert.deepEqual(
+      authorizeHumanReviewAction({
+        reviewer: { id: 'viewer-1', role: 'viewer', active: true },
+        action: 'decide_review',
+        assignment
+      }).allowed,
+      false
+    );
+    assert.deepEqual(
+      authorizeHumanReviewAction({
+        reviewer: { id: 'inactive-lead', role: 'lead', active: false },
+        action: 'assign_review'
+      }),
+      { allowed: false, reason: 'Reviewer is inactive.' }
+    );
   });
 });
