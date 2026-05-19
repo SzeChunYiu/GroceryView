@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "services": [
+    {
+      "name": "groceryview-server",
+      "type": "node-http",
+      "workspace": "@groceryview/server",
+      "startCommand": "node packages/server/dist/index.js",
+      "healthCheck": { "path": "/api/health", "expectedStatus": 200 },
+      "requiredEnv": ["AUTH_SECRET", "DATABASE_URL", "PUBLIC_WEB_URL"]
+    },
+    {
+      "name": "groceryview-web",
+      "type": "static-site",
+      "workspace": "@groceryview/web",
+      "buildCommand": "npm run build -w @groceryview/web",
+      "outputDirectory": "apps/web/dist",
+      "healthCheck": { "path": "/", "expectedStatus": 200 },
+      "requiredEnv": []
+    }
+  ]
+}

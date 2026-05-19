@@ -265,3 +265,48 @@ export function buildOpenApiDocument(): OpenApiDocument {
     }
   };
 }
+
+export type RuntimeConfig = {
+  nodeEnv: 'development' | 'test' | 'production';
+  port: number;
+  authSecret?: string;
+  databaseUrl?: string;
+  publicWebUrl?: string;
+};
+
+export function loadRuntimeConfig(env: Record<string, string | undefined>): RuntimeConfig {
+  const nodeEnv = (env.NODE_ENV ?? 'development') as RuntimeConfig['nodeEnv'];
+  if (!['development', 'test', 'production'].includes(nodeEnv)) throw new Error(`Unsupported NODE_ENV: ${nodeEnv}`);
+  const port = Number(env.PORT ?? '3000');
+  if (!Number.isInteger(port) || port <= 0) throw new Error('PORT must be a positive integer.');
+  if (nodeEnv === 'production') {
+    if (!env.AUTH_SECRET) throw new Error('AUTH_SECRET is required in production.');
+    if (!env.DATABASE_URL) throw new Error('DATABASE_URL is required in production.');
+    if (!env.PUBLIC_WEB_URL) throw new Error('PUBLIC_WEB_URL is required in production.');
+  }
+  return {
+    nodeEnv,
+    port,
+    authSecret: env.AUTH_SECRET,
+    databaseUrl: env.DATABASE_URL,
+    publicWebUrl: env.PUBLIC_WEB_URL
+  };
+}
+
+export type HealthReport = {
+  status: 'ok';
+  service: 'groceryview-server';
+  environment: RuntimeConfig['nodeEnv'];
+  hasDatabase: boolean;
+  hasAuthSecret: boolean;
+};
+
+export function buildHealthReport(config: RuntimeConfig): HealthReport {
+  return {
+    status: 'ok',
+    service: 'groceryview-server',
+    environment: config.nodeEnv,
+    hasDatabase: Boolean(config.databaseUrl),
+    hasAuthSecret: Boolean(config.authSecret)
+  };
+}
