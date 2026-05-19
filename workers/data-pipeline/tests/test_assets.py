@@ -1,69 +1,122 @@
-from decimal import Decimal
-import unittest
-
 from groceryview_data_pipeline.assets import (
     build_latest_price_rollup,
-    collect_quality_checks,
-    normalize_retailer_records,
-    retailer_fetch_stubs,
-    seed_products,
-    seed_stores,
+    build_normalized_products,
+    build_price_observations,
+    build_quality_checks,
+    build_retailer_fetch_stubs,
+    build_seed_products,
+    build_seed_stores,
 )
+from groceryview_data_pipeline.models import LatestPriceRow, PriceObservationRow, PriceProvenance
 
 
-class DataPipelineAssetTests(unittest.TestCase):
-    def test_stub_records_normalize_to_provenance_carrying_observations(self):
-        observations = normalize_retailer_records(retailer_fetch_stubs())
+def test_data_pipeline_assets_cover_the_expected_lane_contract() -> None:
+    stores = build_seed_stores()
+    products = build_seed_products()
+    stubs = build_retailer_fetch_stubs(stores, products)
+    normalized_products = build_normalized_products(products)
+    observations = build_price_observations(stubs, normalized_products)
+    latest = build_latest_price_rollup(observations)
+    quality = build_quality_checks(stubs, observations, latest)
 
-        self.assertEqual(len(observations), 3)
-        self.assertEqual({item.currency for item in observations}, {"SEK"})
-        self.assertEqual({item.price_type for item in observations}, {"promotion", "shelf", "online"})
-        for observation in observations:
-            self.assertIn("source_run_id", observation.provenance)
-            self.assertIn("raw_record_ref", observation.provenance)
-            self.assertIn("parser_version", observation.provenance)
-            self.assertGreaterEqual(observation.confidence, Decimal("0"))
-            self.assertLessEqual(observation.confidence, Decimal("1"))
+    assert len(stores) >= 5
+    assert len(products) >= 8
+    assert len(stubs) > 0
+    assert len(observations) == len(stubs)
+    assert len(latest) <= len(observations)
+    assert quality.observation_count == len(observations)
+    assert quality.latest_rollup_count == len(latest)
+    assert quality.missing_provenance_count == 0
+    assert quality.fetch_stub_count == len(stubs)
+    assert "retailer_page" in quality.source_types
 
-    def test_latest_price_rollup_keeps_newest_per_product_store_and_price_type(self):
-        raw_records = retailer_fetch_stubs()
-        first_record = raw_records[0]
-        older_duplicate = type(first_record)(
-            source_run_id=first_record.source_run_id,
-            source_type=first_record.source_type,
-            source_name=first_record.source_name,
-            source_url=first_record.source_url,
-            external_ref="willys:coffee:older",
-            observed_at="2026-05-20T05:00:00Z",
-            payload={**first_record.payload, "displayPrice": "55.90"},
-            provenance=first_record.provenance,
-        )
-        observations = normalize_retailer_records([older_duplicate, *raw_records])
+    first_stub = stubs[0]
+    assert first_stub.provenance.source_type == "retailer_page"
+    assert first_stub.provenance.source_run_id.startswith("demo-run-")
+    assert first_stub.provenance.raw_snapshot_ref and first_stub.provenance.raw_snapshot_ref.startswith("s3://")
 
-        latest_prices = build_latest_price_rollup(observations)
+    first_observation = observations[0]
+    assert first_observation.provenance.observed_at == first_observation.observed_at
+    assert first_observation.unit_price_amount is not None
+    assert first_observation.price_type in {"regular", "promotion"}
 
-        coffee = [price for price in latest_prices if price.product_id == "prod-arabica-coffee-450g"]
-        self.assertEqual(len(coffee), 1)
-        self.assertEqual(coffee[0].observation_ref, "willys:coffee:450g")
-        self.assertEqual(coffee[0].price, Decimal("49.90"))
+    for row in observations:
+        assert row.provenance.raw_snapshot_ref is not None
+        assert row.provenance.raw_record_id
 
-    def test_quality_checks_pass_for_seeded_stub_pipeline(self):
-        stores = seed_stores()
-        products = seed_products()
-        raw_records = retailer_fetch_stubs()
-        observations = normalize_retailer_records(raw_records)
-        latest_prices = build_latest_price_rollup(observations)
+    for row in latest:
+        assert row.provenance.raw_record_id.startswith("raw-")
 
-        checks = collect_quality_checks(stores, products, raw_records, observations, latest_prices)
-
-        self.assertEqual([check.name for check in checks], [
-            "observations_reference_seed_products",
-            "observations_reference_seed_stores",
-            "raw_records_include_parser_provenance",
-            "latest_prices_cover_observation_keys",
-        ])
-        self.assertTrue(all(check.passed for check in checks), checks)
+    round_tripped = PriceProvenance(**first_stub.provenance.to_dict())
+    assert round_tripped.parser_version == first_stub.provenance.parser_version
 
 
-if __name__ == "__main__":
-    unittest.main()
+def test_latest_price_rollup_picks_latest_observation() -> None:
+    product_slug = build_seed_products()[0].slug
+    store_slug = build_seed_stores()[0].slug
+
+    older_observation = PriceObservationRow(
+        product_slug=product_slug,
+        store_slug=store_slug,
+        price_amount=10.0,
+        unit="package",
+        unit_price_amount=10.0,
+        unit_price_unit="package",
+        price_type="regular",
+        observed_at="2026-05-19T11:00:00+00:00",
+        source_type="retailer_page",
+        confidence=0.7,
+        confidence_label="medium",
+        provenance=PriceProvenance(
+            source_type="retailer_page",
+            source_name="Demo source",
+            source_url="https://example.com",
+            source_run_id="run-1",
+            raw_record_id="raw-1",
+            raw_snapshot_ref="s3://groceryview-raw/run-1.json",
+            fetched_at="2026-05-19T11:00:00+00:00",
+            observed_at="2026-05-19T11:00:00+00:00",
+            parser_version="demo-v1",
+        ),
+        member_only=False,
+        promotion_label=None,
+        valid_from=None,
+        valid_to=None,
+        demo=True,
+    )
+    newer_observation = PriceObservationRow(
+        product_slug=product_slug,
+        store_slug=store_slug,
+        price_amount=9.0,
+        unit="package",
+        unit_price_amount=9.0,
+        unit_price_unit="package",
+        price_type="promotion",
+        observed_at="2026-05-19T12:00:00+00:00",
+        source_type="retailer_page",
+        confidence=0.95,
+        confidence_label="high",
+        provenance=PriceProvenance(
+            source_type="retailer_page",
+            source_name="Demo source",
+            source_url="https://example.com",
+            source_run_id="run-2",
+            raw_record_id="raw-2",
+            raw_snapshot_ref="s3://groceryview-raw/run-2.json",
+            fetched_at="2026-05-19T12:00:00+00:00",
+            observed_at="2026-05-19T12:00:00+00:00",
+            parser_version="demo-v1",
+        ),
+        member_only=False,
+        promotion_label=None,
+        valid_from=None,
+        valid_to=None,
+        demo=True,
+    )
+
+    rolled = build_latest_price_rollup([older_observation, newer_observation])
+    assert len(rolled) == 1
+    rolled_row = rolled[0]
+    assert isinstance(rolled_row, LatestPriceRow)
+    assert rolled_row.price_amount == 9.0
+    assert rolled_row.price_type == "promotion"

@@ -1,41 +1,23 @@
-from __future__ import annotations
+from dagster import Definitions
 
-from . import assets as pipeline_assets
+from .assets import (
+    latest_price_rollup,
+    normalized_products,
+    price_observations,
+    quality_checks,
+    retailer_fetch_stubs,
+    seed_products,
+    seed_stores,
+)
 
-
-try:
-    from dagster import Definitions, asset
-except ModuleNotFoundError:  # Keep unit tests runnable without installing Dagster.
-    Definitions = None  # type: ignore[assignment]
-    asset = None  # type: ignore[assignment]
-
-
-if asset is not None:
-
-    @asset
-    def stores():
-        return pipeline_assets.seed_stores()
-
-    @asset
-    def products():
-        return pipeline_assets.seed_products()
-
-    @asset
-    def raw_retailer_records():
-        return pipeline_assets.retailer_fetch_stubs()
-
-    @asset
-    def price_observations(raw_retailer_records):
-        return pipeline_assets.normalize_retailer_records(raw_retailer_records)
-
-    @asset
-    def latest_prices(price_observations):
-        return pipeline_assets.build_latest_price_rollup(price_observations)
-
-    @asset
-    def quality_checks(stores, products, raw_retailer_records, price_observations, latest_prices):
-        return pipeline_assets.collect_quality_checks(stores, products, raw_retailer_records, price_observations, latest_prices)
-
-    defs = Definitions(assets=[stores, products, raw_retailer_records, price_observations, latest_prices, quality_checks])
-else:
-    defs = None
+defs = Definitions(
+    assets=[
+        seed_stores,
+        seed_products,
+        retailer_fetch_stubs,
+        normalized_products,
+        price_observations,
+        latest_price_rollup,
+        quality_checks,
+    ]
+)
