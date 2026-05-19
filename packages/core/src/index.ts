@@ -549,6 +549,36 @@ export type HumanReviewDecisionResult = {
   writeback: HumanReviewWriteback;
 };
 
+export type HumanReviewerProfile = {
+  id: string;
+  active: boolean;
+  openAssignmentCount: number;
+  maxOpenAssignments: number;
+  specialties?: HumanReviewQueueItem['subjectType'][];
+};
+
+export type HumanReviewAssignmentStatus = 'assigned' | 'in_progress' | 'completed';
+
+export type HumanReviewAssignment = {
+  id: string;
+  reviewId: string;
+  subjectType: HumanReviewQueueItem['subjectType'];
+  subjectId: string;
+  priority: HumanReviewQueueItem['priority'];
+  reason: string;
+  assigneeId: string;
+  assignedAt: string;
+  dueAt: string;
+  status: HumanReviewAssignmentStatus;
+};
+
+export type HumanReviewUnassignedReason = 'already_assigned' | 'no_active_reviewer_capacity';
+
+export type HumanReviewAssignmentPlan = {
+  assignments: HumanReviewAssignment[];
+  unassigned: Array<{ reviewId: string; reason: HumanReviewUnassignedReason }>;
+};
+
 export function planHumanReviewQueue(input: {
   productMatches: ProductMatchReviewCandidate[];
   communityReports: CommunityReportReviewCandidate[];
@@ -579,6 +609,69 @@ export function planHumanReviewQueue(input: {
 
   const priorityRank: Record<HumanReviewQueueItem['priority'], number> = { high: 0, medium: 1, low: 2 };
   return queue.sort((a, b) => priorityRank[a.priority] - priorityRank[b.priority] || a.id.localeCompare(b.id));
+}
+
+const humanReviewPriorityRank: Record<HumanReviewQueueItem['priority'], number> = { high: 0, medium: 1, low: 2 };
+const humanReviewSlaHours: Record<HumanReviewQueueItem['priority'], number> = { high: 4, medium: 24, low: 72 };
+
+function reviewerCanHandle(reviewer: HumanReviewerProfile, item: HumanReviewQueueItem, openCounts: Map<string, number>): boolean {
+  if (!reviewer.active) return false;
+  if ((openCounts.get(reviewer.id) ?? reviewer.openAssignmentCount) >= reviewer.maxOpenAssignments) return false;
+  return reviewer.specialties === undefined || reviewer.specialties.length === 0 || reviewer.specialties.includes(item.subjectType);
+}
+
+export function planHumanReviewAssignments(input: {
+  queue: HumanReviewQueueItem[];
+  reviewers: HumanReviewerProfile[];
+  assignedAt: string;
+  existingAssignments?: HumanReviewAssignment[];
+}): HumanReviewAssignmentPlan {
+  if (Number.isNaN(Date.parse(input.assignedAt))) throw new Error('assignedAt must be an ISO date.');
+
+  const assignedAt = new Date(input.assignedAt);
+  const openCounts = new Map(input.reviewers.map((reviewer) => [reviewer.id, reviewer.openAssignmentCount]));
+  const alreadyAssigned = new Set(
+    (input.existingAssignments ?? [])
+      .filter((assignment) => assignment.status === 'assigned' || assignment.status === 'in_progress')
+      .map((assignment) => assignment.reviewId)
+  );
+  const assignments: HumanReviewAssignment[] = [];
+  const unassigned: HumanReviewAssignmentPlan['unassigned'] = [];
+  const queue = [...input.queue].sort(
+    (a, b) => humanReviewPriorityRank[a.priority] - humanReviewPriorityRank[b.priority] || a.id.localeCompare(b.id)
+  );
+
+  for (const item of queue) {
+    if (alreadyAssigned.has(item.id)) {
+      unassigned.push({ reviewId: item.id, reason: 'already_assigned' });
+      continue;
+    }
+
+    const reviewer = input.reviewers
+      .filter((candidate) => reviewerCanHandle(candidate, item, openCounts))
+      .sort((a, b) => (openCounts.get(a.id) ?? a.openAssignmentCount) - (openCounts.get(b.id) ?? b.openAssignmentCount) || a.id.localeCompare(b.id))[0];
+
+    if (!reviewer) {
+      unassigned.push({ reviewId: item.id, reason: 'no_active_reviewer_capacity' });
+      continue;
+    }
+
+    openCounts.set(reviewer.id, (openCounts.get(reviewer.id) ?? reviewer.openAssignmentCount) + 1);
+    assignments.push({
+      id: `assignment-${item.id}-${reviewer.id}`,
+      reviewId: item.id,
+      subjectType: item.subjectType,
+      subjectId: item.subjectId,
+      priority: item.priority,
+      reason: item.reason,
+      assigneeId: reviewer.id,
+      assignedAt: assignedAt.toISOString(),
+      dueAt: new Date(assignedAt.getTime() + humanReviewSlaHours[item.priority] * 60 * 60 * 1000).toISOString(),
+      status: 'assigned'
+    });
+  }
+
+  return { assignments, unassigned };
 }
 
 function writebackFor(item: HumanReviewQueueItem, decision: HumanReviewDecision): HumanReviewWriteback {
