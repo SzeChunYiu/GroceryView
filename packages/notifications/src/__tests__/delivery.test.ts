@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   applyNotificationSuppressions,
+  buildNotificationOperationsReport,
   deliverDueNotifications,
   planHumanReviewSlaNotifications,
   processNotificationSuppressionEvent,
@@ -392,6 +393,76 @@ describe('processNotificationSuppressionEvent', () => {
       active: false,
       updatedAt: '2026-05-19T20:40:00.000Z',
       source: { provider: 'ses', providerEventId: 'evt-resub', eventType: 'resubscribe' }
+    });
+  });
+});
+
+describe('buildNotificationOperationsReport', () => {
+  it('summarizes worker health and blocks operations on stale queues, provider failures, and dead letters', () => {
+    const report = buildNotificationOperationsReport({
+      now: '2026-05-19T12:00:00.000Z',
+      staleAfterMinutes: 30,
+      dueTasks: [
+        { id: 'task-fresh', sendAt: '2026-05-19T11:45:00.000Z' },
+        { id: 'task-stale', sendAt: '2026-05-19T11:20:00.000Z' }
+      ],
+      workerSummary: { delivered: 4, notDue: 1, retryScheduled: 2, deadLettered: 1, suppressed: 3 },
+      deliveries: [
+        { status: 'sent', channel: 'push', recipient: 'device-1', providerMessageId: 'push-1' },
+        { status: 'failed_no_provider', channel: 'email', recipient: 'ops@example.com', reason: 'No email provider configured.' },
+        { status: 'failed_provider_error', channel: 'push', recipient: 'device-2', reason: 'provider down' }
+      ]
+    });
+
+    assert.deepEqual(report, {
+      status: 'blocked',
+      metrics: {
+        delivered: 4,
+        notDue: 1,
+        retryScheduled: 2,
+        deadLettered: 1,
+        suppressed: 3,
+        providerFailures: 2,
+        staleDueTasks: 1
+      },
+      blockers: [
+        'notification_dead_letters_present',
+        'notification_provider_failures_present',
+        'notification_due_queue_stale'
+      ],
+      warnings: [
+        'notification_retries_scheduled',
+        'notification_suppressions_applied'
+      ],
+      staleTaskIds: ['task-stale']
+    });
+  });
+
+  it('passes when worker delivery is healthy and due tasks are fresh', () => {
+    const report = buildNotificationOperationsReport({
+      now: '2026-05-19T12:00:00.000Z',
+      staleAfterMinutes: 30,
+      dueTasks: [{ id: 'task-fresh', sendAt: '2026-05-19T11:45:00.000Z' }],
+      workerSummary: { delivered: 2, notDue: 0, retryScheduled: 0, deadLettered: 0, suppressed: 0 },
+      deliveries: [
+        { status: 'sent', channel: 'email', recipient: 'user@example.com', providerMessageId: 'email-1' }
+      ]
+    });
+
+    assert.deepEqual(report, {
+      status: 'healthy',
+      metrics: {
+        delivered: 2,
+        notDue: 0,
+        retryScheduled: 0,
+        deadLettered: 0,
+        suppressed: 0,
+        providerFailures: 0,
+        staleDueTasks: 0
+      },
+      blockers: [],
+      warnings: [],
+      staleTaskIds: []
     });
   });
 });
