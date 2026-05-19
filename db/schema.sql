@@ -212,6 +212,14 @@ create table if not exists community_price_reports (
   review_status text not null default 'pending'
 );
 
+create table if not exists human_reviewers (
+  id text primary key,
+  role text not null check (role in ('viewer', 'moderator', 'lead')),
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists human_review_assignments (
   id text primary key,
   review_id text not null unique,
@@ -250,5 +258,6 @@ create index if not exists price_observations_product_time_idx on price_observat
 create index if not exists price_observations_store_time_idx on price_observations(store_id, observed_at desc);
 create index if not exists promotion_observations_product_dates_idx on promotion_observations(product_id, promo_start, promo_end);
 create index if not exists products_category_idx on products(category_id);
+create index if not exists human_reviewers_role_active_idx on human_reviewers(role, active);
 create index if not exists human_review_assignments_status_due_idx on human_review_assignments(status, due_at);
 create index if not exists human_review_assignments_assignee_status_idx on human_review_assignments(assignee_id, status);

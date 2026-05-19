@@ -9,6 +9,9 @@ class RecordingQueryExecutor implements QueryExecutor {
     this.calls.push({ sql, params });
     if (sql.includes('select store_id')) return [{ store_id: 'willys-odenplan' }] as T[];
     if (sql.includes('select weekly_budget')) return [{ weekly_budget: '800', monthly_budget: '3200' }] as T[];
+    if (sql.includes('from human_reviewers')) {
+      return [{ id: 'moderator-1', role: 'moderator', active: true }] as T[];
+    }
     if (sql.includes('from human_review_assignments')) {
       return [
         {
@@ -87,5 +90,20 @@ describe('createPostgresRepository', () => {
       '2026-05-19T14:00:00.000Z',
       'assigned'
     ]);
+  });
+
+  it('persists and reads reviewer roles for permission checks', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertHumanReviewer({ id: 'moderator-1', role: 'moderator', active: true });
+
+    assert.deepEqual(await repo.getHumanReviewer('moderator-1'), {
+      id: 'moderator-1',
+      role: 'moderator',
+      active: true
+    });
+    assert.deepEqual(executor.calls[0].params, ['moderator-1', 'moderator', true]);
+    assert.deepEqual(executor.calls[1].params, ['moderator-1']);
   });
 });

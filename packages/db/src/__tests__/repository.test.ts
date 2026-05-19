@@ -63,4 +63,23 @@ describe('createMemoryRepository', () => {
       'assignment-review-report-1-moderator-2'
     ]);
   });
+
+  it('persists reviewer roles for permission checks', async () => {
+    const repo = createMemoryRepository();
+
+    await repo.upsertHumanReviewer({ id: 'moderator-1', role: 'moderator', active: true });
+    await repo.upsertHumanReviewer({ id: 'lead-1', role: 'lead', active: false });
+
+    assert.deepEqual(await repo.getHumanReviewer('moderator-1'), {
+      id: 'moderator-1',
+      role: 'moderator',
+      active: true
+    });
+    assert.deepEqual(await repo.getHumanReviewer('lead-1'), {
+      id: 'lead-1',
+      role: 'lead',
+      active: false
+    });
+    assert.equal(await repo.getHumanReviewer('missing-reviewer'), null);
+  });
 });
