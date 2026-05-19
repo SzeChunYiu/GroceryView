@@ -10,7 +10,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 
 | Requirement / deliverable | Evidence | Status |
 | --- | --- | --- |
-| Iterative PR + merge workflow | PR #1 through PR #36 and PR #88 merged to `main`; current ruleset application audit is in progress | Done for shipped iterations |
+| Iterative PR + merge workflow | PR #1 through PR #36, PR #88, and PR #89 merged to `main` after this iteration | Done for shipped iterations |
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
@@ -50,7 +50,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Deployment ops foundation | PR #35, `packages/ops` | Readiness/rollback gates shipped |
 | Catalog coverage reporting | PR #36, `packages/catalog` | Coverage/backfill accounting shipped |
 | Release validation workflow repair | PR #88, `.github/workflows/release-validation.yml`, `tests/schema/release-workflow.test.mjs` | Shipped |
-| Main branch ruleset application | Current iteration, GitHub ruleset #16607866, `.github/repository-ruleset.json` | Applied, PR audit pending |
+| Main branch ruleset application | PR #89, GitHub ruleset #16607866, `.github/repository-ruleset.json` | Applied in GitHub |
 
 ## Verification gates
 

@@ -15,7 +15,7 @@ Continue completing GroceryView proposal deliverables iteratively, with each inc
 | Versioned policy artifact | `.github/repository-ruleset.json` records active enforcement, required checks, and GitHub ruleset id #16607866 | Verified |
 | Regression coverage | `tests/schema/ruleset.test.mjs` verifies the policy artifact requires PRs, active enforcement, both status checks, and applied-in-GitHub status | Verified |
 | Completion audit update | `docs/status/completion-audit.md` removes the branch-protection blocker and records the active GitHub ruleset | Verified |
-| PR and merge after iteration | GitHub PR evidence to be added after PR creation | Pending until PR step |
+| PR and merge after iteration | PR #89 | Completed after merge |
 
 ## Verification commands
 
