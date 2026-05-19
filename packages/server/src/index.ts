@@ -1,7 +1,13 @@
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { createGroceryViewApi } from '@groceryview/api';
+import { parseBearerToken, verifySessionToken } from '@groceryview/auth';
 
 export type HttpHandler = (request: Request) => Promise<Response>;
+
+export type AuthOptions = {
+  authSecret?: string;
+  now?: Date;
+};
 
 type JsonRecord = Record<string, unknown>;
 
@@ -54,7 +60,16 @@ function userIdFrom(url: URL): string | Response {
   return userId;
 }
 
-export function createHttpHandler(api = createGroceryViewApi()): HttpHandler {
+export function createHttpHandler(api = createGroceryViewApi(), authOptions: AuthOptions = {}): HttpHandler {
+  const authorizeUser = async (request: Request, userId: string): Promise<Response | null> => {
+    if (!authOptions.authSecret) return null;
+    const token = parseBearerToken(request.headers.get('authorization'));
+    if (!token) return errorResponse(401, 'Bearer session token is required.');
+    const session = await verifySessionToken(token, authOptions.authSecret, authOptions.now);
+    if (session.userId !== userId) return errorResponse(403, 'Session does not match requested user.');
+    return null;
+  };
+
   return async (request: Request): Promise<Response> => {
     const url = new URL(request.url);
     const path = url.pathname.replace(/\/+$/, '') || '/';
@@ -89,6 +104,8 @@ export function createHttpHandler(api = createGroceryViewApi()): HttpHandler {
       const favoriteStoreMatch = path.match(/^\/api\/users\/([^/]+)\/favorite-stores$/);
       if (favoriteStoreMatch) {
         const routeUserId = decodeURIComponent(favoriteStoreMatch[1]);
+        const authError = await authorizeUser(request, routeUserId);
+        if (authError) return authError;
         if (method === 'GET') return jsonResponse(api.getFavoriteStores(routeUserId));
         if (method === 'POST') {
           const body = await readJson(request);
@@ -100,6 +117,8 @@ export function createHttpHandler(api = createGroceryViewApi()): HttpHandler {
       if (path === '/api/watchlist') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
         if (method === 'GET') return jsonResponse(api.getWatchlist(user));
         if (method === 'POST') {
           const body = await readJson(request);
@@ -116,12 +135,16 @@ export function createHttpHandler(api = createGroceryViewApi()): HttpHandler {
       if (path === '/api/basket/current') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
         if (method === 'GET') return jsonResponse(api.getBasket(user));
       }
 
       if (path === '/api/basket/items') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
         if (method === 'POST') {
           const body = await readJson(request);
           api.addBasketItem(user, {
@@ -135,12 +158,16 @@ export function createHttpHandler(api = createGroceryViewApi()): HttpHandler {
       if (path === '/api/basket/compare') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
         if (method === 'POST') return jsonResponse(api.compareBasket(user));
       }
 
       if (path === '/api/budget') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
         if (method === 'PATCH') {
           const body = await readJson(request);
           api.updateBudget(user, {
@@ -154,6 +181,8 @@ export function createHttpHandler(api = createGroceryViewApi()): HttpHandler {
       if (path === '/api/budget/summary') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
         if (method === 'GET') return jsonResponse(api.getBudgetSummary(user));
       }
 
