@@ -311,6 +311,25 @@ const categorySignals = [
   { category: 'Eggs', product: 'Eggs 12-pack', store: 'Lidl Sveavägen', price: '34.90 SEK', signal: 'Private-label swap candidate' }
 ];
 
+const storeComparisons = [
+  { store: 'Willys Odenplan', basketTotal: 742, verifiedCoverage: 82, lowConfidenceRows: 2, bestCategory: 'Coffee', shopperFit: 'Primary weekly basket' },
+  { store: 'Lidl Sveavägen', basketTotal: 729, verifiedCoverage: 76, lowConfidenceRows: 3, bestCategory: 'Eggs and dairy', shopperFit: 'Cheapest split basket' },
+  { store: 'Coop Farsta', basketTotal: 781, verifiedCoverage: 68, lowConfidenceRows: 5, bestCategory: 'Member promos', shopperFit: 'Review before checkout' }
+];
+
+const storeMapRows = [
+  { store: 'Willys Odenplan', district: 'Vasastan', fit: 'Coffee and pantry', coverage: '82%', note: 'Primary weekly basket' },
+  { store: 'Lidl Sveavägen', district: 'Norrmalm', fit: 'Eggs and dairy', coverage: '76%', note: 'Split basket stop' },
+  { store: 'ICA Kvantum Liljeholmen', district: 'Liljeholmen', fit: 'Milk and produce', coverage: '74%', note: 'Transit-friendly backup' }
+];
+
+const catalogCoverageRows = [
+  { category: 'Coffee', products: 18, coverage: '89%', freshness: 'Fresh today', action: 'Keep monitoring' },
+  { category: 'Dairy', products: 24, coverage: '81%', freshness: 'Fresh today', action: 'Backfill member prices' },
+  { category: 'Produce', products: 31, coverage: '62%', freshness: 'Mixed', action: 'Route receipt photos to review' },
+  { category: 'Pantry', products: 42, coverage: '74%', freshness: 'Fresh this week', action: 'Parse missing unit prices' }
+];
+
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Missing #app root');
 
