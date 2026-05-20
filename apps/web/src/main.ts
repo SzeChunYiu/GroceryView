@@ -110,6 +110,12 @@ const billingStatusRows = [
   { account: 'Reviewer desk', plan: 'premium_yearly', status: 'Past due', checkout: 'Required', action: 'Show billing issue' }
 ];
 
+const adDisclosureRows = [
+  { surface: 'Daily deals', placement: 'Sponsored banner', label: 'Sponsored', premium: 'Hidden for premium', rule: 'Never affects Deal Score' },
+  { surface: 'Product page', placement: 'Brand offer card', label: 'Ad', premium: 'Hidden for premium', rule: 'Separated from price rows' },
+  { surface: 'Store map', placement: 'Promoted pickup note', label: 'Sponsored', premium: 'Visible only when useful', rule: 'No route ranking boost' }
+];
+
 const loyaltyOfferRows = [
   { offer: 'Zoégas Coffee 450g Stammis price', chain: 'ICA', requirement: 'ICA Stammis linked', savings: '7 SEK', status: 'Eligible' },
   { offer: 'Coop Medmera dairy coupon', chain: 'Coop', requirement: 'Clip coupon before checkout', savings: '12 SEK', status: 'Needs action' },
@@ -192,6 +198,12 @@ const receiptReviewRows = [
   { line: 'Loose tomatoes', match: 'unknown produce', confidence: 54, budgetAction: 'Hold from forecast', catalogAction: 'Route to human review' }
 ];
 
+const communityReportRows = [
+  { report: 'report-coffee-1', store: 'Willys Odenplan', claim: '49.90 SEK coffee promo', evidence: 'Shelf photo', status: 'Ready for moderator' },
+  { report: 'report-eggs-2', store: 'Lidl Sveavägen', claim: '34.90 SEK eggs', evidence: 'Receipt line', status: 'Needs match check' },
+  { report: 'report-tomatoes-3', store: 'Coop Farsta', claim: '29 SEK/kg tomatoes', evidence: 'Blurry shelf photo', status: 'Low confidence' }
+];
+
 const humanReviewAssignments = [
   {
     id: 'assignment-review-match-1-moderator-1',
@@ -237,6 +249,12 @@ const humanReviewDecisionPreview = applyHumanReviewDecision({
   decidedAt: '2026-05-19T12:45:00.000Z',
   notes: 'Shelf photo confirms equivalent produce unit.'
 });
+
+const receiptHistory = [
+  { receipt: 'Coop Farsta', status: 'Needs human review', budgetImpact: 'Hold 321 SEK', catalogAction: 'No price contribution yet' },
+  { receipt: 'Willys Odenplan', status: 'Reviewed', budgetImpact: 'Apply 180 SEK', catalogAction: 'Verified shelf observations' },
+  { receipt: 'Lidl Sveavägen', status: 'Redacted', budgetImpact: 'Apply total only', catalogAction: 'Image deleted after review' }
+];
 
 const privacyControls = [
   { setting: 'Receipt images', state: 'Auto-delete after review', detail: '7 day retention window' },
@@ -407,6 +425,27 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
+        <h2>Receipt history</h2>
+        <p class="lede">Receipt totals reconcile budgets only after review, and catalog price contribution stays blocked until line-item confidence is high enough.</p>
+        <div class="grid">
+          <div class="metric"><strong>501 SEK</strong><span>reviewed weekly spend</span></div>
+          <div class="metric"><strong>2</strong><span>pending review receipts</span></div>
+          <div class="metric"><strong>7 days</strong><span>image retention</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Reconciliation queue</h2>
+        <table class="table">
+          <thead><tr><th>Receipt</th><th>Status</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptHistory.map((receipt) => `<tr><td>${receipt.receipt}</td><td><span class="status">${receipt.status}</span></td><td>${receipt.budgetImpact}</td><td>${receipt.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
+      <div class="card">
         <h2>Top movers and true deals</h2>
         <p class="lede"><a href="/deals/today/">Open today’s ranked deal board</a> for shopper actions and ranking guardrails. <a href="/prices/confidence/">Review price confidence rules</a>.</p>
         <table class="table">
@@ -430,6 +469,16 @@ app.innerHTML = `
           <thead><tr><th>Label</th><th>Source</th><th>Deal Score</th><th>Decision</th></tr></thead>
           <tbody>
             ${priceConfidenceRows.map((row) => `<tr><td>${row.label}</td><td>${row.source}</td><td>${row.dealScore}</td><td>${row.decision}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Community reports</h2>
+        <p class="lede"><a href="/community/reports/">Open community reports</a> to review shopper-submitted corrections before catalog writeback.</p>
+        <table class="table">
+          <thead><tr><th>Report</th><th>Store</th><th>Claim</th><th>Evidence</th><th>Status</th></tr></thead>
+          <tbody>
+            ${communityReportRows.map((row) => `<tr><td>${row.report}</td><td>${row.store}</td><td>${row.claim}</td><td>${row.evidence}</td><td><span class="status">${row.status}</span></td></tr>`).join('')}
           </tbody>
         </table>
       </div>
@@ -546,6 +595,16 @@ app.innerHTML = `
           <thead><tr><th>Account</th><th>Plan</th><th>Status</th><th>Checkout</th><th>Action</th></tr></thead>
           <tbody>
             ${billingStatusRows.map((row) => `<tr><td>${row.account}</td><td>${row.plan}</td><td><span class="status">${row.status}</span></td><td>${row.checkout}</td><td>${row.action}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Ad disclosure</h2>
+        <p class="lede"><a href="/ads/disclosure/">Open ad disclosure</a> to verify labels, premium removal, and ranking separation.</p>
+        <table class="table">
+          <thead><tr><th>Surface</th><th>Placement</th><th>Label</th><th>Premium</th><th>Rule</th></tr></thead>
+          <tbody>
+            ${adDisclosureRows.map((row) => `<tr><td>${row.surface}</td><td>${row.placement}</td><td><span class="status">${row.label}</span></td><td>${row.premium}</td><td>${row.rule}</td></tr>`).join('')}
           </tbody>
         </table>
       </div>

@@ -10,6 +10,7 @@ const smokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-local-
 const hostedReadinessSmokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-hosted-readiness.sh', import.meta.url), 'utf8');
 const hostedHttpSmokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-hosted-http.sh', import.meta.url), 'utf8');
 const smokeRetailerConnectorScript = readFileSync(new URL('../../../../infra/scripts/smoke-retailer-connector.sh', import.meta.url), 'utf8');
+const smokeOpenPricesScript = readFileSync(new URL('../../../../infra/scripts/smoke-open-prices.sh', import.meta.url), 'utf8');
 const smokeWorkflow = readFileSync(new URL('../../../../.github/workflows/local-infra-smoke.yml', import.meta.url), 'utf8');
 
 describe('local infrastructure compose', () => {
@@ -89,6 +90,10 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /S3_BUCKET/);
     assert.match(infraReadme, /## Retailer connector smoke/);
     assert.match(infraReadme, /smoke-retailer-connector\.sh/);
+    assert.match(infraReadme, /## Open Prices real-data smoke/);
+    assert.match(infraReadme, /smoke-open-prices\.sh/);
+    assert.match(infraReadme, /OPEN_PRICES_OUTPUT_PATH/);
+    assert.match(infraReadme, /acceptedObservations/);
   });
 
   it('documents hosted deployment smoke commands for API, product terminal, web, and PostgreSQL readiness evidence', () => {
@@ -124,6 +129,22 @@ describe('local infrastructure compose', () => {
     assert.match(smokeRetailerConnectorScript, /fetchRetailerConnectorSnapshot/);
     assert.match(smokeRetailerConnectorScript, /Connector smoke blocked before fetch/);
     assert.match(smokeRetailerConnectorScript, /investigate_connector_http_status/);
+  });
+
+  it('ships an Open Prices real-data smoke script with custom User-Agent and parser validation', () => {
+    assert.match(smokeOpenPricesScript, /OPEN_PRICES_USER_AGENT/);
+    assert.match(smokeOpenPricesScript, /OPEN_PRICES_OUTPUT_PATH/);
+    assert.match(smokeOpenPricesScript, /buildOpenPricesConnectorUrl/);
+    assert.match(smokeOpenPricesScript, /parseOpenPricesSnapshot/);
+    assert.match(smokeOpenPricesScript, /runRetailerConnector/);
+    assert.match(smokeOpenPricesScript, /writeFile/);
+    assert.match(smokeOpenPricesScript, /acceptedObservations/);
+    assert.match(smokeOpenPricesScript, /Open Prices normalized artifact written/);
+    assert.match(smokeOpenPricesScript, /currency: 'SEK'/);
+    assert.match(smokeOpenPricesScript, /countryCode: process\.env\.OPEN_PRICES_COUNTRY_CODE \|\| 'SE'/);
+    assert.match(smokeOpenPricesScript, /acceptedCount/);
+    assert.match(smokeOpenPricesScript, /Open Prices smoke requires OPEN_PRICES_USER_AGENT/);
+    assert.match(smokeOpenPricesScript, /Hosted Open Prices real-data smoke passed/);
   });
 
   it('ships a hosted HTTP smoke script for API health, product terminal, and optional web checks', () => {

@@ -111,6 +111,7 @@ describe('deployment ops foundation', () => {
         'missing_artifact:api-image',
         'release_validation_fail',
         'smoke_test_not_run:api-health',
+        'smoke_evidence_stale:hosted_api_health',
         'health_check_failed:api',
         'scheduled_job_failed:notification-worker',
         'change_freeze_active:holiday-freeze',
@@ -120,11 +121,11 @@ describe('deployment ops foundation', () => {
         'observability_not_configured'
       ]),
       {
-        total: 12,
+        total: 13,
         missingSecrets: 1,
         missingArtifacts: 1,
         releaseValidation: 1,
-        smokeTests: 1,
+        smokeTests: 2,
         healthChecks: 1,
         scheduledJobs: 1,
         changeControls: 1,

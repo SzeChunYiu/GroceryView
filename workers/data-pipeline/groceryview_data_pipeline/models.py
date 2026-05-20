@@ -162,6 +162,54 @@ class QualityCheckSummary:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class ObservationFreshnessSummary:
+    status: Literal["ready", "blocked"]
+    observation_count: int
+    fresh_count: int
+    stale_count: int
+    future_count: int
+    missing_observed_at_count: int
+    max_age_hours: int
+    checked_at: str
+    demo: bool = True
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class OpenPricesPullPlan:
+    status: Literal["ready", "blocked"]
+    source_type: SourceType
+    endpoint_url: str
+    parser_version: str
+    required_env: list[str]
+    required_actions: list[str]
+    smoke_command: str
+    evidence_fields: list[str]
+    demo: bool = False
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class ObservationCoverageSummary:
+    status: Literal["ready", "partial"]
+    observation_count: int
+    store_count: int
+    covered_store_count: int
+    missing_store_count: int
+    product_count: int
+    covered_product_count: int
+    missing_product_count: int
+    demo: bool = True
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
 def utc_now() -> str:
     return datetime.now(tz=timezone.utc).isoformat()
 

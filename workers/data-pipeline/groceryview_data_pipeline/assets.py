@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from datetime import datetime, timedelta, timezone
 from typing import Iterable
 
 try:
@@ -15,6 +16,9 @@ except ModuleNotFoundError:
 from .fixtures import FETCHED_AT, HERO_PRODUCTS, RETAILER_PRICE_SNAPSHOT, STOCKHOLM_STORES
 from .models import (
     LatestPriceRow,
+    ObservationCoverageSummary,
+    ObservationFreshnessSummary,
+    OpenPricesPullPlan,
     PriceObservationRow,
     PriceProvenance,
     ProductSeed,
@@ -26,6 +30,8 @@ from .models import (
 ASSET_GROUP = "data_pipeline"
 OBSERVED_AT = FETCHED_AT
 PARSER_VERSION = "demo-retailer-stub-v1"
+OPEN_PRICES_PARSER_VERSION = "open-prices-v1"
+OPEN_PRICES_ENDPOINT_URL = "https://prices.openfoodfacts.org/api/v1/prices?currency=SEK&size=10&location__osm_address_country_code=SE&order_by=-date"
 
 
 def build_seed_stores() -> list[StoreSeed]:
@@ -235,6 +241,103 @@ def build_quality_checks(
     )
 
 
+def _parse_utc_datetime(value: object) -> datetime | None:
+    if not isinstance(value, str) or not value:
+        return None
+    normalized = f"{value[:-1]}+00:00" if value.endswith("Z") else value
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def build_observation_freshness_summary(
+    observations: Iterable[PriceObservationRow],
+    checked_at: str,
+    max_age_hours: int,
+) -> ObservationFreshnessSummary:
+    checked_at_dt = _parse_utc_datetime(checked_at)
+    max_age = timedelta(hours=max_age_hours)
+    observation_list = list(observations)
+    fresh_count = 0
+    stale_count = 0
+    future_count = 0
+    missing_observed_at_count = 0
+
+    for observation in observation_list:
+        observed_at = _parse_utc_datetime(observation.observed_at)
+        if observed_at is None or checked_at_dt is None:
+            missing_observed_at_count += 1
+            continue
+        age = checked_at_dt - observed_at
+        if age < timedelta(0):
+            future_count += 1
+        elif age > max_age:
+            stale_count += 1
+        else:
+            fresh_count += 1
+
+    blocked_count = stale_count + future_count + missing_observed_at_count
+    return ObservationFreshnessSummary(
+        status="ready" if blocked_count == 0 else "blocked",
+        observation_count=len(observation_list),
+        fresh_count=fresh_count,
+        stale_count=stale_count,
+        future_count=future_count,
+        missing_observed_at_count=missing_observed_at_count,
+        max_age_hours=max_age_hours,
+        checked_at=checked_at,
+    )
+
+
+def build_open_prices_pull_plan(open_prices_user_agent_present: bool = False) -> OpenPricesPullPlan:
+    return OpenPricesPullPlan(
+        status="ready" if open_prices_user_agent_present else "blocked",
+        source_type="open_data",
+        endpoint_url=OPEN_PRICES_ENDPOINT_URL,
+        parser_version=OPEN_PRICES_PARSER_VERSION,
+        required_env=["OPEN_PRICES_USER_AGENT"],
+        required_actions=[] if open_prices_user_agent_present else ["set_open_prices_user_agent", "run_open_prices_smoke"],
+        smoke_command="OPEN_PRICES_USER_AGENT=<app/version contact> infra/scripts/smoke-open-prices.sh",
+        evidence_fields=[
+            "sourceUrl",
+            "statusCode",
+            "contentHash",
+            "rawSnapshotRef",
+            "acceptedCount",
+            "firstProduct",
+        ],
+    )
+
+
+def build_observation_coverage_summary(
+    observations: Iterable[PriceObservationRow],
+    stores: Iterable[StoreSeed],
+    products: Iterable[ProductSeed],
+) -> ObservationCoverageSummary:
+    observation_list = list(observations)
+    expected_stores = {store.slug for store in stores}
+    expected_products = {product.slug for product in products}
+    covered_stores = {observation.store_slug for observation in observation_list}
+    covered_products = {observation.product_slug for observation in observation_list}
+    missing_store_count = len(expected_stores - covered_stores)
+    missing_product_count = len(expected_products - covered_products)
+
+    return ObservationCoverageSummary(
+        status="ready" if missing_store_count == 0 and missing_product_count == 0 else "partial",
+        observation_count=len(observation_list),
+        store_count=len(expected_stores),
+        covered_store_count=len(expected_stores & covered_stores),
+        missing_store_count=missing_store_count,
+        product_count=len(expected_products),
+        covered_product_count=len(expected_products & covered_products),
+        missing_product_count=missing_product_count,
+    )
+
+
 def clamp_confidence(confidence: float) -> float:
     if confidence < 0:
         return 0
@@ -327,4 +430,41 @@ def quality_checks(
         for row in latest_price_rollup
     ]
     summary = build_quality_checks(fetch_stubs, observations, rollup)
+    return summary.to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
+def price_observation_freshness(price_observations: list[dict[str, object]]) -> dict[str, object]:
+    observations = [
+        PriceObservationRow(
+            provenance=PriceProvenance(**observation["provenance"]),
+            **{key: value for key, value in observation.items() if key != "provenance"},
+        )
+        for observation in price_observations
+    ]
+    summary = build_observation_freshness_summary(observations, checked_at=OBSERVED_AT, max_age_hours=48)
+    return summary.to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
+def open_prices_real_pull_plan() -> dict[str, object]:
+    return build_open_prices_pull_plan(open_prices_user_agent_present=False).to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
+def price_observation_coverage(
+    seed_stores: list[dict[str, object]],
+    seed_products: list[dict[str, object]],
+    price_observations: list[dict[str, object]],
+) -> dict[str, object]:
+    stores = [StoreSeed(**store) for store in seed_stores]
+    products = [ProductSeed(**product) for product in seed_products]
+    observations = [
+        PriceObservationRow(
+            provenance=PriceProvenance(**observation["provenance"]),
+            **{key: value for key, value in observation.items() if key != "provenance"},
+        )
+        for observation in price_observations
+    ]
+    summary = build_observation_coverage_summary(observations, stores, products)
     return summary.to_dict()

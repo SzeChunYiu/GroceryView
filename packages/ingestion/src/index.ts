@@ -743,6 +743,128 @@ export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnap
   });
 }
 
+export type OpenPricesConnectorUrlInput = {
+  baseUrl?: string;
+  currency?: string;
+  countryCode?: string;
+  size?: number;
+  orderBy?: string;
+};
+
+export function buildOpenPricesConnectorUrl(input: OpenPricesConnectorUrlInput = {}): string {
+  const url = new URL(input.baseUrl ?? 'https://prices.openfoodfacts.org/api/v1/prices');
+  const size = input.size ?? 20;
+  if (!Number.isInteger(size) || size < 1 || size > 100) throw new Error('Open Prices size must be an integer between 1 and 100.');
+  url.searchParams.set('currency', input.currency ?? 'SEK');
+  url.searchParams.set('size', String(size));
+  url.searchParams.set('location__osm_address_country_code', input.countryCode ?? 'SE');
+  url.searchParams.set('order_by', input.orderBy ?? '-date');
+  return url.toString();
+}
+
+function dateToObservedAt(value: unknown, fallback: string): string {
+  if (typeof value !== 'string' || !value.trim()) return fallback;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return `${value}T00:00:00.000Z`;
+  if (isIsoDate(value)) return new Date(value).toISOString();
+  return fallback;
+}
+
+function firstString(...values: unknown[]): string | undefined {
+  for (const value of values) {
+    if (typeof value === 'string' && value.trim()) return value.trim();
+  }
+  return undefined;
+}
+
+function quantityFromOpenPricesProduct(product: Record<string, unknown>): { packageSize: number; packageUnit: string } | null {
+  const quantityValue = product.product_quantity;
+  const quantityUnit = firstString(product.product_quantity_unit);
+  if (Number.isFinite(typeof quantityValue === 'number' ? quantityValue : Number(quantityValue)) && quantityUnit) {
+    return { packageSize: Number(quantityValue), packageUnit: quantityUnit };
+  }
+
+  const quantity = firstString(product.quantity);
+  const match = quantity?.match(/(\d+(?:[.,]\d+)?)\s*(kg|g|l|ml|piece|pcs|roll|diaper)\b/i);
+  if (!match) return null;
+  return { packageSize: Number(match[1].replace(',', '.')), packageUnit: match[2].toLowerCase() };
+}
+
+function categoryIdFromTags(value: unknown): string {
+  const tags = Array.isArray(value) ? value.filter((tag): tag is string => typeof tag === 'string' && tag.trim().length > 0) : [];
+  const selected = [...tags].reverse().find((tag) => tag.startsWith('en:')) ?? tags.at(-1) ?? 'open-prices';
+  return stableKeyPart(selected.replace(/^[a-z]{2}:/, ''));
+}
+
+function chainIdFromOpenPricesLocation(location: Record<string, unknown> | null): string {
+  if (!location) return 'open-prices';
+  return stableKeyPart(firstString(location.osm_brand, location.osm_name, location.osm_tag_value) ?? 'open-prices');
+}
+
+function storeIdFromOpenPricesLocation(location: Record<string, unknown> | null, row: Record<string, unknown>): string | undefined {
+  const locationId = location?.id ?? row.location_id ?? row.location_osm_id;
+  if (locationId === undefined || locationId === null || locationId === '') return undefined;
+  return `open-prices-location-${stableKeyPart(String(locationId))}`;
+}
+
+export function parseOpenPricesSnapshot(snapshot: RetailerConnectorSnapshot): RetailerConnectorParsedProduct[] {
+  let payload: unknown;
+  try {
+    payload = JSON.parse(snapshot.body) as unknown;
+  } catch (error) {
+    throw new Error(`Open Prices snapshot body must be valid JSON: ${error instanceof Error ? error.message : 'unknown parse error'}`);
+  }
+
+  const items = Array.isArray(payload) ? payload : recordFrom(payload, 'payload').items;
+  if (!Array.isArray(items)) throw new Error('Open Prices payload.items must be an array, or the snapshot body must be an array.');
+
+  const products: RetailerConnectorParsedProduct[] = [];
+  for (const item of items) {
+    if (typeof item !== 'object' || item === null || Array.isArray(item)) continue;
+    const row = item as Record<string, unknown>;
+    if (row.currency !== 'SEK') continue;
+
+    const product = typeof row.product === 'object' && row.product !== null && !Array.isArray(row.product)
+      ? row.product as Record<string, unknown>
+      : {};
+    const location = typeof row.location === 'object' && row.location !== null && !Array.isArray(row.location)
+      ? row.location as Record<string, unknown>
+      : null;
+    const code = firstString(row.product_code, product.code);
+    const name = firstString(row.product_name, product.product_name);
+    const price = typeof row.price === 'number' ? row.price : Number(row.price);
+    const quantity = quantityFromOpenPricesProduct(product);
+    if (!code || !name || !Number.isFinite(price) || !quantity) continue;
+
+    const regularPrice = typeof row.price_without_discount === 'number' ? row.price_without_discount : Number(row.price_without_discount);
+    const isDiscounted = row.price_is_discounted === true && Number.isFinite(regularPrice) && regularPrice > price;
+    const priceId = row.id === undefined || row.id === null ? code : String(row.id);
+    const brand = firstString(product.brands)?.split(',').map((part) => part.trim()).find(Boolean);
+
+    products.push({
+      sourceType: 'official_api',
+      observedAt: dateToObservedAt(row.date, snapshot.retrievedAt),
+      chainId: chainIdFromOpenPricesLocation(location),
+      storeId: storeIdFromOpenPricesLocation(location, row),
+      retailerProductId: `open-prices-price-${stableKeyPart(priceId)}`,
+      rawName: name,
+      canonicalName: name,
+      productId: `off-${stableKeyPart(code)}`,
+      categoryId: categoryIdFromTags(product.categories_tags),
+      brand,
+      packageSize: quantity.packageSize,
+      packageUnit: quantity.packageUnit,
+      price,
+      regularPrice: isDiscounted ? regularPrice : undefined,
+      promoText: isDiscounted ? 'Open Prices discounted price' : undefined,
+      memberOnly: false,
+      sourceUrl: snapshot.sourceUrl
+    });
+  }
+
+  if (products.length === 0) throw new Error('Open Prices snapshot contained no usable SEK product price rows.');
+  return products;
+}
+
 export type UnitInput = {
   price: number;
   packageSize: number;

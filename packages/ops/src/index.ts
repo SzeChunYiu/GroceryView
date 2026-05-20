@@ -118,7 +118,9 @@ export function summarizeGateBlockers(blockers: string[]): GateBlockerSummary {
       if (blocker.startsWith('missing_secret:')) summary.missingSecrets += 1;
       if (blocker.startsWith('missing_artifact:')) summary.missingArtifacts += 1;
       if (blocker.startsWith('release_validation_')) summary.releaseValidation += 1;
-      if (blocker.startsWith('smoke_test_') || blocker === 'no_smoke_tests_defined') summary.smokeTests += 1;
+      if (blocker.startsWith('smoke_test_') || blocker.startsWith('smoke_evidence_') || blocker === 'no_smoke_tests_defined') {
+        summary.smokeTests += 1;
+      }
       if (blocker.startsWith('health_check_')) summary.healthChecks += 1;
       if (blocker.startsWith('scheduled_job_')) summary.scheduledJobs += 1;
       if (blocker.startsWith('change_freeze_active:')) summary.changeControls += 1;

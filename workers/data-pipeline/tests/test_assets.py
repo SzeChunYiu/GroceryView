@@ -1,6 +1,9 @@
 from groceryview_data_pipeline.assets import (
     build_latest_price_rollup,
     build_normalized_products,
+    build_observation_coverage_summary,
+    build_observation_freshness_summary,
+    build_open_prices_pull_plan,
     build_price_observations,
     build_quality_checks,
     build_retailer_fetch_stubs,
@@ -49,6 +52,27 @@ def test_data_pipeline_assets_cover_the_expected_lane_contract() -> None:
 
     round_tripped = PriceProvenance(**first_stub.provenance.to_dict())
     assert round_tripped.parser_version == first_stub.provenance.parser_version
+
+
+def test_open_prices_pull_plan_exposes_real_data_smoke_requirements() -> None:
+    plan = build_open_prices_pull_plan()
+
+    assert plan.status == "blocked"
+    assert plan.source_type == "open_data"
+    assert plan.parser_version == "open-prices-v1"
+    assert plan.endpoint_url == "https://prices.openfoodfacts.org/api/v1/prices?currency=SEK&size=10&location__osm_address_country_code=SE&order_by=-date"
+    assert plan.required_env == ["OPEN_PRICES_USER_AGENT"]
+    assert plan.required_actions == ["set_open_prices_user_agent", "run_open_prices_smoke"]
+    assert plan.smoke_command == "OPEN_PRICES_USER_AGENT=<app/version contact> infra/scripts/smoke-open-prices.sh"
+    assert plan.evidence_fields == [
+        "sourceUrl",
+        "statusCode",
+        "contentHash",
+        "rawSnapshotRef",
+        "acceptedCount",
+        "firstProduct",
+    ]
+    assert plan.to_dict()["demo"] is False
 
 
 def test_latest_price_rollup_picks_latest_observation() -> None:
@@ -120,3 +144,98 @@ def test_latest_price_rollup_picks_latest_observation() -> None:
     assert isinstance(rolled_row, LatestPriceRow)
     assert rolled_row.price_amount == 9.0
     assert rolled_row.price_type == "promotion"
+
+
+def test_observation_freshness_summary_blocks_stale_future_and_missing_observations() -> None:
+    product_slug = build_seed_products()[0].slug
+    store_slug = build_seed_stores()[0].slug
+    provenance = PriceProvenance(
+        source_type="retailer_page",
+        source_name="Demo source",
+        source_url="https://example.com",
+        source_run_id="run-freshness",
+        raw_record_id="raw-freshness",
+        raw_snapshot_ref="s3://groceryview-raw/run-freshness.json",
+        fetched_at="2026-05-20T12:00:00+00:00",
+        observed_at="2026-05-20T12:00:00+00:00",
+        parser_version="demo-v1",
+    )
+
+    def row(observed_at: str) -> PriceObservationRow:
+        return PriceObservationRow(
+            product_slug=product_slug,
+            store_slug=store_slug,
+            price_amount=10.0,
+            unit="package",
+            unit_price_amount=10.0,
+            unit_price_unit="package",
+            price_type="regular",
+            observed_at=observed_at,
+            source_type="retailer_page",
+            confidence=0.9,
+            confidence_label="high",
+            provenance=provenance,
+            member_only=False,
+            promotion_label=None,
+            valid_from=None,
+            valid_to=None,
+            demo=True,
+        )
+
+    summary = build_observation_freshness_summary(
+        [
+            row("2026-05-20T11:00:00+00:00"),
+            row("2026-05-18T11:59:59+00:00"),
+            row("2026-05-20T13:00:00+00:00"),
+            row("not-a-date"),
+        ],
+        checked_at="2026-05-20T12:00:00+00:00",
+        max_age_hours=48,
+    )
+
+    assert summary.to_dict() == {
+        "status": "blocked",
+        "observation_count": 4,
+        "fresh_count": 1,
+        "stale_count": 1,
+        "future_count": 1,
+        "missing_observed_at_count": 1,
+        "max_age_hours": 48,
+        "checked_at": "2026-05-20T12:00:00+00:00",
+        "demo": True,
+    }
+
+
+def test_observation_coverage_summary_reports_seeded_store_and_product_gaps() -> None:
+    stores = build_seed_stores()
+    products = build_seed_products()
+    stubs = build_retailer_fetch_stubs(stores, products)
+    normalized_products = build_normalized_products(products)
+    observations = build_price_observations(stubs, normalized_products)
+
+    full_summary = build_observation_coverage_summary(observations, stores, products)
+    assert full_summary.to_dict() == {
+        "status": "ready",
+        "observation_count": len(observations),
+        "store_count": len(stores),
+        "covered_store_count": len(stores),
+        "missing_store_count": 0,
+        "product_count": len(products),
+        "covered_product_count": len(products),
+        "missing_product_count": 0,
+        "demo": True,
+    }
+
+    partial_summary = build_observation_coverage_summary(
+        [
+            observation
+            for observation in observations
+            if observation.store_slug != stores[0].slug and observation.product_slug != products[0].slug
+        ],
+        stores,
+        products,
+    )
+
+    assert partial_summary.status == "partial"
+    assert partial_summary.missing_store_count == 1
+    assert partial_summary.missing_product_count == 1
