@@ -492,6 +492,20 @@ export type NotificationSuppressionRecord = {
   updatedAt: string;
 };
 
+export type AlertRuleRecord = {
+  id: string;
+  userId: string;
+  productId: string;
+  storeId?: string;
+  channel: 'push' | 'email';
+  alertType: 'target_price' | 'deal_score' | 'back_in_stock' | 'price_drop';
+  targetPrice?: number;
+  dealScoreThreshold?: number;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type HumanReviewAssignmentRecord = {
   id: string;
   reviewId: string;
@@ -525,6 +539,8 @@ export type GroceryViewRepository = {
   listDueNotificationTasks(now: string): Promise<NotificationTaskRecord[]>;
   upsertNotificationSuppression(suppression: NotificationSuppressionRecord): Promise<void>;
   listActiveNotificationSuppressions(): Promise<NotificationSuppressionRecord[]>;
+  upsertAlertRule(rule: AlertRuleRecord): Promise<void>;
+  listActiveAlertRules(userId: string): Promise<AlertRuleRecord[]>;
   saveHumanReviewAssignment(assignment: HumanReviewAssignmentRecord): Promise<void>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignmentRecord[]>;
 };
@@ -583,6 +599,7 @@ export function createMemoryRepository(): GroceryViewRepository {
   const communityReporterTrust = new Map<string, CommunityReporterTrustRecord>();
   const notificationTasks = new Map<string, NotificationTaskRecord>();
   const notificationSuppressions = new Map<string, NotificationSuppressionRecord>();
+  const alertRules = new Map<string, AlertRuleRecord>();
   const humanReviewAssignments = new Map<string, HumanReviewAssignmentRecord>();
 
   return {
@@ -693,6 +710,19 @@ export function createMemoryRepository(): GroceryViewRepository {
         .filter((suppression) => suppression.active)
         .sort((a, b) => a.recipient.localeCompare(b.recipient) || (a.channel ?? '').localeCompare(b.channel ?? '') || a.id.localeCompare(b.id))
         .map((suppression) => ({ ...suppression }));
+    },
+
+    async upsertAlertRule(rule) {
+      requireUser(users, rule.userId);
+      alertRules.set(rule.id, { ...rule });
+    },
+
+    async listActiveAlertRules(userId) {
+      requireUser(users, userId);
+      return [...alertRules.values()]
+        .filter((rule) => rule.userId === userId && rule.active)
+        .sort((a, b) => a.productId.localeCompare(b.productId) || a.alertType.localeCompare(b.alertType) || a.id.localeCompare(b.id))
+        .map((rule) => ({ ...rule }));
     }
   };
 }
@@ -736,6 +766,19 @@ type NotificationSuppressionRow = {
   channel: NotificationSuppressionRecord['channel'] | null;
   reason: NotificationSuppressionRecord['reason'];
   active: boolean;
+  updated_at: string | Date;
+};
+type AlertRuleRow = {
+  id: string;
+  user_id: string;
+  product_id: string;
+  store_id: string | null;
+  channel: AlertRuleRecord['channel'];
+  alert_type: AlertRuleRecord['alertType'];
+  target_price: string | number | null;
+  deal_score_threshold: string | number | null;
+  active: boolean;
+  created_at: string | Date;
   updated_at: string | Date;
 };
 type CommunityReporterTrustRow = {
@@ -1087,6 +1130,22 @@ function mapNotificationSuppression(row: NotificationSuppressionRow): Notificati
   };
 }
 
+function mapAlertRule(row: AlertRuleRow): AlertRuleRecord {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    productId: row.product_id,
+    ...(row.store_id ? { storeId: row.store_id } : {}),
+    channel: row.channel,
+    alertType: row.alert_type,
+    ...(row.target_price === null ? {} : { targetPrice: Number(row.target_price) }),
+    ...(row.deal_score_threshold === null ? {} : { dealScoreThreshold: Number(row.deal_score_threshold) }),
+    active: row.active,
+    createdAt: asIso(row.created_at),
+    updatedAt: asIso(row.updated_at)
+  };
+}
+
 export function createPostgresRepository(executor: QueryExecutor): GroceryViewRepository {
   return {
     async upsertUser(user) {
@@ -1398,6 +1457,48 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
          order by recipient, coalesce(channel, ''), id`
       );
       return rows.map(mapNotificationSuppression);
+    },
+
+    async upsertAlertRule(rule) {
+      await executor.query(
+        `insert into alert_rules(
+           id, user_id, product_id, store_id, channel, alert_type, target_price, deal_score_threshold, active, created_at, updated_at
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+         on conflict (id) do update set
+           user_id = excluded.user_id,
+           product_id = excluded.product_id,
+           store_id = excluded.store_id,
+           channel = excluded.channel,
+           alert_type = excluded.alert_type,
+           target_price = excluded.target_price,
+           deal_score_threshold = excluded.deal_score_threshold,
+           active = excluded.active,
+           updated_at = excluded.updated_at`,
+        [
+          rule.id,
+          rule.userId,
+          rule.productId,
+          rule.storeId ?? null,
+          rule.channel,
+          rule.alertType,
+          rule.targetPrice ?? null,
+          rule.dealScoreThreshold ?? null,
+          rule.active,
+          rule.createdAt,
+          rule.updatedAt
+        ]
+      );
+    },
+
+    async listActiveAlertRules(userId) {
+      const rows = await executor.query<AlertRuleRow>(
+        `select id, user_id, product_id, store_id, channel, alert_type, target_price, deal_score_threshold, active, created_at, updated_at
+         from alert_rules
+         where user_id = $1 and active = true
+         order by product_id, alert_type, id`,
+        [userId]
+      );
+      return rows.map(mapAlertRule);
     }
   };
 }

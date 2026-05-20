@@ -123,6 +123,34 @@ class RecordingQueryExecutor implements QueryExecutor {
       updated_at: '2026-05-20T00:00:00.000Z'
     }
   ];
+  alertRuleRows: unknown[] = [
+    {
+      id: 'alert-coffee-target',
+      user_id: 'user-1',
+      product_id: 'coffee',
+      store_id: 'willys-odenplan',
+      channel: 'push',
+      alert_type: 'target_price',
+      target_price: '49.90',
+      deal_score_threshold: null,
+      active: true,
+      created_at: new Date('2026-05-20T08:00:00.000Z'),
+      updated_at: '2026-05-20T08:00:00.000Z'
+    },
+    {
+      id: 'alert-coffee-score',
+      user_id: 'user-1',
+      product_id: 'coffee',
+      store_id: null,
+      channel: 'email',
+      alert_type: 'deal_score',
+      target_price: null,
+      deal_score_threshold: 80,
+      active: true,
+      created_at: '2026-05-20T08:01:00.000Z',
+      updated_at: '2026-05-20T08:01:00.000Z'
+    }
+  ];
   observationHistoryRows: unknown[] = [
     {
       id: 'observation-3',
@@ -268,6 +296,7 @@ class RecordingQueryExecutor implements QueryExecutor {
         }
       ] as T[];
     }
+    if (sql.includes('from alert_rules')) return this.alertRuleRows as T[];
     if (sql.includes('from human_review_assignments')) {
       return [
         {
@@ -543,6 +572,64 @@ describe('createPostgresRepository', () => {
       true,
       '2026-05-19T20:31:00.000Z'
     ]);
+  });
+
+  it('persists and lists active alert rules for account-scoped delivery', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertAlertRule({
+      id: 'alert-coffee-target',
+      userId: 'user-1',
+      productId: 'coffee',
+      storeId: 'willys-odenplan',
+      channel: 'push',
+      alertType: 'target_price',
+      targetPrice: 49.9,
+      active: true,
+      createdAt: '2026-05-20T08:00:00.000Z',
+      updatedAt: '2026-05-20T08:00:00.000Z'
+    });
+
+    assert.deepEqual(await repo.listActiveAlertRules('user-1'), [
+      {
+        id: 'alert-coffee-target',
+        userId: 'user-1',
+        productId: 'coffee',
+        storeId: 'willys-odenplan',
+        channel: 'push',
+        alertType: 'target_price',
+        targetPrice: 49.9,
+        active: true,
+        createdAt: '2026-05-20T08:00:00.000Z',
+        updatedAt: '2026-05-20T08:00:00.000Z'
+      },
+      {
+        id: 'alert-coffee-score',
+        userId: 'user-1',
+        productId: 'coffee',
+        channel: 'email',
+        alertType: 'deal_score',
+        dealScoreThreshold: 80,
+        active: true,
+        createdAt: '2026-05-20T08:01:00.000Z',
+        updatedAt: '2026-05-20T08:01:00.000Z'
+      }
+    ]);
+    assert.deepEqual(executor.calls[0].params, [
+      'alert-coffee-target',
+      'user-1',
+      'coffee',
+      'willys-odenplan',
+      'push',
+      'target_price',
+      49.9,
+      null,
+      true,
+      '2026-05-20T08:00:00.000Z',
+      '2026-05-20T08:00:00.000Z'
+    ]);
+    assert.deepEqual(executor.calls[1].params, ['user-1']);
   });
 });
 

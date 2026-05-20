@@ -255,6 +255,50 @@ describe('createMemoryRepository', () => {
       }
     ]);
   });
+
+  it('persists active alert rules for account alert delivery', async () => {
+    const repo = createMemoryRepository();
+
+    await repo.upsertUser({ id: 'user-1', email: 'alerts@example.com' });
+    await repo.upsertAlertRule({
+      id: 'alert-coffee-target',
+      userId: 'user-1',
+      productId: 'coffee',
+      storeId: 'willys-odenplan',
+      channel: 'push',
+      alertType: 'target_price',
+      targetPrice: 49.9,
+      active: true,
+      createdAt: '2026-05-20T08:00:00.000Z',
+      updatedAt: '2026-05-20T08:00:00.000Z'
+    });
+    await repo.upsertAlertRule({
+      id: 'alert-coffee-inactive',
+      userId: 'user-1',
+      productId: 'coffee',
+      channel: 'email',
+      alertType: 'deal_score',
+      dealScoreThreshold: 80,
+      active: false,
+      createdAt: '2026-05-20T08:01:00.000Z',
+      updatedAt: '2026-05-20T08:01:00.000Z'
+    });
+
+    assert.deepEqual(await repo.listActiveAlertRules('user-1'), [
+      {
+        id: 'alert-coffee-target',
+        userId: 'user-1',
+        productId: 'coffee',
+        storeId: 'willys-odenplan',
+        channel: 'push',
+        alertType: 'target_price',
+        targetPrice: 49.9,
+        active: true,
+        createdAt: '2026-05-20T08:00:00.000Z',
+        updatedAt: '2026-05-20T08:00:00.000Z'
+      }
+    ]);
+  });
 });
 
 describe('applyNotificationTaskAcknowledgements', () => {
