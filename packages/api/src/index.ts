@@ -975,13 +975,32 @@ export function createGroceryViewApi() {
       watchlists.set(userId, [...(watchlists.get(userId) ?? []), item]);
     },
 
+    updateWatchlistItem(userId: string, productId: string, patch: Partial<Omit<WatchlistItem, 'productId'>>) {
+      requireNonEmptyId(userId, 'userId');
+      requireKnownProduct(productId);
+      requireOptionalPositiveFinite(patch.targetPrice, 'targetPrice');
+      requireScoreThreshold(patch.alertDealScoreAt);
+      const items = watchlists.get(userId) ?? [];
+      const index = items.findIndex((item) => item.productId === productId);
+      if (index === -1) throw new Error(`Watchlist item not found: ${productId}`);
+      const next = [...items];
+      next[index] = {
+        ...next[index],
+        ...(patch.targetPrice === undefined ? {} : { targetPrice: patch.targetPrice }),
+        ...(patch.alertDealScoreAt === undefined ? {} : { alertDealScoreAt: patch.alertDealScoreAt }),
+        ...(patch.favoriteStoresOnly === undefined ? {} : { favoriteStoresOnly: patch.favoriteStoresOnly }),
+        productId
+      };
+      watchlists.set(userId, next);
+    },
+
     removeWatchlistItem(userId: string, productId: string) {
       requireNonEmptyId(userId, 'userId');
       requireKnownProduct(productId);
-      const current = watchlists.get(userId) ?? [];
-      const remaining = current.filter((item) => item.productId !== productId);
-      watchlists.set(userId, remaining);
-      return { removed: remaining.length !== current.length };
+      const items = watchlists.get(userId) ?? [];
+      const next = items.filter((item) => item.productId !== productId);
+      watchlists.set(userId, next);
+      return { removed: next.length !== items.length };
     },
 
     getWatchlist(userId: string): { items: WatchlistItem[]; alerts: WatchlistAlert[] } {
@@ -1009,6 +1028,29 @@ export function createGroceryViewApi() {
         return;
       }
       baskets.set(userId, [...current, item]);
+    },
+
+    updateBasketItem(userId: string, productId: string, quantity: number) {
+      requireNonEmptyId(userId, 'userId');
+      requireKnownProduct(productId);
+      if (!Number.isInteger(quantity) || quantity <= 0 || quantity > 99) {
+        throw new Error('quantity must be an integer between 1 and 99');
+      }
+      const items = baskets.get(userId) ?? [];
+      const index = items.findIndex((item) => item.productId === productId);
+      if (index === -1) throw new Error(`Basket item not found: ${productId}`);
+      const next = [...items];
+      next[index] = { productId, quantity };
+      baskets.set(userId, next);
+    },
+
+    removeBasketItem(userId: string, productId: string) {
+      requireNonEmptyId(userId, 'userId');
+      requireKnownProduct(productId);
+      const items = baskets.get(userId) ?? [];
+      const next = items.filter((item) => item.productId !== productId);
+      if (next.length === items.length) throw new Error(`Basket item not found: ${productId}`);
+      baskets.set(userId, next);
     },
 
     getBasket(userId: string) {

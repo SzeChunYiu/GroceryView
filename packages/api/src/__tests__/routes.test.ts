@@ -280,14 +280,21 @@ describe('createGroceryViewApi', () => {
     api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, favoriteStoresOnly: true });
     api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
     api.addBasketItem('user-1', { productId: 'coffee', quantity: 2 });
+    api.updateWatchlistItem('user-1', 'coffee', { targetPrice: 48 });
+    api.updateBasketItem('user-1', 'coffee', 2);
     api.updateBudget('user-1', { weeklyBudget: 800, monthlyBudget: 3200 });
 
     assert.deepEqual(api.getFavoriteStores('user-1').map((store) => store.id), ['willys-odenplan']);
-    assert.equal(api.getWatchlist('user-1').alerts.length, 3);
-    assert.deepEqual(api.getBasket('user-1').items, [{ productId: 'coffee', quantity: 3 }]);
-    assert.equal(api.compareBasket('user-1').cheapestByProduct.total, 149.7);
+    assert.equal(api.getWatchlist('user-1').alerts.length, 2);
+    assert.deepEqual(api.getBasket('user-1').items[0], { productId: 'coffee', quantity: 2 });
+    assert.equal(api.compareBasket('user-1').cheapestByProduct.total, 99.8);
     assert.equal(api.getBudgetSummary('user-1').weeklyBudget, 800);
     assert.equal(api.getIndex('stockholm-grocery-index')?.label, 'Stockholm Grocery Index');
+
+    api.removeWatchlistItem('user-1', 'coffee');
+    api.removeBasketItem('user-1', 'coffee');
+    assert.deepEqual(api.getWatchlist('user-1').items, []);
+    assert.deepEqual(api.getBasket('user-1').items, []);
   });
 
   it('removes watched products and recomputes alerts from remaining items', () => {
@@ -319,6 +326,10 @@ describe('createGroceryViewApi', () => {
       /targetPrice must be positive/
     );
     assert.throws(() => api.addBasketItem('user-1', { productId: 'coffee', quantity: 0 }), /quantity must be an integer/);
+    assert.throws(() => api.updateWatchlistItem('user-1', 'coffee', { targetPrice: 40 }), /Watchlist item not found/);
+    assert.deepEqual(api.removeWatchlistItem('user-1', 'coffee'), { removed: false });
+    assert.throws(() => api.updateBasketItem('user-1', 'coffee', 1), /Basket item not found/);
+    assert.throws(() => api.removeBasketItem('user-1', 'coffee'), /Basket item not found/);
     api.addBasketItem('user-1', { productId: 'coffee', quantity: 98 });
     assert.throws(() => api.addBasketItem('user-1', { productId: 'coffee', quantity: 2 }), /quantity must be an integer/);
     assert.throws(() => api.updateBudget('user-1', { weeklyBudget: -1, monthlyBudget: 3200 }), /weeklyBudget/);
