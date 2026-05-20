@@ -131,6 +131,7 @@ describe('createHttpHandler', () => {
     assert.equal(storeDeals.status, 200);
     assert.deepEqual((await json(storeDeals) as Array<{ productId: string; storeId: string }>).map((deal) => [deal.productId, deal.storeId]), [
       ['coffee', 'willys-odenplan'],
+      ['private-label-milk', 'willys-odenplan'],
       ['milk', 'willys-odenplan'],
       ['butter', 'willys-odenplan']
     ]);
@@ -229,7 +230,7 @@ describe('createHttpHandler', () => {
           action: 'prioritize_manual_or_feed_refresh'
         }
       ],
-      backfillProductIds: ['butter', 'coffee', 'milk']
+      backfillProductIds: ['butter', 'coffee', 'milk', 'private-label-milk']
     });
 
     const index = await handle(new Request('http://localhost/api/indices/stockholm-grocery-index'));
