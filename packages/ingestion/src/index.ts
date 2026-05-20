@@ -46,6 +46,52 @@ export type RetailerSourceRegistryEntry = {
   legalReviewStatus: LegalReviewStatus;
   stubOnly: boolean;
 };
+
+export type StoreLocatorSourceSurface = 'store_locator' | 'store_detail' | 'regional_locator';
+export type StoreIdentifierStatus = 'resolved' | 'fixture_local' | 'unresolved';
+export type StoreLocatorConfidenceReason =
+  | 'official_locator'
+  | 'rendered_html'
+  | 'app_rendered'
+  | 'coordinate_missing'
+  | 'hours_missing'
+  | 'special_hours_unknown'
+  | 'identifier_unresolved';
+
+export type StoreOpeningHoursInterval = {
+  day: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+  opens: string;
+  closes: string;
+};
+
+export type StoreLocatorFixture = {
+  fixtureId: string;
+  chainId: RetailerChainId;
+  sourceUrl: string;
+  sourceSurface: StoreLocatorSourceSurface;
+  sourceRegion: 'stockholm' | 'stockholm_county' | 'coop_ostra' | 'unknown';
+  capturedAt: string;
+  rawSnapshotRef: string;
+  contentDigest: string;
+  storeId: string;
+  storeIdentifierStatus: StoreIdentifierStatus;
+  storeName: string;
+  address: string;
+  coordinates?: { latitude: number; longitude: number };
+  openingHours: StoreOpeningHoursInterval[];
+  specialHoursUnknown: boolean;
+  services: string[];
+  status: 'open' | 'temporarily_closed' | 'planned' | 'unknown';
+  confidence: number;
+  confidenceReasons: StoreLocatorConfidenceReason[];
+  legalReviewStatus: LegalReviewStatus;
+};
+
+export type StoreLocatorFixtureValidation = {
+  status: 'valid' | 'invalid';
+  chainIds: RetailerChainId[];
+  issues: string[];
+};
 export type FlyerSourceFormat = 'weekly_offer_html' | 'store_offer_html' | 'digital_flyer' | 'member_offer' | 'app_offer' | 'app_rendered_offer_html';
 export type FlyerSourcePlanInput = {
   chainId: RetailerChainId;
@@ -197,7 +243,171 @@ export function planRetailerSourceAccess(input: RetailerSourceAccessInput): Reta
         sourceType: input.sourceType,
         reason: 'Flyer campaign ingestion requires approved legal review.',
         requiredActions
-      };
+	      };
+	}
+
+export const stockholmStoreLocatorFixtures: StoreLocatorFixture[] = [
+  {
+    fixtureId: 'ica-stockholm-oppettider-sergels-torg',
+    chainId: 'ica',
+    sourceUrl: 'https://www.ica.se/butiker/oppettider/stockholm/',
+    sourceSurface: 'store_locator',
+    sourceRegion: 'stockholm',
+    capturedAt: '2026-05-20T09:30:00.000Z',
+    rawSnapshotRef: 'fixtures/store-locators/ica/stockholm-oppettider.html',
+    contentDigest: 'sha256:fixture-ica-stockholm-oppettider',
+    storeId: 'ica-stockholm-sergels-torg',
+    storeIdentifierStatus: 'fixture_local',
+    storeName: 'ICA Nara Sergels Torg',
+    address: 'T-Centralen, Stockholm',
+    openingHours: [],
+    specialHoursUnknown: true,
+    services: ['opening_hours', 'store_services'],
+    status: 'unknown',
+    confidence: 0.72,
+    confidenceReasons: ['official_locator', 'rendered_html', 'hours_missing', 'special_hours_unknown', 'identifier_unresolved'],
+    legalReviewStatus: 'approved'
+  },
+  {
+    fixtureId: 'willys-stockholm-odenplan-placeholder',
+    chainId: 'willys',
+    sourceUrl: 'https://www.willys.se/butik',
+    sourceSurface: 'store_locator',
+    sourceRegion: 'stockholm',
+    capturedAt: '2026-05-20T09:30:00.000Z',
+    rawSnapshotRef: 'fixtures/store-locators/willys/stockholm-search.html',
+    contentDigest: 'sha256:fixture-willys-stockholm-search',
+    storeId: 'willys-odenplan',
+    storeIdentifierStatus: 'fixture_local',
+    storeName: 'Willys Odenplan',
+    address: 'Odenplan, Stockholm',
+    openingHours: [],
+    specialHoursUnknown: true,
+    services: ['store_locator'],
+    status: 'unknown',
+    confidence: 0.6,
+    confidenceReasons: ['official_locator', 'app_rendered', 'hours_missing', 'special_hours_unknown', 'identifier_unresolved'],
+    legalReviewStatus: 'pending'
+  },
+  {
+    fixtureId: 'coop-ostra-swedenborgsgatan',
+    chainId: 'coop',
+    sourceUrl: 'https://coopostra.se/butiker/',
+    sourceSurface: 'regional_locator',
+    sourceRegion: 'coop_ostra',
+    capturedAt: '2026-05-20T09:30:00.000Z',
+    rawSnapshotRef: 'fixtures/store-locators/coop/coop-ostra-butiker.html',
+    contentDigest: 'sha256:fixture-coop-ostra-butiker',
+    storeId: 'coop-stockholm-swedenborgsgatan',
+    storeIdentifierStatus: 'fixture_local',
+    storeName: 'Coop Swedenborgsgatan',
+    address: 'Swedenborgsgatan 21, 118 27 Stockholm',
+    openingHours: [],
+    specialHoursUnknown: true,
+    services: ['regional_locator'],
+    status: 'unknown',
+    confidence: 0.7,
+    confidenceReasons: ['official_locator', 'rendered_html', 'hours_missing', 'special_hours_unknown', 'identifier_unresolved'],
+    legalReviewStatus: 'approved'
+  },
+  {
+    fixtureId: 'hemkop-stockholm-butik-sok',
+    chainId: 'hemkop',
+    sourceUrl: 'https://www.hemkop.se/butik-sok',
+    sourceSurface: 'store_locator',
+    sourceRegion: 'stockholm',
+    capturedAt: '2026-05-20T09:30:00.000Z',
+    rawSnapshotRef: 'fixtures/store-locators/hemkop/butik-sok-stockholm.html',
+    contentDigest: 'sha256:fixture-hemkop-butik-sok-stockholm',
+    storeId: 'hemkop-stockholm-search-result',
+    storeIdentifierStatus: 'unresolved',
+    storeName: 'Hemkop Stockholm locator result',
+    address: 'Stockholm',
+    openingHours: [],
+    specialHoursUnknown: true,
+    services: ['store_locator'],
+    status: 'unknown',
+    confidence: 0.58,
+    confidenceReasons: ['official_locator', 'app_rendered', 'hours_missing', 'special_hours_unknown', 'identifier_unresolved'],
+    legalReviewStatus: 'pending'
+  },
+  {
+    fixtureId: 'lidl-stockholm-sveavagen-59',
+    chainId: 'lidl',
+    sourceUrl: 'https://www.lidl.se/s/sv-SE/butiker/stockholm/',
+    sourceSurface: 'store_locator',
+    sourceRegion: 'stockholm',
+    capturedAt: '2026-05-20T09:30:00.000Z',
+    rawSnapshotRef: 'fixtures/store-locators/lidl/stockholm.html',
+    contentDigest: 'sha256:fixture-lidl-stockholm',
+    storeId: 'lidl-stockholm-sveavagen-59',
+    storeIdentifierStatus: 'fixture_local',
+    storeName: 'Lidl Sveavagen',
+    address: 'Sveavagen 59, 113 59 Stockholm',
+    openingHours: [],
+    specialHoursUnknown: true,
+    services: ['store_locator', 'favorite_store'],
+    status: 'open',
+    confidence: 0.82,
+    confidenceReasons: ['official_locator', 'rendered_html', 'hours_missing', 'special_hours_unknown', 'identifier_unresolved'],
+    legalReviewStatus: 'approved'
+  },
+  {
+    fixtureId: 'citygross-stockholm-official-placeholder',
+    chainId: 'city_gross',
+    sourceUrl: 'https://www.citygross.se/',
+    sourceSurface: 'store_locator',
+    sourceRegion: 'stockholm_county',
+    capturedAt: '2026-05-20T09:30:00.000Z',
+    rawSnapshotRef: 'fixtures/store-locators/city-gross/stockholm-county.html',
+    contentDigest: 'sha256:fixture-citygross-stockholm-county',
+    storeId: 'citygross-stockholm-county-unresolved',
+    storeIdentifierStatus: 'unresolved',
+    storeName: 'City Gross Stockholm county locator result',
+    address: 'Stockholm County',
+    openingHours: [],
+    specialHoursUnknown: true,
+    services: ['store_locator'],
+    status: 'unknown',
+    confidence: 0.45,
+    confidenceReasons: ['official_locator', 'app_rendered', 'hours_missing', 'special_hours_unknown', 'identifier_unresolved'],
+    legalReviewStatus: 'pending'
+  }
+];
+
+export function validateStoreLocatorFixtures(fixtures: StoreLocatorFixture[]): StoreLocatorFixtureValidation {
+  const issues: string[] = [];
+  const requiredChains: RetailerChainId[] = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
+  const chainIds = [...new Set(fixtures.map((fixture) => fixture.chainId))].sort() as RetailerChainId[];
+  for (const chainId of requiredChains) {
+    if (!chainIds.includes(chainId)) issues.push(`missing_chain:${chainId}`);
+  }
+  for (const fixture of fixtures) {
+    if (!fixture.sourceUrl.startsWith('https://')) issues.push(`invalid_source_url:${fixture.fixtureId}`);
+    if (!fixture.rawSnapshotRef) issues.push(`missing_raw_snapshot_ref:${fixture.fixtureId}`);
+    if (!fixture.contentDigest.startsWith('sha256:')) issues.push(`missing_content_digest:${fixture.fixtureId}`);
+    if (!fixture.capturedAt || Number.isNaN(Date.parse(fixture.capturedAt))) issues.push(`invalid_captured_at:${fixture.fixtureId}`);
+    if (fixture.storeIdentifierStatus !== 'resolved' && !fixture.confidenceReasons.includes('identifier_unresolved')) {
+      issues.push(`missing_identifier_reason:${fixture.fixtureId}`);
+    }
+    if (fixture.openingHours.length === 0 && !fixture.confidenceReasons.includes('hours_missing')) {
+      issues.push(`missing_hours_reason:${fixture.fixtureId}`);
+    }
+    if (fixture.specialHoursUnknown && !fixture.confidenceReasons.includes('special_hours_unknown')) {
+      issues.push(`missing_special_hours_reason:${fixture.fixtureId}`);
+    }
+    if (fixture.confidence < 0 || fixture.confidence > 1) issues.push(`invalid_confidence:${fixture.fixtureId}`);
+  }
+
+  return {
+    status: issues.length === 0 ? 'valid' : 'invalid',
+    chainIds,
+    issues
+  };
+}
+
+export function locatorFixturesCanAffectDealScore(): false {
+  return false;
 }
 
 export type RetailerConnectorKind = 'official_api' | 'retailer_online_page' | 'flyer_campaign';
