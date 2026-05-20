@@ -634,117 +634,68 @@ export function calculateFixedBasketIndex(input: FixedBasketIndexInput): FixedBa
   };
 }
 
-export type PriceHistoryPoint = {
-  observedAt: string;
-  price: number;
-  storeId?: string;
+export type BasketType =
+  | 'student'
+  | 'family'
+  | 'budget'
+  | 'premium'
+  | 'vegan'
+  | 'high_protein'
+  | 'baby'
+  | 'cleaning'
+  | 'breakfast';
+
+export type BasketTypeComponent = IndexComponent & {
+  category: string;
 };
 
-export type PriceHistorySummary = {
-  latestPrice: number;
-  previousPrice?: number;
-  changeFromPrevious: number;
-  lowestPrice: number;
-  highestPrice: number;
-  isNewLow: boolean;
-  observedCount: number;
-  latestObservedAt: string;
+export type BasketTypeCandidate = {
+  type: BasketType;
+  label: string;
+  components: BasketTypeComponent[];
+  oneWeekMovementPercent: number;
+  oneMonthMovementPercent: number;
+  chainTotals: Array<{ chain: string; total: number }>;
+  areaTotals: Array<{ area: string; total: number }>;
 };
 
-export type PriceChartSourceType = 'shelf' | 'online' | 'flyer' | 'member' | 'receipt' | 'shelf_photo' | 'manual' | 'estimated';
-
-export type PriceChartLineStyle = 'solid' | 'dashed' | 'dotted';
-
-export type PriceChartMarkerType = 'promotion' | 'member' | 'new_low' | 'receipt_confirmed' | 'source_warning';
-
-export type PriceChartObservation = PriceHistoryPoint & {
-  storeId: string;
-  storeName: string;
-  sourceType: PriceChartSourceType;
-  confidence: number;
-  provenanceLabel?: string;
-  markerType?: PriceChartMarkerType;
-  markerLabel?: string;
+export type BasketTypeIndex = FixedBasketIndex & {
+  type: BasketType;
+  oneWeekMovementPercent: number;
+  oneMonthMovementPercent: number;
+  cheapestChain: string;
+  cheapestArea: string;
+  biggestDriver: string;
 };
 
-export type PriceChartSeriesPoint = {
-  time: string;
-  value: number;
-  confidence: number;
-  provenanceLabel?: string;
-};
+export function calculateBasketTypeIndices(input: {
+  baseDate: string;
+  currentDate: string;
+  baskets: BasketTypeCandidate[];
+}): BasketTypeIndex[] {
+  return input.baskets.map((basket) => {
+    const index = calculateFixedBasketIndex({
+      id: `${basket.type}-basket-index`,
+      label: basket.label,
+      baseDate: input.baseDate,
+      currentDate: input.currentDate,
+      components: basket.components
+    });
+    const cheapestChain = basket.chainTotals.reduce((best, candidate) => (candidate.total < best.total ? candidate : best));
+    const cheapestArea = basket.areaTotals.reduce((best, candidate) => (candidate.total < best.total ? candidate : best));
+    const biggestDriver = [...basket.components]
+      .sort((a, b) => Math.abs((b.currentUnitPrice - b.baseUnitPrice) / b.baseUnitPrice) - Math.abs((a.currentUnitPrice - a.baseUnitPrice) / a.baseUnitPrice))[0];
 
-export type PriceChartMarker = {
-  time: string;
-  type: PriceChartMarkerType;
-  text: string;
-  color: string;
-  shape: 'circle' | 'arrowUp' | 'arrowDown';
-  position: 'aboveBar' | 'belowBar' | 'inBar';
-  sourceType: PriceChartSourceType;
-  provenanceLabel?: string;
-};
-
-export type PriceChartSeries = {
-  id: string;
-  storeId: string;
-  storeName: string;
-  sourceType: PriceChartSourceType;
-  lineStyle: PriceChartLineStyle;
-  points: PriceChartSeriesPoint[];
-  markers: PriceChartMarker[];
-};
-
-export type PriceChartAdapterInput = {
-  observations: PriceChartObservation[];
-  asOf?: string;
-  rangeDays?: 7 | 30 | 90 | 365;
-  markerLimitPerSeries?: number;
-};
-
-export type PriceChartAdapterResult = {
-  series: PriceChartSeries[];
-  windowStart?: string;
-  windowEnd?: string;
-};
-
-const chartLineStyleWeight: Record<PriceChartLineStyle, number> = {
-  solid: 0,
-  dashed: 1,
-  dotted: 2
-};
-
-export function priceChartLineStyle(input: {
-  sourceType: PriceChartSourceType;
-  confidence: number;
-}): PriceChartLineStyle {
-  const confidence = clamp(input.confidence, 0, 1);
-  if (input.sourceType === 'estimated' || input.sourceType === 'manual' || confidence < 0.5) return 'dotted';
-  if (input.sourceType === 'shelf_photo' || confidence < 0.8) return 'dashed';
-  return 'solid';
-}
-
-export function summarizePriceHistory(points: PriceHistoryPoint[]): PriceHistorySummary {
-  if (points.length === 0) {
-    throw new Error('At least one price history point is required.');
-  }
-
-  const ordered = [...points].sort((a, b) => new Date(a.observedAt).getTime() - new Date(b.observedAt).getTime());
-  const latest = ordered.at(-1)!;
-  const previous = ordered.at(-2);
-  const previousPrices = ordered.slice(0, -1).map((point) => point.price);
-  const historicalLow = previousPrices.length > 0 ? Math.min(...previousPrices) : latest.price;
-
-  return {
-    latestPrice: latest.price,
-    previousPrice: previous?.price,
-    changeFromPrevious: previous ? roundMoney(latest.price - previous.price) : 0,
-    lowestPrice: Math.min(...ordered.map((point) => point.price)),
-    highestPrice: Math.max(...ordered.map((point) => point.price)),
-    isNewLow: latest.price < historicalLow,
-    observedCount: ordered.length,
-    latestObservedAt: latest.observedAt
-  };
+    return {
+      ...index,
+      type: basket.type,
+      oneWeekMovementPercent: roundMoney(basket.oneWeekMovementPercent),
+      oneMonthMovementPercent: roundMoney(basket.oneMonthMovementPercent),
+      cheapestChain: cheapestChain.chain,
+      cheapestArea: cheapestArea.area,
+      biggestDriver: `${biggestDriver.category} ${roundMoney(((biggestDriver.currentUnitPrice - biggestDriver.baseUnitPrice) / biggestDriver.baseUnitPrice) * 100)}%`
+    };
+  });
 }
 
 function chartMarkersForObservation(observation: PriceChartObservation, isNewLow: boolean): PriceChartMarker[] {
