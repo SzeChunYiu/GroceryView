@@ -121,6 +121,17 @@ describe('buildStaticPages', () => {
       assert.match(market, /vs Stockholm median/);
       assert.match(market, /verified observations/);
       assert.match(market, /Estimated rows cannot top the mover board/);
+      assert.match(market, /Connected market movers API/);
+      assert.match(market, /Load live market movers/);
+      assert.match(market, /data-groceryview-flow="market-movers"/);
+      assert.match(market, /data-flow-action="load-market-movers"/);
+      assert.match(market, /data-market-movers-leader/);
+      assert.match(market, /data-market-movers-range/);
+      assert.match(market, /data-market-movers-evidence/);
+      assert.match(market, /fetch\(apiUrl\('\/api\/market\/overview'/);
+      assert.match(market, /oneMonthMovePercent/);
+      assert.match(market, /range52WeekPositionPercent/);
+      assert.match(market, /stockholmMedianGap/);
       assert.match(market, /Brand-tier indices/);
       assert.match(market, /Private Label Index/);
       assert.match(market, /Premium Brand Index/);
