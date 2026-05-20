@@ -33,6 +33,7 @@ describe('GroceryView API app', () => {
     assert.equal(docs.body.info.title, 'GroceryView API');
     assert.ok(docs.body.paths['/health']);
     assert.ok(docs.body.paths['/products']);
+    assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/stores']);
   });
 
@@ -49,6 +50,18 @@ describe('GroceryView API app', () => {
     const prices = await request(app.getHttpServer()).get('/products/coffee/prices').expect(200);
     assert.equal(prices.body[0].currency, 'SEK');
     assert.equal(prices.body[0].confidence, 'high');
+
+    const terminal = await request(app.getHttpServer()).get('/products/coffee/terminal').expect(200);
+    assert.equal(terminal.body.productId, 'coffee');
+    assert.equal(terminal.body.ticker, 'ZOEGAS-COFFEE-450G');
+    assert.equal(terminal.body.quote.bestPrice, 49.9);
+    assert.deepEqual(terminal.body.distributions.map((distribution: { label: string }) => distribution.label), [
+      'Whole Stockholm',
+      'Odenplan local area'
+    ]);
+    assert.equal(terminal.body.chart.series[0].id, 'willys-odenplan:shelf');
+    assert.equal(terminal.body.historySummary.isNewLow, true);
+    assert.equal(terminal.body.evidenceGuardrails.length, 3);
 
     await request(app.getHttpServer())
       .post('/users/demo/watchlist')
@@ -72,5 +85,9 @@ describe('GroceryView API app', () => {
       .post('/users/demo/basket/items')
       .send({ productId: 'coffee', quantity: 0 })
       .expect(400);
+  });
+
+  it('returns 404 for missing product terminal data', async () => {
+    await request(app.getHttpServer()).get('/products/missing-product/terminal').expect(404);
   });
 });
