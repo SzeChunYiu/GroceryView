@@ -53,6 +53,9 @@ describe('buildStaticPages', () => {
       const login = await readFile(join(root, 'login/index.html'), 'utf8');
       assert.match(login, /Sign in to GroceryView/);
       assert.match(login, /Passkey or magic link/);
+      assert.match(login, /data-groceryview-flow="login"/);
+      assert.match(login, /name="email"/);
+      assert.match(login, /data-flow-result="login"/);
 
       const account = await readFile(join(root, 'account/index.html'), 'utf8');
       assert.match(account, /Alert preferences/);
@@ -62,6 +65,9 @@ describe('buildStaticPages', () => {
       assert.match(account, /Premium access is active/);
       assert.match(account, /\/api\/account\/subscription-access/);
       assert.match(account, /Manage subscription/);
+      assert.match(account, /data-groceryview-flow="account"/);
+      assert.match(account, /data-flow-action="toggle-alert"/);
+      assert.match(account, /data-flow-result="account"/);
 
       const household = await readFile(join(root, 'household/index.html'), 'utf8');
       assert.match(household, /Shared household basket/);
@@ -69,17 +75,26 @@ describe('buildStaticPages', () => {
       assert.match(household, /Household rules/);
       assert.match(household, /Owner approval over 400 SEK/);
       assert.match(household, /No pork, nut alert/);
+      assert.match(household, /data-groceryview-flow="household"/);
+      assert.match(household, /name="approvalLimit"/);
+      assert.match(household, /data-flow-result="household"/);
 
       const basket = await readFile(join(root, 'basket/index.html'), 'utf8');
       assert.match(basket, /Basket lines/);
       assert.match(basket, /Lidl Sveavägen/);
       assert.match(basket, /Smart swaps/);
+      assert.match(basket, /data-groceryview-flow="basket"/);
+      assert.match(basket, /name="coffeeQuantity"/);
+      assert.match(basket, /data-flow-result="basket"/);
 
       const scanner = await readFile(join(root, 'scanner/index.html'), 'utf8');
       assert.match(scanner, /Barcode and receipt scanner/);
       assert.match(scanner, /manual review queue/);
       assert.match(scanner, /Coop Farsta receipt/);
       assert.match(scanner, /Route to product matching queue/);
+      assert.match(scanner, /data-groceryview-flow="scanner"/);
+      assert.match(scanner, /accept="image\/\*"/);
+      assert.match(scanner, /data-flow-action="route-review"/);
 
       const humanReview = await readFile(join(root, 'admin/human-review/index.html'), 'utf8');
       assert.match(humanReview, /Human review operations/);
@@ -94,6 +109,15 @@ describe('buildStaticPages', () => {
       assert.match(privacy, /Control states/);
       assert.match(privacy, /Receipt images/);
       assert.match(privacy, /District only/);
+      assert.match(privacy, /data-groceryview-flow="privacy"/);
+      assert.match(privacy, /data-flow-action="download-export"/);
+      assert.match(privacy, /data-flow-result="privacy"/);
+
+      for (const pagePath of ['login/index.html', 'account/index.html', 'basket/index.html', 'scanner/index.html', 'privacy/index.html']) {
+        const html = await readFile(join(root, pagePath), 'utf8');
+        assert.match(html, /window\.GroceryViewFlowActions/);
+        assert.doesNotMatch(html, /innerHTML\s*=/);
+      }
     } finally {
       await rm(root, { recursive: true, force: true });
     }
