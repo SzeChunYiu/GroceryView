@@ -651,6 +651,15 @@ export function createGroceryViewApi() {
       watchlists.set(userId, [...(watchlists.get(userId) ?? []), item]);
     },
 
+    removeWatchlistItem(userId: string, productId: string) {
+      requireNonEmptyId(userId, 'userId');
+      requireKnownProduct(productId);
+      const current = watchlists.get(userId) ?? [];
+      const remaining = current.filter((item) => item.productId !== productId);
+      watchlists.set(userId, remaining);
+      return { removed: remaining.length !== current.length };
+    },
+
     getWatchlist(userId: string): { items: WatchlistItem[]; alerts: WatchlistAlert[] } {
       const items = watchlists.get(userId) ?? [];
       const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
