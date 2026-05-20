@@ -62,6 +62,21 @@ export type SubscriptionEntitlementLookupRecord = SubscriptionEntitlementSnapsho
   providerSubscriptionId?: string;
 };
 
+export type RuntimePersistenceRepository = {
+  getSubscriptionEntitlement(userId: string): Promise<SubscriptionEntitlementLookupRecord | null>;
+  upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
+  getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
+  listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
+  saveHumanReviewAssignment(assignment: HumanReviewAssignment): Promise<void>;
+  upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
+};
+
+export type RuntimeHandlerOptions = {
+  now?: Date;
+  repository?: RuntimePersistenceRepository;
+  notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
+};
+
 type JsonRecord = Record<string, unknown>;
 
 const jsonHeaders = { 'content-type': 'application/json; charset=utf-8' };
@@ -688,27 +703,60 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
   };
 }
 
-export function buildRuntimeAuthOptions(config: RuntimeConfig): AuthOptions {
+export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): AuthOptions {
   return {
     runtimeConfig: config,
     authSecret: config.authSecret,
+    now: options.now,
     notificationWebhookSecret: config.notificationWebhookSecret,
     billingWebhookSecret: config.billingWebhookSecret,
-    notificationMetricsToken: config.metricsToken
+    notificationMetricsToken: config.metricsToken,
+    notificationMetricsProvider: options.notificationMetricsProvider
   };
 }
 
-export function createRuntimeHttpHandler(env: Record<string, string | undefined> = process.env): HttpHandler {
-  return createHttpHandler(undefined, buildRuntimeAuthOptions(loadRuntimeConfig(env)));
+export function buildRepositoryBackedAuthOptions(
+  config: RuntimeConfig,
+  repository: RuntimePersistenceRepository,
+  options: RuntimeHandlerOptions = {}
+): AuthOptions {
+  return {
+    ...buildRuntimeAuthOptions(config, options),
+    subscriptionEntitlementRepository: {
+      getSubscriptionEntitlement: (userId) => repository.getSubscriptionEntitlement(userId)
+    },
+    humanReviewRepository: {
+      getHumanReviewer: (reviewerId) => repository.getHumanReviewer(reviewerId),
+      listOpenHumanReviewAssignments: () => repository.listOpenHumanReviewAssignments(),
+      saveHumanReviewAssignment: (assignment) => repository.saveHumanReviewAssignment(assignment)
+    },
+    notificationSuppressionSink: {
+      upsertNotificationSuppression: (suppression) => repository.upsertNotificationSuppression(suppression)
+    },
+    billingSubscriptionSink: {
+      upsertSubscriptionEntitlement: (entitlement) => repository.upsertSubscriptionEntitlement(entitlement)
+    }
+  };
 }
 
-export function createRuntimeNodeServer(env: Record<string, string | undefined> = process.env) {
-  return createNodeServer(createRuntimeHttpHandler(env));
+export function buildRuntimeRequestAuthOptions(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): AuthOptions {
+  return options.repository ? buildRepositoryBackedAuthOptions(config, options.repository, options) : buildRuntimeAuthOptions(config, options);
 }
 
-export function startNodeServerFromEnv(env: Record<string, string | undefined> = process.env) {
+export function createRuntimeHttpHandler(
+  env: Record<string, string | undefined> = process.env,
+  options: RuntimeHandlerOptions = {}
+): HttpHandler {
+  return createHttpHandler(undefined, buildRuntimeRequestAuthOptions(loadRuntimeConfig(env), options));
+}
+
+export function createRuntimeNodeServer(env: Record<string, string | undefined> = process.env, options: RuntimeHandlerOptions = {}) {
+  return createNodeServer(createRuntimeHttpHandler(env, options));
+}
+
+export function startNodeServerFromEnv(env: Record<string, string | undefined> = process.env, options: RuntimeHandlerOptions = {}) {
   const config = loadRuntimeConfig(env);
-  const server = createNodeServer(createHttpHandler(undefined, buildRuntimeAuthOptions(config)));
+  const server = createNodeServer(createHttpHandler(undefined, buildRuntimeRequestAuthOptions(config, options)));
   server.listen(config.port);
   return server;
 }
