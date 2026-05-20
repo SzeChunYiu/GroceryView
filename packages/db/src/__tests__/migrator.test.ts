@@ -53,11 +53,128 @@ describe('parseSqlStatements', () => {
     ]);
   });
 
-  it('keeps semicolons inside quoted strings', () => {
-    assert.deepEqual(parseSqlStatements("insert into notes(body) values ('Deal ends at 18:00; confirm with store');\nselect 'it''s ok; really';"), [
-      "insert into notes(body) values ('Deal ends at 18:00; confirm with store')",
-      "select 'it''s ok; really'"
+  it('does not split semicolons inside quoted SQL values or identifiers', () => {
+    assert.deepEqual(
+      parseSqlStatements(`
+        insert into source_runs(source_name, provenance)
+        values ('weekly; leaflet', '{"note":"trusted; source"}');
+        create table "prices;archive"(id text);
+      `),
+      [
+        `insert into source_runs(source_name, provenance)
+        values ('weekly; leaflet', '{"note":"trusted; source"}')`,
+        'create table "prices;archive"(id text)'
+      ]
+    );
+  });
+
+  it('keeps dollar-quoted migration blocks intact', () => {
+    assert.deepEqual(
+      parseSqlStatements(`
+        do $$
+        begin
+          raise notice 'seed; ready';
+        end
+        $$;
+        create index latest_prices_observed_idx on latest_prices(observed_at);
+      `),
+      [
+        `do $$
+        begin
+          raise notice 'seed; ready';
+        end
+        $$`,
+        'create index latest_prices_observed_idx on latest_prices(observed_at)'
+      ]
+    );
+  });
+});
+
+describe('migrationVersionFromPath', () => {
+  it('derives the migration version from a SQL basename', () => {
+    assert.equal(migrationVersionFromPath('infra/db/migrations/001_extensions.sql'), '001_extensions');
+    assert.equal(migrationVersionFromPath('infra\\db\\migrations\\002_init.sql'), '002_init');
+  });
+
+  it('rejects non-SQL migration paths', () => {
+    assert.throws(() => migrationVersionFromPath('infra/db/migrations/README.md'), /must end in \.sql/);
+  });
+});
+
+describe('createMigrationPlan', () => {
+  it('filters SQL files, sorts lexically by path, and preserves SQL contents', () => {
+    const plan = createMigrationPlan([
+      { path: 'infra/db/migrations/010_indexes.sql', sql: 'create index products_name_idx on products(name);' },
+      { path: 'infra/db/migrations/README.md', sql: 'ignore me' },
+      { path: 'infra/db/migrations/001_extensions.sql', sql: 'create extension if not exists postgis;' },
+      { path: 'infra/db/migrations/002_init.sql', sql: 'create table chains(id uuid primary key);' }
     ]);
+
+    assert.deepEqual(plan, [
+      { version: '001_extensions', sql: 'create extension if not exists postgis;' },
+      { version: '002_init', sql: 'create table chains(id uuid primary key);' },
+      { version: '010_indexes', sql: 'create index products_name_idx on products(name);' }
+    ]);
+  });
+
+  it('rejects duplicate derived migration versions', () => {
+    assert.throws(
+      () =>
+        createMigrationPlan([
+          { path: 'infra/db/migrations/001_init.sql', sql: 'create table chains(id uuid primary key);' },
+          { path: 'db/migrations/001_init.sql', sql: 'create table stores(id uuid primary key);' }
+        ]),
+      /Duplicate migration version: 001_init/
+    );
+  });
+});
+
+describe('buildMigrationPlanStatus', () => {
+  const plan = [
+    { version: '001_groceryview_schema', sql: 'create table products(id uuid primary key);' },
+    { version: '002_repository_support_schema', sql: 'create table app_users(id text primary key);' },
+    { version: '003_subscription_entitlements', sql: 'create table subscription_entitlements(user_id text primary key);' }
+  ];
+
+  it('reports ready when every planned migration is applied exactly once', () => {
+    assert.deepEqual(buildMigrationPlanStatus(plan, ['003_subscription_entitlements', '001_groceryview_schema', '002_repository_support_schema']), {
+      status: 'ready',
+      applied: ['001_groceryview_schema', '002_repository_support_schema', '003_subscription_entitlements'],
+      pending: [],
+      unknownApplied: [],
+      duplicateApplied: [],
+      summary: 'All planned migrations are applied.'
+    });
+  });
+
+  it('reports pending migrations without treating unapplied planned versions as drift', () => {
+    assert.deepEqual(buildMigrationPlanStatus(plan, ['001_groceryview_schema']), {
+      status: 'pending',
+      applied: ['001_groceryview_schema'],
+      pending: ['002_repository_support_schema', '003_subscription_entitlements'],
+      unknownApplied: [],
+      duplicateApplied: [],
+      summary: '2 migration(s) pending.'
+    });
+  });
+
+  it('reports metadata drift for unknown or duplicate applied migrations', () => {
+    assert.deepEqual(
+      buildMigrationPlanStatus(plan, [
+        '001_groceryview_schema',
+        '001_groceryview_schema',
+        '002_repository_support_schema',
+        '999_manual_hotfix'
+      ]),
+      {
+        status: 'drift',
+        applied: ['001_groceryview_schema', '002_repository_support_schema'],
+        pending: ['003_subscription_entitlements'],
+        unknownApplied: ['999_manual_hotfix'],
+        duplicateApplied: ['001_groceryview_schema'],
+        summary: 'Migration metadata drift detected: 2 issue(s).'
+      }
+    );
   });
 });
 

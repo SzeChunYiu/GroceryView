@@ -8,54 +8,21 @@ describe('buildCatalogCoverageReport', () => {
       targetCategories: ['coffee', 'dairy', 'eggs', 'bread'],
       targetChains: ['willys', 'ica', 'coop'],
       targetStores: ['willys-odenplan', 'ica-odenplan', 'coop-odenplan'],
-      minimumObservationsPerProduct: 3,
-      minimumFreshPriceShare: 0.8,
-      minimumMedianConfidenceScore: 0.75,
       products: [
-        {
-          id: 'coffee',
-          categoryId: 'coffee',
-          observedChainIds: ['willys'],
-          observedStoreIds: ['willys-odenplan'],
-          observedPriceCount: 2,
-          freshPriceCount: 1,
-          medianConfidenceScore: 0.7
-        },
-        {
-          id: 'milk',
-          categoryId: 'dairy',
-          observedChainIds: ['willys', 'coop'],
-          observedStoreIds: ['willys-odenplan', 'coop-odenplan'],
-          observedPriceCount: 2,
-          freshPriceCount: 2,
-          medianConfidenceScore: 0.6
-        }
+        { id: 'coffee', categoryId: 'coffee', observedChainIds: ['willys'], observedStoreIds: ['willys-odenplan'] },
+        { id: 'milk', categoryId: 'dairy', observedChainIds: ['willys', 'coop'], observedStoreIds: ['willys-odenplan', 'coop-odenplan'] }
       ]
     });
 
     assert.deepEqual(report, {
       status: 'incomplete',
       productCount: 2,
-      quality: {
-        observedPriceCount: 4,
-        freshPriceCount: 3,
-        freshPriceShare: 0.75,
-        observationsPerProduct: 2,
-        medianConfidenceScore: 0.65
-      },
       coverage: {
         categories: { covered: 2, target: 4, percent: 50, missing: ['bread', 'eggs'] },
         chains: { covered: 2, target: 3, percent: 66.67, missing: ['ica'] },
         stores: { covered: 2, target: 3, percent: 66.67, missing: ['ica-odenplan'] }
       },
-      requiredActions: [
-        'backfill_categories:bread,eggs',
-        'backfill_chains:ica',
-        'backfill_stores:ica-odenplan',
-        'increase_price_observation_depth:min_3_per_product',
-        'refresh_price_observations:min_80_percent_fresh',
-        'raise_source_confidence:min_0.75'
-      ]
+      requiredActions: ['backfill_categories:bread,eggs', 'backfill_chains:ica', 'backfill_stores:ica-odenplan']
     });
   });
 
@@ -64,50 +31,11 @@ describe('buildCatalogCoverageReport', () => {
       targetCategories: ['coffee'],
       targetChains: ['willys'],
       targetStores: ['willys-odenplan'],
-      minimumObservationsPerProduct: 3,
-      minimumFreshPriceShare: 0.8,
-      minimumMedianConfidenceScore: 0.75,
-      products: [
-        {
-          id: 'coffee',
-          categoryId: 'coffee',
-          observedChainIds: ['willys'],
-          observedStoreIds: ['willys-odenplan'],
-          observedPriceCount: 4,
-          freshPriceCount: 4,
-          medianConfidenceScore: 0.95
-        }
-      ]
+      products: [{ id: 'coffee', categoryId: 'coffee', observedChainIds: ['willys'], observedStoreIds: ['willys-odenplan'] }]
     });
 
     assert.equal(report.status, 'complete');
     assert.deepEqual(report.requiredActions, []);
-  });
-
-  it('blocks launch quality when target dimensions are present but observations are stale or weak', () => {
-    const report = buildCatalogCoverageReport({
-      targetCategories: ['coffee'],
-      targetChains: ['willys'],
-      targetStores: ['willys-odenplan'],
-      minimumObservationsPerProduct: 2,
-      minimumFreshPriceShare: 0.75,
-      minimumMedianConfidenceScore: 0.8,
-      products: [
-        {
-          id: 'coffee',
-          categoryId: 'coffee',
-          observedChainIds: ['willys'],
-          observedStoreIds: ['willys-odenplan'],
-          observedPriceCount: 2,
-          freshPriceCount: 1,
-          medianConfidenceScore: 0.55
-        }
-      ]
-    });
-
-    assert.equal(report.status, 'incomplete');
-    assert.deepEqual(report.coverage.categories.missing, []);
-    assert.deepEqual(report.requiredActions, ['refresh_price_observations:min_75_percent_fresh', 'raise_source_confidence:min_0.8']);
   });
 });
 

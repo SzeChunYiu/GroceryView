@@ -545,54 +545,85 @@ export function buildRollbackPlan(input: RollbackPlanInput): RollbackPlan {
   };
 }
 
-export type ReleaseValidationStatus = 'pass' | 'fail' | 'pending' | 'missing';
-
-export type ReleasePromotionInput = {
-  releaseValidation: {
-    status: ReleaseValidationStatus;
-    runUrl?: string;
-  };
-  requiredArtifacts: string[];
-  producedArtifacts: string[];
-  smokeTests: Array<{ name: string; status: GateStatus }>;
-  rollbackPlanApproved: boolean;
+export type DeploymentManifestService = {
+  name?: unknown;
+  type?: unknown;
+  workspace?: unknown;
+  startCommand?: unknown;
+  buildCommand?: unknown;
+  outputDirectory?: unknown;
+  healthCheck?: unknown;
+  requiredEnv?: unknown;
 };
 
-export type ReleasePromotionReport = {
-  status: 'promotable' | 'blocked';
+export type DeploymentManifest = {
+  version?: unknown;
+  services?: unknown;
+};
+
+export type DeploymentManifestValidationReport = {
+  status: 'ready' | 'blocked';
   blockers: string[];
-  evidence: string[];
-  summary: string;
+  warnings: string[];
+  serviceNames: string[];
 };
 
-export function buildReleasePromotionReport(input: ReleasePromotionInput): ReleasePromotionReport {
+type HealthCheckShape = {
+  path?: unknown;
+  expectedStatus?: unknown;
+};
+
+export function validateDeploymentManifest(manifest: DeploymentManifest): DeploymentManifestValidationReport {
   const blockers: string[] = [];
-  const evidence: string[] = [];
-  const produced = new Set(input.producedArtifacts);
+  const warnings: string[] = [];
+  const serviceNames: string[] = [];
 
-  if (input.releaseValidation.status !== 'pass') {
-    blockers.push(`release_validation_${input.releaseValidation.status}`);
-  } else {
-    evidence.push(input.releaseValidation.runUrl ? `release_validation:${input.releaseValidation.runUrl}` : 'release_validation:pass');
+  if (manifest.version !== 1) blockers.push('manifest_version_not_supported');
+  if (!Array.isArray(manifest.services) || manifest.services.length === 0) {
+    blockers.push('services_missing');
+    return { status: 'blocked', blockers, warnings, serviceNames };
   }
 
-  for (const artifact of input.requiredArtifacts) {
-    if (!produced.has(artifact)) blockers.push(`missing_artifact:${artifact}`);
-  }
+  const seenNames = new Set<string>();
+  for (const [index, rawService] of manifest.services.entries()) {
+    const service = rawService as DeploymentManifestService;
+    const name = typeof service.name === 'string' && service.name.trim().length > 0 ? service.name : `service_${index}`;
+    if (name === `service_${index}`) blockers.push(`service_name_missing:${index}`);
+    if (seenNames.has(name)) blockers.push(`duplicate_service:${name}`);
+    seenNames.add(name);
+    serviceNames.push(name);
 
-  for (const smoke of input.smokeTests) {
-    if (smoke.status === 'fail') blockers.push(`smoke_test_failed:${smoke.name}`);
-    if (smoke.status === 'not_run') blockers.push(`smoke_test_not_run:${smoke.name}`);
-    if (smoke.status === 'pass') evidence.push(`smoke_test_passed:${smoke.name}`);
-  }
-  if (input.smokeTests.length === 0) blockers.push('no_smoke_tests_defined');
+    if (typeof service.workspace !== 'string' || !service.workspace.startsWith('@groceryview/')) {
+      blockers.push(`workspace_invalid:${name}`);
+    }
+    if (typeof service.type !== 'string' || service.type.trim().length === 0) blockers.push(`service_type_missing:${name}`);
 
-  if (!input.rollbackPlanApproved) blockers.push('rollback_plan_not_approved');
+    const healthCheck = service.healthCheck as HealthCheckShape | undefined;
+    if (!healthCheck || typeof healthCheck.path !== 'string' || !healthCheck.path.startsWith('/')) {
+      blockers.push(`health_check_path_invalid:${name}`);
+    }
+    if (!healthCheck || typeof healthCheck.expectedStatus !== 'number' || healthCheck.expectedStatus < 200 || healthCheck.expectedStatus > 399) {
+      blockers.push(`health_check_status_invalid:${name}`);
+    }
+
+    if (!Array.isArray(service.requiredEnv) || !service.requiredEnv.every((envVar) => typeof envVar === 'string' && /^[A-Z][A-Z0-9_]*$/.test(envVar))) {
+      blockers.push(`required_env_invalid:${name}`);
+    }
+
+    if (service.type === 'node-http' && (typeof service.startCommand !== 'string' || service.startCommand.trim().length === 0)) {
+      blockers.push(`start_command_missing:${name}`);
+    }
+    if (service.type === 'static-site') {
+      if (typeof service.buildCommand !== 'string' || service.buildCommand.trim().length === 0) blockers.push(`build_command_missing:${name}`);
+      if (typeof service.outputDirectory !== 'string' || service.outputDirectory.trim().length === 0) blockers.push(`output_directory_missing:${name}`);
+    }
+    if (Array.isArray(service.requiredEnv) && service.requiredEnv.length === 0) warnings.push(`no_required_env:${name}`);
+  }
 
   return {
-    status: blockers.length === 0 ? 'promotable' : 'blocked',
+    status: blockers.length === 0 ? 'ready' : 'blocked',
     blockers,
-    evidence,
-    summary: blockers.length === 0 ? 'Release candidate can be promoted.' : 'Release candidate is blocked until promotion gates pass.'
+    warnings,
+    serviceNames
   };
 }

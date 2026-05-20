@@ -1,6 +1,15 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildDeploymentReadinessReport, buildReleasePromotionReport, buildRollbackPlan } from '../index.js';
+import {
+  buildDeploymentReadinessReport,
+  buildHostedSmokeCommandPlan,
+  buildRollbackPlan,
+  buildSecretRotationReadinessReport,
+  summarizeSecretRotationReadinessReport,
+  summarizeDeploymentReadinessReport,
+  summarizeGateBlockers,
+  summarizeGateWarnings
+} from '../index.js';
 
 describe('deployment ops foundation', () => {
   it('passes readiness only when provider, secrets, DNS, health checks, and smoke tests are ready', () => {
@@ -222,66 +231,61 @@ describe('deployment ops foundation', () => {
     });
   });
 
-  it('blocks promotion unless release validation, artifacts, smoke tests, and rollback approval pass', () => {
-    const report = buildReleasePromotionReport({
-      releaseValidation: { status: 'fail', runUrl: 'https://github.example/runs/42' },
-      requiredArtifacts: ['web-static', 'api-image', 'worker-bundle'],
-      producedArtifacts: ['web-static'],
-      smokeTests: [
-        { name: 'web-market-page', status: 'pass' },
-        { name: 'api-health', status: 'not_run' }
+  it('builds hosted smoke command plans without embedding secret token values', () => {
+    const plan = buildHostedSmokeCommandPlan({
+      serverUrl: 'https://api.groceryview.example/',
+      webUrl: 'https://groceryview.example',
+      includePostgresReadiness: true,
+      metricsTokenEnvVar: 'PROD_METRICS_TOKEN',
+      timeoutSeconds: 20
+    });
+
+    assert.deepEqual(plan, {
+      commands: [
+        'GROCERYVIEW_SERVER_URL=https://api.groceryview.example GROCERYVIEW_WEB_URL=https://groceryview.example GROCERYVIEW_TERMINAL_PRODUCT_ID=coffee HTTP_SMOKE_TIMEOUT_SECONDS=20 infra/scripts/smoke-hosted-http.sh',
+        'GROCERYVIEW_SERVER_URL=https://api.groceryview.example METRICS_TOKEN=$PROD_METRICS_TOKEN READINESS_TIMEOUT_SECONDS=20 infra/scripts/smoke-hosted-readiness.sh'
       ],
-      rollbackPlanApproved: false
+      requiredSecrets: ['PROD_METRICS_TOKEN'],
+      evidence: ['hosted_api_health', 'hosted_product_terminal', 'hosted_web', 'hosted_postgres_readiness']
+    });
+  });
+
+  it('blocks deployment when required secrets are missing, stale, or lack rotation ownership', () => {
+    const report = buildSecretRotationReadinessReport({
+      checkedAt: '2026-05-20T08:00:00.000Z',
+      maxAgeDays: 90,
+      requiredSecrets: ['DATABASE_URL', 'SESSION_SECRET', 'METRICS_TOKEN', 'BILLING_WEBHOOK_SECRET'],
+      secrets: [
+        {
+          name: 'DATABASE_URL',
+          present: true,
+          rotatedAt: '2026-01-01T00:00:00.000Z',
+          owner: 'platform'
+        },
+        {
+          name: 'SESSION_SECRET',
+          present: true,
+          rotatedAt: '2026-05-01T00:00:00.000Z'
+        },
+        {
+          name: 'METRICS_TOKEN',
+          present: false,
+          rotatedAt: '2026-05-01T00:00:00.000Z',
+          owner: 'platform'
+        }
+      ]
     });
 
     assert.deepEqual(report, {
       status: 'blocked',
       blockers: [
-        'release_validation_fail',
-        'missing_artifact:api-image',
-        'missing_artifact:worker-bundle',
-        'smoke_test_not_run:api-health',
-        'rollback_plan_not_approved'
+        'secret_rotation_stale:DATABASE_URL',
+        'secret_rotation_owner_missing:SESSION_SECRET',
+        'secret_missing:METRICS_TOKEN',
+        'secret_missing:BILLING_WEBHOOK_SECRET'
       ],
-      evidence: ['smoke_test_passed:web-market-page'],
-      summary: 'Release candidate is blocked until promotion gates pass.'
-    });
-  });
-
-  it('marks a candidate promotable when all release promotion gates are satisfied', () => {
-    const report = buildReleasePromotionReport({
-      releaseValidation: { status: 'pass', runUrl: 'https://github.example/runs/43' },
-      requiredArtifacts: ['web-static', 'api-image'],
-      producedArtifacts: ['api-image', 'web-static'],
-      smokeTests: [
-        { name: 'web-market-page', status: 'pass' },
-        { name: 'api-health', status: 'pass' }
-      ],
-      rollbackPlanApproved: true
-    });
-
-    assert.deepEqual(report, {
-      status: 'promotable',
-      blockers: [],
-      evidence: ['release_validation:https://github.example/runs/43', 'smoke_test_passed:web-market-page', 'smoke_test_passed:api-health'],
-      summary: 'Release candidate can be promoted.'
-    });
-  });
-
-  it('blocks promotion when no smoke tests are defined', () => {
-    const report = buildReleasePromotionReport({
-      releaseValidation: { status: 'pass' },
-      requiredArtifacts: ['web-static'],
-      producedArtifacts: ['web-static'],
-      smokeTests: [],
-      rollbackPlanApproved: true
-    });
-
-    assert.deepEqual(report, {
-      status: 'blocked',
-      blockers: ['no_smoke_tests_defined'],
-      evidence: ['release_validation:pass'],
-      summary: 'Release candidate is blocked until promotion gates pass.'
+      readySecrets: [],
+      summary: 'Secret rotation readiness is blocked until required deployment secrets are present, fresh, and owned.'
     });
   });
 

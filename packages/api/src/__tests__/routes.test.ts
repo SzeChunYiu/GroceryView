@@ -297,6 +297,22 @@ describe('createGroceryViewApi', () => {
     assert.deepEqual(api.getBasket('user-1').items, []);
   });
 
+  it('removes watched products and recomputes alerts from remaining items', () => {
+    const api = createGroceryViewApi();
+
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, favoriteStoresOnly: true });
+    api.addWatchlistItem('user-1', { productId: 'milk', targetPrice: 14, favoriteStoresOnly: true });
+
+    assert.equal(api.getWatchlist('user-1').items.length, 2);
+    assert.equal(api.removeWatchlistItem('user-1', 'coffee').removed, true);
+
+    const watchlist = api.getWatchlist('user-1');
+    assert.deepEqual(watchlist.items.map((item) => item.productId), ['milk']);
+    assert.equal(watchlist.alerts.some((alert) => alert.productId === 'coffee'), false);
+    assert.equal(api.removeWatchlistItem('user-1', 'coffee').removed, false);
+  });
+
   it('rejects invalid mutable route inputs before storing state', () => {
     const api = createGroceryViewApi();
 
@@ -310,11 +326,17 @@ describe('createGroceryViewApi', () => {
       /targetPrice must be positive/
     );
     assert.throws(() => api.addBasketItem('user-1', { productId: 'coffee', quantity: 0 }), /quantity must be an integer/);
+    assert.throws(() => api.updateWatchlistItem('user-1', 'coffee', { targetPrice: 40 }), /Watchlist item not found/);
+    assert.deepEqual(api.removeWatchlistItem('user-1', 'coffee'), { removed: false });
+    assert.throws(() => api.updateBasketItem('user-1', 'coffee', 1), /Basket item not found/);
+    assert.throws(() => api.removeBasketItem('user-1', 'coffee'), /Basket item not found/);
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 98 });
+    assert.throws(() => api.addBasketItem('user-1', { productId: 'coffee', quantity: 2 }), /quantity must be an integer/);
     assert.throws(() => api.updateBudget('user-1', { weeklyBudget: -1, monthlyBudget: 3200 }), /weeklyBudget/);
 
     assert.deepEqual(api.getFavoriteStores('user-1'), []);
     assert.deepEqual(api.getWatchlist('user-1').items, []);
-    assert.deepEqual(api.getBasket('user-1').items, []);
+    assert.deepEqual(api.getBasket('user-1').items, [{ productId: 'coffee', quantity: 98 }]);
     assert.equal(api.getBudgetSummary('user-1').weeklyBudget, 0);
   });
 });

@@ -439,8 +439,7 @@ function requireKnownStore(storeId: string) {
   }
 }
 
-function requirePositiveFinite(value: number | undefined, label: string) {
-  if (value === undefined) return;
+function requirePositiveFinite(value: number, label: string) {
   if (!Number.isFinite(value) || value <= 0) {
     throw new Error(`${label} must be positive`);
   }
@@ -456,6 +455,358 @@ function requireScoreThreshold(value: number | undefined) {
   if (!Number.isFinite(value) || value < 0 || value > 100) {
     throw new Error('alertDealScoreAt must be between 0 and 100');
   }
+}
+
+function requireArray<T>(value: T[] | undefined, label: string): T[] {
+  if (!Array.isArray(value)) throw new Error(`${label} must be an array`);
+  return value;
+}
+
+function requireZeroOrPositiveFinite(value: number, label: string) {
+  if (!Number.isFinite(value) || value < 0) {
+    throw new Error(`${label} must be zero or positive`);
+  }
+}
+
+function requireOneOf<T extends string>(value: unknown, label: string, allowed: readonly T[]): T {
+  if (typeof value !== 'string' || !(allowed as readonly string[]).includes(value)) {
+    throw new Error(`${label} must be one of: ${allowed.join(', ')}`);
+  }
+  return value as T;
+}
+
+function optionalOneOf<T extends string>(value: unknown, label: string, allowed: readonly T[]): T | undefined {
+  if (value === undefined) return undefined;
+  return requireOneOf(value, label, allowed);
+}
+
+const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/;
+const isoTimestampPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
+
+function requireIsoTimestamp(value: unknown, label: string): string {
+  if (
+    typeof value !== 'string' ||
+    value.trim() !== value ||
+    !isoTimestampPattern.test(value) ||
+    !Number.isFinite(Date.parse(value))
+  ) {
+    throw new Error(`${label} must be an ISO timestamp`);
+  }
+  return value;
+}
+
+function optionalIsoTimestamp(value: unknown, label: string): string | undefined {
+  if (value === undefined) return undefined;
+  return requireIsoTimestamp(value, label);
+}
+
+function requireIsoDateOrTimestamp(value: string, label: string): string {
+  if (isoDatePattern.test(value) && Number.isFinite(Date.parse(`${value}T00:00:00.000Z`))) return value;
+  return requireIsoTimestamp(value, label);
+}
+
+function toUtcDay(value: string): number {
+  const parsed = isoDatePattern.test(value) ? Date.parse(`${value}T00:00:00.000Z`) : Date.parse(value);
+  return Math.floor(parsed / 86_400_000);
+}
+
+function normalizeSubscriptionEntitlement(input: SubscriptionEntitlementSnapshot): SubscriptionEntitlementSnapshot {
+  const candidate = input as Record<string, unknown>;
+  const tier = requireOneOf(candidate.tier, 'tier', ['free', 'premium'] as const);
+  const status = requireOneOf(candidate.status, 'status', ['active', 'past_due', 'canceled'] as const);
+  const plan = optionalOneOf(candidate.plan, 'plan', ['premium_monthly', 'premium_yearly'] as const);
+  const currentPeriodEndsAt = optionalIsoTimestamp(candidate.currentPeriodEndsAt, 'currentPeriodEndsAt');
+  const provider = optionalOneOf(candidate.provider, 'provider', ['stripe_compatible'] as const);
+  const updatedAt = requireIsoTimestamp(candidate.updatedAt, 'updatedAt');
+
+  return {
+    tier,
+    ...(plan ? { plan: plan as SubscriptionPlan } : {}),
+    status,
+    ...(currentPeriodEndsAt ? { currentPeriodEndsAt } : {}),
+    ...(provider ? { provider } : {}),
+    updatedAt
+  };
+}
+
+function sortPricesByValue(prices: StorePrice[]) {
+  return [...prices].sort((left, right) => left.price - right.price || left.storeName.localeCompare(right.storeName));
+}
+
+function bestPriceFor(product: ProductDetail) {
+  return sortPricesByValue(product.currentPrices)[0] ?? null;
+}
+
+function medianPrice(prices: StorePrice[]): number | null {
+  if (prices.length === 0) return null;
+  const sorted = sortPricesByValue(prices).map((price) => price.price);
+  const middle = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 1) return sorted[middle]!;
+  return (sorted[middle - 1]! + sorted[middle]!) / 2;
+}
+
+function roundPercent(value: number): number {
+  return Math.round((value + Number.EPSILON) * 10) / 10;
+}
+
+function roundPrice(value: number): number {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+function quantile(sorted: number[], q: number): number {
+  if (sorted.length === 0) return 0;
+  if (sorted.length === 1) return roundPrice(sorted[0]!);
+  const position = (sorted.length - 1) * q;
+  const lower = Math.floor(position);
+  const upper = Math.ceil(position);
+  const weight = position - lower;
+  return roundPrice(sorted[lower]! * (1 - weight) + sorted[upper]! * weight);
+}
+
+function storeDistrict(storeId: string): string | null {
+  return stores.find((store) => store.id === storeId)?.district ?? null;
+}
+
+function distributionFor(
+  product: ProductDetail,
+  scope: ProductPriceDistributionScope,
+  label: string,
+  prices: StorePrice[],
+  currentPercentileOverride?: number
+): ProductPriceDistribution | null {
+  if (prices.length === 0) return null;
+  const sortedPrices = sortPricesByValue(prices);
+  const values = sortedPrices.map((price) => price.price).sort((left, right) => left - right);
+  const current = sortedPrices[0]!;
+  const currentPercentile = currentPercentileOverride ?? roundPercent(((values.filter((price) => price <= current.price).length) / values.length) * 100);
+  const cheaperThanPercent = roundPercent(100 - currentPercentile);
+  const scopeText = scope === 'stockholm' ? 'verified Stockholm observations' : `${label} observations`;
+  return {
+    scope,
+    label,
+    sampleSize: values.length,
+    currentPrice: current.price,
+    currentPercentile,
+    cheaperThanPercent,
+    min: roundPrice(values[0]!),
+    p05: quantile(values, 0.05),
+    p25: quantile(values, 0.25),
+    median: quantile(values, 0.5),
+    p75: quantile(values, 0.75),
+    p95: quantile(values, 0.95),
+    max: roundPrice(values.at(-1)!),
+    customerRead: `${current.price.toFixed(2)} SEK at ${current.storeName} is cheaper than ${cheaperThanPercent}% of ${scopeText}.`
+  };
+}
+
+function toIsoObservedAt(value: string): string {
+  return isoDatePattern.test(value) ? `${value}T00:00:00.000Z` : value;
+}
+
+function chartObservationsFor(product: ProductDetail): PriceChartObservation[] {
+  const bestPrice = bestPriceFor(product) ?? product.currentPrices[0];
+  return product.history.map((point) => ({
+    storeId: bestPrice?.storeId ?? 'unknown-store',
+    storeName: bestPrice?.storeName ?? 'Unknown store',
+    observedAt: toIsoObservedAt(point.date),
+    price: point.price,
+    sourceType: point.verified ? 'shelf' : 'estimated',
+    confidence: point.verified ? product.dealSignals.sourceConfidence : 0.35,
+    provenanceLabel: point.verified ? 'Verified price history' : 'Estimated history'
+  }));
+}
+
+function productPriceTerminalFor(product: ProductDetail, asOf?: string): ProductPriceTerminalReport {
+  const bestPrice = bestPriceFor(product);
+  const sortedHistory = [...product.history].sort((left, right) => Date.parse(toIsoObservedAt(left.date)) - Date.parse(toIsoObservedAt(right.date)));
+  const latestHistory = sortedHistory.at(-1);
+  const previousHistory = sortedHistory.at(-2);
+  const oneMonthMovePercent = latestHistory && previousHistory && previousHistory.price > 0
+    ? roundPercent(((latestHistory.price - previousHistory.price) / previousHistory.price) * 100)
+    : null;
+  const historyPrices = sortedHistory.map((point) => point.price);
+  const range52Week = historyPrices.length > 0
+    ? { low: roundPrice(Math.min(...historyPrices)), high: roundPrice(Math.max(...historyPrices)) }
+    : null;
+  const localDistrict = bestPrice ? storeDistrict(bestPrice.storeId) : null;
+  const localPrices = localDistrict
+    ? product.currentPrices.filter((price) => storeDistrict(price.storeId) === localDistrict)
+    : [];
+  const distributions = [
+    distributionFor(product, 'stockholm', 'Whole Stockholm', product.currentPrices, product.dealSignals.currentCityPercentile),
+    distributionFor(product, 'local_area', `${localDistrict ?? 'Local'} local area`, localPrices)
+  ].filter((row): row is ProductPriceDistribution => row !== null);
+  const chartAsOf = asOf ?? (latestHistory ? toIsoObservedAt(latestHistory.date) : undefined);
+  const chart = buildPriceChartSeries({
+    observations: chartObservationsFor(product),
+    ...(chartAsOf ? { asOf: chartAsOf } : {}),
+    rangeDays: 365,
+    markerLimitPerSeries: 8
+  });
+  return {
+    productId: product.id,
+    ticker: product.ticker,
+    productName: product.name,
+    asOf: chartAsOf ?? new Date().toISOString(),
+    quote: {
+      bestPrice: bestPrice?.price ?? null,
+      bestStoreId: bestPrice?.storeId ?? null,
+      bestStoreName: bestPrice?.storeName ?? null,
+      unitPrice: product.unitPrice,
+      dealScore: product.dealScore,
+      band: scoreBand(product.dealScore),
+      oneMonthMovePercent,
+      range52Week,
+      evidenceVolume: {
+        currentPrices: product.currentPrices.length,
+        historyPoints: product.history.length,
+        verifiedHistoryPoints: product.history.filter((point) => point.verified).length
+      }
+    },
+    distributions,
+    chart,
+    historySummary: product.history.length > 0
+      ? summarizePriceHistory(product.history.map((point) => ({ observedAt: toIsoObservedAt(point.date), price: point.price })))
+      : null,
+    evidenceGuardrails: [
+      'Verified shelf or retailer-page prices can power current quote, Deal Score, and basket totals.',
+      'Member, promotion, estimated, and low-confidence rows must stay explicitly labeled before customer action.',
+      'Distribution and chart samples include sample size and provenance-aware confidence styling.'
+    ]
+  };
+}
+
+function buildDealScoreReasons(product: ProductDetail, bestPrice: StorePrice | null, band: ReturnType<typeof scoreBand>): string[] {
+  const reasons = [
+    `${product.name} is in the ${product.dealSignals.currentCityPercentile}th city price percentile.`,
+    `Historical promo percentile is ${product.dealSignals.knownPromoHistoryPercentile}.`,
+    `Equivalent unit-price percentile is ${product.dealSignals.equivalentUnitPricePercentile}.`,
+    `Source confidence is ${Math.round(product.dealSignals.sourceConfidence * 100)}%.`,
+    `Default verdict is ${band.verdict}.`
+  ];
+  if (bestPrice) reasons.unshift(`Best current quote is ${bestPrice.price.toFixed(2)} SEK at ${bestPrice.storeName}.`);
+  return reasons;
+}
+
+function productEquivalentFor(product: ProductDetail): ProductEquivalent {
+  const bestPrice = bestPriceFor(product);
+  return {
+    productId: product.id,
+    productName: product.name,
+    category: product.category,
+    bestPrice: bestPrice?.price ?? null,
+    bestStoreId: bestPrice?.storeId ?? null,
+    dealScore: product.dealScore,
+    reason: `Same ${product.category} category with comparable current price evidence.`
+  };
+}
+
+function latestVerifiedPriceDate(product: ProductDetail): string | null {
+  const verifiedDates = product.history.filter((point) => point.verified).map((point) => point.date);
+  return verifiedDates.sort().at(-1) ?? null;
+}
+
+function priceFreshnessStatus(ageDays: number | null): PriceFreshnessStatus {
+  if (ageDays === null || ageDays > 14) return 'stale';
+  if (ageDays > 7) return 'aging';
+  return 'fresh';
+}
+
+function cheapestPriceByProductId(productIds: string[]): Record<string, number> {
+  const priceByProductId: Record<string, number> = {};
+  for (const productId of new Set(productIds)) {
+    const product = products.find((candidate) => candidate.id === productId);
+    if (!product) throw new Error(`Unknown productId: ${productId}`);
+    priceByProductId[productId] = bestPriceFor(product)?.price ?? 0;
+  }
+  return priceByProductId;
+}
+
+function normalizeHouseholdPlan(userId: string, input: HouseholdPlanRequest): HouseholdPlan {
+  requireNonEmptyId(userId, 'userId');
+  requireNonEmptyId(input.householdId, 'householdId');
+  requireNonEmptyId(input.name, 'name');
+  requireZeroOrPositiveFinite(input.weeklyBudget, 'weeklyBudget');
+  requireZeroOrPositiveFinite(input.approvalLimit, 'approvalLimit');
+  requireNonEmptyId(input.reviewer, 'reviewer');
+
+  const members = requireArray(input.members, 'members').map((member) => {
+    requireNonEmptyId(member.userId, 'member.userId');
+    requireNonEmptyId(member.displayName, 'member.displayName');
+    return { userId: member.userId, displayName: member.displayName };
+  });
+  if (members.length === 0) throw new Error('members must include at least one household member');
+  const memberIds = new Set(members.map((member) => member.userId));
+  if (memberIds.size !== members.length) throw new Error('members must have unique userId values');
+  if (!memberIds.has(userId)) throw new Error('signed-in user must be a household member');
+  if (!memberIds.has(input.reviewer)) throw new Error(`Household member not found: ${input.reviewer}`);
+
+  const household = createHouseholdState({
+    id: input.householdId,
+    name: input.name,
+    weeklyBudget: input.weeklyBudget,
+    members
+  });
+
+  for (const item of input.basketItems ?? []) {
+    requireKnownProduct(item.productId);
+    if (!Number.isInteger(item.quantity) || item.quantity <= 0 || item.quantity > 99) {
+      throw new Error('quantity must be an integer between 1 and 99');
+    }
+    household.addBasketItem({ productId: item.productId, quantity: item.quantity, addedBy: item.addedBy });
+  }
+
+  for (const item of input.watchlistItems ?? []) {
+    requireKnownProduct(item.productId);
+    requireOptionalPositiveFinite(item.targetPrice, 'targetPrice');
+    household.addWatchlistItem({
+      productId: item.productId,
+      addedBy: item.addedBy,
+      ...(item.targetPrice === undefined ? {} : { targetPrice: item.targetPrice })
+    });
+  }
+
+  const sharedFavoriteStoreIds = input.sharedFavoriteStoreIds ?? [];
+  for (const storeId of sharedFavoriteStoreIds) requireKnownStore(storeId);
+  household.setSharedFavoriteStores(sharedFavoriteStoreIds);
+
+  const snapshot = household.snapshot();
+  const summary = summarizeHousehold(
+    snapshot,
+    cheapestPriceByProductId(snapshot.basketItems.map((item) => item.productId))
+  );
+
+  return {
+    household: snapshot,
+    summary,
+    approvalPolicy: {
+      approvalLimit: input.approvalLimit,
+      reviewer: input.reviewer,
+      requiresOwnerApproval: summary.estimatedTotal > input.approvalLimit
+    }
+  };
+}
+
+function storeDealsFor(storeId: string): StoreDeal[] {
+  requireKnownStore(storeId);
+  return products
+    .flatMap((product) => {
+      const price = product.currentPrices.find((candidate) => candidate.storeId === storeId);
+      if (!price) return [];
+      return [{
+        productId: product.id,
+        ticker: product.ticker,
+        productName: product.name,
+        category: product.category,
+        storeId: price.storeId,
+        storeName: price.storeName,
+        price: price.price,
+        dealScore: product.dealScore,
+        band: scoreBand(product.dealScore),
+        unitPrice: product.unitPrice
+      }];
+    })
+    .sort((left, right) => right.dealScore - left.dealScore || left.price - right.price || left.productName.localeCompare(right.productName));
 }
 
 export function createGroceryViewApi() {
@@ -664,7 +1015,19 @@ export function createGroceryViewApi() {
       if (!Number.isInteger(item.quantity) || item.quantity <= 0 || item.quantity > 99) {
         throw new Error('quantity must be an integer between 1 and 99');
       }
-      baskets.set(userId, [...(baskets.get(userId) ?? []), item]);
+      const current = baskets.get(userId) ?? [];
+      const existing = current.find((basketItem) => basketItem.productId === item.productId);
+      if (existing) {
+        const quantity = existing.quantity + item.quantity;
+        if (quantity > 99) {
+          throw new Error('quantity must be an integer between 1 and 99');
+        }
+        baskets.set(userId, current.map((basketItem) =>
+          basketItem.productId === item.productId ? { ...basketItem, quantity } : basketItem
+        ));
+        return;
+      }
+      baskets.set(userId, [...current, item]);
     },
 
     updateBasketItem(userId: string, productId: string, quantity: number) {

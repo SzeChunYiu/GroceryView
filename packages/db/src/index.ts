@@ -89,46 +89,81 @@ export function buildMigrationPlanStatus(migrations: Migration[], appliedVersion
 
 export function parseSqlStatements(sql: string): string[] {
   const statements: string[] = [];
-  let current = '';
-  let inSingleQuote = false;
-  let inDoubleQuote = false;
+  let statement = '';
+  let index = 0;
+  let singleQuoted = false;
+  let doubleQuoted = false;
+  let dollarQuoteTag: string | null = null;
 
-  for (const rawLine of sql.split('\n')) {
-    const line = rawLine.trim();
-    if (line.length === 0 || line.startsWith('--')) continue;
+  while (index < sql.length) {
+    const char = sql[index];
+    const next = sql[index + 1];
 
-    for (let index = 0; index < line.length; index += 1) {
-      const character = line[index];
-      const nextCharacter = line[index + 1];
+    if (!singleQuoted && !doubleQuoted && !dollarQuoteTag && char === '-' && next === '-') {
+      index += 2;
+      while (index < sql.length && sql[index] !== '\n') index += 1;
+      continue;
+    }
 
-      current += character;
+    if (!singleQuoted && !doubleQuoted && !dollarQuoteTag && char === '/' && next === '*') {
+      index += 2;
+      while (index < sql.length && !(sql[index] === '*' && sql[index + 1] === '/')) index += 1;
+      index += index < sql.length ? 2 : 0;
+      continue;
+    }
 
-      if (character === "'" && !inDoubleQuote) {
-        if (inSingleQuote && nextCharacter === "'") {
-          current += nextCharacter;
-          index += 1;
-          continue;
+    if (!singleQuoted && !doubleQuoted && char === '$') {
+      const tag = sql.slice(index).match(/^\$[A-Za-z_][A-Za-z0-9_]*\$|^\$\$/)?.[0];
+      if (tag) {
+        if (!dollarQuoteTag) {
+          dollarQuoteTag = tag;
+        } else if (dollarQuoteTag === tag) {
+          dollarQuoteTag = null;
         }
-        inSingleQuote = !inSingleQuote;
-      } else if (character === '"' && !inSingleQuote) {
-        if (inDoubleQuote && nextCharacter === '"') {
-          current += nextCharacter;
-          index += 1;
-          continue;
-        }
-        inDoubleQuote = !inDoubleQuote;
-      } else if (character === ';' && !inSingleQuote && !inDoubleQuote) {
-        const statement = current.slice(0, -1).trim();
-        if (statement) statements.push(statement);
-        current = '';
+        statement += tag;
+        index += tag.length;
+        continue;
       }
     }
 
-    current += '\n';
+    if (!doubleQuoted && !dollarQuoteTag && char === "'") {
+      statement += char;
+      if (singleQuoted && next === "'") {
+        statement += next;
+        index += 2;
+        continue;
+      }
+      singleQuoted = !singleQuoted;
+      index += 1;
+      continue;
+    }
+
+    if (!singleQuoted && !dollarQuoteTag && char === '"') {
+      statement += char;
+      if (doubleQuoted && next === '"') {
+        statement += next;
+        index += 2;
+        continue;
+      }
+      doubleQuoted = !doubleQuoted;
+      index += 1;
+      continue;
+    }
+
+    if (!singleQuoted && !doubleQuoted && !dollarQuoteTag && char === ';') {
+      const trimmed = statement.trim();
+      if (trimmed) statements.push(trimmed);
+      statement = '';
+      index += 1;
+      continue;
+    }
+
+    statement += char;
+    index += 1;
   }
 
-  const trailingStatement = current.trim();
-  if (trailingStatement) statements.push(trailingStatement);
+  const trimmed = statement.trim();
+  if (trimmed) statements.push(trimmed);
   return statements;
 }
 
