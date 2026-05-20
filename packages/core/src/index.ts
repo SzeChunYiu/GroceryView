@@ -2497,3 +2497,115 @@ export function redactForAdvertisers(input: AdvertiserInput): AdvertiserPayload 
     categoryInterest: input.categoryInterest
   };
 }
+
+export type PersonalInflationItem = {
+  productId: string;
+  productName: string;
+  category: string;
+  quantity: number;
+  baseUnitPrice: number;
+  currentUnitPrice: number;
+  confidence: 'high' | 'medium' | 'low';
+};
+
+export type PersonalInflationContribution = {
+  productId: string;
+  productName: string;
+  category: string;
+  changePercent: number;
+  changeAmount: number;
+  weight: number;
+  confidence: 'high' | 'medium' | 'low';
+};
+
+export type PersonalInflationSummary = {
+  baseDate: string;
+  currentDate: string;
+  inflationPercent: number;
+  changeAmount: number;
+  baseSpend: number;
+  currentSpend: number;
+  confidence: string;
+  itemContributions: PersonalInflationContribution[];
+  categoryContributions: { category: string; changePercent: number; spend: number }[];
+  missingProductIds: string[];
+};
+
+export type PersonalInflationInput = {
+  baseDate: string;
+  currentDate: string;
+  items: PersonalInflationItem[];
+  missingProductIds?: string[];
+};
+
+function personalInflationConfidenceRank(c: 'high' | 'medium' | 'low'): number {
+  return c === 'high' ? 3 : c === 'medium' ? 2 : 1;
+}
+
+function summarizeInflationChange(changePercent: number): string {
+  if (changePercent > 5) return 'high';
+  if (changePercent > 2) return 'medium';
+  return 'low';
+}
+
+export function calculatePersonalGroceryInflation(input: PersonalInflationInput): PersonalInflationSummary {
+  const { baseDate, currentDate, items, missingProductIds = [] } = input;
+
+  const totalBaseSpend = items.reduce((sum, item) => sum + item.baseUnitPrice * item.quantity, 0);
+  const totalCurrentSpend = items.reduce((sum, item) => sum + item.currentUnitPrice * item.quantity, 0);
+  const changeAmount = totalCurrentSpend - totalBaseSpend;
+  const inflationPercent = totalBaseSpend > 0 ? Math.round((changeAmount / totalBaseSpend) * 1000) / 10 : 0;
+
+  const itemContributions: PersonalInflationContribution[] = items.map((item) => {
+    const itemBase = item.baseUnitPrice * item.quantity;
+    const itemCurrent = item.currentUnitPrice * item.quantity;
+    const itemChange = itemCurrent - itemBase;
+    const itemChangePercent = itemBase > 0 ? Math.round((itemChange / itemBase) * 1000) / 10 : 0;
+    const weight = totalBaseSpend > 0 ? Math.round((itemBase / totalBaseSpend) * 100) / 100 : 0;
+    return {
+      productId: item.productId,
+      productName: item.productName,
+      category: item.category,
+      changePercent: itemChangePercent,
+      changeAmount: Math.round(itemChange * 100) / 100,
+      weight,
+      confidence: item.confidence
+    };
+  });
+
+  const categoryMap = new Map<string, { totalChange: number; totalBase: number }>();
+  for (const item of items) {
+    const existing = categoryMap.get(item.category) ?? { totalChange: 0, totalBase: 0 };
+    const itemBase = item.baseUnitPrice * item.quantity;
+    const itemChange = (item.currentUnitPrice - item.baseUnitPrice) * item.quantity;
+    categoryMap.set(item.category, {
+      totalChange: existing.totalChange + itemChange,
+      totalBase: existing.totalBase + itemBase
+    });
+  }
+  const categoryContributions = Array.from(categoryMap.entries()).map(([category, { totalChange, totalBase }]) => ({
+    category,
+    changePercent: totalBase > 0 ? Math.round((totalChange / totalBase) * 1000) / 10 : 0,
+    spend: Math.round(totalBase * 100) / 100
+  }));
+
+  const avgConfidenceRank = items.length > 0
+    ? items.reduce((sum, item) => sum + personalInflationConfidenceRank(item.confidence), 0) / items.length
+    : 0;
+  const confidence = summarizeInflationChange(Math.abs(inflationPercent));
+
+  void avgConfidenceRank;
+
+  return {
+    baseDate,
+    currentDate,
+    inflationPercent,
+    changeAmount: Math.round(changeAmount * 100) / 100,
+    baseSpend: Math.round(totalBaseSpend * 100) / 100,
+    currentSpend: Math.round(totalCurrentSpend * 100) / 100,
+    confidence,
+    itemContributions,
+    categoryContributions,
+    missingProductIds
+  };
+}

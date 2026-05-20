@@ -3,6 +3,7 @@ import {
   buildWatchlistAlerts,
   calculateDealScore,
   calculateFixedBasketIndex,
+  calculatePersonalGroceryInflation,
   compareBasketStrategies,
   rankNutritionPerKrona,
   scoreBand,
@@ -361,6 +362,17 @@ const myStoresBasketIndex = [
   { store: 'Coop Farsta', basketTotal: 811, indexValue: 105.6, confidence: 'Estimated' }
 ];
 
+const personalInflation = calculatePersonalGroceryInflation({
+  baseDate: '2026-01-01',
+  currentDate: '2026-05-20',
+  missingProductIds: ['rice'],
+  items: [
+    { productId: 'coffee', productName: 'Zoégas Coffee 450g', category: 'coffee', quantity: 2, baseUnitPrice: 59.9, currentUnitPrice: 49.9, confidence: 'high' },
+    { productId: 'milk', productName: 'Arla Milk 1L', category: 'dairy', quantity: 4, baseUnitPrice: 13.9, currentUnitPrice: 15.9, confidence: 'medium' },
+    { productId: 'eggs', productName: 'Eggs 12-pack', category: 'eggs', quantity: 1, baseUnitPrice: 32.9, currentUnitPrice: 34.9, confidence: 'medium' }
+  ]
+});
+
 const storeMap = [
   { name: 'Willys Odenplan', chain: 'Willys', format: 'Supermarket', district: 'Vasastan', latitude: 59.337, longitude: 18.049, radiusKm: 0.8, dealScore: 82 },
   { name: 'Lidl Sveavägen', chain: 'Lidl', format: 'Discount', district: 'Vasastan', latitude: 59.342, longitude: 18.057, radiusKm: 1.2, dealScore: 76 },
@@ -420,6 +432,103 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Store map filters</h2>
         <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
@@ -510,6 +619,103 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Store map filters</h2>
         <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
@@ -584,6 +790,103 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Store map filters</h2>
         <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
@@ -675,6 +978,103 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
         <h2>Store map filters</h2>
         <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
         <div class="store-map">
@@ -757,6 +1157,103 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Store map filters</h2>
         <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
@@ -860,6 +1357,103 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
         <h2>Store map filters</h2>
         <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
         <div class="store-map">
@@ -935,6 +1529,103 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
         <h2>Store map filters</h2>
         <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
         <div class="store-map">
@@ -1009,6 +1700,103 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Store map filters</h2>
         <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
@@ -1131,6 +1919,103 @@ app.innerHTML = `
 
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Store map filters</h2>
         <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
@@ -1274,6 +2159,103 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
         <h2>Store map filters</h2>
         <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
         <div class="store-map">
@@ -1369,6 +2351,103 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
         <h2>Store map filters</h2>
         <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
         <div class="store-map">
@@ -1454,6 +2533,103 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Store map filters</h2>
         <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
@@ -1548,6 +2724,103 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Store map filters</h2>
         <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
@@ -1657,6 +2930,103 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
         <h2>Store map filters</h2>
         <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
         <div class="store-map">
@@ -1736,6 +3106,103 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Store map filters</h2>
         <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
@@ -1819,6 +3286,103 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Store map filters</h2>
         <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
