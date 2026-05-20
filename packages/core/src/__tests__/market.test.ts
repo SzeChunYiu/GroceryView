@@ -139,6 +139,24 @@ describe('buildWatchlistAlerts', () => {
       }
     ]);
   });
+
+  it('creates percent-drop alerts from an explicit reference price', () => {
+    const alerts = buildWatchlistAlerts({
+      watchlist: [
+        { productId: 'coffee', referencePrice: 72, alertPercentDrop: 25, favoriteStoresOnly: true },
+        { productId: 'butter', referencePrice: 58, alertPercentDrop: 20, favoriteStoresOnly: false }
+      ],
+      products: [
+        { productId: 'coffee', productName: 'Zoégas Coffee 450g', bestPrice: 49.9, bestStoreId: 'willys-odenplan', dealScore: 82, isNew52WeekLow: false },
+        { productId: 'butter', productName: 'Butter 600g', bestPrice: 54.9, bestStoreId: 'coop-odenplan', dealScore: 42, isNew52WeekLow: false }
+      ],
+      favoriteStoreIds: ['willys-odenplan']
+    });
+
+    assert.deepEqual(alerts, [
+      { productId: 'coffee', productName: 'Zoégas Coffee 450g', type: 'percent_drop', message: 'Zoégas Coffee 450g is 31% below your 72.00 SEK reference price.' }
+    ]);
+  });
 });
 
 describe('summarizeBudget', () => {

@@ -143,6 +143,26 @@ describe('createGroceryViewApi', () => {
     );
     assert.deepEqual(willysDeals[0].band, { label: 'Good deal', verdict: 'Buy' });
     assert.throws(() => api.getStoreDeals('missing-store'), /Unknown storeId/);
+  it('supports watchlist percent-drop alerts against user reference prices', () => {
+    const api = createGroceryViewApi();
+
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addWatchlistItem('user-1', { productId: 'coffee', referencePrice: 72, alertPercentDrop: 25, favoriteStoresOnly: true });
+
+    assert.deepEqual(api.getWatchlist('user-1').alerts, [
+      {
+        productId: 'coffee',
+        productName: 'Zoégas Coffee 450g',
+        type: 'percent_drop',
+        message: 'Zoégas Coffee 450g is 31% below your 72.00 SEK reference price.'
+      },
+      {
+        productId: 'coffee',
+        productName: 'Zoégas Coffee 450g',
+        type: 'new_52_week_low',
+        message: 'Zoégas Coffee 450g is at a new 52-week low.'
+      }
+    ]);
   });
 
 
@@ -324,6 +344,10 @@ describe('createGroceryViewApi', () => {
     assert.throws(
       () => api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 0, alertDealScoreAt: 80, favoriteStoresOnly: true }),
       /targetPrice must be positive/
+    );
+    assert.throws(
+      () => api.addWatchlistItem('user-1', { productId: 'coffee', referencePrice: 50, alertPercentDrop: 101, favoriteStoresOnly: true }),
+      /alertPercentDrop must be between 0 and 100/
     );
     assert.throws(() => api.addBasketItem('user-1', { productId: 'coffee', quantity: 0 }), /quantity must be an integer/);
     assert.throws(() => api.updateWatchlistItem('user-1', 'coffee', { targetPrice: 40 }), /Watchlist item not found/);

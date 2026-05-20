@@ -450,10 +450,10 @@ function requireOptionalPositiveFinite(value: number | undefined, label: string)
   requirePositiveFinite(value, label);
 }
 
-function requireScoreThreshold(value: number | undefined) {
+function requireThreshold(value: number | undefined, label: string) {
   if (value === undefined) return;
   if (!Number.isFinite(value) || value < 0 || value > 100) {
-    throw new Error('alertDealScoreAt must be between 0 and 100');
+    throw new Error(`${label} must be between 0 and 100`);
   }
 }
 
@@ -971,7 +971,9 @@ export function createGroceryViewApi() {
       requireNonEmptyId(userId, 'userId');
       requireKnownProduct(item.productId);
       requireOptionalPositiveFinite(item.targetPrice, 'targetPrice');
-      requireScoreThreshold(item.alertDealScoreAt);
+      requireOptionalPositiveFinite(item.referencePrice, 'referencePrice');
+      requireThreshold(item.alertPercentDrop, 'alertPercentDrop');
+      requireThreshold(item.alertDealScoreAt, 'alertDealScoreAt');
       watchlists.set(userId, [...(watchlists.get(userId) ?? []), item]);
     },
 
