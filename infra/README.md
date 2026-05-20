@@ -43,6 +43,16 @@ OPEN_PRICES_USER_AGENT="GroceryView/0.1 (contact@example.com)" \
 
 The smoke calls `https://prices.openfoodfacts.org/api/v1/prices?currency=SEK&size=10&location__osm_address_country_code=SE&order_by=-date` by default, parses returned SEK price rows into GroceryView ingestion records, requires at least one accepted product price, and prints source URL, content hash, raw snapshot reference, first normalized product, and Open Prices attribution. Override `OPEN_PRICES_COUNTRY_CODE`, `OPEN_PRICES_SIZE`, or `OPEN_PRICES_URL` for bounded follow-up pulls that still return SEK prices.
 
+To save the normalized rows for inspection or handoff to a persistence job, set `OPEN_PRICES_OUTPUT_PATH`:
+
+```bash
+OPEN_PRICES_USER_AGENT="GroceryView/0.1 (contact@example.com)" \
+OPEN_PRICES_OUTPUT_PATH=/tmp/groceryview-open-prices-preview.json \
+  infra/scripts/smoke-open-prices.sh
+```
+
+The artifact includes the same provenance summary plus `acceptedObservations` with normalized products, aliases, price observations, and promotion observations. It intentionally excludes the raw response body; use `rawSnapshotRef` and `contentHash` to bind the artifact back to the pulled source snapshot.
+
 ## Hosted deployment smoke
 
 After deploying a server, run the hosted HTTP smoke before promoting traffic:

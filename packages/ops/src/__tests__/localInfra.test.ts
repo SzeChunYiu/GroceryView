@@ -92,6 +92,8 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /smoke-retailer-connector\.sh/);
     assert.match(infraReadme, /## Open Prices real-data smoke/);
     assert.match(infraReadme, /smoke-open-prices\.sh/);
+    assert.match(infraReadme, /OPEN_PRICES_OUTPUT_PATH/);
+    assert.match(infraReadme, /acceptedObservations/);
   });
 
   it('documents hosted deployment smoke commands for API, product terminal, web, and PostgreSQL readiness evidence', () => {
@@ -131,9 +133,13 @@ describe('local infrastructure compose', () => {
 
   it('ships an Open Prices real-data smoke script with custom User-Agent and parser validation', () => {
     assert.match(smokeOpenPricesScript, /OPEN_PRICES_USER_AGENT/);
+    assert.match(smokeOpenPricesScript, /OPEN_PRICES_OUTPUT_PATH/);
     assert.match(smokeOpenPricesScript, /buildOpenPricesConnectorUrl/);
     assert.match(smokeOpenPricesScript, /parseOpenPricesSnapshot/);
     assert.match(smokeOpenPricesScript, /runRetailerConnector/);
+    assert.match(smokeOpenPricesScript, /writeFile/);
+    assert.match(smokeOpenPricesScript, /acceptedObservations/);
+    assert.match(smokeOpenPricesScript, /Open Prices normalized artifact written/);
     assert.match(smokeOpenPricesScript, /currency: 'SEK'/);
     assert.match(smokeOpenPricesScript, /countryCode: process\.env\.OPEN_PRICES_COUNTRY_CODE \|\| 'SE'/);
     assert.match(smokeOpenPricesScript, /acceptedCount/);

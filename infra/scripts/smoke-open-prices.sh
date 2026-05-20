@@ -17,6 +17,9 @@ fi
 
 cd "$ROOT_DIR"
 node --input-type=module <<'NODE'
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname } from 'node:path';
+
 const {
   buildOpenPricesConnectorUrl,
   fetchRetailerConnectorSnapshot,
@@ -68,7 +71,7 @@ try {
   }
 
   const first = result.ingestion.accepted[0];
-  console.log(JSON.stringify({
+  const summary = {
     status: 'passed',
     message: 'Hosted Open Prices real-data smoke passed',
     sourceUrl: result.snapshot.sourceUrl,
@@ -89,7 +92,26 @@ try {
       observedAt: first.priceObservation.observedAt
     },
     attribution: 'Open Prices by Open Food Facts; respect ODbL/share-alike, custom User-Agent, and rate limits.'
-  }, null, 2));
+  };
+
+  const outputPath = process.env.OPEN_PRICES_OUTPUT_PATH;
+  if (outputPath) {
+    const artifact = {
+      ...summary,
+      generatedAt: new Date().toISOString(),
+      acceptedObservations: result.ingestion.accepted.map((row) => ({
+        product: row.product,
+        alias: row.alias,
+        priceObservation: row.priceObservation,
+        promotionObservation: row.promotionObservation
+      }))
+    };
+    await mkdir(dirname(outputPath), { recursive: true });
+    await writeFile(outputPath, `${JSON.stringify(artifact, null, 2)}\n`);
+    console.error(`Open Prices normalized artifact written: ${outputPath}`);
+  }
+
+  console.log(JSON.stringify(summary, null, 2));
 } catch (error) {
   console.error(JSON.stringify({
     status: 'failed',
