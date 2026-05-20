@@ -109,6 +109,7 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /GROCERYVIEW_WEB_URL/);
     assert.match(infraReadme, /GROCERYVIEW_TERMINAL_PRODUCT_ID/);
     assert.match(infraReadme, /HOSTED_HTTP_SMOKE_OUTPUT_PATH/);
+    assert.match(infraReadme, /HOSTED_READINESS_SMOKE_OUTPUT_PATH/);
     assert.match(infraReadme, /METRICS_TOKEN/);
     assert.match(infraReadme, /\/api\/health/);
     assert.match(infraReadme, /\/api\/products\/\$\{GROCERYVIEW_TERMINAL_PRODUCT_ID:-coffee\}\/terminal/);
@@ -119,10 +120,13 @@ describe('local infrastructure compose', () => {
     assert.match(hostedReadinessSmokeScript, /GROCERYVIEW_SERVER_URL/);
     assert.match(hostedReadinessSmokeScript, /METRICS_TOKEN/);
     assert.match(hostedReadinessSmokeScript, /READINESS_TIMEOUT_SECONDS/);
+    assert.match(hostedReadinessSmokeScript, /HOSTED_READINESS_SMOKE_OUTPUT_PATH/);
     assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/postgres/);
     assert.match(hostedReadinessSmokeScript, /x-groceryview-metrics-token: \$METRICS_TOKEN/);
     assert.match(hostedReadinessSmokeScript, /curl -fsS/);
     assert.match(hostedReadinessSmokeScript, /"status"\[\[:space:\]\]\*:\[\[:space:\]\]\*"ready"/);
+    assert.match(hostedReadinessSmokeScript, /endpoint/);
+    assert.match(hostedReadinessSmokeScript, /Hosted PostgreSQL readiness smoke evidence written/);
   });
 
   it('ships a retailer connector smoke script gated by source access approvals', () => {

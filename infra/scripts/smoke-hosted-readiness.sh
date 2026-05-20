@@ -4,6 +4,7 @@ set -euo pipefail
 GROCERYVIEW_SERVER_URL="${GROCERYVIEW_SERVER_URL:-}"
 METRICS_TOKEN="${METRICS_TOKEN:-}"
 READINESS_TIMEOUT_SECONDS="${READINESS_TIMEOUT_SECONDS:-15}"
+HOSTED_READINESS_SMOKE_OUTPUT_PATH="${HOSTED_READINESS_SMOKE_OUTPUT_PATH:-}"
 
 if [ -z "$GROCERYVIEW_SERVER_URL" ]; then
   echo "GROCERYVIEW_SERVER_URL is required for hosted readiness smoke" >&2
@@ -42,3 +43,24 @@ if ! printf '%s\n' "$response" | grep -Eq '"status"[[:space:]]*:[[:space:]]*"rea
 fi
 
 echo "Hosted PostgreSQL readiness smoke passed: $endpoint"
+
+if [ -n "$HOSTED_READINESS_SMOKE_OUTPUT_PATH" ]; then
+  mkdir -p "$(dirname "$HOSTED_READINESS_SMOKE_OUTPUT_PATH")"
+  HOSTED_READINESS_SMOKE_ENDPOINT="$endpoint"
+  export HOSTED_READINESS_SMOKE_ENDPOINT
+  export HOSTED_READINESS_SMOKE_OUTPUT_PATH
+
+  node --input-type=module <<'NODE'
+import { writeFile } from 'node:fs/promises';
+
+const payload = {
+  status: 'ready',
+  endpoint: process.env.HOSTED_READINESS_SMOKE_ENDPOINT,
+  checkedAt: new Date().toISOString()
+};
+
+await writeFile(process.env.HOSTED_READINESS_SMOKE_OUTPUT_PATH, `${JSON.stringify(payload, null, 2)}\n`);
+NODE
+
+  echo "Hosted PostgreSQL readiness smoke evidence written: $HOSTED_READINESS_SMOKE_OUTPUT_PATH"
+fi
