@@ -25,6 +25,7 @@ from .models import (
     OpenPricesHostedSmokePlan,
     OpenPricesIngestionRunPlan,
     OpenPricesIngestionRunPlanSummary,
+    OpenPricesLaunchReadinessDigest,
     OpenPricesLaunchReadinessSummary,
     OpenPricesPullPlan,
     PriceObservationRow,
@@ -533,6 +534,32 @@ def build_open_prices_launch_readiness_summary(
     )
 
 
+def summarize_open_prices_launch_readiness(
+    summary: OpenPricesLaunchReadinessSummary,
+) -> OpenPricesLaunchReadinessDigest:
+    hosted_smoke_blockers = summary.blockers_by_plan.get("open_prices_hosted_smoke_plan", [])
+    persistence_plan_names = {
+        "open_prices_ingestion_run_plan",
+        "open_prices_artifact_import_plan",
+    }
+    persistence_blocker_count = sum(
+        len(blockers)
+        for plan_name, blockers in summary.blockers_by_plan.items()
+        if plan_name in persistence_plan_names
+    )
+
+    return OpenPricesLaunchReadinessDigest(
+        status=summary.status,
+        checked_plan_count=len(summary.checked_plans),
+        ready_plan_count=summary.ready_plan_count,
+        blocked_plan_count=summary.blocked_plan_count,
+        next_action_count=len(summary.next_actions),
+        evidence_field_count=len(summary.evidence_fields),
+        hosted_smoke_blocker_count=len(hosted_smoke_blockers),
+        persistence_blocker_count=persistence_blocker_count,
+    )
+
+
 def build_observation_coverage_summary(
     observations: Iterable[PriceObservationRow],
     stores: Iterable[StoreSeed],
@@ -793,6 +820,25 @@ def open_prices_launch_readiness(
         OpenPricesHostedSmokePlan(**open_prices_hosted_smoke_plan),
     )
     return summary.to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
+def open_prices_launch_readiness_digest(open_prices_launch_readiness: dict[str, object]) -> dict[str, object]:
+    blockers_by_plan = {
+        str(plan_name): [str(action) for action in actions]
+        for plan_name, actions in dict(open_prices_launch_readiness["blockers_by_plan"]).items()
+    }
+    summary = OpenPricesLaunchReadinessSummary(
+        status=open_prices_launch_readiness["status"],
+        ready_plan_count=int(open_prices_launch_readiness["ready_plan_count"]),
+        blocked_plan_count=int(open_prices_launch_readiness["blocked_plan_count"]),
+        checked_plans=[str(plan) for plan in open_prices_launch_readiness["checked_plans"]],
+        blockers_by_plan=blockers_by_plan,
+        next_actions=[str(action) for action in open_prices_launch_readiness["next_actions"]],
+        evidence_fields=[str(field) for field in open_prices_launch_readiness["evidence_fields"]],
+        demo=bool(open_prices_launch_readiness.get("demo", False)),
+    )
+    return summarize_open_prices_launch_readiness(summary).to_dict()
 
 
 @asset(group_name=ASSET_GROUP)

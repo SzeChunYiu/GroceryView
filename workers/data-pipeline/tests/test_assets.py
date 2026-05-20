@@ -17,6 +17,7 @@ from groceryview_data_pipeline.assets import (
     build_seed_stores,
     summarize_open_prices_artifact_import_plan,
     summarize_data_pipeline_quality_gate,
+    summarize_open_prices_launch_readiness,
     summarize_open_prices_ingestion_run_plan,
 )
 from groceryview_data_pipeline.models import LatestPriceRow, ObservationFreshnessSummary, PriceObservationRow, PriceProvenance
@@ -333,6 +334,52 @@ def test_open_prices_launch_readiness_rolls_up_all_open_prices_plans() -> None:
     assert ready.status == "ready"
     assert ready.blocked_plan_count == 0
     assert ready.next_actions == []
+
+
+def test_open_prices_launch_readiness_digest_counts_operator_signals() -> None:
+    summary = build_open_prices_launch_readiness_summary(
+        build_open_prices_pull_plan(open_prices_user_agent_present=True),
+        build_open_prices_ingestion_run_plan(open_prices_user_agent_present=True),
+        build_open_prices_artifact_import_plan(input_artifact_present=True),
+        build_open_prices_hosted_smoke_plan(),
+    )
+
+    assert summarize_open_prices_launch_readiness(summary).to_dict() == {
+        "status": "blocked",
+        "checked_plan_count": 4,
+        "ready_plan_count": 1,
+        "blocked_plan_count": 3,
+        "next_action_count": 7,
+        "evidence_field_count": 22,
+        "hosted_smoke_blocker_count": 3,
+        "persistence_blocker_count": 5,
+        "demo": False,
+    }
+
+    ready_summary = build_open_prices_launch_readiness_summary(
+        build_open_prices_pull_plan(open_prices_user_agent_present=True),
+        build_open_prices_ingestion_run_plan(
+            open_prices_user_agent_present=True,
+            database_url_present=True,
+            raw_snapshot_storage_present=True,
+            schedule_enabled=True,
+        ),
+        build_open_prices_artifact_import_plan(
+            database_url_present=True,
+            input_artifact_present=True,
+            db_package_built=True,
+        ),
+        build_open_prices_hosted_smoke_plan(
+            deployment_url_present=True,
+            metrics_token_present=True,
+            imported_terminal_product_id_present=True,
+        ),
+    )
+    ready_digest = summarize_open_prices_launch_readiness(ready_summary)
+    assert ready_digest.status == "ready"
+    assert ready_digest.next_action_count == 0
+    assert ready_digest.hosted_smoke_blocker_count == 0
+    assert ready_digest.persistence_blocker_count == 0
 
 
 def test_latest_price_rollup_picks_latest_observation() -> None:
