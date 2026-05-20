@@ -12,6 +12,7 @@ const hostedHttpSmokeScript = readFileSync(new URL('../../../../infra/scripts/sm
 const smokeRetailerConnectorScript = readFileSync(new URL('../../../../infra/scripts/smoke-retailer-connector.sh', import.meta.url), 'utf8');
 const smokeOpenPricesScript = readFileSync(new URL('../../../../infra/scripts/smoke-open-prices.sh', import.meta.url), 'utf8');
 const importOpenPricesArtifactScript = readFileSync(new URL('../../../../infra/scripts/import-open-prices-artifact.sh', import.meta.url), 'utf8');
+const verifyMigrationsScript = readFileSync(new URL('../../../../infra/db/scripts/verify-migrations.sh', import.meta.url), 'utf8');
 const smokeWorkflow = readFileSync(new URL('../../../../.github/workflows/local-infra-smoke.yml', import.meta.url), 'utf8');
 
 describe('local infrastructure compose', () => {
@@ -159,6 +160,13 @@ describe('local infrastructure compose', () => {
     assert.match(importOpenPricesArtifactScript, /new Pool/);
     assert.match(importOpenPricesArtifactScript, /Open Prices artifact import requires OPEN_PRICES_INPUT_PATH/);
     assert.match(importOpenPricesArtifactScript, /Open Prices artifact import requires DATABASE_URL/);
+  });
+
+  it('verifies official API source runs in migration smoke checks', () => {
+    assert.match(verifyMigrationsScript, /insert into source_runs\(source_type, source_name, status\)/);
+    assert.match(verifyMigrationsScript, /values \('official_api', 'Open Prices verifier', 'succeeded'\)/);
+    assert.match(verifyMigrationsScript, /unsupported_source/);
+    assert.match(verifyMigrationsScript, /source_runs official_api source type ok/);
   });
 
   it('ships a hosted HTTP smoke script for API health, product terminal, and optional web checks', () => {
