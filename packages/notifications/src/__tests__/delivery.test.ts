@@ -8,6 +8,7 @@ import {
   planNotificationOperationsAlerts,
   formatNotificationOperationsMetrics,
   planHumanReviewSlaNotifications,
+  parseNotificationSuppressionWebhook,
   processNotificationSuppressionEvent,
   runRepositoryNotificationWorkerCycle,
   runNotificationWorkerTick
@@ -126,6 +127,138 @@ describe('deliverDueNotifications', () => {
     assert.deepEqual(results, [
       { status: 'failed_no_provider', channel: 'email', recipient: 'user@example.com', reason: 'No email provider configured.' }
     ]);
+  });
+});
+
+describe('parseNotificationSuppressionWebhook', () => {
+  it('normalizes SendGrid suppression events into provider-neutral suppression events', () => {
+    const events = parseNotificationSuppressionWebhook({
+      provider: 'sendgrid',
+      receivedAt: '2026-05-20T12:00:00.000Z',
+      payload: [
+        {
+          email: 'bounced@example.com',
+          event: 'bounce',
+          timestamp: 1779278340,
+          sg_event_id: 'sg-bounce-1',
+          sg_message_id: 'message-1'
+        },
+        {
+          email: 'complaint@example.com',
+          event: 'spam report',
+          timestamp: 1779278400,
+          sg_event_id: 'sg-complaint-1'
+        },
+        {
+          email: 'sendable@example.com',
+          event: 'delivered',
+          timestamp: 1779278460
+        }
+      ]
+    });
+
+    assert.deepEqual(events, [
+      {
+        provider: 'sendgrid',
+        providerEventId: 'sg-bounce-1',
+        eventType: 'bounce',
+        recipient: 'bounced@example.com',
+        channel: 'email',
+        occurredAt: '2026-05-20T11:59:00.000Z'
+      },
+      {
+        provider: 'sendgrid',
+        providerEventId: 'sg-complaint-1',
+        eventType: 'complaint',
+        recipient: 'complaint@example.com',
+        channel: 'email',
+        occurredAt: '2026-05-20T12:00:00.000Z'
+      }
+    ]);
+  });
+
+  it('normalizes SNS-wrapped Amazon SES bounce and complaint notifications', () => {
+    const bounceEvents = parseNotificationSuppressionWebhook({
+      provider: 'ses',
+      receivedAt: '2026-05-20T12:00:00.000Z',
+      payload: {
+        Type: 'Notification',
+        Message: JSON.stringify({
+          eventType: 'Bounce',
+          mail: { messageId: 'ses-message-1', timestamp: '2026-05-20T11:59:30.000Z' },
+          bounce: {
+            feedbackId: 'ses-bounce-1',
+            timestamp: '2026-05-20T11:59:40.000Z',
+            bouncedRecipients: [
+              { emailAddress: 'hard-bounce@example.com' },
+              { emailAddress: 'soft-bounce@example.com' }
+            ]
+          }
+        })
+      }
+    });
+    const complaintEvents = parseNotificationSuppressionWebhook({
+      provider: 'ses',
+      receivedAt: '2026-05-20T12:00:00.000Z',
+      payload: {
+        notificationType: 'Complaint',
+        mail: { messageId: 'ses-message-2', timestamp: '2026-05-20T11:58:00.000Z' },
+        complaint: {
+          complainedRecipients: [{ emailAddress: 'complaint@example.com' }]
+        }
+      }
+    });
+
+    assert.deepEqual(bounceEvents, [
+      {
+        provider: 'ses',
+        providerEventId: 'ses-bounce-1',
+        eventType: 'bounce',
+        recipient: 'hard-bounce@example.com',
+        channel: 'email',
+        occurredAt: '2026-05-20T11:59:40.000Z'
+      },
+      {
+        provider: 'ses',
+        providerEventId: 'ses-bounce-1',
+        eventType: 'bounce',
+        recipient: 'soft-bounce@example.com',
+        channel: 'email',
+        occurredAt: '2026-05-20T11:59:40.000Z'
+      }
+    ]);
+    assert.deepEqual(complaintEvents, [
+      {
+        provider: 'ses',
+        providerEventId: 'ses-message-2:Complaint:0:complaint@example.com',
+        eventType: 'complaint',
+        recipient: 'complaint@example.com',
+        channel: 'email',
+        occurredAt: '2026-05-20T11:58:00.000Z'
+      }
+    ]);
+  });
+
+  it('feeds provider webhooks into the existing suppression mutation pipeline', () => {
+    const [event] = parseNotificationSuppressionWebhook({
+      provider: 'sendgrid',
+      receivedAt: '2026-05-20T12:00:00.000Z',
+      payload: { email: 'reader@example.com', event: 'unsubscribe', sg_event_id: 'sg-unsubscribe-1' }
+    });
+
+    assert.deepEqual(processNotificationSuppressionEvent(event!), {
+      id: 'suppression-sendgrid-sg-unsubscribe-1',
+      recipient: 'reader@example.com',
+      channel: 'email',
+      reason: 'unsubscribed',
+      active: true,
+      updatedAt: '2026-05-20T12:00:00.000Z',
+      source: {
+        provider: 'sendgrid',
+        providerEventId: 'sg-unsubscribe-1',
+        eventType: 'unsubscribe'
+      }
+    });
   });
 });
 
