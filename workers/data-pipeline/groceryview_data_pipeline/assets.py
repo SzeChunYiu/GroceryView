@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Iterable
+from urllib.parse import urlparse
 
 try:
     from dagster import asset
@@ -60,6 +61,14 @@ def _unit_price(price_amount: float, unit_size: float) -> float | None:
     if unit_size <= 0:
         return None
     return round(price_amount / unit_size, 2)
+
+
+def _normalize_hosted_smoke_url(url: str) -> str | None:
+    normalized_url = url.strip().rstrip("/")
+    parsed_url = urlparse(normalized_url)
+    if parsed_url.scheme not in {"http", "https"} or not parsed_url.netloc:
+        return None
+    return normalized_url
 
 
 def build_retailer_fetch_stubs(
@@ -430,10 +439,20 @@ def build_open_prices_artifact_import_plan(
 def build_open_prices_hosted_smoke_plan(
     *,
     deployment_url_present: bool = False,
+    deployment_url: str | None = None,
     metrics_token_present: bool = False,
     imported_terminal_product_id_present: bool = False,
 ) -> OpenPricesHostedSmokePlan:
     required_actions: list[str] = []
+    normalized_deployment_url = "<https://api.example.com>"
+    if deployment_url is not None:
+        deployment_url_present = True
+        normalized_url = _normalize_hosted_smoke_url(deployment_url)
+        if normalized_url is None:
+            required_actions.append("fix_groceryview_server_url")
+        else:
+            normalized_deployment_url = normalized_url
+
     if not deployment_url_present:
         required_actions.append("set_groceryview_server_url")
     if not metrics_token_present:
@@ -445,10 +464,10 @@ def build_open_prices_hosted_smoke_plan(
         status="ready" if not required_actions else "blocked",
         source_asset="open_prices_artifact_import_plan",
         smoke_command=(
-            "GROCERYVIEW_SERVER_URL=<https://api.example.com> "
+            f"GROCERYVIEW_SERVER_URL={normalized_deployment_url} "
             "GROCERYVIEW_TERMINAL_PRODUCT_ID=<imported-product-id> "
             "infra/scripts/smoke-hosted-http.sh && "
-            "GROCERYVIEW_SERVER_URL=<https://api.example.com> "
+            f"GROCERYVIEW_SERVER_URL={normalized_deployment_url} "
             "METRICS_TOKEN=<token> infra/scripts/smoke-hosted-readiness.sh"
         ),
         required_env=[
