@@ -53,6 +53,17 @@ OPEN_PRICES_OUTPUT_PATH=/tmp/groceryview-open-prices-preview.json \
 
 The artifact includes the same provenance summary plus `acceptedObservations` with normalized products, aliases, price observations, and promotion observations. It intentionally excludes the raw response body; use `rawSnapshotRef` and `contentHash` to bind the artifact back to the pulled source snapshot.
 
+To persist a saved artifact into PostgreSQL, build the database package and run the import script with `DATABASE_URL` and `OPEN_PRICES_INPUT_PATH`:
+
+```bash
+npm run build --workspace @groceryview/db
+DATABASE_URL=postgresql://groceryview:groceryview@localhost:5432/groceryview \
+OPEN_PRICES_INPUT_PATH=/tmp/groceryview-open-prices-preview.json \
+  infra/scripts/import-open-prices-artifact.sh
+```
+
+The import script creates an `official_api` source run, upserts Open Prices chains/products/aliases, stores each accepted row as a raw price record without a raw response body, writes immutable observations, and lets the database adapter roll them into `latest_prices`.
+
 ## Hosted deployment smoke
 
 After deploying a server, run the hosted HTTP smoke before promoting traffic:
