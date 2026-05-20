@@ -255,7 +255,8 @@ describe('deployment ops foundation', () => {
         'hosted_web',
         'hosted_postgres_readiness',
         'hosted_postgres_readiness_artifact'
-      ]
+      ],
+      artifacts: ['/var/tmp/http-smoke.json', '/var/tmp/readiness-smoke.json']
     });
   });
 
