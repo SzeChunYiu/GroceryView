@@ -104,10 +104,45 @@ describe('buildStaticPages', () => {
       const market = await readFile(join(root, 'market/index.html'), 'utf8');
       assert.match(market, /Stockholm Grocery Market/);
       assert.match(market, /Coffee Index/);
-      assert.match(market, /Basket-type indices/);
-      assert.match(market, /Student Basket Index/);
-      assert.match(market, /Cheapest chain/);
-      assert.match(market, /Coffee -7\.2%/);
+      assert.match(market, /Brand-tier indices/);
+      assert.match(market, /Private Label Index/);
+      assert.match(market, /Premium Brand Index/);
+      assert.match(market, /private-label savings vs national brands/);
+
+      const catalogCoverage = await readFile(join(root, 'catalog/coverage/index.html'), 'utf8');
+      assert.match(catalogCoverage, /Catalog coverage dashboard/);
+      assert.match(catalogCoverage, /Coverage by category/);
+      assert.match(catalogCoverage, /Backfill member prices/);
+      assert.match(catalogCoverage, /Receipt photos need human review before catalog writeback/);
+      assert.match(catalogCoverage, /Products without unit prices cannot rank category savings/);
+
+      const retailerFreshness = await readFile(join(root, 'retailers/freshness/index.html'), 'utf8');
+      assert.match(retailerFreshness, /Retailer freshness monitor/);
+      assert.match(retailerFreshness, /Freshness by retailer/);
+      assert.match(retailerFreshness, /Coop/);
+      assert.match(retailerFreshness, /Pause new alerts/);
+      assert.match(retailerFreshness, /Stale retailer-page rows cannot trigger household notifications/);
+
+      const priceConfidence = await readFile(join(root, 'prices/confidence/index.html'), 'utf8');
+      assert.match(priceConfidence, /Price confidence guide/);
+      assert.match(priceConfidence, /Confidence labels/);
+      assert.match(priceConfidence, /Verified shelf/);
+      assert.match(priceConfidence, /Estimated and low-confidence rows are excluded/);
+      assert.match(priceConfidence, /Only verified or fresh retailer-page prices can alert/);
+
+      const deals = await readFile(join(root, 'deals/today/index.html'), 'utf8');
+      assert.match(deals, /Today’s best grocery deals/);
+      assert.match(deals, /Ranked deal actions/);
+      assert.match(deals, /Deal Score/);
+      assert.match(deals, /Ads excluded from ranking/);
+      assert.match(deals, /Estimated rows held back/);
+
+      const smartSwapsPage = await readFile(join(root, 'savings/smart-swaps/index.html'), 'utf8');
+      assert.match(smartSwapsPage, /Smart grocery swaps/);
+      assert.match(smartSwapsPage, /Swap candidates/);
+      assert.match(smartSwapsPage, /Same roast category/);
+      assert.match(smartSwapsPage, /Estimated swap prices cannot reduce forecast spend/);
+      assert.match(smartSwapsPage, /Dietary restrictions outrank savings/);
 
       const store = await readFile(join(root, 'stores/willys-odenplan/index.html'), 'utf8');
       assert.match(store, /Store highlights/);
