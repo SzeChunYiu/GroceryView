@@ -57,6 +57,39 @@ describe('recommendSmartSwaps', () => {
       { productId: 'garant-500', savingsPercent: 28.57, confidence: 'high' }
     ]);
   });
+
+  it('honors accepted private-label tiers and blocked categories', () => {
+    const swaps = recommendSmartSwaps({
+      source: { id: 'barilla-500', brand: 'Barilla', category: 'pasta', packageSize: 500, packageUnit: 'g', brandTier: 'national', unitPrice: 28 },
+      candidates: [
+        { id: 'garant-500', brand: 'Garant', category: 'pasta', packageSize: 500, packageUnit: 'g', brandTier: 'standard_private_label', unitPrice: 20 },
+        { id: 'budget-500', brand: 'Budget', category: 'pasta', packageSize: 500, packageUnit: 'g', brandTier: 'budget_private_label', unitPrice: 15 }
+      ],
+      acceptPrivateLabel: 'yes',
+      minimumSavingsPercent: 10,
+      privateLabelPreference: {
+        acceptedTiers: ['standard_private_label'],
+        blockedCategories: []
+      }
+    });
+
+    assert.deepEqual(swaps.map((swap) => swap.productId), ['garant-500']);
+
+    const blocked = recommendSmartSwaps({
+      source: { id: 'barilla-500', brand: 'Barilla', category: 'pasta', packageSize: 500, packageUnit: 'g', brandTier: 'national', unitPrice: 28 },
+      candidates: [
+        { id: 'garant-500', brand: 'Garant', category: 'pasta', packageSize: 500, packageUnit: 'g', brandTier: 'standard_private_label', unitPrice: 20 }
+      ],
+      acceptPrivateLabel: 'yes',
+      minimumSavingsPercent: 10,
+      privateLabelPreference: {
+        acceptedTiers: ['standard_private_label'],
+        blockedCategories: ['pasta']
+      }
+    });
+
+    assert.deepEqual(blocked, []);
+  });
 });
 
 describe('planHumanReviewQueue', () => {
