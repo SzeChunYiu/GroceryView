@@ -342,6 +342,7 @@ export type HostedSmokeCommandPlan = {
   commands: string[];
   requiredSecrets: string[];
   evidence: string[];
+  artifacts: string[];
 };
 
 function trimTrailingSlash(url: string): string {
@@ -368,6 +369,7 @@ export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput):
       .join(' ')
   ];
   const evidence = ['hosted_api_health', 'hosted_product_terminal', 'hosted_http_smoke_artifact'];
+  const artifacts = [httpEvidenceOutputPath];
   const requiredSecrets: string[] = [];
 
   if (input.webUrl) evidence.push('hosted_web');
@@ -385,9 +387,10 @@ export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput):
       ].join(' ')
     );
     evidence.push('hosted_postgres_readiness', 'hosted_postgres_readiness_artifact');
+    artifacts.push(readinessEvidenceOutputPath);
   }
 
-  return { commands, requiredSecrets, evidence };
+  return { commands, requiredSecrets, evidence, artifacts };
 }
 
 export type SecretRotationRecord = {
