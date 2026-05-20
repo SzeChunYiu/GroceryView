@@ -2,7 +2,17 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createGroceryViewApi } from '@groceryview/api';
-import { buildExpoReadinessPlan, buildMobileProviderReadinessReport, buildMobileScreenBlueprints, buildMobileShell, buildScanResult, createMobileDiscoveryViewModel, createMobileViewModel, loadMobileProductTerminal } from '../index.js';
+import {
+  buildExpoReadinessPlan,
+  buildMobileProviderReadinessReport,
+  buildMobileScreenBlueprints,
+  buildMobileShell,
+  buildScanResult,
+  createMobileDiscoveryViewModel,
+  createMobileProductPriceTerminalViewModel,
+  createMobileViewModel,
+  loadMobileProductTerminal
+} from '../index.js';
 
 describe('mobile app foundation', () => {
   it('defines the proposal bottom navigation and Today dashboard modules', () => {
@@ -95,6 +105,50 @@ describe('mobile app foundation', () => {
       }),
       /Product not found/
     );
+  });
+
+  it('builds mobile product terminal state from quote, distribution, chart, and evidence data', () => {
+    const viewModel = createMobileProductPriceTerminalViewModel('coffee');
+
+    assert.equal(viewModel?.ticker, 'ZOEGAS-COFFEE-450G');
+    assert.equal(viewModel?.quote.bestPriceLabel, '49.90 SEK');
+    assert.equal(viewModel?.quote.bestStoreName, 'Willys Odenplan');
+    assert.equal(viewModel?.quote.dealVerdict, 'Buy');
+    assert.equal(viewModel?.quote.oneMonthMoveLabel, '-16.7%');
+    assert.equal(viewModel?.quote.range52WeekLabel, '49.90-69.90 SEK');
+    assert.deepEqual(viewModel?.evidence, {
+      currentPrices: 3,
+      historyPoints: 3,
+      verifiedHistoryPoints: 3,
+      latestObservedAt: '2026-05-19T00:00:00.000Z',
+      isNewLow: true,
+      guardrails: [
+        'Verified shelf or retailer-page prices can power current quote, Deal Score, and basket totals.',
+        'Member, promotion, estimated, and low-confidence rows must stay explicitly labeled before customer action.',
+        'Distribution and chart samples include sample size and provenance-aware confidence styling.'
+      ]
+    });
+    assert.deepEqual(viewModel?.distributions.map((distribution) => ({
+      scope: distribution.scope,
+      sampleSize: distribution.sampleSize,
+      medianPrice: distribution.medianPrice,
+      cheaperThanPercent: distribution.cheaperThanPercent
+    })), [
+      { scope: 'stockholm', sampleSize: 3, medianPrice: 59.9, cheaperThanPercent: 92 },
+      { scope: 'local_area', sampleSize: 2, medianPrice: 57.4, cheaperThanPercent: 50 }
+    ]);
+    assert.deepEqual(viewModel?.chartSeries, [
+      {
+        id: 'willys-odenplan:shelf',
+        storeName: 'Willys Odenplan',
+        lineStyle: 'solid',
+        pointCount: 3,
+        latestPrice: 49.9,
+        markerCount: 1
+      }
+    ]);
+    assert.deepEqual(viewModel?.actions, ['add_to_watchlist', 'add_to_weekly_basket', 'compare_stores', 'scan_receipt_to_verify']);
+    assert.equal(createMobileProductPriceTerminalViewModel('missing-product'), null);
   });
 
   it('builds barcode scan results with deal score, equivalent products, and actions', () => {
