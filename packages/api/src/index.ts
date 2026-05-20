@@ -1301,6 +1301,14 @@ export function createGroceryViewApi() {
       favoriteStores.set(userId, set);
     },
 
+    removeFavoriteStore(userId: string, storeId: string) {
+      requireNonEmptyId(userId, 'userId');
+      requireKnownStore(storeId);
+      const set = favoriteStores.get(userId) ?? new Set<string>();
+      set.delete(storeId);
+      favoriteStores.set(userId, set);
+    },
+
     getFavoriteStores(userId: string) {
       const ids = favoriteStores.get(userId) ?? new Set<string>();
       return stores.filter((store) => ids.has(store.id));

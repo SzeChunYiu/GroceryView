@@ -349,6 +349,8 @@ describe('createGroceryViewApi', () => {
     const api = createGroceryViewApi();
 
     api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.removeFavoriteStore('user-1', 'lidl-sveavagen');
     api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, favoriteStoresOnly: true });
     api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
     api.addBasketItem('user-1', { productId: 'coffee', quantity: 2 });
