@@ -35,6 +35,7 @@ describe('local infrastructure compose', () => {
     assert.match(envExample, /^S3_ENDPOINT=http:\/\/localhost:9000$/m);
     assert.match(envExample, /^S3_BUCKET=groceryview-raw$/m);
     assert.match(envExample, /^S3_ACCESS_KEY_ID=groceryview$/m);
+    assert.match(envExample, /^SCAN_UPLOAD_MAX_BYTES=5000000$/m);
   });
 
   it('ships a smoke script for the local development stack', () => {

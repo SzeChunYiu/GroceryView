@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHash, createHmac, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
@@ -510,7 +510,12 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
             notificationWebhookSecret:
               authOptions.notificationWebhookSecret ?? runtimeConfig?.notificationWebhookSecret ?? process.env.NOTIFICATION_WEBHOOK_SECRET,
             billingWebhookSecret: authOptions.billingWebhookSecret ?? runtimeConfig?.billingWebhookSecret ?? process.env.BILLING_WEBHOOK_SECRET,
-            metricsToken: authOptions.notificationMetricsToken ?? runtimeConfig?.metricsToken ?? process.env.METRICS_TOKEN
+            metricsToken: authOptions.notificationMetricsToken ?? runtimeConfig?.metricsToken ?? process.env.METRICS_TOKEN,
+            s3Endpoint: runtimeConfig?.s3Endpoint ?? process.env.S3_ENDPOINT,
+            s3Region: runtimeConfig?.s3Region ?? process.env.S3_REGION,
+            s3Bucket: runtimeConfig?.s3Bucket ?? process.env.S3_BUCKET,
+            s3AccessKeyId: runtimeConfig?.s3AccessKeyId ?? process.env.S3_ACCESS_KEY_ID,
+            s3SecretAccessKey: runtimeConfig?.s3SecretAccessKey ?? process.env.S3_SECRET_ACCESS_KEY
           })
         );
       }
@@ -1145,19 +1150,128 @@ export type RuntimeConfig = {
   notificationWebhookSecret?: string;
   billingWebhookSecret?: string;
   metricsToken?: string;
+  s3Endpoint?: string;
+  s3Region?: string;
+  s3Bucket?: string;
+  s3AccessKeyId?: string;
+  s3SecretAccessKey?: string;
+  scanUploadMaxBytes?: number;
 };
 
-function validatePublicWebUrl(publicWebUrl: string | undefined): void {
-  if (!publicWebUrl) return;
-  let parsed: URL;
-  try {
-    parsed = new URL(publicWebUrl);
-  } catch {
-    throw new Error('PUBLIC_WEB_URL must be a valid absolute URL.');
-  }
-  if (!['http:', 'https:'].includes(parsed.protocol)) {
-    throw new Error('PUBLIC_WEB_URL must use http or https.');
-  }
+const defaultScanUploadMaxBytes = 5_000_000;
+const scanUploadTicketTtlSeconds = 600;
+
+function optionalPositiveIntegerEnv(value: string | undefined, field: string): number | undefined {
+  if (value === undefined || value.trim() === '') return undefined;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed <= 0) throw new Error(`${field} must be a positive integer.`);
+  return parsed;
+}
+
+function hasCompleteS3ScanUploadConfig(config: RuntimeConfig): config is RuntimeConfig & {
+  s3Endpoint: string;
+  s3Region: string;
+  s3Bucket: string;
+  s3AccessKeyId: string;
+  s3SecretAccessKey: string;
+} {
+  return Boolean(config.s3Endpoint && config.s3Region && config.s3Bucket && config.s3AccessKeyId && config.s3SecretAccessKey);
+}
+
+function awsUriEncode(value: string): string {
+  return encodeURIComponent(value).replace(/[!'()*]/g, (character) => `%${character.charCodeAt(0).toString(16).toUpperCase()}`);
+}
+
+function awsCanonicalQuery(params: Array<[string, string]>): string {
+  return params
+    .map(([key, value]) => [awsUriEncode(key), awsUriEncode(value)] as const)
+    .sort(([leftKey, leftValue], [rightKey, rightValue]) => leftKey.localeCompare(rightKey) || leftValue.localeCompare(rightValue))
+    .map(([key, value]) => `${key}=${value}`)
+    .join('&');
+}
+
+function utcDateParts(isoTimestamp: string): { amzDate: string; dateStamp: string } {
+  const date = new Date(isoTimestamp);
+  const yyyy = String(date.getUTCFullYear());
+  const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(date.getUTCDate()).padStart(2, '0');
+  const hh = String(date.getUTCHours()).padStart(2, '0');
+  const min = String(date.getUTCMinutes()).padStart(2, '0');
+  const ss = String(date.getUTCSeconds()).padStart(2, '0');
+  return { dateStamp: `${yyyy}${mm}${dd}`, amzDate: `${yyyy}${mm}${dd}T${hh}${min}${ss}Z` };
+}
+
+function sha256Hex(value: string): string {
+  return createHash('sha256').update(value).digest('hex');
+}
+
+function hmacSha256(key: Buffer | string, value: string): Buffer {
+  return createHmac('sha256', key).update(value).digest();
+}
+
+function hmacSha256Hex(key: Buffer | string, value: string): string {
+  return createHmac('sha256', key).update(value).digest('hex');
+}
+
+function createS3SignatureKey(secretAccessKey: string, dateStamp: string, region: string): Buffer {
+  const kDate = hmacSha256(`AWS4${secretAccessKey}`, dateStamp);
+  const kRegion = hmacSha256(kDate, region);
+  const kService = hmacSha256(kRegion, 's3');
+  return hmacSha256(kService, 'aws4_request');
+}
+
+function createRuntimeScanUploadStorage(config: RuntimeConfig): ScanUploadStorage | undefined {
+  if (!hasCompleteS3ScanUploadConfig(config)) return undefined;
+
+  return {
+    async createUploadTicket(request) {
+      const maxBytes = config.scanUploadMaxBytes ?? defaultScanUploadMaxBytes;
+      if (request.byteLength > maxBytes) throw new Error('byteLength exceeds scan upload maxBytes.');
+
+      const endpoint = new URL(config.s3Endpoint.endsWith('/') ? config.s3Endpoint : `${config.s3Endpoint}/`);
+      const requestedAtMs = Date.parse(request.requestedAt);
+      const expiresAt = new Date(requestedAtMs + scanUploadTicketTtlSeconds * 1000).toISOString();
+      const objectKey = ['scan-uploads', request.kind, request.scanId].map(awsUriEncode).join('/');
+      const rawPathSegments = [
+        ...endpoint.pathname.split('/').filter(Boolean),
+        config.s3Bucket,
+        ...objectKey.split('/')
+      ];
+      const canonicalUri = `/${rawPathSegments.join('/')}`;
+      const uploadUrl = new URL(endpoint.toString());
+      uploadUrl.pathname = canonicalUri;
+
+      const { amzDate, dateStamp } = utcDateParts(request.requestedAt);
+      const credentialScope = `${dateStamp}/${config.s3Region}/s3/aws4_request`;
+      const signedHeaders = 'content-type;host';
+      const credential = `${config.s3AccessKeyId}/${credentialScope}`;
+      const queryParams: Array<[string, string]> = [
+        ['X-Amz-Algorithm', 'AWS4-HMAC-SHA256'],
+        ['X-Amz-Credential', credential],
+        ['X-Amz-Date', amzDate],
+        ['X-Amz-Expires', String(scanUploadTicketTtlSeconds)],
+        ['X-Amz-SignedHeaders', signedHeaders]
+      ];
+      const canonicalQuery = awsCanonicalQuery(queryParams);
+      const canonicalHeaders = `content-type:${request.contentType}\nhost:${uploadUrl.host}\n`;
+      const canonicalRequest = ['PUT', canonicalUri, canonicalQuery, canonicalHeaders, signedHeaders, 'UNSIGNED-PAYLOAD'].join('\n');
+      const stringToSign = ['AWS4-HMAC-SHA256', amzDate, credentialScope, sha256Hex(canonicalRequest)].join('\n');
+      const signature = hmacSha256Hex(createS3SignatureKey(config.s3SecretAccessKey, dateStamp, config.s3Region), stringToSign);
+
+      for (const [key, value] of [...queryParams, ['X-Amz-Signature', signature] as [string, string]]) {
+        uploadUrl.searchParams.set(key, value);
+      }
+
+      return {
+        scanId: request.scanId,
+        uploadUrl: uploadUrl.toString(),
+        payloadUri: `s3://${config.s3Bucket}/${objectKey}`,
+        expiresAt,
+        maxBytes,
+        headers: { 'content-type': request.contentType }
+      };
+    }
+  };
 }
 
 export function loadRuntimeConfig(env: Record<string, string | undefined>): RuntimeConfig {
@@ -1165,6 +1279,7 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
   if (!['development', 'test', 'production'].includes(nodeEnv)) throw new Error(`Unsupported NODE_ENV: ${nodeEnv}`);
   const port = Number(env.PORT ?? '3000');
   if (!Number.isInteger(port) || port <= 0) throw new Error('PORT must be a positive integer.');
+  const scanUploadMaxBytes = optionalPositiveIntegerEnv(env.SCAN_UPLOAD_MAX_BYTES, 'SCAN_UPLOAD_MAX_BYTES');
   if (nodeEnv === 'production') {
     if (!env.AUTH_SECRET) throw new Error('AUTH_SECRET is required in production.');
     if (!env.DATABASE_URL) throw new Error('DATABASE_URL is required in production.');
@@ -1182,11 +1297,18 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     publicWebUrl: env.PUBLIC_WEB_URL,
     notificationWebhookSecret: env.NOTIFICATION_WEBHOOK_SECRET,
     billingWebhookSecret: env.BILLING_WEBHOOK_SECRET,
-    metricsToken: env.METRICS_TOKEN
+    metricsToken: env.METRICS_TOKEN,
+    ...(env.S3_ENDPOINT ? { s3Endpoint: env.S3_ENDPOINT } : {}),
+    ...(env.S3_REGION ? { s3Region: env.S3_REGION } : {}),
+    ...(env.S3_BUCKET ? { s3Bucket: env.S3_BUCKET } : {}),
+    ...(env.S3_ACCESS_KEY_ID ? { s3AccessKeyId: env.S3_ACCESS_KEY_ID } : {}),
+    ...(env.S3_SECRET_ACCESS_KEY ? { s3SecretAccessKey: env.S3_SECRET_ACCESS_KEY } : {}),
+    ...(scanUploadMaxBytes === undefined ? {} : { scanUploadMaxBytes })
   };
 }
 
 export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): AuthOptions {
+  const scanUploadStorage = createRuntimeScanUploadStorage(config);
   return {
     runtimeConfig: config,
     authSecret: config.authSecret,
@@ -1195,7 +1317,8 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     billingWebhookSecret: config.billingWebhookSecret,
     notificationMetricsToken: config.metricsToken,
     notificationMetricsProvider: options.notificationMetricsProvider,
-    postgresReadinessProvider: options.postgresReadinessProvider
+    postgresReadinessProvider: options.postgresReadinessProvider,
+    ...(scanUploadStorage ? { scanUploadStorage } : {})
   };
 }
 
@@ -1323,6 +1446,7 @@ export type HealthReport = {
   hasNotificationWebhookSecret: boolean;
   hasBillingWebhookSecret: boolean;
   hasMetricsToken: boolean;
+  hasScanUploadStorage: boolean;
 };
 
 export function buildHealthReport(config: RuntimeConfig): HealthReport {
@@ -1335,7 +1459,8 @@ export function buildHealthReport(config: RuntimeConfig): HealthReport {
     hasAuthSecret: Boolean(config.authSecret),
     hasNotificationWebhookSecret: Boolean(config.notificationWebhookSecret),
     hasBillingWebhookSecret: Boolean(config.billingWebhookSecret),
-    hasMetricsToken: Boolean(config.metricsToken)
+    hasMetricsToken: Boolean(config.metricsToken),
+    hasScanUploadStorage: hasCompleteS3ScanUploadConfig(config)
   };
 }
 
