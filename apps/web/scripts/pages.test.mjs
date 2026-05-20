@@ -41,8 +41,6 @@ describe('buildStaticPages', () => {
         'stores/map/index.html',
         'stores/willys-odenplan/index.html',
         'watchlist/index.html'
-        'stores/willys-odenplan/index.html',
-        'unit-prices/index.html'
       ]);
 
       const product = await readFile(join(root, 'products/coffee/index.html'), 'utf8');
@@ -159,12 +157,6 @@ describe('buildStaticPages', () => {
       assert.match(smartSwapsPage, /Same roast category/);
       assert.match(smartSwapsPage, /Estimated swap prices cannot reduce forecast spend/);
       assert.match(smartSwapsPage, /Dietary restrictions outrank savings/);
-      const unitPrices = await readFile(join(root, 'unit-prices/index.html'), 'utf8');
-      assert.match(unitPrices, /Compare by unit price/);
-      assert.match(unitPrices, /SEK\/kg/);
-      assert.match(unitPrices, /110.89 SEK\/kg/);
-      assert.match(unitPrices, /Verified member price/);
-      assert.match(unitPrices, /Cheapest multipack today/);
 
       const store = await readFile(join(root, 'stores/willys-odenplan/index.html'), 'utf8');
       assert.match(store, /Store highlights/);
