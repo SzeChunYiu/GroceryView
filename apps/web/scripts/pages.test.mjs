@@ -231,6 +231,15 @@ describe('buildStaticPages', () => {
       assert.match(smartSwapsPage, /Same roast category/);
       assert.match(smartSwapsPage, /Estimated swap prices cannot reduce forecast spend/);
       assert.match(smartSwapsPage, /Dietary restrictions outrank savings/);
+      assert.match(smartSwapsPage, /Connected smart swaps API/);
+      assert.match(smartSwapsPage, /Load live swap candidates/);
+      assert.match(smartSwapsPage, /data-groceryview-flow="smart-swaps"/);
+      assert.match(smartSwapsPage, /data-flow-action="load-smart-swaps"/);
+      assert.match(smartSwapsPage, /data-smart-swaps-best/);
+      assert.match(smartSwapsPage, /data-smart-swaps-count/);
+      assert.match(smartSwapsPage, /data-smart-swaps-confidence/);
+      assert.match(smartSwapsPage, /fetch\(apiUrl\('\/api\/products\/' \+ encodeURIComponent\(productId\) \+ '\/equivalents'/);
+      assert.match(smartSwapsPage, /Connected smart swaps loaded/);
 
       const store = await readFile(join(root, 'stores/willys-odenplan/index.html'), 'utf8');
       assert.match(store, /Store highlights/);

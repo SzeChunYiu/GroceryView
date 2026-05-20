@@ -53,6 +53,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-budget-summary-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setSmartSwapsMetric = (metric, message) => {
+    const target = document.querySelector('[data-smart-swaps-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setStoreDealsMetric = (metric, message) => {
     const target = document.querySelector('[data-store-deals-' + metric + ']');
     if (target) target.textContent = message;
@@ -706,6 +710,41 @@ window.GroceryViewFlowActions = (() => {
       setResult('budget-summary', 'Budget summary API load failed: ' + error.message + '. Static budget forecast remains visible.');
     }
   };
+  const loadSmartSwapsFromApi = async (button) => {
+    const config = getApiConfig();
+    const panel = button.closest('[data-groceryview-flow="smart-swaps"]');
+    const productId = panel?.dataset.productId || 'milk';
+    if (!config.apiBase) {
+      setResult('smart-swaps', 'Local preview mode: connect the API session bridge before loading live swap candidates.');
+      return;
+    }
+    try {
+      const [equivalents, terminal] = await Promise.all([
+        requireApiSuccess(await fetch(apiUrl('/api/products/' + encodeURIComponent(productId) + '/equivalents', config, false), {
+          method: 'GET',
+          headers: config.bearerToken ? apiHeaders(config) : { 'content-type': 'application/json' }
+        })),
+        requireApiSuccess(await fetch(apiUrl('/api/products/' + encodeURIComponent(productId) + '/terminal', config, false), {
+          method: 'GET',
+          headers: config.bearerToken ? apiHeaders(config) : { 'content-type': 'application/json' }
+        }))
+      ]);
+      const candidates = Array.isArray(equivalents) ? equivalents : [];
+      const best = candidates[0] || {};
+      const currentPrice = Number(terminal.quote?.bestPrice);
+      const bestPrice = Number(best.bestPrice);
+      const savings = Number.isFinite(currentPrice) && Number.isFinite(bestPrice)
+        ? Math.max(0, currentPrice - bestPrice)
+        : null;
+      setSmartSwapsMetric('best', best.productName ? best.productName + ' · ' + formatPreciseSek(best.bestPrice) + ' at ' + (best.bestStoreId || 'unknown store') : 'No live swap candidates returned');
+      setSmartSwapsMetric('count', candidates.length + ' comparable products for ' + productId);
+      setSmartSwapsMetric('confidence', best.productName ? 'Deal Score ' + Number(best.dealScore || 0) + (savings == null ? ' · savings unavailable' : ' · saves ' + formatPreciseSek(savings) + ' vs current best') : 'No confidence evidence returned');
+      setSmartSwapsMetric('reason', best.reason || 'Live equivalent-product reason unavailable');
+      setResult('smart-swaps', 'Connected smart swaps loaded: ' + candidates.length + ' comparable products for ' + productId + '; best ' + (best.productName || 'n/a') + '.');
+    } catch (error) {
+      setResult('smart-swaps', 'Smart swaps API load failed: ' + error.message + '. Static swap candidates remain visible.');
+    }
+  };
   const loadStoreDealsFromApi = async (button) => {
     const config = getApiConfig();
     const panel = button.closest('[data-groceryview-flow="store-deals"]');
@@ -901,6 +940,10 @@ window.GroceryViewFlowActions = (() => {
         await loadBudgetSummaryFromApi();
         return;
       }
+      if (flow === 'smart-swaps' && action === 'load-smart-swaps') {
+        await loadSmartSwapsFromApi(button);
+        return;
+      }
       if (flow === 'store-deals' && action === 'load-store-deals') {
         await loadStoreDealsFromApi(button);
         return;
@@ -1052,6 +1095,9 @@ const dailyDealsLivePanel = `
 
 const budgetSummaryLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="budget-summary" style="margin-top:16px"><div class="eyebrow">Connected budget API</div><h2>Pull live household budget summary</h2><p class="lede">Fetch <code>/api/budget/summary</code> through the protected API session bridge to refresh weekly budget, month-to-date spend, next-basket estimate, remaining buffers, and over/under status from account data.</p><div class="grid" aria-label="Live budget summary API metrics"><div class="metric"><strong data-budget-summary-weekly>Waiting for API pull</strong><span>weekly budget status</span></div><div class="metric"><strong data-budget-summary-monthly>Static monthly preview</strong><span>monthly budget status</span></div><div class="metric"><strong data-budget-summary-estimate>Static basket estimate preview</strong><span>next basket buffer</span></div></div><div class="flow-panel" aria-label="Connected budget summary actions"><button type="button" data-flow-action="load-budget-summary">Load live budget summary</button></div><p class="flow-result" data-flow-result="budget-summary" aria-live="polite">Local preview mode: connect the API session bridge before loading live budget summary.</p></section>`;
+
+const smartSwapsLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="smart-swaps" data-product-id="milk" style="margin-top:16px"><div class="eyebrow">Connected smart swaps API</div><h2>Pull live swap candidates</h2><p class="lede">Fetch <code>/api/products/milk/equivalents</code> plus the current product terminal quote to rank comparable products by best known price, Deal Score, estimated savings versus the current best quote, and equivalence reason.</p><div class="grid" aria-label="Live smart swaps API metrics"><div class="metric"><strong data-smart-swaps-best>Waiting for API pull</strong><span>best comparable product</span></div><div class="metric"><strong data-smart-swaps-count>Static candidate preview</strong><span>live comparable-product count</span></div><div class="metric"><strong data-smart-swaps-confidence>Static score preview</strong><span>Deal Score and savings evidence</span></div><div class="metric"><strong data-smart-swaps-reason>Static reason preview</strong><span>equivalence rule</span></div></div><div class="flow-panel" aria-label="Connected smart swaps actions"><button type="button" data-flow-action="load-smart-swaps">Load live swap candidates</button></div><p class="flow-result" data-flow-result="smart-swaps" aria-live="polite">Local preview mode: connect the API session bridge before loading live swap candidates.</p></section>`;
 
 const storeDealsLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="store-deals" data-store-id="willys-odenplan" style="margin-top:16px"><div class="eyebrow">Connected store deals API</div><h2>Pull live in-store deal board</h2><p class="lede">Fetch <code>/api/stores/willys-odenplan/deals</code> to refresh this favorite-store profile with ranked products, current store price, Deal Score, category coverage, and Buy/Compare verdict mix from the public API.</p><div class="grid" aria-label="Live store deals API metrics"><div class="metric"><strong data-store-deals-leader>Waiting for API pull</strong><span>top in-store deal</span></div><div class="metric"><strong data-store-deals-count>Static deal-count preview</strong><span>ranked store products and categories</span></div><div class="metric"><strong data-store-deals-verdict>Static verdict preview</strong><span>Buy and Compare mix</span></div></div><div class="flow-panel" aria-label="Connected store deal actions"><button type="button" data-flow-action="load-store-deals">Load live store deals</button></div><p class="flow-result" data-flow-result="store-deals" aria-live="polite">Local preview mode: connect the API session bridge before loading live store deals.</p></section>`;
@@ -1214,7 +1260,7 @@ const pages = [
     path: 'savings/smart-swaps/index.html',
     title: 'Smart grocery swaps — GroceryView',
     description: 'Compare GroceryView smart swaps by savings, equivalence rule, household fit, source confidence, and budget impact.',
-    body: `<section class="card"><div class="eyebrow">Smart swaps</div><h1>Smart grocery swaps</h1><p class="lede">Review substitute recommendations that save money while respecting product equivalence, household constraints, and verified-price requirements.</p><div class="grid"><div class="metric"><strong>3</strong><span>swap candidates</span></div><div class="metric"><strong>18 SEK</strong><span>weekly savings</span></div><div class="metric"><strong>0</strong><span>diet conflicts</span></div></div></section><section class="card" style="margin-top:16px"><h2>Swap candidates</h2><table class="table"><thead><tr><th>Current item</th><th>Suggested swap</th><th>Saves</th><th>Equivalence</th><th>Decision</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>Garant Bryggkaffe 450g</td><td>12 SEK</td><td>Same roast category and pack size</td><td>Recommend</td></tr><tr><td>Arla Milk 1L</td><td>ICA Milk 1L</td><td>2 SEK</td><td>Same fat level and chilled dairy</td><td>Recommend</td></tr><tr><td>Eggs 12-pack</td><td>Lidl Eggs 12-pack</td><td>4 SEK</td><td>Same pack size</td><td>Recommend in split basket</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Swap guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Verified price required</td><td>Estimated swap prices cannot reduce forecast spend.</td></tr><tr><td>Household diet first</td><td>Dietary restrictions outrank savings.</td></tr><tr><td>No travel penalty</td><td>Distance is shown separately and does not hide cheapest valid swaps.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Smart swaps</div><h1>Smart grocery swaps</h1><p class="lede">Review substitute recommendations that save money while respecting product equivalence, household constraints, and verified-price requirements.</p><div class="grid"><div class="metric"><strong>3</strong><span>swap candidates</span></div><div class="metric"><strong>18 SEK</strong><span>weekly savings</span></div><div class="metric"><strong>0</strong><span>diet conflicts</span></div></div></section><section class="card" style="margin-top:16px"><h2>Swap candidates</h2><table class="table"><thead><tr><th>Current item</th><th>Suggested swap</th><th>Saves</th><th>Equivalence</th><th>Decision</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>Garant Bryggkaffe 450g</td><td>12 SEK</td><td>Same roast category and pack size</td><td>Recommend</td></tr><tr><td>Arla Milk 1L</td><td>ICA Milk 1L</td><td>2 SEK</td><td>Same fat level and chilled dairy</td><td>Recommend</td></tr><tr><td>Eggs 12-pack</td><td>Lidl Eggs 12-pack</td><td>4 SEK</td><td>Same pack size</td><td>Recommend in split basket</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Swap guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Verified price required</td><td>Estimated swap prices cannot reduce forecast spend.</td></tr><tr><td>Household diet first</td><td>Dietary restrictions outrank savings.</td></tr><tr><td>No travel penalty</td><td>Distance is shown separately and does not hide cheapest valid swaps.</td></tr></tbody></table></section>${smartSwapsLivePanel}`
   },
   {
     path: 'products/coffee/index.html',
