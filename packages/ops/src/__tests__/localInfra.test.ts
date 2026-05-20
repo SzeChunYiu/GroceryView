@@ -76,4 +76,16 @@ describe('local infrastructure compose', () => {
     assert.match(smokeWorkflow, /infra\/scripts\/smoke-local-services\.sh/);
     assert.match(smokeWorkflow, /docker compose -f infra\/docker-compose\.yml down -v --remove-orphans/);
   });
+
+  it('documents smoke troubleshooting fixes for common local failures', () => {
+    assert.match(infraReadme, /## Smoke troubleshooting/);
+    assert.match(infraReadme, /### Missing Docker/);
+    assert.match(infraReadme, /docker compose version/);
+    assert.match(infraReadme, /### PostgreSQL 18 volume mount/);
+    assert.match(infraReadme, /\/var\/lib\/postgresql\/data/);
+    assert.match(infraReadme, /docker compose -f infra\/docker-compose\.yml down -v/);
+    assert.match(infraReadme, /### MinIO bucket initialization/);
+    assert.match(infraReadme, /object-storage-init/);
+    assert.match(infraReadme, /S3_BUCKET/);
+  });
 });
