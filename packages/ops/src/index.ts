@@ -334,6 +334,8 @@ export type HostedSmokeCommandPlanInput = {
   includePostgresReadiness: boolean;
   metricsTokenEnvVar?: string;
   timeoutSeconds?: number;
+  httpEvidenceOutputPath?: string;
+  readinessEvidenceOutputPath?: string;
 };
 
 export type HostedSmokeCommandPlan = {
@@ -351,18 +353,21 @@ export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput):
   if (!Number.isInteger(timeout) || timeout <= 0) throw new Error('timeoutSeconds must be a positive integer.');
   const serverUrl = trimTrailingSlash(input.serverUrl);
   const terminalProductId = input.terminalProductId ?? 'coffee';
+  const httpEvidenceOutputPath = input.httpEvidenceOutputPath ?? '/tmp/groceryview-hosted-http-smoke.json';
+  const readinessEvidenceOutputPath = input.readinessEvidenceOutputPath ?? '/tmp/groceryview-hosted-readiness-smoke.json';
   const commands = [
     [
       `GROCERYVIEW_SERVER_URL=${serverUrl}`,
       input.webUrl ? `GROCERYVIEW_WEB_URL=${trimTrailingSlash(input.webUrl)}` : undefined,
       `GROCERYVIEW_TERMINAL_PRODUCT_ID=${terminalProductId}`,
       `HTTP_SMOKE_TIMEOUT_SECONDS=${timeout}`,
+      `HOSTED_HTTP_SMOKE_OUTPUT_PATH=${httpEvidenceOutputPath}`,
       'infra/scripts/smoke-hosted-http.sh'
     ]
       .filter(Boolean)
       .join(' ')
   ];
-  const evidence = ['hosted_api_health', 'hosted_product_terminal'];
+  const evidence = ['hosted_api_health', 'hosted_product_terminal', 'hosted_http_smoke_artifact'];
   const requiredSecrets: string[] = [];
 
   if (input.webUrl) evidence.push('hosted_web');
@@ -375,10 +380,11 @@ export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput):
         `GROCERYVIEW_SERVER_URL=${serverUrl}`,
         `METRICS_TOKEN=$${metricsTokenEnvVar}`,
         `READINESS_TIMEOUT_SECONDS=${timeout}`,
+        `HOSTED_READINESS_SMOKE_OUTPUT_PATH=${readinessEvidenceOutputPath}`,
         'infra/scripts/smoke-hosted-readiness.sh'
       ].join(' ')
     );
-    evidence.push('hosted_postgres_readiness');
+    evidence.push('hosted_postgres_readiness', 'hosted_postgres_readiness_artifact');
   }
 
   return { commands, requiredSecrets, evidence };
