@@ -338,6 +338,56 @@ describe('createHttpHandler', () => {
     assert.equal(plan.destructiveAction, false);
     assert.ok(plan.deleteFromTables.includes('receipt_uploads'));
     assert.deepEqual(plan.anonymizeTables, ['community_price_reports']);
+
+    const fulfillment = await handle(new Request('http://localhost/api/privacy/request-fulfillment?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({
+        slaDays: 30,
+        alertBeforeDays: 5,
+        requests: [
+          {
+            id: 'privacy-export-overdue',
+            userId: 'user-1',
+            type: 'data_export',
+            receivedAt: '2026-04-19T12:00:00.000Z',
+            status: 'in_progress'
+          },
+          {
+            id: 'privacy-delete-due-soon',
+            userId: 'user-1',
+            type: 'account_deletion',
+            receivedAt: '2026-04-25T12:00:00.000Z',
+            status: 'received'
+          }
+        ]
+      })
+    }));
+    assert.equal(fulfillment.status, 200);
+    const fulfillmentPlan = await json(fulfillment) as {
+      status: string;
+      overdueRequestIds: string[];
+      dueSoonRequestIds: string[];
+      items: Array<{ id: string; requiredAction: string; risk: string }>;
+    };
+    assert.equal(fulfillmentPlan.status, 'attention_required');
+    assert.deepEqual(fulfillmentPlan.overdueRequestIds, ['privacy-export-overdue']);
+    assert.deepEqual(fulfillmentPlan.dueSoonRequestIds, ['privacy-delete-due-soon']);
+    assert.deepEqual(fulfillmentPlan.items.map((item) => ({
+      id: item.id,
+      requiredAction: item.requiredAction,
+      risk: item.risk
+    })), [
+      { id: 'privacy-export-overdue', requiredAction: 'fulfill_export', risk: 'overdue' },
+      { id: 'privacy-delete-due-soon', requiredAction: 'fulfill_deletion', risk: 'due_soon' }
+    ]);
+
+    const crossUser = await handle(new Request('http://localhost/api/privacy/request-fulfillment?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({
+        requests: [{ id: 'other-user-request', userId: 'user-2', type: 'data_export', receivedAt: '2026-05-20T12:00:00.000Z', status: 'received' }]
+      })
+    }));
+    assert.equal(crossUser.status, 400);
   });
 
   it('writes and reads user-scoped household plans through protected proposal routes', async () => {

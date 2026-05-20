@@ -28,10 +28,14 @@ import {
   authorizeHumanReviewAction,
   buildPrivacyExport,
   planAccountDeletion,
+  planPrivacyRequestFulfillment,
   summarizeHumanReviewSla,
   type HumanReviewAssignment,
   type HumanReviewDecision,
-  type HumanReviewOperator
+  type HumanReviewOperator,
+  type PrivacyRequest,
+  type PrivacyRequestStatus,
+  type PrivacyRequestType
 } from '@groceryview/core';
 import {
   formatNotificationOperationsMetrics,
@@ -206,6 +210,30 @@ function requiredNumber(value: unknown, field: string): number {
   return parsed;
 }
 
+function optionalPositiveNumber(value: unknown, field: string, fallback: number): number {
+  if (value === undefined) return fallback;
+  const parsed = requiredNumber(value, field);
+  if (!Number.isFinite(parsed) || parsed <= 0) throw new Error(`${field} must be positive.`);
+  return parsed;
+}
+
+function optionalNonNegativeNumber(value: unknown, field: string, fallback: number): number {
+  if (value === undefined) return fallback;
+  const parsed = requiredNumber(value, field);
+  if (!Number.isFinite(parsed) || parsed < 0) throw new Error(`${field} must be non-negative.`);
+  return parsed;
+}
+
+function requiredPrivacyRequestType(value: unknown): PrivacyRequestType {
+  if (value === 'data_export' || value === 'account_deletion' || value === 'ad_data_opt_out') return value;
+  throw new Error('privacy request type must be data_export, account_deletion, or ad_data_opt_out.');
+}
+
+function requiredPrivacyRequestStatus(value: unknown): PrivacyRequestStatus {
+  if (value === 'received' || value === 'in_progress' || value === 'fulfilled' || value === 'rejected') return value;
+  throw new Error('privacy request status must be received, in_progress, fulfilled, or rejected.');
+}
+
 function optionalHumanReviewDecision(value: unknown): HumanReviewDecision | undefined {
   if (value === undefined) return undefined;
   if (value === 'approve' || value === 'reject' || value === 'needs_more_info') return value;
@@ -300,6 +328,20 @@ function householdPlanRequestFromBody(body: JsonRecord): HouseholdPlanRequest {
     }),
     sharedFavoriteStoreIds: optionalStringArray(body.sharedFavoriteStoreIds, 'sharedFavoriteStoreIds') ?? []
   };
+}
+
+function privacyRequestsFromBody(body: JsonRecord, userId: string): PrivacyRequest[] {
+  return requiredRecordArray(body.requests, 'requests').map((request, index) => {
+    const requestUserId = requiredString(request.userId, `requests[${index}].userId`);
+    if (requestUserId !== userId) throw new Error(`requests[${index}].userId must match requested user.`);
+    return {
+      id: requiredString(request.id, `requests[${index}].id`),
+      userId: requestUserId,
+      type: requiredPrivacyRequestType(request.type),
+      receivedAt: requiredIsoTimestamp(request.receivedAt, `requests[${index}].receivedAt`),
+      status: requiredPrivacyRequestStatus(request.status)
+    };
+  });
 }
 
 function userIdFrom(url: URL): string | Response {
@@ -955,6 +997,24 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'POST') return jsonResponse({ ...planAccountDeletion(user), destructiveAction: false, requiresReauthentication: true });
       }
 
+      if (path === '/api/privacy/request-fulfillment') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'POST') {
+          const body = await readJson(request);
+          return jsonResponse(
+            planPrivacyRequestFulfillment({
+              now: (authOptions.now ?? new Date()).toISOString(),
+              slaDays: optionalPositiveNumber(body.slaDays, 'slaDays', 30),
+              alertBeforeDays: optionalNonNegativeNumber(body.alertBeforeDays, 'alertBeforeDays', 5),
+              requests: privacyRequestsFromBody(body, user)
+            })
+          );
+        }
+      }
+
       if (path === '/api/scans/upload-url') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -1101,6 +1161,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       },
       '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
       '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
+      '/api/privacy/request-fulfillment': { post: protectedOperation('Classify privacy export, deletion, and ad opt-out requests by fulfillment deadline.') },
       '/api/scans/process': { post: protectedOperation('Process barcode or receipt scan payloads through configured providers and return review routing work.') },
       '/api/scans/upload-url': { post: protectedOperation('Create a private upload ticket for barcode or receipt scan payload storage.') },
       '/api/users/{userId}/favorite-stores': {
