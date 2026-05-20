@@ -75,4 +75,20 @@ describe('Next.js web scaffold', () => {
     assert.match(marketShell, /householdSavings\.weeklyTotal/);
     assert.match(marketShell, /Weekly basket tape/);
   });
+
+  it('surfaces Stockholm area coverage on the homepage', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+
+    const areaSection = demoData.split('export const stockholmAreas = ')[1] ?? '';
+    const areaSlugs = areaSection.match(/slug: '[^']+'/g) ?? [];
+
+    assert.ok(areaSlugs.length >= 7, 'homepage driver data should expose at least 7 Stockholm area rows');
+    assert.match(demoData, /slug: 'hagersten'/);
+    assert.match(demoData, /slug: 'stockholm-county'/);
+    assert.match(demoData, /topSavings: 'Rice'/);
+    assert.match(demoData, /topSavings: 'Pasta'/);
+    assert.match(marketShell, /stockholmAreas\.map/);
+    assert.match(marketShell, /Area coverage tape/);
+  });
 });

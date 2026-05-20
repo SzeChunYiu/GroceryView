@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { BarChart3, MapPin, ScanSearch, ShoppingBasket } from 'lucide-react';
-import { categories, householdSavings, products, stores, weeklyBasket } from '@/lib/demo-data';
+import { categories, householdSavings, products, stockholmAreas, stores, weeklyBasket } from '@/lib/demo-data';
 
 export function MarketShell() {
   return (
@@ -99,6 +99,26 @@ export function MarketShell() {
                 {store.district} · {store.bestCategory}
               </span>
             </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="border-b border-market-ink/10 px-4 py-3">
+          <h2 className="text-lg font-black">Area coverage tape</h2>
+          <p className="mt-1 text-sm text-market-ink/60">
+            District coverage stays visible so empty areas are clear before live connector data fills in.
+          </p>
+        </div>
+        <div className="grid gap-0 sm:grid-cols-2 lg:grid-cols-4">
+          {stockholmAreas.map((area) => (
+            <div key={area.slug} className="border-b border-market-ink/10 px-4 py-4 text-sm sm:border-r">
+              <span className="block font-bold">{area.name}</span>
+              <span className="mt-1 block text-market-ink/60">{area.storeCount} tracked stores</span>
+              <span className="mt-2 block text-xs font-bold uppercase text-market-ink/50">
+                Top savings: {area.topSavings}
+              </span>
+            </div>
           ))}
         </div>
       </section>

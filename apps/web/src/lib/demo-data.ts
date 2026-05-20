@@ -307,6 +307,8 @@ export const stockholmAreas = [
   { slug: 'norrmalm',   name: 'Norrmalm',   storeCount: 2, topSavings: 'Snacks' },
   { slug: 'sodermalm',  name: 'Södermalm',  storeCount: 1, topSavings: 'Dairy' },
   { slug: 'vasastan',   name: 'Vasastan',   storeCount: 2, topSavings: 'Coffee' },
+  { slug: 'hagersten',  name: 'Hägersten',  storeCount: 1, topSavings: 'Rice' },
+  { slug: 'stockholm-county', name: 'Stockholm County', storeCount: 1, topSavings: 'Pasta' },
   { slug: 'kungsholmen',name: 'Kungsholmen',storeCount: 0, topSavings: '—' },
   { slug: 'ostermalm',  name: 'Östermalm',  storeCount: 0, topSavings: '—' }
 ];
