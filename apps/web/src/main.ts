@@ -361,10 +361,11 @@ const myStoresBasketIndex = [
   { store: 'Coop Farsta', basketTotal: 811, indexValue: 105.6, confidence: 'Estimated' }
 ];
 
-const communityReports = [
-  { product: 'Zoégas Coffee 450g', report: 'Wrong price', evidence: 'Shelf photo', status: 'Needs review', trust: 'trusted reporter' },
-  { product: 'Arla Milk 1L', report: 'Out of stock', evidence: 'Receipt mismatch', status: 'Queued', trust: 'new reporter' },
-  { product: 'Butter 600g', report: 'Promo expired', evidence: 'Retailer page', status: 'Accepted', trust: 'verified history' }
+const storeMap = [
+  { name: 'Willys Odenplan', chain: 'Willys', format: 'Supermarket', district: 'Vasastan', latitude: 59.337, longitude: 18.049, radiusKm: 0.8, dealScore: 82 },
+  { name: 'Lidl Sveavägen', chain: 'Lidl', format: 'Discount', district: 'Vasastan', latitude: 59.342, longitude: 18.057, radiusKm: 1.2, dealScore: 76 },
+  { name: 'ICA Skanstull', chain: 'ICA', format: 'Supermarket', district: 'Sodermalm', latitude: 59.307, longitude: 18.076, radiusKm: 3.6, dealScore: 68 },
+  { name: 'Coop Fridhemsplan', chain: 'Coop', format: 'Supermarket', district: 'Kungsholmen', latitude: 59.332, longitude: 18.031, radiusKm: 2.1, dealScore: 64 }
 ];
 
 const app = document.querySelector<HTMLDivElement>('#app');
@@ -868,12 +869,21 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
-        <h2>Community price reports</h2>
-        <p class="lede">User-submitted price reports flow through a trust-ranked queue. Trusted reporters accelerate verification; new reporters require manual review before any price update.</p>
+        <h2>Store map filters</h2>
+        <p class="lede">Radius filter is for user convenience only. Distance never contributes to Deal Score. Favorite-store status is set by the household, not by proximity.</p>
+        <div class="store-map">
+          <div class="map-pin pin-1">${storeMap[0].name.split(' ')[0]} ${storeMap[0].dealScore}</div>
+          <div class="map-pin pin-2">${storeMap[1].name.split(' ')[0]} ${storeMap[1].dealScore}</div>
+          <div class="map-pin pin-3">${storeMap[2].name.split(' ')[0]} ${storeMap[2].dealScore}</div>
+          <div class="map-pin pin-4">${storeMap[3].name.split(' ')[0]} ${storeMap[3].dealScore}</div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Store coverage</h2>
         <table class="table">
-          <thead><tr><th>Product</th><th>Report type</th><th>Evidence</th><th>Status</th><th>Trust</th></tr></thead>
+          <thead><tr><th>Store</th><th>Chain</th><th>Format</th><th>District</th><th>Radius</th><th>Deal Score</th></tr></thead>
           <tbody>
-            ${communityReports.map((r) => `<tr><td>${r.product}</td><td>${r.report}</td><td>${r.evidence}</td><td><span class="status">${r.status}</span></td><td>${r.trust}</td></tr>`).join('')}
+            ${storeMap.map((store) => `<tr><td>${store.name}</td><td>${store.chain}</td><td>${store.format}</td><td>${store.district}</td><td>${store.radiusKm} km</td><td>${store.dealScore}</td></tr>`).join('')}
           </tbody>
         </table>
       </div>

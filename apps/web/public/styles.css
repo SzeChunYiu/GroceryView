@@ -65,4 +65,10 @@ th { color:#88a49c; font-size: 12px; text-transform: uppercase; letter-spacing: 
 .flow-panel button:hover, .flow-panel button:focus-visible { background: #7cf2ce; outline: 2px solid rgba(204,255,240,.5); outline-offset: 2px; }
 .flow-result { margin-top: 12px; color: #ccfff0; min-height: 24px; font-weight: 800; }
 .api-session { margin-top: 16px; }
+.store-map { position: relative; min-height: 280px; margin-top: 18px; border: 1px solid rgba(255,255,255,.1); border-radius: 18px; overflow: hidden; background: linear-gradient(135deg, rgba(255,255,255,.07), rgba(255,255,255,.02)), repeating-linear-gradient(0deg, transparent, transparent 34px, rgba(255,255,255,.05) 35px), repeating-linear-gradient(90deg, transparent, transparent 42px, rgba(255,255,255,.04) 43px); }
+.map-pin { position: absolute; display: inline-flex; align-items: center; justify-content: center; min-width: 54px; min-height: 36px; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(32,217,166,.45); background: rgba(10, 37, 47, .94); color: #ccfff0; font-size: 12px; font-weight: 800; box-shadow: 0 16px 32px rgba(0,0,0,.28); }
+.pin-1 { left: 42%; top: 28%; }
+.pin-2 { left: 58%; top: 22%; }
+.pin-3 { left: 68%; top: 64%; }
+.pin-4 { left: 24%; top: 42%; }
 @media (max-width: 800px) { .hero, .market, .grid, .quote-strip, .distribution-row { grid-template-columns: 1fr; } }
