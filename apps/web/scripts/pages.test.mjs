@@ -208,6 +208,15 @@ describe('buildStaticPages', () => {
       assert.match(store, /Store highlights/);
       assert.match(store, /Verified shelf/);
       assert.match(store, /Watchlist only/);
+      assert.match(store, /Connected store deals API/);
+      assert.match(store, /Load live store deals/);
+      assert.match(store, /data-groceryview-flow="store-deals"/);
+      assert.match(store, /data-flow-action="load-store-deals"/);
+      assert.match(store, /data-store-deals-leader/);
+      assert.match(store, /data-store-deals-count/);
+      assert.match(store, /data-store-deals-verdict/);
+      assert.match(store, /fetch\(apiUrl\('\/api\/stores\/' \+ encodeURIComponent\(storeId\) \+ '\/deals'/);
+      assert.match(store, /Connected store deals loaded/);
 
       const storeComparison = await readFile(join(root, 'stores/compare/index.html'), 'utf8');
       assert.match(storeComparison, /Compare Stockholm stores/);
