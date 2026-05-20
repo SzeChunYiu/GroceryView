@@ -450,85 +450,64 @@ export function buildRollbackPlan(input: RollbackPlanInput): RollbackPlan {
   };
 }
 
-export type DeploymentManifestService = {
-  name?: unknown;
-  type?: unknown;
-  workspace?: unknown;
-  startCommand?: unknown;
-  buildCommand?: unknown;
-  outputDirectory?: unknown;
-  healthCheck?: unknown;
-  requiredEnv?: unknown;
+export type PartnerApiTier = 'trial' | 'growth' | 'enterprise';
+export type PartnerApiExportFormat = 'json' | 'csv' | 'parquet';
+
+export type PartnerApiAccessInput = {
+  tier: PartnerApiTier;
+  partnerName: string;
+  issuedApiKeys: number;
+  rateLimitPerMinute: number;
+  allowedExportFormats: PartnerApiExportFormat[];
+  includesPriceProvenance: boolean;
+  includesRegionalAggregates: boolean;
+  includesCategoryIndices: boolean;
+  dataLatencyMinutes: number;
+  signedDataProcessingAgreement: boolean;
 };
 
-export type DeploymentManifest = {
-  version?: unknown;
-  services?: unknown;
-};
-
-export type DeploymentManifestValidationReport = {
+export type PartnerApiAccessPlan = {
   status: 'ready' | 'blocked';
+  tier: PartnerApiTier;
+  partnerName: string;
+  rateLimitPerMinute: number;
+  enabledCapabilities: string[];
+  exportFormats: PartnerApiExportFormat[];
   blockers: string[];
-  warnings: string[];
-  serviceNames: string[];
+  summary: string;
 };
 
-type HealthCheckShape = {
-  path?: unknown;
-  expectedStatus?: unknown;
+const minimumRateLimitByTier: Record<PartnerApiTier, number> = {
+  trial: 60,
+  growth: 300,
+  enterprise: 1200
 };
 
-export function validateDeploymentManifest(manifest: DeploymentManifest): DeploymentManifestValidationReport {
+export function buildPartnerApiAccessPlan(input: PartnerApiAccessInput): PartnerApiAccessPlan {
   const blockers: string[] = [];
-  const warnings: string[] = [];
-  const serviceNames: string[] = [];
+  const enabledCapabilities: string[] = [];
 
-  if (manifest.version !== 1) blockers.push('manifest_version_not_supported');
-  if (!Array.isArray(manifest.services) || manifest.services.length === 0) {
-    blockers.push('services_missing');
-    return { status: 'blocked', blockers, warnings, serviceNames };
-  }
+  if (input.issuedApiKeys < 1) blockers.push('api_keys_not_issued');
+  if (input.rateLimitPerMinute < minimumRateLimitByTier[input.tier]) blockers.push(`rate_limit_below_${input.tier}_minimum`);
+  if (input.allowedExportFormats.length === 0) blockers.push('no_export_formats_enabled');
+  if (!input.includesPriceProvenance) blockers.push('price_provenance_not_included');
+  if (!input.signedDataProcessingAgreement) blockers.push('data_processing_agreement_not_signed');
+  if (input.dataLatencyMinutes > 1440) blockers.push('data_latency_above_daily_sla');
 
-  const seenNames = new Set<string>();
-  for (const [index, rawService] of manifest.services.entries()) {
-    const service = rawService as DeploymentManifestService;
-    const name = typeof service.name === 'string' && service.name.trim().length > 0 ? service.name : `service_${index}`;
-    if (name === `service_${index}`) blockers.push(`service_name_missing:${index}`);
-    if (seenNames.has(name)) blockers.push(`duplicate_service:${name}`);
-    seenNames.add(name);
-    serviceNames.push(name);
-
-    if (typeof service.workspace !== 'string' || !service.workspace.startsWith('@groceryview/')) {
-      blockers.push(`workspace_invalid:${name}`);
-    }
-    if (typeof service.type !== 'string' || service.type.trim().length === 0) blockers.push(`service_type_missing:${name}`);
-
-    const healthCheck = service.healthCheck as HealthCheckShape | undefined;
-    if (!healthCheck || typeof healthCheck.path !== 'string' || !healthCheck.path.startsWith('/')) {
-      blockers.push(`health_check_path_invalid:${name}`);
-    }
-    if (!healthCheck || typeof healthCheck.expectedStatus !== 'number' || healthCheck.expectedStatus < 200 || healthCheck.expectedStatus > 399) {
-      blockers.push(`health_check_status_invalid:${name}`);
-    }
-
-    if (!Array.isArray(service.requiredEnv) || !service.requiredEnv.every((envVar) => typeof envVar === 'string' && /^[A-Z][A-Z0-9_]*$/.test(envVar))) {
-      blockers.push(`required_env_invalid:${name}`);
-    }
-
-    if (service.type === 'node-http' && (typeof service.startCommand !== 'string' || service.startCommand.trim().length === 0)) {
-      blockers.push(`start_command_missing:${name}`);
-    }
-    if (service.type === 'static-site') {
-      if (typeof service.buildCommand !== 'string' || service.buildCommand.trim().length === 0) blockers.push(`build_command_missing:${name}`);
-      if (typeof service.outputDirectory !== 'string' || service.outputDirectory.trim().length === 0) blockers.push(`output_directory_missing:${name}`);
-    }
-    if (Array.isArray(service.requiredEnv) && service.requiredEnv.length === 0) warnings.push(`no_required_env:${name}`);
-  }
+  if (input.includesPriceProvenance) enabledCapabilities.push('price_provenance');
+  if (input.includesRegionalAggregates) enabledCapabilities.push('regional_aggregates');
+  if (input.includesCategoryIndices) enabledCapabilities.push('category_indices');
+  if (input.dataLatencyMinutes <= 60) enabledCapabilities.push('hourly_refresh');
+  if (input.dataLatencyMinutes <= 1440) enabledCapabilities.push('daily_refresh');
 
   return {
     status: blockers.length === 0 ? 'ready' : 'blocked',
+    tier: input.tier,
+    partnerName: input.partnerName,
+    rateLimitPerMinute: input.rateLimitPerMinute,
+    enabledCapabilities,
+    exportFormats: [...input.allowedExportFormats].sort(),
     blockers,
-    warnings,
-    serviceNames
+    summary: blockers.length === 0 ? 'Partner API access is ready.' : 'Partner API access is blocked until required controls pass.'
   };
 }
