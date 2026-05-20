@@ -20,6 +20,7 @@ from .models import (
     ObservationFreshnessSummary,
     OpenPricesPullPlan,
     PriceObservationRow,
+    PriceObservationMixSummary,
     PriceProvenance,
     ProductSeed,
     QualityCheckSummary,
@@ -338,6 +339,25 @@ def build_observation_coverage_summary(
     )
 
 
+def _count_values(values: Iterable[str]) -> dict[str, int]:
+    counts: dict[str, int] = defaultdict(int)
+    for value in values:
+        counts[value] += 1
+    return dict(sorted(counts.items()))
+
+
+def build_price_observation_mix_summary(observations: Iterable[PriceObservationRow]) -> PriceObservationMixSummary:
+    observation_list = list(observations)
+    return PriceObservationMixSummary(
+        observation_count=len(observation_list),
+        price_types=_count_values(observation.price_type for observation in observation_list),
+        confidence_labels=_count_values(observation.confidence_label for observation in observation_list),
+        source_types=_count_values(observation.source_type for observation in observation_list),
+        member_only_count=sum(1 for observation in observation_list if observation.member_only),
+        promotion_count=sum(1 for observation in observation_list if observation.price_type == "promotion"),
+    )
+
+
 def clamp_confidence(confidence: float) -> float:
     if confidence < 0:
         return 0
@@ -467,4 +487,17 @@ def price_observation_coverage(
         for observation in price_observations
     ]
     summary = build_observation_coverage_summary(observations, stores, products)
+    return summary.to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
+def price_observation_mix(price_observations: list[dict[str, object]]) -> dict[str, object]:
+    observations = [
+        PriceObservationRow(
+            provenance=PriceProvenance(**observation["provenance"]),
+            **{key: value for key, value in observation.items() if key != "provenance"},
+        )
+        for observation in price_observations
+    ]
+    summary = build_price_observation_mix_summary(observations)
     return summary.to_dict()

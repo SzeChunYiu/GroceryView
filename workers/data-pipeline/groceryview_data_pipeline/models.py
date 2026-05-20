@@ -210,6 +210,20 @@ class ObservationCoverageSummary:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class PriceObservationMixSummary:
+    observation_count: int
+    price_types: dict[str, int]
+    confidence_labels: dict[str, int]
+    source_types: dict[str, int]
+    member_only_count: int
+    promotion_count: int
+    demo: bool = True
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
 def utc_now() -> str:
     return datetime.now(tz=timezone.utc).isoformat()
 

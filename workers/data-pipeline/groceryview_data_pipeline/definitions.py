@@ -6,6 +6,7 @@ from .assets import (
     open_prices_real_pull_plan,
     price_observation_coverage,
     price_observation_freshness,
+    price_observation_mix,
     price_observations,
     quality_checks,
     retailer_fetch_stubs,
@@ -25,5 +26,6 @@ defs = Definitions(
         price_observation_freshness,
         open_prices_real_pull_plan,
         price_observation_coverage,
+        price_observation_mix,
     ]
 )
