@@ -1,51 +1,27 @@
 {
-  "name": "api",
-  "version": "0.0.1",
-  "private": true,
+  "name": "@groceryview/api-app",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/main.js",
   "scripts": {
-    "build": "nest build",
-    "lint": "eslint \"{src,test}/**/*.ts\" --max-warnings=0",
-    "test": "jest --runInBand",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "build": "npm run build -w @groceryview/core && npm run build -w @groceryview/api && tsc -p tsconfig.build.json",
+    "test": "npm run build && tsc -p tsconfig.test.json && node --test dist-test/test/*.js"
   },
   "dependencies": {
-    "@groceryview/api-contracts": "0.0.0",
-    "@nestjs/common": "^11.0.1",
-    "@nestjs/config": "^4.0.4",
-    "@nestjs/core": "^11.0.1",
-    "@nestjs/platform-express": "^11.1.21",
-    "@nestjs/swagger": "^11.4.3",
+    "@groceryview/api": "0.1.0",
+    "@nestjs/common": "^11.1.9",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.1.9",
+    "@nestjs/platform-express": "^11.1.9",
+    "@nestjs/swagger": "^11.2.3",
     "class-transformer": "^0.5.1",
-    "class-validator": "^0.14.4",
+    "class-validator": "^0.14.3",
     "reflect-metadata": "^0.2.2",
-    "rxjs": "^7.8.2",
-    "zod": "^4.4.3"
+    "rxjs": "^7.8.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.18.0",
-    "@nestjs/cli": "^11.0.0",
-    "@nestjs/testing": "^11.0.1",
-    "@types/jest": "^30.0.0",
-    "@types/node": "^24.0.0",
-    "@types/supertest": "^7.0.0",
-    "eslint": "^9.18.0",
-    "globals": "^17.0.0",
-    "jest": "^30.0.0",
-    "prettier": "^3.4.2",
-    "supertest": "^7.0.0",
-    "ts-jest": "^29.2.5",
-    "ts-loader": "^9.5.2",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.7.3",
-    "typescript-eslint": "^8.20.0"
-  },
-  "jest": {
-    "moduleFileExtensions": ["js", "json", "ts"],
-    "rootDir": ".",
-    "testRegex": ".*\\.e2e-spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": ["ts-jest", { "tsconfig": "tsconfig.json" }]
-    },
-    "testEnvironment": "node"
+    "@nestjs/testing": "^11.1.9",
+    "@types/supertest": "^6.0.3",
+    "supertest": "^7.1.4"
   }
 }
