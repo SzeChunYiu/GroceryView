@@ -4,6 +4,7 @@ import {
   POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS,
   POSTGRES_INTEGRATION_REQUIRED_TABLES,
   buildPostgresIntegrationReadinessReport,
+  buildPostgresRepositorySmokeProbes,
   checkPostgresIntegrationReadiness,
   collectPostgresIntegrationProbe,
   type QueryExecutor
@@ -40,6 +41,49 @@ class MissingSchemaMigrationsExecutor extends ProbeQueryExecutor {
       return [{ ok: 1 }] as T[];
     }
     throw new Error('probe failed');
+  }
+}
+
+class RepositorySmokeQueryExecutor implements QueryExecutor {
+  calls: Array<{ sql: string; params: unknown[] }> = [];
+
+  constructor(private readonly readable = true) {}
+
+  async query<T>(sql: string, params: unknown[] = []) {
+    this.calls.push({ sql, params });
+    if (!this.readable) return [] as T[];
+    if (sql.includes('select weekly_budget')) {
+      return [{ weekly_budget: '1000', monthly_budget: '4000' }] as T[];
+    }
+    if (sql.includes('from human_review_assignments')) {
+      return [
+        {
+          id: 'postgres-probe-assignment-run-42',
+          review_id: 'postgres-probe-assignment-run-42',
+          subject_type: 'product_match',
+          subject_id: 'postgres-probe-match-run-42',
+          priority: 'low',
+          reason: 'PostgreSQL integration smoke probe.',
+          assignee_id: 'postgres-probe-reviewer-run-42',
+          assigned_at: '2026-05-20T00:00:00.000Z',
+          due_at: '2026-05-20T00:00:00.000Z',
+          status: 'assigned'
+        }
+      ] as T[];
+    }
+    if (sql.includes('from notification_suppressions')) {
+      return [
+        {
+          id: 'postgres-probe-suppression-run-42',
+          recipient: 'postgres-probe-user-run-42@example.invalid',
+          channel: 'email',
+          reason: 'unsubscribed',
+          active: true,
+          updated_at: '2026-05-20T00:00:00.000Z'
+        }
+      ] as T[];
+    }
+    return [] as T[];
   }
 }
 
@@ -217,5 +261,41 @@ describe('checkPostgresIntegrationReadiness', () => {
     ]);
     assert.match(report.blockers.join('\n'), /missing_table:notification_suppressions/);
     assert.match(report.blockers.join('\n'), /repository_check_fail:suppression_read_probe/);
+  });
+});
+
+describe('buildPostgresRepositorySmokeProbes', () => {
+  it('builds destructive-safe repository read/write probes with sanitized ids', async () => {
+    const executor = new RepositorySmokeQueryExecutor();
+    const probes = buildPostgresRepositorySmokeProbes({
+      runId: 'run/42',
+      now: '2026-05-20T00:00:00.000Z'
+    });
+
+    assert.deepEqual(probes.map((probe) => probe.name), [
+      'user_budget_round_trip',
+      'human_review_assignment_round_trip',
+      'notification_suppression_round_trip'
+    ]);
+
+    for (const probe of probes) {
+      await probe.run(executor);
+    }
+
+    assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-user-run-42')), true);
+    assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-assignment-run-42')), true);
+    assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-suppression-run-42')), true);
+  });
+
+  it('fails closed when a smoke probe cannot read back its write', async () => {
+    const probes = buildPostgresRepositorySmokeProbes({
+      runId: 'run-42',
+      now: '2026-05-20T00:00:00.000Z'
+    });
+
+    await assert.rejects(
+      () => probes[0]!.run(new RepositorySmokeQueryExecutor(false)),
+      /user budget round trip did not return the written values/
+    );
   });
 });
