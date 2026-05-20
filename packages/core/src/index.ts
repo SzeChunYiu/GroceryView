@@ -163,6 +163,68 @@ export type StoreBasketCoverageSummary = {
   fullCoverageStoreIds: string[];
 };
 
+export type LocalOfferSourceType = 'shelf' | 'online' | 'flyer' | 'member' | 'receipt' | 'shelf_photo' | 'manual' | 'estimated';
+
+export type LocalOfferBasketItem = {
+  productId: string;
+  quantity: number;
+  baselineUnitPrice?: number;
+};
+
+export type LocalOffer = {
+  productId: string;
+  storeId: string;
+  storeName: string;
+  unitPrice: number;
+  observedAt: string;
+  sourceType: LocalOfferSourceType;
+  confidence: number;
+  available?: boolean;
+  distanceKm?: number;
+};
+
+export type LocalOfferBasketInput = {
+  items: LocalOfferBasketItem[];
+  offers: LocalOffer[];
+  storeIds?: string[];
+  asOf: string;
+  staleAfterHours?: number;
+};
+
+export type LocalOfferBasketLine = {
+  productId: string;
+  quantity: number;
+  unitPrice: number;
+  lineTotal: number;
+  sourceType: LocalOfferSourceType;
+  confidence: number;
+  observedAt: string;
+  stale: boolean;
+};
+
+export type LocalOfferStoreSummary = {
+  storeId: string;
+  storeName: string;
+  subtotal: number;
+  matchedProductIds: string[];
+  missingProductIds: string[];
+  unavailableProductIds: string[];
+  staleProductIds: string[];
+  coveragePercent: number;
+  averageConfidence: number;
+  confidenceLabel: 'high' | 'medium' | 'low';
+  freshnessLabel: 'fresh' | 'mixed' | 'stale';
+  sourceTypes: LocalOfferSourceType[];
+  lines: LocalOfferBasketLine[];
+  savingsVsBaseline?: number;
+};
+
+export type LocalOfferBasketSummary = {
+  stores: LocalOfferStoreSummary[];
+  bestStore?: LocalOfferStoreSummary;
+  baselineTotal?: number;
+};
+
 export function compareBasketStrategies(input: BasketComparisonInput): BasketComparisonResult {
   const favoriteSet = new Set(input.favoriteStoreIds);
   const missingProductIds: string[] = [];
@@ -268,6 +330,106 @@ export function summarizeStoreBasketCoverage(input: BasketComparisonInput): Stor
     fullCoverageStoreIds: stores
       .filter((coverage) => coverage.missingProductIds.length === 0)
       .map((coverage) => coverage.storeId)
+  };
+}
+
+export function summarizeLocalOfferBasket(input: LocalOfferBasketInput): LocalOfferBasketSummary {
+  const asOf = Date.parse(input.asOf);
+  if (Number.isNaN(asOf)) throw new Error('asOf must be an ISO date.');
+  const staleAfterMs = (input.staleAfterHours ?? 48) * 60 * 60 * 1000;
+  if (staleAfterMs < 0) throw new Error('staleAfterHours must be non-negative.');
+
+  const itemById = new Map(input.items.map((item) => [item.productId, item]));
+  const storeIds = input.storeIds ?? [...new Set(input.offers.map((offer) => offer.storeId))];
+  const baselineTotal = input.items.every((item) => item.baselineUnitPrice !== undefined)
+    ? roundMoney(input.items.reduce((sum, item) => sum + (item.baselineUnitPrice ?? 0) * item.quantity, 0))
+    : undefined;
+
+  const offersByStoreProduct = new Map<string, LocalOffer[]>();
+  for (const offer of input.offers) {
+    if (!itemById.has(offer.productId)) continue;
+    if (input.storeIds && !storeIds.includes(offer.storeId)) continue;
+    if (offer.unitPrice < 0) throw new Error('Local offer unit prices must be non-negative.');
+    if (Number.isNaN(Date.parse(offer.observedAt))) throw new Error('Local offer observedAt must be an ISO date.');
+    const key = `${offer.storeId}\u0000${offer.productId}`;
+    offersByStoreProduct.set(key, [...(offersByStoreProduct.get(key) ?? []), offer]);
+  }
+
+  const stores = storeIds.map((storeId) => {
+    const storeOffers = input.offers.filter((offer) => offer.storeId === storeId);
+    const storeName = storeOffers[0]?.storeName ?? storeNameFromId(storeId);
+    const lines: LocalOfferBasketLine[] = [];
+    const missingProductIds: string[] = [];
+    const unavailableProductIds: string[] = [];
+
+    for (const item of input.items) {
+      const offers = offersByStoreProduct.get(`${storeId}\u0000${item.productId}`) ?? [];
+      const availableOffers = offers.filter((offer) => offer.available !== false);
+      if (availableOffers.length === 0) {
+        if (offers.some((offer) => offer.available === false)) {
+          unavailableProductIds.push(item.productId);
+        } else {
+          missingProductIds.push(item.productId);
+        }
+        continue;
+      }
+
+      const bestOffer = availableOffers.reduce((best, candidate) => {
+        if (candidate.unitPrice !== best.unitPrice) return candidate.unitPrice < best.unitPrice ? candidate : best;
+        return candidate.confidence > best.confidence ? candidate : best;
+      });
+      const observedAtMs = Date.parse(bestOffer.observedAt);
+      lines.push({
+        productId: item.productId,
+        quantity: item.quantity,
+        unitPrice: roundMoney(bestOffer.unitPrice),
+        lineTotal: roundMoney(bestOffer.unitPrice * item.quantity),
+        sourceType: bestOffer.sourceType,
+        confidence: clamp(bestOffer.confidence, 0, 1),
+        observedAt: bestOffer.observedAt,
+        stale: asOf - observedAtMs > staleAfterMs
+      });
+    }
+
+    const subtotal = roundMoney(lines.reduce((sum, line) => sum + line.lineTotal, 0));
+    const averageConfidence = lines.length === 0
+      ? 0
+      : roundMoney(lines.reduce((sum, line) => sum + line.confidence, 0) / lines.length);
+    const staleProductIds = lines.filter((line) => line.stale).map((line) => line.productId);
+    const sourceTypes = [...new Set(lines.map((line) => line.sourceType))].sort();
+    const coveragePercent = input.items.length === 0 ? 100 : roundMoney((lines.length / input.items.length) * 100);
+
+    return {
+      storeId,
+      storeName,
+      subtotal,
+      matchedProductIds: lines.map((line) => line.productId),
+      missingProductIds,
+      unavailableProductIds,
+      staleProductIds,
+      coveragePercent,
+      averageConfidence,
+      confidenceLabel: averageConfidence >= 0.8 ? 'high' : averageConfidence >= 0.5 ? 'medium' : 'low',
+      freshnessLabel: lines.length === 0
+        ? 'stale'
+        : staleProductIds.length === 0
+          ? 'fresh'
+          : staleProductIds.length === lines.length ? 'stale' : 'mixed',
+      sourceTypes,
+      lines,
+      savingsVsBaseline: baselineTotal === undefined || coveragePercent < 100 ? undefined : roundMoney(baselineTotal - subtotal)
+    } satisfies LocalOfferStoreSummary;
+  }).sort((a, b) => {
+    if (b.coveragePercent !== a.coveragePercent) return b.coveragePercent - a.coveragePercent;
+    if (a.subtotal !== b.subtotal) return a.subtotal - b.subtotal;
+    if (b.averageConfidence !== a.averageConfidence) return b.averageConfidence - a.averageConfidence;
+    return a.storeName.localeCompare(b.storeName);
+  });
+
+  return {
+    stores,
+    bestStore: stores[0],
+    baselineTotal
   };
 }
 
