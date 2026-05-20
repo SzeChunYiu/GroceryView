@@ -77,6 +77,27 @@ describe('createGroceryViewApi', () => {
     assert.ok(market.topDeals.length >= 3);
     assert.equal(market.indices[0].id, 'stockholm-grocery-index');
     assert.deepEqual(
+      market.movers.find((mover) => mover.productId === 'coffee'),
+      {
+        productId: 'coffee',
+        ticker: 'ZOEGAS-COFFEE-450G',
+        productName: 'Zoégas Coffee 450g',
+        currentPrice: 49.9,
+        bestStoreId: 'willys-odenplan',
+        bestStoreName: 'Willys Odenplan',
+        oneMonthMovePercent: -16.7,
+        range52Week: { low: 49.9, high: 69.9 },
+        range52WeekPositionPercent: 0,
+        stockholmMedianGap: -10,
+        historyPoints: 3,
+        verifiedHistoryPoints: 3
+      }
+    );
+    assert.deepEqual(
+      market.movers.find((mover) => mover.productId === 'milk')?.range52Week,
+      { low: 13.9, high: 16.9 }
+    );
+    assert.deepEqual(
       market.topDeals.find((deal) => deal.productId === 'milk'),
       {
         productId: 'milk',
@@ -97,6 +118,184 @@ describe('createGroceryViewApi', () => {
       ['lidl-sveavagen', 'willys-odenplan']
     );
     assert.equal(detail?.dealScore, 73);
+  });
+
+  it('serves nutrition-per-krona value rows for customer value comparisons', () => {
+    const api = createGroceryViewApi();
+
+    const report = api.getNutritionValueReport('protein');
+
+    assert.equal(report.metric, 'protein');
+    assert.equal(report.currency, 'SEK');
+    assert.equal(report.rows.length, 3);
+    assert.deepEqual(report.rows.map((row) => row.productId), ['chicken', 'eggs', 'yogurt']);
+    assert.deepEqual(report.leader, {
+      productId: 'chicken',
+      name: 'Chicken thighs',
+      valuePer10Sek: 22.89,
+      saltWarning: true
+    });
+    assert.match(report.guardrails[0], /nutrition labels cannot override allergen locks/i);
+  });
+
+  it('serves pantry replenishment plans with live deal and basket duplicate context', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+
+    const plan = api.getPantryReplenishment('user-1', '2026-05-20T08:00:00.000Z');
+
+    assert.equal(plan.householdId, 'user-1');
+    assert.deepEqual(
+      plan.statuses.map((item) => ({ productId: item.productId, status: item.status, remainingQuantity: item.remainingQuantity })),
+      [
+        { productId: 'coffee', status: 'low_stock', remainingQuantity: 0.5 },
+        { productId: 'milk', status: 'expiring_soon', remainingQuantity: 1 },
+        { productId: 'butter', status: 'in_stock', remainingQuantity: 1 }
+      ]
+    );
+    assert.deepEqual(plan.expiringSoonProductIds, ['milk']);
+    assert.deepEqual(plan.replenishment.map((item) => ({
+      productId: item.productId,
+      alreadyInBasket: item.alreadyInBasket,
+      bestDeal: item.bestDeal && { storeId: item.bestDeal.storeId, price: item.bestDeal.price }
+    })), [
+      { productId: 'coffee', alreadyInBasket: true, bestDeal: { storeId: 'willys-odenplan', price: 49.9 } }
+    ]);
+  });
+
+  it('serves account-scoped loyalty offers with savings and action requirements', () => {
+    const api = createGroceryViewApi();
+
+    const report = api.getLoyaltyOfferReport('user-1');
+
+    assert.equal(report.userId, 'user-1');
+    assert.equal(report.totalEligibleSavings, 26);
+    assert.equal(report.requiresActionCount, 1);
+    assert.equal(report.membershipRequiredCount, 1);
+    assert.deepEqual(report.offers.map((offer) => ({
+      productId: offer.productId,
+      chain: offer.chain,
+      savings: offer.savings,
+      status: offer.status,
+      actionRequired: offer.actionRequired
+    })), [
+      { productId: 'coffee', chain: 'ica', savings: 7, status: 'eligible', actionRequired: false },
+      { productId: 'milk', chain: 'coop', savings: 12, status: 'needs_coupon', actionRequired: true },
+      { productId: 'private-label-milk', chain: 'willys', savings: 7, status: 'eligible', actionRequired: false }
+    ]);
+    assert.match(report.guardrails[0], /member-only savings never overwrite verified public shelf evidence/i);
+  });
+
+  it('serves ad disclosure reports with premium removal and ranking separation guardrails', () => {
+    const api = createGroceryViewApi();
+
+    const freeReport = api.getAdDisclosureReport('user-1');
+
+    assert.equal(freeReport.userId, 'user-1');
+    assert.equal(freeReport.userTier, 'free');
+    assert.equal(freeReport.placementPlan.slots.length, 2);
+    assert.equal(freeReport.premiumAdsRemoved, false);
+    assert.equal(freeReport.affectsDealScore, false);
+    assert.equal(freeReport.allowedCount, 2);
+    assert.equal(freeReport.blockedCount, 2);
+    assert.deepEqual(freeReport.excludedSurfaces, ['deal_score', 'checkout_decision', 'basket_optimizer']);
+    assert.match(freeReport.guardrails[0], /Sponsored placements cannot change Deal Score/i);
+
+    api.upsertSubscriptionEntitlement('premium-user', {
+      tier: 'premium',
+      plan: 'premium_monthly',
+      status: 'active',
+      currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
+      updatedAt: '2026-05-20T00:00:00.000Z'
+    });
+
+    const premiumReport = api.getAdDisclosureReport('premium-user');
+    assert.equal(premiumReport.userTier, 'premium');
+    assert.equal(premiumReport.placementPlan.slots.length, 0);
+    assert.equal(premiumReport.premiumAdsRemoved, true);
+    assert.equal(premiumReport.allowedCount, 0);
+    assert.equal(premiumReport.blockedCount, 4);
+  });
+
+  it('serves notification inbox reports from watchlist alerts plus delivery guardrails', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addWatchlistItem('user-1', {
+      productId: 'coffee',
+      targetPrice: 50,
+      alertDealScoreAt: 80,
+      favoriteStoresOnly: true
+    });
+
+    const report = api.getNotificationInboxReport('user-1');
+
+    assert.equal(report.userId, 'user-1');
+    assert.equal(report.trackedItemCount, 1);
+    assert.equal(report.activeAlertCount, 3);
+    assert.equal(report.deliveredCount, 3);
+    assert.equal(report.heldCount, 1);
+    assert.equal(report.suppressedCount, 1);
+    assert.deepEqual(report.summary, {
+      delivered: 3,
+      held: 1,
+      suppressed: 1,
+      total: 5
+    });
+    assert.match(report.queue[0]?.title ?? '', /Zoégas Coffee 450g/);
+    assert.match(report.queue.find((item) => item.status === 'held')?.reason ?? '', /Quiet hours/i);
+    assert.match(report.queue.find((item) => item.status === 'suppressed')?.reason ?? '', /Provider token invalid/i);
+    assert.match(report.guardrails[0], /Estimated prices never generate household alerts/i);
+  });
+
+  it('serves receipt review reports with budget actuals, match confidence, and writeback guardrails', () => {
+    const api = createGroceryViewApi();
+
+    const report = api.getReceiptReviewReport('user-1');
+
+    assert.equal(report.userId, 'user-1');
+    assert.equal(report.lineCount, 3);
+    assert.equal(report.matchedCount, 2);
+    assert.equal(report.needsReviewCount, 2);
+    assert.equal(report.review.budget.afterReceiptSpend, 762);
+    assert.equal(report.review.budget.remaining, 38);
+    assert.equal(report.review.comparedWithLocalMedianDelta, 3);
+    assert.deepEqual(report.review.goodBuys.map((item) => item.productId), ['coffee']);
+    assert.deepEqual(report.review.overspend.map((item) => [item.productId, item.deltaVsMedian]), [['cheese', 18]]);
+    assert.match(report.guardrails[0], /Low confidence.*cannot update catalog or Deal Score/i);
+  });
+
+  it('serves category market reports with terminal-style mover evidence', () => {
+    const api = createGroceryViewApi();
+
+    const coffee = api.getCategoryMarket('coffee');
+
+    assert.equal(coffee?.category, 'coffee');
+    assert.equal(coffee?.city, 'Stockholm');
+    assert.equal(coffee?.productCount, 1);
+    assert.equal(coffee?.topDeal?.productId, 'coffee');
+    assert.deepEqual(coffee?.rows.map((row) => ({
+      productId: row.productId,
+      currentPrice: row.currentPrice,
+      dealScore: row.dealScore,
+      oneMonthMovePercent: row.oneMonthMovePercent,
+      range52WeekPositionPercent: row.range52WeekPositionPercent,
+      stockholmMedianGap: row.stockholmMedianGap,
+      verifiedHistoryPoints: row.verifiedHistoryPoints
+    })), [
+      {
+        productId: 'coffee',
+        currentPrice: 49.9,
+        dealScore: 82,
+        oneMonthMovePercent: -16.7,
+        range52WeekPositionPercent: 0,
+        stockholmMedianGap: -10,
+        verifiedHistoryPoints: 3
+      }
+    ]);
+    assert.match(coffee?.rows[0]?.customerRead ?? '', /49\.90 SEK at Willys Odenplan/);
+    assert.match(coffee?.guardrails[0] ?? '', /verified category rows/i);
+    assert.equal(api.getCategoryMarket('missing-category'), null);
   });
 
   it('returns cheapest product prices first and uses the cheapest quote for watchlist alerts', () => {
@@ -137,6 +336,7 @@ describe('createGroceryViewApi', () => {
       willysDeals.map((deal) => ({ productId: deal.productId, storeId: deal.storeId, dealScore: deal.dealScore })),
       [
         { productId: 'coffee', storeId: 'willys-odenplan', dealScore: 82 },
+        { productId: 'private-label-milk', storeId: 'willys-odenplan', dealScore: 73 },
         { productId: 'milk', storeId: 'willys-odenplan', dealScore: 73 },
         { productId: 'butter', storeId: 'willys-odenplan', dealScore: 40 }
       ]
@@ -176,6 +376,7 @@ describe('createGroceryViewApi', () => {
     assert.equal(terminal?.chart.series[0].lineStyle, 'solid');
     assert.deepEqual(terminal?.chart.series[0].points.map((point) => point.value), [69.9, 59.9, 49.9]);
     assert.equal(terminal?.historySummary?.isNewLow, true);
+    assert.deepEqual(api.getProductPriceTerminal('milk')?.quote.range52Week, { low: 13.9, high: 16.9 });
     assert.deepEqual(terminal?.evidenceGuardrails, [
       'Verified shelf or retailer-page prices can power current quote, Deal Score, and basket totals.',
       'Member, promotion, estimated, and low-confidence rows must stay explicitly labeled before customer action.',
@@ -216,6 +417,15 @@ describe('createGroceryViewApi', () => {
 
     assert.deepEqual(api.getProductEquivalents('milk'), [
       {
+        productId: 'private-label-milk',
+        productName: 'Garant Milk 1L',
+        category: 'dairy',
+        bestPrice: 12.9,
+        bestStoreId: 'willys-odenplan',
+        dealScore: 73,
+        reason: 'Same dairy category with comparable current price evidence.'
+      },
+      {
         productId: 'butter',
         productName: 'Butter 600g',
         category: 'dairy',
@@ -232,12 +442,12 @@ describe('createGroceryViewApi', () => {
   it('builds a price freshness report with stale backfill actions', () => {
     const api = createGroceryViewApi();
 
-    assert.deepEqual(api.getPriceFreshnessReport('2026-05-20').summary, { fresh: 3, aging: 0, stale: 0 });
+    assert.deepEqual(api.getPriceFreshnessReport('2026-05-20').summary, { fresh: 4, aging: 0, stale: 0 });
 
     const report = api.getPriceFreshnessReport('2026-06-03T00:00:00.000Z');
     assert.deepEqual(report.thresholds, { agingAfterDays: 7, staleAfterDays: 14 });
-    assert.deepEqual(report.summary, { fresh: 0, aging: 0, stale: 3 });
-    assert.deepEqual(report.backfillProductIds, ['butter', 'coffee', 'milk']);
+    assert.deepEqual(report.summary, { fresh: 0, aging: 0, stale: 4 });
+    assert.deepEqual(report.backfillProductIds, ['butter', 'coffee', 'milk', 'private-label-milk']);
     assert.deepEqual(
       report.products.map((product) => ({
         productId: product.productId,
@@ -262,6 +472,13 @@ describe('createGroceryViewApi', () => {
           action: 'prioritize_manual_or_feed_refresh'
         },
         {
+          productId: 'private-label-milk',
+          latestVerifiedPriceDate: '2026-05-19',
+          ageDays: 15,
+          status: 'stale',
+          action: 'prioritize_manual_or_feed_refresh'
+        },
+        {
           productId: 'butter',
           latestVerifiedPriceDate: '2026-05-19',
           ageDays: 15,
@@ -277,6 +494,8 @@ describe('createGroceryViewApi', () => {
     const api = createGroceryViewApi();
 
     api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.removeFavoriteStore('user-1', 'lidl-sveavagen');
     api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, favoriteStoresOnly: true });
     api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
     api.addBasketItem('user-1', { productId: 'coffee', quantity: 2 });
@@ -295,6 +514,104 @@ describe('createGroceryViewApi', () => {
     api.removeBasketItem('user-1', 'coffee');
     assert.deepEqual(api.getWatchlist('user-1').items, []);
     assert.deepEqual(api.getBasket('user-1').items, []);
+  });
+
+  it('summarizes category budgets from the current basket and reports unbudgeted spend', () => {
+    const api = createGroceryViewApi();
+
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.addBasketItem('user-1', { productId: 'butter', quantity: 1 });
+    api.updateCategoryBudgets('user-1', [
+      { category: 'dairy', weeklyBudget: 70 },
+      { category: 'coffee', weeklyBudget: 40 },
+      { category: 'pantry', weeklyBudget: 120 }
+    ]);
+
+    assert.deepEqual(api.getCategoryBudgetSummary('user-1'), {
+      userId: 'user-1',
+      categories: [
+        { category: 'coffee', weeklyBudget: 40, estimatedSpend: 49.9, remaining: -9.9, status: 'over', productIds: ['coffee'] },
+        { category: 'dairy', weeklyBudget: 70, estimatedSpend: 82.7, remaining: -12.7, status: 'over', productIds: ['butter', 'milk'] },
+        { category: 'pantry', weeklyBudget: 120, estimatedSpend: 0, remaining: 120, status: 'under', productIds: [] }
+      ],
+      unbudgetedCategories: []
+    });
+
+    api.updateCategoryBudgets('user-1', [{ category: 'coffee', weeklyBudget: 60 }]);
+    assert.deepEqual(api.getCategoryBudgetSummary('user-1').unbudgetedCategories, [
+      { category: 'dairy', estimatedSpend: 82.7, productIds: ['butter', 'milk'] }
+    ]);
+    assert.throws(
+      () => api.updateCategoryBudgets('user-1', [{ category: 'coffee', weeklyBudget: 10 }, { category: ' coffee ', weeklyBudget: 20 }]),
+      /categories must be unique/
+    );
+    assert.throws(() => api.updateCategoryBudgets('user-1', [{ category: 'coffee', weeklyBudget: -1 }]), /weeklyBudget/);
+  });
+
+  it('returns basket comparison reports with explicit strategy and trust labels', () => {
+    const api = createGroceryViewApi();
+
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.addBasketItem('user-1', { productId: 'butter', quantity: 1 });
+
+    const report = api.compareBasketReport('user-1');
+    assert.equal(report.currency, 'SEK');
+    assert.deepEqual(report.favoriteStoreIds, ['willys-odenplan', 'lidl-sveavagen']);
+    assert.deepEqual(report.strategies.map((strategy) => strategy.id), [
+      'cheapest_across_selected',
+      'all_at_one_store',
+      'favorite_only',
+      'private_label_substitution'
+    ]);
+    assert.deepEqual(report.strategies[0], {
+      id: 'cheapest_across_selected',
+      label: 'Cheapest across selected stores',
+      total: 84.7,
+      savingsVsBestSingleStore: 2,
+      storeCount: 2,
+      assignments: [
+        {
+          productId: 'milk',
+          productName: 'Arla Milk 1L',
+          quantity: 2,
+          storeId: 'lidl-sveavagen',
+          storeName: 'Lidl Sveavägen',
+          unitPrice: 13.9,
+          lineTotal: 27.8,
+          priceLabel: 'verified_shelf'
+        },
+        {
+          productId: 'butter',
+          productName: 'Butter 600g',
+          quantity: 1,
+          storeId: 'willys-odenplan',
+          storeName: 'Willys Odenplan',
+          unitPrice: 56.9,
+          lineTotal: 56.9,
+          priceLabel: 'verified_shelf'
+        }
+      ],
+      missingProductIds: [],
+      estimatedProductIds: [],
+      warnings: ['All included prices are verified shelf demo prices.']
+    });
+    assert.deepEqual(report.strategies[1]?.total, 86.7);
+    assert.deepEqual(report.strategies[3]?.assignments[0], {
+      productId: 'private-label-milk',
+      productName: 'Garant Milk 1L',
+      quantity: 2,
+      storeId: 'willys-odenplan',
+      storeName: 'Willys Odenplan',
+      unitPrice: 12.9,
+      lineTotal: 25.8,
+      priceLabel: 'verified_shelf',
+      substitutionForProductId: 'milk',
+      substitutionForProductName: 'Arla Milk 1L'
+    });
+    assert.equal(report.strategies[3]?.total, 82.7);
   });
 
   it('removes watched products and recomputes alerts from remaining items', () => {
