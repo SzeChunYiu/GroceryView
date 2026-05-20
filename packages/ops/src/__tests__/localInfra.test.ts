@@ -69,6 +69,17 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /smoke-retailer-connector\.sh/);
   });
 
+  it('documents hosted deployment smoke commands for API, web, and PostgreSQL readiness evidence', () => {
+    assert.match(infraReadme, /## Hosted deployment smoke/);
+    assert.match(infraReadme, /infra\/scripts\/smoke-hosted-http\.sh/);
+    assert.match(infraReadme, /infra\/scripts\/smoke-hosted-readiness\.sh/);
+    assert.match(infraReadme, /GROCERYVIEW_SERVER_URL/);
+    assert.match(infraReadme, /GROCERYVIEW_WEB_URL/);
+    assert.match(infraReadme, /METRICS_TOKEN/);
+    assert.match(infraReadme, /\/api\/health/);
+    assert.match(infraReadme, /\/api\/readiness\/postgres/);
+  });
+
   it('ships a hosted PostgreSQL readiness smoke script for deployment evidence', () => {
     assert.match(hostedReadinessSmokeScript, /GROCERYVIEW_SERVER_URL/);
     assert.match(hostedReadinessSmokeScript, /METRICS_TOKEN/);

@@ -20,7 +20,6 @@ The script starts the core services, waits for healthy Postgres, Redis, and MinI
 
 GitHub Actions also runs this smoke check in `Local infrastructure smoke` for pull requests that change local infrastructure files.
 
-
 ## Retailer connector smoke
 
 After a connector has approved legal/robots/data-agreement gates, build the ingestion package and run a real endpoint pull smoke without parsing or persisting product rows:
@@ -31,6 +30,33 @@ GROCERYVIEW_CONNECTOR_URL="https://provider.example/api/products" GROCERYVIEW_CO
 ```
 
 The script reuses the ingestion connector gate, refuses to fetch when required approvals are missing, performs the HTTP pull with a timeout, and prints status code, byte count, content hash, and raw snapshot reference for follow-up parser work.
+
+## Hosted deployment smoke
+
+After deploying a server, run the hosted HTTP smoke before promoting traffic:
+
+```bash
+GROCERYVIEW_SERVER_URL=https://api.groceryview.example \
+  infra/scripts/smoke-hosted-http.sh
+```
+
+The HTTP smoke calls `/api/health` and requires `status: ok` from the `groceryview-server` service. To include the deployed web surface in the same evidence run, set `GROCERYVIEW_WEB_URL`:
+
+```bash
+GROCERYVIEW_SERVER_URL=https://api.groceryview.example \
+GROCERYVIEW_WEB_URL=https://groceryview.example \
+  infra/scripts/smoke-hosted-http.sh
+```
+
+After the hosted database has migrations applied, run the token-protected PostgreSQL readiness smoke:
+
+```bash
+GROCERYVIEW_SERVER_URL=https://api.groceryview.example \
+METRICS_TOKEN=replace-with-deployment-token \
+  infra/scripts/smoke-hosted-readiness.sh
+```
+
+The readiness smoke calls `/api/readiness/postgres` with `METRICS_TOKEN` and requires a `ready` response before the deployment can count as database-backed smoke evidence.
 
 ## Smoke troubleshooting
 
