@@ -408,6 +408,35 @@ describe('createGroceryViewApi', () => {
     assert.equal(api.getProductPriceTerminal('missing-product'), null);
   });
 
+  it('returns product price spread reports across verified store quotes', () => {
+    const api = createGroceryViewApi();
+
+    const spread = api.getProductPriceSpread('coffee');
+
+    assert.equal(spread?.productId, 'coffee');
+    assert.equal(spread?.currency, 'SEK');
+    assert.equal(spread?.sampleSize, 3);
+    assert.equal(spread?.bestStoreId, 'willys-odenplan');
+    assert.equal(spread?.highestStoreId, 'coop-odenplan');
+    assert.equal(spread?.spread, 15);
+    assert.equal(spread?.spreadPercent, 30.1);
+    assert.deepEqual(spread?.rows.map((row) => ({
+      storeId: row.storeId,
+      rank: row.rank,
+      price: row.price,
+      deltaFromBest: row.deltaFromBest,
+      deltaFromBestPercent: row.deltaFromBestPercent,
+      priceLabel: row.priceLabel
+    })), [
+      { storeId: 'willys-odenplan', rank: 1, price: 49.9, deltaFromBest: 0, deltaFromBestPercent: 0, priceLabel: 'best' },
+      { storeId: 'lidl-sveavagen', rank: 2, price: 59.9, deltaFromBest: 10, deltaFromBestPercent: 20, priceLabel: 'above_best' },
+      { storeId: 'coop-odenplan', rank: 3, price: 64.9, deltaFromBest: 15, deltaFromBestPercent: 30.1, priceLabel: 'above_best' }
+    ]);
+    assert.match(spread?.customerRead ?? '', /ranges 15\.00 SEK across 3 verified store quotes/i);
+    assert.match(spread?.guardrails[0] ?? '', /current verified store quotes/i);
+    assert.equal(api.getProductPriceSpread('missing-product'), null);
+  });
+
   it('returns Deal Score v1 reports without using distance in the default score', () => {
     const api = createGroceryViewApi();
 
