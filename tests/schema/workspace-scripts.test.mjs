@@ -12,13 +12,15 @@ const packages = {
 
 describe('workspace package scripts', () => {
   it('builds local workspace dependencies before tests that import package entrypoints', () => {
-    assert.match(packages.api.scripts.test, /npm run build -w @groceryview\/core/);
+    for (const workspace of ['@groceryview/core', '@groceryview/monetization']) {
+      assert.match(packages.api.scripts.test, new RegExp(`npm run build -w ${workspace.replace('/', '\\/')}`));
+    }
 
-    for (const workspace of ['@groceryview/core', '@groceryview/api', '@groceryview/auth']) {
+    for (const workspace of ['@groceryview/core', '@groceryview/monetization', '@groceryview/api', '@groceryview/auth']) {
       assert.match(packages.server.scripts.test, new RegExp(`npm run build -w ${workspace.replace('/', '\\/')}`));
     }
 
-    for (const workspace of ['@groceryview/core', '@groceryview/api']) {
+    for (const workspace of ['@groceryview/core', '@groceryview/monetization', '@groceryview/api']) {
       assert.match(packages.mobile.scripts.test, new RegExp(`npm run build -w ${workspace.replace('/', '\\/')}`));
     }
   });

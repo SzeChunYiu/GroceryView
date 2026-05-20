@@ -13,6 +13,12 @@ import {
   type WatchlistAlert,
   type WatchlistItem
 } from '@groceryview/core';
+import {
+  buildSubscriptionAccessPolicy,
+  type SubscriptionAccessPolicy,
+  type SubscriptionEntitlementSnapshot,
+  type SubscriptionPlan
+} from '@groceryview/monetization';
 
 export type Store = {
   id: string;
@@ -162,6 +168,56 @@ function requireScoreThreshold(value: number | undefined) {
   }
 }
 
+function requireOneOf<T extends string>(value: unknown, label: string, allowed: readonly T[]): T {
+  if (typeof value !== 'string' || !(allowed as readonly string[]).includes(value)) {
+    throw new Error(`${label} must be one of: ${allowed.join(', ')}`);
+  }
+  return value as T;
+}
+
+function optionalOneOf<T extends string>(value: unknown, label: string, allowed: readonly T[]): T | undefined {
+  if (value === undefined) return undefined;
+  return requireOneOf(value, label, allowed);
+}
+
+const isoTimestampPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
+
+function requireIsoTimestamp(value: unknown, label: string): string {
+  if (
+    typeof value !== 'string' ||
+    value.trim() !== value ||
+    !isoTimestampPattern.test(value) ||
+    !Number.isFinite(Date.parse(value))
+  ) {
+    throw new Error(`${label} must be an ISO timestamp`);
+  }
+  return value;
+}
+
+function optionalIsoTimestamp(value: unknown, label: string): string | undefined {
+  if (value === undefined) return undefined;
+  return requireIsoTimestamp(value, label);
+}
+
+function normalizeSubscriptionEntitlement(input: SubscriptionEntitlementSnapshot): SubscriptionEntitlementSnapshot {
+  const candidate = input as Record<string, unknown>;
+  const tier = requireOneOf(candidate.tier, 'tier', ['free', 'premium'] as const);
+  const status = requireOneOf(candidate.status, 'status', ['active', 'past_due', 'canceled'] as const);
+  const plan = optionalOneOf(candidate.plan, 'plan', ['premium_monthly', 'premium_yearly'] as const);
+  const currentPeriodEndsAt = optionalIsoTimestamp(candidate.currentPeriodEndsAt, 'currentPeriodEndsAt');
+  const provider = optionalOneOf(candidate.provider, 'provider', ['stripe_compatible'] as const);
+  const updatedAt = requireIsoTimestamp(candidate.updatedAt, 'updatedAt');
+
+  return {
+    tier,
+    ...(plan ? { plan: plan as SubscriptionPlan } : {}),
+    status,
+    ...(currentPeriodEndsAt ? { currentPeriodEndsAt } : {}),
+    ...(provider ? { provider } : {}),
+    updatedAt
+  };
+}
+
 function sortPricesByValue(prices: StorePrice[]) {
   return [...prices].sort((left, right) => left.price - right.price || left.storeName.localeCompare(right.storeName));
 }
@@ -175,6 +231,7 @@ export function createGroceryViewApi() {
   const watchlists = new Map<string, WatchlistItem[]>();
   const baskets = new Map<string, BasketItemRequest[]>();
   const budgets = new Map<string, UserBudgetPatch>();
+  const subscriptionEntitlements = new Map<string, SubscriptionEntitlementSnapshot>();
 
   const productSnapshots = () =>
     products.map((product) => {
@@ -294,6 +351,24 @@ export function createGroceryViewApi() {
     getBudgetSummary(userId: string): BudgetSummary {
       const budget = budgets.get(userId) ?? { weeklyBudget: 0, monthlyBudget: 0 };
       return summarizeBudget({ ...budget, estimatedBasketTotal: this.compareBasket(userId).cheapestByProduct.total, receiptTotalsThisWeek: [], receiptTotalsThisMonth: [] });
+    },
+
+    upsertSubscriptionEntitlement(userId: string, entitlement: SubscriptionEntitlementSnapshot) {
+      requireNonEmptyId(userId, 'userId');
+      subscriptionEntitlements.set(userId, normalizeSubscriptionEntitlement(entitlement));
+    },
+
+    getSubscriptionEntitlement(userId: string): SubscriptionEntitlementSnapshot | null {
+      requireNonEmptyId(userId, 'userId');
+      return subscriptionEntitlements.get(userId) ?? null;
+    },
+
+    getSubscriptionAccess(userId: string, now = new Date().toISOString()): SubscriptionAccessPolicy {
+      requireNonEmptyId(userId, 'userId');
+      return buildSubscriptionAccessPolicy({
+        entitlement: subscriptionEntitlements.get(userId) ?? null,
+        now: requireIsoTimestamp(now, 'now')
+      });
     },
 
     getIndices() {
