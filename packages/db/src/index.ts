@@ -217,6 +217,22 @@ export type PostgresPriceObservationWriter = {
   recordPriceObservation(observation: PriceObservationRecord): Promise<PriceObservationWriteResult>;
 };
 
+export type PriceObservationHistoryRecord = PriceObservationRecord & {
+  observationId: string;
+  currency: string;
+  memberRequired: boolean;
+};
+
+export type PriceObservationHistoryFilter = {
+  productId: string;
+  chainId?: string;
+  storeId?: string;
+  priceType?: PriceType;
+  observedFrom?: string;
+  observedTo?: string;
+  limit?: number;
+};
+
 export type LatestPriceRecord = {
   productId: string;
   chainId: string;
@@ -234,6 +250,7 @@ export type LatestPriceRecord = {
 
 export type PostgresPriceReader = {
   listLatestPricesForProduct(productId: string): Promise<LatestPriceRecord[]>;
+  listPriceObservationHistory(filter: PriceObservationHistoryFilter): Promise<PriceObservationHistoryRecord[]>;
 };
 
 export type SourceRunRecord = {
@@ -592,6 +609,31 @@ type LatestPriceRow = {
   confidence: string | number;
   provenance: Record<string, unknown> | string | null;
 };
+type PriceObservationHistoryRow = {
+  id: string;
+  product_id: string;
+  chain_id: string;
+  store_id: string | null;
+  source_run_id: string | null;
+  raw_record_id: string | null;
+  retailer_product_ref: string | null;
+  price_type: PriceType;
+  price: string | number;
+  regular_price: string | number | null;
+  unit_price: string | number;
+  currency: string;
+  quantity: string | number | null;
+  quantity_unit: string | null;
+  promotion_text: string | null;
+  promotion_starts_on: string | Date | null;
+  promotion_ends_on: string | Date | null;
+  member_required: boolean;
+  observed_at: string | Date;
+  valid_from: string | Date | null;
+  valid_until: string | Date | null;
+  confidence: string | number;
+  provenance: Record<string, unknown> | string | null;
+};
 
 function asIso(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : value;
@@ -615,6 +657,38 @@ function mapLatestPrice(row: LatestPriceRow): LatestPriceRecord {
     unitPrice: Number(row.unit_price),
     currency: row.currency,
     observedAt: asIso(row.observed_at),
+    confidence: Number(row.confidence),
+    provenance: asRecord(row.provenance)
+  };
+}
+
+function optionalIso(value: string | Date | null): string | undefined {
+  return value === null ? undefined : asIso(value);
+}
+
+function mapPriceObservationHistory(row: PriceObservationHistoryRow): PriceObservationHistoryRecord {
+  return {
+    observationId: row.id,
+    productId: row.product_id,
+    chainId: row.chain_id,
+    ...(row.store_id ? { storeId: row.store_id } : {}),
+    ...(row.source_run_id ? { sourceRunId: row.source_run_id } : {}),
+    ...(row.raw_record_id ? { rawRecordId: row.raw_record_id } : {}),
+    ...(row.retailer_product_ref ? { retailerProductRef: row.retailer_product_ref } : {}),
+    priceType: row.price_type,
+    price: Number(row.price),
+    ...(row.regular_price === null ? {} : { regularPrice: Number(row.regular_price) }),
+    unitPrice: Number(row.unit_price),
+    currency: row.currency,
+    ...(row.quantity === null ? {} : { quantity: Number(row.quantity) }),
+    ...(row.quantity_unit ? { quantityUnit: row.quantity_unit } : {}),
+    ...(row.promotion_text ? { promotionText: row.promotion_text } : {}),
+    ...(optionalIso(row.promotion_starts_on) ? { promotionStartsOn: optionalIso(row.promotion_starts_on) } : {}),
+    ...(optionalIso(row.promotion_ends_on) ? { promotionEndsOn: optionalIso(row.promotion_ends_on) } : {}),
+    memberRequired: row.member_required,
+    observedAt: asIso(row.observed_at),
+    ...(optionalIso(row.valid_from) ? { validFrom: optionalIso(row.valid_from) } : {}),
+    ...(optionalIso(row.valid_until) ? { validUntil: optionalIso(row.valid_until) } : {}),
     confidence: Number(row.confidence),
     provenance: asRecord(row.provenance)
   };
@@ -1344,6 +1418,54 @@ export function createPostgresPriceReader(executor: QueryExecutor): PostgresPric
         [productId]
       );
       return rows.map(mapLatestPrice);
+    },
+
+    async listPriceObservationHistory(filter) {
+      const limit = Math.min(Math.max(filter.limit ?? 500, 1), 1000);
+      const rows = await executor.query<PriceObservationHistoryRow>(
+        `select id,
+                product_id,
+                chain_id,
+                store_id,
+                source_run_id,
+                raw_record_id,
+                retailer_product_ref,
+                price_type,
+                price,
+                regular_price,
+                unit_price,
+                currency,
+                quantity,
+                quantity_unit,
+                promotion_text,
+                promotion_starts_on,
+                promotion_ends_on,
+                member_required,
+                observed_at,
+                valid_from,
+                valid_until,
+                confidence,
+                provenance
+         from observations
+         where product_id = $1
+           and ($2::uuid is null or chain_id = $2::uuid)
+           and ($3::uuid is null or store_id = $3::uuid)
+           and ($4::text is null or price_type = $4)
+           and ($5::timestamptz is null or observed_at >= $5::timestamptz)
+           and ($6::timestamptz is null or observed_at <= $6::timestamptz)
+         order by observed_at desc, chain_id, store_id, price_type, id
+         limit $7`,
+        [
+          filter.productId,
+          filter.chainId ?? null,
+          filter.storeId ?? null,
+          filter.priceType ?? null,
+          filter.observedFrom ?? null,
+          filter.observedTo ?? null,
+          limit
+        ]
+      );
+      return rows.map(mapPriceObservationHistory);
     }
   };
 }

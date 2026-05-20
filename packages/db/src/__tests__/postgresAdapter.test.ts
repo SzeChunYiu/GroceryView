@@ -14,6 +14,58 @@ class RecordingQueryExecutor implements QueryExecutor {
   observationId: string | undefined = 'observation-1';
   sourceRunId: string | undefined = 'source-run-1';
   rawRecordId: string | undefined = 'raw-record-1';
+  observationHistoryRows: unknown[] = [
+    {
+      id: 'observation-3',
+      product_id: 'product-1',
+      chain_id: 'chain-1',
+      store_id: 'store-1',
+      source_run_id: 'source-run-1',
+      raw_record_id: 'raw-record-1',
+      retailer_product_ref: 'retailer-1',
+      price_type: 'promotion',
+      price: '44.90',
+      regular_price: '59.90',
+      unit_price: '99.7778',
+      currency: 'SEK',
+      quantity: '450',
+      quantity_unit: 'g',
+      promotion_text: 'Veckokampanj',
+      promotion_starts_on: '2026-05-18',
+      promotion_ends_on: '2026-05-24',
+      member_required: true,
+      observed_at: new Date('2026-05-20T09:00:00.000Z'),
+      valid_from: '2026-05-18T00:00:00.000Z',
+      valid_until: '2026-05-24T23:59:59.000Z',
+      confidence: '0.8800',
+      provenance: '{"sourceType":"retailer_page","campaign":"weekly"}'
+    },
+    {
+      id: 'observation-4',
+      product_id: 'product-1',
+      chain_id: 'chain-2',
+      store_id: null,
+      source_run_id: null,
+      raw_record_id: null,
+      retailer_product_ref: null,
+      price_type: 'online',
+      price: 49.9,
+      regular_price: null,
+      unit_price: 110.8889,
+      currency: 'SEK',
+      quantity: null,
+      quantity_unit: null,
+      promotion_text: null,
+      promotion_starts_on: null,
+      promotion_ends_on: null,
+      member_required: false,
+      observed_at: '2026-05-20T08:00:00.000Z',
+      valid_from: null,
+      valid_until: null,
+      confidence: 0.91,
+      provenance: { sourceType: 'retailer_api' }
+    }
+  ];
   latestPriceRows: unknown[] = [
     {
       product_id: 'product-1',
@@ -51,6 +103,7 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('insert into raw_records')) return this.rawRecordId === undefined ? ([] as T[]) : ([{ id: this.rawRecordId }] as T[]);
     if (sql.includes('insert into observations')) return this.observationId === undefined ? ([] as T[]) : ([{ id: this.observationId }] as T[]);
     if (sql.includes('from latest_prices')) return this.latestPriceRows as T[];
+    if (sql.includes('from observations')) return this.observationHistoryRows as T[];
     if (sql.includes('select store_id')) return [{ store_id: 'willys-odenplan' }] as T[];
     if (sql.includes('select weekly_budget')) return [{ weekly_budget: '800', monthly_budget: '3200' }] as T[];
     if (sql.includes('insert into weekly_baskets')) return this.basketId === undefined ? ([] as T[]) : ([{ id: this.basketId }] as T[]);
@@ -555,5 +608,89 @@ describe('createPostgresPriceReader', () => {
     assert.match(executor.calls[0]!.sql, /where product_id = \$1/);
     assert.match(executor.calls[0]!.sql, /order by observed_at desc, chain_id, store_id, price_type/);
     assert.deepEqual(executor.calls[0]!.params, ['product-1']);
+  });
+
+  it('lists price observation history with bounded filters and full provenance mapping', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresPriceReader(executor);
+
+    assert.deepEqual(
+      await reader.listPriceObservationHistory({
+        productId: 'product-1',
+        chainId: 'chain-1',
+        storeId: 'store-1',
+        priceType: 'promotion',
+        observedFrom: '2026-05-01T00:00:00.000Z',
+        observedTo: '2026-05-31T23:59:59.000Z',
+        limit: 20
+      }),
+      [
+        {
+          observationId: 'observation-3',
+          productId: 'product-1',
+          chainId: 'chain-1',
+          storeId: 'store-1',
+          sourceRunId: 'source-run-1',
+          rawRecordId: 'raw-record-1',
+          retailerProductRef: 'retailer-1',
+          priceType: 'promotion',
+          price: 44.9,
+          regularPrice: 59.9,
+          unitPrice: 99.7778,
+          currency: 'SEK',
+          quantity: 450,
+          quantityUnit: 'g',
+          promotionText: 'Veckokampanj',
+          promotionStartsOn: '2026-05-18',
+          promotionEndsOn: '2026-05-24',
+          memberRequired: true,
+          observedAt: '2026-05-20T09:00:00.000Z',
+          validFrom: '2026-05-18T00:00:00.000Z',
+          validUntil: '2026-05-24T23:59:59.000Z',
+          confidence: 0.88,
+          provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
+        },
+        {
+          observationId: 'observation-4',
+          productId: 'product-1',
+          chainId: 'chain-2',
+          priceType: 'online',
+          price: 49.9,
+          unitPrice: 110.8889,
+          currency: 'SEK',
+          memberRequired: false,
+          observedAt: '2026-05-20T08:00:00.000Z',
+          confidence: 0.91,
+          provenance: { sourceType: 'retailer_api' }
+        }
+      ]
+    );
+
+    assert.match(executor.calls[0]!.sql, /from observations/);
+    assert.match(executor.calls[0]!.sql, /where product_id = \$1/);
+    assert.match(executor.calls[0]!.sql, /\$2::uuid is null or chain_id = \$2::uuid/);
+    assert.match(executor.calls[0]!.sql, /\$3::uuid is null or store_id = \$3::uuid/);
+    assert.match(executor.calls[0]!.sql, /\$4::text is null or price_type = \$4/);
+    assert.match(executor.calls[0]!.sql, /order by observed_at desc, chain_id, store_id, price_type, id/);
+    assert.deepEqual(executor.calls[0]!.params, [
+      'product-1',
+      'chain-1',
+      'store-1',
+      'promotion',
+      '2026-05-01T00:00:00.000Z',
+      '2026-05-31T23:59:59.000Z',
+      20
+    ]);
+  });
+
+  it('clamps price observation history limits to a safe range', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresPriceReader(executor);
+
+    await reader.listPriceObservationHistory({ productId: 'product-1', limit: 5000 });
+    await reader.listPriceObservationHistory({ productId: 'product-1', limit: 0 });
+
+    assert.deepEqual(executor.calls[0]!.params, ['product-1', null, null, null, null, null, 1000]);
+    assert.deepEqual(executor.calls[1]!.params, ['product-1', null, null, null, null, null, 1]);
   });
 });
