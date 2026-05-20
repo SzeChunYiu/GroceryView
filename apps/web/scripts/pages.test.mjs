@@ -150,6 +150,15 @@ describe('buildStaticPages', () => {
       assert.match(retailerFreshness, /Coop/);
       assert.match(retailerFreshness, /Pause new alerts/);
       assert.match(retailerFreshness, /Stale retailer-page rows cannot trigger household notifications/);
+      assert.match(retailerFreshness, /Connected price freshness API/);
+      assert.match(retailerFreshness, /Load live freshness report/);
+      assert.match(retailerFreshness, /data-groceryview-flow="price-freshness"/);
+      assert.match(retailerFreshness, /data-flow-action="load-price-freshness"/);
+      assert.match(retailerFreshness, /data-price-freshness-summary/);
+      assert.match(retailerFreshness, /data-price-freshness-backfill/);
+      assert.match(retailerFreshness, /data-price-freshness-thresholds/);
+      assert.match(retailerFreshness, /fetch\(apiUrl\('\/api\/prices\/freshness\?asOf='/);
+      assert.match(retailerFreshness, /Connected price freshness loaded/);
 
       const shoppingRoute = await readFile(join(root, 'routes/shopping/index.html'), 'utf8');
       assert.match(shoppingRoute, /Shopping route planner/);
