@@ -249,6 +249,41 @@ export type DeploymentSmokeEvidenceReport = {
   summary: string;
 };
 
+export type DeploymentSmokeEvidenceSummary = {
+  status: DeploymentSmokeEvidenceReport['status'];
+  totalBlockers: number;
+  missingEvidence: number;
+  staleEvidence: number;
+  failedEvidence: number;
+  notRunEvidence: number;
+  missingUrls: number;
+  passedEvidence: number;
+};
+
+export function summarizeDeploymentSmokeEvidenceReport(report: DeploymentSmokeEvidenceReport): DeploymentSmokeEvidenceSummary {
+  return report.blockers.reduce<DeploymentSmokeEvidenceSummary>(
+    (summary, blocker) => {
+      summary.totalBlockers += 1;
+      if (blocker.startsWith('smoke_evidence_missing:')) summary.missingEvidence += 1;
+      if (blocker.startsWith('smoke_evidence_stale:')) summary.staleEvidence += 1;
+      if (blocker.startsWith('smoke_evidence_failed:')) summary.failedEvidence += 1;
+      if (blocker.startsWith('smoke_evidence_not_run:')) summary.notRunEvidence += 1;
+      if (blocker.startsWith('smoke_evidence_url_missing:')) summary.missingUrls += 1;
+      return summary;
+    },
+    {
+      status: report.status,
+      totalBlockers: 0,
+      missingEvidence: 0,
+      staleEvidence: 0,
+      failedEvidence: 0,
+      notRunEvidence: 0,
+      missingUrls: 0,
+      passedEvidence: report.passed.length
+    }
+  );
+}
+
 export function buildDeploymentSmokeEvidenceReport(input: DeploymentSmokeEvidenceInput): DeploymentSmokeEvidenceReport {
   const blockers: string[] = [];
   const passed: string[] = [];
