@@ -238,6 +238,13 @@ const categorySignals = [
   { category: 'Eggs', product: 'Eggs 12-pack', store: 'Lidl Sveavägen', price: '34.90 SEK', signal: 'Private-label swap candidate' }
 ];
 
+const catalogCoverageRows = [
+  { category: 'Coffee', products: 18, coverage: '89%', freshness: 'Fresh today', action: 'Keep monitoring' },
+  { category: 'Dairy', products: 24, coverage: '81%', freshness: 'Fresh today', action: 'Backfill member prices' },
+  { category: 'Produce', products: 31, coverage: '62%', freshness: 'Mixed', action: 'Route receipt photos to review' },
+  { category: 'Pantry', products: 42, coverage: '74%', freshness: 'Fresh this week', action: 'Parse missing unit prices' }
+];
+
 const index = calculateFixedBasketIndex({
   id: 'stockholm-grocery-index',
   label: 'Stockholm Grocery Index',
@@ -396,7 +403,7 @@ app.innerHTML = `
     <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Category signals</h2>
-        <p class="lede">Category pages expose the product, store, and signal that drives each index movement.</p>
+        <p class="lede">Category pages expose the product, store, and signal that drives each index movement. <a href="/catalog/coverage/">Open catalog coverage</a>.</p>
         <table class="table">
           <thead><tr><th>Category</th><th>Product</th><th>Store</th><th>Price</th><th>Signal</th></tr></thead>
           <tbody>
@@ -407,6 +414,16 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Catalog coverage</h2>
+        <p class="lede">Coverage rows show whether categories are ready for alerts, rankings, and forecast writebacks.</p>
+        <table class="table">
+          <thead><tr><th>Category</th><th>Products</th><th>Coverage</th><th>Freshness</th><th>Action</th></tr></thead>
+          <tbody>
+            ${catalogCoverageRows.map((row) => `<tr><td>${row.category}</td><td>${row.products}</td><td>${row.coverage}</td><td>${row.freshness}</td><td>${row.action}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Weekly basket strategy</h2>
         <p class="lede">Cheapest by product across selected favorite stores. Distance is informational only and never reduces savings. <a href="/budget/forecast/">Open budget forecast</a>.</p>
