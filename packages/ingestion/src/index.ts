@@ -996,6 +996,11 @@ export type IngestionOutput = {
   promotionObservation: IngestedPromotionObservation | null;
 };
 
+export type LatestPriceRollup = IngestedPriceObservation & {
+  rollupKey: string;
+  replacedObservationCount: number;
+};
+
 function validateInput(input: RetailerProductInput): void {
   if (!input.rawName.trim()) throw new Error('rawName is required.');
   if (!input.canonicalName.trim()) throw new Error('canonicalName is required.');
@@ -1108,4 +1113,42 @@ export function planIngestionBatch(inputs: RetailerProductInput[]): IngestionBat
     }
   }
   return { accepted, rejected };
+}
+
+function latestRollupKey(observation: IngestedPriceObservation): string {
+  return [observation.productId, observation.storeId ?? observation.chainId, observation.sourceType].join('::');
+}
+
+function isNewerCandidate(candidate: IngestedPriceObservation, current: LatestPriceRollup): boolean {
+  const candidateTime = Date.parse(candidate.observedAt);
+  const currentTime = Date.parse(current.observedAt);
+  if (Number.isNaN(candidateTime)) throw new Error('observedAt must be an ISO date.');
+  if (Number.isNaN(currentTime)) throw new Error('observedAt must be an ISO date.');
+  if (candidateTime !== currentTime) return candidateTime > currentTime;
+  return candidate.confidenceScore > current.confidenceScore;
+}
+
+export function rollupLatestPriceObservations(observations: IngestedPriceObservation[]): LatestPriceRollup[] {
+  const latestByKey = new Map<string, LatestPriceRollup>();
+
+  for (const observation of observations) {
+    const rollupKey = latestRollupKey(observation);
+    const current = latestByKey.get(rollupKey);
+    if (!current) {
+      latestByKey.set(rollupKey, { ...observation, rollupKey, replacedObservationCount: 0 });
+      continue;
+    }
+
+    if (isNewerCandidate(observation, current)) {
+      latestByKey.set(rollupKey, {
+        ...observation,
+        rollupKey,
+        replacedObservationCount: current.replacedObservationCount + 1
+      });
+    } else {
+      current.replacedObservationCount += 1;
+    }
+  }
+
+  return [...latestByKey.values()].sort((a, b) => a.rollupKey.localeCompare(b.rollupKey));
 }
