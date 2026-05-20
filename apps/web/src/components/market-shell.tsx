@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { BarChart3, MapPin, ScanSearch, ShoppingBasket } from 'lucide-react';
-import { categories, products, stores } from '@/lib/demo-data';
+import { categories, householdSavings, products, stores, weeklyBasket } from '@/lib/demo-data';
 
 export function MarketShell() {
   return (
@@ -122,6 +122,41 @@ export function MarketShell() {
         ))}
       </section>
 
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 sm:grid-cols-4">
+          <div className="sm:col-span-2">
+            <h2 className="text-lg font-black">Weekly basket tape</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Household planning rows reuse the same visible product slugs as the price terminal.
+            </p>
+          </div>
+          <LightMetric label="Planned total" value={householdSavings.weeklyTotal} />
+          <LightMetric label="Vs last week" value={householdSavings.vsLastWeek} />
+        </div>
+        <div className="grid grid-cols-[1fr_auto_auto_auto] border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
+          <span>Basket item</span>
+          <span>Qty</span>
+          <span>Total</span>
+          <span>Move</span>
+        </div>
+        {weeklyBasket.map((item) => {
+          const product = products.find((candidate) => candidate.slug === item.slug);
+
+          return (
+            <Link
+              key={item.slug}
+              href={`/products/${item.slug}`}
+              className="grid grid-cols-[1fr_auto_auto_auto] gap-3 px-4 py-4 text-sm hover:bg-market-oat/45"
+            >
+              <span className="font-bold">{product?.ticker ?? item.slug}</span>
+              <span>{item.qty}</span>
+              <span>{item.total}</span>
+              <span>{item.vsLastWeek}</span>
+            </Link>
+          );
+        })}
+      </section>
+
       <div className="flex items-center gap-2 rounded-lg border border-market-ink/10 bg-white p-4 text-sm text-market-ink/70">
         <ScanSearch size={18} />
         Scanner and receipt review routes can reuse this shell when the scanner placeholder graduates.
@@ -144,6 +179,15 @@ function MetadataRow({ label, value }: Readonly<{ label: string; value: string }
     <div className="flex items-start justify-between gap-4 border-b border-market-ink/10 pb-2 last:border-0">
       <dt className="font-semibold text-market-ink/55">{label}</dt>
       <dd className="text-right font-bold">{value}</dd>
+    </div>
+  );
+}
+
+function LightMetric({ label, value }: Readonly<{ label: string; value: string }>) {
+  return (
+    <div className="rounded-md bg-market-oat/45 p-3">
+      <strong className="block text-2xl">{value}</strong>
+      <span className="text-xs font-semibold text-market-ink/55">{label}</span>
     </div>
   );
 }

@@ -330,12 +330,15 @@ export const weeklyBasket = [
   { slug: 'icas-egg-15p',                qty: 1, total: '39.95 SEK', vsLastWeek: '+1.8%' },
   { slug: 'felix-ketchup-1kg',           qty: 1, total: '32.00 SEK', vsLastWeek: '-3.0%' },
   { slug: 'skogaholm-rostbrod-500g',     qty: 1, total: '26.50 SEK', vsLastWeek: '+0.0%' },
-  { slug: 'findus-arter-650g',           qty: 1, total: '24.90 SEK', vsLastWeek: '-1.4%' }
+  { slug: 'findus-arter-650g',           qty: 1, total: '24.90 SEK', vsLastWeek: '-1.4%' },
+  { slug: 'eldorado-basmati-rice-1kg',   qty: 1, total: '18.90 SEK', vsLastWeek: '-7.2%' },
+  { slug: 'barilla-spaghetti-1kg',        qty: 2, total: '55.80 SEK', vsLastWeek: '-1.9%' },
+  { slug: 'bregott-normalsaltat-600g',    qty: 1, total: '56.90 SEK', vsLastWeek: '+6.9%' }
 ];
 
 export const householdSavings = {
-  weeklyTotal: '285.00 SEK',
-  vsLastWeek: '-12.40 SEK',
-  vsLastMonth: '-54.10 SEK',
+  weeklyTotal: '416.60 SEK',
+  vsLastWeek: '-15.30 SEK',
+  vsLastMonth: '-61.40 SEK',
   topSaving: { product: 'Zoegas Coffee 450g', amount: '-4.60 SEK', driver: 'member promo' }
 };
