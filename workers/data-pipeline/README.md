@@ -16,6 +16,7 @@ Dagster scaffold for the GroceryView data-worker lane.
 - Open Prices real-data pull plan asset with required User-Agent, endpoint, parser, smoke command, and evidence fields.
 - Open Prices artifact import plan asset with the PostgreSQL import command, required env, database targets, and persisted evidence fields.
 - Open Prices ingestion run plan asset with schedule, persistence targets, idempotency keys, and fail-closed deployment requirements.
+- Open Prices launch readiness summary that rolls the pull, scheduled ingestion, and artifact import plans into one blocker list for operators.
 - An `open_prices_ingestion_schedule` Dagster schedule contract that targets the Open Prices pull, ingestion plan, observations, latest-price rollup, freshness, and coverage assets every six hours.
 - A `dagster dev` entrypoint that boots the local webserver.
 - Deterministic seed/order behavior so local materializations are reproducible.
@@ -45,6 +46,7 @@ Example Dagster assets in this lane:
 - `open_prices_real_pull_plan`
 - `open_prices_artifact_import_plan`
 - `open_prices_ingestion_run_plan`
+- `open_prices_launch_readiness`
 
 Example Dagster schedules in this lane:
 - `open_prices_ingestion_schedule`
@@ -61,6 +63,8 @@ Example Dagster schedules in this lane:
 When those gates are ready, the planned run materializes the Open Prices pull, persists raw snapshots/source-run evidence, writes normalized price observations, refreshes latest-price rollups, and emits freshness/coverage evidence. The idempotency key uses source type, source URL, content hash, parser version, and observed timestamp so reruns do not duplicate accepted price rows.
 
 `open_prices_ingestion_schedule` is defined with cron `17 */6 * * *` in UTC and targets the same assets listed in the run plan. The schedule contract is included in the Dagster smoke verifier so accidental removal blocks release validation once Dagster is installed in the worker environment.
+
+`open_prices_launch_readiness` combines the pull plan, scheduled ingestion plan, and artifact import plan into one readiness summary. It reports ready/blocked plan counts, blockers grouped by plan, deduplicated next actions, and the full evidence-field set needed before Open Prices data can safely power product prices.
 
 ## Open Prices artifact import plan
 
