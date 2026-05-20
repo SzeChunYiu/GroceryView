@@ -7,12 +7,28 @@ import {
   deliverDueNotifications,
   planNotificationOperationsAlerts,
   formatNotificationOperationsMetrics,
+  planDeadLetterNotificationReplay,
   planHumanReviewSlaNotifications,
   parseNotificationSuppressionWebhook,
   processNotificationSuppressionEvent,
   runRepositoryNotificationWorkerCycle,
   runNotificationWorkerTick
 } from '../index.js';
+
+const persistedTask = (overrides: Partial<Parameters<typeof planDeadLetterNotificationReplay>[0]['tasks'][number]> = {}) => ({
+  id: 'task-1',
+  channel: 'email' as const,
+  type: 'weekly_report',
+  title: 'Weekly report',
+  body: 'Summary',
+  priority: 'normal' as const,
+  sendAt: '2026-05-19T10:00:00.000Z',
+  recipient: 'user@example.com',
+  attemptCount: 3,
+  maxAttempts: 3,
+  status: 'dead_lettered' as const,
+  ...overrides
+});
 
 describe('buildNotificationProviderReadinessReport', () => {
   it('fails closed when required provider credentials or health checks are missing', () => {
@@ -88,6 +104,66 @@ describe('buildNotificationProviderReadinessReport', () => {
       warnings: [],
       summary: 'Notification providers are ready.'
     });
+  });
+});
+
+describe('planDeadLetterNotificationReplay', () => {
+  it('requeues eligible dead-letter tasks at the requested replay time', () => {
+    const plan = planDeadLetterNotificationReplay({
+      now: '2026-05-20T08:00:00.000Z',
+      replayAt: '2026-05-20T08:15:00.000Z',
+      maxReplayAttempts: 5,
+      tasks: [
+        persistedTask({ id: 'dead-letter-a', attemptCount: 3 }),
+        persistedTask({ id: 'dead-letter-b', attemptCount: 4, channel: 'push', recipient: 'device-1' })
+      ]
+    });
+
+    assert.deepEqual(plan.skipped, []);
+    assert.deepEqual(
+      plan.replayable.map((task) => ({
+        id: task.id,
+        channel: task.channel,
+        status: task.status,
+        attemptCount: task.attemptCount,
+        sendAt: task.sendAt
+      })),
+      [
+        {
+          id: 'dead-letter-a',
+          channel: 'email',
+          status: 'queued',
+          attemptCount: 0,
+          sendAt: '2026-05-20T08:15:00.000Z'
+        },
+        {
+          id: 'dead-letter-b',
+          channel: 'push',
+          status: 'queued',
+          attemptCount: 0,
+          sendAt: '2026-05-20T08:15:00.000Z'
+        }
+      ]
+    );
+  });
+
+  it('skips non-dead-letter tasks, exhausted replay attempts, and invalid timestamps', () => {
+    const plan = planDeadLetterNotificationReplay({
+      now: '2026-05-20T08:00:00.000Z',
+      maxReplayAttempts: 5,
+      tasks: [
+        persistedTask({ id: 'queued-task', status: 'queued', attemptCount: 1 }),
+        persistedTask({ id: 'exhausted-task', attemptCount: 5 }),
+        persistedTask({ id: 'bad-time-task', attemptCount: 2, sendAt: 'not-a-date' })
+      ]
+    });
+
+    assert.deepEqual(plan.replayable, []);
+    assert.deepEqual(plan.skipped, [
+      { taskId: 'bad-time-task', reason: 'invalid_send_at' },
+      { taskId: 'exhausted-task', reason: 'attempt_limit_reached' },
+      { taskId: 'queued-task', reason: 'not_dead_lettered' }
+    ]);
   });
 });
 
