@@ -185,6 +185,15 @@ describe('createHttpHandler', () => {
     assert.equal(equivalents.status, 200);
     assert.deepEqual(await json(equivalents), [
       {
+        productId: 'private-label-milk',
+        productName: 'Garant Milk 1L',
+        category: 'dairy',
+        bestPrice: 12.9,
+        bestStoreId: 'willys-odenplan',
+        dealScore: 73,
+        reason: 'Same dairy category with comparable current price evidence.'
+      },
+      {
         productId: 'butter',
         productName: 'Butter 600g',
         category: 'dairy',
