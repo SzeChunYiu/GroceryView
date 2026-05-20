@@ -202,6 +202,27 @@ export type NotificationOperationsAlertInput = {
   recipients: HumanReviewSlaAlertRecipient[];
 };
 
+export type NotificationProviderHealthStatus = 'pass' | 'fail' | 'not_run';
+
+export type NotificationProviderReadinessInput = {
+  requiredChannels: DeliveryChannel[];
+  providers: Array<{
+    channel: DeliveryChannel;
+    providerName: string;
+    configured: boolean;
+    credentialsPresent: boolean;
+    healthStatus: NotificationProviderHealthStatus;
+  }>;
+};
+
+export type NotificationProviderReadinessReport = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  evidence: string[];
+  warnings: string[];
+  summary: string;
+};
+
 export type PersistedNotificationTask = {
   id: string;
   channel: DeliveryChannel;
@@ -406,6 +427,47 @@ function nextAttemptAt(now: string, retryDelayMinutes: number): string {
 function deliveryReason(result: DeliveryResult): string {
   if (result.status === 'failed_no_provider' || result.status === 'failed_provider_error') return result.reason;
   return 'Notification was not delivered.';
+}
+
+export function buildNotificationProviderReadinessReport(
+  input: NotificationProviderReadinessInput
+): NotificationProviderReadinessReport {
+  const blockers: string[] = [];
+  const evidence: string[] = [];
+  const warnings: string[] = [];
+  const providersByChannel = new Map(input.providers.map((provider) => [provider.channel, provider]));
+
+  for (const channel of input.requiredChannels) {
+    const provider = providersByChannel.get(channel);
+
+    if (!provider?.configured) {
+      blockers.push(`notification_provider_not_configured:${channel}`);
+    } else {
+      evidence.push(`notification_provider_configured:${channel}:${provider.providerName}`);
+    }
+
+    if (!provider?.credentialsPresent) {
+      blockers.push(`notification_provider_credentials_missing:${channel}`);
+    } else {
+      evidence.push(`notification_provider_credentials_present:${channel}`);
+    }
+
+    if (provider?.healthStatus === 'pass') {
+      evidence.push(`notification_provider_health_pass:${channel}`);
+    } else if (provider?.healthStatus === 'fail') {
+      blockers.push(`notification_provider_health_failed:${channel}`);
+    } else {
+      blockers.push(`notification_provider_health_not_run:${channel}`);
+    }
+  }
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    evidence,
+    warnings,
+    summary: blockers.length === 0 ? 'Notification providers are ready.' : 'Notification provider readiness is blocked.'
+  };
 }
 
 export async function runNotificationWorkerTick(input: NotificationWorkerTickInput): Promise<NotificationWorkerTickResult> {

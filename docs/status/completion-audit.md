@@ -10,7 +10,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 
 | Requirement / deliverable | Evidence | Status |
 | --- | --- | --- |
-| Iterative PR + merge workflow | PR #1 through PR #36, PR #88 through PR #111, PR #119, PR #120, PR #123, PR #127, and PR #134 merged to `main` after this iteration | Done for shipped iterations |
+| Iterative PR + merge workflow | PR #1 through PR #36, PR #88 through PR #112, PR #119, PR #120, PR #123, PR #127, PR #134, and PR #136 merged to `main` after this iteration | Done for shipped iterations |
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
@@ -18,6 +18,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | API foundation | PR #3, `packages/api` | Foundation shipped |
 | SQL data schema | PR #4, `db/schema.sql` | Foundation shipped |
 | PostgreSQL provenance schema | PR #111, `infra/db/SCHEMA.md`, `infra/db/migrations/001_groceryview_schema.sql` | Shipped after merge |
+| Database migration verifier | PR #112, `infra/db/scripts/verify-migrations.sh` | Shipped after merge |
 | HTTP server | PR #5, `packages/server` | Foundation shipped |
 | SEO pages | PR #6, `apps/web/scripts/pages.mjs` | Foundation shipped |
 | Persistence/migrations | PR #7, `packages/db`, `db/migrations` | Contract/in-memory shipped |
@@ -43,6 +44,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | PostgreSQL query executor | PR #26, `createPgQueryExecutor` | Client adapter shipped |
 | Static web flow scaffolds | PR #27, `apps/web/scripts/pages.mjs` | Static route scaffolds shipped |
 | Notification delivery foundation | PR #28, `packages/notifications` | Provider-neutral delivery shipped |
+| Notification provider readiness gates | PR #136, `buildNotificationProviderReadinessReport` | Shipped after merge |
 | Notification worker orchestration | PR #90, `runNotificationWorkerTick` | Shipped after merge |
 | Notification task persistence | PR #100, `notification_tasks`, repository methods | Shipped after merge |
 | Notification suppression filtering | PR #101, `applyNotificationSuppressions` | Shipped after merge |
@@ -100,7 +102,7 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 - Real OCR/camera/upload pipeline for barcode and receipt scanning. Provider-neutral scan pipeline exists; real camera/OCR providers still missing.
 - Real Expo/React Native screens and device builds. Expo route/readiness config is being added; real React Native component screens and store builds still missing.
 - Real interactive web UI for login, account, household, privacy, basket, and scanner flows. Static page scaffolds are being added before full interactivity.
-- Push/email provider adapters and production notification workers. Provider-neutral delivery, worker tick orchestration, persisted task schedules, acknowledgement application, suppression filtering, persisted suppression records, suppression event normalization, a signed suppression webhook route, worker-level suppression enforcement, delivery health reporting, Prometheus-style metric export, a token-protected metrics endpoint, blocked-report alert planning, and repository-backed worker cycle orchestration exist; real provider credentials, configured worker/cron runtime, provider-specific signature adapters, production metrics scraping, and live alert delivery still missing.
+- Push/email provider adapters and production notification workers. Provider-neutral delivery, worker tick orchestration, persisted task schedules, acknowledgement application, suppression filtering, persisted suppression records, suppression event normalization, a signed suppression webhook route, worker-level suppression enforcement, delivery health reporting, Prometheus-style metric export, a token-protected metrics endpoint, blocked-report alert planning, and repository-backed worker cycle orchestration and provider-readiness gates exist; real provider credentials, configured worker/cron runtime, provider-specific signature adapters, production metrics scraping, and live alert delivery still missing.
 - AdMob/AdSense and subscription billing integration. Provider-neutral monetization contracts are being added; real provider credentials/webhooks still missing.
 - Hosting provider selection, real deployment, secrets, DNS, observability, smoke tests, and rollback. Deployment readiness/rollback gates and scheduled-worker checks are being added; real provider deployment, configured cron runtime, and live smoke proof still missing.
 - Full catalog/data coverage beyond seed products/stores. Catalog coverage reporting exists; real retailer/feed backfill data still missing.

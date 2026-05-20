@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   applyNotificationSuppressions,
   buildNotificationOperationsReport,
+  buildNotificationProviderReadinessReport,
   deliverDueNotifications,
   planNotificationOperationsAlerts,
   formatNotificationOperationsMetrics,
@@ -11,6 +12,83 @@ import {
   runRepositoryNotificationWorkerCycle,
   runNotificationWorkerTick
 } from '../index.js';
+
+describe('buildNotificationProviderReadinessReport', () => {
+  it('fails closed when required provider credentials or health checks are missing', () => {
+    const report = buildNotificationProviderReadinessReport({
+      requiredChannels: ['push', 'email'],
+      providers: [
+        {
+          channel: 'push',
+          providerName: 'expo',
+          configured: true,
+          credentialsPresent: true,
+          healthStatus: 'pass'
+        },
+        {
+          channel: 'email',
+          providerName: 'sendgrid',
+          configured: false,
+          credentialsPresent: false,
+          healthStatus: 'not_run'
+        }
+      ]
+    });
+
+    assert.deepEqual(report, {
+      status: 'blocked',
+      blockers: [
+        'notification_provider_not_configured:email',
+        'notification_provider_credentials_missing:email',
+        'notification_provider_health_not_run:email'
+      ],
+      evidence: [
+        'notification_provider_configured:push:expo',
+        'notification_provider_credentials_present:push',
+        'notification_provider_health_pass:push'
+      ],
+      warnings: [],
+      summary: 'Notification provider readiness is blocked.'
+    });
+  });
+
+  it('passes only when every required provider is configured with credentials and passing health', () => {
+    const report = buildNotificationProviderReadinessReport({
+      requiredChannels: ['push', 'email'],
+      providers: [
+        {
+          channel: 'push',
+          providerName: 'expo',
+          configured: true,
+          credentialsPresent: true,
+          healthStatus: 'pass'
+        },
+        {
+          channel: 'email',
+          providerName: 'sendgrid',
+          configured: true,
+          credentialsPresent: true,
+          healthStatus: 'pass'
+        }
+      ]
+    });
+
+    assert.deepEqual(report, {
+      status: 'ready',
+      blockers: [],
+      evidence: [
+        'notification_provider_configured:push:expo',
+        'notification_provider_credentials_present:push',
+        'notification_provider_health_pass:push',
+        'notification_provider_configured:email:sendgrid',
+        'notification_provider_credentials_present:email',
+        'notification_provider_health_pass:email'
+      ],
+      warnings: [],
+      summary: 'Notification providers are ready.'
+    });
+  });
+});
 
 describe('deliverDueNotifications', () => {
   it('sends due push and email notifications through provider adapters and records results', async () => {
