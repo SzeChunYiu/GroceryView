@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildHealthReport, loadRuntimeConfig } from '../index.js';
+import { fileURLToPath } from 'node:url';
+import { buildHealthReport, createRuntimeHttpHandler, isDirectServerEntrypoint, loadRuntimeConfig } from '../index.js';
 
 describe('runtime config', () => {
   it('loads production runtime config with required secrets and urls', () => {
@@ -68,5 +69,48 @@ describe('runtime config', () => {
       hasBillingWebhookSecret: false,
       hasMetricsToken: false
     });
+  });
+
+  it('creates a runtime HTTP handler from deployment environment secrets', async () => {
+    const handle = createRuntimeHttpHandler({
+      NODE_ENV: 'development',
+      PORT: '3000',
+      AUTH_SECRET: 'auth-secret',
+      DATABASE_URL: 'postgres://example',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'notification-secret',
+      BILLING_WEBHOOK_SECRET: 'billing-secret',
+      METRICS_TOKEN: 'metrics-secret'
+    });
+
+    const health = await handle(new Request('http://localhost/api/health'));
+    assert.equal(health.status, 200);
+    assert.deepEqual(await health.json(), {
+      status: 'ok',
+      service: 'groceryview-server',
+      environment: 'development',
+      hasDatabase: true,
+      hasAuthSecret: true,
+      hasNotificationWebhookSecret: true,
+      hasBillingWebhookSecret: true,
+      hasMetricsToken: true
+    });
+
+    const protectedAccountRoute = await handle(new Request('http://localhost/api/account/subscription-access?userId=user-1'));
+    assert.equal(protectedAccountRoute.status, 401);
+
+    const metricsRoute = await handle(new Request('http://localhost/api/metrics/notifications', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
+    }));
+    assert.equal(metricsRoute.status, 503);
+  });
+
+  it('detects when the server module is executed directly as the deployment entrypoint', () => {
+    const moduleUrl = new URL('../index.js', import.meta.url).href;
+    const modulePath = fileURLToPath(moduleUrl);
+
+    assert.equal(isDirectServerEntrypoint(moduleUrl, modulePath), true);
+    assert.equal(isDirectServerEntrypoint(moduleUrl, '/tmp/other-entrypoint.js'), false);
+    assert.equal(isDirectServerEntrypoint(moduleUrl, undefined), false);
   });
 });
