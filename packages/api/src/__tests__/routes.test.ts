@@ -187,6 +187,23 @@ describe('createGroceryViewApi', () => {
     assert.match(report.guardrails[0], /member-only savings never overwrite verified public shelf evidence/i);
   });
 
+  it('serves receipt review reports with budget actuals, match confidence, and writeback guardrails', () => {
+    const api = createGroceryViewApi();
+
+    const report = api.getReceiptReviewReport('user-1');
+
+    assert.equal(report.userId, 'user-1');
+    assert.equal(report.lineCount, 3);
+    assert.equal(report.matchedCount, 2);
+    assert.equal(report.needsReviewCount, 2);
+    assert.equal(report.review.budget.afterReceiptSpend, 762);
+    assert.equal(report.review.budget.remaining, 38);
+    assert.equal(report.review.comparedWithLocalMedianDelta, 3);
+    assert.deepEqual(report.review.goodBuys.map((item) => item.productId), ['coffee']);
+    assert.deepEqual(report.review.overspend.map((item) => [item.productId, item.deltaVsMedian]), [['cheese', 18]]);
+    assert.match(report.guardrails[0], /Low confidence.*cannot update catalog or Deal Score/i);
+  });
+
   it('serves category market reports with terminal-style mover evidence', () => {
     const api = createGroceryViewApi();
 

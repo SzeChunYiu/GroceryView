@@ -157,6 +157,26 @@ describe('createHttpHandler', () => {
       ['private-label-milk', 'eligible', 7]
     ]);
 
+    const receiptReview = await handle(new Request('http://localhost/api/receipts/review?userId=user-1'));
+    assert.equal(receiptReview.status, 200);
+    const receiptReviewBody = await json(receiptReview) as {
+      userId: string;
+      lineCount: number;
+      matchedCount: number;
+      needsReviewCount: number;
+      review: { budget: { afterReceiptSpend: number; remaining: number }; comparedWithLocalMedianDelta: number; confidenceLabel: string };
+      guardrails: string[];
+    };
+    assert.equal(receiptReviewBody.userId, 'user-1');
+    assert.equal(receiptReviewBody.lineCount, 3);
+    assert.equal(receiptReviewBody.matchedCount, 2);
+    assert.equal(receiptReviewBody.needsReviewCount, 2);
+    assert.equal(receiptReviewBody.review.budget.afterReceiptSpend, 762);
+    assert.equal(receiptReviewBody.review.budget.remaining, 38);
+    assert.equal(receiptReviewBody.review.comparedWithLocalMedianDelta, 3);
+    assert.equal(receiptReviewBody.review.confidenceLabel, 'medium-high');
+    assert.match(receiptReviewBody.guardrails[0] ?? '', /cannot update catalog or Deal Score/i);
+
     const categoryMarket = await handle(new Request('http://localhost/api/categories/coffee/market'));
     assert.equal(categoryMarket.status, 200);
     const categoryMarketBody = await json(categoryMarket) as {

@@ -612,6 +612,13 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (authError) return authError;
         if (method === 'GET') return jsonResponse(api.getLoyaltyOfferReport(user));
       }
+      if (path === '/api/receipts/review') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(api.getReceiptReviewReport(user));
+      }
       const categoryMarketMatch = path.match(/^\/api\/categories\/([^/]+)\/market$/);
       if (method === 'GET' && categoryMarketMatch) {
         const report = api.getCategoryMarket(decodeURIComponent(categoryMarketMatch[1]));
@@ -1202,6 +1209,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/nutrition/value': { get: publicOperation('Get nutrition per krona rankings with sugar and salt warning guardrails.') },
       '/api/pantry/replenishment': { get: protectedOperation('Get pantry replenishment status with expiry, basket duplicate, and best-deal context.') },
       '/api/loyalty/offers': { get: protectedOperation('Get account-scoped loyalty offers with savings, coupon actions, and membership guardrails.') },
+      '/api/receipts/review': { get: protectedOperation('Get receipt review budget impact, match confidence, and writeback guardrails.') },
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },

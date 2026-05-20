@@ -44,6 +44,7 @@ describe('buildOpenApiDocument', () => {
       '/api/products/{id}/prices',
       '/api/products/{id}/terminal',
       '/api/readiness/postgres',
+      '/api/receipts/review',
       '/api/scans/process',
       '/api/scans/upload-url',
       '/api/stores',
@@ -91,6 +92,8 @@ describe('buildOpenApiDocument', () => {
     assert.match(doc.paths['/api/pantry/replenishment'].get?.summary ?? '', /pantry replenishment/i);
     assert.deepEqual(doc.paths['/api/loyalty/offers'].get?.security, [{ bearerAuth: [] }]);
     assert.match(doc.paths['/api/loyalty/offers'].get?.summary ?? '', /loyalty offers/i);
+    assert.deepEqual(doc.paths['/api/receipts/review'].get?.security, [{ bearerAuth: [] }]);
+    assert.match(doc.paths['/api/receipts/review'].get?.summary ?? '', /receipt review/i);
     assert.equal(doc.paths['/api/categories/{category}/market'].get?.security, undefined);
     assert.match(doc.paths['/api/categories/{category}/market'].get?.summary ?? '', /category market/i);
   });
