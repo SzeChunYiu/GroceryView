@@ -12,6 +12,8 @@ import {
   planIngestionBatch,
   planRetailerConnectorRun,
   planRetailerSourceAccess,
+  planRetailerSurfacePolicy,
+  retailerRobotsPolicyMatrix,
   runRetailerConnector,
   stockholmStoreLocatorFixtures,
   validateStoreLocatorFixtures
@@ -156,6 +158,62 @@ describe('planRetailerSourceAccess', () => {
       reason: 'Retailer page ingestion requires robots.txt allow and approved legal review.',
       requiredActions: ['robots_txt_allow_required', 'legal_review_approval_required']
     });
+  });
+});
+
+describe('planRetailerSurfacePolicy', () => {
+  it('covers every target retailer and required source-policy surface', () => {
+    const chains = ['city_gross', 'coop', 'hemkop', 'ica', 'lidl', 'willys'] as const;
+    const surfaces = ['store_locator', 'offer', 'product', 'search', 'basket', 'account', 'member', 'app_api'] as const;
+
+    assert.equal(retailerRobotsPolicyMatrix.length, chains.length * surfaces.length);
+    for (const chainId of chains) {
+      for (const surface of surfaces) {
+        const plan = planRetailerSurfacePolicy({ chainId, surface });
+        assert.equal(plan.chainId, chainId);
+        assert.equal(plan.surface, surface);
+        assert.match(plan.robotsUrl, /^https:\/\/www\..+\/robots\.txt$/);
+        assert.equal(Number.isNaN(Date.parse(plan.checkedAt)), false);
+      }
+    }
+  });
+
+  it('fails closed for blocked account, basket, member, and search surfaces', () => {
+    for (const chainId of ['city_gross', 'coop', 'hemkop', 'ica', 'lidl', 'willys'] as const) {
+      for (const surface of ['account', 'basket', 'member'] as const) {
+        const plan = planRetailerSurfacePolicy({ chainId, surface });
+        assert.equal(plan.policy, 'blocked');
+        assert.equal(plan.canFetch, false);
+        assert.ok(plan.requiredActions.includes('source_surface_blocked'));
+      }
+    }
+
+    for (const chainId of ['city_gross', 'coop', 'hemkop', 'lidl', 'willys'] as const) {
+      const plan = planRetailerSurfacePolicy({ chainId, surface: 'search' });
+      assert.equal(plan.policy, 'blocked');
+      assert.equal(plan.canFetch, false);
+      assert.ok(plan.disallowedPathMatches.length > 0);
+    }
+  });
+
+  it('preserves crawl-delay metadata for crawl-delay retailers', () => {
+    for (const chainId of ['hemkop', 'willys'] as const) {
+      const plan = planRetailerSurfacePolicy({ chainId, surface: 'store_locator' });
+      assert.equal(plan.policy, 'fixture_review');
+      assert.equal(plan.canFetch, false);
+      assert.equal(plan.crawlDelaySeconds, 10);
+      assert.ok(plan.requiredActions.includes('crawl_delay_10s_required'));
+    }
+  });
+
+  it('keeps app and API surfaces stub-only with no network fetch', () => {
+    for (const chainId of ['city_gross', 'coop', 'hemkop', 'ica', 'lidl', 'willys'] as const) {
+      const plan = planRetailerSurfacePolicy({ chainId, surface: 'app_api' });
+      assert.equal(plan.policy, 'stub_only');
+      assert.equal(plan.canFetch, false);
+      assert.deepEqual(plan.disallowedPathMatches, []);
+      assert.ok(plan.requiredActions.includes('stub_only_no_network_fetch'));
+    }
   });
 });
 
