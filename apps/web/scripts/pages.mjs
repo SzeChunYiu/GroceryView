@@ -295,6 +295,24 @@ window.GroceryViewFlowActions = (() => {
       setResult('scanner', 'Scan API processing failed: ' + error.message + '. Local preview remains staged.');
     }
   };
+  const loadScannerStorageHealthFromApi = async () => {
+    const config = getApiConfig();
+    if (!config.apiBase) {
+      setResult('scanner', 'Local preview: add an API base URL before checking private scan upload storage.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/health', config, false), {
+        method: 'GET'
+      });
+      const payload = await requireApiSuccess(response);
+      setResult('scanner', payload.hasScanUploadStorage
+        ? 'Connected API: private scan upload storage is configured for receipt and barcode captures.'
+        : 'Connected API: private scan upload storage is not configured; uploads will stay in local preview.');
+    } catch (error) {
+      setResult('scanner', 'Scan storage health check failed: ' + error.message + '. Local preview remains staged.');
+    }
+  };
   const saveHouseholdToApi = async (form) => {
     const config = getApiConfig();
     const data = new FormData(form);
@@ -534,6 +552,10 @@ window.GroceryViewFlowActions = (() => {
         await loadPrivacyFulfillmentFromApi();
         return;
       }
+      if (flow === 'scanner' && action === 'check-storage-health') {
+        await loadScannerStorageHealthFromApi();
+        return;
+      }
       if (flow === 'product-terminal' && action === 'load-product-terminal') {
         await loadProductTerminalFromApi(button);
         return;
@@ -753,7 +775,7 @@ const pages = [
     path: 'scanner/index.html',
     title: 'Barcode and receipt scanner — GroceryView',
     description: 'GroceryView scanner page scaffold for barcode lookup, receipt parsing, confidence, and manual review.',
-    body: `<section class="card" data-groceryview-flow="scanner"><div class="eyebrow">Scanner</div><h1>Barcode and receipt scanner</h1><p class="lede">Scan products and receipts, surface confidence levels, and send uncertain matches to the manual review queue.</p><div class="grid"><div class="metric"><strong>Barcode</strong><span>product lookup and smart swaps</span></div><div class="metric"><strong>Receipt</strong><span>budget impact review</span></div><div class="metric"><strong>Confidence</strong><span>low-confidence review routing</span></div></div><form class="flow-panel" aria-label="Scanner upload preview"><label>Receipt or barcode image<input name="scanImage" type="file" accept="image/*" /></label><button type="submit">Preview upload</button></form><div class="flow-panel" aria-label="Scanner review actions"><button type="button" data-flow-action="route-review">Route to review</button><button type="button" data-flow-action="mark-matched">Mark matched</button></div><p class="flow-result" data-flow-result="scanner" aria-live="polite">Uploads remain local preview until OCR provider credentials are configured.</p></section><section class="card" style="margin-top:16px"><h2>Review queue</h2><table class="table"><thead><tr><th>Capture</th><th>Status</th><th>Next action</th></tr></thead><tbody><tr><td>Coop Farsta receipt</td><td>Needs human review</td><td>Confirm milk line item and loyalty discount</td></tr><tr><td>Arla Milk barcode</td><td>Matched</td><td>Ready for basket price update</td></tr><tr><td>Loose tomatoes label</td><td>Low confidence</td><td>Route to product matching queue</td></tr></tbody></table></section>`
+    body: `<section class="card" data-groceryview-flow="scanner"><div class="eyebrow">Scanner</div><h1>Barcode and receipt scanner</h1><p class="lede">Scan products and receipts, surface confidence levels, and send uncertain matches to the manual review queue.</p><div class="grid"><div class="metric"><strong>Barcode</strong><span>product lookup and smart swaps</span></div><div class="metric"><strong>Receipt</strong><span>budget impact review</span></div><div class="metric"><strong>Confidence</strong><span>low-confidence review routing</span></div></div><form class="flow-panel" aria-label="Scanner upload preview"><label>Receipt or barcode image<input name="scanImage" type="file" accept="image/*" /></label><button type="submit">Preview upload</button></form><div class="flow-panel" aria-label="Scanner review actions"><button type="button" data-flow-action="check-storage-health">Check upload storage</button><button type="button" data-flow-action="route-review">Route to review</button><button type="button" data-flow-action="mark-matched">Mark matched</button></div><p class="flow-result" data-flow-result="scanner" aria-live="polite">Uploads remain local preview until OCR provider credentials are configured.</p></section><section class="card" style="margin-top:16px"><h2>Upload readiness</h2><table class="table"><thead><tr><th>Dependency</th><th>Ready state</th><th>Customer impact</th></tr></thead><tbody><tr><td>Private scan storage</td><td>Health endpoint confirms configuration</td><td>Receipts and barcodes upload before OCR processing</td></tr><tr><td>Receipt OCR</td><td>Provider checked during processing</td><td>Uncertain rows route to human review</td></tr><tr><td>Barcode lookup</td><td>Provider checked during processing</td><td>Matched products update basket prices</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Review queue</h2><table class="table"><thead><tr><th>Capture</th><th>Status</th><th>Next action</th></tr></thead><tbody><tr><td>Coop Farsta receipt</td><td>Needs human review</td><td>Confirm milk line item and loyalty discount</td></tr><tr><td>Arla Milk barcode</td><td>Matched</td><td>Ready for basket price update</td></tr><tr><td>Loose tomatoes label</td><td>Low confidence</td><td>Route to product matching queue</td></tr></tbody></table></section>`
   },
   {
     path: 'receipts/review/index.html',
