@@ -443,6 +443,8 @@ export type DeploymentGateDigest = {
   status: 'ready' | 'blocked';
   blockers: string[];
   totalBlockers: number;
+  readyChecks: number;
+  blockedChecks: number;
   checks: {
     deploymentReadiness: DeploymentReadinessReport['status'];
     smokeEvidence: DeploymentSmokeEvidenceReport['status'];
@@ -462,10 +464,19 @@ export function buildDeploymentGateDigest(input: DeploymentGateDigestInput): Dep
   if (input.releaseValidation === 'fail') blockers.push('release_validation_failed');
   if (input.releaseValidation === 'not_run') blockers.push('release_validation_not_run');
 
+  const checkStatuses = [
+    input.readiness.status,
+    input.smokeEvidence.status,
+    input.secretRotation.status,
+    input.releaseValidation === 'pass' ? 'ready' : 'blocked'
+  ];
+
   return {
     status: blockers.length === 0 ? 'ready' : 'blocked',
     blockers,
     totalBlockers: blockers.length,
+    readyChecks: checkStatuses.filter((status) => status === 'ready').length,
+    blockedChecks: checkStatuses.filter((status) => status === 'blocked').length,
     checks: {
       deploymentReadiness: input.readiness.status,
       smokeEvidence: input.smokeEvidence.status,
