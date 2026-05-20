@@ -33,8 +33,6 @@ describe('buildStaticPages', () => {
         'products/coffee/index.html',
         'receipts/review/index.html',
         'retailers/freshness/index.html',
-        'routes/shopping/index.html',
-        'savings/ledger/index.html',
         'savings/smart-swaps/index.html',
         'scanner/index.html',
         'stores/compare/index.html',
@@ -46,18 +44,46 @@ describe('buildStaticPages', () => {
       const product = await readFile(join(root, 'products/coffee/index.html'), 'utf8');
       assert.match(product, /ZOEGAS-COFFEE-450G/);
       assert.match(product, /Deal Score/);
-      assert.match(product, /Current store prices/);
-      assert.match(product, /Unit price/);
-      assert.match(product, /promotion/);
-      assert.match(product, /Member label: Stammis price/);
-      assert.match(product, /94% verified retailer page/);
-      assert.match(product, /2026-05-20 06:00/);
-      assert.match(product, /Unverified estimate: do not treat as official shelf price/);
-      assert.match(product, /excluded from official shelf-price claims/);
-      assert.match(product, /Availability/);
-      assert.match(product, /In stock/);
-      assert.match(product, /Out of stock report/);
-      assert.match(product, /Verified 34 min ago/);
+      assert.match(product, /Product price terminal/);
+      assert.match(product, /Current best verified shelf price: 54\.90 SEK/);
+      assert.match(product, /Best verified shelf/);
+      assert.match(product, /Lowest visible promo/);
+      assert.match(product, /52W range/);
+      assert.match(product, /Evidence volume/);
+      assert.match(product, /Stockholm vs local price distribution/);
+      assert.match(product, /P05 48.90/);
+      assert.match(product, /Median 59.90/);
+      assert.match(product, /Odenplan local area/);
+      assert.match(product, /Cheaper than 96% of local observations/);
+      assert.match(product, /not treated as an official shelf-price comparison/);
+      assert.match(product, /Trading-style price chart/);
+      assert.match(product, /7D/);
+      assert.match(product, /30D/);
+      assert.match(product, /90D/);
+      assert.match(product, /1Y/);
+      assert.match(product, /All verified/);
+      assert.match(product, /candlesticks, moving median/);
+      assert.match(product, /weekly promo/);
+      assert.match(product, /30D moving median/);
+      assert.match(product, /52-week low touch/);
+      assert.match(product, /ICA Kvantum Liljeholmen - 54\.90 SEK/);
+      assert.match(product, /Willys Odenplan/);
+      assert.match(product, /Current best comparable price/);
+      assert.match(product, /Official shelf price/);
+      assert.match(product, /Promo campaign/);
+      assert.match(product, /Member-only/);
+      assert.match(product, /Unverified \/ estimated/);
+      assert.match(product, /Estimated fallback\. Never styled as an official shelf price/);
+      assert.match(product, /2026-05-16 08:45 UTC/);
+      assert.match(product, /Price evidence guardrails/);
+
+      const styles = await readFile(join(process.cwd(), 'public/styles.css'), 'utf8');
+      assert.match(styles, /\.quote-strip/);
+      assert.match(styles, /\.distribution-board/);
+      assert.match(styles, /\.histogram/);
+      assert.match(styles, /\.price-terminal/);
+      assert.match(styles, /\.status\.verified/);
+      assert.match(styles, /\.flow-panel/);
 
       const market = await readFile(join(root, 'market/index.html'), 'utf8');
       assert.match(market, /Stockholm Grocery Market/);
@@ -80,13 +106,6 @@ describe('buildStaticPages', () => {
       assert.match(retailerFreshness, /Coop/);
       assert.match(retailerFreshness, /Pause new alerts/);
       assert.match(retailerFreshness, /Stale retailer-page rows cannot trigger household notifications/);
-
-      const shoppingRoute = await readFile(join(root, 'routes/shopping/index.html'), 'utf8');
-      assert.match(shoppingRoute, /Shopping route planner/);
-      assert.match(shoppingRoute, /Ordered stops/);
-      assert.match(shoppingRoute, /Lidl Sveavägen/);
-      assert.match(shoppingRoute, /Route time can reorder stops but cannot change product deal ranking/);
-      assert.match(shoppingRoute, /Unverified prices cannot justify an extra route stop/);
 
       const priceConfidence = await readFile(join(root, 'prices/confidence/index.html'), 'utf8');
       assert.match(priceConfidence, /Price confidence guide/);
