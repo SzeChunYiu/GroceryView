@@ -242,3 +242,19 @@ Application repository pantry inventory for replenishment planning.
 Key columns: `user_id`, `product_id`, `name`, `category`, `quantity`, `unit`, `minimum_quantity`, `target_quantity`, `expires_on`, `updated_at`.
 
 Indexes: `pantry_items_user_idx` for account inventory reads and `pantry_items_expiry_idx` for expiry-aware replenishment jobs.
+
+### `receipt_uploads`
+
+Account-scoped receipt scan metadata for OCR review and purchase history workflows.
+
+Key columns: `user_id`, `store_id`, `image_uri`, `purchased_at`, `total_amount`, `ocr_confidence`, `status`, `created_at`, `updated_at`.
+
+Indexes: `receipt_uploads_user_purchased_idx` for account purchase history reads and `receipt_uploads_status_idx` for review queue processing.
+
+### `receipt_items`
+
+Line items parsed from receipt scans, including optional product matches.
+
+Key columns: `receipt_id`, `raw_name`, `product_id`, `canonical_name`, `quantity`, `item_total`, `match_confidence`.
+
+Indexes: `receipt_items_receipt_idx` for receipt detail reads.
