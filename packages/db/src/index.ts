@@ -813,6 +813,11 @@ export type PostgresRepositoryProbe = {
   run(executor: QueryExecutor): Promise<void>;
 };
 
+export type BuildPostgresRepositorySmokeProbesInput = {
+  runId: string;
+  now: string;
+};
+
 export type CollectPostgresIntegrationProbeInput = {
   executor: QueryExecutor;
   requiredTables?: readonly string[];
@@ -841,6 +846,66 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '007_notification_suppressions',
   '008_notification_task_suppressed_status'
 ] as const;
+
+function assertProbe(condition: boolean, message: string): void {
+  if (!condition) throw new Error(message);
+}
+
+export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositorySmokeProbesInput): PostgresRepositoryProbe[] {
+  const safeId = input.runId.replace(/[^a-zA-Z0-9_-]/g, '-');
+  const userId = `postgres-probe-user-${safeId}`;
+  const assignmentId = `postgres-probe-assignment-${safeId}`;
+  const suppressionId = `postgres-probe-suppression-${safeId}`;
+
+  return [
+    {
+      name: 'user_budget_round_trip',
+      async run(executor) {
+        const repository = createPostgresRepository(executor);
+        await repository.upsertUser({ id: userId, email: `${userId}@example.invalid` });
+        await repository.upsertBudget(userId, { weeklyBudget: 1000, monthlyBudget: 4000 });
+        const budget = await repository.getBudget(userId);
+        assertProbe(budget?.weeklyBudget === 1000 && budget.monthlyBudget === 4000, 'user budget round trip did not return the written values');
+      }
+    },
+    {
+      name: 'human_review_assignment_round_trip',
+      async run(executor) {
+        const repository = createPostgresRepository(executor);
+        await repository.saveHumanReviewAssignment({
+          id: assignmentId,
+          reviewId: assignmentId,
+          subjectType: 'product_match',
+          subjectId: `postgres-probe-match-${safeId}`,
+          priority: 'low',
+          reason: 'PostgreSQL integration smoke probe.',
+          assigneeId: `postgres-probe-reviewer-${safeId}`,
+          assignedAt: input.now,
+          dueAt: input.now,
+          status: 'assigned'
+        });
+        const assignments = await repository.listOpenHumanReviewAssignments();
+        assertProbe(assignments.some((assignment) => assignment.id === assignmentId), 'human review assignment probe row was not readable');
+      }
+    },
+    {
+      name: 'notification_suppression_round_trip',
+      async run(executor) {
+        const repository = createPostgresRepository(executor);
+        await repository.upsertNotificationSuppression({
+          id: suppressionId,
+          recipient: `${userId}@example.invalid`,
+          channel: 'email',
+          reason: 'unsubscribed',
+          active: true,
+          updatedAt: input.now
+        });
+        const suppressions = await repository.listActiveNotificationSuppressions();
+        assertProbe(suppressions.some((suppression) => suppression.id === suppressionId), 'notification suppression probe row was not readable');
+      }
+    }
+  ];
+}
 
 export type PostgresIntegrationReadinessReport = {
   status: 'ready' | 'blocked';
