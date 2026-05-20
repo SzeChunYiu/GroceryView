@@ -446,10 +446,16 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       }
 
       const productPricesMatch = path.match(/^\/api\/products\/([^/]+)\/prices$/);
-      if (method === 'GET' && productPricesMatch) return jsonResponse(api.getProductPrices(decodeURIComponent(productPricesMatch[1])));
+      if (method === 'GET' && productPricesMatch) {
+        const productId = decodeURIComponent(productPricesMatch[1]);
+        return api.getProduct(productId) ? jsonResponse(api.getProductPrices(productId)) : errorResponse(404, 'Product not found.');
+      }
 
       const productHistoryMatch = path.match(/^\/api\/products\/([^/]+)\/history$/);
-      if (method === 'GET' && productHistoryMatch) return jsonResponse(api.getProductHistory(decodeURIComponent(productHistoryMatch[1])));
+      if (method === 'GET' && productHistoryMatch) {
+        const productId = decodeURIComponent(productHistoryMatch[1]);
+        return api.getProduct(productId) ? jsonResponse(api.getProductHistory(productId)) : errorResponse(404, 'Product not found.');
+      }
 
       const favoriteStoreMatch = path.match(/^\/api\/users\/([^/]+)\/favorite-stores$/);
       if (favoriteStoreMatch) {

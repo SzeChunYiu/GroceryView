@@ -73,6 +73,18 @@ describe('createHttpHandler', () => {
     assert.equal((await json(index) as { label: string }).label, 'Stockholm Grocery Index');
   });
 
+  it('returns 404 for unknown product child resources', async () => {
+    const handle = createHttpHandler();
+
+    const prices = await handle(new Request('http://localhost/api/products/missing-product/prices'));
+    assert.equal(prices.status, 404);
+    assert.match((await json(prices) as { error: string }).error, /Product not found/);
+
+    const history = await handle(new Request('http://localhost/api/products/missing-product/history'));
+    assert.equal(history.status, 404);
+    assert.match((await json(history) as { error: string }).error, /Product not found/);
+  });
+
   it('mutates favorite stores, watchlist, basket, and budget through proposal routes', async () => {
     const handle = createHttpHandler();
 
