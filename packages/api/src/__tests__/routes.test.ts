@@ -94,6 +94,10 @@ describe('createGroceryViewApi', () => {
       }
     );
     assert.deepEqual(
+      market.movers.find((mover) => mover.productId === 'milk')?.range52Week,
+      { low: 13.9, high: 16.9 }
+    );
+    assert.deepEqual(
       market.topDeals.find((deal) => deal.productId === 'milk'),
       {
         productId: 'milk',
@@ -193,6 +197,7 @@ describe('createGroceryViewApi', () => {
     assert.equal(terminal?.chart.series[0].lineStyle, 'solid');
     assert.deepEqual(terminal?.chart.series[0].points.map((point) => point.value), [69.9, 59.9, 49.9]);
     assert.equal(terminal?.historySummary?.isNewLow, true);
+    assert.deepEqual(api.getProductPriceTerminal('milk')?.quote.range52Week, { low: 13.9, high: 16.9 });
     assert.deepEqual(terminal?.evidenceGuardrails, [
       'Verified shelf or retailer-page prices can power current quote, Deal Score, and basket totals.',
       'Member, promotion, estimated, and low-confidence rows must stay explicitly labeled before customer action.',

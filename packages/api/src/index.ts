@@ -568,6 +568,14 @@ function roundPrice(value: number): number {
   return Math.round((value + Number.EPSILON) * 100) / 100;
 }
 
+function range52WeekFrom(history: Array<{ price: number }>, bestPrice: StorePrice | null): { low: number; high: number } | null {
+  const prices = history.map((point) => point.price);
+  if (bestPrice) prices.push(bestPrice.price);
+  return prices.length > 0
+    ? { low: roundPrice(Math.min(...prices)), high: roundPrice(Math.max(...prices)) }
+    : null;
+}
+
 function quantile(sorted: number[], q: number): number {
   if (sorted.length === 0) return 0;
   if (sorted.length === 1) return roundPrice(sorted[0]!);
@@ -639,10 +647,7 @@ function productPriceTerminalFor(product: ProductDetail, asOf?: string): Product
   const oneMonthMovePercent = latestHistory && previousHistory && previousHistory.price > 0
     ? roundPercent(((latestHistory.price - previousHistory.price) / previousHistory.price) * 100)
     : null;
-  const historyPrices = sortedHistory.map((point) => point.price);
-  const range52Week = historyPrices.length > 0
-    ? { low: roundPrice(Math.min(...historyPrices)), high: roundPrice(Math.max(...historyPrices)) }
-    : null;
+  const range52Week = range52WeekFrom(sortedHistory, bestPrice);
   const localDistrict = bestPrice ? storeDistrict(bestPrice.storeId) : null;
   const localPrices = localDistrict
     ? product.currentPrices.filter((price) => storeDistrict(price.storeId) === localDistrict)
@@ -699,10 +704,7 @@ function marketMoverFor(product: ProductDetail): MarketMover {
   const oneMonthMovePercent = latestHistory && previousHistory && previousHistory.price > 0
     ? roundPercent(((latestHistory.price - previousHistory.price) / previousHistory.price) * 100)
     : null;
-  const historyPrices = sortedHistory.map((point) => point.price);
-  const range52Week = historyPrices.length > 0
-    ? { low: roundPrice(Math.min(...historyPrices)), high: roundPrice(Math.max(...historyPrices)) }
-    : null;
+  const range52Week = range52WeekFrom(sortedHistory, bestPrice);
   const rangeSpread = range52Week ? range52Week.high - range52Week.low : 0;
   const range52WeekPositionPercent = bestPrice && range52Week && rangeSpread > 0
     ? roundPercent(Math.max(0, Math.min(100, ((bestPrice.price - range52Week.low) / rangeSpread) * 100)))
