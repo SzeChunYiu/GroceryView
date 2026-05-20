@@ -31,6 +31,10 @@ describe('buildStaticPages', () => {
       const market = await readFile(join(root, 'market/index.html'), 'utf8');
       assert.match(market, /Stockholm Grocery Market/);
       assert.match(market, /Coffee Index/);
+      assert.match(market, /Brand-tier indices/);
+      assert.match(market, /Private Label Index/);
+      assert.match(market, /Premium Brand Index/);
+      assert.match(market, /private-label savings vs national brands/);
 
       const store = await readFile(join(root, 'stores/willys-odenplan/index.html'), 'utf8');
       assert.match(store, /Store highlights/);

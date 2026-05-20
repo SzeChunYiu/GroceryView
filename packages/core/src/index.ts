@@ -185,6 +185,89 @@ export function calculateFixedBasketIndex(input: FixedBasketIndexInput): FixedBa
 
 export type BrandTier = 'national' | 'premium' | 'standard_private_label' | 'budget_private_label' | 'organic_private_label' | 'discount_chain_label';
 
+export type BrandTierPriceObservation = {
+  brandTier: BrandTier;
+  category: string;
+  baseUnitPrice: number;
+  currentUnitPrice: number;
+};
+
+export type BrandTierIndex = {
+  brandTier: BrandTier;
+  label: string;
+  value: number;
+  movementPercent: number;
+  categoryCount: number;
+};
+
+export type BrandTierIndexSummary = {
+  indices: BrandTierIndex[];
+  privateLabelSavingsPercent: number;
+  highestSavingsCategories: string[];
+  premiumGapPercent: number;
+};
+
+const brandTierLabels: Record<BrandTier, string> = {
+  national: 'National Brand Index',
+  premium: 'Premium Brand Index',
+  standard_private_label: 'Standard Private Label Index',
+  budget_private_label: 'Budget Private Label Index',
+  organic_private_label: 'Organic Brand Index',
+  discount_chain_label: 'Private Label Index'
+};
+
+export function calculateBrandTierIndices(observations: BrandTierPriceObservation[]): BrandTierIndexSummary {
+  if (observations.length === 0) throw new Error('At least one brand-tier observation is required.');
+
+  const byTier = new Map<BrandTier, BrandTierPriceObservation[]>();
+  for (const observation of observations) {
+    const current = byTier.get(observation.brandTier) ?? [];
+    current.push(observation);
+    byTier.set(observation.brandTier, current);
+  }
+
+  const indices = [...byTier.entries()]
+    .map(([brandTier, rows]) => calculateFixedBasketIndex({
+      id: `${brandTier}-index`,
+      label: brandTierLabels[brandTier],
+      baseDate: 'brand-tier-base',
+      currentDate: 'brand-tier-current',
+      components: rows.map((row) => ({ productId: row.category, baseUnitPrice: row.baseUnitPrice, currentUnitPrice: row.currentUnitPrice, weight: 1 }))
+    }))
+    .map((index) => ({
+      brandTier: index.id.replace('-index', '') as BrandTier,
+      label: index.label,
+      value: index.value,
+      movementPercent: index.movementPercent,
+      categoryCount: index.components.length
+    }))
+    .sort((a, b) => a.value - b.value);
+
+  const nationalByCategory = new Map(observations.filter((row) => row.brandTier === 'national').map((row) => [row.category, row.currentUnitPrice]));
+  const privateRows = observations.filter((row) => isPrivateLabel(row.brandTier));
+  const savingsByCategory = privateRows
+    .map((row) => {
+      const national = nationalByCategory.get(row.category);
+      if (!national || national <= 0) return undefined;
+      return { category: row.category, savingsPercent: ((national - row.currentUnitPrice) / national) * 100 };
+    })
+    .filter((row): row is { category: string; savingsPercent: number } => row !== undefined);
+
+  const averageSavings = savingsByCategory.length
+    ? savingsByCategory.reduce((sum, row) => sum + row.savingsPercent, 0) / savingsByCategory.length
+    : 0;
+  const premiumIndex = indices.find((index) => index.brandTier === 'premium')?.value;
+  const privateIndexValues = indices.filter((index) => isPrivateLabel(index.brandTier)).map((index) => index.value);
+  const privateIndexAverage = privateIndexValues.length ? privateIndexValues.reduce((sum, value) => sum + value, 0) / privateIndexValues.length : undefined;
+
+  return {
+    indices,
+    privateLabelSavingsPercent: roundMoney(averageSavings),
+    highestSavingsCategories: savingsByCategory.sort((a, b) => b.savingsPercent - a.savingsPercent).slice(0, 3).map((row) => row.category),
+    premiumGapPercent: premiumIndex !== undefined && privateIndexAverage !== undefined ? roundMoney(((premiumIndex - privateIndexAverage) / privateIndexAverage) * 100) : 0
+  };
+}
+
 export type SearchableProduct = {
   id: string;
   ticker: string;
