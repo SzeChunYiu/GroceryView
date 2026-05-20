@@ -318,6 +318,15 @@ describe('buildStaticPages', () => {
       assert.match(humanReview, /SLA breached/);
       assert.match(humanReview, /Approve product match/);
       assert.match(humanReview, /approve_product_match/);
+      assert.match(humanReview, /Connected human review API/);
+      assert.match(humanReview, /Load live review queue/);
+      assert.match(humanReview, /data-groceryview-flow="human-review"/);
+      assert.match(humanReview, /data-flow-action="load-human-review"/);
+      assert.match(humanReview, /data-human-review-assignments/);
+      assert.match(humanReview, /data-human-review-sla/);
+      assert.match(humanReview, /data-human-review-priority/);
+      assert.match(humanReview, /fetch\(apiUrl\('\/api\/human-review\/assignments'/);
+      assert.match(humanReview, /Connected human review queue loaded/);
 
       const privacy = await readFile(join(root, 'privacy/index.html'), 'utf8');
       assert.match(privacy, /Export or delete your data/);
