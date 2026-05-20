@@ -25,6 +25,7 @@ describe('buildStaticPages', () => {
         'market/index.html',
         'meal-plans/index.html',
         'notifications/inbox/index.html',
+        'pantry/index.html',
         'prices/confidence/index.html',
         'privacy/index.html',
         'products/coffee/index.html',
@@ -193,6 +194,13 @@ describe('buildStaticPages', () => {
       assert.match(mealPlans, /Tuesday pasta bake/);
       assert.match(mealPlans, /Needs coffee promo confirmation/);
       assert.match(mealPlans, /Estimated produce prices cannot reduce the weekly meal budget/);
+
+      const pantry = await readFile(join(root, 'pantry/index.html'), 'utf8');
+      assert.match(pantry, /Pantry inventory/);
+      assert.match(pantry, /Inventory signals/);
+      assert.match(pantry, /Rice 1kg/);
+      assert.match(pantry, /Use before expiry/);
+      assert.match(pantry, /Meal plans consume expiring pantry items before adding duplicate basket lines/);
 
       const watchlist = await readFile(join(root, 'watchlist/index.html'), 'utf8');
       assert.match(watchlist, /Price watchlist workbench/);

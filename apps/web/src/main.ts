@@ -116,6 +116,12 @@ const mealPlanRows = [
   { meal: 'Saturday coffee brunch', items: 'Zoégas Coffee 450g, eggs, bread', cost: '176 SEK', fit: 'Favorite-store pickup', status: 'Needs coffee promo confirmation' }
 ];
 
+const pantryRows = [
+  { item: 'Rice 1kg', onHand: '0.3 kg', reorder: 'Below 0.5 kg', action: 'Add Lidl private-label rice', status: 'Low stock' },
+  { item: 'Eggs', onHand: '4 left', reorder: 'Needed for meal plan', action: 'Add verified 12-pack deal', status: 'Reorder' },
+  { item: 'Tomatoes', onHand: '2 days fresh', reorder: 'Use before expiry', action: 'Hold new produce line', status: 'Use first' }
+];
+
 const watchlistRows = [
   { product: 'Zoégas Coffee 450g', target: '50 SEK', current: '49.90 SEK', trigger: 'Deal Score >= 80', status: 'Ready for push' },
   { product: 'Butter 600g', target: '45 SEK', current: '54.90 SEK', trigger: '52-week low', status: 'Watching' },
@@ -518,6 +524,16 @@ app.innerHTML = `
           <thead><tr><th>Meal</th><th>Key items</th><th>Cost</th><th>Fit</th><th>Status</th></tr></thead>
           <tbody>
             ${mealPlanRows.map((row) => `<tr><td>${row.meal}</td><td>${row.items}</td><td>${row.cost}</td><td>${row.fit}</td><td><span class="status">${row.status}</span></td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Pantry inventory</h2>
+        <p class="lede"><a href="/pantry/">Open pantry inventory</a> to avoid duplicate basket lines and prioritize expiring staples.</p>
+        <table class="table">
+          <thead><tr><th>Item</th><th>On hand</th><th>Reorder</th><th>Action</th><th>Status</th></tr></thead>
+          <tbody>
+            ${pantryRows.map((row) => `<tr><td>${row.item}</td><td>${row.onHand}</td><td>${row.reorder}</td><td>${row.action}</td><td><span class="status">${row.status}</span></td></tr>`).join('')}
           </tbody>
         </table>
       </div>
