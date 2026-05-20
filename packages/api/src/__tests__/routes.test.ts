@@ -187,6 +187,37 @@ describe('createGroceryViewApi', () => {
     assert.match(report.guardrails[0], /member-only savings never overwrite verified public shelf evidence/i);
   });
 
+  it('serves ad disclosure reports with premium removal and ranking separation guardrails', () => {
+    const api = createGroceryViewApi();
+
+    const freeReport = api.getAdDisclosureReport('user-1');
+
+    assert.equal(freeReport.userId, 'user-1');
+    assert.equal(freeReport.userTier, 'free');
+    assert.equal(freeReport.placementPlan.slots.length, 2);
+    assert.equal(freeReport.premiumAdsRemoved, false);
+    assert.equal(freeReport.affectsDealScore, false);
+    assert.equal(freeReport.allowedCount, 2);
+    assert.equal(freeReport.blockedCount, 2);
+    assert.deepEqual(freeReport.excludedSurfaces, ['deal_score', 'checkout_decision', 'basket_optimizer']);
+    assert.match(freeReport.guardrails[0], /Sponsored placements cannot change Deal Score/i);
+
+    api.upsertSubscriptionEntitlement('premium-user', {
+      tier: 'premium',
+      plan: 'premium_monthly',
+      status: 'active',
+      currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
+      updatedAt: '2026-05-20T00:00:00.000Z'
+    });
+
+    const premiumReport = api.getAdDisclosureReport('premium-user');
+    assert.equal(premiumReport.userTier, 'premium');
+    assert.equal(premiumReport.placementPlan.slots.length, 0);
+    assert.equal(premiumReport.premiumAdsRemoved, true);
+    assert.equal(premiumReport.allowedCount, 0);
+    assert.equal(premiumReport.blockedCount, 4);
+  });
+
   it('serves receipt review reports with budget actuals, match confidence, and writeback guardrails', () => {
     const api = createGroceryViewApi();
 
