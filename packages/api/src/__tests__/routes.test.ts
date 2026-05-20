@@ -621,6 +621,38 @@ describe('createGroceryViewApi', () => {
     assert.equal(report.strategies[3]?.total, 82.7);
   });
 
+  it('returns local offer basket reports for selected favorite stores', () => {
+    const api = createGroceryViewApi();
+
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.addBasketItem('user-1', { productId: 'butter', quantity: 1 });
+
+    const report = api.getLocalOfferBasketReport('user-1');
+    assert.equal(report.userId, 'user-1');
+    assert.deepEqual(report.storeIds, ['willys-odenplan', 'lidl-sveavagen']);
+    assert.equal(report.basketItemCount, 2);
+    assert.equal(report.baselineTotal, 84.7);
+    assert.deepEqual(report.bestStore && {
+      storeId: report.bestStore.storeId,
+      subtotal: report.bestStore.subtotal,
+      coveragePercent: report.bestStore.coveragePercent,
+      averageConfidence: report.bestStore.averageConfidence,
+      freshnessLabel: report.bestStore.freshnessLabel,
+      savingsVsBaseline: report.bestStore.savingsVsBaseline
+    }, {
+      storeId: 'willys-odenplan',
+      subtotal: 86.7,
+      coveragePercent: 100,
+      averageConfidence: 0.79,
+      freshnessLabel: 'fresh',
+      savingsVsBaseline: -2
+    });
+    assert.deepEqual(report.stores[1]?.missingProductIds, ['butter']);
+    assert.match(report.guardrails[1], /Distance/);
+  });
+
   it('removes watched products and recomputes alerts from remaining items', () => {
     const api = createGroceryViewApi();
 

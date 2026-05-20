@@ -13,8 +13,10 @@ import {
   summarizeBudget,
   summarizePriceHistory,
   summarizeHousehold,
+  summarizeLocalOfferBasket,
   type BasketComparisonResult,
   type BudgetSummary,
+  type LocalOfferBasketSummary,
   type PriceChartAdapterResult,
   type PriceChartObservation,
   type PriceHistorySummary,
@@ -263,6 +265,13 @@ export type BasketComparisonReport = {
   strategies: BasketComparisonReportStrategy[];
   missingProductIds: string[];
   estimatedProductIds: string[];
+};
+
+export type LocalOfferBasketReport = LocalOfferBasketSummary & {
+  userId: string;
+  storeIds: string[];
+  basketItemCount: number;
+  guardrails: string[];
 };
 
 export type ProductEquivalent = {
@@ -1150,6 +1159,41 @@ function basketInputItems(userItems: BasketItemRequest[]) {
   });
 }
 
+function localOfferBasketItems(userItems: BasketItemRequest[]) {
+  return userItems.map((item) => {
+    const product = products.find((candidate) => candidate.id === item.productId);
+    const baselineUnitPrice = product ? medianPrice(product.currentPrices) ?? undefined : undefined;
+    return {
+      productId: item.productId,
+      quantity: item.quantity,
+      ...(baselineUnitPrice === undefined ? {} : { baselineUnitPrice })
+    };
+  });
+}
+
+function localOffersForBasket(userItems: BasketItemRequest[], storeIds: string[], asOf: string) {
+  const selectedStoreIds = new Set(storeIds);
+  const selectedProductIds = new Set(userItems.map((item) => item.productId));
+  return products
+    .filter((product) => selectedProductIds.has(product.id))
+    .flatMap((product) => {
+      const latestHistory = product.history.at(-1);
+      const observedAt = latestHistory ? `${latestHistory.date}T08:00:00.000Z` : asOf;
+      return product.currentPrices
+        .filter((price) => selectedStoreIds.has(price.storeId))
+        .map((price) => ({
+          productId: product.id,
+          storeId: price.storeId,
+          storeName: price.storeName,
+          unitPrice: price.price,
+          observedAt,
+          sourceType: 'online' as const,
+          confidence: product.dealSignals.sourceConfidence,
+          available: true
+        }));
+    });
+}
+
 function productName(productId: string): string {
   return products.find((product) => product.id === productId)?.name ?? productId;
 }
@@ -1833,6 +1877,31 @@ export function createGroceryViewApi() {
     compareBasketReport(userId: string): BasketComparisonReport {
       const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
       return buildBasketComparisonReport(userId, favoriteStoreIds, baskets.get(userId) ?? []);
+    },
+
+    getLocalOfferBasketReport(userId: string, asOf = '2026-05-20T12:00:00.000Z'): LocalOfferBasketReport {
+      requireNonEmptyId(userId, 'userId');
+      const userItems = baskets.get(userId) ?? [];
+      const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
+      const storeIds = favoriteStoreIds.length > 0 ? favoriteStoreIds : stores.map((store) => store.id);
+      const summary = summarizeLocalOfferBasket({
+        asOf,
+        storeIds,
+        items: localOfferBasketItems(userItems),
+        offers: localOffersForBasket(userItems, storeIds, asOf),
+        staleAfterHours: 72
+      });
+      return {
+        userId,
+        storeIds,
+        basketItemCount: userItems.length,
+        ...summary,
+        guardrails: [
+          'Local offer baskets rank only selected favorite stores, falling back to all stores when none are selected.',
+          'Distance is informational and never reduces savings; coverage and verified price evidence decide ranking.',
+          'Stale or missing offer lines remain visible instead of being treated as available current prices.'
+        ]
+      };
     },
 
     updateBudget(userId: string, patch: UserBudgetPatch) {
