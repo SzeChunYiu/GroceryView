@@ -33,6 +33,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-price-freshness-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setWatchlistMetric = (metric, message) => {
+    const target = document.querySelector('[data-watchlist-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setApiSessionResult = (message) => {
     const target = document.querySelector('[data-api-session-result]');
     if (target) target.textContent = message;
@@ -534,6 +538,43 @@ window.GroceryViewFlowActions = (() => {
       setResult('price-freshness', 'Price freshness API load failed: ' + error.message + '. Static retailer freshness board remains visible.');
     }
   };
+  const formatWatchlistTriggerValue = (metric, value) => {
+    if (!Number.isFinite(Number(value))) return 'n/a';
+    if (metric === 'price') return formatPreciseSek(value);
+    if (metric === 'deal_score') return Math.round(Number(value)).toString();
+    return Number(value).toFixed(1);
+  };
+  const loadWatchlistFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('watchlist', 'Local preview mode: connect the API session bridge before loading live watchlist alerts.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/watchlist', config), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const items = Array.isArray(payload.items) ? payload.items : [];
+      const alerts = Array.isArray(payload.alerts) ? payload.alerts : [];
+      const targetItems = items.filter((item) => Number.isFinite(Number(item.targetPrice)));
+      const scopedItems = items.filter((item) => item.favoriteStoresOnly);
+      const lowAlerts = alerts.filter((alert) => alert.type === 'new_52w_low');
+      const firstAlert = alerts[0] || {};
+      const trigger = firstAlert.trigger || {};
+      const triggerMetric = trigger.metric || firstAlert.type || 'alert';
+      const triggerValue = formatWatchlistTriggerValue(trigger.metric, trigger.value);
+      const triggerThreshold = formatWatchlistTriggerValue(trigger.metric, trigger.threshold);
+      setWatchlistMetric('summary', items.length + ' tracked · ' + alerts.length + ' active alerts');
+      setWatchlistMetric('target', targetItems.length ? targetItems.map((item) => item.productId + ' ≤ ' + formatPreciseSek(item.targetPrice)).join(' · ') : 'No target prices set');
+      setWatchlistMetric('trigger', alerts.length ? triggerMetric + ' ' + triggerValue + ' vs threshold ' + triggerThreshold : 'No active trigger from current prices');
+      setWatchlistMetric('scope', scopedItems.length + '/' + items.length + ' favorite-store scoped · ' + lowAlerts.length + ' 52-week-low alerts');
+      setResult('watchlist', 'Connected watchlist loaded: ' + items.length + ' tracked items and ' + alerts.length + ' active alerts. ' + (firstAlert.message || 'No current alert messages.'));
+    } catch (error) {
+      setResult('watchlist', 'Watchlist API load failed: ' + error.message + '. Static watchlist board remains visible.');
+    }
+  };
   const messages = {
     'toggle-alert': 'Alert rule updated locally; production save waits for authenticated account API.',
     'manage-subscription': 'Billing portal handoff prepared without exposing provider customer IDs.',
@@ -601,6 +642,10 @@ window.GroceryViewFlowActions = (() => {
       }
       if (flow === 'price-freshness' && action === 'load-price-freshness') {
         await loadPriceFreshnessFromApi(button);
+        return;
+      }
+      if (flow === 'watchlist' && action === 'load-watchlist') {
+        await loadWatchlistFromApi();
         return;
       }
       if (flow && action) setResult(flow, messages[action] || 'Action preview recorded.');
@@ -724,6 +769,9 @@ const categoryMarketLivePanel = `
 const priceFreshnessLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="price-freshness" data-as-of="2026-05-20T00:00:00.000Z" style="margin-top:16px"><div class="eyebrow">Connected price freshness API</div><h2>Pull live freshness and backfill status</h2><p class="lede">Fetch <code>/api/prices/freshness</code> to replace static freshness copy with API counts for fresh, aging, stale, and backfill-needed product rows before those rows power deal boards or alerts.</p><div class="grid" aria-label="Live price freshness API metrics"><div class="metric"><strong data-price-freshness-summary>Waiting for API pull</strong><span>fresh/aging/stale</span></div><div class="metric"><strong data-price-freshness-backfill>Static backfill preview</strong><span>backfill queue</span></div><div class="metric"><strong data-price-freshness-thresholds>Static freshness thresholds</strong><span>aging and stale windows</span></div><div class="metric"><strong data-price-freshness-stale>Static stale-product preview</strong><span>stale products</span></div></div><div class="flow-panel" aria-label="Connected price freshness actions"><button type="button" data-flow-action="load-price-freshness">Load live freshness report</button></div><p class="flow-result" data-flow-result="price-freshness" aria-live="polite">Local preview mode: connect the API session bridge before loading live price freshness.</p></section>`;
 
+const watchlistLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="watchlist" style="margin-top:16px"><div class="eyebrow">Connected watchlist API</div><h2>Pull live target and alert numbers</h2><p class="lede">Fetch <code>/api/watchlist</code> through the protected API session bridge to refresh tracked-item counts, target-price rules, active trigger values, favorite-store scope, and 52-week-low alert evidence from account data.</p><div class="grid" aria-label="Live watchlist API metrics"><div class="metric"><strong data-watchlist-summary>Waiting for API pull</strong><span>tracked items and alerts</span></div><div class="metric"><strong data-watchlist-target>Static target preview</strong><span>target price rules</span></div><div class="metric"><strong data-watchlist-trigger>Static trigger preview</strong><span>current trigger value</span></div><div class="metric"><strong data-watchlist-scope>Static scope preview</strong><span>favorite-store and 52W scope</span></div></div><div class="flow-panel" aria-label="Connected watchlist actions"><button type="button" data-flow-action="load-watchlist">Load live watchlist alerts</button></div><p class="flow-result" data-flow-result="watchlist" aria-live="polite">Local preview mode: connect the API session bridge before loading live watchlist alerts.</p></section>`;
+
 const pages = [
   {
     path: 'login/index.html',
@@ -771,7 +819,7 @@ const pages = [
     path: 'watchlist/index.html',
     title: 'Price watchlist workbench — GroceryView',
     description: 'GroceryView watchlist workbench for target prices, Deal Score triggers, notification channels, and confidence-safe alert status.',
-    body: `<section class="card"><div class="eyebrow">Watchlist</div><h1>Price watchlist workbench</h1><p class="lede">Review target prices, Deal Score triggers, source confidence, and notification readiness before alerts reach a household.</p><div class="grid"><div class="metric"><strong>4</strong><span>tracked staples</span></div><div class="metric"><strong>2</strong><span>alerts ready</span></div><div class="metric"><strong>1</strong><span>held for review</span></div></div></section><section class="card" style="margin-top:16px"><h2>Tracked items</h2><table class="table"><thead><tr><th>Product</th><th>Target</th><th>Current</th><th>Trigger</th><th>Status</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>50 SEK</td><td>49.90 SEK</td><td>Deal Score ≥ 80</td><td>Ready for push</td></tr><tr><td>Butter 600g</td><td>45 SEK</td><td>54.90 SEK</td><td>52-week low</td><td>Watching</td></tr><tr><td>Eggs 12-pack</td><td>35 SEK</td><td>34.90 SEK</td><td>Favorite stores only</td><td>Ready for email</td></tr><tr><td>Loose tomatoes</td><td>29 SEK/kg</td><td>Estimated</td><td>Confidence ≥ 80%</td><td>Held for review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Notification guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied behavior</th></tr></thead><tbody><tr><td>Quiet hours</td><td>Push alerts pause from 21:00 to 07:00.</td></tr><tr><td>Confidence floor</td><td>Estimated prices cannot trigger household notifications.</td></tr><tr><td>Favorite-store scope</td><td>Scoped rules ignore stores outside the household basket set.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Watchlist</div><h1>Price watchlist workbench</h1><p class="lede">Review target prices, Deal Score triggers, source confidence, and notification readiness before alerts reach a household.</p><div class="grid"><div class="metric"><strong>4</strong><span>tracked staples</span></div><div class="metric"><strong>2</strong><span>alerts ready</span></div><div class="metric"><strong>1</strong><span>held for review</span></div></div></section><section class="card" style="margin-top:16px"><h2>Tracked items</h2><table class="table"><thead><tr><th>Product</th><th>Target</th><th>Current</th><th>Trigger</th><th>Status</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>50 SEK</td><td>49.90 SEK</td><td>Deal Score ≥ 80</td><td>Ready for push</td></tr><tr><td>Butter 600g</td><td>45 SEK</td><td>54.90 SEK</td><td>52-week low</td><td>Watching</td></tr><tr><td>Eggs 12-pack</td><td>35 SEK</td><td>34.90 SEK</td><td>Favorite stores only</td><td>Ready for email</td></tr><tr><td>Loose tomatoes</td><td>29 SEK/kg</td><td>Estimated</td><td>Confidence ≥ 80%</td><td>Held for review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Notification guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied behavior</th></tr></thead><tbody><tr><td>Quiet hours</td><td>Push alerts pause from 21:00 to 07:00.</td></tr><tr><td>Confidence floor</td><td>Estimated prices cannot trigger household notifications.</td></tr><tr><td>Favorite-store scope</td><td>Scoped rules ignore stores outside the household basket set.</td></tr></tbody></table></section>${watchlistLivePanel}`
   },
   {
     path: 'notifications/inbox/index.html',
