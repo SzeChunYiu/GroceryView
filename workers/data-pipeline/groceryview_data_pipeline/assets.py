@@ -427,6 +427,7 @@ def build_data_pipeline_quality_gate(
     quality: QualityCheckSummary,
     freshness: ObservationFreshnessSummary,
     coverage: ObservationCoverageSummary,
+    open_prices_ingestion: OpenPricesIngestionRunPlan | None = None,
     min_observations: int = 1,
 ) -> DataPipelineQualityGateSummary:
     blockers: list[str] = []
@@ -445,13 +446,20 @@ def build_data_pipeline_quality_gate(
         blockers.append("price_observation_freshness_blocked")
     if coverage.status != "ready":
         blockers.append("price_observation_coverage_partial")
+    if open_prices_ingestion is not None and open_prices_ingestion.status != "ready":
+        blockers.append("open_prices_ingestion_plan_blocked")
 
     return DataPipelineQualityGateSummary(
         status="ready" if not blockers else "blocked",
         blockers=blockers,
         observation_count=quality.observation_count,
         latest_rollup_count=quality.latest_rollup_count,
-        checked_assets=["quality_checks", "price_observation_freshness", "price_observation_coverage"],
+        checked_assets=[
+            "quality_checks",
+            "price_observation_freshness",
+            "price_observation_coverage",
+            *([] if open_prices_ingestion is None else ["open_prices_ingestion_run_plan"]),
+        ],
     )
 
 
@@ -615,9 +623,11 @@ def data_pipeline_quality_gate(
     quality_checks: dict[str, object],
     price_observation_freshness: dict[str, object],
     price_observation_coverage: dict[str, object],
+    open_prices_ingestion_run_plan: dict[str, object],
 ) -> dict[str, object]:
     quality = QualityCheckSummary(**quality_checks)
     freshness = ObservationFreshnessSummary(**price_observation_freshness)
     coverage = ObservationCoverageSummary(**price_observation_coverage)
-    summary = build_data_pipeline_quality_gate(quality, freshness, coverage)
+    open_prices_ingestion = OpenPricesIngestionRunPlan(**open_prices_ingestion_run_plan)
+    summary = build_data_pipeline_quality_gate(quality, freshness, coverage, open_prices_ingestion)
     return summary.to_dict()

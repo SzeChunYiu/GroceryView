@@ -231,6 +231,21 @@ fi
 
 echo "required migration extensions ok"
 
+docker exec "$CONTAINER_NAME" \
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 \
+  -c "insert into source_runs(source_type, source_name, status)
+      values ('official_api', 'Open Prices verifier', 'succeeded')" >/dev/null
+
+if docker exec "$CONTAINER_NAME" \
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 \
+  -c "insert into source_runs(source_type, source_name, status)
+      values ('unsupported_source', 'Unsupported verifier', 'succeeded')" >/dev/null 2>&1; then
+  echo "source_runs source_type assertion failed: unsupported_source was accepted" >&2
+  exit 1
+fi
+
+echo "source_runs official_api source type ok"
+
 if [ -d "$SEEDS_DIR" ]; then
   mapfile -t SEEDS < <(find "$SEEDS_DIR" -maxdepth 1 -type f -name '*.sql' | sort)
 else

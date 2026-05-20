@@ -25,6 +25,26 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-market-movers-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setCategoryMarketMetric = (metric, message) => {
+    const target = document.querySelector('[data-category-market-' + metric + ']');
+    if (target) target.textContent = message;
+  };
+  const setPriceFreshnessMetric = (metric, message) => {
+    const target = document.querySelector('[data-price-freshness-' + metric + ']');
+    if (target) target.textContent = message;
+  };
+  const setWatchlistMetric = (metric, message) => {
+    const target = document.querySelector('[data-watchlist-' + metric + ']');
+    if (target) target.textContent = message;
+  };
+  const setDailyDealsMetric = (metric, message) => {
+    const target = document.querySelector('[data-daily-deals-' + metric + ']');
+    if (target) target.textContent = message;
+  };
+  const setBudgetSummaryMetric = (metric, message) => {
+    const target = document.querySelector('[data-budget-summary-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setApiSessionResult = (message) => {
     const target = document.querySelector('[data-api-session-result]');
     if (target) target.textContent = message;
@@ -291,6 +311,24 @@ window.GroceryViewFlowActions = (() => {
       setResult('scanner', 'Scan API processing failed: ' + error.message + '. Local preview remains staged.');
     }
   };
+  const loadScannerStorageHealthFromApi = async () => {
+    const config = getApiConfig();
+    if (!config.apiBase) {
+      setResult('scanner', 'Local preview: add an API base URL before checking private scan upload storage.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/health', config, false), {
+        method: 'GET'
+      });
+      const payload = await requireApiSuccess(response);
+      setResult('scanner', payload.hasScanUploadStorage
+        ? 'Connected API: private scan upload storage is configured for receipt and barcode captures.'
+        : 'Connected API: private scan upload storage is not configured; uploads will stay in local preview.');
+    } catch (error) {
+      setResult('scanner', 'Scan storage health check failed: ' + error.message + '. Local preview remains staged.');
+    }
+  };
   const saveHouseholdToApi = async (form) => {
     const config = getApiConfig();
     const data = new FormData(form);
@@ -448,6 +486,147 @@ window.GroceryViewFlowActions = (() => {
       setResult('market-movers', 'Market movers API load failed: ' + error.message + '. Static mover board remains visible.');
     }
   };
+  const loadCategoryMarketFromApi = async (button) => {
+    const config = getApiConfig();
+    const panel = button.closest('[data-groceryview-flow="category-market"]');
+    const categoryId = panel?.dataset.category || 'coffee';
+    if (!config.apiBase) {
+      setResult('category-market', 'Local preview mode: connect the API session bridge before loading live category market numbers.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/categories/' + encodeURIComponent(categoryId) + '/market', config, false), {
+        method: 'GET',
+        headers: config.bearerToken ? apiHeaders(config) : { 'content-type': 'application/json' }
+      });
+      const payload = await requireApiSuccess(response);
+      const rows = Array.isArray(payload.rows) ? payload.rows : [];
+      const leader = rows[0] || {};
+      const range52Week = leader.range52Week;
+      const rangeMessage = range52Week && Number.isFinite(Number(range52Week.low)) && Number.isFinite(Number(range52Week.high))
+        ? formatPreciseSek(range52Week.low) + ' to ' + formatPreciseSek(range52Week.high) + ' · ' + formatUnsignedPercent(leader.range52WeekPositionPercent) + ' through range'
+        : '52W range unavailable';
+      const medianGap = Number.isFinite(Number(leader.stockholmMedianGap))
+        ? formatPreciseSek(leader.stockholmMedianGap) + ' vs Stockholm median'
+        : 'median gap unavailable';
+      const evidence = Number(leader.verifiedHistoryPoints || 0) + '/' + Number(leader.historyPoints || 0) + ' verified history points';
+      setCategoryMarketMetric('leader', (leader.productName || leader.ticker || 'Category leader') + ': ' + formatPreciseSek(leader.currentPrice) + ' · Deal Score ' + Number(leader.dealScore || 0) + ' · 1M move ' + formatPercent(leader.oneMonthMovePercent));
+      setCategoryMarketMetric('range', '52W range ' + rangeMessage);
+      setCategoryMarketMetric('median', medianGap);
+      setCategoryMarketMetric('evidence', evidence);
+      setResult('category-market', 'Connected category market loaded: ' + rows.length + ' ' + (payload.category || categoryId) + ' rows from /api/categories/' + categoryId + '/market; leader ' + (leader.ticker || leader.productId || 'n/a') + '.');
+    } catch (error) {
+      setResult('category-market', 'Category market API load failed: ' + error.message + '. Static category board remains visible.');
+    }
+  };
+  const loadPriceFreshnessFromApi = async (button) => {
+    const config = getApiConfig();
+    const panel = button.closest('[data-groceryview-flow="price-freshness"]');
+    const asOf = panel?.dataset.asOf || new Date().toISOString();
+    if (!config.apiBase) {
+      setResult('price-freshness', 'Local preview mode: connect the API session bridge before loading live price freshness.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/prices/freshness?asOf=' + encodeURIComponent(asOf), config, false), {
+        method: 'GET',
+        headers: config.bearerToken ? apiHeaders(config) : { 'content-type': 'application/json' }
+      });
+      const payload = await requireApiSuccess(response);
+      const summary = payload.summary || {};
+      const products = Array.isArray(payload.products) ? payload.products : [];
+      const backfillIds = Array.isArray(payload.backfillProductIds) ? payload.backfillProductIds : [];
+      const staleProducts = products.filter((product) => product.status === 'stale').map((product) => product.productName || product.productId);
+      setPriceFreshnessMetric('summary', 'Fresh ' + Number(summary.fresh || 0) + ' · aging ' + Number(summary.aging || 0) + ' · stale ' + Number(summary.stale || 0));
+      setPriceFreshnessMetric('backfill', backfillIds.length ? backfillIds.join(', ') : 'No backfill needed');
+      setPriceFreshnessMetric('thresholds', 'Aging after ' + Number(payload.thresholds?.agingAfterDays || 0) + 'd · stale after ' + Number(payload.thresholds?.staleAfterDays || 0) + 'd');
+      setPriceFreshnessMetric('stale', staleProducts.length ? staleProducts.join(', ') : 'No stale products');
+      setResult('price-freshness', 'Connected price freshness loaded: ' + products.length + ' products as of ' + (payload.asOf || asOf) + '; ' + backfillIds.length + ' backfill actions.');
+    } catch (error) {
+      setResult('price-freshness', 'Price freshness API load failed: ' + error.message + '. Static retailer freshness board remains visible.');
+    }
+  };
+  const formatWatchlistTriggerValue = (metric, value) => {
+    if (!Number.isFinite(Number(value))) return 'n/a';
+    if (metric === 'price') return formatPreciseSek(value);
+    if (metric === 'deal_score') return Math.round(Number(value)).toString();
+    return Number(value).toFixed(1);
+  };
+  const loadWatchlistFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('watchlist', 'Local preview mode: connect the API session bridge before loading live watchlist alerts.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/watchlist', config), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const items = Array.isArray(payload.items) ? payload.items : [];
+      const alerts = Array.isArray(payload.alerts) ? payload.alerts : [];
+      const targetItems = items.filter((item) => Number.isFinite(Number(item.targetPrice)));
+      const scopedItems = items.filter((item) => item.favoriteStoresOnly);
+      const lowAlerts = alerts.filter((alert) => alert.type === 'new_52w_low');
+      const firstAlert = alerts[0] || {};
+      const trigger = firstAlert.trigger || {};
+      const triggerMetric = trigger.metric || firstAlert.type || 'alert';
+      const triggerValue = formatWatchlistTriggerValue(trigger.metric, trigger.value);
+      const triggerThreshold = formatWatchlistTriggerValue(trigger.metric, trigger.threshold);
+      setWatchlistMetric('summary', items.length + ' tracked · ' + alerts.length + ' active alerts');
+      setWatchlistMetric('target', targetItems.length ? targetItems.map((item) => item.productId + ' ≤ ' + formatPreciseSek(item.targetPrice)).join(' · ') : 'No target prices set');
+      setWatchlistMetric('trigger', alerts.length ? triggerMetric + ' ' + triggerValue + ' vs threshold ' + triggerThreshold : 'No active trigger from current prices');
+      setWatchlistMetric('scope', scopedItems.length + '/' + items.length + ' favorite-store scoped · ' + lowAlerts.length + ' 52-week-low alerts');
+      setResult('watchlist', 'Connected watchlist loaded: ' + items.length + ' tracked items and ' + alerts.length + ' active alerts. ' + (firstAlert.message || 'No current alert messages.'));
+    } catch (error) {
+      setResult('watchlist', 'Watchlist API load failed: ' + error.message + '. Static watchlist board remains visible.');
+    }
+  };
+  const loadDailyDealsFromApi = async () => {
+    const config = getApiConfig();
+    if (!config.apiBase) {
+      setResult('daily-deals', 'Local preview mode: connect the API session bridge before loading live daily deals.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/market/overview', config, false), {
+        method: 'GET',
+        headers: config.bearerToken ? apiHeaders(config) : { 'content-type': 'application/json' }
+      });
+      const payload = await requireApiSuccess(response);
+      const topDeals = Array.isArray(payload.topDeals) ? payload.topDeals : [];
+      const leader = topDeals[0] || {};
+      const buyDeals = topDeals.filter((deal) => deal.band?.verdict === 'Buy');
+      const compareDeals = topDeals.filter((deal) => deal.band?.verdict === 'Compare');
+      setDailyDealsMetric('leader', (leader.ticker || leader.productId || 'Top deal') + ' · Deal Score ' + Number(leader.dealScore || 0) + ' · ' + (leader.band?.verdict || 'no verdict'));
+      setDailyDealsMetric('price', formatPreciseSek(leader.bestPrice) + ' at ' + (leader.bestStoreId || 'unknown store'));
+      setDailyDealsMetric('count', topDeals.length + ' ranked deals · ' + buyDeals.length + ' buy · ' + compareDeals.length + ' compare');
+      setResult('daily-deals', 'Connected daily deals loaded: ' + topDeals.length + ' top deals from /api/market/overview; leader ' + (leader.ticker || leader.productId || 'n/a') + '.');
+    } catch (error) {
+      setResult('daily-deals', 'Daily deals API load failed: ' + error.message + '. Static deal board remains visible.');
+    }
+  };
+  const loadBudgetSummaryFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('budget-summary', 'Local preview mode: connect the API session bridge before loading live budget summary.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/budget/summary', config), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      setBudgetSummaryMetric('weekly', 'Weekly ' + formatSek(payload.weeklyBudget) + ' · remaining actual ' + formatSek(payload.weeklyRemainingActual) + ' · ' + (payload.weeklyStatus || 'unknown'));
+      setBudgetSummaryMetric('monthly', 'Monthly ' + formatSek(payload.monthlyBudget) + ' · remaining actual ' + formatSek(payload.monthlyRemainingActual) + ' · ' + (payload.monthlyStatus || 'unknown'));
+      setBudgetSummaryMetric('estimate', 'Next basket ' + formatSek(payload.estimatedBasketTotal) + ' · after-estimate buffer ' + formatSek(payload.weeklyRemainingAfterEstimate));
+      setResult('budget-summary', 'Connected budget summary loaded: weekly ' + (payload.weeklyStatus || 'unknown') + ', monthly ' + (payload.monthlyStatus || 'unknown') + ', next basket ' + formatSek(payload.estimatedBasketTotal) + '.');
+    } catch (error) {
+      setResult('budget-summary', 'Budget summary API load failed: ' + error.message + '. Static budget forecast remains visible.');
+    }
+  };
   const messages = {
     'toggle-alert': 'Alert rule updated locally; production save waits for authenticated account API.',
     'manage-subscription': 'Billing portal handoff prepared without exposing provider customer IDs.',
@@ -497,12 +676,36 @@ window.GroceryViewFlowActions = (() => {
         await loadPrivacyFulfillmentFromApi();
         return;
       }
+      if (flow === 'scanner' && action === 'check-storage-health') {
+        await loadScannerStorageHealthFromApi();
+        return;
+      }
       if (flow === 'product-terminal' && action === 'load-product-terminal') {
         await loadProductTerminalFromApi(button);
         return;
       }
       if (flow === 'market-movers' && action === 'load-market-movers') {
         await loadMarketMoversFromApi();
+        return;
+      }
+      if (flow === 'category-market' && action === 'load-category-market') {
+        await loadCategoryMarketFromApi(button);
+        return;
+      }
+      if (flow === 'price-freshness' && action === 'load-price-freshness') {
+        await loadPriceFreshnessFromApi(button);
+        return;
+      }
+      if (flow === 'watchlist' && action === 'load-watchlist') {
+        await loadWatchlistFromApi();
+        return;
+      }
+      if (flow === 'daily-deals' && action === 'load-daily-deals') {
+        await loadDailyDealsFromApi();
+        return;
+      }
+      if (flow === 'budget-summary' && action === 'load-budget-summary') {
+        await loadBudgetSummaryFromApi();
         return;
       }
       if (flow && action) setResult(flow, messages[action] || 'Action preview recorded.');
@@ -620,6 +823,21 @@ const productTerminalLivePanel = `
 const productPriceGuardrails = `
   <section class="card" style="margin-top:16px"><h2>Price evidence guardrails</h2><table class="table"><thead><tr><th>Signal</th><th>Displayed behavior</th></tr></thead><tbody><tr><td>Verified shelf or retailer page</td><td>Can contribute to current price, Deal Score, and basket totals.</td></tr><tr><td>Member or promotion price</td><td>Shown with explicit loyalty or campaign label before shoppers act.</td></tr><tr><td>Estimated or low-confidence row</td><td>Marked unverified and excluded from official shelf-price claims.</td></tr></tbody></table></section>`;
 
+const categoryMarketLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="category-market" data-category="coffee" style="margin-top:16px"><div class="eyebrow">Connected category market API</div><h2>Pull current coffee category numbers</h2><p class="lede">Fetch <code>/api/categories/coffee/market</code> to refresh category rows with current price, Deal Score, 1M move, 52-week position, Stockholm median gap, and verified-history evidence from the API instead of static copy.</p><div class="grid" aria-label="Live category market API metrics"><div class="metric"><strong data-category-market-leader>Waiting for API pull</strong><span>category leader</span></div><div class="metric"><strong data-category-market-range>Static 52W range preview</strong><span>52W position</span></div><div class="metric"><strong data-category-market-median>Static Stockholm median preview</strong><span>same-product median gap</span></div><div class="metric"><strong data-category-market-evidence>Static verified history preview</strong><span>verified category evidence</span></div></div><div class="flow-panel" aria-label="Connected category market actions"><button type="button" data-flow-action="load-category-market">Load live category market</button></div><p class="flow-result" data-flow-result="category-market" aria-live="polite">Local preview mode: connect the API session bridge before loading live category market numbers.</p></section>`;
+
+const priceFreshnessLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="price-freshness" data-as-of="2026-05-20T00:00:00.000Z" style="margin-top:16px"><div class="eyebrow">Connected price freshness API</div><h2>Pull live freshness and backfill status</h2><p class="lede">Fetch <code>/api/prices/freshness</code> to replace static freshness copy with API counts for fresh, aging, stale, and backfill-needed product rows before those rows power deal boards or alerts.</p><div class="grid" aria-label="Live price freshness API metrics"><div class="metric"><strong data-price-freshness-summary>Waiting for API pull</strong><span>fresh/aging/stale</span></div><div class="metric"><strong data-price-freshness-backfill>Static backfill preview</strong><span>backfill queue</span></div><div class="metric"><strong data-price-freshness-thresholds>Static freshness thresholds</strong><span>aging and stale windows</span></div><div class="metric"><strong data-price-freshness-stale>Static stale-product preview</strong><span>stale products</span></div></div><div class="flow-panel" aria-label="Connected price freshness actions"><button type="button" data-flow-action="load-price-freshness">Load live freshness report</button></div><p class="flow-result" data-flow-result="price-freshness" aria-live="polite">Local preview mode: connect the API session bridge before loading live price freshness.</p></section>`;
+
+const watchlistLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="watchlist" style="margin-top:16px"><div class="eyebrow">Connected watchlist API</div><h2>Pull live target and alert numbers</h2><p class="lede">Fetch <code>/api/watchlist</code> through the protected API session bridge to refresh tracked-item counts, target-price rules, active trigger values, favorite-store scope, and 52-week-low alert evidence from account data.</p><div class="grid" aria-label="Live watchlist API metrics"><div class="metric"><strong data-watchlist-summary>Waiting for API pull</strong><span>tracked items and alerts</span></div><div class="metric"><strong data-watchlist-target>Static target preview</strong><span>target price rules</span></div><div class="metric"><strong data-watchlist-trigger>Static trigger preview</strong><span>current trigger value</span></div><div class="metric"><strong data-watchlist-scope>Static scope preview</strong><span>favorite-store and 52W scope</span></div></div><div class="flow-panel" aria-label="Connected watchlist actions"><button type="button" data-flow-action="load-watchlist">Load live watchlist alerts</button></div><p class="flow-result" data-flow-result="watchlist" aria-live="polite">Local preview mode: connect the API session bridge before loading live watchlist alerts.</p></section>`;
+
+const dailyDealsLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="daily-deals" style="margin-top:16px"><div class="eyebrow">Connected daily deals API</div><h2>Pull live ranked deal board</h2><p class="lede">Fetch <code>/api/market/overview</code> to refresh the daily shopper board with top deal ticker, best price, Deal Score, verdict mix, and store evidence from the public market API.</p><div class="grid" aria-label="Live daily deals API metrics"><div class="metric"><strong data-daily-deals-leader>Waiting for API pull</strong><span>top ranked deal</span></div><div class="metric"><strong data-daily-deals-price>Static best-price preview</strong><span>price and store</span></div><div class="metric"><strong data-daily-deals-count>Static deal-count preview</strong><span>ranked deal count</span></div></div><div class="flow-panel" aria-label="Connected daily deals actions"><button type="button" data-flow-action="load-daily-deals">Load live deal board</button></div><p class="flow-result" data-flow-result="daily-deals" aria-live="polite">Local preview mode: connect the API session bridge before loading live daily deals.</p></section>`;
+
+const budgetSummaryLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="budget-summary" style="margin-top:16px"><div class="eyebrow">Connected budget API</div><h2>Pull live household budget summary</h2><p class="lede">Fetch <code>/api/budget/summary</code> through the protected API session bridge to refresh weekly budget, month-to-date spend, next-basket estimate, remaining buffers, and over/under status from account data.</p><div class="grid" aria-label="Live budget summary API metrics"><div class="metric"><strong data-budget-summary-weekly>Waiting for API pull</strong><span>weekly budget status</span></div><div class="metric"><strong data-budget-summary-monthly>Static monthly preview</strong><span>monthly budget status</span></div><div class="metric"><strong data-budget-summary-estimate>Static basket estimate preview</strong><span>next basket buffer</span></div></div><div class="flow-panel" aria-label="Connected budget summary actions"><button type="button" data-flow-action="load-budget-summary">Load live budget summary</button></div><p class="flow-result" data-flow-result="budget-summary" aria-live="polite">Local preview mode: connect the API session bridge before loading live budget summary.</p></section>`;
+
 const pages = [
   {
     path: 'login/index.html',
@@ -667,7 +885,7 @@ const pages = [
     path: 'watchlist/index.html',
     title: 'Price watchlist workbench — GroceryView',
     description: 'GroceryView watchlist workbench for target prices, Deal Score triggers, notification channels, and confidence-safe alert status.',
-    body: `<section class="card"><div class="eyebrow">Watchlist</div><h1>Price watchlist workbench</h1><p class="lede">Review target prices, Deal Score triggers, source confidence, and notification readiness before alerts reach a household.</p><div class="grid"><div class="metric"><strong>4</strong><span>tracked staples</span></div><div class="metric"><strong>2</strong><span>alerts ready</span></div><div class="metric"><strong>1</strong><span>held for review</span></div></div></section><section class="card" style="margin-top:16px"><h2>Tracked items</h2><table class="table"><thead><tr><th>Product</th><th>Target</th><th>Current</th><th>Trigger</th><th>Status</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>50 SEK</td><td>49.90 SEK</td><td>Deal Score ≥ 80</td><td>Ready for push</td></tr><tr><td>Butter 600g</td><td>45 SEK</td><td>54.90 SEK</td><td>52-week low</td><td>Watching</td></tr><tr><td>Eggs 12-pack</td><td>35 SEK</td><td>34.90 SEK</td><td>Favorite stores only</td><td>Ready for email</td></tr><tr><td>Loose tomatoes</td><td>29 SEK/kg</td><td>Estimated</td><td>Confidence ≥ 80%</td><td>Held for review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Notification guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied behavior</th></tr></thead><tbody><tr><td>Quiet hours</td><td>Push alerts pause from 21:00 to 07:00.</td></tr><tr><td>Confidence floor</td><td>Estimated prices cannot trigger household notifications.</td></tr><tr><td>Favorite-store scope</td><td>Scoped rules ignore stores outside the household basket set.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Watchlist</div><h1>Price watchlist workbench</h1><p class="lede">Review target prices, Deal Score triggers, source confidence, and notification readiness before alerts reach a household.</p><div class="grid"><div class="metric"><strong>4</strong><span>tracked staples</span></div><div class="metric"><strong>2</strong><span>alerts ready</span></div><div class="metric"><strong>1</strong><span>held for review</span></div></div></section><section class="card" style="margin-top:16px"><h2>Tracked items</h2><table class="table"><thead><tr><th>Product</th><th>Target</th><th>Current</th><th>Trigger</th><th>Status</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>50 SEK</td><td>49.90 SEK</td><td>Deal Score ≥ 80</td><td>Ready for push</td></tr><tr><td>Butter 600g</td><td>45 SEK</td><td>54.90 SEK</td><td>52-week low</td><td>Watching</td></tr><tr><td>Eggs 12-pack</td><td>35 SEK</td><td>34.90 SEK</td><td>Favorite stores only</td><td>Ready for email</td></tr><tr><td>Loose tomatoes</td><td>29 SEK/kg</td><td>Estimated</td><td>Confidence ≥ 80%</td><td>Held for review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Notification guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied behavior</th></tr></thead><tbody><tr><td>Quiet hours</td><td>Push alerts pause from 21:00 to 07:00.</td></tr><tr><td>Confidence floor</td><td>Estimated prices cannot trigger household notifications.</td></tr><tr><td>Favorite-store scope</td><td>Scoped rules ignore stores outside the household basket set.</td></tr></tbody></table></section>${watchlistLivePanel}`
   },
   {
     path: 'notifications/inbox/index.html',
@@ -703,13 +921,13 @@ const pages = [
     path: 'budget/forecast/index.html',
     title: 'Grocery budget forecast — GroceryView',
     description: 'Forecast GroceryView household grocery spend with weekly basket totals, month-end projection, receipt actuals, and over-budget prevention actions.',
-    body: `<section class="card"><div class="eyebrow">Budget forecast</div><h1>Grocery budget forecast</h1><p class="lede">Compare planned baskets with receipt actuals, project month-end spend, and choose corrective actions before the household goes over budget.</p><div class="grid"><div class="metric"><strong>742 SEK</strong><span>next basket forecast</span></div><div class="metric"><strong>501 SEK</strong><span>spent this week</span></div><div class="metric"><strong>3 084 SEK</strong><span>month-end projection</span></div></div></section><section class="card" style="margin-top:16px"><h2>Forecast ledger</h2><table class="table"><thead><tr><th>Period</th><th>Budget</th><th>Actual / forecast</th><th>Variance</th><th>Status</th></tr></thead><tbody><tr><td>This week actuals</td><td>800 SEK</td><td>501 SEK</td><td>+299 SEK</td><td>On track</td></tr><tr><td>Next planned basket</td><td>800 SEK</td><td>742 SEK</td><td>+58 SEK</td><td>Needs review</td></tr><tr><td>Month-end projection</td><td>3 200 SEK</td><td>3 084 SEK</td><td>+116 SEK</td><td>On track</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Correction plan</h2><table class="table"><thead><tr><th>Action</th><th>Impact</th><th>Guardrail</th></tr></thead><tbody><tr><td>Apply coffee private-label swap</td><td>Saves 12 SEK</td><td>Requires verified shelf price</td></tr><tr><td>Move eggs to Lidl split basket</td><td>Saves 4 SEK</td><td>Favorite-store only route</td></tr><tr><td>Hold estimated tomato price</td><td>Avoids false saving</td><td>Needs review before forecast credit</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Budget forecast</div><h1>Grocery budget forecast</h1><p class="lede">Compare planned baskets with receipt actuals, project month-end spend, and choose corrective actions before the household goes over budget.</p><div class="grid"><div class="metric"><strong>742 SEK</strong><span>next basket forecast</span></div><div class="metric"><strong>501 SEK</strong><span>spent this week</span></div><div class="metric"><strong>3 084 SEK</strong><span>month-end projection</span></div></div></section><section class="card" style="margin-top:16px"><h2>Forecast ledger</h2><table class="table"><thead><tr><th>Period</th><th>Budget</th><th>Actual / forecast</th><th>Variance</th><th>Status</th></tr></thead><tbody><tr><td>This week actuals</td><td>800 SEK</td><td>501 SEK</td><td>+299 SEK</td><td>On track</td></tr><tr><td>Next planned basket</td><td>800 SEK</td><td>742 SEK</td><td>+58 SEK</td><td>Needs review</td></tr><tr><td>Month-end projection</td><td>3 200 SEK</td><td>3 084 SEK</td><td>+116 SEK</td><td>On track</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Correction plan</h2><table class="table"><thead><tr><th>Action</th><th>Impact</th><th>Guardrail</th></tr></thead><tbody><tr><td>Apply coffee private-label swap</td><td>Saves 12 SEK</td><td>Requires verified shelf price</td></tr><tr><td>Move eggs to Lidl split basket</td><td>Saves 4 SEK</td><td>Favorite-store only route</td></tr><tr><td>Hold estimated tomato price</td><td>Avoids false saving</td><td>Needs review before forecast credit</td></tr></tbody></table></section>${budgetSummaryLivePanel}`
   },
   {
     path: 'scanner/index.html',
     title: 'Barcode and receipt scanner — GroceryView',
     description: 'GroceryView scanner page scaffold for barcode lookup, receipt parsing, confidence, and manual review.',
-    body: `<section class="card" data-groceryview-flow="scanner"><div class="eyebrow">Scanner</div><h1>Barcode and receipt scanner</h1><p class="lede">Scan products and receipts, surface confidence levels, and send uncertain matches to the manual review queue.</p><div class="grid"><div class="metric"><strong>Barcode</strong><span>product lookup and smart swaps</span></div><div class="metric"><strong>Receipt</strong><span>budget impact review</span></div><div class="metric"><strong>Confidence</strong><span>low-confidence review routing</span></div></div><form class="flow-panel" aria-label="Scanner upload preview"><label>Receipt or barcode image<input name="scanImage" type="file" accept="image/*" /></label><button type="submit">Preview upload</button></form><div class="flow-panel" aria-label="Scanner review actions"><button type="button" data-flow-action="route-review">Route to review</button><button type="button" data-flow-action="mark-matched">Mark matched</button></div><p class="flow-result" data-flow-result="scanner" aria-live="polite">Uploads remain local preview until OCR provider credentials are configured.</p></section><section class="card" style="margin-top:16px"><h2>Review queue</h2><table class="table"><thead><tr><th>Capture</th><th>Status</th><th>Next action</th></tr></thead><tbody><tr><td>Coop Farsta receipt</td><td>Needs human review</td><td>Confirm milk line item and loyalty discount</td></tr><tr><td>Arla Milk barcode</td><td>Matched</td><td>Ready for basket price update</td></tr><tr><td>Loose tomatoes label</td><td>Low confidence</td><td>Route to product matching queue</td></tr></tbody></table></section>`
+    body: `<section class="card" data-groceryview-flow="scanner"><div class="eyebrow">Scanner</div><h1>Barcode and receipt scanner</h1><p class="lede">Scan products and receipts, surface confidence levels, and send uncertain matches to the manual review queue.</p><div class="grid"><div class="metric"><strong>Barcode</strong><span>product lookup and smart swaps</span></div><div class="metric"><strong>Receipt</strong><span>budget impact review</span></div><div class="metric"><strong>Confidence</strong><span>low-confidence review routing</span></div></div><form class="flow-panel" aria-label="Scanner upload preview"><label>Receipt or barcode image<input name="scanImage" type="file" accept="image/*" /></label><button type="submit">Preview upload</button></form><div class="flow-panel" aria-label="Scanner review actions"><button type="button" data-flow-action="check-storage-health">Check upload storage</button><button type="button" data-flow-action="route-review">Route to review</button><button type="button" data-flow-action="mark-matched">Mark matched</button></div><p class="flow-result" data-flow-result="scanner" aria-live="polite">Uploads remain local preview until OCR provider credentials are configured.</p></section><section class="card" style="margin-top:16px"><h2>Upload readiness</h2><table class="table"><thead><tr><th>Dependency</th><th>Ready state</th><th>Customer impact</th></tr></thead><tbody><tr><td>Private scan storage</td><td>Health endpoint confirms configuration</td><td>Receipts and barcodes upload before OCR processing</td></tr><tr><td>Receipt OCR</td><td>Provider checked during processing</td><td>Uncertain rows route to human review</td></tr><tr><td>Barcode lookup</td><td>Provider checked during processing</td><td>Matched products update basket prices</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Review queue</h2><table class="table"><thead><tr><th>Capture</th><th>Status</th><th>Next action</th></tr></thead><tbody><tr><td>Coop Farsta receipt</td><td>Needs human review</td><td>Confirm milk line item and loyalty discount</td></tr><tr><td>Arla Milk barcode</td><td>Matched</td><td>Ready for basket price update</td></tr><tr><td>Loose tomatoes label</td><td>Low confidence</td><td>Route to product matching queue</td></tr></tbody></table></section>`
   },
   {
     path: 'receipts/review/index.html',
@@ -739,7 +957,7 @@ const pages = [
     path: 'retailers/freshness/index.html',
     title: 'Retailer freshness monitor — GroceryView',
     description: 'Monitor GroceryView retailer scrape freshness, parser health, stale catalog rows, and alert eligibility by chain.',
-    body: `<section class="card"><div class="eyebrow">Retailer freshness</div><h1>Retailer freshness monitor</h1><p class="lede">Review chain-level scrape freshness and parser health before retailer-page observations update deals, alerts, or basket totals.</p><div class="grid"><div class="metric"><strong>4</strong><span>chains monitored</span></div><div class="metric"><strong>1</strong><span>stale parser feed</span></div><div class="metric"><strong>93%</strong><span>fresh eligible rows</span></div></div></section><section class="card" style="margin-top:16px"><h2>Freshness by retailer</h2><table class="table"><thead><tr><th>Retailer</th><th>Last scrape</th><th>Parser health</th><th>Eligible rows</th><th>Action</th></tr></thead><tbody><tr><td>Willys</td><td>2026-05-20 07:45</td><td>Healthy</td><td>94%</td><td>Keep publishing</td></tr><tr><td>ICA</td><td>2026-05-20 07:30</td><td>Healthy</td><td>91%</td><td>Backfill loyalty labels</td></tr><tr><td>Coop</td><td>2026-05-19 18:20</td><td>Stale feed</td><td>73%</td><td>Pause new alerts</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Freshness guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Alert freshness</td><td>Stale retailer-page rows cannot trigger household notifications.</td></tr><tr><td>Parser health</td><td>Parser failures keep old prices visible but exclude them from Deal Score updates.</td></tr><tr><td>Chain labels</td><td>Member-only and promotion labels must survive parser backfills.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Retailer freshness</div><h1>Retailer freshness monitor</h1><p class="lede">Review chain-level scrape freshness and parser health before retailer-page observations update deals, alerts, or basket totals.</p><div class="grid"><div class="metric"><strong>4</strong><span>chains monitored</span></div><div class="metric"><strong>1</strong><span>stale parser feed</span></div><div class="metric"><strong>93%</strong><span>fresh eligible rows</span></div></div></section><section class="card" style="margin-top:16px"><h2>Freshness by retailer</h2><table class="table"><thead><tr><th>Retailer</th><th>Last scrape</th><th>Parser health</th><th>Eligible rows</th><th>Action</th></tr></thead><tbody><tr><td>Willys</td><td>2026-05-20 07:45</td><td>Healthy</td><td>94%</td><td>Keep publishing</td></tr><tr><td>ICA</td><td>2026-05-20 07:30</td><td>Healthy</td><td>91%</td><td>Backfill loyalty labels</td></tr><tr><td>Coop</td><td>2026-05-19 18:20</td><td>Stale feed</td><td>73%</td><td>Pause new alerts</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Freshness guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Alert freshness</td><td>Stale retailer-page rows cannot trigger household notifications.</td></tr><tr><td>Parser health</td><td>Parser failures keep old prices visible but exclude them from Deal Score updates.</td></tr><tr><td>Chain labels</td><td>Member-only and promotion labels must survive parser backfills.</td></tr></tbody></table></section>${priceFreshnessLivePanel}`
   },
   {
     path: 'routes/shopping/index.html',
@@ -757,7 +975,7 @@ const pages = [
     path: 'deals/today/index.html',
     title: 'Today’s best grocery deals — GroceryView',
     description: 'Daily GroceryView deal board with Deal Score, source confidence, savings, and recommended shopper actions.',
-    body: `<section class="card"><div class="eyebrow">Daily deal board</div><h1>Today’s best grocery deals</h1><p class="lede">Prioritize verified discounts with strong Deal Scores, clear source confidence, and practical shopping actions.</p><div class="grid"><div class="metric"><strong>82</strong><span>top Deal Score</span></div><div class="metric"><strong>3</strong><span>verified deal rows</span></div><div class="metric"><strong>44 SEK</strong><span>basket savings</span></div></div></section><section class="card" style="margin-top:16px"><h2>Ranked deal actions</h2><table class="table"><thead><tr><th>Product</th><th>Store</th><th>Deal Score</th><th>Confidence</th><th>Action</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>Willys Odenplan</td><td>82</td><td>Verified shelf</td><td>Buy two for this week</td></tr><tr><td>Eggs 12-pack</td><td>Lidl Sveavägen</td><td>76</td><td>Retailer page</td><td>Add to split basket</td></tr><tr><td>Garant Bryggkaffe 450g</td><td>Willys Odenplan</td><td>73</td><td>Verified shelf</td><td>Use as private-label swap</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Deal guardrails</h2><table class="table"><thead><tr><th>Rule</th><th>Why it matters</th></tr></thead><tbody><tr><td>Ads excluded from ranking</td><td>Sponsored placements cannot increase Deal Score.</td></tr><tr><td>Estimated rows held back</td><td>Low-confidence prices must be reviewed before appearing as top deals.</td></tr><tr><td>Member prices labeled</td><td>Loyalty-only offers are separated from public shelf prices.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Daily deal board</div><h1>Today’s best grocery deals</h1><p class="lede">Prioritize verified discounts with strong Deal Scores, clear source confidence, and practical shopping actions.</p><div class="grid"><div class="metric"><strong>82</strong><span>top Deal Score</span></div><div class="metric"><strong>3</strong><span>verified deal rows</span></div><div class="metric"><strong>44 SEK</strong><span>basket savings</span></div></div></section><section class="card" style="margin-top:16px"><h2>Ranked deal actions</h2><table class="table"><thead><tr><th>Product</th><th>Store</th><th>Deal Score</th><th>Confidence</th><th>Action</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>Willys Odenplan</td><td>82</td><td>Verified shelf</td><td>Buy two for this week</td></tr><tr><td>Eggs 12-pack</td><td>Lidl Sveavägen</td><td>76</td><td>Retailer page</td><td>Add to split basket</td></tr><tr><td>Garant Bryggkaffe 450g</td><td>Willys Odenplan</td><td>73</td><td>Verified shelf</td><td>Use as private-label swap</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Deal guardrails</h2><table class="table"><thead><tr><th>Rule</th><th>Why it matters</th></tr></thead><tbody><tr><td>Ads excluded from ranking</td><td>Sponsored placements cannot increase Deal Score.</td></tr><tr><td>Estimated rows held back</td><td>Low-confidence prices must be reviewed before appearing as top deals.</td></tr><tr><td>Member prices labeled</td><td>Loyalty-only offers are separated from public shelf prices.</td></tr></tbody></table></section>${dailyDealsLivePanel}`
   },
   {
     path: 'savings/ledger/index.html',
@@ -799,7 +1017,7 @@ const pages = [
     path: 'categories/coffee/index.html',
     title: 'Coffee deals in Stockholm — GroceryView',
     description: 'Coffee category page with price index, top deals, and percentile signals.',
-    body: `<section class="card"><div class="eyebrow">Category</div><h1>Stockholm Coffee Deals</h1><p class="lede">Coffee Index is at 91.6 with strong current promotions.</p><div class="grid"><div class="metric"><strong>-8.4%</strong><span>1M move</span></div><div class="metric"><strong>12th</strong><span>Historical percentile</span></div><div class="metric"><strong>Zoégas</strong><span>Top deal</span></div></div></section><section class="card" style="margin-top:16px"><h2>Category signals</h2><table class="table"><thead><tr><th>Product</th><th>Store</th><th>Price</th><th>Signal</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>Willys Odenplan</td><td>49.90 SEK</td><td>12th historical percentile</td></tr><tr><td>Garant Bryggkaffe 450g</td><td>Willys Odenplan</td><td>37.90 SEK</td><td>Private-label swap candidate</td></tr><tr><td>Arvid Nordquist 500g</td><td>Coop Farsta</td><td>59.90 SEK</td><td>Watchlist only</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Category</div><h1>Stockholm Coffee Deals</h1><p class="lede">Coffee Index is at 91.6 with strong current promotions.</p><div class="grid"><div class="metric"><strong>-8.4%</strong><span>1M move</span></div><div class="metric"><strong>12th</strong><span>Historical percentile</span></div><div class="metric"><strong>Zoégas</strong><span>Top deal</span></div></div></section><section class="card" style="margin-top:16px"><h2>Category signals</h2><table class="table"><thead><tr><th>Product</th><th>Store</th><th>Price</th><th>Signal</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>Willys Odenplan</td><td>49.90 SEK</td><td>12th historical percentile</td></tr><tr><td>Garant Bryggkaffe 450g</td><td>Willys Odenplan</td><td>37.90 SEK</td><td>Private-label swap candidate</td></tr><tr><td>Arvid Nordquist 500g</td><td>Coop Farsta</td><td>59.90 SEK</td><td>Watchlist only</td></tr></tbody></table></section>${categoryMarketLivePanel}`
   }
 ];
 

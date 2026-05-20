@@ -17,6 +17,7 @@ describe('buildOpenApiDocument', () => {
       '/api/billing/subscription-events',
       '/api/budget',
       '/api/budget/summary',
+      '/api/categories/{category}/market',
       '/api/health',
       '/api/households/current',
       '/api/human-review/assignments',
@@ -78,5 +79,7 @@ describe('buildOpenApiDocument', () => {
     assert.equal(doc.paths['/api/products/{id}/terminal'].get?.security, undefined);
     assert.match(doc.paths['/api/products/{id}/terminal'].get?.summary ?? '', /price terminal/i);
     assert.equal(doc.paths['/api/market/overview'].get?.security, undefined);
+    assert.equal(doc.paths['/api/categories/{category}/market'].get?.security, undefined);
+    assert.match(doc.paths['/api/categories/{category}/market'].get?.summary ?? '', /category market/i);
   });
 });

@@ -366,11 +366,13 @@ export type SecretRotationReadinessReport = {
   status: 'ready' | 'blocked';
   blockers: string[];
   readySecrets: string[];
+  requiredSecretCount: number;
   summary: string;
 };
 
 export type SecretRotationReadinessSummary = {
   status: SecretRotationReadinessReport['status'];
+  requiredSecrets: number;
   totalBlockers: number;
   missingSecrets: number;
   staleSecrets: number;
@@ -408,6 +410,7 @@ export function buildSecretRotationReadinessReport(input: SecretRotationReadines
     status: blockers.length === 0 ? 'ready' : 'blocked',
     blockers,
     readySecrets,
+    requiredSecretCount: input.requiredSecrets.length,
     summary:
       blockers.length === 0
         ? 'Secret rotation readiness passed.'
@@ -420,6 +423,7 @@ export function summarizeSecretRotationReadinessReport(
 ): SecretRotationReadinessSummary {
   return {
     status: report.status,
+    requiredSecrets: report.requiredSecretCount,
     totalBlockers: report.blockers.length,
     missingSecrets: report.blockers.filter((blocker) => blocker.startsWith('secret_missing:')).length,
     staleSecrets: report.blockers.filter((blocker) => blocker.startsWith('secret_rotation_stale:')).length,
@@ -439,6 +443,8 @@ export type DeploymentGateDigest = {
   status: 'ready' | 'blocked';
   blockers: string[];
   totalBlockers: number;
+  readyChecks: number;
+  blockedChecks: number;
   checks: {
     deploymentReadiness: DeploymentReadinessReport['status'];
     smokeEvidence: DeploymentSmokeEvidenceReport['status'];
@@ -458,10 +464,19 @@ export function buildDeploymentGateDigest(input: DeploymentGateDigestInput): Dep
   if (input.releaseValidation === 'fail') blockers.push('release_validation_failed');
   if (input.releaseValidation === 'not_run') blockers.push('release_validation_not_run');
 
+  const checkStatuses = [
+    input.readiness.status,
+    input.smokeEvidence.status,
+    input.secretRotation.status,
+    input.releaseValidation === 'pass' ? 'ready' : 'blocked'
+  ];
+
   return {
     status: blockers.length === 0 ? 'ready' : 'blocked',
     blockers,
     totalBlockers: blockers.length,
+    readyChecks: checkStatuses.filter((status) => status === 'ready').length,
+    blockedChecks: checkStatuses.filter((status) => status === 'blocked').length,
     checks: {
       deploymentReadiness: input.readiness.status,
       smokeEvidence: input.smokeEvidence.status,

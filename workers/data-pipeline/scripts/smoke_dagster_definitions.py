@@ -18,6 +18,10 @@ EXPECTED_ASSETS = {
     "seed_stores",
 }
 
+EXPECTED_SCHEDULES = {
+    "open_prices_ingestion_schedule",
+}
+
 
 def asset_names() -> set[str]:
     try:
@@ -38,21 +42,45 @@ def asset_names() -> set[str]:
     return {key.to_user_string() for key in asset_graph.get_all_asset_keys()}
 
 
+def schedule_names() -> set[str]:
+    try:
+        from groceryview_data_pipeline.definitions import defs
+    except ModuleNotFoundError as exc:
+        if exc.name == "dagster":
+            raise RuntimeError(
+                "Dagster is not installed. Run `pip install -e .[dev]` from "
+                "workers/data-pipeline before this smoke check."
+            ) from exc
+        raise
+
+    return {schedule.name for schedule in defs.get_all_schedule_defs()}
+
+
 def main() -> int:
     names = asset_names()
+    schedules = schedule_names()
     missing = sorted(EXPECTED_ASSETS - names)
     unexpected = sorted(names - EXPECTED_ASSETS)
+    missing_schedules = sorted(EXPECTED_SCHEDULES - schedules)
+    unexpected_schedules = sorted(schedules - EXPECTED_SCHEDULES)
 
-    if missing or unexpected:
+    if missing or unexpected or missing_schedules or unexpected_schedules:
         if missing:
             print(f"Missing assets: {', '.join(missing)}", file=sys.stderr)
         if unexpected:
             print(f"Unexpected assets: {', '.join(unexpected)}", file=sys.stderr)
+        if missing_schedules:
+            print(f"Missing schedules: {', '.join(missing_schedules)}", file=sys.stderr)
+        if unexpected_schedules:
+            print(f"Unexpected schedules: {', '.join(unexpected_schedules)}", file=sys.stderr)
         return 1
 
     print("Dagster definitions loaded.")
     print("Assets:")
     for name in sorted(names):
+        print(f"- {name}")
+    print("Schedules:")
+    for name in sorted(schedules):
         print(f"- {name}")
     return 0
 

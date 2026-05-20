@@ -301,6 +301,23 @@ export type MarketMover = {
   verifiedHistoryPoints: number;
 };
 
+export type CategoryMarketRow = MarketMover & {
+  category: string;
+  unitPrice: string;
+  dealScore: number;
+  band: ReturnType<typeof scoreBand>;
+  customerRead: string;
+};
+
+export type CategoryMarketReport = {
+  category: string;
+  city: string;
+  productCount: number;
+  topDeal: { productId: string; currentPrice: number | null; dealScore: number } | null;
+  rows: CategoryMarketRow[];
+  guardrails: string[];
+};
+
 export type StoreDeal = {
   productId: string;
   ticker: string;
@@ -726,6 +743,49 @@ function marketMoverFor(product: ProductDetail): MarketMover {
   };
 }
 
+function categoryMarketRowFor(product: ProductDetail): CategoryMarketRow {
+  const mover = marketMoverFor(product);
+  const priceText = mover.currentPrice == null ? 'No verified current price' : `${mover.currentPrice.toFixed(2)} SEK`;
+  const storeText = mover.bestStoreName ?? 'unknown store';
+  const medianText = mover.stockholmMedianGap == null
+    ? 'without a Stockholm median comparison'
+    : `${Math.abs(mover.stockholmMedianGap).toFixed(2)} SEK ${mover.stockholmMedianGap <= 0 ? 'below' : 'above'} Stockholm median`;
+  const moveText = mover.oneMonthMovePercent == null
+    ? 'with no 1M move yet'
+    : `${mover.oneMonthMovePercent > 0 ? '+' : ''}${mover.oneMonthMovePercent.toFixed(1)}% over 1M`;
+  return {
+    ...mover,
+    category: product.category,
+    unitPrice: product.unitPrice,
+    dealScore: product.dealScore,
+    band: scoreBand(product.dealScore),
+    customerRead: `${priceText} at ${storeText} is ${moveText} and ${medianText}; ${mover.verifiedHistoryPoints}/${mover.historyPoints} verified history points.`
+  };
+}
+
+function categoryMarketFor(category: string): CategoryMarketReport | null {
+  const normalizedCategory = category.trim().toLowerCase();
+  if (!normalizedCategory) throw new Error('category is required');
+  const rows = products
+    .filter((product) => product.category.toLowerCase() === normalizedCategory)
+    .map(categoryMarketRowFor)
+    .sort((left, right) => right.dealScore - left.dealScore || Math.abs(right.oneMonthMovePercent ?? 0) - Math.abs(left.oneMonthMovePercent ?? 0) || left.productName.localeCompare(right.productName));
+  if (rows.length === 0) return null;
+  const leader = rows[0]!;
+  return {
+    category: normalizedCategory,
+    city: 'Stockholm',
+    productCount: rows.length,
+    topDeal: { productId: leader.productId, currentPrice: leader.currentPrice, dealScore: leader.dealScore },
+    rows,
+    guardrails: [
+      'Only verified category rows can lead the category market board.',
+      '52-week ranges include the current quote so shoppers never see a price outside the displayed range.',
+      'Same-category rows keep Deal Score, median gap, and verified-history evidence visible before customer action.'
+    ]
+  };
+}
+
 function buildDealScoreReasons(product: ProductDetail, bestPrice: StorePrice | null, band: ReturnType<typeof scoreBand>): string[] {
   const reasons = [
     `${product.name} is in the ${product.dealSignals.currentCityPercentile}th city price percentile.`,
@@ -899,6 +959,10 @@ export function createGroceryViewApi() {
           };
         });
       return { city: 'Stockholm', indices: [index], movers, topDeals };
+    },
+
+    getCategoryMarket(category: string): CategoryMarketReport | null {
+      return categoryMarketFor(category);
     },
 
     getStores() {

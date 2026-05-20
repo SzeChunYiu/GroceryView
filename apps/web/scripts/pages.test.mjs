@@ -150,6 +150,15 @@ describe('buildStaticPages', () => {
       assert.match(retailerFreshness, /Coop/);
       assert.match(retailerFreshness, /Pause new alerts/);
       assert.match(retailerFreshness, /Stale retailer-page rows cannot trigger household notifications/);
+      assert.match(retailerFreshness, /Connected price freshness API/);
+      assert.match(retailerFreshness, /Load live freshness report/);
+      assert.match(retailerFreshness, /data-groceryview-flow="price-freshness"/);
+      assert.match(retailerFreshness, /data-flow-action="load-price-freshness"/);
+      assert.match(retailerFreshness, /data-price-freshness-summary/);
+      assert.match(retailerFreshness, /data-price-freshness-backfill/);
+      assert.match(retailerFreshness, /data-price-freshness-thresholds/);
+      assert.match(retailerFreshness, /fetch\(apiUrl\('\/api\/prices\/freshness\?asOf='/);
+      assert.match(retailerFreshness, /Connected price freshness loaded/);
 
       const shoppingRoute = await readFile(join(root, 'routes/shopping/index.html'), 'utf8');
       assert.match(shoppingRoute, /Shopping route planner/);
@@ -171,6 +180,15 @@ describe('buildStaticPages', () => {
       assert.match(deals, /Deal Score/);
       assert.match(deals, /Ads excluded from ranking/);
       assert.match(deals, /Estimated rows held back/);
+      assert.match(deals, /Connected daily deals API/);
+      assert.match(deals, /Load live deal board/);
+      assert.match(deals, /data-groceryview-flow="daily-deals"/);
+      assert.match(deals, /data-flow-action="load-daily-deals"/);
+      assert.match(deals, /data-daily-deals-leader/);
+      assert.match(deals, /data-daily-deals-price/);
+      assert.match(deals, /data-daily-deals-count/);
+      assert.match(deals, /fetch\(apiUrl\('\/api\/market\/overview'/);
+      assert.match(deals, /Connected daily deals loaded/);
 
       const savingsLedger = await readFile(join(root, 'savings/ledger/index.html'), 'utf8');
       assert.match(savingsLedger, /Savings ledger/);
@@ -209,6 +227,18 @@ describe('buildStaticPages', () => {
       assert.match(category, /Category signals/);
       assert.match(category, /Private-label swap candidate/);
       assert.match(category, /Arvid Nordquist/);
+      assert.match(category, /Connected category market API/);
+      assert.match(category, /Load live category market/);
+      assert.match(category, /data-groceryview-flow="category-market"/);
+      assert.match(category, /data-category="coffee"/);
+      assert.match(category, /data-flow-action="load-category-market"/);
+      assert.match(category, /data-category-market-leader/);
+      assert.match(category, /data-category-market-range/);
+      assert.match(category, /data-category-market-evidence/);
+      assert.match(category, /fetch\(apiUrl\('\/api\/categories\/' \+ encodeURIComponent\(categoryId\) \+ '\/market'/);
+      assert.match(category, /range52WeekPositionPercent/);
+      assert.match(category, /stockholmMedianGap/);
+      assert.match(category, /Connected category market loaded/);
 
       const login = await readFile(join(root, 'login/index.html'), 'utf8');
       assert.match(login, /Sign in to GroceryView/);
@@ -283,6 +313,16 @@ describe('buildStaticPages', () => {
       assert.match(watchlist, /Ready for push/);
       assert.match(watchlist, /Held for review/);
       assert.match(watchlist, /Estimated prices cannot trigger household notifications/);
+      assert.match(watchlist, /Connected watchlist API/);
+      assert.match(watchlist, /Load live watchlist alerts/);
+      assert.match(watchlist, /data-groceryview-flow="watchlist"/);
+      assert.match(watchlist, /data-flow-action="load-watchlist"/);
+      assert.match(watchlist, /data-watchlist-summary/);
+      assert.match(watchlist, /data-watchlist-target/);
+      assert.match(watchlist, /data-watchlist-trigger/);
+      assert.match(watchlist, /data-watchlist-scope/);
+      assert.match(watchlist, /fetch\(apiUrl\('\/api\/watchlist'/);
+      assert.match(watchlist, /Connected watchlist loaded/);
 
       const notificationInbox = await readFile(join(root, 'notifications/inbox/index.html'), 'utf8');
       assert.match(notificationInbox, /Grocery alert inbox/);
@@ -328,15 +368,29 @@ describe('buildStaticPages', () => {
       assert.match(budgetForecast, /Month-end projection/);
       assert.match(budgetForecast, /Correction plan/);
       assert.match(budgetForecast, /Needs review before forecast credit/);
+      assert.match(budgetForecast, /Connected budget API/);
+      assert.match(budgetForecast, /Load live budget summary/);
+      assert.match(budgetForecast, /data-groceryview-flow="budget-summary"/);
+      assert.match(budgetForecast, /data-flow-action="load-budget-summary"/);
+      assert.match(budgetForecast, /data-budget-summary-weekly/);
+      assert.match(budgetForecast, /data-budget-summary-monthly/);
+      assert.match(budgetForecast, /data-budget-summary-estimate/);
+      assert.match(budgetForecast, /fetch\(apiUrl\('\/api\/budget\/summary'/);
+      assert.match(budgetForecast, /Connected budget summary loaded/);
 
       const scanner = await readFile(join(root, 'scanner/index.html'), 'utf8');
       assert.match(scanner, /Barcode and receipt scanner/);
       assert.match(scanner, /manual review queue/);
+      assert.match(scanner, /Upload readiness/);
+      assert.match(scanner, /Private scan storage/);
       assert.match(scanner, /Coop Farsta receipt/);
       assert.match(scanner, /Route to product matching queue/);
       assert.match(scanner, /data-groceryview-flow="scanner"/);
       assert.match(scanner, /accept="image\/\*"/);
+      assert.match(scanner, /data-flow-action="check-storage-health"/);
       assert.match(scanner, /data-flow-action="route-review"/);
+      assert.match(scanner, /fetch\(apiUrl\('\/api\/health/);
+      assert.match(scanner, /hasScanUploadStorage/);
       assert.match(scanner, /fetch\(apiUrl\('\/api\/scans\/upload-url/);
       assert.match(scanner, /fetch\(ticket\.uploadUrl/);
       assert.match(scanner, /method: 'PUT'/);
