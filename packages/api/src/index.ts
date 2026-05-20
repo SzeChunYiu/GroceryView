@@ -193,13 +193,17 @@ export function createGroceryViewApi() {
     getMarketOverview() {
       const topDeals = [...products]
         .sort((a, b) => b.dealScore - a.dealScore)
-        .map((product) => ({
-          productId: product.id,
-          ticker: product.ticker,
-          bestPrice: product.currentPrices[0]?.price ?? null,
-          dealScore: product.dealScore,
-          band: scoreBand(product.dealScore)
-        }));
+        .map((product) => {
+          const bestPrice = bestPriceFor(product);
+          return {
+            productId: product.id,
+            ticker: product.ticker,
+            bestPrice: bestPrice?.price ?? null,
+            bestStoreId: bestPrice?.storeId ?? null,
+            dealScore: product.dealScore,
+            band: scoreBand(product.dealScore)
+          };
+        });
       return { city: 'Stockholm', indices: [index], topDeals };
     },
 
