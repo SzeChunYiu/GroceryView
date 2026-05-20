@@ -34,6 +34,7 @@ describe('buildStaticPages', () => {
         'pantry/index.html',
         'prices/anomalies/index.html',
         'prices/confidence/index.html',
+        'privacy/consent/index.html',
         'privacy/index.html',
         'products/coffee/index.html',
         'products/compare/index.html',
@@ -138,6 +139,13 @@ describe('buildStaticPages', () => {
       assert.match(priceAnomalies, /Butter 600g/);
       assert.match(priceAnomalies, /Outlier spikes cannot update Deal Score/);
       assert.match(priceAnomalies, /Large price drops require fresh retailer-page or receipt evidence/);
+
+      const privacyConsent = await readFile(join(root, 'privacy/consent/index.html'), 'utf8');
+      assert.match(privacyConsent, /Privacy consent center/);
+      assert.match(privacyConsent, /Consent controls/);
+      assert.match(privacyConsent, /Anonymous price contribution/);
+      assert.match(privacyConsent, /Personalized ad or notification uses remain disabled/);
+      assert.match(privacyConsent, /Raw receipt images and line-level household identity never enter advertiser payloads/);
 
       const deals = await readFile(join(root, 'deals/today/index.html'), 'utf8');
       assert.match(deals, /Today’s best grocery deals/);
