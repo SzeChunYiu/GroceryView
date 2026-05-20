@@ -279,6 +279,17 @@ export type RawRecordReadRecord = RawRecordRecord & {
   createdAt: string;
 };
 
+export type SourceRunReadRecord = SourceRunRecord & {
+  sourceRunId: string;
+  startedAt: string;
+};
+
+export type SourceRunListFilter = {
+  status?: SourceRunRecord['status'];
+  sourceType?: SourceRunRecord['sourceType'];
+  limit?: number;
+};
+
 export type FinishSourceRunRecord = {
   sourceRunId: string;
   finishedAt?: string;
@@ -301,6 +312,7 @@ export type PostgresSourceRecordWriter = {
 };
 
 export type PostgresSourceRecordReader = {
+  listSourceRuns(filter?: SourceRunListFilter): Promise<SourceRunReadRecord[]>;
   getRawRecordByHash(sourceRunId: string, payloadHash: string): Promise<RawRecordReadRecord | null>;
 };
 
@@ -662,6 +674,17 @@ type RawRecordRow = {
   provenance: Record<string, unknown> | string | null;
   created_at: string | Date;
 };
+type SourceRunRow = {
+  id: string;
+  source_type: SourceRunRecord['sourceType'];
+  source_name: string;
+  source_url: string | null;
+  started_at: string | Date;
+  finished_at: string | Date | null;
+  status: SourceRunRecord['status'];
+  provenance: Record<string, unknown> | string | null;
+  error_message: string | null;
+};
 
 function asIso(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : value;
@@ -733,6 +756,20 @@ function mapRawRecord(row: RawRecordRow): RawRecordReadRecord {
     payloadHash: row.payload_hash,
     provenance: asRecord(row.provenance),
     createdAt: asIso(row.created_at)
+  };
+}
+
+function mapSourceRun(row: SourceRunRow): SourceRunReadRecord {
+  return {
+    sourceRunId: row.id,
+    sourceType: row.source_type,
+    sourceName: row.source_name,
+    ...(row.source_url ? { sourceUrl: row.source_url } : {}),
+    startedAt: asIso(row.started_at),
+    ...(row.finished_at ? { finishedAt: asIso(row.finished_at) } : {}),
+    status: row.status,
+    provenance: asRecord(row.provenance),
+    ...(row.error_message ? { errorMessage: row.error_message } : {})
   };
 }
 
@@ -1347,6 +1384,28 @@ export function createPostgresSourceRecordWriter(executor: QueryExecutor): Postg
 
 export function createPostgresSourceRecordReader(executor: QueryExecutor): PostgresSourceRecordReader {
   return {
+    async listSourceRuns(filter = {}) {
+      const limit = Math.min(Math.max(filter.limit ?? 100, 1), 500);
+      const rows = await executor.query<SourceRunRow>(
+        `select id,
+                source_type,
+                source_name,
+                source_url,
+                started_at,
+                finished_at,
+                status,
+                provenance,
+                error_message
+         from source_runs
+         where ($1::text is null or status = $1)
+           and ($2::text is null or source_type = $2)
+         order by started_at desc, id
+         limit $3`,
+        [filter.status ?? null, filter.sourceType ?? null, limit]
+      );
+      return rows.map(mapSourceRun);
+    },
+
     async getRawRecordByHash(sourceRunId, payloadHash) {
       const rows = await executor.query<RawRecordRow>(
         `select id,
