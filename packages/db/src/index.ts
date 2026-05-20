@@ -1362,6 +1362,12 @@ export type CollectPostgresIntegrationProbeInput = {
 
 export type CheckPostgresIntegrationReadinessInput = CollectPostgresIntegrationProbeInput;
 
+export type CheckPostgresRepositoryIntegrationReadinessInput = Omit<CollectPostgresIntegrationProbeInput, 'repositoryProbes'> & {
+  runId?: string;
+  now?: string;
+  repositoryProbes?: readonly PostgresRepositoryProbe[];
+};
+
 export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'chains',
   'products',
@@ -1950,4 +1956,22 @@ export async function checkPostgresIntegrationReadiness(
   input: CheckPostgresIntegrationReadinessInput
 ): Promise<PostgresIntegrationReadinessReport> {
   return buildPostgresIntegrationReadinessReport(await collectPostgresIntegrationProbe(input));
+}
+
+export async function checkPostgresRepositoryIntegrationReadiness(
+  input: CheckPostgresRepositoryIntegrationReadinessInput
+): Promise<PostgresIntegrationReadinessReport> {
+  const now = input.now ?? new Date().toISOString();
+  const runId = input.runId ?? `db-readiness-${now.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
+  const repositoryProbes = [
+    ...buildPostgresRepositorySmokeProbes({ runId, now }),
+    ...(input.repositoryProbes ?? [])
+  ];
+
+  return checkPostgresIntegrationReadiness({
+    executor: input.executor,
+    requiredTables: input.requiredTables,
+    requiredMigrationVersions: input.requiredMigrationVersions,
+    repositoryProbes
+  });
 }
