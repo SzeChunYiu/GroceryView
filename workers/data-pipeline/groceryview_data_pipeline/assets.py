@@ -702,6 +702,7 @@ def build_data_pipeline_quality_gate(
     open_prices_ingestion: OpenPricesIngestionRunPlan | None = None,
     open_prices_import: OpenPricesArtifactImportPlan | None = None,
     open_prices_hosted_smoke: OpenPricesHostedSmokePlan | None = None,
+    open_prices_schedule_health: OpenPricesScheduleHealthPlan | None = None,
     min_observations: int = 1,
 ) -> DataPipelineQualityGateSummary:
     blockers: list[str] = []
@@ -726,6 +727,8 @@ def build_data_pipeline_quality_gate(
         blockers.append("open_prices_artifact_import_plan_blocked")
     if open_prices_hosted_smoke is not None and open_prices_hosted_smoke.status != "ready":
         blockers.append("open_prices_hosted_smoke_plan_blocked")
+    if open_prices_schedule_health is not None and open_prices_schedule_health.status != "ready":
+        blockers.append("open_prices_schedule_health_plan_blocked")
 
     return DataPipelineQualityGateSummary(
         status="ready" if not blockers else "blocked",
@@ -739,6 +742,7 @@ def build_data_pipeline_quality_gate(
             *([] if open_prices_ingestion is None else ["open_prices_ingestion_run_plan"]),
             *([] if open_prices_import is None else ["open_prices_artifact_import_plan"]),
             *([] if open_prices_hosted_smoke is None else ["open_prices_hosted_smoke_plan"]),
+            *([] if open_prices_schedule_health is None else ["open_prices_schedule_health_plan"]),
         ],
     )
 
@@ -984,6 +988,7 @@ def data_pipeline_quality_gate(
     open_prices_ingestion_run_plan: dict[str, object],
     open_prices_artifact_import_plan: dict[str, object],
     open_prices_hosted_smoke_plan: dict[str, object],
+    open_prices_schedule_health_plan: dict[str, object],
 ) -> dict[str, object]:
     quality = QualityCheckSummary(**quality_checks)
     freshness = ObservationFreshnessSummary(**price_observation_freshness)
@@ -991,6 +996,7 @@ def data_pipeline_quality_gate(
     open_prices_ingestion = OpenPricesIngestionRunPlan(**open_prices_ingestion_run_plan)
     open_prices_import = OpenPricesArtifactImportPlan(**open_prices_artifact_import_plan)
     open_prices_hosted_smoke = OpenPricesHostedSmokePlan(**open_prices_hosted_smoke_plan)
+    open_prices_schedule_health = OpenPricesScheduleHealthPlan(**open_prices_schedule_health_plan)
     summary = build_data_pipeline_quality_gate(
         quality,
         freshness,
@@ -998,5 +1004,6 @@ def data_pipeline_quality_gate(
         open_prices_ingestion,
         open_prices_import,
         open_prices_hosted_smoke,
+        open_prices_schedule_health,
     )
     return summary.to_dict()
