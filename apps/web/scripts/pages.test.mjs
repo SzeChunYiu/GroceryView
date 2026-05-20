@@ -153,6 +153,18 @@ describe('buildStaticPages', () => {
       assert.match(catalogCoverage, /Backfill member prices/);
       assert.match(catalogCoverage, /Receipt photos need human review before catalog writeback/);
       assert.match(catalogCoverage, /Products without unit prices cannot rank category savings/);
+      assert.match(catalogCoverage, /Connected catalog coverage API/);
+      assert.match(catalogCoverage, /Load live coverage report/);
+      assert.match(catalogCoverage, /data-groceryview-flow="catalog-coverage"/);
+      assert.match(catalogCoverage, /data-flow-action="load-catalog-coverage"/);
+      assert.match(catalogCoverage, /data-catalog-coverage-products/);
+      assert.match(catalogCoverage, /data-catalog-coverage-freshness/);
+      assert.match(catalogCoverage, /data-catalog-coverage-stores/);
+      assert.match(catalogCoverage, /data-catalog-coverage-backfill/);
+      assert.match(catalogCoverage, /fetch\(apiUrl\('\/api\/prices\/freshness\?asOf='/);
+      assert.match(catalogCoverage, /fetch\(apiUrl\('\/api\/stores'/);
+      assert.match(catalogCoverage, /fetch\(apiUrl\('\/api\/market\/overview'/);
+      assert.match(catalogCoverage, /Connected catalog coverage loaded/);
 
       const retailerFreshness = await readFile(join(root, 'retailers/freshness/index.html'), 'utf8');
       assert.match(retailerFreshness, /Retailer freshness monitor/);

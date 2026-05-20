@@ -37,6 +37,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-price-freshness-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setCatalogCoverageMetric = (metric, message) => {
+    const target = document.querySelector('[data-catalog-coverage-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setPriceConfidenceMetric = (metric, message) => {
     const target = document.querySelector('[data-price-confidence-' + metric + ']');
     if (target) target.textContent = message;
@@ -633,6 +637,48 @@ window.GroceryViewFlowActions = (() => {
       setResult('price-freshness', 'Price freshness API load failed: ' + error.message + '. Static retailer freshness board remains visible.');
     }
   };
+  const loadCatalogCoverageFromApi = async (button) => {
+    const config = getApiConfig();
+    const panel = button.closest('[data-groceryview-flow="catalog-coverage"]');
+    const asOf = panel?.dataset.asOf || new Date().toISOString();
+    if (!config.apiBase) {
+      setResult('catalog-coverage', 'Local preview mode: connect the API session bridge before loading live catalog coverage.');
+      return;
+    }
+    try {
+      const headers = config.bearerToken ? apiHeaders(config) : { 'content-type': 'application/json' };
+      const [freshness, stores, market] = await Promise.all([
+        requireApiSuccess(await fetch(apiUrl('/api/prices/freshness?asOf=' + encodeURIComponent(asOf), config, false), {
+          method: 'GET',
+          headers
+        })),
+        requireApiSuccess(await fetch(apiUrl('/api/stores', config, false), {
+          method: 'GET',
+          headers
+        })),
+        requireApiSuccess(await fetch(apiUrl('/api/market/overview', config, false), {
+          method: 'GET',
+          headers
+        }))
+      ]);
+      const products = Array.isArray(freshness.products) ? freshness.products : [];
+      const storeRows = Array.isArray(stores) ? stores : [];
+      const topDeals = Array.isArray(market.topDeals) ? market.topDeals : [];
+      const categories = [...new Set(products.map((product) => product.category).filter(Boolean))];
+      const chains = [...new Set(storeRows.map((store) => store.chain).filter(Boolean))];
+      const districts = [...new Set(storeRows.map((store) => store.district).filter(Boolean))];
+      const backfillIds = Array.isArray(freshness.backfillProductIds) ? freshness.backfillProductIds : [];
+      const summary = freshness.summary || {};
+      const buyReadyDeals = topDeals.filter((deal) => deal.band?.verdict === 'Buy');
+      setCatalogCoverageMetric('products', products.length + ' products · ' + categories.length + ' categories · ' + topDeals.length + ' market rows');
+      setCatalogCoverageMetric('freshness', 'Fresh ' + Number(summary.fresh || 0) + ' · aging ' + Number(summary.aging || 0) + ' · stale ' + Number(summary.stale || 0));
+      setCatalogCoverageMetric('stores', storeRows.length + ' stores · ' + chains.length + ' chains · ' + districts.length + ' districts');
+      setCatalogCoverageMetric('backfill', backfillIds.length ? backfillIds.join(', ') : 'No backfill actions · ' + buyReadyDeals.length + ' buy-ready deal rows');
+      setResult('catalog-coverage', 'Connected catalog coverage loaded: ' + products.length + ' products, ' + storeRows.length + ' stores, ' + backfillIds.length + ' backfill actions.');
+    } catch (error) {
+      setResult('catalog-coverage', 'Catalog coverage API load failed: ' + error.message + '. Static coverage board remains visible.');
+    }
+  };
   const formatWatchlistTriggerValue = (metric, value) => {
     if (!Number.isFinite(Number(value))) return 'n/a';
     if (metric === 'price') return formatPreciseSek(value);
@@ -963,6 +1009,10 @@ window.GroceryViewFlowActions = (() => {
         await loadPriceFreshnessFromApi(button);
         return;
       }
+      if (flow === 'catalog-coverage' && action === 'load-catalog-coverage') {
+        await loadCatalogCoverageFromApi(button);
+        return;
+      }
       if (flow === 'watchlist' && action === 'load-watchlist') {
         await loadWatchlistFromApi();
         return;
@@ -1126,6 +1176,9 @@ const marketIndicesLivePanel = `
 const priceFreshnessLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="price-freshness" data-as-of="2026-05-20T00:00:00.000Z" style="margin-top:16px"><div class="eyebrow">Connected price freshness API</div><h2>Pull live freshness and backfill status</h2><p class="lede">Fetch <code>/api/prices/freshness</code> to replace static freshness copy with API counts for fresh, aging, stale, and backfill-needed product rows before those rows power deal boards or alerts.</p><div class="grid" aria-label="Live price freshness API metrics"><div class="metric"><strong data-price-freshness-summary>Waiting for API pull</strong><span>fresh/aging/stale</span></div><div class="metric"><strong data-price-freshness-backfill>Static backfill preview</strong><span>backfill queue</span></div><div class="metric"><strong data-price-freshness-thresholds>Static freshness thresholds</strong><span>aging and stale windows</span></div><div class="metric"><strong data-price-freshness-stale>Static stale-product preview</strong><span>stale products</span></div></div><div class="flow-panel" aria-label="Connected price freshness actions"><button type="button" data-flow-action="load-price-freshness">Load live freshness report</button></div><p class="flow-result" data-flow-result="price-freshness" aria-live="polite">Local preview mode: connect the API session bridge before loading live price freshness.</p></section>`;
 
+const catalogCoverageLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="catalog-coverage" data-as-of="2026-05-20T00:00:00.000Z" style="margin-top:16px"><div class="eyebrow">Connected catalog coverage API</div><h2>Pull live coverage report</h2><p class="lede">Fetch <code>/api/prices/freshness</code>, <code>/api/stores</code>, and <code>/api/market/overview</code> to refresh product/category coverage, freshness status, store-chain footprint, market rows, and backfill actions before low-coverage rows power shopper alerts or deal boards.</p><div class="grid" aria-label="Live catalog coverage API metrics"><div class="metric"><strong data-catalog-coverage-products>Waiting for API pull</strong><span>products, categories, and market rows</span></div><div class="metric"><strong data-catalog-coverage-freshness>Static freshness preview</strong><span>fresh/aging/stale mix</span></div><div class="metric"><strong data-catalog-coverage-stores>Static store footprint preview</strong><span>stores, chains, districts</span></div><div class="metric"><strong data-catalog-coverage-backfill>Static backfill preview</strong><span>backfill queue and buy-ready rows</span></div></div><div class="flow-panel" aria-label="Connected catalog coverage actions"><button type="button" data-flow-action="load-catalog-coverage">Load live coverage report</button></div><p class="flow-result" data-flow-result="catalog-coverage" aria-live="polite">Local preview mode: connect the API session bridge before loading live catalog coverage.</p></section>`;
+
 const watchlistLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="watchlist" style="margin-top:16px"><div class="eyebrow">Connected watchlist API</div><h2>Pull live target and alert numbers</h2><p class="lede">Fetch <code>/api/watchlist</code> through the protected API session bridge to refresh tracked-item counts, target-price rules, active trigger values, favorite-store scope, and 52-week-low alert evidence from account data.</p><div class="grid" aria-label="Live watchlist API metrics"><div class="metric"><strong data-watchlist-summary>Waiting for API pull</strong><span>tracked items and alerts</span></div><div class="metric"><strong data-watchlist-target>Static target preview</strong><span>target price rules</span></div><div class="metric"><strong data-watchlist-trigger>Static trigger preview</strong><span>current trigger value</span></div><div class="metric"><strong data-watchlist-scope>Static scope preview</strong><span>favorite-store and 52W scope</span></div></div><div class="flow-panel" aria-label="Connected watchlist actions"><button type="button" data-flow-action="load-watchlist">Load live watchlist alerts</button></div><p class="flow-result" data-flow-result="watchlist" aria-live="polite">Local preview mode: connect the API session bridge before loading live watchlist alerts.</p></section>`;
 
@@ -1266,7 +1319,7 @@ const pages = [
     path: 'catalog/coverage/index.html',
     title: 'Catalog coverage dashboard — GroceryView',
     description: 'Track GroceryView catalog coverage by category, store, verified price freshness, low-confidence gaps, and backfill actions.',
-    body: `<section class="card"><div class="eyebrow">Catalog coverage</div><h1>Catalog coverage dashboard</h1><p class="lede">Monitor which categories and stores have enough verified price evidence before they power deal boards, alerts, or basket forecasts.</p><div class="grid"><div class="metric"><strong>78%</strong><span>overall coverage</span></div><div class="metric"><strong>14</strong><span>verified gaps</span></div><div class="metric"><strong>6</strong><span>backfill actions</span></div></div></section><section class="card" style="margin-top:16px"><h2>Coverage by category</h2><table class="table"><thead><tr><th>Category</th><th>Products tracked</th><th>Verified coverage</th><th>Freshness</th><th>Gap action</th></tr></thead><tbody><tr><td>Coffee</td><td>18</td><td>89%</td><td>Fresh today</td><td>Keep monitoring</td></tr><tr><td>Dairy</td><td>24</td><td>81%</td><td>Fresh today</td><td>Backfill member prices</td></tr><tr><td>Produce</td><td>31</td><td>62%</td><td>Mixed</td><td>Route receipt photos to review</td></tr><tr><td>Pantry</td><td>42</td><td>74%</td><td>Fresh this week</td><td>Parse missing unit prices</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Backfill guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Verified freshness window</td><td>Stale rows can display but cannot trigger alerts.</td></tr><tr><td>Low-confidence produce</td><td>Receipt photos need human review before catalog writeback.</td></tr><tr><td>Unit-price completeness</td><td>Products without unit prices cannot rank category savings.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Catalog coverage</div><h1>Catalog coverage dashboard</h1><p class="lede">Monitor which categories and stores have enough verified price evidence before they power deal boards, alerts, or basket forecasts.</p><div class="grid"><div class="metric"><strong>78%</strong><span>overall coverage</span></div><div class="metric"><strong>14</strong><span>verified gaps</span></div><div class="metric"><strong>6</strong><span>backfill actions</span></div></div></section><section class="card" style="margin-top:16px"><h2>Coverage by category</h2><table class="table"><thead><tr><th>Category</th><th>Products tracked</th><th>Verified coverage</th><th>Freshness</th><th>Gap action</th></tr></thead><tbody><tr><td>Coffee</td><td>18</td><td>89%</td><td>Fresh today</td><td>Keep monitoring</td></tr><tr><td>Dairy</td><td>24</td><td>81%</td><td>Fresh today</td><td>Backfill member prices</td></tr><tr><td>Produce</td><td>31</td><td>62%</td><td>Mixed</td><td>Route receipt photos to review</td></tr><tr><td>Pantry</td><td>42</td><td>74%</td><td>Fresh this week</td><td>Parse missing unit prices</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Backfill guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Verified freshness window</td><td>Stale rows can display but cannot trigger alerts.</td></tr><tr><td>Low-confidence produce</td><td>Receipt photos need human review before catalog writeback.</td></tr><tr><td>Unit-price completeness</td><td>Products without unit prices cannot rank category savings.</td></tr></tbody></table></section>${catalogCoverageLivePanel}`
   },
   {
     path: 'retailers/freshness/index.html',
