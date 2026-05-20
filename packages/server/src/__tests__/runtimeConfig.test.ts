@@ -370,7 +370,9 @@ describe('runtime config', () => {
       assert.equal(body.status, 'ready');
       assert.deepEqual(body.blockers, []);
       assert.equal(body.evidence.includes('table:app_users'), true);
+      assert.equal(body.evidence.includes('table:alert_rules'), true);
       assert.equal(body.evidence.includes('migration:003_subscription_entitlements'), true);
+      assert.equal(body.evidence.includes('migration:004_alert_rules'), true);
       assert.equal(JSON.stringify(body).includes('runtime-password'), false);
     } finally {
       await service.close();
