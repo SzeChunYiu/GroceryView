@@ -4,6 +4,7 @@ import {
   createPostgresCatalogReader,
   createPostgresPriceObservationWriter,
   createPostgresPriceReader,
+  createPostgresProductAliasRepository,
   createPostgresRepository,
   createPostgresSourceRecordReader,
   createPostgresSourceRecordWriter,
@@ -57,6 +58,19 @@ class RecordingQueryExecutor implements QueryExecutor {
       online_order_url: 'https://example.invalid/willys/torsplan',
       created_at: new Date('2026-05-20T06:00:00.000Z'),
       updated_at: '2026-05-20T06:01:00.000Z'
+    }
+  ];
+  aliasRows: unknown[] = [
+    {
+      id: 'alias-1',
+      product_id: 'product-1',
+      alias: 'ZOEGA SKANEROST',
+      normalized_alias: 'zoega skanerost',
+      source_type: 'receipt',
+      source_ref: 'receipt-ocr',
+      match_confidence: '0.9100',
+      reviewed_at: new Date('2026-05-20T07:30:00.000Z'),
+      created_at: '2026-05-20T07:29:00.000Z'
     }
   ];
   sourceRunRows: unknown[] = [
@@ -204,6 +218,8 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('from observations')) return this.observationHistoryRows as T[];
     if (sql.includes('from stores')) return this.storeRows as T[];
     if (sql.includes('from products')) return this.productRows as T[];
+    if (sql.includes('insert into aliases')) return this.aliasRows as T[];
+    if (sql.includes('from aliases')) return this.aliasRows as T[];
     if (sql.includes('from subscription_entitlements')) return this.subscriptionEntitlementRows as T[];
     if (sql.includes('select store_id')) return [{ store_id: 'willys-odenplan' }] as T[];
     if (sql.includes('select weekly_budget')) return [{ weekly_budget: '800', monthly_budget: '3200' }] as T[];
@@ -668,6 +684,96 @@ describe('createPostgresCatalogReader', () => {
     await reader.listStores({ limit: 0 });
 
     assert.deepEqual(executor.calls[0]!.params, [null, null, null, 500]);
+    assert.deepEqual(executor.calls[1]!.params, [null, null, null, 1]);
+  });
+});
+
+describe('createPostgresProductAliasRepository', () => {
+  it('upserts product aliases with parameterized SQL and maps the returned row', async () => {
+    const executor = new RecordingQueryExecutor();
+    const aliases = createPostgresProductAliasRepository(executor);
+
+    assert.deepEqual(
+      await aliases.upsertProductAlias({
+        productId: 'product-1',
+        alias: 'ZOEGA SKANEROST',
+        normalizedAlias: 'zoega skanerost',
+        sourceType: 'receipt',
+        sourceRef: 'receipt-ocr',
+        matchConfidence: 0.91,
+        reviewedAt: '2026-05-20T07:30:00.000Z'
+      }),
+      {
+        aliasId: 'alias-1',
+        productId: 'product-1',
+        alias: 'ZOEGA SKANEROST',
+        normalizedAlias: 'zoega skanerost',
+        sourceType: 'receipt',
+        sourceRef: 'receipt-ocr',
+        matchConfidence: 0.91,
+        reviewedAt: '2026-05-20T07:30:00.000Z',
+        createdAt: '2026-05-20T07:29:00.000Z'
+      }
+    );
+
+    assert.match(executor.calls[0]!.sql, /insert into aliases/);
+    assert.match(executor.calls[0]!.sql, /on conflict \(normalized_alias, source_type, source_ref\) do update/);
+    assert.match(executor.calls[0]!.sql, /returning id/);
+    assert.deepEqual(executor.calls[0]!.params, [
+      'product-1',
+      'ZOEGA SKANEROST',
+      'zoega skanerost',
+      'receipt',
+      'receipt-ocr',
+      0.91,
+      '2026-05-20T07:30:00.000Z'
+    ]);
+  });
+
+  it('fails closed when an alias upsert does not return a row', async () => {
+    const executor = new RecordingQueryExecutor();
+    executor.aliasRows = [];
+    const aliases = createPostgresProductAliasRepository(executor);
+
+    await assert.rejects(
+      () =>
+        aliases.upsertProductAlias({
+          productId: 'product-1',
+          alias: 'Unknown',
+          normalizedAlias: 'unknown',
+          sourceType: 'manual',
+          matchConfidence: 0.5
+        }),
+      /Product alias upsert did not return a row/
+    );
+  });
+
+  it('finds product aliases with bounded lookup filters', async () => {
+    const executor = new RecordingQueryExecutor();
+    const aliases = createPostgresProductAliasRepository(executor);
+
+    assert.equal(
+      (await aliases.findProductAliases({ normalizedAlias: 'zoega skanerost', productId: 'product-1', sourceType: 'receipt', limit: 10 }))
+        .length,
+      1
+    );
+
+    assert.match(executor.calls[0]!.sql, /from aliases/);
+    assert.match(executor.calls[0]!.sql, /normalized_alias = \$1/);
+    assert.match(executor.calls[0]!.sql, /product_id = \$2::uuid/);
+    assert.match(executor.calls[0]!.sql, /source_type = \$3/);
+    assert.match(executor.calls[0]!.sql, /order by match_confidence desc, reviewed_at desc nulls last, created_at desc, id/);
+    assert.deepEqual(executor.calls[0]!.params, ['zoega skanerost', 'product-1', 'receipt', 10]);
+  });
+
+  it('clamps product alias lookup limits to a safe range', async () => {
+    const executor = new RecordingQueryExecutor();
+    const aliases = createPostgresProductAliasRepository(executor);
+
+    await aliases.findProductAliases({ limit: 5000 });
+    await aliases.findProductAliases({ limit: 0 });
+
+    assert.deepEqual(executor.calls[0]!.params, [null, null, null, 100]);
     assert.deepEqual(executor.calls[1]!.params, [null, null, null, 1]);
   });
 });

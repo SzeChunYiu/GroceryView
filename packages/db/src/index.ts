@@ -250,11 +250,47 @@ export type StoreCatalogListFilter = {
   limit?: number;
 };
 
+export type ProductAliasSourceType = 'retailer' | 'receipt' | 'community' | 'import' | 'manual';
+
+export type ProductAliasRecord = {
+  aliasId: string;
+  productId: string;
+  alias: string;
+  normalizedAlias: string;
+  sourceType: ProductAliasSourceType;
+  sourceRef?: string;
+  matchConfidence: number;
+  reviewedAt?: string;
+  createdAt: string;
+};
+
+export type ProductAliasWriteRecord = {
+  productId: string;
+  alias: string;
+  normalizedAlias: string;
+  sourceType: ProductAliasSourceType;
+  sourceRef?: string;
+  matchConfidence: number;
+  reviewedAt?: string;
+};
+
+export type ProductAliasLookupFilter = {
+  normalizedAlias?: string;
+  productId?: string;
+  sourceType?: ProductAliasSourceType;
+  limit?: number;
+};
+
 export type PostgresCatalogReader = {
   getProductBySlug(slug: string): Promise<ProductCatalogRecord | null>;
   listProducts(filter?: ProductCatalogListFilter): Promise<ProductCatalogRecord[]>;
   getStoreBySlug(slug: string): Promise<StoreCatalogRecord | null>;
   listStores(filter?: StoreCatalogListFilter): Promise<StoreCatalogRecord[]>;
+};
+
+export type PostgresProductAliasRepository = {
+  upsertProductAlias(alias: ProductAliasWriteRecord): Promise<ProductAliasRecord>;
+  findProductAliases(filter: ProductAliasLookupFilter): Promise<ProductAliasRecord[]>;
 };
 
 export type PriceObservationRecord = {
@@ -898,6 +934,17 @@ type StoreCatalogRow = {
   created_at: string | Date;
   updated_at: string | Date;
 };
+type ProductAliasRow = {
+  id: string;
+  product_id: string;
+  alias: string;
+  normalized_alias: string;
+  source_type: ProductAliasSourceType;
+  source_ref: string | null;
+  match_confidence: string | number;
+  reviewed_at: string | Date | null;
+  created_at: string | Date;
+};
 
 function asIso(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : value;
@@ -1028,6 +1075,20 @@ function mapStoreCatalog(row: StoreCatalogRow): StoreCatalogRecord {
     ...(row.online_order_url ? { onlineOrderUrl: row.online_order_url } : {}),
     createdAt: asIso(row.created_at),
     updatedAt: asIso(row.updated_at)
+  };
+}
+
+function mapProductAlias(row: ProductAliasRow): ProductAliasRecord {
+  return {
+    aliasId: row.id,
+    productId: row.product_id,
+    alias: row.alias,
+    normalizedAlias: row.normalized_alias,
+    sourceType: row.source_type,
+    ...(row.source_ref ? { sourceRef: row.source_ref } : {}),
+    matchConfidence: Number(row.match_confidence),
+    ...(row.reviewed_at ? { reviewedAt: asIso(row.reviewed_at) } : {}),
+    createdAt: asIso(row.created_at)
   };
 }
 
@@ -1549,6 +1610,73 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
         [filter.search ?? null, filter.chainSlug ?? null, filter.city ?? null, limit]
       );
       return rows.map(mapStoreCatalog);
+    }
+  };
+}
+
+export function createPostgresProductAliasRepository(executor: QueryExecutor): PostgresProductAliasRepository {
+  return {
+    async upsertProductAlias(alias) {
+      const rows = await executor.query<ProductAliasRow>(
+        `insert into aliases(
+           product_id,
+           alias,
+           normalized_alias,
+           source_type,
+           source_ref,
+           match_confidence,
+           reviewed_at
+         ) values ($1, $2, $3, $4, $5, $6, $7)
+         on conflict (normalized_alias, source_type, source_ref) do update set
+           product_id = excluded.product_id,
+           alias = excluded.alias,
+           match_confidence = excluded.match_confidence,
+           reviewed_at = excluded.reviewed_at
+         returning id,
+                   product_id,
+                   alias,
+                   normalized_alias,
+                   source_type,
+                   source_ref,
+                   match_confidence,
+                   reviewed_at,
+                   created_at`,
+        [
+          alias.productId,
+          alias.alias,
+          alias.normalizedAlias,
+          alias.sourceType,
+          alias.sourceRef ?? null,
+          alias.matchConfidence,
+          alias.reviewedAt ?? null
+        ]
+      );
+      const row = rows[0];
+      if (!row) throw new Error('Product alias upsert did not return a row');
+      return mapProductAlias(row);
+    },
+
+    async findProductAliases(filter) {
+      const limit = Math.min(Math.max(filter.limit ?? 25, 1), 100);
+      const rows = await executor.query<ProductAliasRow>(
+        `select id,
+                product_id,
+                alias,
+                normalized_alias,
+                source_type,
+                source_ref,
+                match_confidence,
+                reviewed_at,
+                created_at
+         from aliases
+         where ($1::text is null or normalized_alias = $1)
+           and ($2::uuid is null or product_id = $2::uuid)
+           and ($3::text is null or source_type = $3)
+         order by match_confidence desc, reviewed_at desc nulls last, created_at desc, id
+         limit $4`,
+        [filter.normalizedAlias ?? null, filter.productId ?? null, filter.sourceType ?? null, limit]
+      );
+      return rows.map(mapProductAlias);
     }
   };
 }
