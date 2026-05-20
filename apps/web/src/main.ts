@@ -355,6 +355,12 @@ const nutritionDeals = rankNutritionPerKrona([
   { productId: 'yogurt', name: 'Greek yogurt', price: 34.9, nutritionPerPackage: { proteinGrams: 55, calories: 380, fiberGrams: 0, sugarGrams: 16, saltGrams: 0.5 } }
 ], 'protein');
 
+const businessSignals = [
+  { segment: 'Category price trends', metric: 'Coffee index -8.4% MTD', buyer: 'Retailer category team', guardrail: 'Aggregated district index' },
+  { segment: 'Brand vs private label', metric: 'Private label basket -5.8% vs base', buyer: 'CPG revenue manager', guardrail: 'No household-level exports' },
+  { segment: 'Promotion frequency', metric: 'Dairy promos 3.1x per month', buyer: 'Retail media analyst', guardrail: 'Organic ranking separated from ads' }
+];
+
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Missing #app root');
 
@@ -830,6 +836,27 @@ app.innerHTML = `
             </tr>`).join('')}
           </tbody>
         </table>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>B2B grocery analytics</h2>
+        <p class="lede">Aggregated, privacy-safe market signals for retail and CPG teams. No household-level data is ever exported. Deal Score is never sold or revealed as a ranking signal.</p>
+        <table class="table">
+          <thead><tr><th>Segment</th><th>Metric</th><th>Buyer</th><th>Guardrail</th></tr></thead>
+          <tbody>
+            ${businessSignals.map((s) => `<tr><td>${s.segment}</td><td>${s.metric}</td><td>${s.buyer}</td><td>${s.guardrail}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Partnership leads</h2>
+        <div class="grid">
+          <div class="metric"><strong>3</strong><span>active signal categories</span></div>
+          <div class="metric"><strong>0</strong><span>household exports</span></div>
+          <div class="metric"><strong>API</strong><span>delivery method</span></div>
+        </div>
       </div>
     </section>
   </main>
