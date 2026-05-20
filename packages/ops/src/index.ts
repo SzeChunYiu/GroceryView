@@ -85,24 +85,25 @@ export type DeploymentReadinessReport = {
   summary: string;
 };
 
-export type GateBlockerSummary = {
-  total: number;
-  missingSecrets: number;
-  missingArtifacts: number;
-  releaseValidation: number;
-  smokeTests: number;
-  healthChecks: number;
-  scheduledJobs: number;
-  changeControls: number;
-  incidents: number;
-  rollbackPlan: number;
-  deploymentPrerequisites: number;
+export type SourceWorkerRunStatus = 'succeeded' | 'failed' | 'partial' | 'never_run';
+
+export type SourceWorkerReadinessInput = {
+  now: string;
+  maxRunAgeMinutes: number;
+  workers: Array<{
+    name: string;
+    enabled: boolean;
+    scheduleConfigured: boolean;
+    lastRunFinishedAt?: string;
+    lastRunStatus: SourceWorkerRunStatus;
+  }>;
 };
 
-export type GateWarningSummary = {
-  total: number;
-  missingHealthCheckDefinitions: number;
-  missingSmokeTestDefinitions: number;
+export type SourceWorkerReadinessReport = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  evidence: string[];
+  summary: string;
 };
 
 export type DeploymentReadinessReportSummary = {
@@ -211,6 +212,57 @@ export function buildDeploymentReadinessReport(input: DeploymentReadinessInput):
     blockers,
     warnings,
     summary: blockers.length === 0 ? 'Deployment readiness gates passed.' : 'Deployment is blocked until required gates pass.'
+  };
+}
+
+function parseOpsIsoDate(value: string, label: string): number {
+  const parsed = Date.parse(value);
+  if (Number.isNaN(parsed)) throw new Error(`${label} must be an ISO date.`);
+  return parsed;
+}
+
+export function buildSourceWorkerReadinessReport(input: SourceWorkerReadinessInput): SourceWorkerReadinessReport {
+  if (input.maxRunAgeMinutes < 0) throw new Error('maxRunAgeMinutes must be non-negative.');
+  const nowMs = parseOpsIsoDate(input.now, 'now');
+  const blockers: string[] = [];
+  const evidence: string[] = [];
+
+  for (const worker of [...input.workers].sort((a, b) => a.name.localeCompare(b.name))) {
+    if (!worker.enabled) blockers.push(`source_worker_disabled:${worker.name}`);
+    if (!worker.scheduleConfigured) blockers.push(`source_worker_schedule_not_configured:${worker.name}`);
+
+    if (worker.lastRunStatus === 'never_run') {
+      blockers.push(`source_worker_never_run:${worker.name}`);
+      continue;
+    }
+
+    if (worker.lastRunStatus === 'failed') blockers.push(`source_worker_failed:${worker.name}`);
+    if (worker.lastRunStatus === 'partial') blockers.push(`source_worker_partial:${worker.name}`);
+
+    if (!worker.lastRunFinishedAt) {
+      blockers.push(`source_worker_missing_finished_at:${worker.name}`);
+      continue;
+    }
+
+    const finishedAtMs = parseOpsIsoDate(worker.lastRunFinishedAt, `lastRunFinishedAt for ${worker.name}`);
+    if (finishedAtMs > nowMs) {
+      blockers.push(`source_worker_finished_in_future:${worker.name}`);
+      continue;
+    }
+
+    const ageMinutes = Math.round(((nowMs - finishedAtMs) / (60 * 1000) + Number.EPSILON) * 100) / 100;
+    if (ageMinutes > input.maxRunAgeMinutes) {
+      blockers.push(`source_worker_stale:${worker.name}`);
+    } else if (worker.enabled && worker.scheduleConfigured && worker.lastRunStatus === 'succeeded') {
+      evidence.push(`source_worker_ready:${worker.name}`);
+    }
+  }
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    evidence,
+    summary: blockers.length === 0 ? 'Source worker schedules are ready.' : 'Source worker schedules are blocked.'
   };
 }
 
