@@ -19,8 +19,7 @@ describe('buildStaticPages', () => {
         'budget/forecast/index.html',
         'catalog/coverage/index.html',
         'categories/coffee/index.html',
-        'community/reports/index.html',
-        'deals/today/index.html',
+        'heatmap/index.html',
         'household/index.html',
         'login/index.html',
         'loyalty/offers/index.html',
@@ -158,6 +157,16 @@ describe('buildStaticPages', () => {
       assert.match(smartSwapsPage, /Same roast category/);
       assert.match(smartSwapsPage, /Estimated swap prices cannot reduce forecast spend/);
       assert.match(smartSwapsPage, /Dietary restrictions outrank savings/);
+
+      const heatmap = await readFile(join(root, 'heatmap/index.html'), 'utf8');
+      assert.match(heatmap, /Category heatmap/);
+      assert.match(heatmap, /Chain\/category movers/);
+      assert.match(heatmap, /Willys/);
+      assert.match(heatmap, /ICA/);
+      assert.match(heatmap, /Coop/);
+      assert.match(heatmap, /Lidl/);
+      assert.match(heatmap, /Verified shelf \+ promo/);
+      assert.match(heatmap, /Estimated receipt confidence/);
 
       const store = await readFile(join(root, 'stores/willys-odenplan/index.html'), 'utf8');
       assert.match(store, /Store highlights/);
