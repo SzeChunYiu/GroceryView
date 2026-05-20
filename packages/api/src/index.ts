@@ -3,11 +3,18 @@ import {
   calculateDealScore,
   calculateFixedBasketIndex,
   compareBasketStrategies,
+  createHouseholdState,
   scoreBand,
   searchProducts,
   summarizeBudget,
+  summarizeHousehold,
   type BasketComparisonResult,
   type BudgetSummary,
+  type HouseholdBasketItem,
+  type HouseholdMember,
+  type HouseholdSnapshot,
+  type HouseholdSummary,
+  type HouseholdWatchlistItem,
   type SearchableProduct,
   type StorePrice,
   type WatchlistAlert,
@@ -58,6 +65,30 @@ export type BasketItemRequest = {
 export type UserBudgetPatch = {
   weeklyBudget: number;
   monthlyBudget: number;
+};
+
+export type HouseholdPlanRequest = {
+  householdId: string;
+  name: string;
+  weeklyBudget: number;
+  approvalLimit: number;
+  reviewer: string;
+  members: HouseholdMember[];
+  basketItems?: HouseholdBasketItem[];
+  watchlistItems?: HouseholdWatchlistItem[];
+  sharedFavoriteStoreIds?: string[];
+};
+
+export type HouseholdApprovalPolicy = {
+  approvalLimit: number;
+  reviewer: string;
+  requiresOwnerApproval: boolean;
+};
+
+export type HouseholdPlan = {
+  household: HouseholdSnapshot;
+  summary: HouseholdSummary;
+  approvalPolicy: HouseholdApprovalPolicy;
 };
 
 const stores: Store[] = [
@@ -181,6 +212,17 @@ function requireScoreThreshold(value: number | undefined) {
   }
 }
 
+function requireArray<T>(value: T[] | undefined, label: string): T[] {
+  if (!Array.isArray(value)) throw new Error(`${label} must be an array`);
+  return value;
+}
+
+function requireZeroOrPositiveFinite(value: number, label: string) {
+  if (!Number.isFinite(value) || value < 0) {
+    throw new Error(`${label} must be zero or positive`);
+  }
+}
+
 function requireOneOf<T extends string>(value: unknown, label: string, allowed: readonly T[]): T {
   if (typeof value !== 'string' || !(allowed as readonly string[]).includes(value)) {
     throw new Error(`${label} must be one of: ${allowed.join(', ')}`);
@@ -239,6 +281,81 @@ function bestPriceFor(product: ProductDetail) {
   return sortPricesByValue(product.currentPrices)[0] ?? null;
 }
 
+function cheapestPriceByProductId(productIds: string[]): Record<string, number> {
+  const priceByProductId: Record<string, number> = {};
+  for (const productId of new Set(productIds)) {
+    const product = products.find((candidate) => candidate.id === productId);
+    if (!product) throw new Error(`Unknown productId: ${productId}`);
+    priceByProductId[productId] = bestPriceFor(product)?.price ?? 0;
+  }
+  return priceByProductId;
+}
+
+function normalizeHouseholdPlan(userId: string, input: HouseholdPlanRequest): HouseholdPlan {
+  requireNonEmptyId(userId, 'userId');
+  requireNonEmptyId(input.householdId, 'householdId');
+  requireNonEmptyId(input.name, 'name');
+  requireZeroOrPositiveFinite(input.weeklyBudget, 'weeklyBudget');
+  requireZeroOrPositiveFinite(input.approvalLimit, 'approvalLimit');
+  requireNonEmptyId(input.reviewer, 'reviewer');
+
+  const members = requireArray(input.members, 'members').map((member) => {
+    requireNonEmptyId(member.userId, 'member.userId');
+    requireNonEmptyId(member.displayName, 'member.displayName');
+    return { userId: member.userId, displayName: member.displayName };
+  });
+  if (members.length === 0) throw new Error('members must include at least one household member');
+  const memberIds = new Set(members.map((member) => member.userId));
+  if (memberIds.size !== members.length) throw new Error('members must have unique userId values');
+  if (!memberIds.has(userId)) throw new Error('signed-in user must be a household member');
+  if (!memberIds.has(input.reviewer)) throw new Error(`Household member not found: ${input.reviewer}`);
+
+  const household = createHouseholdState({
+    id: input.householdId,
+    name: input.name,
+    weeklyBudget: input.weeklyBudget,
+    members
+  });
+
+  for (const item of input.basketItems ?? []) {
+    requireKnownProduct(item.productId);
+    if (!Number.isInteger(item.quantity) || item.quantity <= 0 || item.quantity > 99) {
+      throw new Error('quantity must be an integer between 1 and 99');
+    }
+    household.addBasketItem({ productId: item.productId, quantity: item.quantity, addedBy: item.addedBy });
+  }
+
+  for (const item of input.watchlistItems ?? []) {
+    requireKnownProduct(item.productId);
+    requireOptionalPositiveFinite(item.targetPrice, 'targetPrice');
+    household.addWatchlistItem({
+      productId: item.productId,
+      addedBy: item.addedBy,
+      ...(item.targetPrice === undefined ? {} : { targetPrice: item.targetPrice })
+    });
+  }
+
+  const sharedFavoriteStoreIds = input.sharedFavoriteStoreIds ?? [];
+  for (const storeId of sharedFavoriteStoreIds) requireKnownStore(storeId);
+  household.setSharedFavoriteStores(sharedFavoriteStoreIds);
+
+  const snapshot = household.snapshot();
+  const summary = summarizeHousehold(
+    snapshot,
+    cheapestPriceByProductId(snapshot.basketItems.map((item) => item.productId))
+  );
+
+  return {
+    household: snapshot,
+    summary,
+    approvalPolicy: {
+      approvalLimit: input.approvalLimit,
+      reviewer: input.reviewer,
+      requiresOwnerApproval: summary.estimatedTotal > input.approvalLimit
+    }
+  };
+}
+
 function storeDealsFor(storeId: string): StoreDeal[] {
   requireKnownStore(storeId);
   return products
@@ -267,6 +384,7 @@ export function createGroceryViewApi() {
   const baskets = new Map<string, BasketItemRequest[]>();
   const budgets = new Map<string, UserBudgetPatch>();
   const subscriptionEntitlements = new Map<string, SubscriptionEntitlementSnapshot>();
+  const householdPlans = new Map<string, HouseholdPlan>();
 
   const productSnapshots = () =>
     products.map((product) => {
@@ -404,6 +522,17 @@ export function createGroceryViewApi() {
     getBudgetSummary(userId: string): BudgetSummary {
       const budget = budgets.get(userId) ?? { weeklyBudget: 0, monthlyBudget: 0 };
       return summarizeBudget({ ...budget, estimatedBasketTotal: this.compareBasket(userId).cheapestByProduct.total, receiptTotalsThisWeek: [], receiptTotalsThisMonth: [] });
+    },
+
+    upsertHouseholdPlan(userId: string, input: HouseholdPlanRequest): HouseholdPlan {
+      const plan = normalizeHouseholdPlan(userId, input);
+      householdPlans.set(userId, plan);
+      return plan;
+    },
+
+    getHouseholdPlan(userId: string): HouseholdPlan | null {
+      requireNonEmptyId(userId, 'userId');
+      return householdPlans.get(userId) ?? null;
     },
 
     upsertSubscriptionEntitlement(userId: string, entitlement: SubscriptionEntitlementSnapshot) {

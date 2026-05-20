@@ -15,6 +15,11 @@ describe('authenticated HTTP routes', () => {
 
     const unauthenticatedPrivacyExport = await handle(new Request('http://localhost/api/privacy/export?userId=user-1'));
     assert.equal(unauthenticatedPrivacyExport.status, 401);
+    const unauthenticatedHousehold = await handle(new Request('http://localhost/api/households/current?userId=user-1', {
+      method: 'PUT',
+      body: JSON.stringify({ householdId: 'house-1', name: 'Home', weeklyBudget: 100, approvalLimit: 100, reviewer: 'user-1', members: [{ userId: 'user-1', displayName: 'Alex' }], basketItems: [], sharedFavoriteStoreIds: [] })
+    }));
+    assert.equal(unauthenticatedHousehold.status, 401);
     const unauthenticatedScan = await handle(new Request('http://localhost/api/scans/process?userId=user-1', {
       method: 'POST',
       body: JSON.stringify({ scanId: 'scan-1', kind: 'barcode', payload: '0735000123456' })
@@ -35,6 +40,12 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${wrongUserToken}` }
     }));
     assert.equal(forbiddenPrivacyPlan.status, 403);
+    const forbiddenHousehold = await handle(new Request('http://localhost/api/households/current?userId=user-1', {
+      method: 'PUT',
+      headers: { authorization: `Bearer ${wrongUserToken}` },
+      body: JSON.stringify({ householdId: 'house-1', name: 'Home', weeklyBudget: 100, approvalLimit: 100, reviewer: 'user-1', members: [{ userId: 'user-1', displayName: 'Alex' }], basketItems: [], sharedFavoriteStoreIds: [] })
+    }));
+    assert.equal(forbiddenHousehold.status, 403);
     const forbiddenScan = await handle(new Request('http://localhost/api/scans/process?userId=user-1', {
       method: 'POST',
       headers: { authorization: `Bearer ${wrongUserToken}` },
@@ -55,6 +66,12 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${token}` }
     }));
     assert.equal(authorizedPrivacyExport.status, 200);
+    const authorizedHousehold = await handle(new Request('http://localhost/api/households/current?userId=user-1', {
+      method: 'PUT',
+      headers: { authorization: `Bearer ${token}` },
+      body: JSON.stringify({ householdId: 'house-1', name: 'Home', weeklyBudget: 100, approvalLimit: 100, reviewer: 'user-1', members: [{ userId: 'user-1', displayName: 'Alex' }], basketItems: [], sharedFavoriteStoreIds: [] })
+    }));
+    assert.equal(authorizedHousehold.status, 200);
     const authorizedScan = await handle(new Request('http://localhost/api/scans/process?userId=user-1', {
       method: 'POST',
       headers: { authorization: `Bearer ${token}` },
