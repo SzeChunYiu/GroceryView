@@ -8,11 +8,11 @@ describe('mobile query cache plan', () => {
 
     assert.deepEqual(
       registry.map((definition) => definition.id),
-      ['today', 'search', 'product', 'basket', 'budget']
+      ['today', 'search', 'product', 'productTerminal', 'basket', 'budget']
     );
     assert.deepEqual(
       registry.map((definition) => definition.route),
-      ['/today', '/search', '/products/[id]', '/basket', '/budget']
+      ['/today', '/search', '/products/[id]', '/products/[id]/terminal', '/basket', '/budget']
     );
     assert.equal(registry.every((definition) => definition.persist), true);
     assert.equal(registry.every((definition) => definition.networkMode === 'offlineFirst'), true);
@@ -29,6 +29,13 @@ describe('mobile query cache plan', () => {
       'product',
       'zoegas-coffee-450g'
     ]);
+    assert.deepEqual(buildMobileQueryKey({ id: 'productTerminal', userId: 'User-1', productId: ' Coffee ' }), [
+      'mobile',
+      'user-1',
+      'product',
+      'coffee',
+      'terminal'
+    ]);
     assert.deepEqual(buildMobileQueryKey({ id: 'basket', userId: 'User-1' }), ['mobile', 'user-1', 'basket']);
     assert.deepEqual(buildMobileQueryKey({ id: 'budget', userId: 'User-1' }), ['mobile', 'user-1', 'budget']);
   });
@@ -38,8 +45,8 @@ describe('mobile query cache plan', () => {
 
     assert.equal(plan.storageKey, 'groceryview.mobile.query-cache.v1');
     assert.equal(plan.userPartitionKey, 'user:user-1');
-    assert.deepEqual(plan.hydrateOrder, ['today', 'basket', 'budget', 'search', 'product']);
-    assert.deepEqual(plan.persistedQueryIds, ['today', 'search', 'product', 'basket', 'budget']);
+    assert.deepEqual(plan.hydrateOrder, ['today', 'basket', 'budget', 'search', 'product', 'productTerminal']);
+    assert.deepEqual(plan.persistedQueryIds, ['today', 'search', 'product', 'productTerminal', 'basket', 'budget']);
     assert.equal(plan.maxPersistedAgeMs, 86_400_000);
     assert.equal(plan.purgeOnSignOut, true);
     assert.deepEqual(plan.redactBeforePersist, ['receipt_images', 'auth_tokens', 'precise_location']);
@@ -48,6 +55,7 @@ describe('mobile query cache plan', () => {
   it('rejects cache keys that cannot be safely partitioned', () => {
     assert.throws(() => buildMobileQueryKey({ id: 'today', userId: ' ' }), /userId is required/);
     assert.throws(() => buildMobileQueryKey({ id: 'product', userId: 'user-1', productId: ' ' }), /productId is required/);
+    assert.throws(() => buildMobileQueryKey({ id: 'productTerminal', userId: 'user-1', productId: ' ' }), /productId is required/);
     assert.throws(() => buildMobilePersistedCachePlan(' '), /userId is required/);
   });
 });
