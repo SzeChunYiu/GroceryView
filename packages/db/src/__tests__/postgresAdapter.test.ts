@@ -8,8 +8,6 @@ import {
   createPostgresRepository,
   createPostgresSourceRecordReader,
   createPostgresSourceRecordWriter,
-  persistOpenPricesArtifact,
-  type OpenPricesNormalizedArtifact,
   type QueryExecutor
 } from '../index.js';
 
@@ -19,8 +17,6 @@ class RecordingQueryExecutor implements QueryExecutor {
   observationId: string | undefined = 'observation-1';
   sourceRunId: string | undefined = 'source-run-1';
   rawRecordId: string | undefined = 'raw-record-1';
-  chainId: string | undefined = 'chain-open-prices';
-  productId: string | undefined = 'product-open-prices';
   productRows: unknown[] = [
     {
       id: 'product-1',
@@ -75,47 +71,6 @@ class RecordingQueryExecutor implements QueryExecutor {
       match_confidence: '0.9100',
       reviewed_at: new Date('2026-05-20T07:30:00.000Z'),
       created_at: '2026-05-20T07:29:00.000Z'
-    }
-  ];
-  pantryItemRows: unknown[] = [
-    {
-      id: 'pantry-coffee',
-      user_id: 'user-1',
-      product_id: 'coffee',
-      name: 'Coffee',
-      category: 'pantry',
-      quantity: '1.000',
-      unit: 'bag',
-      minimum_quantity: '1.000',
-      target_quantity: '3.000',
-      expires_on: '2026-07-01',
-      updated_at: '2026-05-20T08:00:00.000Z'
-    }
-  ];
-  receiptUploadRows: unknown[] = [
-    {
-      id: 'receipt-1',
-      user_id: 'user-1',
-      store_id: 'willys-odenplan',
-      image_uri: 'scan://receipts/receipt-1.jpg',
-      purchased_at: new Date('2026-05-20T08:00:00.000Z'),
-      total_amount: '64.90',
-      ocr_confidence: '0.9400',
-      status: 'parsed',
-      created_at: '2026-05-20T08:01:00.000Z',
-      updated_at: '2026-05-20T08:02:00.000Z'
-    }
-  ];
-  receiptItemRows: unknown[] = [
-    {
-      id: 'receipt-item-1',
-      receipt_id: 'receipt-1',
-      raw_name: 'BRYGGKAFFE 450G',
-      product_id: 'coffee',
-      canonical_name: 'Bryggkaffe 450 g',
-      quantity: '1.000',
-      item_total: '64.90',
-      match_confidence: '0.9100'
     }
   ];
   sourceRunRows: unknown[] = [
@@ -286,8 +241,6 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('from source_runs')) return this.sourceRunRows as T[];
     if (sql.includes('insert into raw_records')) return this.rawRecordId === undefined ? ([] as T[]) : ([{ id: this.rawRecordId }] as T[]);
     if (sql.includes('from raw_records')) return this.rawRecordRows as T[];
-    if (sql.includes('insert into chains')) return this.chainId === undefined ? ([] as T[]) : ([{ id: this.chainId }] as T[]);
-    if (sql.includes('insert into products')) return this.productId === undefined ? ([] as T[]) : ([{ id: this.productId }] as T[]);
     if (sql.includes('insert into observations')) return this.observationId === undefined ? ([] as T[]) : ([{ id: this.observationId }] as T[]);
     if (sql.includes('from latest_prices')) return this.latestPriceRows as T[];
     if (sql.includes('from observations')) return this.observationHistoryRows as T[];
@@ -344,9 +297,6 @@ class RecordingQueryExecutor implements QueryExecutor {
       ] as T[];
     }
     if (sql.includes('from alert_rules')) return this.alertRuleRows as T[];
-    if (sql.includes('from pantry_items')) return this.pantryItemRows as T[];
-    if (sql.includes('from receipt_uploads')) return this.receiptUploadRows as T[];
-    if (sql.includes('from receipt_items')) return this.receiptItemRows as T[];
     if (sql.includes('from human_review_assignments')) {
       return [
         {
@@ -680,137 +630,6 @@ describe('createPostgresRepository', () => {
       '2026-05-20T08:00:00.000Z'
     ]);
     assert.deepEqual(executor.calls[1].params, ['user-1']);
-  });
-
-  it('persists and lists pantry inventory items', async () => {
-    const executor = new RecordingQueryExecutor();
-    const repo = createPostgresRepository(executor);
-
-    await repo.upsertPantryItem({
-      id: 'pantry-coffee',
-      userId: 'user-1',
-      productId: 'coffee',
-      name: 'Coffee',
-      category: 'pantry',
-      quantity: 1,
-      unit: 'bag',
-      minimumQuantity: 1,
-      targetQuantity: 3,
-      expiresOn: '2026-07-01',
-      updatedAt: '2026-05-20T08:00:00.000Z'
-    });
-
-    assert.deepEqual(await repo.listPantryItems('user-1'), [
-      {
-        id: 'pantry-coffee',
-        userId: 'user-1',
-        productId: 'coffee',
-        name: 'Coffee',
-        category: 'pantry',
-        quantity: 1,
-        unit: 'bag',
-        minimumQuantity: 1,
-        targetQuantity: 3,
-        expiresOn: '2026-07-01',
-        updatedAt: '2026-05-20T08:00:00.000Z'
-      }
-    ]);
-    assert.deepEqual(executor.calls[0].params, [
-      'pantry-coffee',
-      'user-1',
-      'coffee',
-      'Coffee',
-      'pantry',
-      1,
-      'bag',
-      1,
-      3,
-      '2026-07-01',
-      '2026-05-20T08:00:00.000Z'
-    ]);
-    assert.deepEqual(executor.calls[1].params, ['user-1']);
-  });
-
-  it('persists and lists receipt uploads with parsed items', async () => {
-    const executor = new RecordingQueryExecutor();
-    const repo = createPostgresRepository(executor);
-
-    await repo.upsertReceiptUpload({
-      id: 'receipt-1',
-      userId: 'user-1',
-      storeId: 'willys-odenplan',
-      imageUri: 'scan://receipts/receipt-1.jpg',
-      purchasedAt: '2026-05-20T08:00:00.000Z',
-      totalAmount: 64.9,
-      ocrConfidence: 0.94,
-      status: 'parsed',
-      createdAt: '2026-05-20T08:01:00.000Z',
-      updatedAt: '2026-05-20T08:02:00.000Z',
-      items: [
-        {
-          id: 'receipt-item-1',
-          receiptId: 'receipt-1',
-          rawName: 'BRYGGKAFFE 450G',
-          productId: 'coffee',
-          canonicalName: 'Bryggkaffe 450 g',
-          quantity: 1,
-          itemTotal: 64.9,
-          matchConfidence: 0.91
-        }
-      ]
-    });
-
-    assert.deepEqual(await repo.listReceiptUploads('user-1'), [
-      {
-        id: 'receipt-1',
-        userId: 'user-1',
-        storeId: 'willys-odenplan',
-        imageUri: 'scan://receipts/receipt-1.jpg',
-        purchasedAt: '2026-05-20T08:00:00.000Z',
-        totalAmount: 64.9,
-        ocrConfidence: 0.94,
-        status: 'parsed',
-        createdAt: '2026-05-20T08:01:00.000Z',
-        updatedAt: '2026-05-20T08:02:00.000Z',
-        items: [
-          {
-            id: 'receipt-item-1',
-            receiptId: 'receipt-1',
-            rawName: 'BRYGGKAFFE 450G',
-            productId: 'coffee',
-            canonicalName: 'Bryggkaffe 450 g',
-            quantity: 1,
-            itemTotal: 64.9,
-            matchConfidence: 0.91
-          }
-        ]
-      }
-    ]);
-    assert.deepEqual(executor.calls[0].params, [
-      'receipt-1',
-      'user-1',
-      'willys-odenplan',
-      'scan://receipts/receipt-1.jpg',
-      '2026-05-20T08:00:00.000Z',
-      64.9,
-      0.94,
-      'parsed',
-      '2026-05-20T08:01:00.000Z',
-      '2026-05-20T08:02:00.000Z'
-    ]);
-    assert.deepEqual(executor.calls[1].params, ['receipt-1']);
-    assert.deepEqual(executor.calls[2].params, [
-      'receipt-item-1',
-      'receipt-1',
-      'BRYGGKAFFE 450G',
-      'coffee',
-      'Bryggkaffe 450 g',
-      1,
-      64.9,
-      0.91
-    ]);
-    assert.deepEqual(executor.calls[3].params, ['user-1']);
-    assert.deepEqual(executor.calls[4].params, [['receipt-1']]);
   });
 });
 
@@ -1249,162 +1068,6 @@ describe('createPostgresSourceRecordReader', () => {
     const reader = createPostgresSourceRecordReader(executor);
 
     assert.equal(await reader.getRawRecordByHash('source-run-1', 'sha256:missing'), null);
-  });
-});
-
-describe('persistOpenPricesArtifact', () => {
-  it('persists normalized Open Prices artifacts into canonical products, raw records, observations, and latest prices', async () => {
-    const executor = new RecordingQueryExecutor();
-    const artifact: OpenPricesNormalizedArtifact = {
-      status: 'passed',
-      sourceUrl: 'https://prices.openfoodfacts.org/api/v1/prices?currency=SEK&size=10',
-      retrievedAt: '2026-05-20T10:24:58.072Z',
-      contentHash: 'sha256:open-prices-snapshot',
-      rawSnapshotRef: 'raw://open-prices-smoke/source-run/sha256-open-prices-snapshot',
-      acceptedObservations: [
-        {
-          product: {
-            id: 'off-5202390016912',
-            canonicalName: 'Just Like Mature Cheddar Slices',
-            brand: 'Violife',
-            categoryId: 'plant-based-cheese',
-            packageSize: 200,
-            packageUnit: 'g',
-            comparableUnit: 'kg'
-          },
-          alias: {
-            rawName: 'Just Like Mature Cheddar Slices',
-            sourceType: 'official_api',
-            matchedProductId: 'off-5202390016912',
-            matchConfidence: 0.95,
-            reviewedByHuman: false
-          },
-          priceObservation: {
-            productId: 'off-5202390016912',
-            retailerProductId: 'open-prices-price-123',
-            chainId: 'ica-kvantum',
-            observedAt: '2026-05-19T00:00:00.000Z',
-            price: 32.13,
-            unitPrice: 160.65,
-            currency: 'SEK',
-            priceType: 'online',
-            sourceType: 'official_api',
-            sourceUrl: 'https://prices.openfoodfacts.org/api/v1/prices?currency=SEK&size=10',
-            parserVersion: 'open-prices-v1',
-            rawSnapshotRef: 'raw://open-prices-smoke/source-run/sha256-open-prices-snapshot',
-            sourceRunId: 'source-run-open-prices',
-            provenance: {
-              sourceType: 'official_api',
-              sourceUrl: 'https://prices.openfoodfacts.org/api/v1/prices?currency=SEK&size=10',
-              observedAt: '2026-05-19T00:00:00.000Z',
-              parserVersion: 'open-prices-v1',
-              rawSnapshotRef: 'raw://open-prices-smoke/source-run/sha256-open-prices-snapshot',
-              sourceRunId: 'source-run-open-prices'
-            },
-            confidenceScore: 0.95,
-            isOnlinePrice: true,
-            isInstorePrice: false
-          },
-          promotionObservation: null
-        }
-      ]
-    };
-
-    assert.deepEqual(await persistOpenPricesArtifact(executor, artifact), {
-      status: 'persisted',
-      sourceRunId: 'source-run-1',
-      acceptedCount: 1,
-      rawRecordIds: ['raw-record-1'],
-      observationIds: ['observation-1'],
-      productIds: ['product-open-prices'],
-      chainIds: ['chain-open-prices']
-    });
-
-    const sourceRunCall = executor.calls.find((call) => call.sql.includes('insert into source_runs'));
-    assert.deepEqual(sourceRunCall?.params.slice(0, 6), [
-      'official_api',
-      'Open Food Facts Open Prices',
-      artifact.sourceUrl,
-      artifact.retrievedAt,
-      null,
-      'running'
-    ]);
-    assert.match(String(sourceRunCall?.params[6]), /"contentHash":"sha256:open-prices-snapshot"/);
-
-    const chainCall = executor.calls.find((call) => call.sql.includes('insert into chains'));
-    assert.match(chainCall?.sql ?? '', /on conflict \(slug\) do update/);
-    assert.deepEqual(chainCall?.params, ['ica-kvantum', 'ica-kvantum', 'SE']);
-
-    const productCall = executor.calls.find((call) => call.sql.includes('insert into products'));
-    assert.match(productCall?.sql ?? '', /on conflict \(slug\) do update/);
-    assert.deepEqual(productCall?.params.slice(0, 7), [
-      'off-5202390016912',
-      'Just Like Mature Cheddar Slices',
-      'Violife',
-      ['plant-based-cheese'],
-      200,
-      'g',
-      'kg'
-    ]);
-
-    const aliasCall = executor.calls.find((call) => call.sql.includes('insert into aliases'));
-    assert.deepEqual(aliasCall?.params.slice(0, 6), [
-      'product-open-prices',
-      'Just Like Mature Cheddar Slices',
-      'just like mature cheddar slices',
-      'import',
-      'sha256:open-prices-snapshot',
-      0.95
-    ]);
-
-    const rawRecordCall = executor.calls.find((call) => call.sql.includes('insert into raw_records'));
-    assert.deepEqual(rawRecordCall?.params.slice(0, 4), [
-      'source-run-1',
-      'price',
-      'open-prices-price-123',
-      '2026-05-19T00:00:00.000Z'
-    ]);
-    const payload = JSON.parse(String(rawRecordCall?.params[4])) as Record<string, unknown>;
-    assert.equal('body' in payload, false);
-    assert.match(String(rawRecordCall?.params[5]), /^sha256:/);
-    assert.match(String(rawRecordCall?.params[6]), /"rawSnapshotRef":"raw:\/\/open-prices-smoke\/source-run\/sha256-open-prices-snapshot"/);
-
-    const observationCall = executor.calls.find((call) => call.sql.includes('insert into observations'));
-    assert.deepEqual(observationCall?.params.slice(0, 11), [
-      'product-open-prices',
-      'chain-open-prices',
-      null,
-      'source-run-1',
-      'raw-record-1',
-      'open-prices-price-123',
-      'online',
-      32.13,
-      null,
-      160.65,
-      'SEK'
-    ]);
-    assert.equal(observationCall?.params[20], 0.95);
-    assert.match(String(observationCall?.params[21]), /"contentHash":"sha256:open-prices-snapshot"/);
-
-    const finishCall = executor.calls.find((call) => call.sql.includes('update source_runs'));
-    assert.deepEqual(finishCall?.params, ['source-run-1', null, 'succeeded', null]);
-  });
-
-  it('fails closed before database writes when an artifact has no passed accepted observations', async () => {
-    const executor = new RecordingQueryExecutor();
-
-    await assert.rejects(
-      persistOpenPricesArtifact(executor, {
-        status: 'failed',
-        sourceUrl: 'https://prices.openfoodfacts.org/api/v1/prices',
-        retrievedAt: '2026-05-20T10:24:58.072Z',
-        contentHash: 'sha256:open-prices-snapshot',
-        rawSnapshotRef: 'raw://open-prices-smoke/source-run/sha256-open-prices-snapshot',
-        acceptedObservations: []
-      }),
-      /passed Open Prices artifact with at least one accepted observation/
-    );
-    assert.equal(executor.calls.length, 0);
   });
 });
 

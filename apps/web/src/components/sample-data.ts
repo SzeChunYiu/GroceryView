@@ -1,6 +1,10 @@
 export type BasketItem = {
   name: string;
+  quantity: string;
   currentPrice: number;
+  usualPrice: number;
+  store: string;
+  confidence: string;
 };
 
 export type HouseholdMember = {
@@ -16,11 +20,18 @@ export type PrivacyControl = {
   state: string;
 };
 
+export type ScannerQueueItem = {
+  item: string;
+  status: string;
+  confidence: number;
+  owner: string;
+};
+
 export const basketItems: BasketItem[] = [
-  { name: 'Zoegas Coffee', currentPrice: 49.9 },
-  { name: 'Arla Milk', currentPrice: 13.9 },
-  { name: 'Butter 600g', currentPrice: 54.9 },
-  { name: 'Eggs 12-pack', currentPrice: 34.9 }
+  { name: 'Zoegas Coffee 450g', quantity: '2 packs', currentPrice: 49.9, usualPrice: 59.9, store: 'Willys Odenplan', confidence: 'Verified shelf' },
+  { name: 'Arla Milk 1L', quantity: '6 bottles', currentPrice: 14.9, usualPrice: 16.4, store: 'ICA Kvantum Liljeholmen', confidence: 'High confidence' },
+  { name: 'Butter 600g', quantity: '1 pack', currentPrice: 54.9, usualPrice: 52.9, store: 'Coop Farsta', confidence: 'Estimated' },
+  { name: 'Oats 1.5kg', quantity: '1 bag', currentPrice: 28.9, usualPrice: 33.5, store: 'Hemkop T-Centralen', confidence: 'Verified shelf' }
 ];
 
 export const householdMembers: HouseholdMember[] = [
@@ -50,6 +61,12 @@ export const privacyControls: PrivacyControl[] = [
     detail: 'No raw receipt lines, household identity, or private notes are exposed.',
     state: 'Aggregated'
   }
+];
+
+export const scannerQueue: ScannerQueueItem[] = [
+  { item: 'Coop Farsta receipt', status: 'Needs review', confidence: 71, owner: 'Mina' },
+  { item: 'Arla Milk barcode', status: 'Matched', confidence: 98, owner: 'Alex' },
+  { item: 'Loose tomatoes label', status: 'Low confidence', confidence: 54, owner: 'Sam' }
 ];
 
 export function formatSek(value: number) {
