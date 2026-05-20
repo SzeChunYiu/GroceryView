@@ -138,6 +138,29 @@ describe('createGroceryViewApi', () => {
     assert.match(report.guardrails[0], /nutrition labels cannot override allergen locks/i);
   });
 
+  it('serves deal-based meal suggestions with cost and household guardrails', () => {
+    const api = createGroceryViewApi();
+
+    const report = api.getMealPlanSuggestionsReport('user-1', { maxMealCost: 120, servings: 4 });
+
+    assert.equal(report.userId, 'user-1');
+    assert.equal(report.currency, 'SEK');
+    assert.equal(report.maxMealCost, 120);
+    assert.equal(report.servings, 4);
+    assert.equal(report.dealCount, 4);
+    assert.deepEqual(report.ingredientProductIds, ['chicken', 'pasta', 'tomatoes']);
+    assert.deepEqual(report.suggestions, [{
+      title: 'Chicken thighs pasta bowl',
+      ingredientProductIds: ['chicken', 'pasta', 'tomatoes'],
+      estimatedCost: 104.7,
+      estimatedCostPerServing: 26.18,
+      reason: 'Uses high-scoring current deals across protein, pantry, and vegetables.'
+    }]);
+    assert.match(report.guardrails[0], /never update a basket/i);
+    assert.deepEqual(api.getMealPlanSuggestionsReport('user-1', { maxMealCost: 20 }).suggestions, []);
+    assert.throws(() => api.getMealPlanSuggestionsReport('user-1', { servings: 0 }), /servings must be positive/);
+  });
+
   it('serves pantry replenishment plans with live deal and basket duplicate context', () => {
     const api = createGroceryViewApi();
     api.addFavoriteStore('user-1', 'willys-odenplan');

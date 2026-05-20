@@ -42,6 +42,8 @@ describe('authenticated HTTP routes', () => {
     assert.equal(unauthenticatedPantry.status, 401);
     const unauthenticatedLocalOffers = await handle(new Request('http://localhost/api/basket/local-offers?userId=user-1'));
     assert.equal(unauthenticatedLocalOffers.status, 401);
+    const unauthenticatedMealPlans = await handle(new Request('http://localhost/api/meal-plans/suggestions?userId=user-1'));
+    assert.equal(unauthenticatedMealPlans.status, 401);
 
     const wrongUserToken = await createSessionToken({ userId: 'user-2', expiresAt: '2099-01-01T00:00:00.000Z' }, 'secret');
     const forbidden = await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
@@ -91,6 +93,10 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${wrongUserToken}` }
     }));
     assert.equal(forbiddenLocalOffers.status, 403);
+    const forbiddenMealPlans = await handle(new Request('http://localhost/api/meal-plans/suggestions?userId=user-1', {
+      headers: { authorization: `Bearer ${wrongUserToken}` }
+    }));
+    assert.equal(forbiddenMealPlans.status, 403);
 
     const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'secret');
     const authorized = await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
@@ -139,5 +145,9 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${token}` }
     }));
     assert.equal(authorizedLocalOffers.status, 200);
+    const authorizedMealPlans = await handle(new Request('http://localhost/api/meal-plans/suggestions?userId=user-1', {
+      headers: { authorization: `Bearer ${token}` }
+    }));
+    assert.equal(authorizedMealPlans.status, 200);
   });
 });

@@ -698,6 +698,18 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
 
       if (method === 'GET' && path === '/api/market/overview') return jsonResponse(api.getMarketOverview());
       if (method === 'GET' && path === '/api/nutrition/value') return jsonResponse(api.getNutritionValueReport(optionalNutritionMetric(url.searchParams.get('metric'))));
+      if (path === '/api/meal-plans/suggestions') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') {
+          return jsonResponse(api.getMealPlanSuggestionsReport(user, {
+            maxMealCost: optionalPositiveNumber(url.searchParams.get('maxMealCost') === null ? undefined : Number(url.searchParams.get('maxMealCost')), 'maxMealCost', 120),
+            servings: optionalPositiveNumber(url.searchParams.get('servings') === null ? undefined : Number(url.searchParams.get('servings')), 'servings', 4)
+          }));
+        }
+      }
       if (path === '/api/pantry/replenishment') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -1366,6 +1378,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/auth/session': { post: publicOperation('Exchange a verified auth provider assertion for a short-lived bearer session.') },
       '/api/market/overview': { get: publicOperation('Get Stockholm grocery market overview.') },
       '/api/nutrition/value': { get: publicOperation('Get nutrition per krona rankings with sugar and salt warning guardrails.') },
+      '/api/meal-plans/suggestions': { get: protectedOperation('Get deal-based meal suggestions with cost, serving, and household guardrails.') },
       '/api/pantry/replenishment': {
         get: protectedOperation('Get pantry replenishment status with expiry, basket duplicate, and best-deal context.'),
         post: protectedOperation('Plan pantry replenishment from current stock, usage, expiry, and verified deal candidates.')

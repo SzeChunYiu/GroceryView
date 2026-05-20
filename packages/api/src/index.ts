@@ -14,9 +14,12 @@ import {
   summarizePriceHistory,
   summarizeHousehold,
   summarizeLocalOfferBasket,
+  suggestDealBasedMeals,
   type BasketComparisonResult,
   type BudgetSummary,
   type LocalOfferBasketSummary,
+  type MealDeal,
+  type MealSuggestion,
   type PriceChartAdapterResult,
   type PriceChartObservation,
   type PriceHistorySummary,
@@ -464,6 +467,17 @@ export type NutritionValueReport = {
   guardrails: string[];
 };
 
+export type MealPlanSuggestionsReport = {
+  userId: string;
+  currency: 'SEK';
+  servings: number;
+  maxMealCost: number;
+  suggestions: MealSuggestion[];
+  dealCount: number;
+  ingredientProductIds: string[];
+  guardrails: string[];
+};
+
 export type LoyaltyOfferStatus = 'eligible' | 'needs_coupon' | 'needs_membership';
 
 export type LoyaltyOffer = {
@@ -633,6 +647,13 @@ const nutritionProducts: NutritionProduct[] = [
   { productId: 'chicken', name: 'Chicken thighs', price: 69.9, nutritionPerPackage: { proteinGrams: 160, calories: 900, fiberGrams: 0, sugarGrams: 0, saltGrams: 2.4 } },
   { productId: 'eggs', name: 'Eggs 12-pack', price: 34.9, nutritionPerPackage: { proteinGrams: 75, calories: 840, fiberGrams: 0, sugarGrams: 1, saltGrams: 1.8 } },
   { productId: 'yogurt', name: 'Greek yogurt', price: 34.9, nutritionPerPackage: { proteinGrams: 55, calories: 380, fiberGrams: 0, sugarGrams: 16, saltGrams: 0.5 } }
+];
+
+const mealDeals: MealDeal[] = [
+  { productId: 'chicken', name: 'Chicken thighs', category: 'protein', price: 69.9, dealScore: 91 },
+  { productId: 'pasta', name: 'Pasta', category: 'pantry', price: 14.9, dealScore: 82 },
+  { productId: 'tomatoes', name: 'Tomatoes', category: 'vegetables', price: 19.9, dealScore: 79 },
+  { productId: 'milk', name: 'Arla Milk 1L', category: 'dairy', price: 13.9, dealScore: 73 }
 ];
 
 const defaultPantry: PantryInventoryItem[] = [
@@ -1446,6 +1467,29 @@ export function createGroceryViewApi() {
           'Verified nutrition labels cannot override allergen locks or household diet rules.',
           'Salt and sugar warnings remain visible even when a product has strong value per krona.',
           'Nutrition value is advisory and cannot rewrite basket or meal-plan decisions without user confirmation.'
+        ]
+      };
+    },
+
+    getMealPlanSuggestionsReport(userId: string, options: { maxMealCost?: number; servings?: number } = {}): MealPlanSuggestionsReport {
+      requireNonEmptyId(userId, 'userId');
+      const maxMealCost = options.maxMealCost ?? 120;
+      const servings = options.servings ?? 4;
+      requirePositiveFinite(maxMealCost, 'maxMealCost');
+      requirePositiveFinite(servings, 'servings');
+      const suggestions = suggestDealBasedMeals({ deals: mealDeals, maxMealCost, servings });
+      return {
+        userId,
+        currency: 'SEK',
+        servings,
+        maxMealCost,
+        suggestions,
+        dealCount: mealDeals.length,
+        ingredientProductIds: [...new Set(suggestions.flatMap((suggestion) => suggestion.ingredientProductIds))].sort(),
+        guardrails: [
+          'Meal suggestions use current high-scoring deals but never update a basket without user confirmation.',
+          'Diet, allergen, and household rules must be checked before a suggested meal is saved.',
+          'Per-serving cost is advisory and cannot hide stale or missing ingredient price evidence.'
         ]
       };
     },
