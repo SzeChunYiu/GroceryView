@@ -77,6 +77,23 @@ describe('createGroceryViewApi', () => {
     assert.ok(market.topDeals.length >= 3);
     assert.equal(market.indices[0].id, 'stockholm-grocery-index');
     assert.deepEqual(
+      market.movers.find((mover) => mover.productId === 'coffee'),
+      {
+        productId: 'coffee',
+        ticker: 'ZOEGAS-COFFEE-450G',
+        productName: 'Zoégas Coffee 450g',
+        currentPrice: 49.9,
+        bestStoreId: 'willys-odenplan',
+        bestStoreName: 'Willys Odenplan',
+        oneMonthMovePercent: -16.7,
+        range52Week: { low: 49.9, high: 69.9 },
+        range52WeekPositionPercent: 0,
+        stockholmMedianGap: -10,
+        historyPoints: 3,
+        verifiedHistoryPoints: 3
+      }
+    );
+    assert.deepEqual(
       market.topDeals.find((deal) => deal.productId === 'milk'),
       {
         productId: 'milk',

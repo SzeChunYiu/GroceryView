@@ -286,6 +286,21 @@ export type ProductPriceTerminalReport = {
   evidenceGuardrails: string[];
 };
 
+export type MarketMover = {
+  productId: string;
+  ticker: string;
+  productName: string;
+  currentPrice: number | null;
+  bestStoreId: string | null;
+  bestStoreName: string | null;
+  oneMonthMovePercent: number | null;
+  range52Week: { low: number; high: number } | null;
+  range52WeekPositionPercent: number | null;
+  stockholmMedianGap: number | null;
+  historyPoints: number;
+  verifiedHistoryPoints: number;
+};
+
 export type StoreDeal = {
   productId: string;
   ticker: string;
@@ -676,6 +691,39 @@ function productPriceTerminalFor(product: ProductDetail, asOf?: string): Product
   };
 }
 
+function marketMoverFor(product: ProductDetail): MarketMover {
+  const bestPrice = bestPriceFor(product);
+  const sortedHistory = [...product.history].sort((left, right) => Date.parse(toIsoObservedAt(left.date)) - Date.parse(toIsoObservedAt(right.date)));
+  const latestHistory = sortedHistory.at(-1);
+  const previousHistory = sortedHistory.at(-2);
+  const oneMonthMovePercent = latestHistory && previousHistory && previousHistory.price > 0
+    ? roundPercent(((latestHistory.price - previousHistory.price) / previousHistory.price) * 100)
+    : null;
+  const historyPrices = sortedHistory.map((point) => point.price);
+  const range52Week = historyPrices.length > 0
+    ? { low: roundPrice(Math.min(...historyPrices)), high: roundPrice(Math.max(...historyPrices)) }
+    : null;
+  const rangeSpread = range52Week ? range52Week.high - range52Week.low : 0;
+  const range52WeekPositionPercent = bestPrice && range52Week && rangeSpread > 0
+    ? roundPercent(Math.max(0, Math.min(100, ((bestPrice.price - range52Week.low) / rangeSpread) * 100)))
+    : null;
+  const stockholmMedian = medianPrice(product.currentPrices);
+  return {
+    productId: product.id,
+    ticker: product.ticker,
+    productName: product.name,
+    currentPrice: bestPrice?.price ?? null,
+    bestStoreId: bestPrice?.storeId ?? null,
+    bestStoreName: bestPrice?.storeName ?? null,
+    oneMonthMovePercent,
+    range52Week,
+    range52WeekPositionPercent,
+    stockholmMedianGap: bestPrice && stockholmMedian != null ? roundPrice(bestPrice.price - stockholmMedian) : null,
+    historyPoints: product.history.length,
+    verifiedHistoryPoints: product.history.filter((point) => point.verified).length
+  };
+}
+
 function buildDealScoreReasons(product: ProductDetail, bestPrice: StorePrice | null, band: ReturnType<typeof scoreBand>): string[] {
   const reasons = [
     `${product.name} is in the ${product.dealSignals.currentCityPercentile}th city price percentile.`,
@@ -832,6 +880,9 @@ export function createGroceryViewApi() {
 
   return {
     getMarketOverview() {
+      const movers = [...products]
+        .map(marketMoverFor)
+        .sort((left, right) => Math.abs(right.oneMonthMovePercent ?? 0) - Math.abs(left.oneMonthMovePercent ?? 0));
       const topDeals = [...products]
         .sort((a, b) => b.dealScore - a.dealScore)
         .map((product) => {
@@ -845,7 +896,7 @@ export function createGroceryViewApi() {
             band: scoreBand(product.dealScore)
           };
         });
-      return { city: 'Stockholm', indices: [index], topDeals };
+      return { city: 'Stockholm', indices: [index], movers, topDeals };
     },
 
     getStores() {

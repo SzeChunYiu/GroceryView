@@ -116,7 +116,12 @@ describe('createHttpHandler', () => {
 
     const market = await handle(new Request('http://localhost/api/market/overview'));
     assert.equal(market.status, 200);
-    assert.equal((await json(market) as { city: string }).city, 'Stockholm');
+    const marketBody = await json(market) as { city: string; movers: Array<{ productId: string; oneMonthMovePercent: number; stockholmMedianGap: number; verifiedHistoryPoints: number }> };
+    assert.equal(marketBody.city, 'Stockholm');
+    assert.equal(marketBody.movers[0]?.productId, 'coffee');
+    assert.equal(marketBody.movers[0]?.oneMonthMovePercent, -16.7);
+    assert.equal(marketBody.movers[0]?.stockholmMedianGap, -10);
+    assert.equal(marketBody.movers[0]?.verifiedHistoryPoints, 3);
 
     const stores = await handle(new Request('http://localhost/api/stores'));
     assert.equal(stores.status, 200);
