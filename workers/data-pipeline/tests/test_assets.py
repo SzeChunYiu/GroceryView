@@ -14,6 +14,7 @@ from groceryview_data_pipeline.assets import (
     build_seed_products,
     build_seed_stores,
     summarize_data_pipeline_quality_gate,
+    summarize_open_prices_ingestion_run_plan,
 )
 from groceryview_data_pipeline.models import LatestPriceRow, ObservationFreshnessSummary, PriceObservationRow, PriceProvenance
 
@@ -176,6 +177,28 @@ def test_open_prices_artifact_import_plan_exposes_database_import_contract() -> 
     )
     assert ready.status == "ready"
     assert ready.required_actions == []
+
+
+def test_open_prices_ingestion_run_plan_summary_counts_operator_requirements() -> None:
+    blocked = build_open_prices_ingestion_run_plan(open_prices_user_agent_present=True)
+    assert summarize_open_prices_ingestion_run_plan(blocked).to_dict() == {
+        "status": "blocked",
+        "required_action_count": 3,
+        "required_env_count": 4,
+        "materialization_asset_count": 5,
+        "persistence_target_count": 5,
+        "evidence_field_count": 8,
+        "schedule_cron": "17 */6 * * *",
+        "demo": False,
+    }
+
+    ready = build_open_prices_ingestion_run_plan(
+        open_prices_user_agent_present=True,
+        database_url_present=True,
+        raw_snapshot_storage_present=True,
+        schedule_enabled=True,
+    )
+    assert summarize_open_prices_ingestion_run_plan(ready).required_action_count == 0
 
 
 def test_latest_price_rollup_picks_latest_observation() -> None:

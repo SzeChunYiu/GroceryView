@@ -22,6 +22,7 @@ from .models import (
     ObservationFreshnessSummary,
     OpenPricesArtifactImportPlan,
     OpenPricesIngestionRunPlan,
+    OpenPricesIngestionRunPlanSummary,
     OpenPricesPullPlan,
     PriceObservationRow,
     PriceObservationMixSummary,
@@ -419,6 +420,18 @@ def build_open_prices_artifact_import_plan(
             "productCount",
             "chainCount",
         ],
+    )
+
+
+def summarize_open_prices_ingestion_run_plan(plan: OpenPricesIngestionRunPlan) -> OpenPricesIngestionRunPlanSummary:
+    return OpenPricesIngestionRunPlanSummary(
+        status=plan.status,
+        required_action_count=len(plan.required_actions),
+        required_env_count=len(plan.required_env),
+        materialization_asset_count=len(plan.materialization_assets),
+        persistence_target_count=len(plan.persistence_targets),
+        evidence_field_count=len(plan.evidence_fields),
+        schedule_cron=plan.schedule_cron,
     )
 
 

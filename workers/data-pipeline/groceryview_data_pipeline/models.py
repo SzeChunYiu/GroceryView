@@ -229,6 +229,21 @@ class OpenPricesArtifactImportPlan:
 
 
 @dataclass(frozen=True)
+class OpenPricesIngestionRunPlanSummary:
+    status: Literal["ready", "blocked"]
+    required_action_count: int
+    required_env_count: int
+    materialization_asset_count: int
+    persistence_target_count: int
+    evidence_field_count: int
+    schedule_cron: str
+    demo: bool = False
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class ObservationCoverageSummary:
     status: Literal["ready", "partial"]
     observation_count: int
