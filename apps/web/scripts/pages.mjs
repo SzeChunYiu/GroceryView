@@ -111,6 +111,42 @@ window.GroceryViewFlowActions = (() => {
       setResult('account', 'Subscription access check failed: ' + error.message + '.');
     }
   };
+  const loadPrivacyExportFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('privacy', 'Local preview: connect the API session bridge before downloading an account export.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/privacy/export', config), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const sectionCount = Array.isArray(payload.sections) ? payload.sections.length : 0;
+      setResult('privacy', 'Connected API: privacy export generated with ' + sectionCount + ' sections at ' + (payload.generatedAt || 'current time') + '.');
+    } catch (error) {
+      setResult('privacy', 'Privacy export failed: ' + error.message + '. Local export preview preserved.');
+    }
+  };
+  const loadDeletionPlanFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('privacy', 'Local preview: connect the API session bridge before planning account deletion.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/privacy/deletion-plan', config), {
+        method: 'POST',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const deleteCount = Array.isArray(payload.deleteFromTables) ? payload.deleteFromTables.length : 0;
+      setResult('privacy', 'Connected API: deletion plan prepared for ' + deleteCount + ' personal tables; destructive action requires re-authentication.');
+    } catch (error) {
+      setResult('privacy', 'Deletion plan failed: ' + error.message + '. Local plan preview preserved.');
+    }
+  };
   const saveBasketToApi = async (form) => {
     const config = getApiConfig();
     if (!hasApiSession(config)) {
@@ -181,6 +217,14 @@ window.GroceryViewFlowActions = (() => {
       }
       if (flow === 'account' && action === 'manage-subscription') {
         await loadSubscriptionAccessFromApi();
+        return;
+      }
+      if (flow === 'privacy' && action === 'download-export') {
+        await loadPrivacyExportFromApi();
+        return;
+      }
+      if (flow === 'privacy' && action === 'plan-deletion') {
+        await loadDeletionPlanFromApi();
         return;
       }
       if (flow && action) setResult(flow, messages[action] || 'Action preview recorded.');
