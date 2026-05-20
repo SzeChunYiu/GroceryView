@@ -1,6 +1,199 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { compareBasketStrategies, summarizeLocalOfferBasket, summarizeStoreBasketCoverage } from '../index.js';
+import { compareBasketStrategies, summarizeLocalOfferBasket, summarizeStoreBasketCoverage, validateBasketComparisonLineFixtures } from '../index.js';
+
+describe('validateBasketComparisonLineFixtures', () => {
+  it('accepts every basket comparison line status with explicit inclusion or exclusion fields', () => {
+    const validation = validateBasketComparisonLineFixtures([
+      {
+        basketLineId: 'line:matched',
+        requestedProductId: 'standardmjolk-1l',
+        requestedQuantity: 2,
+        requestedUnit: 'l',
+        retailerChainId: 'ica',
+        storeId: 'ica-nara-baronen-odenplan',
+        status: 'matched',
+        matchedProductId: 'ica-standardmjolk-1l',
+        availabilitySource: 'retailer',
+        priceSourceType: 'online',
+        unitPrice: 14.9,
+        lineTotal: 29.8,
+        memberOnly: false,
+        weightAdjusted: false,
+        confidence: 0.9,
+        disclosureCopy: 'Matched online price.'
+      },
+      {
+        basketLineId: 'line:missing',
+        requestedProductId: 'basmatiris-1kg',
+        requestedQuantity: 1,
+        requestedUnit: 'kg',
+        retailerChainId: 'coop',
+        storeId: 'coop-odenplan',
+        status: 'missing_product_match',
+        availabilitySource: 'unknown',
+        memberOnly: false,
+        weightAdjusted: false,
+        confidence: 0.2,
+        exclusionReason: 'No comparable product match for this retailer fixture.',
+        disclosureCopy: 'No comparable product was matched.'
+      },
+      {
+        basketLineId: 'line:unavailable',
+        requestedProductId: 'agg-12-pack',
+        requestedQuantity: 1,
+        requestedUnit: 'pcs',
+        retailerChainId: 'willys',
+        storeId: 'willys-odenplan',
+        status: 'unavailable',
+        matchedProductId: 'willys-agg-12-pack',
+        availabilitySource: 'retailer',
+        memberOnly: false,
+        weightAdjusted: false,
+        confidence: 0.75,
+        exclusionReason: 'Matched product was not available in this fixture.',
+        disclosureCopy: 'Product matched but unavailable.'
+      },
+      {
+        basketLineId: 'line:sub-offered',
+        requestedProductId: 'hushallsost-1kg',
+        requestedQuantity: 1,
+        requestedUnit: 'kg',
+        retailerChainId: 'hemkop',
+        storeId: 'hemkop-torsplan',
+        status: 'substitution_offered',
+        matchedProductId: 'hemkop-hushallsost-1kg',
+        replacementProductId: 'hemkop-prastost-700g',
+        replacementAccepted: false,
+        availabilitySource: 'retailer',
+        priceSourceType: 'online',
+        unitPrice: 89.9,
+        memberOnly: false,
+        weightAdjusted: false,
+        confidence: 0.7,
+        exclusionReason: 'Replacement not accepted in default public basket scenario.',
+        disclosureCopy: 'Replacement offered but not accepted.'
+      },
+      {
+        basketLineId: 'line:sub-accepted',
+        requestedProductId: 'tomater-500g',
+        requestedQuantity: 1,
+        requestedUnit: 'pack',
+        retailerChainId: 'lidl',
+        storeId: 'lidl-sveavagen',
+        status: 'substitution_accepted',
+        matchedProductId: 'lidl-tomater-500g',
+        replacementProductId: 'lidl-tomater-400g',
+        replacementAccepted: true,
+        availabilitySource: 'retailer',
+        priceSourceType: 'shelf',
+        unitPrice: 24.9,
+        lineTotal: 24.9,
+        memberOnly: false,
+        weightAdjusted: false,
+        confidence: 0.8,
+        disclosureCopy: 'Accepted replacement included in substitution scenario.'
+      },
+      {
+        basketLineId: 'line:member',
+        requestedProductId: 'bryggkaffe-450g',
+        requestedQuantity: 1,
+        requestedUnit: 'pack',
+        retailerChainId: 'coop',
+        storeId: 'coop-odenplan',
+        status: 'member_only',
+        matchedProductId: 'coop-bryggkaffe-450g',
+        availabilitySource: 'retailer',
+        priceSourceType: 'member',
+        unitPrice: 39.9,
+        memberOnly: true,
+        weightAdjusted: false,
+        confidence: 0.8,
+        exclusionReason: 'Member-only price excluded from default public basket.',
+        disclosureCopy: 'Requires membership.'
+      },
+      {
+        basketLineId: 'line:weight',
+        requestedProductId: 'bananer-1kg',
+        requestedQuantity: 1,
+        requestedUnit: 'kg',
+        retailerChainId: 'city_gross',
+        storeId: 'city-gross-bromma',
+        status: 'weight_adjusted',
+        matchedProductId: 'citygross-bananer-losvikt',
+        availabilitySource: 'retailer',
+        priceSourceType: 'shelf',
+        unitPrice: 21.9,
+        lineTotal: 21.9,
+        memberOnly: false,
+        weightAdjusted: true,
+        confidence: 0.85,
+        disclosureCopy: 'Final total depends on picked weight.'
+      }
+    ]);
+
+    assert.deepEqual(validation, {
+      status: 'valid',
+      basketLineIds: [
+        'line:matched',
+        'line:member',
+        'line:missing',
+        'line:sub-accepted',
+        'line:sub-offered',
+        'line:unavailable',
+        'line:weight'
+      ],
+      issues: []
+    });
+  });
+
+  it('rejects fixture states that would silently include excluded basket lines', () => {
+    const validation = validateBasketComparisonLineFixtures([
+      {
+        basketLineId: 'line:bad-member',
+        requestedProductId: 'coffee',
+        requestedQuantity: 1,
+        requestedUnit: 'pack',
+        retailerChainId: 'coop',
+        storeId: 'coop-odenplan',
+        status: 'member_only',
+        availabilitySource: 'retailer',
+        priceSourceType: 'member',
+        unitPrice: 39.9,
+        lineTotal: 39.9,
+        memberOnly: false,
+        weightAdjusted: false,
+        confidence: 0.8,
+        disclosureCopy: 'Requires membership.'
+      },
+      {
+        basketLineId: 'line:bad-sub',
+        requestedProductId: 'milk',
+        requestedQuantity: 1,
+        requestedUnit: 'l',
+        retailerChainId: 'ica',
+        storeId: 'ica-nara-baronen-odenplan',
+        status: 'substitution_offered',
+        replacementProductId: 'ica-oat-drink-1l',
+        replacementAccepted: true,
+        availabilitySource: 'retailer',
+        lineTotal: 15.9,
+        memberOnly: false,
+        weightAdjusted: false,
+        confidence: 0.7,
+        disclosureCopy: 'Replacement offered.'
+      }
+    ]);
+
+    assert.equal(validation.status, 'invalid');
+    assert.ok(validation.issues.includes('member_only_flag_required:line:bad-member'));
+    assert.ok(validation.issues.includes('member_only_reason_required:line:bad-member'));
+    assert.ok(validation.issues.includes('member_only_has_public_total:line:bad-member'));
+    assert.ok(validation.issues.includes('substitution_offered_acceptance_required:line:bad-sub'));
+    assert.ok(validation.issues.includes('substitution_offered_reason_required:line:bad-sub'));
+    assert.ok(validation.issues.includes('substitution_offered_has_line_total:line:bad-sub'));
+  });
+});
 
 describe('compareBasketStrategies', () => {
   it('compares favorite-store baskets without penalizing distance', () => {
