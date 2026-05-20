@@ -11,6 +11,7 @@ const hostedReadinessSmokeScript = readFileSync(new URL('../../../../infra/scrip
 const hostedHttpSmokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-hosted-http.sh', import.meta.url), 'utf8');
 const smokeRetailerConnectorScript = readFileSync(new URL('../../../../infra/scripts/smoke-retailer-connector.sh', import.meta.url), 'utf8');
 const smokeOpenPricesScript = readFileSync(new URL('../../../../infra/scripts/smoke-open-prices.sh', import.meta.url), 'utf8');
+const importOpenPricesArtifactScript = readFileSync(new URL('../../../../infra/scripts/import-open-prices-artifact.sh', import.meta.url), 'utf8');
 const smokeWorkflow = readFileSync(new URL('../../../../.github/workflows/local-infra-smoke.yml', import.meta.url), 'utf8');
 
 describe('local infrastructure compose', () => {
@@ -93,6 +94,8 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /## Open Prices real-data smoke/);
     assert.match(infraReadme, /smoke-open-prices\.sh/);
     assert.match(infraReadme, /OPEN_PRICES_OUTPUT_PATH/);
+    assert.match(infraReadme, /import-open-prices-artifact\.sh/);
+    assert.match(infraReadme, /OPEN_PRICES_INPUT_PATH/);
     assert.match(infraReadme, /acceptedObservations/);
   });
 
@@ -145,6 +148,17 @@ describe('local infrastructure compose', () => {
     assert.match(smokeOpenPricesScript, /acceptedCount/);
     assert.match(smokeOpenPricesScript, /Open Prices smoke requires OPEN_PRICES_USER_AGENT/);
     assert.match(smokeOpenPricesScript, /Hosted Open Prices real-data smoke passed/);
+  });
+
+  it('ships an Open Prices artifact import script for PostgreSQL persistence', () => {
+    assert.match(importOpenPricesArtifactScript, /OPEN_PRICES_INPUT_PATH/);
+    assert.match(importOpenPricesArtifactScript, /DATABASE_URL/);
+    assert.match(importOpenPricesArtifactScript, /packages\/db\/dist\/index\.js/);
+    assert.match(importOpenPricesArtifactScript, /persistOpenPricesArtifact/);
+    assert.match(importOpenPricesArtifactScript, /createPgQueryExecutor/);
+    assert.match(importOpenPricesArtifactScript, /new Pool/);
+    assert.match(importOpenPricesArtifactScript, /Open Prices artifact import requires OPEN_PRICES_INPUT_PATH/);
+    assert.match(importOpenPricesArtifactScript, /Open Prices artifact import requires DATABASE_URL/);
   });
 
   it('ships a hosted HTTP smoke script for API health, product terminal, and optional web checks', () => {

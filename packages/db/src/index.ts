@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 export type Migration = {
   version: string;
   sql: string;
@@ -405,7 +407,7 @@ export type PostgresPriceReader = {
 };
 
 export type SourceRunRecord = {
-  sourceType: 'retailer_api' | 'retailer_page' | 'weekly_leaflet' | 'receipt_ocr' | 'community_report' | 'manual_seed';
+  sourceType: 'official_api' | 'retailer_api' | 'retailer_page' | 'weekly_leaflet' | 'receipt_ocr' | 'community_report' | 'manual_seed';
   sourceName: string;
   sourceUrl?: string;
   startedAt?: string;
@@ -482,6 +484,74 @@ export type PostgresSourceRecordWriter = {
 export type PostgresSourceRecordReader = {
   listSourceRuns(filter?: SourceRunListFilter): Promise<SourceRunReadRecord[]>;
   getRawRecordByHash(sourceRunId: string, payloadHash: string): Promise<RawRecordReadRecord | null>;
+};
+
+export type OpenPricesArtifactProduct = {
+  id: string;
+  canonicalName: string;
+  brand?: string;
+  categoryId?: string;
+  packageSize?: number;
+  packageUnit?: string;
+  comparableUnit: string;
+};
+
+export type OpenPricesArtifactAlias = {
+  rawName: string;
+  sourceType?: string;
+  matchedProductId?: string;
+  matchConfidence: number;
+  reviewedByHuman?: boolean;
+};
+
+export type OpenPricesArtifactPriceObservation = {
+  productId: string;
+  retailerProductId?: string;
+  chainId: string;
+  observedAt: string;
+  price: number;
+  unitPrice: number;
+  currency: 'SEK';
+  regularPrice?: number;
+  priceType: string;
+  sourceType?: string;
+  sourceUrl?: string;
+  parserVersion?: string;
+  rawSnapshotRef: string;
+  sourceRunId?: string;
+  confidenceScore: number;
+  isOnlinePrice?: boolean;
+  isInstorePrice?: boolean;
+  provenance?: Record<string, unknown>;
+};
+
+export type OpenPricesArtifactAcceptedObservation = {
+  product: OpenPricesArtifactProduct;
+  alias: OpenPricesArtifactAlias;
+  priceObservation: OpenPricesArtifactPriceObservation;
+  promotionObservation?: {
+    promoText?: string;
+    memberOnly?: boolean;
+  } | null;
+};
+
+export type OpenPricesNormalizedArtifact = {
+  status: string;
+  sourceUrl: string;
+  retrievedAt: string;
+  contentHash: string;
+  rawSnapshotRef: string;
+  acceptedObservations: OpenPricesArtifactAcceptedObservation[];
+};
+
+export type OpenPricesArtifactPersistenceResult = {
+  status: 'persisted';
+  sourceRunId: string;
+  acceptedCount: number;
+  rawRecordIds: string[];
+  observationIds: string[];
+  productIds: string[];
+  chainIds: string[];
 };
 
 export type HumanReviewerRecord = {
@@ -1643,6 +1713,236 @@ export function createPgQueryExecutor(client: PgLikeClient): QueryExecutor {
       const result = await client.query(sql, params);
       return result.rows as T[];
     }
+  };
+}
+
+type IdRow = { id: string };
+
+function normalizeImportSlug(value: string): string {
+  const slug = value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  if (!slug) throw new Error('Open Prices import slug must contain at least one alphanumeric character.');
+  return slug;
+}
+
+function normalizeAlias(value: string): string {
+  const normalized = value.trim().toLowerCase().replace(/\s+/g, ' ');
+  if (!normalized) throw new Error('Open Prices alias must be non-empty.');
+  return normalized;
+}
+
+function contentHashForPayload(payload: unknown): string {
+  return `sha256:${createHash('sha256').update(JSON.stringify(payload)).digest('hex')}`;
+}
+
+function mapOpenPricesPriceType(value: string): PriceType {
+  if (value === 'online' || value === 'member' || value === 'receipt' || value === 'estimated') return value;
+  if (value === 'flyer') return 'promotion';
+  if (value === 'in_store' || value === 'shelf_photo') return 'shelf';
+  if (value === 'manual') return 'community';
+  throw new Error(`Unsupported Open Prices artifact priceType: ${value}`);
+}
+
+function validateOpenPricesArtifact(artifact: OpenPricesNormalizedArtifact): void {
+  if (artifact.status !== 'passed' || artifact.acceptedObservations.length === 0) {
+    throw new Error('persistOpenPricesArtifact requires a passed Open Prices artifact with at least one accepted observation.');
+  }
+  if (!artifact.sourceUrl?.trim()) throw new Error('Open Prices artifact sourceUrl is required.');
+  if (!artifact.contentHash?.startsWith('sha256:')) throw new Error('Open Prices artifact contentHash must start with sha256:.');
+  if (!artifact.rawSnapshotRef?.trim()) throw new Error('Open Prices artifact rawSnapshotRef is required.');
+  if (Number.isNaN(Date.parse(artifact.retrievedAt))) throw new Error('Open Prices artifact retrievedAt must be an ISO date.');
+
+  artifact.acceptedObservations.forEach((row, index) => {
+    const path = `acceptedObservations[${index}]`;
+    if (!row.product.id.trim()) throw new Error(`${path}.product.id is required.`);
+    if (!row.product.canonicalName.trim()) throw new Error(`${path}.product.canonicalName is required.`);
+    if (!row.product.comparableUnit.trim()) throw new Error(`${path}.product.comparableUnit is required.`);
+    if (!row.alias.rawName.trim()) throw new Error(`${path}.alias.rawName is required.`);
+    if (!Number.isFinite(row.alias.matchConfidence) || row.alias.matchConfidence < 0 || row.alias.matchConfidence > 1) {
+      throw new Error(`${path}.alias.matchConfidence must be between 0 and 1.`);
+    }
+    if (!row.priceObservation.chainId.trim()) throw new Error(`${path}.priceObservation.chainId is required.`);
+    if (!Number.isFinite(row.priceObservation.price) || row.priceObservation.price < 0) throw new Error(`${path}.priceObservation.price must be non-negative.`);
+    if (!Number.isFinite(row.priceObservation.unitPrice) || row.priceObservation.unitPrice < 0) {
+      throw new Error(`${path}.priceObservation.unitPrice must be non-negative.`);
+    }
+    if (row.priceObservation.currency !== 'SEK') throw new Error(`${path}.priceObservation.currency must be SEK.`);
+    if (Number.isNaN(Date.parse(row.priceObservation.observedAt))) throw new Error(`${path}.priceObservation.observedAt must be an ISO date.`);
+    if (!Number.isFinite(row.priceObservation.confidenceScore) || row.priceObservation.confidenceScore < 0 || row.priceObservation.confidenceScore > 1) {
+      throw new Error(`${path}.priceObservation.confidenceScore must be between 0 and 1.`);
+    }
+    mapOpenPricesPriceType(row.priceObservation.priceType);
+  });
+}
+
+async function upsertOpenPricesChain(executor: QueryExecutor, chainSlug: string): Promise<string> {
+  const slug = normalizeImportSlug(chainSlug);
+  const rows = await executor.query<IdRow>(
+    `insert into chains(slug, name, country_code)
+     values ($1, $2, $3)
+     on conflict (slug) do update set
+       name = excluded.name,
+       country_code = excluded.country_code,
+       updated_at = now()
+     returning id`,
+    [slug, slug, 'SE']
+  );
+  const id = rows[0]?.id;
+  if (!id) throw new Error(`Open Prices chain upsert did not return an id: ${slug}`);
+  return id;
+}
+
+async function upsertOpenPricesProduct(executor: QueryExecutor, product: OpenPricesArtifactProduct): Promise<string> {
+  const slug = normalizeImportSlug(product.id);
+  const rows = await executor.query<IdRow>(
+    `insert into products(
+       slug,
+       canonical_name,
+       brand,
+       category_path,
+       package_size,
+       package_unit,
+       comparable_unit
+     ) values ($1, $2, $3, $4, $5, $6, $7)
+     on conflict (slug) do update set
+       canonical_name = excluded.canonical_name,
+       brand = excluded.brand,
+       category_path = excluded.category_path,
+       package_size = excluded.package_size,
+       package_unit = excluded.package_unit,
+       comparable_unit = excluded.comparable_unit,
+       updated_at = now()
+     returning id`,
+    [
+      slug,
+      product.canonicalName,
+      product.brand ?? null,
+      product.categoryId ? [product.categoryId] : [],
+      product.packageSize ?? null,
+      product.packageUnit ?? null,
+      product.comparableUnit
+    ]
+  );
+  const id = rows[0]?.id;
+  if (!id) throw new Error(`Open Prices product upsert did not return an id: ${slug}`);
+  return id;
+}
+
+export async function persistOpenPricesArtifact(
+  executor: QueryExecutor,
+  artifact: OpenPricesNormalizedArtifact
+): Promise<OpenPricesArtifactPersistenceResult> {
+  validateOpenPricesArtifact(artifact);
+  const sourceWriter = createPostgresSourceRecordWriter(executor);
+  const aliasRepository = createPostgresProductAliasRepository(executor);
+  const priceWriter = createPostgresPriceObservationWriter(executor);
+  const sourceRun = await sourceWriter.createSourceRun({
+    sourceType: 'official_api',
+    sourceName: 'Open Food Facts Open Prices',
+    sourceUrl: artifact.sourceUrl,
+    startedAt: artifact.retrievedAt,
+    status: 'running',
+    provenance: {
+      source: 'open_prices',
+      sourceUrl: artifact.sourceUrl,
+      contentHash: artifact.contentHash,
+      rawSnapshotRef: artifact.rawSnapshotRef,
+      acceptedCount: artifact.acceptedObservations.length
+    }
+  });
+
+  const rawRecordIds: string[] = [];
+  const observationIds: string[] = [];
+  const productIds = new Set<string>();
+  const chainIds = new Set<string>();
+
+  for (const accepted of artifact.acceptedObservations) {
+    const priceObservation = accepted.priceObservation;
+    const chainId = await upsertOpenPricesChain(executor, priceObservation.chainId);
+    const productId = await upsertOpenPricesProduct(executor, accepted.product);
+    chainIds.add(chainId);
+    productIds.add(productId);
+
+    await aliasRepository.upsertProductAlias({
+      productId,
+      alias: accepted.alias.rawName,
+      normalizedAlias: normalizeAlias(accepted.alias.rawName),
+      sourceType: 'import',
+      sourceRef: artifact.contentHash,
+      matchConfidence: accepted.alias.matchConfidence
+    });
+
+    const payload = {
+      product: accepted.product,
+      alias: accepted.alias,
+      priceObservation,
+      promotionObservation: accepted.promotionObservation ?? null
+    };
+    const rawRecord = await sourceWriter.upsertRawRecord({
+      sourceRunId: sourceRun.sourceRunId,
+      recordType: 'price',
+      externalRef: priceObservation.retailerProductId ?? accepted.product.id,
+      observedAt: priceObservation.observedAt,
+      payload,
+      payloadHash: contentHashForPayload({
+        contentHash: artifact.contentHash,
+        productId: accepted.product.id,
+        retailerProductId: priceObservation.retailerProductId ?? null,
+        observedAt: priceObservation.observedAt,
+        price: priceObservation.price
+      }),
+      provenance: {
+        source: 'open_prices',
+        sourceUrl: priceObservation.sourceUrl ?? artifact.sourceUrl,
+        contentHash: artifact.contentHash,
+        rawSnapshotRef: priceObservation.rawSnapshotRef || artifact.rawSnapshotRef,
+        parserVersion: priceObservation.parserVersion
+      }
+    });
+    rawRecordIds.push(rawRecord.rawRecordId);
+
+    const provenance = {
+      ...(priceObservation.provenance ?? {}),
+      source: 'open_prices',
+      sourceUrl: priceObservation.sourceUrl ?? artifact.sourceUrl,
+      contentHash: artifact.contentHash,
+      rawSnapshotRef: priceObservation.rawSnapshotRef || artifact.rawSnapshotRef,
+      parserVersion: priceObservation.parserVersion
+    };
+    const observation = await priceWriter.recordPriceObservation({
+      productId,
+      chainId,
+      sourceRunId: sourceRun.sourceRunId,
+      rawRecordId: rawRecord.rawRecordId,
+      retailerProductRef: priceObservation.retailerProductId,
+      priceType: mapOpenPricesPriceType(priceObservation.priceType),
+      price: priceObservation.price,
+      regularPrice: priceObservation.regularPrice,
+      unitPrice: priceObservation.unitPrice,
+      currency: priceObservation.currency,
+      quantity: accepted.product.packageSize,
+      quantityUnit: accepted.product.packageUnit,
+      promotionText: accepted.promotionObservation?.promoText,
+      memberRequired: accepted.promotionObservation?.memberOnly ?? false,
+      observedAt: priceObservation.observedAt,
+      confidence: priceObservation.confidenceScore,
+      provenance
+    });
+    observationIds.push(observation.observationId);
+  }
+
+  await sourceWriter.finishSourceRun({
+    sourceRunId: sourceRun.sourceRunId,
+    status: 'succeeded'
+  });
+
+  return {
+    status: 'persisted',
+    sourceRunId: sourceRun.sourceRunId,
+    acceptedCount: artifact.acceptedObservations.length,
+    rawRecordIds,
+    observationIds,
+    productIds: [...productIds],
+    chainIds: [...chainIds]
   };
 }
 

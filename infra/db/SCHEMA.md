@@ -71,7 +71,7 @@ Indexes: `aliases_normalized_trgm_idx` for fuzzy alias matching.
 
 ### `source_runs`
 
-One ingestion attempt from a retailer API, page scrape, leaflet, OCR run, community report, or manual seed.
+One ingestion attempt from an official public API, retailer API, page scrape, leaflet, OCR run, community report, or manual seed. Open Prices imports use `official_api` so public, license-aware pulls stay distinct from retailer-specific connectors.
 
 Key columns: `source_type`, `source_name`, `source_url`, `started_at`, `finished_at`, `status`, `provenance`, `error_message`.
 

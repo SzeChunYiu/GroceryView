@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -9,6 +9,12 @@ const migration = readFileSync(join(repoRoot, 'infra/db/migrations/001_groceryvi
 const repositoryMigration = readFileSync(join(repoRoot, 'infra/db/migrations/002_repository_support_schema.sql'), 'utf8').toLowerCase();
 const entitlementMigration = readFileSync(join(repoRoot, 'infra/db/migrations/003_subscription_entitlements.sql'), 'utf8').toLowerCase();
 const alertRulesMigration = readFileSync(join(repoRoot, 'infra/db/migrations/004_alert_rules.sql'), 'utf8').toLowerCase();
+const migrationsDir = join(repoRoot, 'infra/db/migrations');
+const allMigrations = readdirSync(migrationsDir)
+  .filter((entry) => entry.endsWith('.sql'))
+  .sort()
+  .map((entry) => readFileSync(join(migrationsDir, entry), 'utf8').toLowerCase())
+  .join('\n');
 const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}`;
 const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
@@ -93,6 +99,12 @@ describe('infra/db PostgreSQL schema contract', () => {
       assert.match(tableDefinition(table), /\bprovenance\b/, `${table}.provenance missing`);
       assert.match(schemaDoc, new RegExp(`### \`${table}\`[\\s\\S]*provenance`), `${table} provenance missing from SCHEMA.md`);
     }
+  });
+
+  it('allows official public API source runs for persisted Open Prices pulls', () => {
+    assert.match(allMigrations, /official_api/, 'official_api source run migration missing');
+    assert.match(schemaDoc, /official public api/, 'official API source run docs missing');
+    assert.match(schemaDoc, /open prices/, 'Open Prices persistence docs missing');
   });
 
   it('indexes geospatial store lookup and fuzzy product matching', () => {
