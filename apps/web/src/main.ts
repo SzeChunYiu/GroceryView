@@ -4,6 +4,7 @@ import {
   calculateDealScore,
   calculateFixedBasketIndex,
   compareBasketStrategies,
+  rankNutritionPerKrona,
   scoreBand,
   searchProducts,
   suggestDealBasedMeals,
@@ -347,6 +348,12 @@ const catalogCoverageRows = [
   { category: 'Produce', products: 31, coverage: '62%', freshness: 'Mixed', action: 'Route receipt photos to review' },
   { category: 'Pantry', products: 42, coverage: '74%', freshness: 'Fresh this week', action: 'Parse missing unit prices' }
 ];
+
+const nutritionDeals = rankNutritionPerKrona([
+  { productId: 'chicken', name: 'Chicken thighs', price: 69.9, nutritionPerPackage: { proteinGrams: 160, calories: 900, fiberGrams: 0, sugarGrams: 0, saltGrams: 2.4 } },
+  { productId: 'eggs', name: 'Eggs 12-pack', price: 34.9, nutritionPerPackage: { proteinGrams: 75, calories: 840, fiberGrams: 0, sugarGrams: 1, saltGrams: 1.8 } },
+  { productId: 'yogurt', name: 'Greek yogurt', price: 34.9, nutritionPerPackage: { proteinGrams: 55, calories: 380, fiberGrams: 0, sugarGrams: 16, saltGrams: 0.5 } }
+], 'protein');
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Missing #app root');
@@ -802,6 +809,24 @@ app.innerHTML = `
               <td>${meal.ingredientProductIds.join(', ')}</td>
               <td>${meal.estimatedCost.toFixed(2)} SEK</td>
               <td>${meal.estimatedCostPerServing.toFixed(2)} SEK</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Nutrition per krona</h2>
+        <p class="lede">Protein value ranks by nutrition per 10 SEK so cheap deals do not hide weak food value.</p>
+        <table class="table">
+          <thead><tr><th>Product</th><th>Protein / 10 SEK</th><th>Price</th><th>Health note</th></tr></thead>
+          <tbody>
+            ${nutritionDeals.map((deal) => `<tr>
+              <td>${deal.name}</td>
+              <td>${deal.valuePer10Sek}g</td>
+              <td>${deal.price.toFixed(2)} SEK</td>
+              <td>${deal.saltWarning ? 'Salt warning' : `${deal.sugarPerPackage}g sugar/package`}</td>
             </tr>`).join('')}
           </tbody>
         </table>
