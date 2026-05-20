@@ -353,11 +353,16 @@ describe('buildStaticPages', () => {
       const scanner = await readFile(join(root, 'scanner/index.html'), 'utf8');
       assert.match(scanner, /Barcode and receipt scanner/);
       assert.match(scanner, /manual review queue/);
+      assert.match(scanner, /Upload readiness/);
+      assert.match(scanner, /Private scan storage/);
       assert.match(scanner, /Coop Farsta receipt/);
       assert.match(scanner, /Route to product matching queue/);
       assert.match(scanner, /data-groceryview-flow="scanner"/);
       assert.match(scanner, /accept="image\/\*"/);
+      assert.match(scanner, /data-flow-action="check-storage-health"/);
       assert.match(scanner, /data-flow-action="route-review"/);
+      assert.match(scanner, /fetch\(apiUrl\('\/api\/health/);
+      assert.match(scanner, /hasScanUploadStorage/);
       assert.match(scanner, /fetch\(apiUrl\('\/api\/scans\/upload-url/);
       assert.match(scanner, /fetch\(ticket\.uploadUrl/);
       assert.match(scanner, /method: 'PUT'/);
