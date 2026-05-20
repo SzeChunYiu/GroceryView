@@ -37,7 +37,10 @@ describe('local infrastructure compose', () => {
     assert.match(smokeScript, /pg_isready -U "\$POSTGRES_USER" -d "\$POSTGRES_DB"/);
     assert.match(smokeScript, /redis-cli ping/);
     assert.match(smokeScript, /mc ls "local\/\$S3_BUCKET"/);
-    assert.match(smokeScript, /compose logs "\$service"/);
+    assert.match(smokeScript, /print_service_diagnostics\(\)/);
+    assert.match(smokeScript, /docker inspect[\s\S]*health=/);
+    assert.match(smokeScript, /compose logs --no-color --tail=120 "\$service"/);
+    assert.match(smokeScript, /"\$POSTGRES_SERVICE" "\$REDIS_SERVICE" "\$OBJECT_STORAGE_SERVICE" "\$OBJECT_STORAGE_INIT_SERVICE"/);
   });
 
   it('runs the local services smoke check in CI for infra changes', () => {
