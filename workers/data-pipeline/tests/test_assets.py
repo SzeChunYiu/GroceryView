@@ -333,13 +333,19 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
     freshness = build_observation_freshness_summary(observations, checked_at="2026-05-19T10:00:00+00:00", max_age_hours=48)
     coverage = build_observation_coverage_summary(observations, stores, products)
 
-    ready_gate = build_data_pipeline_quality_gate(quality, freshness, coverage)
+    ready_ingestion = build_open_prices_ingestion_run_plan(
+        open_prices_user_agent_present=True,
+        database_url_present=True,
+        raw_snapshot_storage_present=True,
+        schedule_enabled=True,
+    )
+    ready_gate = build_data_pipeline_quality_gate(quality, freshness, coverage, ready_ingestion)
     assert ready_gate.to_dict() == {
         "status": "ready",
         "blockers": [],
         "observation_count": len(observations),
         "latest_rollup_count": len(latest),
-        "checked_assets": ["quality_checks", "price_observation_freshness", "price_observation_coverage"],
+        "checked_assets": ["quality_checks", "price_observation_freshness", "price_observation_coverage", "open_prices_ingestion_run_plan"],
         "demo": True,
     }
 
@@ -356,3 +362,9 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
     blocked_gate = build_data_pipeline_quality_gate(quality, stale_freshness, coverage)
     assert blocked_gate.status == "blocked"
     assert blocked_gate.blockers == ["price_observation_freshness_blocked"]
+
+    blocked_ingestion = build_open_prices_ingestion_run_plan(open_prices_user_agent_present=True)
+    blocked_open_prices_gate = build_data_pipeline_quality_gate(quality, freshness, coverage, blocked_ingestion)
+    assert blocked_open_prices_gate.status == "blocked"
+    assert blocked_open_prices_gate.blockers == ["open_prices_ingestion_plan_blocked"]
+    assert blocked_open_prices_gate.checked_assets[-1] == "open_prices_ingestion_run_plan"
