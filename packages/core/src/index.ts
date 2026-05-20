@@ -258,6 +258,7 @@ export type StorePrice = {
   storeId: string;
   storeName: string;
   price: number;
+  priceType?: WatchlistPriceType;
   distanceKm?: number;
 };
 
@@ -1079,11 +1080,21 @@ export function searchProducts(products: SearchableProduct[], query: string): Se
   });
 }
 
+export type WatchlistPriceType = 'shelf' | 'member' | 'promotion' | 'estimated';
+
 export type WatchlistItem = {
   productId: string;
   targetPrice?: number;
   alertDealScoreAt?: number;
   favoriteStoresOnly: boolean;
+  allowedPriceTypes?: WatchlistPriceType[];
+};
+
+export type WatchlistProductPriceSnapshot = {
+  storeId: string;
+  storeName: string;
+  price: number;
+  priceType: WatchlistPriceType;
 };
 
 export type WatchlistProductSnapshot = {
@@ -1091,6 +1102,8 @@ export type WatchlistProductSnapshot = {
   productName: string;
   bestPrice: number;
   bestStoreId: string;
+  bestPriceType?: WatchlistPriceType;
+  prices?: WatchlistProductPriceSnapshot[];
   dealScore: number;
   isNew52WeekLow: boolean;
 };
@@ -1110,6 +1123,29 @@ export type WatchlistAlert = {
   message: string;
 };
 
+function watchlistProductForItem(item: WatchlistItem, product: WatchlistProductSnapshot): WatchlistProductSnapshot | null {
+  if (!item.allowedPriceTypes || item.allowedPriceTypes.length === 0) return product;
+
+  const allowed = new Set(item.allowedPriceTypes);
+  const eligiblePrices = (product.prices ?? [])
+    .filter((price) => allowed.has(price.priceType))
+    .sort((left, right) => left.price - right.price || left.storeName.localeCompare(right.storeName));
+
+  if (eligiblePrices.length > 0) {
+    const bestPrice = eligiblePrices[0]!;
+    return {
+      ...product,
+      bestPrice: bestPrice.price,
+      bestStoreId: bestPrice.storeId,
+      bestPriceType: bestPrice.priceType,
+      prices: eligiblePrices
+    };
+  }
+
+  const fallbackPriceType = product.bestPriceType ?? 'shelf';
+  return allowed.has(fallbackPriceType) ? product : null;
+}
+
 export function buildWatchlistAlerts(input: {
   watchlist: WatchlistItem[];
   products: WatchlistProductSnapshot[];
@@ -1120,7 +1156,8 @@ export function buildWatchlistAlerts(input: {
   const alerts: WatchlistAlert[] = [];
 
   for (const item of input.watchlist) {
-    const product = productById.get(item.productId);
+    const rawProduct = productById.get(item.productId);
+    const product = rawProduct ? watchlistProductForItem(item, rawProduct) : null;
     if (!product) continue;
     if (item.favoriteStoresOnly && !favoriteStoreSet.has(product.bestStoreId)) continue;
 

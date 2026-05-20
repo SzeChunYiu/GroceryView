@@ -32,7 +32,8 @@ import {
   type SearchableProduct,
   type StorePrice,
   type WatchlistAlert,
-  type WatchlistItem
+  type WatchlistItem,
+  type WatchlistPriceType
 } from '@groceryview/core';
 import {
   buildAdDeliveryComplianceReport,
@@ -109,6 +110,8 @@ export type PriceConfidenceReason =
   | 'requires_human_review'
   | 'fixture_backed'
   | 'manual_entry';
+
+const watchlistPriceTypes = ['shelf', 'member', 'promotion', 'estimated'] as const satisfies readonly WatchlistPriceType[];
 
 export type ContentDigest = {
   algorithm: 'sha-256' | 'sha-384' | 'sha-512';
@@ -718,6 +721,17 @@ function requireScoreThreshold(value: number | undefined) {
   if (value === undefined) return;
   if (!Number.isFinite(value) || value < 0 || value > 100) {
     throw new Error('alertDealScoreAt must be between 0 and 100');
+  }
+}
+
+function requireAllowedPriceTypes(value: WatchlistPriceType[] | undefined) {
+  if (value === undefined) return;
+  if (!Array.isArray(value)) throw new Error('allowedPriceTypes must be an array');
+  const allowed = new Set(watchlistPriceTypes);
+  for (const priceType of value) {
+    if (!allowed.has(priceType)) {
+      throw new Error(`allowedPriceTypes must contain only: ${watchlistPriceTypes.join(', ')}`);
+    }
   }
 }
 
@@ -1336,6 +1350,13 @@ export function createGroceryViewApi() {
         productName: product.name,
         bestPrice: bestPrice?.price ?? 0,
         bestStoreId: bestPrice?.storeId ?? '',
+        bestPriceType: bestPrice?.priceType ?? 'shelf' as const,
+        prices: product.currentPrices.map((price) => ({
+          storeId: price.storeId,
+          storeName: price.storeName,
+          price: price.price,
+          priceType: price.priceType ?? 'shelf' as const
+        })),
         dealScore: product.dealScore,
         isNew52WeekLow: product.id === 'coffee'
       };
@@ -1716,6 +1737,7 @@ export function createGroceryViewApi() {
       requireKnownProduct(item.productId);
       requireOptionalPositiveFinite(item.targetPrice, 'targetPrice');
       requireScoreThreshold(item.alertDealScoreAt);
+      requireAllowedPriceTypes(item.allowedPriceTypes);
       watchlists.set(userId, [...(watchlists.get(userId) ?? []), item]);
     },
 
@@ -1724,6 +1746,7 @@ export function createGroceryViewApi() {
       requireKnownProduct(productId);
       requireOptionalPositiveFinite(patch.targetPrice, 'targetPrice');
       requireScoreThreshold(patch.alertDealScoreAt);
+      requireAllowedPriceTypes(patch.allowedPriceTypes);
       const items = watchlists.get(userId) ?? [];
       const index = items.findIndex((item) => item.productId === productId);
       if (index === -1) throw new Error(`Watchlist item not found: ${productId}`);
@@ -1733,6 +1756,7 @@ export function createGroceryViewApi() {
         ...(patch.targetPrice === undefined ? {} : { targetPrice: patch.targetPrice }),
         ...(patch.alertDealScoreAt === undefined ? {} : { alertDealScoreAt: patch.alertDealScoreAt }),
         ...(patch.favoriteStoresOnly === undefined ? {} : { favoriteStoresOnly: patch.favoriteStoresOnly }),
+        ...(patch.allowedPriceTypes === undefined ? {} : { allowedPriceTypes: patch.allowedPriceTypes }),
         productId
       };
       watchlists.set(userId, next);

@@ -65,6 +65,35 @@ describe('api contract schemas', () => {
     }
   });
 
+  it('captures watchlist price-type preferences for trusted alerts', () => {
+    assert.deepEqual(
+      apiContractSchemas.watchlist.parse({
+        id: 'watch-1',
+        userId: 'user-1',
+        productId: 'coffee'
+      }).allowedPriceTypes,
+      ['shelf']
+    );
+    assert.deepEqual(
+      apiContractSchemas.watchlist.parse({
+        id: 'watch-2',
+        userId: 'user-1',
+        productId: 'coffee',
+        allowedPriceTypes: ['shelf', 'promotion']
+      }).allowedPriceTypes,
+      ['shelf', 'promotion']
+    );
+    assert.equal(
+      apiContractSchemas.watchlist.safeParse({
+        id: 'watch-3',
+        userId: 'user-1',
+        productId: 'coffee',
+        allowedPriceTypes: ['scraped']
+      }).success,
+      false
+    );
+  });
+
   it('publishes OpenAPI-compatible component metadata for price provenance', () => {
     const price = apiContractOpenApiComponents.PriceObservation;
     assert.ok(price.required.includes('priceType'));

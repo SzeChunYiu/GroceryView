@@ -139,6 +139,37 @@ describe('buildWatchlistAlerts', () => {
       }
     ]);
   });
+
+  it('filters watchlist alerts by allowed price type before choosing the best quote', () => {
+    const alerts = buildWatchlistAlerts({
+      watchlist: [
+        { productId: 'coffee', targetPrice: 50, favoriteStoresOnly: false, allowedPriceTypes: ['shelf'] },
+        { productId: 'coffee', targetPrice: 45, favoriteStoresOnly: false, allowedPriceTypes: ['member'] },
+        { productId: 'coffee', targetPrice: 45, favoriteStoresOnly: false, allowedPriceTypes: ['estimated'] }
+      ],
+      products: [
+        {
+          productId: 'coffee',
+          productName: 'Zoégas Coffee 450g',
+          bestPrice: 39.9,
+          bestStoreId: 'willys-odenplan',
+          bestPriceType: 'member',
+          prices: [
+            { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 39.9, priceType: 'member' },
+            { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', price: 49.9, priceType: 'shelf' }
+          ],
+          dealScore: 82,
+          isNew52WeekLow: false
+        }
+      ],
+      favoriteStoreIds: []
+    });
+
+    assert.deepEqual(alerts.map((alert) => alert.trigger), [
+      { metric: 'price', value: 49.9, threshold: 50, storeId: 'coop-odenplan', storeName: 'Coop Odenplan' },
+      { metric: 'price', value: 39.9, threshold: 45, storeId: 'willys-odenplan', storeName: 'Willys Odenplan' }
+    ]);
+  });
 });
 
 describe('summarizeBudget', () => {

@@ -73,6 +73,7 @@ export const watchlistSchema = z.object({
   productId: idSchema,
   targetPrice: moneyAmountSchema.optional(),
   minimumDealScore: z.number().min(0).max(100).optional(),
+  allowedPriceTypes: z.array(priceTypeSchema).default(['shelf']),
   favoriteStoresOnly: z.boolean().default(false)
 });
 
