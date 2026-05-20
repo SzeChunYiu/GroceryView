@@ -11,8 +11,16 @@ export class ProductsController {
     return allProducts(query);
   }
 
+  @Get(':id/terminal')
+  @ApiOkResponse({ description: 'Product price terminal distribution, quote, and chart data' })
+  terminal(@Param('id') id: string, @Query('asOf') asOf?: string) {
+    const terminal = groceryApi.getProductPriceTerminal(id, { asOf });
+    if (!terminal) throw new NotFoundException('Product not found');
+    return { ...terminal, demo: true };
+  }
+
   @Get(':id')
-  @ApiOkResponse({ description: 'Product terminal data' })
+  @ApiOkResponse({ description: 'Product detail data' })
   detail(@Param('id') id: string) {
     const product = groceryApi.getProduct(id);
     if (!product) throw new NotFoundException('Product not found');
