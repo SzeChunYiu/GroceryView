@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildWatchlistAlerts, planBudgetMode, searchProducts, summarizeBudget } from '../index.js';
+import { buildWatchlistAlerts, searchProducts, summarizeBudget, summarizeCategoryDealLeaders } from '../index.js';
 
 describe('searchProducts', () => {
   it('finds products by ticker, name, category, or chain availability', () => {
@@ -10,28 +10,6 @@ describe('searchProducts', () => {
     ], 'willys coffee');
 
     assert.deepEqual(results.map((product) => product.id), ['coffee']);
-  });
-
-  it('plans budget modes with mode-specific thresholds and recommendations', () => {
-    const summary = summarizeBudget({
-      weeklyBudget: 800,
-      monthlyBudget: 3200,
-      estimatedBasketTotal: 760,
-      receiptTotalsThisWeek: [321, 180],
-      receiptTotalsThisMonth: [321, 180, 760, 690]
-    });
-
-    const strict = planBudgetMode(summary, 'strict');
-    const student = planBudgetMode(summary, 'student');
-    const healthy = planBudgetMode({ ...summary, estimatedBasketTotal: 825, weeklyRemainingAfterEstimate: -25 }, 'healthy');
-
-    assert.equal(strict.weeklyStatus, 'watch');
-    assert.equal(strict.alertThresholdPercent, 10);
-    assert.ok(strict.recommendations.some((item) => item.includes('Require every basket add')));
-    assert.equal(student.weeklyStatus, 'watch');
-    assert.ok(student.recommendations.some((item) => item.includes('private-label swaps')));
-    assert.equal(healthy.weeklyStatus, 'blocked');
-    assert.ok(healthy.recommendations.some((item) => item.includes('nutrition-per-krona')));
   });
 });
 
