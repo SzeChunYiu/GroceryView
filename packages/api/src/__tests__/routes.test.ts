@@ -106,6 +106,24 @@ describe('createGroceryViewApi', () => {
     assert.equal(api.getDealScore('missing-product'), null);
   });
 
+  it('serves product equivalents for comparison routes', () => {
+    const api = createGroceryViewApi();
+
+    assert.deepEqual(api.getProductEquivalents('milk'), [
+      {
+        productId: 'butter',
+        productName: 'Butter 600g',
+        category: 'dairy',
+        bestPrice: 54.9,
+        bestStoreId: 'coop-odenplan',
+        dealScore: 40,
+        reason: 'Same dairy category with comparable current price evidence.'
+      }
+    ]);
+    assert.deepEqual(api.getProductEquivalents('coffee'), []);
+    assert.deepEqual(api.getProductEquivalents('missing-product'), []);
+  });
+
   it('supports favorite stores, watchlist, basket, budget, and index endpoints', () => {
     const api = createGroceryViewApi();
 

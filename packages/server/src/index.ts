@@ -706,6 +706,13 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return report ? jsonResponse(report) : errorResponse(404, 'Product not found.');
       }
 
+      const productEquivalentsMatch = path.match(/^\/api\/products\/([^/]+)\/equivalents$/);
+      if (method === 'GET' && productEquivalentsMatch) {
+        const productId = decodeURIComponent(productEquivalentsMatch[1]);
+        if (!api.getProduct(productId)) return errorResponse(404, 'Product not found.');
+        return jsonResponse(api.getProductEquivalents(productId));
+      }
+
       const favoriteStoreMatch = path.match(/^\/api\/users\/([^/]+)\/favorite-stores$/);
       if (favoriteStoreMatch) {
         const routeUserId = decodeURIComponent(favoriteStoreMatch[1]);
@@ -950,6 +957,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/products/search': { get: publicOperation('Search products.') },
       '/api/products/{id}': { get: publicOperation('Get product detail.') },
       '/api/products/{id}/deal-score': { get: publicOperation('Get Deal Score v1 report with customer-facing reasons.') },
+      '/api/products/{id}/equivalents': { get: publicOperation('Get comparable products in the same category.') },
       '/api/products/{id}/prices': { get: publicOperation('Get product prices by store.') },
       '/api/products/{id}/history': { get: publicOperation('Get product price history.') },
       '/api/households/current': {
