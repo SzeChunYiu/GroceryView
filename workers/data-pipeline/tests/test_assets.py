@@ -9,6 +9,7 @@ from groceryview_data_pipeline.assets import (
     build_open_prices_ingestion_run_plan,
     build_open_prices_launch_readiness_summary,
     build_open_prices_pull_plan,
+    build_open_prices_schedule_health_plan,
     build_price_observation_mix_summary,
     build_price_observations,
     build_quality_checks,
@@ -292,6 +293,49 @@ def test_open_prices_hosted_smoke_plan_summary_counts_hosted_evidence_requiremen
         imported_terminal_product_id_present=True,
     )
     assert summarize_open_prices_hosted_smoke_plan(ready).required_action_count == 0
+
+
+def test_open_prices_schedule_health_plan_blocks_until_worker_schedules_are_observable() -> None:
+    plan = build_open_prices_schedule_health_plan(ingestion_schedule_enabled=True)
+
+    assert plan.status == "blocked"
+    assert plan.source_assets == [
+        "open_prices_ingestion_run_plan",
+        "open_prices_launch_readiness_digest",
+    ]
+    assert plan.schedule_names == [
+        "open_prices_ingestion_schedule",
+        "open_prices_import_readiness_schedule",
+    ]
+    assert plan.required_env == [
+        "DAGSTER_DEPLOYMENT_URL",
+        "OPEN_PRICES_INGESTION_SCHEDULE_ENABLED",
+        "OPEN_PRICES_IMPORT_READINESS_SCHEDULE_ENABLED",
+        "OPEN_PRICES_SCHEDULE_HEALTH_MAX_AGE_HOURS",
+    ]
+    assert plan.required_actions == [
+        "configure_dagster_deployment_url",
+        "enable_open_prices_import_readiness_schedule",
+        "publish_open_prices_schedule_health_probe",
+    ]
+    assert plan.evidence_fields == [
+        "scheduleName",
+        "cronSchedule",
+        "lastTickAt",
+        "lastRunStatus",
+        "lastRunAgeHours",
+        "nextTickAt",
+    ]
+    assert plan.to_dict()["demo"] is False
+
+    ready = build_open_prices_schedule_health_plan(
+        dagster_deployment_url_present=True,
+        ingestion_schedule_enabled=True,
+        import_readiness_schedule_enabled=True,
+        schedule_health_probe_configured=True,
+    )
+    assert ready.status == "ready"
+    assert ready.required_actions == []
 
 
 def test_open_prices_launch_readiness_rolls_up_all_open_prices_plans() -> None:

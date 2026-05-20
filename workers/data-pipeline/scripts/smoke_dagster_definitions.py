@@ -12,6 +12,7 @@ EXPECTED_ASSETS = {
     "open_prices_launch_readiness",
     "open_prices_launch_readiness_digest",
     "open_prices_real_pull_plan",
+    "open_prices_schedule_health_plan",
     "price_observation_coverage",
     "price_observation_freshness",
     "price_observation_mix",
