@@ -12,6 +12,53 @@ export type ScoreBand = {
   verdict: 'Buy now' | 'Buy' | 'Compare' | 'Normal' | 'Wait';
 };
 
+export type DealScoreSourceType = 'shelf' | 'online' | 'flyer' | 'member' | 'receipt' | 'shelf_photo' | 'manual' | 'estimated';
+
+export type HistoricalDealScorePoint = {
+  observedAt: string;
+  unitPrice: number;
+  sourceType: DealScoreSourceType;
+  confidence: number;
+};
+
+export type DealScoreReasonCode =
+  | 'low_percentile'
+  | 'below_median'
+  | 'below_30_day_low'
+  | 'near_30_day_low'
+  | 'limited_history'
+  | 'low_confidence'
+  | 'mixed_source_types'
+  | 'claimed_regular_price_unverified'
+  | 'distance_excluded'
+  | 'perishable_short_history'
+  | 'source_type_cap';
+
+export type HistoricalDealScoreInput = {
+  currentUnitPrice: number;
+  asOf: string;
+  history: HistoricalDealScorePoint[];
+  sourceType: DealScoreSourceType;
+  sourceConfidence: number;
+  claimedRegularUnitPrice?: number;
+  distanceKm?: number;
+  perishableShortLife?: boolean;
+};
+
+export type HistoricalDealScore = {
+  score: number;
+  band: ScoreBand;
+  currentPercentile: number;
+  medianUnitPrice: number;
+  medianDiscountPercent: number;
+  observedThirtyDayLow?: number;
+  thirtyDayLowDiscountPercent?: number;
+  observationCount: number;
+  cappedAt?: number;
+  reasons: DealScoreReasonCode[];
+  warnings: DealScoreReasonCode[];
+};
+
 const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
 const roundMoney = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
 const formatSek = (value: number): string => `${value.toFixed(2)} SEK`;
@@ -47,6 +94,113 @@ export function scoreBand(score: number): ScoreBand {
   if (normalized >= 60) return { label: 'Fair deal', verdict: 'Compare' };
   if (normalized >= 40) return { label: 'Normal price', verdict: 'Normal' };
   return { label: 'Not a real deal', verdict: 'Wait' };
+}
+
+export function calculateHistoricalDealScore(input: HistoricalDealScoreInput): HistoricalDealScore {
+  if (input.currentUnitPrice < 0) throw new Error('Current unit price must be non-negative.');
+  const asOf = Date.parse(input.asOf);
+  if (Number.isNaN(asOf)) throw new Error('asOf must be an ISO date.');
+
+  const parsedHistory = input.history
+    .map((point) => ({ ...point, observedAtMs: Date.parse(point.observedAt) }))
+    .filter((point) => !Number.isNaN(point.observedAtMs) && point.observedAtMs <= asOf)
+    .sort((a, b) => a.observedAtMs - b.observedAtMs);
+  if (parsedHistory.length === 0) throw new Error('At least one historical unit-price point is required.');
+  if (parsedHistory.some((point) => point.unitPrice < 0)) throw new Error('Historical unit prices must be non-negative.');
+
+  const reasons = new Set<DealScoreReasonCode>();
+  const warnings = new Set<DealScoreReasonCode>();
+  const historyPrices = parsedHistory.map((point) => point.unitPrice);
+  const medianUnitPrice = median(historyPrices);
+  const percentilePrices = [...historyPrices, input.currentUnitPrice].sort((a, b) => a - b);
+  let rank = 0;
+  for (let index = 0; index < percentilePrices.length; index += 1) {
+    if (percentilePrices[index] <= input.currentUnitPrice) rank = index;
+  }
+  const currentPercentile = percentilePrices.length === 1 ? 0 : Math.round((rank / (percentilePrices.length - 1)) * 100);
+  const medianDiscountPercent = medianUnitPrice > 0
+    ? roundMoney(((medianUnitPrice - input.currentUnitPrice) / medianUnitPrice) * 100)
+    : 0;
+
+  const thirtyDayStart = asOf - 30 * 24 * 60 * 60 * 1000;
+  const thirtyDayPrices = parsedHistory
+    .filter((point) => point.observedAtMs >= thirtyDayStart)
+    .map((point) => point.unitPrice);
+  const observedThirtyDayLow = thirtyDayPrices.length === 0 ? undefined : roundMoney(Math.min(...thirtyDayPrices));
+  const thirtyDayLowDiscountPercent = observedThirtyDayLow === undefined || observedThirtyDayLow <= 0
+    ? undefined
+    : roundMoney(((observedThirtyDayLow - input.currentUnitPrice) / observedThirtyDayLow) * 100);
+
+  if (currentPercentile <= 20) reasons.add('low_percentile');
+  if (medianDiscountPercent >= 5) reasons.add('below_median');
+  if (observedThirtyDayLow !== undefined && input.currentUnitPrice <= observedThirtyDayLow) reasons.add('below_30_day_low');
+  if (observedThirtyDayLow !== undefined && input.currentUnitPrice > observedThirtyDayLow && input.currentUnitPrice <= observedThirtyDayLow * 1.03) reasons.add('near_30_day_low');
+  if (input.distanceKm !== undefined) reasons.add('distance_excluded');
+  if (input.perishableShortLife) reasons.add('perishable_short_history');
+
+  const sourceTypes = new Set(parsedHistory.map((point) => point.sourceType));
+  let cap = 100;
+  if (parsedHistory.length < 3 && !input.perishableShortLife) {
+    cap = Math.min(cap, 60);
+    warnings.add('limited_history');
+  }
+  if (input.sourceConfidence < 0.5) {
+    cap = Math.min(cap, 50);
+    warnings.add('low_confidence');
+  }
+  if (sourceTypes.size > 1) {
+    cap = Math.min(cap, 70);
+    warnings.add('mixed_source_types');
+  }
+  if (input.sourceType === 'estimated' || input.sourceType === 'manual') {
+    cap = Math.min(cap, 60);
+    warnings.add('source_type_cap');
+  }
+  if (
+    input.claimedRegularUnitPrice !== undefined &&
+    observedThirtyDayLow !== undefined &&
+    input.claimedRegularUnitPrice > observedThirtyDayLow
+  ) {
+    cap = Math.min(cap, 70);
+    warnings.add('claimed_regular_price_unverified');
+  }
+
+  const percentileStrength = 100 - currentPercentile;
+  const medianDiscountStrength = clamp(medianDiscountPercent * 3, 0, 100);
+  const thirtyDayStrength = observedThirtyDayLow === undefined
+    ? 0
+    : input.currentUnitPrice <= observedThirtyDayLow
+      ? 100
+      : input.currentUnitPrice <= observedThirtyDayLow * 1.03 ? 70 : 0;
+  const sourceQuality = clamp(input.sourceConfidence, 0, 1) * 70 + Math.min(1, parsedHistory.length / 5) * 30;
+  const rawScore = Math.round(
+    percentileStrength * 0.35 +
+      medianDiscountStrength * 0.25 +
+      thirtyDayStrength * 0.2 +
+      sourceQuality * 0.2
+  );
+  const score = Math.min(rawScore, cap);
+
+  return {
+    score,
+    band: scoreBand(score),
+    currentPercentile,
+    medianUnitPrice: roundMoney(medianUnitPrice),
+    medianDiscountPercent,
+    observedThirtyDayLow,
+    thirtyDayLowDiscountPercent,
+    observationCount: parsedHistory.length,
+    cappedAt: cap < rawScore ? cap : undefined,
+    reasons: [...reasons],
+    warnings: [...warnings]
+  };
+}
+
+function median(values: number[]): number {
+  const sorted = [...values].sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 1) return sorted[middle];
+  return (sorted[middle - 1] + sorted[middle]) / 2;
 }
 
 export type DealOpportunityInput = {
