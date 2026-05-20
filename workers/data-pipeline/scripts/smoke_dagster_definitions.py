@@ -1,0 +1,55 @@
+from __future__ import annotations
+
+import sys
+
+EXPECTED_ASSETS = {
+    "latest_price_rollup",
+    "normalized_products",
+    "price_observations",
+    "quality_checks",
+    "retailer_fetch_stubs",
+    "seed_products",
+    "seed_stores",
+}
+
+
+def asset_names() -> set[str]:
+    try:
+        from groceryview_data_pipeline.definitions import defs
+    except ModuleNotFoundError as exc:
+        if exc.name == "dagster":
+            raise RuntimeError(
+                "Dagster is not installed. Run `pip install -e .[dev]` from "
+                "workers/data-pipeline before this smoke check."
+            ) from exc
+        raise
+
+    if hasattr(defs, "resolve_asset_graph"):
+        asset_graph = defs.resolve_asset_graph()
+    else:
+        asset_graph = defs.get_asset_graph()
+
+    return {key.to_user_string() for key in asset_graph.get_all_asset_keys()}
+
+
+def main() -> int:
+    names = asset_names()
+    missing = sorted(EXPECTED_ASSETS - names)
+    unexpected = sorted(names - EXPECTED_ASSETS)
+
+    if missing or unexpected:
+        if missing:
+            print(f"Missing assets: {', '.join(missing)}", file=sys.stderr)
+        if unexpected:
+            print(f"Unexpected assets: {', '.join(unexpected)}", file=sys.stderr)
+        return 1
+
+    print("Dagster definitions loaded.")
+    print("Assets:")
+    for name in sorted(names):
+        print(f"- {name}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

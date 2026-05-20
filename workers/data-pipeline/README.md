@@ -1,24 +1,41 @@
-# GroceryView Data Pipeline
+# GroceryView data pipeline
 
-This worker package contains the first Dagster-compatible data-pipeline slice for GroceryView. It intentionally uses checked-in retailer stubs only; there is no live scraping or retailer HTTP traffic.
+Dagster scaffold for the GroceryView data-worker lane.
 
-Pipeline assets:
+## What ships here
 
-- `stores` and `products`: seed Stockholm store and hero product records.
-- `raw_retailer_records`: deterministic retailer fixture records with parser provenance.
-- `price_observations`: normalized immutable price facts with `price_type`, `confidence`, `observed_at`, `source_type`, `source_url`, and provenance.
-- `latest_prices`: rollup keyed by product, chain, store, and price type.
-- `quality_checks`: checks seed references, parser provenance, and rollup coverage.
+- Stockholm store and product seed assets.
+- Stubbed retailer fetch assets with explicit provenance.
+- Normalization, price-observation, latest-price rollup, and quality-check assets.
+- A `dagster dev` entrypoint that boots the local webserver.
+- Deterministic seed/order behavior so local materializations are reproducible.
 
-Run the pure unit tests without Dagster:
+## Run locally
 
-```sh
-PYTHONPATH=. python -m unittest discover -s tests
-```
-
-With Dagster installed, list or serve assets from this module:
-
-```sh
-dagster asset list -m groceryview_data_pipeline.definitions
+```bash
+cd workers/data-pipeline
+python3 -m venv .venv
+. .venv/bin/activate
+scripts/verify_dagster_definitions.sh
 dagster dev -m groceryview_data_pipeline.definitions
 ```
+
+Example Dagster assets in this lane:
+- `seed_stores`
+- `seed_products`
+- `retailer_fetch_stubs`
+- `normalized_products`
+- `price_observations`
+- `latest_price_rollup`
+- `quality_checks`
+
+## Tests
+
+```bash
+pytest
+```
+
+`scripts/verify_dagster_definitions.sh` is the CI-safe definitions load test.
+It installs the worker package, imports `groceryview_data_pipeline.definitions`,
+lists the seven expected assets, and exits nonzero if Dagster cannot load the
+module.
