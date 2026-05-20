@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { listLocalSmokeEnvOverrideNames, localSmokeEnvOverrides } from '../index.js';
 
 const compose = readFileSync(new URL('../../../../infra/docker-compose.yml', import.meta.url), 'utf8');
 const envExample = readFileSync(new URL('../../../../.env.example', import.meta.url), 'utf8');
@@ -46,6 +47,27 @@ describe('local infrastructure compose', () => {
     assert.match(smokeScript, /docker inspect[\s\S]*health=/);
     assert.match(smokeScript, /compose logs --no-color --tail=120 "\$service"/);
     assert.match(smokeScript, /"\$POSTGRES_SERVICE" "\$REDIS_SERVICE" "\$OBJECT_STORAGE_SERVICE" "\$OBJECT_STORAGE_INIT_SERVICE"/);
+  });
+
+  it('publishes every supported smoke environment override for operators', () => {
+    assert.deepEqual(listLocalSmokeEnvOverrideNames(), [
+      'COMPOSE_FILE',
+      'POSTGRES_SERVICE',
+      'REDIS_SERVICE',
+      'OBJECT_STORAGE_SERVICE',
+      'OBJECT_STORAGE_INIT_SERVICE',
+      'POSTGRES_DB',
+      'POSTGRES_USER',
+      'S3_BUCKET',
+      'WAIT_SECONDS'
+    ]);
+
+    for (const override of localSmokeEnvOverrides) {
+      assert.match(smokeScript, new RegExp(`${override.name}="\\$\\{${override.name}:-`));
+      assert.match(infraReadme, new RegExp(`\\| \`${override.name}\` \\|`));
+      assert.ok(override.defaultValue.length > 0);
+      assert.ok(override.purpose.length > 20);
+    }
   });
 
   it('runs the local services smoke check in CI for infra changes', () => {
