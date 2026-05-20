@@ -1,9 +1,18 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createGroceryViewApi } from '@groceryview/api';
 import { parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
+import {
+  checkPostgresIntegrationReadiness,
+  createPgQueryExecutor,
+  createPostgresRepository,
+  type PgLikeClient,
+  type PostgresIntegrationReadinessReport,
+  type QueryExecutor
+} from '@groceryview/db';
 import {
   buildSubscriptionAccessPolicy,
   processBillingSubscriptionEvent,
@@ -54,6 +63,7 @@ export type AuthOptions = {
   };
   notificationMetricsToken?: string;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
+  postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
 };
 
 export type SubscriptionEntitlementLookupRecord = SubscriptionEntitlementSnapshot & {
@@ -71,14 +81,23 @@ export type RuntimePersistenceRepository = {
   upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
 };
 
+export type RuntimePgPool = PgLikeClient & {
+  end(): Promise<void> | void;
+};
+
+export type RuntimePgPoolFactory = (databaseUrl: string) => RuntimePgPool;
+
 export type RuntimeHandlerOptions = {
   now?: Date;
   repository?: RuntimePersistenceRepository;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
+  postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
+  pgPoolFactory?: RuntimePgPoolFactory;
 };
 
 type JsonRecord = Record<string, unknown>;
 
+const require = createRequire(import.meta.url);
 const jsonHeaders = { 'content-type': 'application/json; charset=utf-8' };
 
 function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
@@ -349,6 +368,29 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           formatNotificationOperationsMetrics(await authOptions.notificationMetricsProvider(), { service: 'groceryview-server' }),
           { status: 200, headers: { 'content-type': 'text/plain; version=0.0.4; charset=utf-8' } }
         );
+      }
+
+      if (method === 'GET' && path === '/api/readiness/postgres') {
+        if (!authOptions.notificationMetricsToken) return errorResponse(503, 'PostgreSQL readiness token is not configured.');
+        if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
+          return errorResponse(401, 'A valid PostgreSQL readiness token is required.');
+        }
+        if (!authOptions.postgresReadinessProvider) return errorResponse(503, 'PostgreSQL readiness provider is not configured.');
+
+        try {
+          const report = await authOptions.postgresReadinessProvider();
+          return jsonResponse(report, { status: report.status === 'ready' ? 200 : 503 });
+        } catch {
+          return jsonResponse(
+            {
+              status: 'blocked',
+              blockers: ['postgres_readiness_probe_failed'],
+              evidence: [],
+              summary: 'PostgreSQL integration contract is blocked.'
+            },
+            { status: 503 }
+          );
+        }
       }
 
       if (method === 'GET' && path === '/api/human-review/assignments') {
@@ -662,6 +704,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/human-review/assignments': { get: protectedOperation('List open human-review assignments and SLA status.') },
       '/api/human-review/assignments/{id}/decisions': { post: protectedOperation('Record a human-review decision.') },
       '/api/metrics/notifications': { get: metricsOperation('Export notification operations metrics.') },
+      '/api/readiness/postgres': { get: metricsOperation('Check PostgreSQL schema and migration readiness without exposing database secrets.') },
       '/api/notifications/suppression-events': { post: webhookOperation('Accept signed notification suppression provider events.') }
     }
   };
@@ -711,8 +754,19 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     notificationWebhookSecret: config.notificationWebhookSecret,
     billingWebhookSecret: config.billingWebhookSecret,
     notificationMetricsToken: config.metricsToken,
-    notificationMetricsProvider: options.notificationMetricsProvider
+    notificationMetricsProvider: options.notificationMetricsProvider,
+    postgresReadinessProvider: options.postgresReadinessProvider
   };
+}
+
+function createDefaultPgPool(databaseUrl: string): RuntimePgPool {
+  const pg = require('pg') as { Pool?: new (config: { connectionString: string }) => RuntimePgPool };
+  if (!pg.Pool) throw new Error('pg Pool export is not available.');
+  return new pg.Pool({ connectionString: databaseUrl });
+}
+
+function noopClose(): Promise<void> {
+  return Promise.resolve();
 }
 
 export function buildRepositoryBackedAuthOptions(
@@ -743,20 +797,73 @@ export function buildRuntimeRequestAuthOptions(config: RuntimeConfig, options: R
   return options.repository ? buildRepositoryBackedAuthOptions(config, options.repository, options) : buildRuntimeAuthOptions(config, options);
 }
 
+function createRuntimeRepositoryResource(config: RuntimeConfig, options: RuntimeHandlerOptions): {
+  repository?: RuntimePersistenceRepository;
+  postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
+  close(): Promise<void>;
+} {
+  if (options.repository || !config.databaseUrl) return { close: noopClose };
+
+  const pool = (options.pgPoolFactory ?? createDefaultPgPool)(config.databaseUrl);
+  const executor: QueryExecutor = createPgQueryExecutor(pool);
+  return {
+    repository: createPostgresRepository(executor),
+    postgresReadinessProvider: () => checkPostgresIntegrationReadiness({ executor, repositoryProbes: [] }),
+    async close() {
+      await pool.end();
+    }
+  };
+}
+
+function createRuntimeHttpServiceFromConfig(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): RuntimeHttpService {
+  const resource = createRuntimeRepositoryResource(config, options);
+  const runtimeOptions: RuntimeHandlerOptions = {
+    ...options,
+    ...(resource.repository ? { repository: resource.repository } : {}),
+    postgresReadinessProvider: options.postgresReadinessProvider ?? resource.postgresReadinessProvider
+  };
+  const authOptions = buildRuntimeRequestAuthOptions(config, runtimeOptions);
+  return {
+    handler: createHttpHandler(undefined, authOptions),
+    close: resource.close
+  };
+}
+
+export type RuntimeHttpService = {
+  handler: HttpHandler;
+  close(): Promise<void>;
+};
+
+export function createRuntimeHttpService(
+  env: Record<string, string | undefined> = process.env,
+  options: RuntimeHandlerOptions = {}
+): RuntimeHttpService {
+  return createRuntimeHttpServiceFromConfig(loadRuntimeConfig(env), options);
+}
+
 export function createRuntimeHttpHandler(
   env: Record<string, string | undefined> = process.env,
   options: RuntimeHandlerOptions = {}
 ): HttpHandler {
-  return createHttpHandler(undefined, buildRuntimeRequestAuthOptions(loadRuntimeConfig(env), options));
+  return createRuntimeHttpService(env, options).handler;
 }
 
 export function createRuntimeNodeServer(env: Record<string, string | undefined> = process.env, options: RuntimeHandlerOptions = {}) {
-  return createNodeServer(createRuntimeHttpHandler(env, options));
+  const service = createRuntimeHttpService(env, options);
+  const server = createNodeServer(service.handler);
+  server.on('close', () => {
+    void service.close();
+  });
+  return server;
 }
 
 export function startNodeServerFromEnv(env: Record<string, string | undefined> = process.env, options: RuntimeHandlerOptions = {}) {
   const config = loadRuntimeConfig(env);
-  const server = createNodeServer(createHttpHandler(undefined, buildRuntimeRequestAuthOptions(config, options)));
+  const service = createRuntimeHttpServiceFromConfig(config, options);
+  const server = createNodeServer(service.handler);
+  server.on('close', () => {
+    void service.close();
+  });
   server.listen(config.port);
   return server;
 }
