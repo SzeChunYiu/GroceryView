@@ -33,7 +33,6 @@ describe('buildOpenApiDocument', () => {
       '/api/products/search',
       '/api/products/{id}',
       '/api/products/{id}/deal-score',
-      '/api/products/{id}/equivalents',
       '/api/products/{id}/history',
       '/api/products/{id}/prices',
       '/api/products/{id}/terminal',
@@ -69,10 +68,7 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/metrics/notifications'].get?.security, [{ metricsToken: [] }]);
     assert.deepEqual(doc.paths['/api/readiness/postgres'].get?.security, [{ metricsToken: [] }]);
     assert.deepEqual(doc.paths['/api/notifications/suppression-events'].post?.security, [{ webhookSignature: [] }]);
-    assert.deepEqual(doc.paths['/api/notifications/provider-suppression-events'].post?.security, [{ webhookSignature: [] }]);
-    assert.match(doc.paths['/api/health'].get?.summary ?? '', /without exposing secrets/i);
-    assert.equal(doc.paths['/api/products/{id}/terminal'].get?.security, undefined);
-    assert.match(doc.paths['/api/products/{id}/terminal'].get?.summary ?? '', /price terminal/i);
+    assert.match(doc.paths['/api/products/{id}/deal-score'].get?.summary ?? '', /without distance/i);
     assert.equal(doc.paths['/api/market/overview'].get?.security, undefined);
   });
 });

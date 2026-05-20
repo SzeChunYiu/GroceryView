@@ -756,6 +756,12 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return jsonResponse(api.getProductPrices(productId));
       }
 
+      const productDealScoreMatch = path.match(/^\/api\/products\/([^/]+)\/deal-score$/);
+      if (method === 'GET' && productDealScoreMatch) {
+        const dealScore = api.getProductDealScore(decodeURIComponent(productDealScoreMatch[1]));
+        return dealScore ? jsonResponse(dealScore) : errorResponse(404, 'Product not found.');
+      }
+
       const productHistoryMatch = path.match(/^\/api\/products\/([^/]+)\/history$/);
       if (method === 'GET' && productHistoryMatch) {
         const productId = decodeURIComponent(productHistoryMatch[1]);
@@ -1089,8 +1095,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/stores/{id}/deals': { get: publicOperation('Get ranked in-store deals for one store.') },
       '/api/products/search': { get: publicOperation('Search products.') },
       '/api/products/{id}': { get: publicOperation('Get product detail.') },
-      '/api/products/{id}/deal-score': { get: publicOperation('Get Deal Score v1 report with customer-facing reasons.') },
-      '/api/products/{id}/equivalents': { get: publicOperation('Get comparable products in the same category.') },
+      '/api/products/{id}/deal-score': { get: publicOperation('Get product Deal Score without distance as a ranking factor.') },
       '/api/products/{id}/prices': { get: publicOperation('Get product prices by store.') },
       '/api/products/{id}/history': { get: publicOperation('Get product price history.') },
       '/api/products/{id}/terminal': { get: publicOperation('Get product price terminal distribution, quote, and chart data.') },
