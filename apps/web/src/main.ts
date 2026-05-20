@@ -61,6 +61,12 @@ const priceConfidenceRows = [
   { label: 'Low confidence', source: 'OCR or match uncertainty', dealScore: 'Ineligible', decision: 'Route to review' }
 ];
 
+const priceAnomalyRows = [
+  { product: 'Butter 600g', store: 'Coop Farsta', signal: '42% overnight spike', evidence: 'Parser changed package size', decision: 'Hold from Deal Score' },
+  { product: 'Eggs 12-pack', store: 'Lidl Sveavägen', signal: '18% price drop', evidence: 'Fresh retailer page', decision: 'Allow alert' },
+  { product: 'Tomatoes kg', store: 'Willys Odenplan', signal: 'Missing unit price', evidence: 'Low-confidence OCR', decision: 'Route to review' }
+];
+
 const dailyDealActions = [
   { product: 'Zoégas Coffee 450g', store: 'Willys Odenplan', score: 82, confidence: 'Verified shelf', action: 'Buy two for this week' },
   { product: 'Eggs 12-pack', store: 'Lidl Sveavägen', score: 76, confidence: 'Retailer page', action: 'Add to split basket' },
@@ -1340,6 +1346,16 @@ app.innerHTML = `
           <thead><tr><th>Label</th><th>Source</th><th>Deal Score</th><th>Decision</th></tr></thead>
           <tbody>
             ${priceConfidenceRows.map((row) => `<tr><td>${row.label}</td><td>${row.source}</td><td>${row.dealScore}</td><td>${row.decision}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Price anomaly review</h2>
+        <p class="lede"><a href="/prices/anomalies/">Open price anomalies</a> to quarantine spikes, drops, and parser outliers before alerts or Deal Score update.</p>
+        <table class="table">
+          <thead><tr><th>Product</th><th>Store</th><th>Signal</th><th>Evidence</th><th>Decision</th></tr></thead>
+          <tbody>
+            ${priceAnomalyRows.map((row) => `<tr><td>${row.product}</td><td>${row.store}</td><td>${row.signal}</td><td>${row.evidence}</td><td><span class="status">${row.decision}</span></td></tr>`).join('')}
           </tbody>
         </table>
       </div>
