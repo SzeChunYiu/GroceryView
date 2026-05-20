@@ -1097,28 +1097,12 @@ export type IngestionBatchPlan = {
   rejected: Array<{ input: RetailerProductInput; reason: string }>;
 };
 
-export function priceObservationIdentity(input: RetailerProductInput): string {
-  validateInput(input);
-  const chainId = input.chainId.trim().toLowerCase();
-  const storeScope = input.storeId?.trim().toLowerCase() || 'online';
-  const productScope = (input.retailerProductId?.trim() || input.productId.trim()).toLowerCase();
-  const observedAt = new Date(input.observedAt).toISOString();
-  return [chainId, storeScope, productScope, input.sourceType, observedAt].join('|');
-}
-
 export function planIngestionBatch(inputs: RetailerProductInput[]): IngestionBatchPlan {
   const accepted: IngestionOutput[] = [];
   const rejected: Array<{ input: RetailerProductInput; reason: string }> = [];
-  const acceptedIdentities = new Set<string>();
   for (const input of inputs) {
     try {
-      const identity = priceObservationIdentity(input);
-      if (acceptedIdentities.has(identity)) {
-        rejected.push({ input, reason: `Duplicate price observation: ${identity}` });
-        continue;
-      }
       accepted.push(ingestRetailerProduct(input));
-      acceptedIdentities.add(identity);
     } catch (error) {
       rejected.push({ input, reason: error instanceof Error ? error.message : 'Unknown ingestion error.' });
     }

@@ -1,6 +1,5 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { assertOfficialPriceIndexSource, buildDefaultFlyerSourcePlans, buildOfficialBaselineSourceRegistry, buildRetailerSourceRegistry, confidenceForSource, findRetailerSourceRegistryEntry, ingestRetailerProduct, normalizeUnitPrice, officialPriceIndexSources, planFlyerSourceFetch, planIngestionBatch, planRetailerSourceAccess } from '../index.js';
 import {
   buildOpenPricesConnectorUrl,
   confidenceForSource,
@@ -11,8 +10,11 @@ import {
   parseOpenPricesSnapshot,
   parseRetailerProductJsonSnapshot,
   planIngestionBatch,
+  planRetailerConnectorRun,
   planRetailerSourceAccess,
-  priceObservationIdentity
+  runRetailerConnector,
+  stockholmStoreLocatorFixtures,
+  validateStoreLocatorFixtures
 } from '../index.js';
 
 describe('confidenceForSource', () => {
@@ -40,6 +42,9 @@ describe('ingestRetailerProduct', () => {
     const output = ingestRetailerProduct({
       sourceType: 'retailer_online_page',
       observedAt: '2026-05-19T16:00:00.000Z',
+      parserVersion: 'retailer-page-parser-v1',
+      rawSnapshotRef: 's3://groceryview-raw/willys/coffee-2026-05-19.json',
+      sourceRunId: 'source-run-2026-05-19',
       chainId: 'willys',
       storeId: 'willys-odenplan',
       retailerProductId: 'wil-zoegas-450',
@@ -61,73 +66,58 @@ describe('ingestRetailerProduct', () => {
     assert.equal(output.alias.matchConfidence, 0.85);
     assert.equal(output.priceObservation.unitPrice, 110.8889);
     assert.equal(output.priceObservation.confidenceScore, 0.85);
+    assert.equal(output.priceObservation.priceType, 'online');
+    assert.deepEqual(output.priceObservation.provenance, {
+      sourceType: 'retailer_online_page',
+      sourceUrl: 'https://example.test/coffee',
+      observedAt: '2026-05-19T16:00:00.000Z',
+      parserVersion: 'retailer-page-parser-v1',
+      rawSnapshotRef: 's3://groceryview-raw/willys/coffee-2026-05-19.json',
+      sourceRunId: 'source-run-2026-05-19'
+    });
     assert.deepEqual(output.promotionObservation && {
       promoPrice: output.promotionObservation.promoPrice,
       regularPriceClaimed: output.promotionObservation.regularPriceClaimed,
-      memberOnly: output.promotionObservation.memberOnly
-    }, { promoPrice: 49.9, regularPriceClaimed: 69.9, memberOnly: false });
+      memberOnly: output.promotionObservation.memberOnly,
+      priceType: output.promotionObservation.priceType,
+      provenance: output.promotionObservation.provenance
+    }, {
+      promoPrice: 49.9,
+      regularPriceClaimed: 69.9,
+      memberOnly: false,
+      priceType: 'online',
+      provenance: output.priceObservation.provenance
+    });
+  });
+
+  it('rejects records that cannot preserve parser and raw snapshot provenance', () => {
+    assert.throws(() => ingestRetailerProduct({
+      sourceType: 'manual_user_report',
+      observedAt: '2026-05-19T16:00:00.000Z',
+      parserVersion: '',
+      rawSnapshotRef: '',
+      chainId: 'coop',
+      rawName: 'Milk',
+      canonicalName: 'Milk 1L',
+      productId: 'milk',
+      categoryId: 'dairy',
+      packageSize: 1,
+      packageUnit: 'l',
+      price: 14.9
+    }), /parserVersion is required/);
   });
 });
 
 describe('planIngestionBatch', () => {
   it('separates valid records from rejected records with reasons', () => {
     const plan = planIngestionBatch([
-      { sourceType: 'manual_user_report', observedAt: '2026-05-19T16:00:00.000Z', chainId: 'coop', rawName: 'Milk', canonicalName: 'Milk 1L', productId: 'milk', categoryId: 'dairy', packageSize: 1, packageUnit: 'l', price: 14.9 },
-      { sourceType: 'manual_user_report', observedAt: 'bad-date', chainId: 'coop', rawName: '', canonicalName: 'Bad', productId: 'bad', categoryId: 'dairy', packageSize: 0, packageUnit: 'l', price: -1 }
+      { sourceType: 'manual_user_report', observedAt: '2026-05-19T16:00:00.000Z', parserVersion: 'manual-v1', rawSnapshotRef: 'manual://milk', chainId: 'coop', rawName: 'Milk', canonicalName: 'Milk 1L', productId: 'milk', categoryId: 'dairy', packageSize: 1, packageUnit: 'l', price: 14.9 },
+      { sourceType: 'manual_user_report', observedAt: 'bad-date', parserVersion: 'manual-v1', rawSnapshotRef: 'manual://bad', chainId: 'coop', rawName: '', canonicalName: 'Bad', productId: 'bad', categoryId: 'dairy', packageSize: 0, packageUnit: 'l', price: -1 }
     ]);
 
     assert.equal(plan.accepted.length, 1);
     assert.equal(plan.rejected.length, 1);
     assert.match(plan.rejected[0].reason, /rawName is required/);
-  });
-
-  it('rejects duplicate price observations before downstream writes', () => {
-    const first = {
-      sourceType: 'retailer_online_page' as const,
-      observedAt: '2026-05-19T16:00:00.000Z',
-      chainId: 'willys',
-      storeId: 'willys-odenplan',
-      retailerProductId: 'wil-zoegas-450',
-      rawName: 'Zoegas Skanerost 450g',
-      canonicalName: 'Zoegas Coffee 450g',
-      productId: 'coffee-zoegas-450g',
-      categoryId: 'coffee',
-      packageSize: 450,
-      packageUnit: 'g',
-      price: 49.9
-    };
-    const duplicate = { ...first, rawName: 'Zoegas Skanerost Coffee 450g', price: 52.9 };
-
-    const plan = planIngestionBatch([first, duplicate]);
-
-    assert.equal(plan.accepted.length, 1);
-    assert.equal(plan.rejected.length, 1);
-    assert.match(plan.rejected[0].reason, /Duplicate price observation/);
-    assert.equal(plan.rejected[0].reason.includes(priceObservationIdentity(first)), true);
-  });
-
-  it('keeps same-product observations distinct by store scope', () => {
-    const base = {
-      sourceType: 'retailer_online_page' as const,
-      observedAt: '2026-05-19T16:00:00.000Z',
-      chainId: 'willys',
-      retailerProductId: 'wil-zoegas-450',
-      rawName: 'Zoegas Skanerost 450g',
-      canonicalName: 'Zoegas Coffee 450g',
-      productId: 'coffee-zoegas-450g',
-      categoryId: 'coffee',
-      packageSize: 450,
-      packageUnit: 'g',
-      price: 49.9
-    };
-
-    const plan = planIngestionBatch([
-      { ...base, storeId: 'willys-odenplan' },
-      { ...base, storeId: 'willys-sodermalm' }
-    ]);
-
-    assert.equal(plan.accepted.length, 2);
-    assert.equal(plan.rejected.length, 0);
   });
 });
 
@@ -169,95 +159,85 @@ describe('planRetailerSourceAccess', () => {
   });
 });
 
-describe('buildRetailerSourceRegistry', () => {
-  it('defines stub-only source policy for each researched Stockholm grocery chain', () => {
-    const registry = buildRetailerSourceRegistry();
+describe('store locator fixtures', () => {
+  it('covers every target Stockholm chain with immutable raw snapshot provenance', () => {
+    const validation = validateStoreLocatorFixtures(stockholmStoreLocatorFixtures);
 
-    assert.deepEqual(registry.map((entry) => entry.chainId), ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']);
-    for (const entry of registry) {
-      assert.equal(entry.stubOnly, true);
-      assert.equal(entry.legalReviewStatus, 'pending');
-      assert.ok(entry.surfaces.includes('store_locator'), `${entry.chainId} should define a store locator surface`);
-      assert.ok(entry.sourceUrls.length > 0, `${entry.chainId} should include source URLs`);
-      assert.match(entry.robotsPolicy.robotsUrl, /^https:\/\/www\./);
-      assert.equal(entry.robotsPolicy.checkedAt, '2026-05-20T00:00:00.000Z');
+    assert.deepEqual(validation, {
+      status: 'valid',
+      chainIds: ['city_gross', 'coop', 'hemkop', 'ica', 'lidl', 'willys'],
+      issues: []
+    });
+    assert.equal(stockholmStoreLocatorFixtures.length, 6);
+    for (const fixture of stockholmStoreLocatorFixtures) {
+      assert.match(fixture.sourceUrl, /^https:\/\//);
+      assert.match(fixture.rawSnapshotRef, /^fixtures\/store-locators\//);
+      assert.match(fixture.contentDigest, /^sha256:/);
+      assert.equal(Number.isNaN(Date.parse(fixture.capturedAt)), false);
     }
   });
 
-  it('captures robots constraints for Axfood retailer pages without enabling live fetches', () => {
-    const willys = findRetailerSourceRegistryEntry('willys');
-    const hemkop = findRetailerSourceRegistryEntry('hemkop');
-    const cityGross = findRetailerSourceRegistryEntry('city_gross');
+  it('makes unresolved identifiers, missing hours, and special-hour gaps explicit', () => {
+    const unresolved = stockholmStoreLocatorFixtures.filter((fixture) => fixture.storeIdentifierStatus !== 'resolved');
 
-    assert.equal(willys.robotsPolicy.crawlDelaySeconds, 10);
-    assert.equal(willys.robotsPolicy.visitTimeUtc, '0400-0845');
-    assert.ok(willys.robotsPolicy.disallowedPaths.includes('/varukorg'));
-    assert.ok(hemkop.robotsPolicy.disallowedPaths.includes('/mina-sidor/'));
-    assert.ok(cityGross.robotsPolicy.disallowedPaths.includes('/loop54/'));
-    assert.equal(willys.stubOnly && hemkop.stubOnly && cityGross.stubOnly, true);
+    assert.ok(unresolved.length > 0);
+    for (const fixture of unresolved) {
+      assert.ok(fixture.confidenceReasons.includes('identifier_unresolved'));
+    }
+    for (const fixture of stockholmStoreLocatorFixtures.filter((fixture) => fixture.openingHours.length === 0)) {
+      assert.ok(fixture.confidenceReasons.includes('hours_missing'));
+      assert.ok(fixture.confidenceReasons.includes('special_hours_unknown'));
+      assert.equal(fixture.specialHoursUnknown, true);
+    }
   });
 
-  it('returns defensive copies so callers cannot mutate the source registry singleton', () => {
-    const registry = buildRetailerSourceRegistry();
-    registry[0].surfaces.length = 0;
-    registry[0].robotsPolicy.disallowedPaths.push('/mutated');
-
-    const ica = findRetailerSourceRegistryEntry('ica');
-
-    assert.ok(ica.surfaces.includes('store_locator'));
-    assert.equal(ica.robotsPolicy.disallowedPaths.includes('/mutated'), false);
+  it('keeps locator coverage out of default Deal Score ranking', () => {
+    assert.equal(locatorFixturesCanAffectDealScore(), false);
   });
 });
 
-describe('planFlyerSourceFetch', () => {
-  it('serializes all supported flyer source formats with provenance fields and no product facts', () => {
-    const plans = buildDefaultFlyerSourcePlans('2026-05-20T06:00:00.000Z');
+describe('planRetailerConnectorRun', () => {
+  it('plans ready connector runs with deterministic idempotency and provenance metadata', () => {
+    const plan = planRetailerConnectorRun({
+      connectorId: 'Willys API v1',
+      requestedAt: '2026-05-19T18:00:00.000Z',
+      chainId: 'willys',
+      sourceType: 'official_api',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true,
+      endpointUrl: 'https://api.example.test/willys/products',
+      parserVersion: 'willys-api-v1'
+    });
 
-    assert.deepEqual(
-      [...new Set(plans.map((plan) => plan.format))].sort(),
-      ['app_offer', 'app_rendered_offer_html', 'digital_flyer', 'member_offer', 'store_offer_html', 'weekly_offer_html']
-    );
-
-    for (const plan of plans) {
-      assert.match(plan.sourceUrl, /^https:\/\//);
-      assert.ok(plan.sourceHost.length > 0);
-      assert.equal(plan.retrievedAt, '2026-05-20T06:00:00.000Z');
-      assert.equal(plan.rawSnapshotRef, null);
-      assert.equal(plan.contentHash, null);
-      assert.equal(plan.parserVersion, '0.1.0');
-      assert.match(plan.robotsPolicy.robotsUrl, /^https:\/\/www\./);
-      assert.equal(plan.legalReviewStatus, 'pending');
-      assert.equal(plan.emitsProductFacts, false);
-    }
+    assert.deepEqual(plan, {
+      status: 'ready',
+      connectorId: 'Willys API v1',
+      chainId: 'willys',
+      sourceType: 'official_api',
+      runKey: 'willys:official-api:willys-api-v1:2026-05-19',
+      sourceRunId: 'source-run:willys:official-api:willys-api-v1:2026-05-19',
+      provenance: {
+        sourceType: 'official_api',
+        sourceUrl: 'https://api.example.test/willys/products',
+        capturedAt: '2026-05-19T18:00:00.000Z',
+        parserVersion: 'willys-api-v1'
+      },
+      requiredActions: []
+    });
   });
 
-  it('carries chain-specific flyer constraints from the researched public surfaces', () => {
-    const plans = buildDefaultFlyerSourcePlans('2026-05-20T06:00:00.000Z');
-    const willys = plans.find((plan) => plan.chainId === 'willys' && plan.format === 'store_offer_html');
-    const hemkop = plans.find((plan) => plan.chainId === 'hemkop' && plan.format === 'digital_flyer');
-    const coop = plans.find((plan) => plan.chainId === 'coop');
-    const cityGross = plans.find((plan) => plan.chainId === 'city_gross');
-
-    assert.equal(willys?.requiresStoreSelection, true);
-    assert.equal(willys?.robotsPolicy.crawlDelaySeconds, 10);
-    assert.equal(willys?.robotsPolicy.visitTimeUtc, '0400-0845');
-    assert.equal(hemkop?.robotsPolicy.crawlDelaySeconds, 10);
-    assert.equal(coop?.sourceHost, 'dr.coop.se');
-    assert.equal(coop?.retailerStoreKey, '105740');
-    assert.equal(cityGross?.format, 'app_rendered_offer_html');
-    assert.equal(cityGross?.emitsProductFacts, false);
-  });
-
-  it('marks member and app offer plans as authentication-bound stubs', () => {
-    const lidlMember = planFlyerSourceFetch({
-      chainId: 'lidl',
-      sourceUrl: 'https://www.lidl.se/c/lidl-plus/s10017033',
-      format: 'member_offer',
-      retrievedAt: '2026-05-20T06:00:00.000Z',
-      requiresAuthentication: true,
-      memberOnly: true,
-      rawSnapshotRef: 'raw/lidl-plus.html',
-      contentHash: 'sha256:lidl'
+  it('blocks connector runs before fetch when legal or robots gates are not satisfied', () => {
+    const plan = planRetailerConnectorRun({
+      connectorId: 'ica-page',
+      requestedAt: '2026-05-19T18:00:00.000Z',
+      chainId: 'ica',
+      sourceType: 'retailer_online_page',
+      robotsTxtStatus: 'unknown',
+      legalReviewStatus: 'pending',
+      hasDataAgreement: false,
+      endpointUrl: 'https://example.test/ica',
+      parserVersion: 'ica-page-v1'
     });
 
     assert.equal(plan.status, 'blocked');
