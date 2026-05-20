@@ -47,6 +47,14 @@ describe('buildStaticPages', () => {
       assert.match(product, /ICA Kvantum Torsplan/);
       assert.match(product, /Coop Medborgarplatsen/);
       assert.match(product, /Estimated observations need review/);
+      assert.match(product, /Current store prices/);
+      assert.match(product, /Unit price/);
+      assert.match(product, /promotion/);
+      assert.match(product, /Member label: Stammis price/);
+      assert.match(product, /94% verified retailer page/);
+      assert.match(product, /2026-05-20 06:00/);
+      assert.match(product, /Unverified estimate: do not treat as official shelf price/);
+      assert.match(product, /excluded from official shelf-price claims/);
 
       const market = await readFile(join(root, 'market/index.html'), 'utf8');
       assert.match(market, /Stockholm Grocery Market/);
