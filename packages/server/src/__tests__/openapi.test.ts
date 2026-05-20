@@ -29,6 +29,7 @@ describe('buildOpenApiDocument', () => {
       '/api/notifications/provider-suppression-events',
       '/api/notifications/suppression-events',
       '/api/nutrition/value',
+      '/api/pantry/replenishment',
       '/api/prices/freshness',
       '/api/privacy/deletion-plan',
       '/api/privacy/export',
@@ -82,6 +83,8 @@ describe('buildOpenApiDocument', () => {
     assert.equal(doc.paths['/api/market/overview'].get?.security, undefined);
     assert.equal(doc.paths['/api/nutrition/value'].get?.security, undefined);
     assert.match(doc.paths['/api/nutrition/value'].get?.summary ?? '', /nutrition.*krona/i);
+    assert.deepEqual(doc.paths['/api/pantry/replenishment'].get?.security, [{ bearerAuth: [] }]);
+    assert.match(doc.paths['/api/pantry/replenishment'].get?.summary ?? '', /pantry replenishment/i);
     assert.equal(doc.paths['/api/categories/{category}/market'].get?.security, undefined);
     assert.match(doc.paths['/api/categories/{category}/market'].get?.summary ?? '', /category market/i);
   });

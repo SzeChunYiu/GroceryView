@@ -135,6 +135,17 @@ describe('createHttpHandler', () => {
     ]);
     assert.equal(nutritionBody.leader.productId, 'chicken');
 
+    const pantry = await handle(new Request('http://localhost/api/pantry/replenishment?userId=user-1&asOf=2026-05-20T08:00:00.000Z'));
+    assert.equal(pantry.status, 200);
+    const pantryBody = await json(pantry) as { statuses: Array<{ productId: string; status: string }>; replenishment: Array<{ productId: string; alreadyInBasket: boolean }>; expiringSoonProductIds: string[] };
+    assert.deepEqual(pantryBody.statuses.map((row) => [row.productId, row.status]), [
+      ['coffee', 'low_stock'],
+      ['milk', 'expiring_soon'],
+      ['butter', 'in_stock']
+    ]);
+    assert.deepEqual(pantryBody.replenishment.map((row) => [row.productId, row.alreadyInBasket]), [['coffee', false]]);
+    assert.deepEqual(pantryBody.expiringSoonProductIds, ['milk']);
+
     const categoryMarket = await handle(new Request('http://localhost/api/categories/coffee/market'));
     assert.equal(categoryMarket.status, 200);
     const categoryMarketBody = await json(categoryMarket) as {

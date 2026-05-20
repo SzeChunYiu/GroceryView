@@ -138,6 +138,32 @@ describe('createGroceryViewApi', () => {
     assert.match(report.guardrails[0], /nutrition labels cannot override allergen locks/i);
   });
 
+  it('serves pantry replenishment plans with live deal and basket duplicate context', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+
+    const plan = api.getPantryReplenishment('user-1', '2026-05-20T08:00:00.000Z');
+
+    assert.equal(plan.householdId, 'user-1');
+    assert.deepEqual(
+      plan.statuses.map((item) => ({ productId: item.productId, status: item.status, remainingQuantity: item.remainingQuantity })),
+      [
+        { productId: 'coffee', status: 'low_stock', remainingQuantity: 0.5 },
+        { productId: 'milk', status: 'expiring_soon', remainingQuantity: 1 },
+        { productId: 'butter', status: 'in_stock', remainingQuantity: 1 }
+      ]
+    );
+    assert.deepEqual(plan.expiringSoonProductIds, ['milk']);
+    assert.deepEqual(plan.replenishment.map((item) => ({
+      productId: item.productId,
+      alreadyInBasket: item.alreadyInBasket,
+      bestDeal: item.bestDeal && { storeId: item.bestDeal.storeId, price: item.bestDeal.price }
+    })), [
+      { productId: 'coffee', alreadyInBasket: true, bestDeal: { storeId: 'willys-odenplan', price: 49.9 } }
+    ]);
+  });
+
   it('serves category market reports with terminal-style mover evidence', () => {
     const api = createGroceryViewApi();
 

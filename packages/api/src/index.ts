@@ -6,6 +6,7 @@ import {
   compareBasketStrategies,
   createHouseholdState,
   rankNutritionPerKrona,
+  planPantryReplenishment,
   scoreBand,
   searchProducts,
   summarizeBudget,
@@ -24,6 +25,8 @@ import {
   type NutritionMetric,
   type NutritionProduct,
   type NutritionRank,
+  type PantryInventoryItem,
+  type PantryPlan,
   type SearchableProduct,
   type StorePrice,
   type WatchlistAlert,
@@ -512,6 +515,16 @@ const nutritionProducts: NutritionProduct[] = [
   { productId: 'chicken', name: 'Chicken thighs', price: 69.9, nutritionPerPackage: { proteinGrams: 160, calories: 900, fiberGrams: 0, sugarGrams: 0, saltGrams: 2.4 } },
   { productId: 'eggs', name: 'Eggs 12-pack', price: 34.9, nutritionPerPackage: { proteinGrams: 75, calories: 840, fiberGrams: 0, sugarGrams: 1, saltGrams: 1.8 } },
   { productId: 'yogurt', name: 'Greek yogurt', price: 34.9, nutritionPerPackage: { proteinGrams: 55, calories: 380, fiberGrams: 0, sugarGrams: 16, saltGrams: 0.5 } }
+];
+
+const defaultPantry: PantryInventoryItem[] = [
+  { productId: 'coffee', name: 'Zoégas Coffee 450g', category: 'pantry', quantity: 1, unit: 'pack', minimumQuantity: 1, targetQuantity: 3 },
+  { productId: 'milk', name: 'Arla Milk 1L', category: 'dairy', quantity: 1, unit: 'l', minimumQuantity: 1, targetQuantity: 2, expiresAt: '2026-05-22T08:00:00.000Z' },
+  { productId: 'butter', name: 'Butter 600g', category: 'dairy', quantity: 1, unit: 'pack', minimumQuantity: 0.5, targetQuantity: 2 }
+];
+
+const defaultPantryUsage = [
+  { productId: 'coffee', quantityUsed: 0.5, usedAt: '2026-05-19T07:00:00.000Z' }
 ];
 
 const index = calculateFixedBasketIndex({
@@ -1227,6 +1240,33 @@ export function createGroceryViewApi() {
           'Nutrition value is advisory and cannot rewrite basket or meal-plan decisions without user confirmation.'
         ]
       };
+    },
+
+    getPantryReplenishment(userId: string, asOf = '2026-05-20T08:00:00.000Z'): PantryPlan {
+      requireNonEmptyId(userId, 'userId');
+      const basketItems = baskets.get(userId) ?? [];
+      const household: HouseholdSnapshot = {
+        id: userId,
+        name: `${userId} pantry`,
+        weeklyBudget: budgets.get(userId)?.weeklyBudget ?? 0,
+        members: [{ userId, displayName: userId }],
+        basketItems: basketItems.map((item) => ({ productId: item.productId, quantity: item.quantity, addedBy: userId })),
+        watchlistItems: (watchlists.get(userId) ?? []).map((item) => ({ productId: item.productId, targetPrice: item.targetPrice, addedBy: userId })),
+        sharedFavoriteStoreIds: this.getFavoriteStores(userId).map((store) => store.id)
+      };
+      const deals = products.flatMap((product) => {
+        const bestPrice = bestPriceFor(product);
+        return bestPrice
+          ? [{ productId: product.id, storeId: bestPrice.storeId, storeName: bestPrice.storeName, price: bestPrice.price, dealScore: product.dealScore }]
+          : [];
+      });
+      return planPantryReplenishment({
+        now: asOf,
+        household,
+        pantry: defaultPantry,
+        usage: defaultPantryUsage,
+        deals
+      });
     },
 
     getCategoryMarket(category: string): CategoryMarketReport | null {
