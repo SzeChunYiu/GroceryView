@@ -20,10 +20,14 @@ describe('buildStaticPages', () => {
         'household/index.html',
         'login/index.html',
         'market/index.html',
+        'notifications/inbox/index.html',
         'privacy/index.html',
         'products/coffee/index.html',
+        'receipts/review/index.html',
+        'savings/smart-swaps/index.html',
         'scanner/index.html',
         'stores/compare/index.html',
+        'stores/map/index.html',
         'stores/willys-odenplan/index.html',
         'watchlist/index.html'
       ]);
@@ -43,6 +47,13 @@ describe('buildStaticPages', () => {
       assert.match(deals, /Ads excluded from ranking/);
       assert.match(deals, /Estimated rows held back/);
 
+      const smartSwapsPage = await readFile(join(root, 'savings/smart-swaps/index.html'), 'utf8');
+      assert.match(smartSwapsPage, /Smart grocery swaps/);
+      assert.match(smartSwapsPage, /Swap candidates/);
+      assert.match(smartSwapsPage, /Same roast category/);
+      assert.match(smartSwapsPage, /Estimated swap prices cannot reduce forecast spend/);
+      assert.match(smartSwapsPage, /Dietary restrictions outrank savings/);
+
       const store = await readFile(join(root, 'stores/willys-odenplan/index.html'), 'utf8');
       assert.match(store, /Store highlights/);
       assert.match(store, /Verified shelf/);
@@ -55,6 +66,13 @@ describe('buildStaticPages', () => {
       assert.match(storeComparison, /Low-confidence rows/);
       assert.match(storeComparison, /Low-confidence receipt rows stay out of Deal Score/);
 
+      const storeMap = await readFile(join(root, 'stores/map/index.html'), 'utf8');
+      assert.match(storeMap, /Stockholm store map/);
+      assert.match(storeMap, /District store list/);
+      assert.match(storeMap, /Willys Odenplan/);
+      assert.match(storeMap, /No travel-time penalty in Deal Score/);
+      assert.match(storeMap, /Pickup notes separate from prices/);
+
       const category = await readFile(join(root, 'categories/coffee/index.html'), 'utf8');
       assert.match(category, /Category signals/);
       assert.match(category, /Private-label swap candidate/);
@@ -65,7 +83,15 @@ describe('buildStaticPages', () => {
       assert.match(login, /Passkey or magic link/);
       assert.match(login, /data-groceryview-flow="login"/);
       assert.match(login, /name="email"/);
+      assert.match(login, /data-api-session-panel/);
+      assert.match(login, /name="apiBase"/);
+      assert.match(login, /name="apiUserId"/);
+      assert.match(login, /name="apiBearerToken"/);
       assert.match(login, /data-flow-result="login"/);
+      assert.match(login, /sessionStorage\.setItem\('groceryview\.bearerToken'/);
+      assert.match(login, /sessionStorage\.getItem\('groceryview\.bearerToken'\)/);
+      assert.match(login, /localStorage\.getItem\('groceryview\.apiBase'\)/);
+      assert.doesNotMatch(login, /localStorage\.setItem\('groceryview\.bearerToken'/);
 
       const account = await readFile(join(root, 'account/index.html'), 'utf8');
       assert.match(account, /Alert preferences/);
@@ -78,6 +104,9 @@ describe('buildStaticPages', () => {
       assert.match(account, /data-groceryview-flow="account"/);
       assert.match(account, /data-flow-action="toggle-alert"/);
       assert.match(account, /data-flow-result="account"/);
+      assert.match(account, /fetch\(apiUrl\('\/api\/watchlist/);
+      assert.match(account, /fetch\(apiUrl\('\/api\/account\/subscription-access/);
+      assert.match(account, /authorization: 'Bearer '/);
 
       const watchlist = await readFile(join(root, 'watchlist/index.html'), 'utf8');
       assert.match(watchlist, /Price watchlist workbench/);
@@ -85,6 +114,13 @@ describe('buildStaticPages', () => {
       assert.match(watchlist, /Ready for push/);
       assert.match(watchlist, /Held for review/);
       assert.match(watchlist, /Estimated prices cannot trigger household notifications/);
+
+      const notificationInbox = await readFile(join(root, 'notifications/inbox/index.html'), 'utf8');
+      assert.match(notificationInbox, /Grocery alert inbox/);
+      assert.match(notificationInbox, /Alert delivery queue/);
+      assert.match(notificationInbox, /Quiet hours 21:00-07:00/);
+      assert.match(notificationInbox, /Provider token invalid/);
+      assert.match(notificationInbox, /Invalid tokens stop future sends/);
 
       const household = await readFile(join(root, 'household/index.html'), 'utf8');
       assert.match(household, /Shared household basket/);
@@ -103,6 +139,10 @@ describe('buildStaticPages', () => {
       assert.match(basket, /data-groceryview-flow="basket"/);
       assert.match(basket, /name="coffeeQuantity"/);
       assert.match(basket, /data-flow-result="basket"/);
+      assert.match(basket, /Save basket to API/);
+      assert.match(basket, /\/api\/users\/' \+ encodeURIComponent\(config\.userId\) \+ '\/favorite-stores/);
+      assert.match(basket, /fetch\(apiUrl\('\/api\/basket\/items/);
+      assert.match(basket, /fetch\(apiUrl\('\/api\/basket\/compare/);
 
       const budgetForecast = await readFile(join(root, 'budget/forecast/index.html'), 'utf8');
       assert.match(budgetForecast, /Grocery budget forecast/);
@@ -120,6 +160,13 @@ describe('buildStaticPages', () => {
       assert.match(scanner, /accept="image\/\*"/);
       assert.match(scanner, /data-flow-action="route-review"/);
 
+      const receiptReview = await readFile(join(root, 'receipts/review/index.html'), 'utf8');
+      assert.match(receiptReview, /Receipt review desk/);
+      assert.match(receiptReview, /Line-item decisions/);
+      assert.match(receiptReview, /Post to weekly actuals/);
+      assert.match(receiptReview, /Route to human review/);
+      assert.match(receiptReview, /Cannot update catalog or Deal Score/);
+
       const humanReview = await readFile(join(root, 'admin/human-review/index.html'), 'utf8');
       assert.match(humanReview, /Human review operations/);
       assert.match(humanReview, /Moderator assignments/);
@@ -136,6 +183,8 @@ describe('buildStaticPages', () => {
       assert.match(privacy, /data-groceryview-flow="privacy"/);
       assert.match(privacy, /data-flow-action="download-export"/);
       assert.match(privacy, /data-flow-result="privacy"/);
+      assert.match(privacy, /fetch\(apiUrl\('\/api\/privacy\/export/);
+      assert.match(privacy, /fetch\(apiUrl\('\/api\/privacy\/deletion-plan/);
 
       for (const pagePath of ['login/index.html', 'account/index.html', 'basket/index.html', 'scanner/index.html', 'privacy/index.html']) {
         const html = await readFile(join(root, pagePath), 'utf8');

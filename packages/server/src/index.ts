@@ -15,6 +15,7 @@ import {
 } from '@groceryview/db';
 import {
   buildSubscriptionAccessPolicy,
+  parseStripeCompatibleSubscriptionEvent,
   processBillingSubscriptionEvent,
   type BillingSubscriptionEntitlementMutation,
   type BillingSubscriptionEvent,
@@ -25,6 +26,8 @@ import {
 import {
   applyHumanReviewDecision,
   authorizeHumanReviewAction,
+  buildPrivacyExport,
+  planAccountDeletion,
   summarizeHumanReviewSla,
   type HumanReviewAssignment,
   type HumanReviewDecision,
@@ -60,6 +63,7 @@ export type AuthOptions = {
     upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
   };
   billingWebhookSecret?: string;
+  billingPriceIdPlanMap?: Partial<Record<string, SubscriptionPlan>>;
   billingSubscriptionSink?: {
     upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
   };
@@ -296,6 +300,20 @@ function parseBillingSubscriptionEvent(body: JsonRecord): BillingSubscriptionEve
   };
 }
 
+function parseBillingSubscriptionWebhookBody(body: JsonRecord, authOptions: AuthOptions): BillingSubscriptionEvent {
+  rejectSensitiveBillingEventFields(body);
+  if (body.provider !== undefined) return parseBillingSubscriptionEvent(body);
+
+  const receivedAt = (authOptions.now ?? new Date()).toISOString();
+  const event = parseStripeCompatibleSubscriptionEvent({
+    payload: body,
+    receivedAt,
+    priceIdPlanMap: authOptions.billingPriceIdPlanMap
+  });
+  if (!event) throw new Error('Unsupported billing subscription webhook event.');
+  return event;
+}
+
 export function createHttpHandler(api = createGroceryViewApi(), authOptions: AuthOptions = {}): HttpHandler {
   const requireSession = async (request: Request): Promise<SessionPayload | Response> => {
     if (!authOptions.authSecret) return errorResponse(503, 'Auth secret is not configured.');
@@ -521,7 +539,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         const sink = authOptions.billingSubscriptionSink;
         if (!sink) return errorResponse(503, 'Billing subscription sink is not configured.');
 
-        const entitlement = processBillingSubscriptionEvent(parseBillingSubscriptionEvent(parseJsonObject(rawBody)));
+        const entitlement = processBillingSubscriptionEvent(parseBillingSubscriptionWebhookBody(parseJsonObject(rawBody), authOptions));
         await sink.upsertSubscriptionEntitlement(entitlement);
         return jsonResponse(
           { accepted: true, persisted: true, userId: entitlement.userId, status: entitlement.status },
@@ -645,6 +663,35 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(api.getBudgetSummary(user));
       }
 
+      if (path === '/api/privacy/export') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') {
+          return jsonResponse(
+            buildPrivacyExport(
+              {
+                userId: user,
+                favoriteStoreIds: api.getFavoriteStores(user).map((store) => store.id),
+                watchlistProductIds: api.getWatchlist(user).items.map((item) => item.productId),
+                receiptIds: [],
+                householdIds: []
+              },
+              (authOptions.now ?? new Date()).toISOString()
+            )
+          );
+        }
+      }
+
+      if (path === '/api/privacy/deletion-plan') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'POST') return jsonResponse({ ...planAccountDeletion(user), destructiveAction: false, requiresReauthentication: true });
+      }
+
       if (method === 'GET' && path === '/api/indices') return jsonResponse(api.getIndices());
       const indexMatch = path.match(/^\/api\/indices\/([^/]+)$/);
       if (method === 'GET' && indexMatch) {
@@ -735,6 +782,8 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/products/{id}/history': { get: publicOperation('Get product price history.') },
       '/api/products/{id}/equivalents': { get: publicOperation('Get comparable products in the same category.') },
       '/api/products/{id}/deal-score': { get: publicOperation('Get Deal Score detail for one product.') },
+      '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
+      '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
       '/api/users/{userId}/favorite-stores': {
         get: protectedOperation('List favorite stores.'),
         post: protectedOperation('Add favorite store.')

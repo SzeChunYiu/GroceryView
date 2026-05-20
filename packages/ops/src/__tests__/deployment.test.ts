@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildDeploymentReadinessReport, buildRollbackPlan } from '../index.js';
+import { buildDeploymentReadinessReport, buildDeploymentSmokeEvidenceReport, buildRollbackPlan } from '../index.js';
 
 describe('deployment ops foundation', () => {
   it('passes readiness only when provider, secrets, DNS, health checks, and smoke tests are ready', () => {
@@ -112,6 +112,64 @@ describe('deployment ops foundation', () => {
         'Run smoke tests before re-enabling traffic.'
       ],
       requiresManualDatabaseRecovery: true
+    });
+  });
+
+  it('blocks production deployment when required smoke evidence is missing, stale, or failed', () => {
+    const report = buildDeploymentSmokeEvidenceReport({
+      checkedAt: '2026-05-20T08:00:00.000Z',
+      maxAgeMinutes: 30,
+      requiredSmokeTests: ['web-home', 'api-health', 'notification-worker'],
+      evidence: [
+        {
+          name: 'web-home',
+          status: 'pass',
+          checkedAt: '2026-05-20T07:00:00.000Z',
+          url: 'https://groceryview.example/health'
+        },
+        {
+          name: 'api-health',
+          status: 'fail',
+          checkedAt: '2026-05-20T07:55:00.000Z',
+          url: 'https://api.groceryview.example/health'
+        }
+      ]
+    });
+
+    assert.deepEqual(report, {
+      status: 'blocked',
+      blockers: ['smoke_evidence_stale:web-home', 'smoke_evidence_failed:api-health', 'smoke_evidence_missing:notification-worker'],
+      passed: ['web-home'],
+      summary: 'Deployment smoke evidence is blocked until every required probe has fresh passing proof.'
+    });
+  });
+
+  it('accepts fresh passing smoke evidence for every required production probe', () => {
+    const report = buildDeploymentSmokeEvidenceReport({
+      checkedAt: '2026-05-20T08:00:00.000Z',
+      maxAgeMinutes: 30,
+      requiredSmokeTests: ['web-home', 'api-health'],
+      evidence: [
+        {
+          name: 'web-home',
+          status: 'pass',
+          checkedAt: '2026-05-20T07:45:00.000Z',
+          url: 'https://groceryview.example/health'
+        },
+        {
+          name: 'api-health',
+          status: 'pass',
+          checkedAt: '2026-05-20T07:59:00.000Z',
+          url: 'https://api.groceryview.example/health'
+        }
+      ]
+    });
+
+    assert.deepEqual(report, {
+      status: 'ready',
+      blockers: [],
+      passed: ['web-home', 'api-health'],
+      summary: 'Deployment smoke evidence is fresh and passing.'
     });
   });
 });

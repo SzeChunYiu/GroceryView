@@ -71,6 +71,70 @@ export type RollbackPlan = {
   requiresManualDatabaseRecovery: boolean;
 };
 
+export type DeploymentSmokeEvidence = {
+  name: string;
+  status: GateStatus;
+  checkedAt: string;
+  url: string;
+};
+
+export type DeploymentSmokeEvidenceInput = {
+  checkedAt: string;
+  maxAgeMinutes: number;
+  requiredSmokeTests: string[];
+  evidence: DeploymentSmokeEvidence[];
+};
+
+export type DeploymentSmokeEvidenceReport = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  passed: string[];
+  summary: string;
+};
+
+export function buildDeploymentSmokeEvidenceReport(input: DeploymentSmokeEvidenceInput): DeploymentSmokeEvidenceReport {
+  const blockers: string[] = [];
+  const passed: string[] = [];
+  const evidenceByName = new Map(input.evidence.map((evidence) => [evidence.name, evidence]));
+  const checkedAt = Date.parse(input.checkedAt);
+  const maxAgeMs = input.maxAgeMinutes * 60 * 1000;
+
+  for (const name of input.requiredSmokeTests) {
+    const evidence = evidenceByName.get(name);
+    if (!evidence) {
+      blockers.push(`smoke_evidence_missing:${name}`);
+      continue;
+    }
+
+    const evidenceCheckedAt = Date.parse(evidence.checkedAt);
+    if (!Number.isFinite(evidenceCheckedAt) || !Number.isFinite(checkedAt) || checkedAt - evidenceCheckedAt > maxAgeMs) {
+      blockers.push(`smoke_evidence_stale:${name}`);
+    }
+
+    if (evidence.status === 'pass') {
+      passed.push(name);
+    } else if (evidence.status === 'fail') {
+      blockers.push(`smoke_evidence_failed:${name}`);
+    } else {
+      blockers.push(`smoke_evidence_not_run:${name}`);
+    }
+
+    if (!evidence.url) {
+      blockers.push(`smoke_evidence_url_missing:${name}`);
+    }
+  }
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    passed,
+    summary:
+      blockers.length === 0
+        ? 'Deployment smoke evidence is fresh and passing.'
+        : 'Deployment smoke evidence is blocked until every required probe has fresh passing proof.'
+  };
+}
+
 export function buildRollbackPlan(input: RollbackPlanInput): RollbackPlan {
   const steps = [`Disable new traffic to release ${input.currentRelease}.`, `Restore application artifact ${input.previousRelease}.`];
   let requiresManualDatabaseRecovery = false;
