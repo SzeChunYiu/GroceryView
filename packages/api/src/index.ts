@@ -212,6 +212,41 @@ export type DealScoreReport = {
   reasons: string[];
 };
 
+export type BasketComparisonReportAssignment = {
+  productId: string;
+  productName: string;
+  quantity: number;
+  storeId: string;
+  storeName: string;
+  unitPrice: number;
+  lineTotal: number;
+  priceLabel: 'verified_shelf' | 'missing_price' | 'estimated';
+  substitutionForProductId?: string;
+  substitutionForProductName?: string;
+};
+
+export type BasketComparisonReportStrategy = {
+  id: 'cheapest_across_selected' | 'all_at_one_store' | 'favorite_only' | 'private_label_substitution';
+  label: string;
+  total: number | null;
+  savingsVsBestSingleStore: number;
+  storeCount: number;
+  assignments: BasketComparisonReportAssignment[];
+  missingProductIds: string[];
+  estimatedProductIds: string[];
+  warnings: string[];
+};
+
+export type BasketComparisonReport = {
+  userId: string;
+  currency: 'SEK';
+  favoriteStoreIds: string[];
+  itemCount: number;
+  strategies: BasketComparisonReportStrategy[];
+  missingProductIds: string[];
+  estimatedProductIds: string[];
+};
+
 export type ProductEquivalent = {
   productId: string;
   productName: string;
@@ -415,6 +450,25 @@ const products: ProductDetail[] = [
     ]
   }
 ,
+  {
+    id: 'private-label-milk',
+    ticker: 'GARANT-MILK-1L',
+    name: 'Garant Milk 1L',
+    category: 'dairy',
+    brandTier: 'standard_private_label',
+    availableChains: ['willys'],
+    currentPrices: [
+      { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 12.9 }
+    ],
+    dealScore: calculateDealScore({ currentCityPercentile: 22, knownPromoHistoryPercentile: 25, equivalentUnitPricePercentile: 10, discountDepthPercent: 12, sourceConfidence: 0.82 }),
+    verdict: 'Buy',
+    unitPrice: '12.90 SEK/l',
+    dealSignals: { currentCityPercentile: 22, knownPromoHistoryPercentile: 25, equivalentUnitPricePercentile: 10, discountDepthPercent: 12, sourceConfidence: 0.82 },
+    history: [
+      { date: '2026-05-01', price: 13.9, verified: true },
+      { date: '2026-05-19', price: 12.9, verified: true }
+    ]
+  },
   {
     id: 'butter',
     ticker: 'BUTTER-600G',
@@ -897,6 +951,174 @@ function normalizeHouseholdPlan(userId: string, input: HouseholdPlanRequest): Ho
   };
 }
 
+function basketInputItems(userItems: BasketItemRequest[]) {
+  return userItems.map((item) => {
+    const product = products.find((candidate) => candidate.id === item.productId);
+    return { productId: item.productId, quantity: item.quantity, prices: product?.currentPrices ?? [] };
+  });
+}
+
+function productName(productId: string): string {
+  return products.find((product) => product.id === productId)?.name ?? productId;
+}
+
+function comparableUnit(product: ProductDetail): string {
+  return product.unitPrice.split('/').at(-1)?.trim().toLowerCase() ?? '';
+}
+
+function reportAssignment(
+  assignment: { productId: string; quantity: number; storeId: string; storeName: string; unitPrice: number; lineTotal: number },
+  substitution?: ProductDetail
+): BasketComparisonReportAssignment {
+  const originalName = productName(assignment.productId);
+  return {
+    productId: substitution?.id ?? assignment.productId,
+    productName: substitution?.name ?? originalName,
+    quantity: assignment.quantity,
+    storeId: assignment.storeId,
+    storeName: assignment.storeName,
+    unitPrice: assignment.unitPrice,
+    lineTotal: assignment.lineTotal,
+    priceLabel: 'verified_shelf',
+    ...(substitution ? { substitutionForProductId: assignment.productId, substitutionForProductName: originalName } : {})
+  };
+}
+
+function strategyWarnings(missingProductIds: string[], estimatedProductIds: string[]): string[] {
+  const warnings: string[] = [];
+  if (missingProductIds.length > 0) warnings.push('Some basket items are missing verified prices for this strategy.');
+  if (estimatedProductIds.length > 0) warnings.push('Estimated prices are labeled and excluded from verified shelf totals.');
+  if (warnings.length === 0) warnings.push('All included prices are verified shelf demo prices.');
+  return warnings;
+}
+
+function privateLabelStrategy(
+  userItems: BasketItemRequest[],
+  favoriteStoreIds: string[],
+  bestSingleStoreTotal: number | null
+): BasketComparisonReportStrategy {
+  const favoriteStores = new Set(favoriteStoreIds);
+  const assignments: BasketComparisonReportAssignment[] = [];
+  const missingProductIds: string[] = [];
+
+  for (const item of userItems) {
+    const source = products.find((product) => product.id === item.productId);
+    if (!source) {
+      missingProductIds.push(item.productId);
+      continue;
+    }
+    const candidates = [
+      source,
+      ...products.filter((product) =>
+        product.category === source.category &&
+        product.brandTier.includes('private_label') &&
+        comparableUnit(product) === comparableUnit(source)
+      )
+    ];
+    const pricedCandidates = candidates
+      .flatMap((product) => product.currentPrices
+        .filter((price) => favoriteStores.has(price.storeId))
+        .map((price) => ({ product, price })))
+      .sort((left, right) => left.price.price - right.price.price || left.product.name.localeCompare(right.product.name));
+    const best = pricedCandidates[0];
+    if (!best) {
+      missingProductIds.push(item.productId);
+      continue;
+    }
+    assignments.push(reportAssignment({
+      productId: source.id,
+      quantity: item.quantity,
+      storeId: best.price.storeId,
+      storeName: best.price.storeName,
+      unitPrice: best.price.price,
+      lineTotal: roundPrice(best.price.price * item.quantity)
+    }, best.product.id === source.id ? undefined : best.product));
+  }
+
+  const total = assignments.length > 0 ? roundPrice(assignments.reduce((sum, assignment) => sum + assignment.lineTotal, 0)) : null;
+  return {
+    id: 'private_label_substitution',
+    label: 'Private-label substitution',
+    total,
+    savingsVsBestSingleStore: total !== null && bestSingleStoreTotal !== null ? roundPrice(bestSingleStoreTotal - total) : 0,
+    storeCount: new Set(assignments.map((assignment) => assignment.storeId)).size,
+    assignments,
+    missingProductIds,
+    estimatedProductIds: [],
+    warnings: strategyWarnings(missingProductIds, [])
+  };
+}
+
+function buildBasketComparisonReport(userId: string, favoriteStoreIds: string[], userItems: BasketItemRequest[]): BasketComparisonReport {
+  const comparison = compareBasketStrategies({ favoriteStoreIds, items: basketInputItems(userItems) });
+  const cheapestAssignments = comparison.cheapestByProduct.assignments.map((assignment) => reportAssignment(assignment));
+  const bestSingleStoreAssignments = comparison.bestSingleStore
+    ? userItems.flatMap((item) => {
+      const product = products.find((candidate) => candidate.id === item.productId);
+      const price = product?.currentPrices.find((candidate) => candidate.storeId === comparison.bestSingleStore?.storeId);
+      if (!price) return [];
+      return [reportAssignment({
+        productId: item.productId,
+        quantity: item.quantity,
+        storeId: price.storeId,
+        storeName: price.storeName,
+        unitPrice: price.price,
+        lineTotal: roundPrice(price.price * item.quantity)
+      })];
+    })
+    : [];
+  const bestSingleStoreTotal = comparison.bestSingleStore?.total ?? null;
+  const estimatedProductIds: string[] = [];
+
+  return {
+    userId,
+    currency: 'SEK',
+    favoriteStoreIds,
+    itemCount: userItems.reduce((sum, item) => sum + item.quantity, 0),
+    strategies: [
+      {
+        id: 'cheapest_across_selected',
+        label: 'Cheapest across selected stores',
+        total: comparison.cheapestByProduct.total,
+        savingsVsBestSingleStore: comparison.savingsVsBestSingleStore,
+        storeCount: comparison.splitStoreCount,
+        assignments: cheapestAssignments,
+        missingProductIds: comparison.missingProductIds,
+        estimatedProductIds,
+        warnings: strategyWarnings(comparison.missingProductIds, estimatedProductIds)
+      },
+      {
+        id: 'all_at_one_store',
+        label: 'All at one store',
+        total: bestSingleStoreTotal,
+        savingsVsBestSingleStore: 0,
+        storeCount: bestSingleStoreAssignments.length > 0 ? 1 : 0,
+        assignments: bestSingleStoreAssignments,
+        missingProductIds: comparison.bestSingleStore ? [] : userItems.map((item) => item.productId),
+        estimatedProductIds,
+        warnings: strategyWarnings(comparison.bestSingleStore ? [] : userItems.map((item) => item.productId), estimatedProductIds)
+      },
+      {
+        id: 'favorite_only',
+        label: 'Favorite stores only',
+        total: comparison.cheapestByProduct.total,
+        savingsVsBestSingleStore: comparison.savingsVsBestSingleStore,
+        storeCount: comparison.splitStoreCount,
+        assignments: cheapestAssignments,
+        missingProductIds: comparison.missingProductIds,
+        estimatedProductIds,
+        warnings: [
+          `Restricted to favorite stores: ${favoriteStoreIds.join(', ') || 'none'}.`,
+          ...strategyWarnings(comparison.missingProductIds, estimatedProductIds)
+        ]
+      },
+      privateLabelStrategy(userItems, favoriteStoreIds, bestSingleStoreTotal)
+    ],
+    missingProductIds: comparison.missingProductIds,
+    estimatedProductIds
+  };
+}
+
 function storeDealsFor(storeId: string): StoreDeal[] {
   requireKnownStore(storeId);
   return products
@@ -1176,11 +1398,12 @@ export function createGroceryViewApi() {
 
     compareBasket(userId: string): BasketComparisonResult {
       const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
-      const items = (baskets.get(userId) ?? []).map((item) => {
-        const product = products.find((candidate) => candidate.id === item.productId);
-        return { productId: item.productId, quantity: item.quantity, prices: product?.currentPrices ?? [] };
-      });
-      return compareBasketStrategies({ favoriteStoreIds, items });
+      return compareBasketStrategies({ favoriteStoreIds, items: basketInputItems(baskets.get(userId) ?? []) });
+    },
+
+    compareBasketReport(userId: string): BasketComparisonReport {
+      const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
+      return buildBasketComparisonReport(userId, favoriteStoreIds, baskets.get(userId) ?? []);
     },
 
     updateBudget(userId: string, patch: UserBudgetPatch) {

@@ -147,6 +147,7 @@ describe('createHttpHandler', () => {
     assert.equal(storeDeals.status, 200);
     assert.deepEqual((await json(storeDeals) as Array<{ productId: string; storeId: string }>).map((deal) => [deal.productId, deal.storeId]), [
       ['coffee', 'willys-odenplan'],
+      ['private-label-milk', 'willys-odenplan'],
       ['milk', 'willys-odenplan'],
       ['butter', 'willys-odenplan']
     ]);
@@ -200,6 +201,15 @@ describe('createHttpHandler', () => {
     assert.equal(equivalents.status, 200);
     assert.deepEqual(await json(equivalents), [
       {
+        productId: 'private-label-milk',
+        productName: 'Garant Milk 1L',
+        category: 'dairy',
+        bestPrice: 12.9,
+        bestStoreId: 'willys-odenplan',
+        dealScore: 73,
+        reason: 'Same dairy category with comparable current price evidence.'
+      },
+      {
         productId: 'butter',
         productName: 'Butter 600g',
         category: 'dairy',
@@ -215,7 +225,7 @@ describe('createHttpHandler', () => {
     assert.deepEqual(await json(freshness), {
       asOf: '2026-06-03T00:00:00.000Z',
       thresholds: { agingAfterDays: 7, staleAfterDays: 14 },
-      summary: { fresh: 0, aging: 0, stale: 3 },
+      summary: { fresh: 0, aging: 0, stale: 4 },
       products: [
         {
           productId: 'coffee',
@@ -236,6 +246,15 @@ describe('createHttpHandler', () => {
           action: 'prioritize_manual_or_feed_refresh'
         },
         {
+          productId: 'private-label-milk',
+          productName: 'Garant Milk 1L',
+          category: 'dairy',
+          latestVerifiedPriceDate: '2026-05-19',
+          ageDays: 15,
+          status: 'stale',
+          action: 'prioritize_manual_or_feed_refresh'
+        },
+        {
           productId: 'butter',
           productName: 'Butter 600g',
           category: 'dairy',
@@ -245,7 +264,7 @@ describe('createHttpHandler', () => {
           action: 'prioritize_manual_or_feed_refresh'
         }
       ],
-      backfillProductIds: ['butter', 'coffee', 'milk']
+      backfillProductIds: ['butter', 'coffee', 'milk', 'private-label-milk']
     });
 
     const index = await handle(new Request('http://localhost/api/indices/stockholm-grocery-index'));

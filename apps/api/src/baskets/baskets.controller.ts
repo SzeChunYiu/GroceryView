@@ -24,7 +24,7 @@ export class BasketsController {
   @Get('comparison')
   @ApiOkResponse({ description: 'Basket price comparison' })
   comparison() {
-    return groceryApi.compareBasket('demo');
+    return groceryApi.compareBasketReport('demo');
   }
 
   @Post('items')
