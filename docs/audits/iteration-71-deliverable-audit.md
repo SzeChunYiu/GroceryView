@@ -14,7 +14,7 @@ Continue shipping GroceryView toward production readiness and merge each round t
 | Keep health truthful for injected runtime config | `/api/health` now respects `authOptions.runtimeConfig` for database/public URL/secret presence flags instead of only reading `process.env` | Implemented |
 | Make deployment entrypoint executable | `isDirectServerEntrypoint()` guards direct execution, and `startNodeServerFromEnv()` listens on configured `PORT` when `packages/server/dist/index.js` is run directly | Implemented |
 | Refresh completion audit | `docs/status/completion-audit.md` records the server runtime entrypoint and narrows the deployment gap wording | Updated |
-| PR and merge to `main` after the round | PR #272 | Pending until merge step |
+| PR and merge to `main` after the round | PR #272 merged to `main` with merge commit `cdd1294` | Completed |
 
 ## Implementation scope
 
