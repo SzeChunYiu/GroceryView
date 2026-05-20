@@ -30,6 +30,7 @@ from .models import (
     OpenPricesLaunchReadinessDigest,
     OpenPricesLaunchReadinessSummary,
     OpenPricesPullPlan,
+    OpenPricesScheduleHealthPlan,
     PriceObservationRow,
     PriceObservationMixSummary,
     PriceProvenance,
@@ -493,6 +494,51 @@ def build_open_prices_hosted_smoke_plan(
     )
 
 
+def build_open_prices_schedule_health_plan(
+    *,
+    dagster_deployment_url_present: bool = False,
+    ingestion_schedule_enabled: bool = False,
+    import_readiness_schedule_enabled: bool = False,
+    schedule_health_probe_configured: bool = False,
+) -> OpenPricesScheduleHealthPlan:
+    required_actions: list[str] = []
+    if not dagster_deployment_url_present:
+        required_actions.append("configure_dagster_deployment_url")
+    if not ingestion_schedule_enabled:
+        required_actions.append("enable_open_prices_ingestion_schedule")
+    if not import_readiness_schedule_enabled:
+        required_actions.append("enable_open_prices_import_readiness_schedule")
+    if not schedule_health_probe_configured:
+        required_actions.append("publish_open_prices_schedule_health_probe")
+
+    return OpenPricesScheduleHealthPlan(
+        status="ready" if not required_actions else "blocked",
+        source_assets=[
+            "open_prices_ingestion_run_plan",
+            "open_prices_launch_readiness_digest",
+        ],
+        schedule_names=[
+            "open_prices_ingestion_schedule",
+            "open_prices_import_readiness_schedule",
+        ],
+        required_env=[
+            "DAGSTER_DEPLOYMENT_URL",
+            "OPEN_PRICES_INGESTION_SCHEDULE_ENABLED",
+            "OPEN_PRICES_IMPORT_READINESS_SCHEDULE_ENABLED",
+            "OPEN_PRICES_SCHEDULE_HEALTH_MAX_AGE_HOURS",
+        ],
+        required_actions=required_actions,
+        evidence_fields=[
+            "scheduleName",
+            "cronSchedule",
+            "lastTickAt",
+            "lastRunStatus",
+            "lastRunAgeHours",
+            "nextTickAt",
+        ],
+    )
+
+
 def summarize_open_prices_ingestion_run_plan(plan: OpenPricesIngestionRunPlan) -> OpenPricesIngestionRunPlanSummary:
     return OpenPricesIngestionRunPlanSummary(
         status=plan.status,
@@ -833,6 +879,16 @@ def open_prices_hosted_smoke_plan(open_prices_artifact_import_plan: dict[str, ob
         deployment_url_present=False,
         metrics_token_present=False,
         imported_terminal_product_id_present=open_prices_artifact_import_plan.get("status") == "ready",
+    ).to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
+def open_prices_schedule_health_plan() -> dict[str, object]:
+    return build_open_prices_schedule_health_plan(
+        dagster_deployment_url_present=False,
+        ingestion_schedule_enabled=False,
+        import_readiness_schedule_enabled=False,
+        schedule_health_probe_configured=False,
     ).to_dict()
 
 

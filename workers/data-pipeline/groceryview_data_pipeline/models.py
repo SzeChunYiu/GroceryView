@@ -244,6 +244,20 @@ class OpenPricesHostedSmokePlan:
 
 
 @dataclass(frozen=True)
+class OpenPricesScheduleHealthPlan:
+    status: Literal["ready", "blocked"]
+    source_assets: list[str]
+    schedule_names: list[str]
+    required_env: list[str]
+    required_actions: list[str]
+    evidence_fields: list[str]
+    demo: bool = False
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class OpenPricesIngestionRunPlanSummary:
     status: Literal["ready", "blocked"]
     required_action_count: int
