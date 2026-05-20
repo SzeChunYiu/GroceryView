@@ -1,4 +1,6 @@
 import { createGroceryViewApi } from '@groceryview/api';
+export { buildMobilePersistedCachePlan, buildMobileQueryKey, buildMobileQueryRegistry } from './queryCache.js';
+export type { MobilePersistedCachePlan, MobileQueryDefinition, MobileQueryId, MobileQueryKeyInput, MobileScreenRoute } from './queryCache.js';
 
 export type MobileTab = {
   id: 'today' | 'stores' | 'basket' | 'scan' | 'profile';
