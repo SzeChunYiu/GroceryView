@@ -193,6 +193,14 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       if (method === 'GET' && path === '/api/market/overview') return jsonResponse(api.getMarketOverview());
       if (method === 'GET' && path === '/api/stores') return jsonResponse(api.getStores());
 
+      if (method === 'GET' && path === '/api/account/subscription-access') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        return jsonResponse(api.getSubscriptionAccess(user, (authOptions.now ?? new Date()).toISOString()));
+      }
+
       if (method === 'GET' && path === '/api/metrics/notifications') {
         if (!authOptions.notificationMetricsToken) return errorResponse(503, 'Notification metrics token is not configured.');
         if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
@@ -469,6 +477,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/health': { get: publicOperation('Get API runtime health without exposing secrets.') },
       '/api/market/overview': { get: publicOperation('Get Stockholm grocery market overview.') },
       '/api/stores': { get: publicOperation('List stores.') },
+      '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
       '/api/stores/{id}': { get: publicOperation('Get store profile.') },
       '/api/products/search': { get: publicOperation('Search products.') },
       '/api/products/{id}': { get: publicOperation('Get product detail.') },
