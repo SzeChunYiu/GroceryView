@@ -555,6 +555,17 @@ describe('createHttpHandler', () => {
     });
     assert.match(localOffers.guardrails[0], /favorite stores/);
 
+    const storeQuote = await json(await handle(new Request('http://localhost/api/basket/stores/willys-odenplan/quote?userId=user-1'))) as {
+      storeId: string;
+      total: number | null;
+      priceGapVsCheapestComplete: number | null;
+      missingProductIds: string[];
+    };
+    assert.equal(storeQuote.storeId, 'willys-odenplan');
+    assert.equal(storeQuote.total, 99.8);
+    assert.equal(storeQuote.priceGapVsCheapestComplete, 0);
+    assert.deepEqual(storeQuote.missingProductIds, []);
+
     const budget = await json(await handle(new Request('http://localhost/api/budget/summary?userId=user-1'))) as { weeklyRemainingAfterEstimate: number };
     assert.equal(budget.weeklyRemainingAfterEstimate, 700.2);
 
