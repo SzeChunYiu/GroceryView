@@ -194,6 +194,22 @@ class OpenPricesPullPlan:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class ObservationCoverageSummary:
+    status: Literal["ready", "partial"]
+    observation_count: int
+    store_count: int
+    covered_store_count: int
+    missing_store_count: int
+    product_count: int
+    covered_product_count: int
+    missing_product_count: int
+    demo: bool = True
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
 def utc_now() -> str:
     return datetime.now(tz=timezone.utc).isoformat()
 

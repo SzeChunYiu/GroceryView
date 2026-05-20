@@ -1,6 +1,7 @@
 from groceryview_data_pipeline.assets import (
     build_latest_price_rollup,
     build_normalized_products,
+    build_observation_coverage_summary,
     build_observation_freshness_summary,
     build_open_prices_pull_plan,
     build_price_observations,
@@ -203,3 +204,38 @@ def test_observation_freshness_summary_blocks_stale_future_and_missing_observati
         "checked_at": "2026-05-20T12:00:00+00:00",
         "demo": True,
     }
+
+
+def test_observation_coverage_summary_reports_seeded_store_and_product_gaps() -> None:
+    stores = build_seed_stores()
+    products = build_seed_products()
+    stubs = build_retailer_fetch_stubs(stores, products)
+    normalized_products = build_normalized_products(products)
+    observations = build_price_observations(stubs, normalized_products)
+
+    full_summary = build_observation_coverage_summary(observations, stores, products)
+    assert full_summary.to_dict() == {
+        "status": "ready",
+        "observation_count": len(observations),
+        "store_count": len(stores),
+        "covered_store_count": len(stores),
+        "missing_store_count": 0,
+        "product_count": len(products),
+        "covered_product_count": len(products),
+        "missing_product_count": 0,
+        "demo": True,
+    }
+
+    partial_summary = build_observation_coverage_summary(
+        [
+            observation
+            for observation in observations
+            if observation.store_slug != stores[0].slug and observation.product_slug != products[0].slug
+        ],
+        stores,
+        products,
+    )
+
+    assert partial_summary.status == "partial"
+    assert partial_summary.missing_store_count == 1
+    assert partial_summary.missing_product_count == 1
