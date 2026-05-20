@@ -158,6 +158,8 @@ describe('buildStaticPages', () => {
       assert.match(household, /No pork, nut alert/);
       assert.match(household, /data-groceryview-flow="household"/);
       assert.match(household, /name="approvalLimit"/);
+      assert.match(household, /fetch\(apiUrl\('\/api\/households\/current/);
+      assert.match(household, /approvalPolicy/);
       assert.match(household, /data-flow-result="household"/);
 
       const basket = await readFile(join(root, 'basket/index.html'), 'utf8');

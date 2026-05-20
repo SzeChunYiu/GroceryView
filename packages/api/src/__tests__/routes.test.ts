@@ -96,6 +96,54 @@ describe('createGroceryViewApi', () => {
     assert.equal(api.getIndex('stockholm-grocery-index')?.label, 'Stockholm Grocery Index');
   });
 
+  it('persists household plans with member attribution, budget summary, and approval policy', () => {
+    const api = createGroceryViewApi();
+
+    const plan = api.upsertHouseholdPlan('user-1', {
+      householdId: 'house-1',
+      name: 'Odenplan Household',
+      weeklyBudget: 500,
+      approvalLimit: 70,
+      reviewer: 'user-2',
+      members: [
+        { userId: 'user-1', displayName: 'Alex' },
+        { userId: 'user-2', displayName: 'Mina' }
+      ],
+      basketItems: [
+        { productId: 'milk', quantity: 2, addedBy: 'user-1' },
+        { productId: 'coffee', quantity: 1, addedBy: 'user-2' }
+      ],
+      watchlistItems: [{ productId: 'coffee', addedBy: 'user-1', targetPrice: 50 }],
+      sharedFavoriteStoreIds: ['willys-odenplan', 'lidl-sveavagen']
+    });
+
+    assert.equal(plan.household.id, 'house-1');
+    assert.equal(plan.summary.estimatedTotal, 77.7);
+    assert.equal(plan.summary.remainingBudget, 422.3);
+    assert.deepEqual(plan.summary.memberContributions, [
+      { userId: 'user-1', displayName: 'Alex', itemCount: 1 },
+      { userId: 'user-2', displayName: 'Mina', itemCount: 1 }
+    ]);
+    assert.deepEqual(plan.summary.sharedFavoriteStoreIds, ['lidl-sveavagen', 'willys-odenplan']);
+    assert.deepEqual(plan.approvalPolicy, {
+      approvalLimit: 70,
+      reviewer: 'user-2',
+      requiresOwnerApproval: true
+    });
+    assert.deepEqual(api.getHouseholdPlan('user-1'), plan);
+
+    assert.throws(() => api.upsertHouseholdPlan('user-1', {
+      householdId: 'house-2',
+      name: 'Broken Household',
+      weeklyBudget: 100,
+      approvalLimit: 100,
+      reviewer: 'user-1',
+      members: [{ userId: 'user-1', displayName: 'Alex' }],
+      basketItems: [{ productId: 'missing-product', quantity: 1, addedBy: 'user-1' }],
+      sharedFavoriteStoreIds: []
+    }), /Unknown productId: missing-product/);
+  });
+
   it('resolves account subscription access from stored entitlements and fails closed without one', () => {
     const api = createGroceryViewApi();
 

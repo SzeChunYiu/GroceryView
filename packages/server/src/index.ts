@@ -3,7 +3,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { createGroceryViewApi } from '@groceryview/api';
+import { createGroceryViewApi, type HouseholdPlanRequest } from '@groceryview/api';
 import { parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
 import {
   checkPostgresIntegrationReadiness,
@@ -206,6 +206,55 @@ function requiredIsoTimestamp(value: unknown, field: string): string {
 function optionalIsoTimestamp(value: unknown, field: string): string | undefined {
   if (value === undefined) return undefined;
   return requiredIsoTimestamp(value, field);
+}
+
+function requiredRecordArray(value: unknown, field: string): JsonRecord[] {
+  if (!Array.isArray(value)) throw new Error(`${field} must be an array.`);
+  return value.map((item, index) => {
+    if (item === null || typeof item !== 'object' || Array.isArray(item)) {
+      throw new Error(`${field}[${index}] must be an object.`);
+    }
+    return item as JsonRecord;
+  });
+}
+
+function optionalRecordArray(value: unknown, field: string): JsonRecord[] | undefined {
+  if (value === undefined) return undefined;
+  return requiredRecordArray(value, field);
+}
+
+function optionalStringArray(value: unknown, field: string): string[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value)) throw new Error(`${field} must be an array.`);
+  return value.map((item, index) => requiredString(item, `${field}[${index}]`));
+}
+
+function householdPlanRequestFromBody(body: JsonRecord): HouseholdPlanRequest {
+  return {
+    householdId: requiredString(body.householdId, 'householdId'),
+    name: requiredString(body.name, 'name'),
+    weeklyBudget: requiredNumber(body.weeklyBudget, 'weeklyBudget'),
+    approvalLimit: requiredNumber(body.approvalLimit, 'approvalLimit'),
+    reviewer: requiredString(body.reviewer, 'reviewer'),
+    members: requiredRecordArray(body.members, 'members').map((member) => ({
+      userId: requiredString(member.userId, 'members.userId'),
+      displayName: requiredString(member.displayName, 'members.displayName')
+    })),
+    basketItems: (optionalRecordArray(body.basketItems, 'basketItems') ?? []).map((item) => ({
+      productId: requiredString(item.productId, 'basketItems.productId'),
+      quantity: requiredNumber(item.quantity, 'basketItems.quantity'),
+      addedBy: requiredString(item.addedBy, 'basketItems.addedBy')
+    })),
+    watchlistItems: (optionalRecordArray(body.watchlistItems, 'watchlistItems') ?? []).map((item) => {
+      const targetPrice = optionalNumber(item.targetPrice, 'watchlistItems.targetPrice');
+      return {
+        productId: requiredString(item.productId, 'watchlistItems.productId'),
+        addedBy: requiredString(item.addedBy, 'watchlistItems.addedBy'),
+        ...(targetPrice === undefined ? {} : { targetPrice })
+      };
+    }),
+    sharedFavoriteStoreIds: optionalStringArray(body.sharedFavoriteStoreIds, 'sharedFavoriteStoreIds') ?? []
+  };
 }
 
 function userIdFrom(url: URL): string | Response {
@@ -674,12 +723,28 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(api.getBudgetSummary(user));
       }
 
+      if (path === '/api/households/current') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') {
+          const plan = api.getHouseholdPlan(user);
+          return plan ? jsonResponse({ userId: user, ...plan }) : errorResponse(404, 'Household plan not found.');
+        }
+        if (method === 'PUT') {
+          const body = await readJson(request);
+          return jsonResponse({ userId: user, ...api.upsertHouseholdPlan(user, householdPlanRequestFromBody(body)) });
+        }
+      }
+
       if (path === '/api/privacy/export') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
         if (method === 'GET') {
+          const householdPlan = api.getHouseholdPlan(user);
           return jsonResponse(
             buildPrivacyExport(
               {
@@ -687,7 +752,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
                 favoriteStoreIds: api.getFavoriteStores(user).map((store) => store.id),
                 watchlistProductIds: api.getWatchlist(user).items.map((item) => item.productId),
                 receiptIds: [],
-                householdIds: []
+                householdIds: householdPlan ? [householdPlan.household.id] : []
               },
               (authOptions.now ?? new Date()).toISOString()
             )
@@ -771,7 +836,7 @@ export type OpenApiSecurityRequirement = {
   billingWebhookSignature?: never[];
 };
 
-export type OpenApiPathItem = Partial<Record<'get' | 'post' | 'patch' | 'delete', OpenApiOperation>>;
+export type OpenApiPathItem = Partial<Record<'get' | 'post' | 'put' | 'patch' | 'delete', OpenApiOperation>>;
 
 export type OpenApiDocument = {
   openapi: '3.1.0';
@@ -817,6 +882,10 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/products/{id}': { get: publicOperation('Get product detail.') },
       '/api/products/{id}/prices': { get: publicOperation('Get product prices by store.') },
       '/api/products/{id}/history': { get: publicOperation('Get product price history.') },
+      '/api/households/current': {
+        get: protectedOperation('Get the signed-in user household plan.'),
+        put: protectedOperation('Create or replace the signed-in user household plan and budget summary.')
+      },
       '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
       '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
       '/api/scans/process': { post: protectedOperation('Process barcode or receipt scan payloads through configured providers and return review routing work.') },

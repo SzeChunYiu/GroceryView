@@ -170,6 +170,54 @@ describe('createHttpHandler', () => {
     assert.deepEqual(plan.anonymizeTables, ['community_price_reports']);
   });
 
+  it('writes and reads user-scoped household plans through protected proposal routes', async () => {
+    const handle = createHttpHandler();
+    const payload = {
+      householdId: 'house-1',
+      name: 'Odenplan Household',
+      weeklyBudget: 500,
+      approvalLimit: 70,
+      reviewer: 'user-2',
+      members: [
+        { userId: 'user-1', displayName: 'Alex' },
+        { userId: 'user-2', displayName: 'Mina' }
+      ],
+      basketItems: [
+        { productId: 'milk', quantity: 2, addedBy: 'user-1' },
+        { productId: 'coffee', quantity: 1, addedBy: 'user-2' }
+      ],
+      watchlistItems: [{ productId: 'coffee', addedBy: 'user-1', targetPrice: 50 }],
+      sharedFavoriteStoreIds: ['willys-odenplan', 'lidl-sveavagen']
+    };
+
+    const written = await handle(new Request('http://localhost/api/households/current?userId=user-1', {
+      method: 'PUT',
+      body: JSON.stringify(payload)
+    }));
+    assert.equal(written.status, 200);
+    const body = await json(written) as {
+      userId: string;
+      summary: { estimatedTotal: number; remainingBudget: number; sharedFavoriteStoreIds: string[] };
+      approvalPolicy: { requiresOwnerApproval: boolean; reviewer: string };
+    };
+    assert.equal(body.userId, 'user-1');
+    assert.equal(body.summary.estimatedTotal, 77.7);
+    assert.equal(body.summary.remainingBudget, 422.3);
+    assert.deepEqual(body.summary.sharedFavoriteStoreIds, ['lidl-sveavagen', 'willys-odenplan']);
+    assert.deepEqual(body.approvalPolicy, { approvalLimit: 70, reviewer: 'user-2', requiresOwnerApproval: true });
+
+    const read = await json(await handle(new Request('http://localhost/api/households/current?userId=user-1'))) as { household: { id: string; members: unknown[] } };
+    assert.equal(read.household.id, 'house-1');
+    assert.equal(read.household.members.length, 2);
+
+    const invalid = await handle(new Request('http://localhost/api/households/current?userId=user-1', {
+      method: 'PUT',
+      body: JSON.stringify({ ...payload, basketItems: [{ productId: 'missing-product', quantity: 1, addedBy: 'user-1' }] })
+    }));
+    assert.equal(invalid.status, 400);
+    assert.match(JSON.stringify(await json(invalid)), /Unknown productId: missing-product/);
+  });
+
   it('processes scan uploads through configured providers and returns review work items', async () => {
     const handle = createHttpHandler(undefined, {
       now: new Date('2026-05-20T13:00:00.000Z'),

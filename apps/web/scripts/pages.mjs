@@ -175,6 +175,47 @@ window.GroceryViewFlowActions = (() => {
       setResult('scanner', 'Scan API processing failed: ' + error.message + '. Local preview remains staged.');
     }
   };
+  const saveHouseholdToApi = async (form) => {
+    const config = getApiConfig();
+    const data = new FormData(form);
+    const approvalLimit = Number(data.get('approvalLimit') || 400);
+    const reviewerName = String(data.get('reviewer') || 'Mina');
+    if (!hasApiSession(config)) {
+      setResult('household', 'Local preview: household approval limit updated to ' + (approvalLimit || 400) + ' SEK. Connect the API session bridge to save the household plan.');
+      return;
+    }
+    const reviewerId = reviewerName === 'Alex' ? config.userId : 'household-' + reviewerName.toLowerCase();
+    const members = [
+      { userId: config.userId, displayName: 'Alex' },
+      ...(reviewerId === config.userId ? [] : [{ userId: reviewerId, displayName: reviewerName }])
+    ];
+    try {
+      const response = await fetch(apiUrl('/api/households/current', config), {
+        method: 'PUT',
+        headers: apiHeaders(config),
+        body: JSON.stringify({
+          householdId: 'web-household-preview',
+          name: 'GroceryView household',
+          weeklyBudget: 800,
+          approvalLimit: Number.isFinite(approvalLimit) ? approvalLimit : 400,
+          reviewer: reviewerId,
+          members,
+          basketItems: [
+            { productId: 'milk', quantity: 2, addedBy: config.userId },
+            { productId: 'coffee', quantity: 1, addedBy: reviewerId }
+          ],
+          watchlistItems: [{ productId: 'coffee', addedBy: config.userId, targetPrice: 50 }],
+          sharedFavoriteStoreIds: ['lidl-sveavagen', 'willys-odenplan']
+        })
+      });
+      const payload = await requireApiSuccess(response);
+      const total = payload.summary ? payload.summary.estimatedTotal : 0;
+      const approvalState = payload.approvalPolicy?.requiresOwnerApproval ? 'owner approval required' : 'no owner approval required';
+      setResult('household', 'Connected API: household plan saved at ' + formatSek(total) + '; ' + approvalState + '.');
+    } catch (error) {
+      setResult('household', 'Household API save failed: ' + error.message + '. Local approval preview preserved.');
+    }
+  };
   const saveBasketToApi = async (form) => {
     const config = getApiConfig();
     if (!hasApiSession(config)) {
@@ -225,7 +266,7 @@ window.GroceryViewFlowActions = (() => {
       const flow = form.closest('[data-groceryview-flow]')?.dataset.groceryviewFlow;
       const data = new FormData(form);
       if (flow === 'login') setResult(flow, 'Sign-in link queued for ' + (data.get('email') || 'your email') + '. Demo mode does not send email.');
-      if (flow === 'household') setResult(flow, 'Household approval limit preview updated to ' + (data.get('approvalLimit') || '400') + ' SEK.');
+      if (flow === 'household') await saveHouseholdToApi(form);
       if (flow === 'basket' && event.submitter?.dataset.flowAction === 'save-basket-api') {
         await saveBasketToApi(form);
       } else if (flow === 'basket') {
