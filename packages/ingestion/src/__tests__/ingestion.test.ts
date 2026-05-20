@@ -1,11 +1,13 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  buildOpenPricesConnectorUrl,
   confidenceForSource,
   fetchRetailerConnectorSnapshot,
   ingestRetailerProduct,
   locatorFixturesCanAffectDealScore,
   normalizeUnitPrice,
+  parseOpenPricesSnapshot,
   parseRetailerProductJsonSnapshot,
   planIngestionBatch,
   planRetailerConnectorRun,
@@ -473,5 +475,94 @@ describe('parseRetailerProductJsonSnapshot', () => {
       rawSnapshotRef: 'raw://bad',
       contentHash: 'sha256:bad'
     }), /items\[0\]\.canonicalName/);
+  });
+});
+
+describe('Open Prices real-data connector', () => {
+  it('builds a compliant Sweden SEK Open Prices URL for bounded public pulls', () => {
+    assert.equal(
+      buildOpenPricesConnectorUrl({ currency: 'SEK', countryCode: 'SE', size: 5 }),
+      'https://prices.openfoodfacts.org/api/v1/prices?currency=SEK&size=5&location__osm_address_country_code=SE&order_by=-date'
+    );
+  });
+
+  it('normalizes Open Prices API rows into ingestion-ready price observations', async () => {
+    const result = await runRetailerConnector({
+      connectorId: 'open-prices-public-api',
+      requestedAt: '2026-05-20T10:15:00.000Z',
+      chainId: 'open_prices',
+      sourceType: 'official_api',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true,
+      endpointUrl: buildOpenPricesConnectorUrl({ currency: 'SEK', countryCode: 'SE', size: 2 }),
+      parserVersion: 'open-prices-v1',
+      fetcher: (plan) => ({
+        statusCode: 200,
+        contentType: 'application/json',
+        retrievedAt: '2026-05-20T10:15:03.000Z',
+        sourceUrl: plan.provenance.sourceUrl,
+        rawSnapshotRef: `raw://open-prices/${plan.runKey}.json`,
+        body: JSON.stringify({
+          total: 1,
+          items: [{
+            id: 31101,
+            product_code: '7311312007100',
+            product_name: null,
+            price: 34.9,
+            price_is_discounted: true,
+            price_without_discount: 39.9,
+            currency: 'SEK',
+            date: '2024-07-28',
+            product: {
+              code: '7311312007100',
+              product_name: 'Crunchy granola äpple & kanel',
+              brands: 'Risenta',
+              product_quantity: 375,
+              product_quantity_unit: 'g',
+              categories_tags: ['en:breakfast-cereals', 'en:mueslis']
+            },
+            location: {
+              id: 1,
+              osm_brand: 'Lidl',
+              osm_name: 'Lidl',
+              osm_address_city: 'Landskrona kommun',
+              osm_address_country_code: 'SE'
+            }
+          }]
+        })
+      }),
+      parser: parseOpenPricesSnapshot
+    });
+
+    assert.equal(result.status, 'completed');
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.rejectedCount, 0);
+    assert.deepEqual(result.requiredActions, []);
+    assert.equal(result.ingestion.accepted[0].product.id, 'off-7311312007100');
+    assert.equal(result.ingestion.accepted[0].product.canonicalName, 'Crunchy granola äpple & kanel');
+    assert.equal(result.ingestion.accepted[0].product.categoryId, 'mueslis');
+    assert.equal(result.ingestion.accepted[0].product.packageSize, 375);
+    assert.equal(result.ingestion.accepted[0].product.packageUnit, 'g');
+    assert.equal(result.ingestion.accepted[0].priceObservation.chainId, 'lidl');
+    assert.equal(result.ingestion.accepted[0].priceObservation.retailerProductId, 'open-prices-price-31101');
+    assert.equal(result.ingestion.accepted[0].priceObservation.storeId, 'open-prices-location-1');
+    assert.equal(result.ingestion.accepted[0].priceObservation.observedAt, '2024-07-28T00:00:00.000Z');
+    assert.equal(result.ingestion.accepted[0].priceObservation.price, 34.9);
+    assert.equal(result.ingestion.accepted[0].priceObservation.regularPrice, 39.9);
+    assert.equal(result.ingestion.accepted[0].priceObservation.unitPrice, 93.0667);
+    assert.equal(result.ingestion.accepted[0].promotionObservation?.promoText, 'Open Prices discounted price');
+  });
+
+  it('fails closed when an Open Prices snapshot has no usable SEK product price rows', () => {
+    assert.throws(() => parseOpenPricesSnapshot({
+      statusCode: 200,
+      body: JSON.stringify({ items: [{ id: 1, currency: 'EUR', price: 2.5, product: {} }] }),
+      contentType: 'application/json',
+      retrievedAt: '2026-05-20T10:15:03.000Z',
+      sourceUrl: 'https://prices.openfoodfacts.org/api/v1/prices?currency=SEK',
+      rawSnapshotRef: 'raw://open-prices/empty',
+      contentHash: 'sha256:empty'
+    }), /no usable SEK product price rows/);
   });
 });

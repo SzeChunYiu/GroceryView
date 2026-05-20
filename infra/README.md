@@ -31,6 +31,18 @@ GROCERYVIEW_CONNECTOR_URL="https://provider.example/api/products" GROCERYVIEW_CO
 
 The script reuses the ingestion connector gate, refuses to fetch when required approvals are missing, performs the HTTP pull with a timeout, and prints status code, byte count, content hash, and raw snapshot reference for follow-up parser work.
 
+## Open Prices real-data smoke
+
+Use Open Food Facts Open Prices as the first public, license-aware real price-data pull. Build the ingestion package, provide a custom User-Agent as requested by the Open Food Facts API rules, then run:
+
+```bash
+npm run build --workspace @groceryview/ingestion
+OPEN_PRICES_USER_AGENT="GroceryView/0.1 (contact@example.com)" \
+  infra/scripts/smoke-open-prices.sh
+```
+
+The smoke calls `https://prices.openfoodfacts.org/api/v1/prices?currency=SEK&size=10&location__osm_address_country_code=SE&order_by=-date` by default, parses returned SEK price rows into GroceryView ingestion records, requires at least one accepted product price, and prints source URL, content hash, raw snapshot reference, first normalized product, and Open Prices attribution. Override `OPEN_PRICES_COUNTRY_CODE`, `OPEN_PRICES_SIZE`, or `OPEN_PRICES_URL` for bounded follow-up pulls that still return SEK prices.
+
 ## Hosted deployment smoke
 
 After deploying a server, run the hosted HTTP smoke before promoting traffic:
