@@ -1,7 +1,9 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  buildDeploymentGateDigest,
   buildDeploymentReadinessReport,
+  buildDeploymentSmokeEvidenceReport,
   buildHostedSmokeCommandPlan,
   buildRollbackPlan,
   buildSecretRotationReadinessReport,
@@ -309,5 +311,68 @@ describe('deployment ops foundation', () => {
       ownerlessSecrets: 1,
       readySecrets: 1
     });
+  });
+
+  it('builds a combined deployment gate digest for release dashboards', () => {
+    const readiness = buildDeploymentReadinessReport({
+      providerSelected: true,
+      requiredSecretsPresent: ['DATABASE_URL'],
+      requiredSecrets: ['DATABASE_URL'],
+      dnsConfigured: true,
+      healthChecks: [{ name: 'api', status: 'pass' }],
+      smokeTests: [{ name: 'health-endpoint', status: 'pass' }],
+      observabilityConfigured: true
+    });
+    const smokeEvidence = buildDeploymentSmokeEvidenceReport({
+      checkedAt: '2026-05-20T08:00:00.000Z',
+      maxAgeMinutes: 30,
+      requiredSmokeTests: ['hosted_api_health'],
+      evidence: [{ name: 'hosted_api_health', status: 'pass', checkedAt: '2026-05-20T07:45:00.000Z', url: 'https://example.com/health' }]
+    });
+    const secretRotation = buildSecretRotationReadinessReport({
+      checkedAt: '2026-05-20T08:00:00.000Z',
+      maxAgeDays: 90,
+      requiredSecrets: ['DATABASE_URL'],
+      secrets: [{ name: 'DATABASE_URL', present: true, rotatedAt: '2026-05-01T00:00:00.000Z', owner: 'platform' }]
+    });
+
+    assert.deepEqual(buildDeploymentGateDigest({ readiness, smokeEvidence, secretRotation, releaseValidation: 'pass' }), {
+      status: 'ready',
+      blockers: [],
+      totalBlockers: 0,
+      checks: {
+        deploymentReadiness: 'ready',
+        smokeEvidence: 'ready',
+        secretRotation: 'ready',
+        releaseValidation: 'pass'
+      },
+      summary: 'Deployment gate digest is ready.'
+    });
+
+    assert.deepEqual(
+      buildDeploymentGateDigest({
+        readiness: { ...readiness, status: 'blocked', blockers: ['observability_not_configured'] },
+        smokeEvidence: { ...smokeEvidence, status: 'blocked', blockers: ['smoke_evidence_stale:hosted_api_health'] },
+        secretRotation: { ...secretRotation, status: 'blocked', blockers: ['secret_rotation_stale:DATABASE_URL'] },
+        releaseValidation: 'fail'
+      }),
+      {
+        status: 'blocked',
+        blockers: [
+          'deployment:observability_not_configured',
+          'smoke:smoke_evidence_stale:hosted_api_health',
+          'secret_rotation:secret_rotation_stale:DATABASE_URL',
+          'release_validation_failed'
+        ],
+        totalBlockers: 4,
+        checks: {
+          deploymentReadiness: 'blocked',
+          smokeEvidence: 'blocked',
+          secretRotation: 'blocked',
+          releaseValidation: 'fail'
+        },
+        summary: 'Deployment gate digest is blocked until every required gate passes.'
+      }
+    );
   });
 });

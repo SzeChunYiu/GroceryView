@@ -428,6 +428,50 @@ export function summarizeSecretRotationReadinessReport(
   };
 }
 
+export type DeploymentGateDigestInput = {
+  readiness: DeploymentReadinessReport;
+  smokeEvidence: DeploymentSmokeEvidenceReport;
+  secretRotation: SecretRotationReadinessReport;
+  releaseValidation: GateStatus;
+};
+
+export type DeploymentGateDigest = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  totalBlockers: number;
+  checks: {
+    deploymentReadiness: DeploymentReadinessReport['status'];
+    smokeEvidence: DeploymentSmokeEvidenceReport['status'];
+    secretRotation: SecretRotationReadinessReport['status'];
+    releaseValidation: GateStatus;
+  };
+  summary: string;
+};
+
+export function buildDeploymentGateDigest(input: DeploymentGateDigestInput): DeploymentGateDigest {
+  const blockers = [
+    ...input.readiness.blockers.map((blocker) => `deployment:${blocker}`),
+    ...input.smokeEvidence.blockers.map((blocker) => `smoke:${blocker}`),
+    ...input.secretRotation.blockers.map((blocker) => `secret_rotation:${blocker}`)
+  ];
+
+  if (input.releaseValidation === 'fail') blockers.push('release_validation_failed');
+  if (input.releaseValidation === 'not_run') blockers.push('release_validation_not_run');
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    totalBlockers: blockers.length,
+    checks: {
+      deploymentReadiness: input.readiness.status,
+      smokeEvidence: input.smokeEvidence.status,
+      secretRotation: input.secretRotation.status,
+      releaseValidation: input.releaseValidation
+    },
+    summary: blockers.length === 0 ? 'Deployment gate digest is ready.' : 'Deployment gate digest is blocked until every required gate passes.'
+  };
+}
+
 export function buildRollbackPlan(input: RollbackPlanInput): RollbackPlan {
   const steps = [`Disable new traffic to release ${input.currentRelease}.`, `Restore application artifact ${input.previousRelease}.`];
   let requiresManualDatabaseRecovery = false;
