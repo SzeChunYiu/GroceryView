@@ -4,6 +4,7 @@ from groceryview_data_pipeline.assets import (
     build_observation_coverage_summary,
     build_observation_freshness_summary,
     build_open_prices_pull_plan,
+    build_price_observation_mix_summary,
     build_price_observations,
     build_quality_checks,
     build_retailer_fetch_stubs,
@@ -239,3 +240,20 @@ def test_observation_coverage_summary_reports_seeded_store_and_product_gaps() ->
     assert partial_summary.status == "partial"
     assert partial_summary.missing_store_count == 1
     assert partial_summary.missing_product_count == 1
+
+
+def test_price_observation_mix_summary_counts_price_evidence_breakdowns() -> None:
+    stores = build_seed_stores()
+    products = build_seed_products()
+    stubs = build_retailer_fetch_stubs(stores, products)
+    normalized_products = build_normalized_products(products)
+    observations = build_price_observations(stubs, normalized_products)
+
+    summary = build_price_observation_mix_summary(observations)
+
+    assert summary.observation_count == len(observations)
+    assert summary.source_types == {"retailer_page": len(observations)}
+    assert summary.price_types["member"] == sum(1 for observation in observations if observation.price_type == "member")
+    assert summary.price_types["promotion"] == summary.promotion_count
+    assert summary.confidence_labels["verified"] >= 1
+    assert summary.member_only_count == sum(1 for observation in observations if observation.member_only)
