@@ -37,6 +37,19 @@ export type ProductDetail = SearchableProduct & {
   history: Array<{ date: string; price: number; verified: boolean }>;
 };
 
+export type StoreDeal = {
+  productId: string;
+  ticker: string;
+  productName: string;
+  category: string;
+  storeId: string;
+  storeName: string;
+  price: number;
+  dealScore: number;
+  band: ReturnType<typeof scoreBand>;
+  unitPrice: string;
+};
+
 export type BasketItemRequest = {
   productId: string;
   quantity: number;
@@ -226,6 +239,28 @@ function bestPriceFor(product: ProductDetail) {
   return sortPricesByValue(product.currentPrices)[0] ?? null;
 }
 
+function storeDealsFor(storeId: string): StoreDeal[] {
+  requireKnownStore(storeId);
+  return products
+    .flatMap((product) => {
+      const price = product.currentPrices.find((candidate) => candidate.storeId === storeId);
+      if (!price) return [];
+      return [{
+        productId: product.id,
+        ticker: product.ticker,
+        productName: product.name,
+        category: product.category,
+        storeId: price.storeId,
+        storeName: price.storeName,
+        price: price.price,
+        dealScore: product.dealScore,
+        band: scoreBand(product.dealScore),
+        unitPrice: product.unitPrice
+      }];
+    })
+    .sort((left, right) => right.dealScore - left.dealScore || left.price - right.price || left.productName.localeCompare(right.productName));
+}
+
 export function createGroceryViewApi() {
   const favoriteStores = new Map<string, Set<string>>();
   const watchlists = new Map<string, WatchlistItem[]>();
@@ -270,6 +305,10 @@ export function createGroceryViewApi() {
 
     getStore(id: string) {
       return stores.find((store) => store.id === id) ?? null;
+    },
+
+    getStoreDeals(storeId: string) {
+      return storeDealsFor(storeId);
     },
 
     searchProducts(query: string) {

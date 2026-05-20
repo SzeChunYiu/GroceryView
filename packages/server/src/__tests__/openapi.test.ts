@@ -33,6 +33,7 @@ describe('buildOpenApiDocument', () => {
       '/api/readiness/postgres',
       '/api/stores',
       '/api/stores/{id}',
+      '/api/stores/{id}/deals',
       '/api/users/{userId}/favorite-stores',
       '/api/watchlist'
     ]);

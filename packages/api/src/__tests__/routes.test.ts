@@ -52,6 +52,22 @@ describe('createGroceryViewApi', () => {
     ]);
   });
 
+  it('returns ranked store-specific deals without mixing other stores', () => {
+    const api = createGroceryViewApi();
+
+    const willysDeals = api.getStoreDeals('willys-odenplan');
+    assert.deepEqual(
+      willysDeals.map((deal) => ({ productId: deal.productId, storeId: deal.storeId, dealScore: deal.dealScore })),
+      [
+        { productId: 'coffee', storeId: 'willys-odenplan', dealScore: 82 },
+        { productId: 'milk', storeId: 'willys-odenplan', dealScore: 73 },
+        { productId: 'butter', storeId: 'willys-odenplan', dealScore: 40 }
+      ]
+    );
+    assert.deepEqual(willysDeals[0].band, { label: 'Good deal', verdict: 'Buy' });
+    assert.throws(() => api.getStoreDeals('missing-store'), /Unknown storeId/);
+  });
+
   it('supports favorite stores, watchlist, basket, budget, and index endpoints', () => {
     const api = createGroceryViewApi();
 
