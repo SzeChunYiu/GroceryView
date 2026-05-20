@@ -77,6 +77,16 @@ describe('GroceryView API app', () => {
     const basket = await request(app.getHttpServer()).get('/users/demo/basket').expect(200);
     assert.equal(basket.body.items[0].quantity, 2);
 
+    const comparison = await request(app.getHttpServer()).get('/users/demo/basket/comparison').expect(200);
+    assert.deepEqual(comparison.body.strategies.map((strategy: { id: string }) => strategy.id), [
+      'cheapest_across_selected',
+      'all_at_one_store',
+      'favorite_only',
+      'private_label_substitution'
+    ]);
+    assert.deepEqual(comparison.body.strategies[0].missingProductIds, ['coffee']);
+    assert.match(comparison.body.strategies[0].warnings[0], /missing verified prices/);
+
     await request(app.getHttpServer()).get('/users/demo/alerts').expect(200);
   });
 

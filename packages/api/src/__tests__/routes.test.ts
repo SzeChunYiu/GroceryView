@@ -154,6 +154,7 @@ describe('createGroceryViewApi', () => {
       willysDeals.map((deal) => ({ productId: deal.productId, storeId: deal.storeId, dealScore: deal.dealScore })),
       [
         { productId: 'coffee', storeId: 'willys-odenplan', dealScore: 82 },
+        { productId: 'private-label-milk', storeId: 'willys-odenplan', dealScore: 73 },
         { productId: 'milk', storeId: 'willys-odenplan', dealScore: 73 },
         { productId: 'butter', storeId: 'willys-odenplan', dealScore: 40 }
       ]
@@ -233,6 +234,15 @@ describe('createGroceryViewApi', () => {
 
     assert.deepEqual(api.getProductEquivalents('milk'), [
       {
+        productId: 'private-label-milk',
+        productName: 'Garant Milk 1L',
+        category: 'dairy',
+        bestPrice: 12.9,
+        bestStoreId: 'willys-odenplan',
+        dealScore: 73,
+        reason: 'Same dairy category with comparable current price evidence.'
+      },
+      {
         productId: 'butter',
         productName: 'Butter 600g',
         category: 'dairy',
@@ -249,12 +259,12 @@ describe('createGroceryViewApi', () => {
   it('builds a price freshness report with stale backfill actions', () => {
     const api = createGroceryViewApi();
 
-    assert.deepEqual(api.getPriceFreshnessReport('2026-05-20').summary, { fresh: 3, aging: 0, stale: 0 });
+    assert.deepEqual(api.getPriceFreshnessReport('2026-05-20').summary, { fresh: 4, aging: 0, stale: 0 });
 
     const report = api.getPriceFreshnessReport('2026-06-03T00:00:00.000Z');
     assert.deepEqual(report.thresholds, { agingAfterDays: 7, staleAfterDays: 14 });
-    assert.deepEqual(report.summary, { fresh: 0, aging: 0, stale: 3 });
-    assert.deepEqual(report.backfillProductIds, ['butter', 'coffee', 'milk']);
+    assert.deepEqual(report.summary, { fresh: 0, aging: 0, stale: 4 });
+    assert.deepEqual(report.backfillProductIds, ['butter', 'coffee', 'milk', 'private-label-milk']);
     assert.deepEqual(
       report.products.map((product) => ({
         productId: product.productId,
@@ -273,6 +283,13 @@ describe('createGroceryViewApi', () => {
         },
         {
           productId: 'milk',
+          latestVerifiedPriceDate: '2026-05-19',
+          ageDays: 15,
+          status: 'stale',
+          action: 'prioritize_manual_or_feed_refresh'
+        },
+        {
+          productId: 'private-label-milk',
           latestVerifiedPriceDate: '2026-05-19',
           ageDays: 15,
           status: 'stale',
@@ -312,6 +329,71 @@ describe('createGroceryViewApi', () => {
     api.removeBasketItem('user-1', 'coffee');
     assert.deepEqual(api.getWatchlist('user-1').items, []);
     assert.deepEqual(api.getBasket('user-1').items, []);
+  });
+
+  it('returns basket comparison reports with explicit strategy and trust labels', () => {
+    const api = createGroceryViewApi();
+
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.addBasketItem('user-1', { productId: 'butter', quantity: 1 });
+
+    const report = api.compareBasketReport('user-1');
+    assert.equal(report.currency, 'SEK');
+    assert.deepEqual(report.favoriteStoreIds, ['willys-odenplan', 'lidl-sveavagen']);
+    assert.deepEqual(report.strategies.map((strategy) => strategy.id), [
+      'cheapest_across_selected',
+      'all_at_one_store',
+      'favorite_only',
+      'private_label_substitution'
+    ]);
+    assert.deepEqual(report.strategies[0], {
+      id: 'cheapest_across_selected',
+      label: 'Cheapest across selected stores',
+      total: 84.7,
+      savingsVsBestSingleStore: 2,
+      storeCount: 2,
+      assignments: [
+        {
+          productId: 'milk',
+          productName: 'Arla Milk 1L',
+          quantity: 2,
+          storeId: 'lidl-sveavagen',
+          storeName: 'Lidl Sveavägen',
+          unitPrice: 13.9,
+          lineTotal: 27.8,
+          priceLabel: 'verified_shelf'
+        },
+        {
+          productId: 'butter',
+          productName: 'Butter 600g',
+          quantity: 1,
+          storeId: 'willys-odenplan',
+          storeName: 'Willys Odenplan',
+          unitPrice: 56.9,
+          lineTotal: 56.9,
+          priceLabel: 'verified_shelf'
+        }
+      ],
+      missingProductIds: [],
+      estimatedProductIds: [],
+      warnings: ['All included prices are verified shelf demo prices.']
+    });
+    assert.deepEqual(report.strategies[1]?.total, 86.7);
+    assert.deepEqual(report.strategies[3]?.assignments[0], {
+      productId: 'private-label-milk',
+      productName: 'Garant Milk 1L',
+      quantity: 2,
+      storeId: 'willys-odenplan',
+      storeName: 'Willys Odenplan',
+      unitPrice: 12.9,
+      lineTotal: 25.8,
+      priceLabel: 'verified_shelf',
+      substitutionForProductId: 'milk',
+      substitutionForProductName: 'Arla Milk 1L'
+    });
+    assert.equal(report.strategies[3]?.total, 82.7);
   });
 
   it('removes watched products and recomputes alerts from remaining items', () => {
