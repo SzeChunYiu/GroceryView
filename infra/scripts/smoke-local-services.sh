@@ -94,6 +94,6 @@ compose run --rm "$OBJECT_STORAGE_INIT_SERVICE" >/dev/null
 compose run --rm --entrypoint /bin/sh "$OBJECT_STORAGE_INIT_SERVICE" -c '
   mc alias set local http://object-storage:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" >/dev/null
   mc ls "local/$S3_BUCKET" >/dev/null
-'
+' || fail_with_diagnostics "object storage bucket verification failed"
 
 echo "Local services ready: postgres redis object-storage bucket=$S3_BUCKET"

@@ -65,6 +65,9 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /object-storage-init/);
     assert.match(infraReadme, /S3_BUCKET/);
     assert.match(smokeScript, /compose logs "\$service"/);
+    assert.match(smokeScript, /docker inspect[\s\S]*health=/);
+    assert.match(smokeScript, /compose logs --no-color --tail=120 "\$service"/);
+    assert.match(smokeScript, /"\$POSTGRES_SERVICE" "\$REDIS_SERVICE" "\$OBJECT_STORAGE_SERVICE" "\$OBJECT_STORAGE_INIT_SERVICE"/);
   });
 
   it('runs the local services smoke check in CI for infra changes', () => {
