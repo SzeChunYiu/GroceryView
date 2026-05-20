@@ -35,6 +35,11 @@ describe('buildStaticPages', () => {
       assert.match(login, /Sign in to GroceryView/);
       assert.match(login, /Passkey or magic link/);
 
+      const account = await readFile(join(root, 'account/index.html'), 'utf8');
+      assert.match(account, /Alert preferences/);
+      assert.match(account, /Coffee below 50 SEK/);
+      assert.match(account, /Daily digest/);
+
       const household = await readFile(join(root, 'household/index.html'), 'utf8');
       assert.match(household, /Shared household basket/);
       assert.match(household, /member attribution/);
