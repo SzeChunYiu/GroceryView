@@ -124,6 +124,44 @@ const index = calculateFixedBasketIndex({
   ]
 });
 
+function requireNonEmptyId(value: string, label: string) {
+  if (value.trim().length === 0) {
+    throw new Error(`${label} is required`);
+  }
+}
+
+function requireKnownProduct(productId: string) {
+  requireNonEmptyId(productId, 'productId');
+  if (!products.some((product) => product.id === productId)) {
+    throw new Error(`Unknown productId: ${productId}`);
+  }
+}
+
+function requireKnownStore(storeId: string) {
+  requireNonEmptyId(storeId, 'storeId');
+  if (!stores.some((store) => store.id === storeId)) {
+    throw new Error(`Unknown storeId: ${storeId}`);
+  }
+}
+
+function requirePositiveFinite(value: number, label: string) {
+  if (!Number.isFinite(value) || value <= 0) {
+    throw new Error(`${label} must be positive`);
+  }
+}
+
+function requireOptionalPositiveFinite(value: number | undefined, label: string) {
+  if (value === undefined) return;
+  requirePositiveFinite(value, label);
+}
+
+function requireScoreThreshold(value: number | undefined) {
+  if (value === undefined) return;
+  if (!Number.isFinite(value) || value < 0 || value > 100) {
+    throw new Error('alertDealScoreAt must be between 0 and 100');
+  }
+}
+
 export function createGroceryViewApi() {
   const favoriteStores = new Map<string, Set<string>>();
   const watchlists = new Map<string, WatchlistItem[]>();
@@ -179,6 +217,8 @@ export function createGroceryViewApi() {
     },
 
     addFavoriteStore(userId: string, storeId: string) {
+      requireNonEmptyId(userId, 'userId');
+      requireKnownStore(storeId);
       const set = favoriteStores.get(userId) ?? new Set<string>();
       set.add(storeId);
       favoriteStores.set(userId, set);
@@ -190,6 +230,10 @@ export function createGroceryViewApi() {
     },
 
     addWatchlistItem(userId: string, item: WatchlistItem) {
+      requireNonEmptyId(userId, 'userId');
+      requireKnownProduct(item.productId);
+      requireOptionalPositiveFinite(item.targetPrice, 'targetPrice');
+      requireScoreThreshold(item.alertDealScoreAt);
       watchlists.set(userId, [...(watchlists.get(userId) ?? []), item]);
     },
 
@@ -200,6 +244,11 @@ export function createGroceryViewApi() {
     },
 
     addBasketItem(userId: string, item: BasketItemRequest) {
+      requireNonEmptyId(userId, 'userId');
+      requireKnownProduct(item.productId);
+      if (!Number.isInteger(item.quantity) || item.quantity <= 0 || item.quantity > 99) {
+        throw new Error('quantity must be an integer between 1 and 99');
+      }
       baskets.set(userId, [...(baskets.get(userId) ?? []), item]);
     },
 
@@ -217,6 +266,13 @@ export function createGroceryViewApi() {
     },
 
     updateBudget(userId: string, patch: UserBudgetPatch) {
+      requireNonEmptyId(userId, 'userId');
+      if (!Number.isFinite(patch.weeklyBudget) || patch.weeklyBudget < 0) {
+        throw new Error('weeklyBudget must be zero or positive');
+      }
+      if (!Number.isFinite(patch.monthlyBudget) || patch.monthlyBudget < 0) {
+        throw new Error('monthlyBudget must be zero or positive');
+      }
       budgets.set(userId, patch);
     },
 
