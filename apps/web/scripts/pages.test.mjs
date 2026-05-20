@@ -58,6 +58,9 @@ describe('buildStaticPages', () => {
       const privacy = await readFile(join(root, 'privacy/index.html'), 'utf8');
       assert.match(privacy, /Export or delete your data/);
       assert.match(privacy, /advertiser payloads stay aggregated/);
+      assert.match(privacy, /Control states/);
+      assert.match(privacy, /Receipt images/);
+      assert.match(privacy, /District only/);
     } finally {
       await rm(root, { recursive: true, force: true });
     }
