@@ -19,7 +19,7 @@ class ProbeQueryExecutor implements QueryExecutor {
       return [{ table_name: 'app_users' }, { table_name: 'notification_tasks' }] as T[];
     }
     if (sql.includes('schema_migrations')) {
-      return [{ version: '001_initial_schema' }, { version: '006_notification_tasks' }] as T[];
+      return [{ version: '001_groceryview_schema' }] as T[];
     }
     if (sql.includes('select 1 as ok')) {
       return [{ ok: 1 }] as T[];
@@ -93,7 +93,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       requiredTables: [...POSTGRES_INTEGRATION_REQUIRED_TABLES],
       existingTables: ['app_users', 'favorite_stores', 'notification_tasks'],
       requiredMigrationVersions: [...POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS],
-      appliedMigrationVersions: ['001_initial_schema', '006_notification_tasks'],
+      appliedMigrationVersions: ['001_groceryview_schema'],
       repositoryChecks: [
         { name: 'upsert_user', status: 'pass' },
         { name: 'human_review_assignment_round_trip', status: 'fail' },
@@ -107,11 +107,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_table:human_review_assignments',
       'missing_table:human_reviewers',
       'missing_table:notification_suppressions',
-      'missing_migration:003_human_review_assignments',
-      'missing_migration:004_human_reviewers',
-      'missing_migration:005_community_reporter_trust',
-      'missing_migration:007_notification_suppressions',
-      'missing_migration:008_notification_task_suppressed_status',
+      'missing_migration:002_repository_support_schema',
       'repository_check_fail:human_review_assignment_round_trip',
       'repository_check_not_run:notification_suppression_round_trip'
     ]);
@@ -119,8 +115,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'table:app_users',
       'table:favorite_stores',
       'table:notification_tasks',
-      'migration:001_initial_schema',
-      'migration:006_notification_tasks',
+      'migration:001_groceryview_schema',
       'repository_check:upsert_user'
     ]);
   });
@@ -150,13 +145,8 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'table:human_reviewers',
         'table:notification_suppressions',
         'table:notification_tasks',
-        'migration:001_initial_schema',
-        'migration:003_human_review_assignments',
-        'migration:004_human_reviewers',
-        'migration:005_community_reporter_trust',
-        'migration:006_notification_tasks',
-        'migration:007_notification_suppressions',
-        'migration:008_notification_task_suppressed_status',
+        'migration:001_groceryview_schema',
+        'migration:002_repository_support_schema',
         'repository_check:favorite_store_round_trip',
         'repository_check:human_review_assignment_round_trip',
         'repository_check:notification_suppression_round_trip',
@@ -192,7 +182,7 @@ describe('collectPostgresIntegrationProbe', () => {
       requiredTables: [...POSTGRES_INTEGRATION_REQUIRED_TABLES],
       existingTables: ['app_users', 'notification_tasks'],
       requiredMigrationVersions: [...POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS],
-      appliedMigrationVersions: ['001_initial_schema', '006_notification_tasks'],
+      appliedMigrationVersions: ['001_groceryview_schema'],
       repositoryChecks: [
         { name: 'user_read_probe', status: 'pass' },
         { name: 'suppression_read_probe', status: 'fail' }
@@ -224,7 +214,7 @@ describe('collectPostgresIntegrationProbe', () => {
 
     const report = buildPostgresIntegrationReadinessReport(probe);
     assert.equal(report.status, 'blocked');
-    assert.match(report.blockers.join('\n'), /missing_migration:001_initial_schema/);
+    assert.match(report.blockers.join('\n'), /missing_migration:001_groceryview_schema/);
     assert.match(report.blockers.join('\n'), /repository_check_fail:schema_migrations_probe/);
     assert.deepEqual(report.evidence, ['table:app_users', 'repository_check:user_read_probe']);
   });
@@ -255,8 +245,7 @@ describe('checkPostgresIntegrationReadiness', () => {
     assert.deepEqual(report.evidence, [
       'table:app_users',
       'table:notification_tasks',
-      'migration:001_initial_schema',
-      'migration:006_notification_tasks',
+      'migration:001_groceryview_schema',
       'repository_check:user_read_probe'
     ]);
     assert.match(report.blockers.join('\n'), /missing_table:notification_suppressions/);
