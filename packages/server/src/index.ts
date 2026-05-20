@@ -1,7 +1,15 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { createGroceryViewApi } from '@groceryview/api';
-import { parseBearerToken, verifySessionToken } from '@groceryview/auth';
+import { parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
+import {
+  applyHumanReviewDecision,
+  authorizeHumanReviewAction,
+  summarizeHumanReviewSla,
+  type HumanReviewAssignment,
+  type HumanReviewDecision,
+  type HumanReviewOperator
+} from '@groceryview/core';
 import {
   formatNotificationOperationsMetrics,
   processNotificationSuppressionEvent,
@@ -16,6 +24,11 @@ export type HttpHandler = (request: Request) => Promise<Response>;
 export type AuthOptions = {
   authSecret?: string;
   now?: Date;
+  humanReviewRepository?: {
+    getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
+    listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
+    saveHumanReviewAssignment(assignment: HumanReviewAssignment): Promise<void>;
+  };
   notificationWebhookSecret?: string;
   notificationSuppressionSink?: {
     upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
@@ -84,6 +97,25 @@ function requiredNumber(value: unknown, field: string): number {
   return parsed;
 }
 
+function optionalHumanReviewDecision(value: unknown): HumanReviewDecision | undefined {
+  if (value === undefined) return undefined;
+  if (value === 'approve' || value === 'reject' || value === 'needs_more_info') return value;
+  throw new Error('decision must be approve, reject, or needs_more_info.');
+}
+
+function requiredHumanReviewDecision(value: unknown): HumanReviewDecision {
+  const parsed = optionalHumanReviewDecision(value);
+  if (parsed === undefined) throw new Error('decision is required.');
+  return parsed;
+}
+
+function optionalString(value: unknown, field: string): string | undefined {
+  if (value === undefined) return undefined;
+  if (typeof value !== 'string') throw new Error(`${field} must be a string.`);
+  const trimmed = value.trim();
+  return trimmed ? trimmed : undefined;
+}
+
 function userIdFrom(url: URL): string | Response {
   const userId = url.searchParams.get('userId');
   if (!userId) return errorResponse(400, 'userId query parameter is required.');
@@ -113,11 +145,27 @@ function hasValidMetricsToken(request: Request, token: string): boolean {
 }
 
 export function createHttpHandler(api = createGroceryViewApi(), authOptions: AuthOptions = {}): HttpHandler {
-  const authorizeUser = async (request: Request, userId: string): Promise<Response | null> => {
-    if (!authOptions.authSecret) return null;
+  const requireSession = async (request: Request): Promise<SessionPayload | Response> => {
+    if (!authOptions.authSecret) return errorResponse(503, 'Auth secret is not configured.');
     const token = parseBearerToken(request.headers.get('authorization'));
     if (!token) return errorResponse(401, 'Bearer session token is required.');
-    const session = await verifySessionToken(token, authOptions.authSecret, authOptions.now);
+    return verifySessionToken(token, authOptions.authSecret, authOptions.now);
+  };
+
+  const requireHumanReviewer = async (request: Request): Promise<{ reviewer: HumanReviewOperator } | Response> => {
+    const session = await requireSession(request);
+    if (session instanceof Response) return session;
+    const repository = authOptions.humanReviewRepository;
+    if (!repository) return errorResponse(503, 'Human review repository is not configured.');
+    const reviewer = await repository.getHumanReviewer(session.userId);
+    if (!reviewer) return errorResponse(403, 'Session user is not a registered human reviewer.');
+    return { reviewer };
+  };
+
+  const authorizeUser = async (request: Request, userId: string): Promise<Response | null> => {
+    if (!authOptions.authSecret) return null;
+    const session = await requireSession(request);
+    if (session instanceof Response) return session;
     if (session.userId !== userId) return errorResponse(403, 'Session does not match requested user.');
     return null;
   };
@@ -156,6 +204,58 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           formatNotificationOperationsMetrics(await authOptions.notificationMetricsProvider(), { service: 'groceryview-server' }),
           { status: 200, headers: { 'content-type': 'text/plain; version=0.0.4; charset=utf-8' } }
         );
+      }
+
+      if (method === 'GET' && path === '/api/human-review/assignments') {
+        const result = await requireHumanReviewer(request);
+        if (result instanceof Response) return result;
+        const authorization = authorizeHumanReviewAction({ reviewer: result.reviewer, action: 'view_queue' });
+        if (!authorization.allowed) return errorResponse(403, authorization.reason);
+        const assignments = await authOptions.humanReviewRepository!.listOpenHumanReviewAssignments();
+        return jsonResponse({
+          assignments,
+          sla: summarizeHumanReviewSla({
+            assignments,
+            now: (authOptions.now ?? new Date()).toISOString()
+          })
+        });
+      }
+
+      const humanReviewDecisionMatch = path.match(/^\/api\/human-review\/assignments\/([^/]+)\/decisions$/);
+      if (method === 'POST' && humanReviewDecisionMatch) {
+        const result = await requireHumanReviewer(request);
+        if (result instanceof Response) return result;
+        const repository = authOptions.humanReviewRepository!;
+        const assignmentId = decodeURIComponent(humanReviewDecisionMatch[1]);
+        const assignments = await repository.listOpenHumanReviewAssignments();
+        const assignment = assignments.find((candidate) => candidate.id === assignmentId);
+        if (!assignment) return errorResponse(404, 'Human review assignment not found.');
+        const authorization = authorizeHumanReviewAction({ reviewer: result.reviewer, action: 'decide_review', assignment });
+        if (!authorization.allowed) return errorResponse(403, authorization.reason);
+
+        const body = await readJson(request);
+        const decision = requiredHumanReviewDecision(body.decision);
+        const decidedAt = optionalString(body.decidedAt, 'decidedAt') ?? (authOptions.now ?? new Date()).toISOString();
+        const decisionResult = applyHumanReviewDecision({
+          item: {
+            id: assignment.reviewId,
+            subjectType: assignment.subjectType,
+            subjectId: assignment.subjectId,
+            priority: assignment.priority,
+            reason: assignment.reason
+          },
+          decision,
+          reviewerId: result.reviewer.id,
+          decidedAt,
+          notes: optionalString(body.notes, 'notes')
+        });
+
+        const nextAssignment: HumanReviewAssignment = {
+          ...assignment,
+          status: decision === 'needs_more_info' ? 'in_progress' : 'completed'
+        };
+        await repository.saveHumanReviewAssignment(nextAssignment);
+        return jsonResponse({ decision: decisionResult, assignment: nextAssignment }, { status: 202 });
       }
 
       if (method === 'POST' && path === '/api/notifications/suppression-events') {
@@ -389,6 +489,8 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/budget/summary': { get: protectedOperation('Get budget summary.') },
       '/api/indices': { get: publicOperation('List grocery indices.') },
       '/api/indices/{id}': { get: publicOperation('Get grocery index detail.') },
+      '/api/human-review/assignments': { get: protectedOperation('List open human-review assignments and SLA status.') },
+      '/api/human-review/assignments/{id}/decisions': { post: protectedOperation('Record a human-review decision.') },
       '/api/metrics/notifications': { get: metricsOperation('Export notification operations metrics.') },
       '/api/notifications/suppression-events': { post: webhookOperation('Accept signed notification suppression provider events.') }
     }
