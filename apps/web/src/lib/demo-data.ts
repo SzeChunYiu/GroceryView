@@ -286,6 +286,20 @@ export const categories = [
     index: '97.4',
     movement: '-2.6%',
     topDeal: 'FINDUS-ARTER-650G'
+  },
+  {
+    slug: 'rice',
+    name: 'Rice',
+    index: '92.8',
+    movement: '-7.2%',
+    topDeal: 'ELDORADO-BASMATI-RICE-1KG'
+  },
+  {
+    slug: 'butter',
+    name: 'Butter',
+    index: '106.9',
+    movement: '+6.9%',
+    topDeal: 'BREGOTT-NORMALSALTAT-600G'
   }
 ];
 
