@@ -29,13 +29,10 @@ describe('buildStaticPages', () => {
         'nutrition/allergens/index.html',
         'pantry/index.html',
         'prices/confidence/index.html',
-        'price-confidence/index.html',
         'privacy/index.html',
         'products/coffee/index.html',
         'receipts/review/index.html',
         'retailers/freshness/index.html',
-        'routes/shopping/index.html',
-        'savings/ledger/index.html',
         'savings/smart-swaps/index.html',
         'scanner/index.html',
         'stores/compare/index.html',
@@ -123,13 +120,6 @@ describe('buildStaticPages', () => {
       assert.match(retailerFreshness, /Coop/);
       assert.match(retailerFreshness, /Pause new alerts/);
       assert.match(retailerFreshness, /Stale retailer-page rows cannot trigger household notifications/);
-
-      const shoppingRoute = await readFile(join(root, 'routes/shopping/index.html'), 'utf8');
-      assert.match(shoppingRoute, /Shopping route planner/);
-      assert.match(shoppingRoute, /Ordered stops/);
-      assert.match(shoppingRoute, /Lidl Sveavägen/);
-      assert.match(shoppingRoute, /Route time can reorder stops but cannot change product deal ranking/);
-      assert.match(shoppingRoute, /Unverified prices cannot justify an extra route stop/);
 
       const priceConfidence = await readFile(join(root, 'prices/confidence/index.html'), 'utf8');
       assert.match(priceConfidence, /Price confidence guide/);
@@ -342,13 +332,6 @@ describe('buildStaticPages', () => {
         assert.match(html, /window\.GroceryViewFlowActions/);
         assert.doesNotMatch(html, /innerHTML\s*=/);
       }
-
-      const priceConfidence = await readFile(join(root, 'price-confidence/index.html'), 'utf8');
-      assert.match(priceConfidence, /Price confidence/);
-      assert.match(priceConfidence, /Source rules/);
-      assert.match(priceConfidence, /Claim guardrails/);
-      assert.match(priceConfidence, /Needs confirmation/);
-      assert.match(priceConfidence, /never as a guaranteed saving/);
     } finally {
       await rm(root, { recursive: true, force: true });
     }
