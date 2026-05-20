@@ -49,13 +49,13 @@ services:
       timeout: 5s
       retries: 5
 
-  object-storage-setup:
+  object-storage-init:
     image: minio/mc:latest
     depends_on:
       object-storage:
         condition: service_healthy
     environment:
-      S3_BUCKET: ${S3_BUCKET:-groceryview-local}
+      S3_BUCKET: ${S3_BUCKET:-groceryview-raw}
       MINIO_ROOT_USER: ${MINIO_ROOT_USER:-groceryview}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-groceryview-secret}
     entrypoint:
@@ -64,7 +64,6 @@ services:
       - |
         mc alias set local http://object-storage:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"
         mc mb --ignore-existing "local/$$S3_BUCKET"
-        mc anonymous set private "local/$$S3_BUCKET"
 
   pgadmin:
     image: dpage/pgadmin4:latest
