@@ -1,7 +1,9 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { IsBoolean, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsArray, IsBoolean, IsIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { groceryApi } from '../demo-data.js';
+
+const allowedWatchlistPriceTypes = ['shelf', 'member', 'promotion', 'estimated'] as const;
 
 class WatchlistItemDto {
   @IsString()
@@ -20,6 +22,11 @@ class WatchlistItemDto {
   @IsOptional()
   @IsBoolean()
   favoriteStoresOnly = false;
+
+  @IsOptional()
+  @IsArray()
+  @IsIn(allowedWatchlistPriceTypes, { each: true })
+  allowedPriceTypes?: Array<(typeof allowedWatchlistPriceTypes)[number]>;
 }
 
 @ApiTags('watchlists')

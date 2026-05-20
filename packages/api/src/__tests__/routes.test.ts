@@ -466,7 +466,13 @@ describe('createGroceryViewApi', () => {
     api.addFavoriteStore('user-1', 'willys-odenplan');
     api.addFavoriteStore('user-1', 'lidl-sveavagen');
     api.removeFavoriteStore('user-1', 'lidl-sveavagen');
-    api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, favoriteStoresOnly: true });
+    api.addWatchlistItem('user-1', {
+      productId: 'coffee',
+      targetPrice: 50,
+      alertDealScoreAt: 80,
+      favoriteStoresOnly: true,
+      allowedPriceTypes: ['shelf']
+    });
     api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
     api.addBasketItem('user-1', { productId: 'coffee', quantity: 2 });
     api.updateWatchlistItem('user-1', 'coffee', { targetPrice: 48 });
@@ -474,6 +480,7 @@ describe('createGroceryViewApi', () => {
     api.updateBudget('user-1', { weeklyBudget: 800, monthlyBudget: 3200 });
 
     assert.deepEqual(api.getFavoriteStores('user-1').map((store) => store.id), ['willys-odenplan']);
+    assert.deepEqual(api.getWatchlist('user-1').items[0]?.allowedPriceTypes, ['shelf']);
     assert.equal(api.getWatchlist('user-1').alerts.length, 2);
     assert.deepEqual(api.getBasket('user-1').items[0], { productId: 'coffee', quantity: 2 });
     assert.equal(api.compareBasket('user-1').cheapestByProduct.total, 99.8);
@@ -611,6 +618,15 @@ describe('createGroceryViewApi', () => {
     assert.throws(
       () => api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 0, alertDealScoreAt: 80, favoriteStoresOnly: true }),
       /targetPrice must be positive/
+    );
+    assert.throws(
+      () => api.addWatchlistItem('user-1', {
+        productId: 'coffee',
+        targetPrice: 50,
+        favoriteStoresOnly: true,
+        allowedPriceTypes: ['scraped' as 'shelf']
+      }),
+      /allowedPriceTypes/
     );
     assert.throws(() => api.addBasketItem('user-1', { productId: 'coffee', quantity: 0 }), /quantity must be an integer/);
     assert.throws(() => api.updateWatchlistItem('user-1', 'coffee', { targetPrice: 40 }), /Watchlist item not found/);

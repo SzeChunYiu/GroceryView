@@ -391,7 +391,7 @@ describe('createHttpHandler', () => {
 
     assert.equal((await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
       method: 'POST',
-      body: JSON.stringify({ productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, favoriteStoresOnly: true })
+      body: JSON.stringify({ productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, favoriteStoresOnly: true, allowedPriceTypes: ['shelf'] })
     }))).status, 201);
 
     assert.equal((await handle(new Request('http://localhost/api/basket/items?userId=user-1', {
@@ -426,7 +426,11 @@ describe('createHttpHandler', () => {
       body: JSON.stringify({ categories: [{ category: 'coffee', weeklyBudget: 100 }, { category: 'dairy', weeklyBudget: 40 }] })
     }))).status, 200);
 
-    const watchlist = await json(await handle(new Request('http://localhost/api/watchlist?userId=user-1'))) as { alerts: unknown[] };
+    const watchlist = await json(await handle(new Request('http://localhost/api/watchlist?userId=user-1'))) as {
+      items: Array<{ allowedPriceTypes?: string[] }>;
+      alerts: unknown[];
+    };
+    assert.deepEqual(watchlist.items[0]?.allowedPriceTypes, ['shelf']);
     assert.equal(watchlist.alerts.length, 2);
 
     const comparison = await json(await handle(new Request('http://localhost/api/basket/compare?userId=user-1', { method: 'POST' }))) as { cheapestByProduct: { total: number } };

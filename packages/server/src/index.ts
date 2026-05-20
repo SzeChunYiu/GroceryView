@@ -35,7 +35,8 @@ import {
   type HumanReviewOperator,
   type PrivacyRequest,
   type PrivacyRequestStatus,
-  type PrivacyRequestType
+  type PrivacyRequestType,
+  type WatchlistPriceType
 } from '@groceryview/core';
 import {
   formatNotificationOperationsMetrics,
@@ -306,6 +307,20 @@ function optionalStringArray(value: unknown, field: string): string[] | undefine
   if (value === undefined) return undefined;
   if (!Array.isArray(value)) throw new Error(`${field} must be an array.`);
   return value.map((item, index) => requiredString(item, `${field}[${index}]`));
+}
+
+const watchlistPriceTypes = ['shelf', 'member', 'promotion', 'estimated'] as const satisfies readonly WatchlistPriceType[];
+
+function optionalWatchlistPriceTypes(value: unknown): WatchlistPriceType[] | undefined {
+  const values = optionalStringArray(value, 'allowedPriceTypes');
+  if (values === undefined) return undefined;
+  const allowed = new Set<string>(watchlistPriceTypes);
+  for (const priceType of values) {
+    if (!allowed.has(priceType)) {
+      throw new Error(`allowedPriceTypes must contain only: ${watchlistPriceTypes.join(', ')}.`);
+    }
+  }
+  return values as WatchlistPriceType[];
 }
 
 function householdPlanRequestFromBody(body: JsonRecord): HouseholdPlanRequest {
@@ -915,6 +930,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
             productId: requiredString(body.productId, 'productId'),
             targetPrice: optionalNumber(body.targetPrice, 'targetPrice'),
             alertDealScoreAt: optionalNumber(body.alertDealScoreAt, 'alertDealScoreAt'),
+            allowedPriceTypes: optionalWatchlistPriceTypes(body.allowedPriceTypes),
             favoriteStoresOnly: typeof body.favoriteStoresOnly === 'boolean' ? body.favoriteStoresOnly : true
           });
           return jsonResponse(api.getWatchlist(user), { status: 201 });
@@ -933,6 +949,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           api.updateWatchlistItem(user, productId, {
             targetPrice: optionalNumber(body.targetPrice, 'targetPrice'),
             alertDealScoreAt: optionalNumber(body.alertDealScoreAt, 'alertDealScoreAt'),
+            allowedPriceTypes: optionalWatchlistPriceTypes(body.allowedPriceTypes),
             favoriteStoresOnly: typeof body.favoriteStoresOnly === 'boolean' ? body.favoriteStoresOnly : undefined
           });
           return jsonResponse(api.getWatchlist(user));

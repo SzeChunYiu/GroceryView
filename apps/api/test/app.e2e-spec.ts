@@ -65,10 +65,11 @@ describe('GroceryView API app', () => {
 
     await request(app.getHttpServer())
       .post('/users/demo/watchlist')
-      .send({ productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80 })
+      .send({ productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, allowedPriceTypes: ['shelf'] })
       .expect(201);
     const watchlist = await request(app.getHttpServer()).get('/users/demo/watchlist').expect(200);
     assert.equal(watchlist.body.items[0].productId, 'coffee');
+    assert.deepEqual(watchlist.body.items[0].allowedPriceTypes, ['shelf']);
 
     await request(app.getHttpServer())
       .post('/users/demo/basket/items')
