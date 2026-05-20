@@ -71,6 +71,7 @@ wait_healthy() {
   fail_with_diagnostics "service did not become healthy within ${WAIT_SECONDS}s: $service"
   echo "service did not become healthy within ${WAIT_SECONDS}s: $service" >&2
   compose ps "$service" >&2 || true
+  compose logs "$service" >&2 || true
   exit 1
 }
 

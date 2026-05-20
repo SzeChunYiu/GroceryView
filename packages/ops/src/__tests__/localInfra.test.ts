@@ -64,6 +64,7 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /### MinIO bucket initialization/);
     assert.match(infraReadme, /object-storage-init/);
     assert.match(infraReadme, /S3_BUCKET/);
+    assert.match(smokeScript, /compose logs "\$service"/);
   });
 
   it('runs the local services smoke check in CI for infra changes', () => {
