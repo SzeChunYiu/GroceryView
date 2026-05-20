@@ -489,6 +489,16 @@ export type SourceRunHealthInput = {
   runs: SourceRunReadRecord[];
 };
 
+export type SourceRunHealthReadFilter = {
+  sourceType?: SourceRunRecord['sourceType'];
+  limit?: number;
+};
+
+export type CheckSourceRunHealthInput = Omit<SourceRunHealthInput, 'runs'> & {
+  reader: Pick<PostgresSourceRecordReader, 'listSourceRuns'>;
+  filter?: SourceRunHealthReadFilter;
+};
+
 export type SourceRunHealthReport = {
   status: 'healthy' | 'blocked';
   blockers: string[];
@@ -519,6 +529,13 @@ export type SourceRunHealthSummary = {
   stale: number;
   latestSuccessfulRunId?: string;
   latestSuccessfulFinishedAt?: string;
+};
+
+export type SourceRunHealthCheckResult = {
+  report: SourceRunHealthReport;
+  summary: SourceRunHealthSummary;
+  runCount: number;
+  filter: SourceRunHealthReadFilter;
 };
 
 export type FinishSourceRunRecord = {
@@ -887,6 +904,26 @@ export function summarizeSourceRunHealthReport(report: SourceRunHealthReport): S
   }
 
   return summary;
+}
+
+export async function checkSourceRunHealth(input: CheckSourceRunHealthInput): Promise<SourceRunHealthCheckResult> {
+  const filter: SourceRunHealthReadFilter = {
+    ...(input.filter?.sourceType ? { sourceType: input.filter.sourceType } : {}),
+    limit: input.filter?.limit ?? 100
+  };
+  const runs = await input.reader.listSourceRuns(filter);
+  const report = buildSourceRunHealthReport({
+    now: input.now,
+    maxRunningMinutes: input.maxRunningMinutes,
+    staleAfterMinutes: input.staleAfterMinutes,
+    runs
+  });
+  return {
+    report,
+    summary: summarizeSourceRunHealthReport(report),
+    runCount: runs.length,
+    filter
+  };
 }
 
 function requireUser(users: Map<string, UserRecord>, userId: string): void {

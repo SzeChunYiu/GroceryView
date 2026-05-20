@@ -17,6 +17,7 @@ def test_dagster_smoke_expected_asset_contract() -> None:
         "open_prices_hosted_smoke_plan",
         "open_prices_ingestion_run_plan",
         "open_prices_launch_readiness",
+        "open_prices_launch_readiness_digest",
         "open_prices_real_pull_plan",
         "price_observation_coverage",
         "price_observation_freshness",

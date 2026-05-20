@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Iterable
+from urllib.parse import urlparse
 
 try:
     from dagster import asset
@@ -26,6 +27,7 @@ from .models import (
     OpenPricesHostedSmokePlanSummary,
     OpenPricesIngestionRunPlan,
     OpenPricesIngestionRunPlanSummary,
+    OpenPricesLaunchReadinessDigest,
     OpenPricesLaunchReadinessSummary,
     OpenPricesPullPlan,
     PriceObservationRow,
@@ -60,6 +62,14 @@ def _unit_price(price_amount: float, unit_size: float) -> float | None:
     if unit_size <= 0:
         return None
     return round(price_amount / unit_size, 2)
+
+
+def _normalize_hosted_smoke_url(url: str) -> str | None:
+    normalized_url = url.strip().rstrip("/")
+    parsed_url = urlparse(normalized_url)
+    if parsed_url.scheme not in {"http", "https"} or not parsed_url.netloc:
+        return None
+    return normalized_url
 
 
 def build_retailer_fetch_stubs(
@@ -430,10 +440,20 @@ def build_open_prices_artifact_import_plan(
 def build_open_prices_hosted_smoke_plan(
     *,
     deployment_url_present: bool = False,
+    deployment_url: str | None = None,
     metrics_token_present: bool = False,
     imported_terminal_product_id_present: bool = False,
 ) -> OpenPricesHostedSmokePlan:
     required_actions: list[str] = []
+    normalized_deployment_url = "<https://api.example.com>"
+    if deployment_url is not None:
+        deployment_url_present = True
+        normalized_url = _normalize_hosted_smoke_url(deployment_url)
+        if normalized_url is None:
+            required_actions.append("fix_groceryview_server_url")
+        else:
+            normalized_deployment_url = normalized_url
+
     if not deployment_url_present:
         required_actions.append("set_groceryview_server_url")
     if not metrics_token_present:
@@ -445,10 +465,10 @@ def build_open_prices_hosted_smoke_plan(
         status="ready" if not required_actions else "blocked",
         source_asset="open_prices_artifact_import_plan",
         smoke_command=(
-            "GROCERYVIEW_SERVER_URL=<https://api.example.com> "
+            f"GROCERYVIEW_SERVER_URL={normalized_deployment_url} "
             "GROCERYVIEW_TERMINAL_PRODUCT_ID=<imported-product-id> "
             "infra/scripts/smoke-hosted-http.sh && "
-            "GROCERYVIEW_SERVER_URL=<https://api.example.com> "
+            f"GROCERYVIEW_SERVER_URL={normalized_deployment_url} "
             "METRICS_TOKEN=<token> infra/scripts/smoke-hosted-readiness.sh"
         ),
         required_env=[
@@ -541,6 +561,32 @@ def build_open_prices_launch_readiness_summary(
         blockers_by_plan=blockers_by_plan,
         next_actions=next_actions,
         evidence_fields=evidence_fields,
+    )
+
+
+def summarize_open_prices_launch_readiness(
+    summary: OpenPricesLaunchReadinessSummary,
+) -> OpenPricesLaunchReadinessDigest:
+    hosted_smoke_blockers = summary.blockers_by_plan.get("open_prices_hosted_smoke_plan", [])
+    persistence_plan_names = {
+        "open_prices_ingestion_run_plan",
+        "open_prices_artifact_import_plan",
+    }
+    persistence_blocker_count = sum(
+        len(blockers)
+        for plan_name, blockers in summary.blockers_by_plan.items()
+        if plan_name in persistence_plan_names
+    )
+
+    return OpenPricesLaunchReadinessDigest(
+        status=summary.status,
+        checked_plan_count=len(summary.checked_plans),
+        ready_plan_count=summary.ready_plan_count,
+        blocked_plan_count=summary.blocked_plan_count,
+        next_action_count=len(summary.next_actions),
+        evidence_field_count=len(summary.evidence_fields),
+        hosted_smoke_blocker_count=len(hosted_smoke_blockers),
+        persistence_blocker_count=persistence_blocker_count,
     )
 
 
@@ -804,6 +850,25 @@ def open_prices_launch_readiness(
         OpenPricesHostedSmokePlan(**open_prices_hosted_smoke_plan),
     )
     return summary.to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
+def open_prices_launch_readiness_digest(open_prices_launch_readiness: dict[str, object]) -> dict[str, object]:
+    blockers_by_plan = {
+        str(plan_name): [str(action) for action in actions]
+        for plan_name, actions in dict(open_prices_launch_readiness["blockers_by_plan"]).items()
+    }
+    summary = OpenPricesLaunchReadinessSummary(
+        status=open_prices_launch_readiness["status"],
+        ready_plan_count=int(open_prices_launch_readiness["ready_plan_count"]),
+        blocked_plan_count=int(open_prices_launch_readiness["blocked_plan_count"]),
+        checked_plans=[str(plan) for plan in open_prices_launch_readiness["checked_plans"]],
+        blockers_by_plan=blockers_by_plan,
+        next_actions=[str(action) for action in open_prices_launch_readiness["next_actions"]],
+        evidence_fields=[str(field) for field in open_prices_launch_readiness["evidence_fields"]],
+        demo=bool(open_prices_launch_readiness.get("demo", False)),
+    )
+    return summarize_open_prices_launch_readiness(summary).to_dict()
 
 
 @asset(group_name=ASSET_GROUP)

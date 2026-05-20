@@ -301,6 +301,22 @@ class OpenPricesLaunchReadinessSummary:
 
 
 @dataclass(frozen=True)
+class OpenPricesLaunchReadinessDigest:
+    status: Literal["ready", "blocked"]
+    checked_plan_count: int
+    ready_plan_count: int
+    blocked_plan_count: int
+    next_action_count: int
+    evidence_field_count: int
+    hosted_smoke_blocker_count: int
+    persistence_blocker_count: int
+    demo: bool = False
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class ObservationCoverageSummary:
     status: Literal["ready", "partial"]
     observation_count: int
