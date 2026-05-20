@@ -1,14 +1,18 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createPostgresPriceObservationWriter, createPostgresRepository, type QueryExecutor } from '../index.js';
+import { createPostgresPriceObservationWriter, createPostgresRepository, createPostgresSourceRecordWriter, type QueryExecutor } from '../index.js';
 
 class RecordingQueryExecutor implements QueryExecutor {
   calls: Array<{ sql: string; params: unknown[] }> = [];
   basketId: string | number | undefined = 'basket-1';
   observationId: string | undefined = 'observation-1';
+  sourceRunId: string | undefined = 'source-run-1';
+  rawRecordId: string | undefined = 'raw-record-1';
 
   async query<T>(sql: string, params: unknown[] = []) {
     this.calls.push({ sql, params });
+    if (sql.includes('insert into source_runs')) return this.sourceRunId === undefined ? ([] as T[]) : ([{ id: this.sourceRunId }] as T[]);
+    if (sql.includes('insert into raw_records')) return this.rawRecordId === undefined ? ([] as T[]) : ([{ id: this.rawRecordId }] as T[]);
     if (sql.includes('insert into observations')) return this.observationId === undefined ? ([] as T[]) : ([{ id: this.observationId }] as T[]);
     if (sql.includes('select store_id')) return [{ store_id: 'willys-odenplan' }] as T[];
     if (sql.includes('select weekly_budget')) return [{ weekly_budget: '800', monthly_budget: '3200' }] as T[];
@@ -288,6 +292,100 @@ describe('createPostgresRepository', () => {
       true,
       '2026-05-19T20:31:00.000Z'
     ]);
+  });
+});
+
+describe('createPostgresSourceRecordWriter', () => {
+  it('creates source runs with provenance and optional timing metadata', async () => {
+    const executor = new RecordingQueryExecutor();
+    const writer = createPostgresSourceRecordWriter(executor);
+
+    assert.deepEqual(
+      await writer.createSourceRun({
+        sourceType: 'retailer_api',
+        sourceName: 'Willys',
+        sourceUrl: 'https://example.invalid/willys/offers',
+        startedAt: '2026-05-20T08:00:00.000Z',
+        finishedAt: '2026-05-20T08:01:00.000Z',
+        status: 'succeeded',
+        provenance: { collectorVersion: '2026.05.20', schedule: 'daily' }
+      }),
+      { sourceRunId: 'source-run-1' }
+    );
+
+    assert.match(executor.calls[0]!.sql, /insert into source_runs/);
+    assert.match(executor.calls[0]!.sql, /returning id/);
+    assert.deepEqual(executor.calls[0]!.params, [
+      'retailer_api',
+      'Willys',
+      'https://example.invalid/willys/offers',
+      '2026-05-20T08:00:00.000Z',
+      '2026-05-20T08:01:00.000Z',
+      'succeeded',
+      JSON.stringify({ collectorVersion: '2026.05.20', schedule: 'daily' }),
+      null
+    ]);
+  });
+
+  it('upserts raw records idempotently by source run and payload hash', async () => {
+    const executor = new RecordingQueryExecutor();
+    const writer = createPostgresSourceRecordWriter(executor);
+
+    assert.deepEqual(
+      await writer.upsertRawRecord({
+        sourceRunId: 'source-run-1',
+        recordType: 'price',
+        externalRef: 'retailer-price-1',
+        observedAt: '2026-05-20T08:00:00.000Z',
+        payload: { product: 'coffee', price: 49.9 },
+        payloadHash: 'sha256:payload-1',
+        provenance: { fetchUrl: 'https://example.invalid/coffee', parserVersion: 'retailer-v1' }
+      }),
+      { rawRecordId: 'raw-record-1' }
+    );
+
+    assert.match(executor.calls[0]!.sql, /insert into raw_records/);
+    assert.match(executor.calls[0]!.sql, /on conflict \(source_run_id, payload_hash\) do update/);
+    assert.match(executor.calls[0]!.sql, /returning id/);
+    assert.deepEqual(executor.calls[0]!.params, [
+      'source-run-1',
+      'price',
+      'retailer-price-1',
+      '2026-05-20T08:00:00.000Z',
+      JSON.stringify({ product: 'coffee', price: 49.9 }),
+      'sha256:payload-1',
+      JSON.stringify({ fetchUrl: 'https://example.invalid/coffee', parserVersion: 'retailer-v1' })
+    ]);
+  });
+
+  it('fails closed when source run or raw record writes do not return ids', async () => {
+    const executor = new RecordingQueryExecutor();
+    const writer = createPostgresSourceRecordWriter(executor);
+    executor.sourceRunId = undefined;
+
+    await assert.rejects(
+      writer.createSourceRun({
+        sourceType: 'retailer_page',
+        sourceName: 'Retailer',
+        status: 'failed',
+        provenance: {},
+        errorMessage: 'timeout'
+      }),
+      /Source run insert did not return an id/
+    );
+
+    executor.sourceRunId = 'source-run-1';
+    executor.rawRecordId = undefined;
+    await assert.rejects(
+      writer.upsertRawRecord({
+        sourceRunId: 'source-run-1',
+        recordType: 'product',
+        payload: { sku: 'sku-1' },
+        payloadHash: 'sha256:payload-2',
+        provenance: {}
+      }),
+      /Raw record upsert did not return an id/
+    );
   });
 });
 

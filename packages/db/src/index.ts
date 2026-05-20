@@ -217,6 +217,40 @@ export type PostgresPriceObservationWriter = {
   recordPriceObservation(observation: PriceObservationRecord): Promise<PriceObservationWriteResult>;
 };
 
+export type SourceRunRecord = {
+  sourceType: 'retailer_api' | 'retailer_page' | 'weekly_leaflet' | 'receipt_ocr' | 'community_report' | 'manual_seed';
+  sourceName: string;
+  sourceUrl?: string;
+  startedAt?: string;
+  finishedAt?: string;
+  status: 'running' | 'succeeded' | 'failed' | 'partial';
+  provenance: Record<string, unknown>;
+  errorMessage?: string;
+};
+
+export type RawRecordRecord = {
+  sourceRunId: string;
+  recordType: 'product' | 'store' | 'price' | 'promotion' | 'receipt' | 'community_report';
+  externalRef?: string;
+  observedAt?: string;
+  payload: Record<string, unknown>;
+  payloadHash: string;
+  provenance: Record<string, unknown>;
+};
+
+export type SourceRunWriteResult = {
+  sourceRunId: string;
+};
+
+export type RawRecordWriteResult = {
+  rawRecordId: string;
+};
+
+export type PostgresSourceRecordWriter = {
+  createSourceRun(sourceRun: SourceRunRecord): Promise<SourceRunWriteResult>;
+  upsertRawRecord(rawRecord: RawRecordRecord): Promise<RawRecordWriteResult>;
+};
+
 export type HumanReviewerRecord = {
   id: string;
   role: 'viewer' | 'moderator' | 'lead';
@@ -979,6 +1013,74 @@ export type PostgresIntegrationReadinessReport = {
 type TableNameRow = { table_name: string };
 type MigrationVersionRow = { version: string };
 type ObservationIdRow = { id: string };
+type SourceRunIdRow = { id: string };
+type RawRecordIdRow = { id: string };
+
+export function createPostgresSourceRecordWriter(executor: QueryExecutor): PostgresSourceRecordWriter {
+  return {
+    async createSourceRun(sourceRun) {
+      const rows = await executor.query<SourceRunIdRow>(
+        `insert into source_runs(
+           source_type,
+           source_name,
+           source_url,
+           started_at,
+           finished_at,
+           status,
+           provenance,
+           error_message
+         ) values ($1, $2, $3, coalesce($4, now()), $5, $6, $7::jsonb, $8)
+         returning id`,
+        [
+          sourceRun.sourceType,
+          sourceRun.sourceName,
+          sourceRun.sourceUrl ?? null,
+          sourceRun.startedAt ?? null,
+          sourceRun.finishedAt ?? null,
+          sourceRun.status,
+          JSON.stringify(sourceRun.provenance),
+          sourceRun.errorMessage ?? null
+        ]
+      );
+      const sourceRunId = rows[0]?.id;
+      if (!sourceRunId) throw new Error('Source run insert did not return an id');
+      return { sourceRunId };
+    },
+
+    async upsertRawRecord(rawRecord) {
+      const rows = await executor.query<RawRecordIdRow>(
+        `insert into raw_records(
+           source_run_id,
+           record_type,
+           external_ref,
+           observed_at,
+           payload,
+           payload_hash,
+           provenance
+         ) values ($1, $2, $3, $4, $5::jsonb, $6, $7::jsonb)
+         on conflict (source_run_id, payload_hash) do update set
+           record_type = excluded.record_type,
+           external_ref = excluded.external_ref,
+           observed_at = excluded.observed_at,
+           payload = excluded.payload,
+           provenance = excluded.provenance
+         returning id`,
+        [
+          rawRecord.sourceRunId,
+          rawRecord.recordType,
+          rawRecord.externalRef ?? null,
+          rawRecord.observedAt ?? null,
+          JSON.stringify(rawRecord.payload),
+          rawRecord.payloadHash,
+          JSON.stringify(rawRecord.provenance)
+        ]
+      );
+      const rawRecordId = rows[0]?.id;
+      if (!rawRecordId) throw new Error('Raw record upsert did not return an id');
+      return { rawRecordId };
+    }
+  };
+}
 
 export function createPostgresPriceObservationWriter(executor: QueryExecutor): PostgresPriceObservationWriter {
   return {
