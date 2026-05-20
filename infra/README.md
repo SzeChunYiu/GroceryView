@@ -41,7 +41,7 @@ OPEN_PRICES_USER_AGENT="GroceryView/0.1 (contact@example.com)" \
   infra/scripts/smoke-open-prices.sh
 ```
 
-The smoke calls `https://prices.openfoodfacts.org/api/v1/prices?currency=SEK&size=10&location__osm_address_country_code=SE&order_by=-date` by default, parses returned SEK price rows into GroceryView ingestion records, requires at least one accepted product price, and prints source URL, content hash, raw snapshot reference, first normalized product, and Open Prices attribution. Override `OPEN_PRICES_COUNTRY_CODE`, `OPEN_PRICES_SIZE`, or `OPEN_PRICES_URL` for bounded follow-up pulls that still return SEK prices.
+The smoke calls `https://prices.openfoodfacts.org/api/v1/prices?currency=SEK&size=10&location__osm_address_country_code=SE&order_by=-date` by default, parses returned SEK price rows into GroceryView ingestion records, requires at least one accepted product price, and prints source URL, content hash, raw snapshot reference, first normalized product, and Open Prices attribution. Override `OPEN_PRICES_COUNTRY_CODE`, `OPEN_PRICES_SIZE`, `OPEN_PRICES_TIMEOUT_SECONDS`, or `OPEN_PRICES_URL` for bounded follow-up pulls that still return SEK prices.
 
 To save the normalized rows for inspection or handoff to a persistence job, set `OPEN_PRICES_OUTPUT_PATH`:
 

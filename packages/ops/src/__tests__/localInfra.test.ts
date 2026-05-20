@@ -148,6 +148,7 @@ describe('local infrastructure compose', () => {
     assert.match(smokeOpenPricesScript, /currency: 'SEK'/);
     assert.match(smokeOpenPricesScript, /countryCode: process\.env\.OPEN_PRICES_COUNTRY_CODE \|\| 'SE'/);
     assert.match(smokeOpenPricesScript, /acceptedCount/);
+    assert.match(smokeOpenPricesScript, /OPEN_PRICES_TIMEOUT_SECONDS must be a positive integer/);
     assert.match(smokeOpenPricesScript, /Open Prices smoke requires OPEN_PRICES_USER_AGENT/);
     assert.match(smokeOpenPricesScript, /Hosted Open Prices real-data smoke passed/);
   });
