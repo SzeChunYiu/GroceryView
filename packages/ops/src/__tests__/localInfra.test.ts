@@ -6,6 +6,7 @@ const compose = readFileSync(new URL('../../../../infra/docker-compose.yml', imp
 const envExample = readFileSync(new URL('../../../../.env.example', import.meta.url), 'utf8');
 const infraReadme = readFileSync(new URL('../../../../infra/README.md', import.meta.url), 'utf8');
 const smokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-local-services.sh', import.meta.url), 'utf8');
+const hostedReadinessSmokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-hosted-readiness.sh', import.meta.url), 'utf8');
 const smokeWorkflow = readFileSync(new URL('../../../../.github/workflows/local-infra-smoke.yml', import.meta.url), 'utf8');
 
 describe('local infrastructure compose', () => {
@@ -62,5 +63,15 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /### MinIO bucket initialization/);
     assert.match(infraReadme, /object-storage-init/);
     assert.match(infraReadme, /S3_BUCKET/);
+  });
+
+  it('ships a hosted PostgreSQL readiness smoke script for deployment evidence', () => {
+    assert.match(hostedReadinessSmokeScript, /GROCERYVIEW_SERVER_URL/);
+    assert.match(hostedReadinessSmokeScript, /METRICS_TOKEN/);
+    assert.match(hostedReadinessSmokeScript, /READINESS_TIMEOUT_SECONDS/);
+    assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/postgres/);
+    assert.match(hostedReadinessSmokeScript, /x-groceryview-metrics-token: \$METRICS_TOKEN/);
+    assert.match(hostedReadinessSmokeScript, /curl -fsS/);
+    assert.match(hostedReadinessSmokeScript, /"status"\[\[:space:\]\]\*:\[\[:space:\]\]\*"ready"/);
   });
 });
