@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createGroceryViewApi } from '@groceryview/api';
-import { buildExpoReadinessPlan, buildMobileScreenBlueprints, buildMobileShell, buildScanResult, createMobileDiscoveryViewModel, createMobileViewModel } from '../index.js';
+import { buildExpoReadinessPlan, buildMobileProviderReadinessReport, buildMobileScreenBlueprints, buildMobileShell, buildScanResult, createMobileDiscoveryViewModel, createMobileViewModel } from '../index.js';
 
 describe('mobile app foundation', () => {
   it('defines the proposal bottom navigation and Today dashboard modules', () => {
@@ -121,5 +121,50 @@ describe('mobile app foundation', () => {
       '/scan/receipt',
       '/profile'
     ]);
+  });
+
+  it('blocks mobile screens when required providers are unavailable', () => {
+    const report = buildMobileProviderReadinessReport({
+      providers: {
+        camera: 'available',
+        'secure-session': 'available',
+        'barcode-lookup': 'available',
+        ocr: 'not_configured',
+        'push-notifications': 'denied'
+      }
+    });
+
+    assert.equal(report.status, 'blocked');
+    assert.deepEqual(report.blockers, [
+      'mobile_provider_missing:/scan/receipt:ocr',
+      'mobile_provider_missing:/profile:push-notifications'
+    ]);
+
+    const barcode = report.screenStates.find((screen) => screen.route === '/scan/barcode');
+    const receipt = report.screenStates.find((screen) => screen.route === '/scan/receipt');
+    const profile = report.screenStates.find((screen) => screen.route === '/profile');
+
+    assert.equal(barcode?.state, 'ready');
+    assert.equal(receipt?.state, 'needs_provider');
+    assert.deepEqual(receipt?.actions, []);
+    assert.equal(profile?.state, 'needs_provider');
+    assert.deepEqual(profile?.missingProviders, ['push-notifications']);
+  });
+
+  it('marks mobile provider readiness ready when all provider gates are available', () => {
+    const report = buildMobileProviderReadinessReport({
+      providers: {
+        camera: 'available',
+        'secure-session': 'available',
+        'barcode-lookup': 'available',
+        ocr: 'available',
+        'push-notifications': 'available'
+      }
+    });
+
+    assert.equal(report.status, 'ready');
+    assert.deepEqual(report.blockers, []);
+    assert.equal(report.screenStates.every((screen) => screen.state === 'ready'), true);
+    assert.equal(report.summary, 'Mobile providers are ready.');
   });
 });
