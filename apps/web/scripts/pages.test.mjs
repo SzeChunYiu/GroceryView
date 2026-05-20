@@ -362,14 +362,19 @@ describe('buildStaticPages', () => {
       const privacy = await readFile(join(root, 'privacy/index.html'), 'utf8');
       assert.match(privacy, /Export or delete your data/);
       assert.match(privacy, /advertiser payloads stay aggregated/);
+      assert.match(privacy, /Request fulfillment deadlines/);
       assert.match(privacy, /Control states/);
       assert.match(privacy, /Receipt images/);
       assert.match(privacy, /District only/);
       assert.match(privacy, /data-groceryview-flow="privacy"/);
       assert.match(privacy, /data-flow-action="download-export"/);
+      assert.match(privacy, /data-flow-action="check-fulfillment"/);
       assert.match(privacy, /data-flow-result="privacy"/);
       assert.match(privacy, /fetch\(apiUrl\('\/api\/privacy\/export/);
       assert.match(privacy, /fetch\(apiUrl\('\/api\/privacy\/deletion-plan/);
+      assert.match(privacy, /fetch\(apiUrl\('\/api\/privacy\/request-fulfillment/);
+      assert.match(privacy, /overdueRequestIds/);
+      assert.match(privacy, /dueSoonRequestIds/);
 
       for (const pagePath of ['login/index.html', 'account/index.html', 'basket/index.html', 'scanner/index.html', 'privacy/index.html', 'products/coffee/index.html']) {
         const html = await readFile(join(root, pagePath), 'utf8');
