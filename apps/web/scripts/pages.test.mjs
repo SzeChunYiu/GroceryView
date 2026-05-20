@@ -324,6 +324,14 @@ describe('buildStaticPages', () => {
       assert.match(humanReview, /Approve product match/);
       assert.match(humanReview, /approve_product_match/);
 
+      const store = await readFile(join(root, 'stores/willys-odenplan/index.html'), 'utf8');
+      assert.match(store, /Store deal feed/);
+      assert.match(store, /ZOEGAS-COFFEE-450G/);
+      assert.match(store, /110\.89 SEK\/kg/);
+      assert.match(store, /member promo/);
+      assert.match(store, /not universal shelf price/);
+      assert.match(store, /Unverified estimate/);
+
       const privacy = await readFile(join(root, 'privacy/index.html'), 'utf8');
       assert.match(privacy, /Export or delete your data/);
       assert.match(privacy, /advertiser payloads stay aggregated/);
