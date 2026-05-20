@@ -99,6 +99,14 @@ GROCERYVIEW_TERMINAL_PRODUCT_ID=coffee \
   infra/scripts/smoke-hosted-http.sh
 ```
 
+Set `HOSTED_HTTP_SMOKE_OUTPUT_PATH` to save passed hosted HTTP smoke evidence as JSON for release records:
+
+```bash
+GROCERYVIEW_SERVER_URL=https://api.groceryview.example \
+HOSTED_HTTP_SMOKE_OUTPUT_PATH=/tmp/groceryview-hosted-http-smoke.json \
+  infra/scripts/smoke-hosted-http.sh
+```
+
 After the hosted database has migrations applied, run the token-protected PostgreSQL readiness smoke:
 
 ```bash

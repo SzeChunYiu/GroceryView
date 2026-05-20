@@ -5,6 +5,7 @@ GROCERYVIEW_SERVER_URL="${GROCERYVIEW_SERVER_URL:-}"
 GROCERYVIEW_WEB_URL="${GROCERYVIEW_WEB_URL:-}"
 GROCERYVIEW_TERMINAL_PRODUCT_ID="${GROCERYVIEW_TERMINAL_PRODUCT_ID:-coffee}"
 HTTP_SMOKE_TIMEOUT_SECONDS="${HTTP_SMOKE_TIMEOUT_SECONDS:-15}"
+HOSTED_HTTP_SMOKE_OUTPUT_PATH="${HOSTED_HTTP_SMOKE_OUTPUT_PATH:-}"
 
 if [ -z "$GROCERYVIEW_SERVER_URL" ]; then
   echo "GROCERYVIEW_SERVER_URL is required for hosted HTTP smoke" >&2
@@ -83,4 +84,30 @@ if [ -n "$GROCERYVIEW_WEB_URL" ]; then
     -o /dev/null \
     "$GROCERYVIEW_WEB_URL"
   echo "Hosted web smoke passed: $GROCERYVIEW_WEB_URL"
+fi
+
+if [ -n "$HOSTED_HTTP_SMOKE_OUTPUT_PATH" ]; then
+  mkdir -p "$(dirname "$HOSTED_HTTP_SMOKE_OUTPUT_PATH")"
+  HOSTED_HTTP_SMOKE_API_HEALTH_URL="$api_health_url"
+  HOSTED_HTTP_SMOKE_PRODUCT_TERMINAL_URL="$api_terminal_url"
+  export HOSTED_HTTP_SMOKE_API_HEALTH_URL
+  export HOSTED_HTTP_SMOKE_PRODUCT_TERMINAL_URL
+  export HOSTED_HTTP_SMOKE_OUTPUT_PATH
+
+  node --input-type=module <<'NODE'
+import { writeFile } from 'node:fs/promises';
+
+const payload = {
+  status: 'passed',
+  apiHealthUrl: process.env.HOSTED_HTTP_SMOKE_API_HEALTH_URL,
+  productTerminalUrl: process.env.HOSTED_HTTP_SMOKE_PRODUCT_TERMINAL_URL,
+  productId: process.env.GROCERYVIEW_TERMINAL_PRODUCT_ID,
+  webUrl: process.env.GROCERYVIEW_WEB_URL || null,
+  checkedAt: new Date().toISOString()
+};
+
+await writeFile(process.env.HOSTED_HTTP_SMOKE_OUTPUT_PATH, `${JSON.stringify(payload, null, 2)}\n`);
+NODE
+
+  echo "Hosted HTTP smoke evidence written: $HOSTED_HTTP_SMOKE_OUTPUT_PATH"
 fi
