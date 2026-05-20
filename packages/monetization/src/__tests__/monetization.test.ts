@@ -5,8 +5,10 @@ import {
   buildAdPlacementPlan,
   buildMobilePremiumEntitlementPlan,
   buildMonetizationProviderReadinessReport,
+  buildSubscriptionAccessPolicy,
   buildSubscriptionCheckoutPlan,
-  planBillingWebhookEvent
+  parseStripeCompatibleSubscriptionEvent,
+  processBillingSubscriptionEvent
 } from '../index.js';
 
 describe('monetization foundation', () => {
@@ -385,70 +387,52 @@ describe('monetization foundation', () => {
     });
   });
 
-  it('plans signed billing webhook events as idempotent subscription mutations', () => {
-    const plan = planBillingWebhookEvent({
-      providerName: 'stripe_compatible',
-      webhookConfigured: true,
-      signatureVerified: true,
-      providerEventId: 'evt_123',
-      eventType: 'checkout_completed',
+  it('hides mobile ads for active premium entitlements and schedules status refresh', () => {
+    const plan = buildMobilePremiumEntitlementPlan({
       userId: 'user-1',
-      plan: 'premium_monthly',
-      occurredAt: '2026-05-20T00:00:00.000Z'
+      userTier: 'premium',
+      platform: 'ios',
+      billingProviderConfigured: true,
+      activeSubscriptionPlan: 'premium_monthly',
+      expiresAt: '2026-06-20T00:00:00.000Z',
+      now: '2026-05-20T00:00:00.000Z'
     });
 
-    assert.deepEqual(plan, {
-      status: 'ready',
-      providerEventId: 'evt_123',
-      idempotencyKey: 'stripe_compatible:evt_123',
-      subscriptionMutation: {
-        userId: 'user-1',
-        tier: 'premium',
-        plan: 'premium_monthly',
-        billingStatus: 'active',
-        changedAt: '2026-05-20T00:00:00.000Z',
-        reason: 'checkout_completed'
-      }
-    });
+    assert.equal(plan.premiumActive, true);
+    assert.deepEqual(plan.adPlan.slots, []);
+    assert.deepEqual(plan.blockers, []);
+    assert.deepEqual(plan.actions, ['hide_mobile_ads', 'refresh_subscription_status']);
   });
 
-  it('blocks unsigned billing webhooks before subscription mutation planning', () => {
-    const plan = planBillingWebhookEvent({
-      providerName: 'stripe_compatible',
-      webhookConfigured: true,
-      signatureVerified: false,
-      providerEventId: 'evt_unsigned',
-      eventType: 'subscription_renewed',
-      userId: 'user-1',
-      plan: 'premium_yearly',
-      occurredAt: '2026-05-20T00:00:00.000Z'
+  it('keeps labeled mobile ads and checkout actions for free users', () => {
+    const plan = buildMobilePremiumEntitlementPlan({
+      userId: 'user-2',
+      userTier: 'free',
+      platform: 'android',
+      billingProviderConfigured: true,
+      now: '2026-05-20T00:00:00.000Z'
     });
 
-    assert.deepEqual(plan, {
-      status: 'blocked',
-      reason: 'Billing webhook signature must be verified before processing.',
-      requiredActions: ['billing_webhook_signature_required']
-    });
+    assert.equal(plan.premiumActive, false);
+    assert.deepEqual(plan.adPlan.slots.map((slot) => `${slot.surface}:${slot.provider}:${slot.label}`), ['mobile_deals_feed:admob:Sponsored']);
+    assert.equal(plan.adPlan.affectsDealScore, false);
+    assert.deepEqual(plan.blockers, []);
+    assert.deepEqual(plan.actions, ['show_mobile_deals_ads', 'start_premium_checkout', 'restore_purchase']);
   });
 
-  it('skips duplicate provider webhook events by provider event id', () => {
-    const plan = planBillingWebhookEvent({
-      providerName: 'stripe_compatible',
-      webhookConfigured: true,
-      signatureVerified: true,
-      providerEventId: 'evt_seen',
-      eventType: 'invoice_payment_failed',
-      userId: 'user-1',
-      plan: 'premium_monthly',
-      occurredAt: '2026-05-20T00:00:00.000Z',
-      previousEventIds: ['evt_seen']
+  it('blocks expired mobile premium recovery when billing is not configured', () => {
+    const plan = buildMobilePremiumEntitlementPlan({
+      userId: 'user-3',
+      userTier: 'premium',
+      platform: 'ios',
+      billingProviderConfigured: false,
+      activeSubscriptionPlan: 'premium_yearly',
+      expiresAt: '2026-05-19T00:00:00.000Z',
+      now: '2026-05-20T00:00:00.000Z'
     });
 
-    assert.deepEqual(plan, {
-      status: 'duplicate',
-      providerEventId: 'evt_seen',
-      idempotencyKey: 'stripe_compatible:evt_seen',
-      requiredActions: ['skip_duplicate_billing_event']
-    });
+    assert.equal(plan.premiumActive, false);
+    assert.deepEqual(plan.blockers, ['mobile_billing_provider_not_configured']);
+    assert.deepEqual(plan.actions, ['show_mobile_deals_ads']);
   });
 });

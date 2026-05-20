@@ -208,11 +208,6 @@ export function buildAdDeliveryComplianceReport(candidates: AdDeliveryCandidate[
 }
 
 export type SubscriptionPlan = 'premium_monthly' | 'premium_yearly';
-export type BillingWebhookEventType =
-  | 'checkout_completed'
-  | 'subscription_renewed'
-  | 'subscription_canceled'
-  | 'invoice_payment_failed';
 
 export type SubscriptionEntitlementSnapshot = {
   tier: UserTier;
@@ -507,101 +502,37 @@ export function buildSubscriptionCheckoutPlan(input: SubscriptionCheckoutInput):
   };
 }
 
-export type BillingWebhookPlanInput = {
-  providerName: 'stripe_compatible';
-  webhookConfigured: boolean;
-  signatureVerified: boolean;
-  providerEventId: string;
-  eventType: BillingWebhookEventType;
-  userId: string;
-  plan?: SubscriptionPlan;
-  occurredAt: string;
-  previousEventIds?: string[];
-};
+export function buildMobilePremiumEntitlementPlan(input: MobilePremiumEntitlementInput): MobilePremiumEntitlementPlan {
+  if (!input.userId) throw new Error('userId is required.');
+  const blockers: string[] = [];
+  const actions: MobilePremiumEntitlementPlan['actions'] = [];
+  let premiumActive = input.userTier === 'premium';
 
-export type BillingWebhookPlan =
-  | {
-      status: 'blocked';
-      reason: string;
-      requiredActions: string[];
+  if (input.expiresAt) {
+    const expiresAtMs = Date.parse(input.expiresAt);
+    const nowMs = Date.parse(input.now);
+    if (Number.isNaN(expiresAtMs)) throw new Error('expiresAt must be an ISO date.');
+    if (Number.isNaN(nowMs)) throw new Error('now must be an ISO date.');
+    premiumActive = premiumActive && expiresAtMs > nowMs;
+  }
+
+  if (premiumActive) {
+    actions.push('hide_mobile_ads', 'refresh_subscription_status');
+  } else {
+    actions.push('show_mobile_deals_ads');
+    if (input.billingProviderConfigured) {
+      actions.push('start_premium_checkout', 'restore_purchase');
+    } else {
+      blockers.push('mobile_billing_provider_not_configured');
     }
-  | {
-      status: 'duplicate';
-      providerEventId: string;
-      idempotencyKey: string;
-      requiredActions: ['skip_duplicate_billing_event'];
-    }
-  | {
-      status: 'ready';
-      providerEventId: string;
-      idempotencyKey: string;
-      subscriptionMutation: {
-        userId: string;
-        tier: UserTier;
-        plan?: SubscriptionPlan;
-        billingStatus: 'active' | 'canceled' | 'past_due';
-        changedAt: string;
-        reason: BillingWebhookEventType;
-      };
-    };
-
-export function planBillingWebhookEvent(input: BillingWebhookPlanInput): BillingWebhookPlan {
-  if (!input.webhookConfigured) {
-    return {
-      status: 'blocked',
-      reason: 'Billing webhook endpoint is not configured.',
-      requiredActions: ['billing_webhook_not_configured']
-    };
-  }
-  if (!input.signatureVerified) {
-    return {
-      status: 'blocked',
-      reason: 'Billing webhook signature must be verified before processing.',
-      requiredActions: ['billing_webhook_signature_required']
-    };
-  }
-  if (!input.providerEventId.trim()) throw new Error('providerEventId is required.');
-  if (!input.userId.trim()) throw new Error('userId is required.');
-  if (Number.isNaN(Date.parse(input.occurredAt))) throw new Error('occurredAt must be an ISO date.');
-
-  const idempotencyKey = `${input.providerName}:${input.providerEventId}`;
-  if ((input.previousEventIds ?? []).includes(input.providerEventId)) {
-    return {
-      status: 'duplicate',
-      providerEventId: input.providerEventId,
-      idempotencyKey,
-      requiredActions: ['skip_duplicate_billing_event']
-    };
-  }
-
-  if (input.eventType === 'checkout_completed' || input.eventType === 'subscription_renewed') {
-    if (!input.plan) throw new Error('plan is required for active subscription events.');
-    return {
-      status: 'ready',
-      providerEventId: input.providerEventId,
-      idempotencyKey,
-      subscriptionMutation: {
-        userId: input.userId,
-        tier: 'premium',
-        plan: input.plan,
-        billingStatus: 'active',
-        changedAt: input.occurredAt,
-        reason: input.eventType
-      }
-    };
   }
 
   return {
-    status: 'ready',
-    providerEventId: input.providerEventId,
-    idempotencyKey,
-    subscriptionMutation: {
-      userId: input.userId,
-      tier: input.eventType === 'subscription_canceled' ? 'free' : 'premium',
-      plan: input.plan,
-      billingStatus: input.eventType === 'subscription_canceled' ? 'canceled' : 'past_due',
-      changedAt: input.occurredAt,
-      reason: input.eventType
-    }
+    userId: input.userId,
+    platform: input.platform,
+    premiumActive,
+    adPlan: buildAdPlacementPlan({ userTier: premiumActive ? 'premium' : 'free', configuredProviders: ['admob'] }),
+    blockers,
+    actions
   };
 }
