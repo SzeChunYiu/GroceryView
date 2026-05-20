@@ -878,6 +878,7 @@ export type HealthReport = {
   service: 'groceryview-server';
   environment: RuntimeConfig['nodeEnv'];
   hasDatabase: boolean;
+  hasPublicWebUrl: boolean;
   hasAuthSecret: boolean;
   hasNotificationWebhookSecret: boolean;
   hasBillingWebhookSecret: boolean;
@@ -890,6 +891,7 @@ export function buildHealthReport(config: RuntimeConfig): HealthReport {
     service: 'groceryview-server',
     environment: config.nodeEnv,
     hasDatabase: Boolean(config.databaseUrl),
+    hasPublicWebUrl: Boolean(config.publicWebUrl),
     hasAuthSecret: Boolean(config.authSecret),
     hasNotificationWebhookSecret: Boolean(config.notificationWebhookSecret),
     hasBillingWebhookSecret: Boolean(config.billingWebhookSecret),
