@@ -29,6 +29,7 @@ describe('buildStaticPages', () => {
         'notifications/inbox/index.html',
         'nutrition/allergens/index.html',
         'pantry/index.html',
+        'prices/anomalies/index.html',
         'prices/confidence/index.html',
         'privacy/index.html',
         'products/coffee/index.html',
@@ -116,6 +117,13 @@ describe('buildStaticPages', () => {
       assert.match(priceConfidence, /Verified shelf/);
       assert.match(priceConfidence, /Estimated and low-confidence rows are excluded/);
       assert.match(priceConfidence, /Only verified or fresh retailer-page prices can alert/);
+
+      const priceAnomalies = await readFile(join(root, 'prices/anomalies/index.html'), 'utf8');
+      assert.match(priceAnomalies, /Price anomaly review/);
+      assert.match(priceAnomalies, /Anomaly queue/);
+      assert.match(priceAnomalies, /Butter 600g/);
+      assert.match(priceAnomalies, /Outlier spikes cannot update Deal Score/);
+      assert.match(priceAnomalies, /Large price drops require fresh retailer-page or receipt evidence/);
 
       const deals = await readFile(join(root, 'deals/today/index.html'), 'utf8');
       assert.match(deals, /Today’s best grocery deals/);
