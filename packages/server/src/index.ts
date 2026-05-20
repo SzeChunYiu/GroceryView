@@ -5,7 +5,14 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createGroceryViewApi } from '@groceryview/api';
 import { parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
-import { createPgQueryExecutor, createPostgresRepository, type PgLikeClient } from '@groceryview/db';
+import {
+  checkPostgresIntegrationReadiness,
+  createPgQueryExecutor,
+  createPostgresRepository,
+  type PgLikeClient,
+  type PostgresIntegrationReadinessReport,
+  type QueryExecutor
+} from '@groceryview/db';
 import {
   buildSubscriptionAccessPolicy,
   processBillingSubscriptionEvent,
@@ -56,6 +63,7 @@ export type AuthOptions = {
   };
   notificationMetricsToken?: string;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
+  postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
 };
 
 export type SubscriptionEntitlementLookupRecord = SubscriptionEntitlementSnapshot & {
@@ -83,6 +91,7 @@ export type RuntimeHandlerOptions = {
   now?: Date;
   repository?: RuntimePersistenceRepository;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
+  postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   pgPoolFactory?: RuntimePgPoolFactory;
 };
 
@@ -359,6 +368,29 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           formatNotificationOperationsMetrics(await authOptions.notificationMetricsProvider(), { service: 'groceryview-server' }),
           { status: 200, headers: { 'content-type': 'text/plain; version=0.0.4; charset=utf-8' } }
         );
+      }
+
+      if (method === 'GET' && path === '/api/readiness/postgres') {
+        if (!authOptions.notificationMetricsToken) return errorResponse(503, 'PostgreSQL readiness token is not configured.');
+        if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
+          return errorResponse(401, 'A valid PostgreSQL readiness token is required.');
+        }
+        if (!authOptions.postgresReadinessProvider) return errorResponse(503, 'PostgreSQL readiness provider is not configured.');
+
+        try {
+          const report = await authOptions.postgresReadinessProvider();
+          return jsonResponse(report, { status: report.status === 'ready' ? 200 : 503 });
+        } catch {
+          return jsonResponse(
+            {
+              status: 'blocked',
+              blockers: ['postgres_readiness_probe_failed'],
+              evidence: [],
+              summary: 'PostgreSQL integration contract is blocked.'
+            },
+            { status: 503 }
+          );
+        }
       }
 
       if (method === 'GET' && path === '/api/human-review/assignments') {
@@ -672,6 +704,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/human-review/assignments': { get: protectedOperation('List open human-review assignments and SLA status.') },
       '/api/human-review/assignments/{id}/decisions': { post: protectedOperation('Record a human-review decision.') },
       '/api/metrics/notifications': { get: metricsOperation('Export notification operations metrics.') },
+      '/api/readiness/postgres': { get: metricsOperation('Check PostgreSQL schema and migration readiness without exposing database secrets.') },
       '/api/notifications/suppression-events': { post: webhookOperation('Accept signed notification suppression provider events.') }
     }
   };
@@ -721,7 +754,8 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     notificationWebhookSecret: config.notificationWebhookSecret,
     billingWebhookSecret: config.billingWebhookSecret,
     notificationMetricsToken: config.metricsToken,
-    notificationMetricsProvider: options.notificationMetricsProvider
+    notificationMetricsProvider: options.notificationMetricsProvider,
+    postgresReadinessProvider: options.postgresReadinessProvider
   };
 }
 
@@ -765,13 +799,16 @@ export function buildRuntimeRequestAuthOptions(config: RuntimeConfig, options: R
 
 function createRuntimeRepositoryResource(config: RuntimeConfig, options: RuntimeHandlerOptions): {
   repository?: RuntimePersistenceRepository;
+  postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   close(): Promise<void>;
 } {
   if (options.repository || !config.databaseUrl) return { close: noopClose };
 
   const pool = (options.pgPoolFactory ?? createDefaultPgPool)(config.databaseUrl);
+  const executor: QueryExecutor = createPgQueryExecutor(pool);
   return {
-    repository: createPostgresRepository(createPgQueryExecutor(pool)),
+    repository: createPostgresRepository(executor),
+    postgresReadinessProvider: () => checkPostgresIntegrationReadiness({ executor, repositoryProbes: [] }),
     async close() {
       await pool.end();
     }
@@ -780,7 +817,12 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
 
 function createRuntimeHttpServiceFromConfig(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): RuntimeHttpService {
   const resource = createRuntimeRepositoryResource(config, options);
-  const authOptions = buildRuntimeRequestAuthOptions(config, resource.repository ? { ...options, repository: resource.repository } : options);
+  const runtimeOptions: RuntimeHandlerOptions = {
+    ...options,
+    ...(resource.repository ? { repository: resource.repository } : {}),
+    postgresReadinessProvider: options.postgresReadinessProvider ?? resource.postgresReadinessProvider
+  };
+  const authOptions = buildRuntimeRequestAuthOptions(config, runtimeOptions);
   return {
     handler: createHttpHandler(undefined, authOptions),
     close: resource.close
