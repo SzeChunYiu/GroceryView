@@ -194,6 +194,50 @@ export type SearchableProduct = {
   availableChains: string[];
 };
 
+export type CategoryDealCandidate = {
+  productId: string;
+  productName: string;
+  category: string;
+  storeName: string;
+  price: number;
+  dealScore: number;
+  sourceConfidence: number;
+};
+
+export type CategoryDealLeader = CategoryDealCandidate & {
+  signal: string;
+};
+
+export function summarizeCategoryDealLeaders(input: {
+  candidates: CategoryDealCandidate[];
+  minimumSourceConfidence?: number;
+}): CategoryDealLeader[] {
+  const minimumSourceConfidence = input.minimumSourceConfidence ?? 0.5;
+  const leaderByCategory = new Map<string, CategoryDealCandidate>();
+
+  for (const candidate of input.candidates) {
+    if (candidate.sourceConfidence < minimumSourceConfidence) continue;
+    const current = leaderByCategory.get(candidate.category);
+    if (
+      !current ||
+      candidate.dealScore > current.dealScore ||
+      (candidate.dealScore === current.dealScore && candidate.price < current.price) ||
+      (candidate.dealScore === current.dealScore &&
+        candidate.price === current.price &&
+        candidate.productName.localeCompare(current.productName) < 0)
+    ) {
+      leaderByCategory.set(candidate.category, candidate);
+    }
+  }
+
+  return [...leaderByCategory.values()]
+    .map((candidate) => ({
+      ...candidate,
+      signal: `${scoreBand(candidate.dealScore).label} at ${formatSek(candidate.price)}`
+    }))
+    .sort((a, b) => a.category.localeCompare(b.category));
+}
+
 export function searchProducts(products: SearchableProduct[], query: string): SearchableProduct[] {
   const terms = query
     .toLowerCase()
