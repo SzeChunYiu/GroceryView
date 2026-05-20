@@ -60,6 +60,75 @@ describe('notification suppression webhook route', () => {
     ]);
   });
 
+  it('accepts signed provider-native webhook payloads and persists every parsed suppression', async () => {
+    const persisted: Array<Record<string, unknown>> = [];
+    const handle = createHttpHandler(undefined, {
+      notificationWebhookSecret: 'webhook-secret',
+      now: new Date('2026-05-20T12:00:00.000Z'),
+      notificationSuppressionSink: {
+        upsertNotificationSuppression: async (suppression) => {
+          persisted.push(suppression);
+        }
+      }
+    });
+    const body = JSON.stringify([
+      {
+        email: 'bounced@example.com',
+        event: 'bounce',
+        timestamp: 1779278340,
+        sg_event_id: 'sg-bounce-1'
+      },
+      {
+        email: 'complaint@example.com',
+        event: 'spam report',
+        sg_event_id: 'sg-complaint-1'
+      },
+      {
+        email: 'delivered@example.com',
+        event: 'delivered'
+      }
+    ]);
+
+    const response = await handle(new Request('http://localhost/api/notifications/suppression-events?provider=sendgrid', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-groceryview-signature': signBody(body, 'webhook-secret')
+      },
+      body
+    }));
+
+    assert.equal(response.status, 202);
+    assert.deepEqual(await json(response), {
+      accepted: true,
+      persisted: true,
+      suppressionCount: 2,
+      suppressionIds: ['suppression-sendgrid-sg-bounce-1', 'suppression-sendgrid-sg-complaint-1']
+    });
+    assert.deepEqual(persisted.map((suppression) => ({
+      id: suppression.id,
+      recipient: suppression.recipient,
+      reason: suppression.reason,
+      active: suppression.active,
+      updatedAt: suppression.updatedAt
+    })), [
+      {
+        id: 'suppression-sendgrid-sg-bounce-1',
+        recipient: 'bounced@example.com',
+        reason: 'bounce',
+        active: true,
+        updatedAt: '2026-05-20T11:59:00.000Z'
+      },
+      {
+        id: 'suppression-sendgrid-sg-complaint-1',
+        recipient: 'complaint@example.com',
+        reason: 'complaint',
+        active: true,
+        updatedAt: '2026-05-20T12:00:00.000Z'
+      }
+    ]);
+  });
+
   it('rejects unsigned or mismatched webhook bodies before persistence', async () => {
     const persisted: Array<Record<string, unknown>> = [];
     const handle = createHttpHandler(undefined, {
