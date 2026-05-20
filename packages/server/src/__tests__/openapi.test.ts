@@ -14,6 +14,8 @@ describe('buildOpenApiDocument', () => {
       '/api/budget',
       '/api/budget/summary',
       '/api/health',
+      '/api/human-review/assignments',
+      '/api/human-review/assignments/{id}/decisions',
       '/api/indices',
       '/api/indices/{id}',
       '/api/market/overview',
@@ -33,6 +35,8 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.components.securitySchemes.metricsToken, { type: 'apiKey', in: 'header', name: 'x-groceryview-metrics-token' });
     assert.deepEqual(doc.components.securitySchemes.webhookSignature, { type: 'apiKey', in: 'header', name: 'x-groceryview-signature' });
     assert.deepEqual(doc.paths['/api/watchlist'].get?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/human-review/assignments'].get?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/human-review/assignments/{id}/decisions'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/metrics/notifications'].get?.security, [{ metricsToken: [] }]);
     assert.deepEqual(doc.paths['/api/notifications/suppression-events'].post?.security, [{ webhookSignature: [] }]);
     assert.match(doc.paths['/api/health'].get?.summary ?? '', /without exposing secrets/i);
