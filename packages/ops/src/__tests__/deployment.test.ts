@@ -342,6 +342,8 @@ describe('deployment ops foundation', () => {
       status: 'ready',
       blockers: [],
       totalBlockers: 0,
+      readyChecks: 4,
+      blockedChecks: 0,
       checks: {
         deploymentReadiness: 'ready',
         smokeEvidence: 'ready',
@@ -367,6 +369,8 @@ describe('deployment ops foundation', () => {
           'release_validation_failed'
         ],
         totalBlockers: 4,
+        readyChecks: 0,
+        blockedChecks: 4,
         checks: {
           deploymentReadiness: 'blocked',
           smokeEvidence: 'blocked',
