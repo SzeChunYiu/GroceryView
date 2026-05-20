@@ -1,4 +1,6 @@
 import { createGroceryViewApi, type ProductDetail, type ProductPriceTerminalReport } from '@groceryview/api';
+export { buildMobileAppSessionPlan } from './appSession.js';
+export type { MobileAppSessionInput, MobileAppSessionPlan, MobileConnectivityState } from './appSession.js';
 export {
   applyMobileMutationSyncResult,
   planMobileOfflineMutation,
