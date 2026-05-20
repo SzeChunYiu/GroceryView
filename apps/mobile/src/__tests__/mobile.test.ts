@@ -8,6 +8,7 @@ import {
   buildMobileScreenBlueprints,
   buildMobileShell,
   buildScanResult,
+  composeMobileProductTerminalScreen,
   createMobileDiscoveryViewModel,
   createMobileProductPriceTerminalViewModel,
   createMobileViewModel,
@@ -149,6 +150,61 @@ describe('mobile app foundation', () => {
     ]);
     assert.deepEqual(viewModel?.actions, ['add_to_watchlist', 'add_to_weekly_basket', 'compare_stores', 'scan_receipt_to_verify']);
     assert.equal(createMobileProductPriceTerminalViewModel('missing-product'), null);
+  });
+
+  it('composes a renderable mobile product terminal screen with quote, evidence, chart, and actions', () => {
+    const screen = composeMobileProductTerminalScreen('coffee');
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.title, 'Zoégas Coffee 450g');
+    assert.equal(screen.state, 'ready');
+    assert.deepEqual(screen.children.map((section) => section.key), ['quote', 'evidence', 'distribution', 'chart', 'actions']);
+
+    const quote = screen.children.find((section) => section.key === 'quote');
+    assert.equal(quote?.type, 'section');
+    assert.deepEqual(quote?.children.map((metric) => metric.type), ['metric', 'metric', 'metric', 'metric']);
+    assert.deepEqual(quote?.children.map((metric) => 'value' in metric ? metric.value : null), [
+      '49.90 SEK',
+      '82 / Buy',
+      '-16.7%',
+      '49.90-69.90 SEK'
+    ]);
+
+    const distribution = screen.children.find((section) => section.key === 'distribution');
+    if (!distribution || distribution.type !== 'section') throw new Error('distribution section missing');
+    assert.deepEqual(distribution?.children.map((row) => 'value' in row ? row.value : null), [
+      '59.90 SEK median, cheaper than 92%',
+      '57.40 SEK median, cheaper than 50%'
+    ]);
+
+    const chart = screen.children.find((section) => section.key === 'chart');
+    if (!chart || chart.type !== 'section') throw new Error('chart section missing');
+    assert.deepEqual(chart?.children.map((row) => 'value' in row ? row.value : null), [
+      '3 points, latest 49.90 SEK, 1 markers'
+    ]);
+
+    const actions = screen.children.find((section) => section.key === 'actions');
+    if (!actions || actions.type !== 'section') throw new Error('actions section missing');
+    assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), [
+      'Watch price',
+      'Add to basket',
+      'Compare stores',
+      'Verify with receipt'
+    ]);
+  });
+
+  it('composes an empty mobile product terminal screen when product data is missing', () => {
+    const screen = composeMobileProductTerminalScreen('missing-product');
+
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.state, 'empty');
+    assert.deepEqual(screen.children, [
+      {
+        type: 'empty',
+        key: 'missing-product',
+        message: 'Product terminal data is unavailable for this product.',
+        action: 'search_product'
+      }
+    ]);
   });
 
   it('builds barcode scan results with deal score, equivalent products, and actions', () => {
