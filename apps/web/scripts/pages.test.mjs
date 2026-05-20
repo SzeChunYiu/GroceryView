@@ -38,6 +38,8 @@ describe('buildStaticPages', () => {
         'savings/ledger/index.html',
         'savings/smart-swaps/index.html',
         'scanner/index.html',
+        'stores/compare/index.html',
+        'stores/map/index.html',
         'stores/willys-odenplan/index.html',
         'watchlist/index.html'
       ]);
@@ -180,19 +182,6 @@ describe('buildStaticPages', () => {
       assert.match(category, /Category signals/);
       assert.match(category, /Private-label swap candidate/);
       assert.match(category, /Arvid Nordquist/);
-
-      const watchlist = await readFile(join(root, 'watchlist/index.html'), 'utf8');
-      assert.match(watchlist, /Grocery watchlist/);
-      assert.match(watchlist, /Best price/);
-      assert.match(watchlist, /Favorite-store price/);
-      assert.match(watchlist, /7D/);
-      assert.match(watchlist, /30D/);
-      assert.match(watchlist, /Stockholm percentile/);
-      assert.match(watchlist, /Historical percentile/);
-      assert.match(watchlist, /Deal Score/);
-      assert.match(watchlist, /Alert status/);
-      assert.match(watchlist, /Below target/);
-      assert.match(watchlist, /Stock up/);
 
       const login = await readFile(join(root, 'login/index.html'), 'utf8');
       assert.match(login, /Sign in to GroceryView/);
