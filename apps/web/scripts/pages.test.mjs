@@ -27,6 +27,7 @@ describe('buildStaticPages', () => {
         'savings/smart-swaps/index.html',
         'scanner/index.html',
         'stores/compare/index.html',
+        'stores/map/index.html',
         'stores/willys-odenplan/index.html',
         'watchlist/index.html'
       ]);
@@ -64,6 +65,13 @@ describe('buildStaticPages', () => {
       assert.match(storeComparison, /Verified coverage/);
       assert.match(storeComparison, /Low-confidence rows/);
       assert.match(storeComparison, /Low-confidence receipt rows stay out of Deal Score/);
+
+      const storeMap = await readFile(join(root, 'stores/map/index.html'), 'utf8');
+      assert.match(storeMap, /Stockholm store map/);
+      assert.match(storeMap, /District store list/);
+      assert.match(storeMap, /Willys Odenplan/);
+      assert.match(storeMap, /No travel-time penalty in Deal Score/);
+      assert.match(storeMap, /Pickup notes separate from prices/);
 
       const category = await readFile(join(root, 'categories/coffee/index.html'), 'utf8');
       assert.match(category, /Category signals/);
