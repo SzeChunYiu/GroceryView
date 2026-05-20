@@ -2,11 +2,13 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   confidenceForSource,
+  fetchRetailerConnectorSnapshot,
   ingestRetailerProduct,
   normalizeUnitPrice,
   planIngestionBatch,
   planRetailerConnectorRun,
-  planRetailerSourceAccess
+  planRetailerSourceAccess,
+  runRetailerConnector
 } from '../index.js';
 
 describe('confidenceForSource', () => {
@@ -214,5 +216,151 @@ describe('planRetailerConnectorRun', () => {
 
     assert.equal(plan.status, 'duplicate');
     assert.deepEqual(plan.requiredActions, ['skip_duplicate_connector_run']);
+  });
+});
+
+
+describe('runRetailerConnector', () => {
+  it('fetches a ready connector, stamps provenance, and ingests parsed products', async () => {
+    const result = await runRetailerConnector({
+      connectorId: 'Willys API v1',
+      requestedAt: '2026-05-19T18:00:00.000Z',
+      chainId: 'willys',
+      sourceType: 'official_api',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true,
+      endpointUrl: 'https://api.example.test/willys/products',
+      parserVersion: 'willys-api-v1',
+      fetcher: async (plan) => ({
+        statusCode: 200,
+        body: '{"items":[{"id":"wil-zoegas-450"}]}',
+        contentType: 'application/json',
+        retrievedAt: plan.provenance.capturedAt,
+        sourceUrl: plan.provenance.sourceUrl,
+        rawSnapshotRef: `s3://groceryview-raw/${plan.runKey}.json`
+      }),
+      parser: (snapshot) => {
+        assert.equal(snapshot.statusCode, 200);
+        assert.equal(snapshot.contentHash?.startsWith('sha256:'), true);
+        assert.equal(snapshot.rawSnapshotRef, 's3://groceryview-raw/willys:official-api:willys-api-v1:2026-05-19.json');
+        return [{
+          storeId: 'willys-odenplan',
+          retailerProductId: 'wil-zoegas-450',
+          rawName: 'Zoégas Skånerost 450g',
+          canonicalName: 'Zoégas Coffee 450g',
+          productId: 'coffee-zoegas-450g',
+          categoryId: 'coffee',
+          brand: 'Zoégas',
+          packageSize: 450,
+          packageUnit: 'g',
+          price: 49.9,
+          regularPrice: 69.9,
+          promoText: 'Veckans erbjudande'
+        }];
+      }
+    });
+
+    assert.equal(result.status, 'completed');
+    assert.equal(result.fetchAttempted, true);
+    assert.equal(result.parserAttempted, true);
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.rejectedCount, 0);
+    assert.deepEqual(result.requiredActions, []);
+    assert.equal(result.ingestion.accepted[0].priceObservation.sourceRunId, 'source-run:willys:official-api:willys-api-v1:2026-05-19');
+    assert.deepEqual(result.ingestion.accepted[0].priceObservation.provenance, {
+      sourceType: 'official_api',
+      sourceUrl: 'https://api.example.test/willys/products',
+      observedAt: '2026-05-19T18:00:00.000Z',
+      parserVersion: 'willys-api-v1',
+      rawSnapshotRef: 's3://groceryview-raw/willys:official-api:willys-api-v1:2026-05-19.json',
+      sourceRunId: 'source-run:willys:official-api:willys-api-v1:2026-05-19'
+    });
+  });
+
+  it('does not fetch when source access gates block the connector', async () => {
+    const result = await runRetailerConnector({
+      connectorId: 'ica-page',
+      requestedAt: '2026-05-19T18:00:00.000Z',
+      chainId: 'ica',
+      sourceType: 'retailer_online_page',
+      robotsTxtStatus: 'unknown',
+      legalReviewStatus: 'pending',
+      hasDataAgreement: false,
+      endpointUrl: 'https://example.test/ica',
+      parserVersion: 'ica-page-v1',
+      fetcher: () => { throw new Error('fetcher should not be called'); },
+      parser: () => { throw new Error('parser should not be called'); }
+    });
+
+    assert.equal(result.status, 'blocked');
+    assert.equal(result.fetchAttempted, false);
+    assert.equal(result.parserAttempted, false);
+    assert.deepEqual(result.requiredActions, ['robots_txt_allow_required', 'legal_review_approval_required']);
+  });
+
+  it('fails closed when the connector fetch returns a non-success response', async () => {
+    const result = await runRetailerConnector({
+      connectorId: 'Coop flyer',
+      requestedAt: '2026-05-19T18:00:00.000Z',
+      chainId: 'coop',
+      sourceType: 'flyer_campaign',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: false,
+      endpointUrl: 'https://example.test/coop/flyer',
+      parserVersion: 'coop-flyer-v1',
+      fetcher: () => ({
+        statusCode: 503,
+        body: 'unavailable',
+        rawSnapshotRef: 's3://groceryview-raw/coop-flyer-error.html'
+      }),
+      parser: () => []
+    });
+
+    assert.equal(result.status, 'failed');
+    assert.equal(result.fetchAttempted, true);
+    assert.equal(result.parserAttempted, false);
+    assert.deepEqual(result.requiredActions, ['investigate_connector_run_failure']);
+    assert.match(result.error ?? '', /HTTP 503/);
+  });
+});
+
+describe('fetchRetailerConnectorSnapshot', () => {
+  it('uses a provided fetch implementation to produce a content-addressed raw snapshot', async () => {
+    const plan = planRetailerConnectorRun({
+      connectorId: 'Willys API v1',
+      requestedAt: '2026-05-19T18:00:00.000Z',
+      chainId: 'willys',
+      sourceType: 'official_api',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true,
+      endpointUrl: 'https://api.example.test/willys/products',
+      parserVersion: 'willys-api-v1'
+    });
+
+    const snapshot = await fetchRetailerConnectorSnapshot(plan, {
+      retrievedAt: '2026-05-19T18:01:00.000Z',
+      rawSnapshotRefPrefix: 'raw://test-snapshots',
+      fetchImpl: async (url, init) => {
+        assert.equal(url, 'https://api.example.test/willys/products');
+        assert.deepEqual(init?.headers, { accept: 'application/json' });
+        return {
+          status: 200,
+          headers: { get: (name: string) => name === 'content-type' ? 'application/json' : null },
+          text: async () => '{"items":[]}'
+        };
+      },
+      headers: { accept: 'application/json' }
+    });
+
+    assert.equal(snapshot.statusCode, 200);
+    assert.equal(snapshot.body, '{"items":[]}');
+    assert.equal(snapshot.contentType, 'application/json');
+    assert.equal(snapshot.retrievedAt, '2026-05-19T18:01:00.000Z');
+    assert.equal(snapshot.sourceUrl, 'https://api.example.test/willys/products');
+    assert.equal(snapshot.contentHash?.startsWith('sha256:'), true);
+    assert.match(snapshot.rawSnapshotRef, /^raw:\/\/test-snapshots\/source-run-willys-official-api-willys-api-v1-2026-05-19\/sha256-/);
   });
 });

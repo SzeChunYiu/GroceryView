@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto';
+
 export type SourceType =
   | 'official_api'
   | 'retailer_online_page'
@@ -263,6 +265,196 @@ export function planRetailerConnectorRun(input: RetailerConnectorPlanInput): Ret
     return { ...base, status: 'duplicate', requiredActions: ['skip_duplicate_connector_run'] };
   }
   return { ...base, status: 'ready' };
+}
+
+
+export type RetailerConnectorFetchResult = {
+  statusCode: number;
+  body: string;
+  contentType?: string;
+  retrievedAt?: string;
+  sourceUrl?: string;
+  rawSnapshotRef: string;
+  contentHash?: string;
+};
+
+export type RetailerConnectorSnapshot = {
+  statusCode: number;
+  body: string;
+  contentType: string | null;
+  retrievedAt: string;
+  sourceUrl: string;
+  rawSnapshotRef: string;
+  contentHash: string;
+};
+
+export type RetailerConnectorParsedProduct = Omit<
+  RetailerProductInput,
+  'sourceType' | 'observedAt' | 'parserVersion' | 'rawSnapshotRef' | 'sourceRunId' | 'chainId' | 'sourceUrl'
+> & Partial<Pick<RetailerProductInput, 'sourceType' | 'observedAt' | 'parserVersion' | 'rawSnapshotRef' | 'sourceRunId' | 'chainId' | 'sourceUrl'>>;
+
+export type RetailerConnectorFetcher = (plan: RetailerConnectorRunPlan) => RetailerConnectorFetchResult | Promise<RetailerConnectorFetchResult>;
+export type RetailerConnectorParser = (snapshot: RetailerConnectorSnapshot, plan: RetailerConnectorRunPlan) => RetailerConnectorParsedProduct[] | Promise<RetailerConnectorParsedProduct[]>;
+
+export type RetailerConnectorRunInput = RetailerConnectorPlanInput & {
+  fetcher: RetailerConnectorFetcher;
+  parser: RetailerConnectorParser;
+};
+
+export type RetailerConnectorRunResult = {
+  status: 'completed' | 'blocked' | 'duplicate' | 'failed';
+  plan: RetailerConnectorRunPlan;
+  snapshot: RetailerConnectorSnapshot | null;
+  ingestion: IngestionBatchPlan;
+  fetchAttempted: boolean;
+  parserAttempted: boolean;
+  acceptedCount: number;
+  rejectedCount: number;
+  requiredActions: string[];
+  error?: string;
+};
+
+export type ConnectorFetchResponse = {
+  status: number;
+  text(): Promise<string>;
+  headers: { get(name: string): string | null };
+};
+
+export type ConnectorFetch = (url: string, init?: { headers?: Record<string, string> }) => Promise<ConnectorFetchResponse>;
+
+export type FetchRetailerConnectorSnapshotOptions = {
+  fetchImpl?: ConnectorFetch;
+  headers?: Record<string, string>;
+  retrievedAt?: string;
+  rawSnapshotRefPrefix?: string;
+};
+
+const emptyIngestionBatch = (): IngestionBatchPlan => ({ accepted: [], rejected: [] });
+const isIsoDate = (value: string): boolean => !Number.isNaN(Date.parse(value));
+
+function contentHashFor(body: string): string {
+  return `sha256:${createHash('sha256').update(body).digest('hex')}`;
+}
+
+function normalizeSnapshot(fetchResult: RetailerConnectorFetchResult, plan: RetailerConnectorRunPlan): RetailerConnectorSnapshot {
+  if (fetchResult.statusCode < 200 || fetchResult.statusCode >= 300) throw new Error(`connector fetch returned HTTP ${fetchResult.statusCode}.`);
+  if (!fetchResult.rawSnapshotRef.trim()) throw new Error('rawSnapshotRef is required for connector snapshots.');
+
+  const retrievedAt = fetchResult.retrievedAt ?? plan.provenance.capturedAt;
+  if (!isIsoDate(retrievedAt)) throw new Error('retrievedAt must be an ISO date.');
+
+  const sourceUrl = fetchResult.sourceUrl ?? plan.provenance.sourceUrl;
+  if (!sourceUrl?.trim()) throw new Error('sourceUrl is required for connector snapshots.');
+
+  return {
+    statusCode: fetchResult.statusCode,
+    body: fetchResult.body,
+    contentType: fetchResult.contentType ?? null,
+    retrievedAt,
+    sourceUrl,
+    rawSnapshotRef: fetchResult.rawSnapshotRef,
+    contentHash: fetchResult.contentHash ?? contentHashFor(fetchResult.body)
+  };
+}
+
+function normalizeParsedProduct(row: RetailerConnectorParsedProduct, plan: RetailerConnectorRunPlan, snapshot: RetailerConnectorSnapshot): RetailerProductInput {
+  return {
+    ...row,
+    sourceType: row.sourceType ?? plan.sourceType,
+    observedAt: row.observedAt ?? snapshot.retrievedAt,
+    parserVersion: row.parserVersion ?? plan.provenance.parserVersion,
+    rawSnapshotRef: row.rawSnapshotRef ?? snapshot.rawSnapshotRef,
+    sourceRunId: row.sourceRunId ?? plan.sourceRunId,
+    chainId: row.chainId ?? plan.chainId,
+    sourceUrl: row.sourceUrl ?? snapshot.sourceUrl
+  };
+}
+
+export async function fetchRetailerConnectorSnapshot(
+  plan: RetailerConnectorRunPlan,
+  options: FetchRetailerConnectorSnapshotOptions = {}
+): Promise<RetailerConnectorFetchResult> {
+  if (plan.status !== 'ready') throw new Error('fetchRetailerConnectorSnapshot requires a ready connector plan.');
+  if (!plan.provenance.sourceUrl?.trim()) throw new Error('sourceUrl is required to fetch a connector snapshot.');
+
+  const fetchImpl = options.fetchImpl ?? (globalThis.fetch as unknown as ConnectorFetch | undefined);
+  if (!fetchImpl) throw new Error('fetch implementation is required to fetch a connector snapshot.');
+
+  const response = await fetchImpl(plan.provenance.sourceUrl, { headers: options.headers });
+  const body = await response.text();
+  const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const contentHash = contentHashFor(body);
+  const refHash = contentHash.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '');
+  const rawSnapshotRef = `${options.rawSnapshotRefPrefix ?? 'raw://connector-snapshots'}/${stableKeyPart(plan.sourceRunId)}/${refHash}`;
+
+  return {
+    statusCode: response.status,
+    body,
+    contentType: response.headers.get('content-type') ?? undefined,
+    retrievedAt,
+    sourceUrl: plan.provenance.sourceUrl,
+    rawSnapshotRef,
+    contentHash
+  };
+}
+
+export async function runRetailerConnector(input: RetailerConnectorRunInput): Promise<RetailerConnectorRunResult> {
+  const plan = planRetailerConnectorRun(input);
+  const baseResult = {
+    plan,
+    snapshot: null,
+    ingestion: emptyIngestionBatch(),
+    fetchAttempted: false,
+    parserAttempted: false,
+    acceptedCount: 0,
+    rejectedCount: 0
+  };
+
+  if (plan.status === 'blocked') return { ...baseResult, status: 'blocked', requiredActions: plan.requiredActions };
+  if (plan.status === 'duplicate') return { ...baseResult, status: 'duplicate', requiredActions: plan.requiredActions };
+  if (!plan.provenance.sourceUrl?.trim()) {
+    return { ...baseResult, status: 'blocked', requiredActions: [...plan.requiredActions, 'endpoint_url_required'] };
+  }
+
+  let snapshot: RetailerConnectorSnapshot | null = null;
+  let fetchAttempted = false;
+  let parserAttempted = false;
+
+  try {
+    fetchAttempted = true;
+    snapshot = normalizeSnapshot(await input.fetcher(plan), plan);
+    const currentSnapshot = snapshot;
+    parserAttempted = true;
+    const parsed = await input.parser(currentSnapshot, plan);
+    const ingestion = planIngestionBatch(parsed.map((row) => normalizeParsedProduct(row, plan, currentSnapshot)));
+    const requiredActions = ingestion.rejected.length > 0 ? ['review_rejected_connector_records'] : [];
+
+    return {
+      status: ingestion.accepted.length > 0 || ingestion.rejected.length === 0 ? 'completed' : 'failed',
+      plan,
+      snapshot,
+      ingestion,
+      fetchAttempted,
+      parserAttempted,
+      acceptedCount: ingestion.accepted.length,
+      rejectedCount: ingestion.rejected.length,
+      requiredActions,
+      error: ingestion.accepted.length === 0 && ingestion.rejected.length > 0 ? 'Every parsed connector record was rejected.' : undefined
+    };
+  } catch (error) {
+    return {
+      status: 'failed',
+      plan,
+      snapshot,
+      ingestion: emptyIngestionBatch(),
+      fetchAttempted,
+      parserAttempted,
+      acceptedCount: 0,
+      rejectedCount: 0,
+      requiredActions: ['investigate_connector_run_failure'],
+      error: error instanceof Error ? error.message : 'Unknown connector run error.'
+    };
+  }
 }
 
 export type UnitInput = {
