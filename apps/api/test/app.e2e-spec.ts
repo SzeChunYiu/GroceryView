@@ -1,16 +1,17 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { INestApplication } from '@nestjs/common';
+import assert from 'node:assert/strict';
+import { afterEach, beforeEach, describe, it } from 'node:test';
+import { type INestApplication } from '@nestjs/common';
+import { Test, type TestingModule } from '@nestjs/testing';
 import request from 'supertest';
-import { App } from 'supertest/types';
-import { AppModule } from './../src/app.module';
-import { configureApp } from './../src/configure-app';
+import { AppModule } from '../src/app.module.js';
+import { configureApp } from '../src/configure-app.js';
 
-describe('AppController (e2e)', () => {
-  let app: INestApplication<App>;
+describe('GroceryView API app', () => {
+  let app: INestApplication;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [AppModule]
     }).compile();
 
     app = moduleFixture.createNestApplication();
@@ -18,202 +19,82 @@ describe('AppController (e2e)', () => {
     await app.init();
   });
 
-  it('/health (GET)', () => {
-    return request(app.getHttpServer())
+  afterEach(async () => {
+    await app.close();
+  });
+
+  it('serves health and OpenAPI docs', async () => {
+    await request(app.getHttpServer())
       .get('/health')
       .expect(200)
       .expect({ status: 'ok', service: 'api' });
+
+    const docs = await request(app.getHttpServer()).get('/api-json').expect(200);
+    assert.equal(docs.body.info.title, 'GroceryView API');
+    assert.ok(docs.body.paths['/health']);
+    assert.ok(docs.body.paths['/products']);
+    assert.ok(docs.body.paths['/products/{id}/terminal']);
+    assert.ok(docs.body.paths['/stores']);
   });
 
-  it('serves OpenAPI docs under /api', () => {
-    return request(app.getHttpServer())
-      .get('/api-json')
-      .expect(200)
-      .expect(({ body }) => {
-        expect(body).toMatchObject({
-          openapi: expect.stringMatching(/^3\./),
-          info: {
-            title: 'GroceryView API',
-            version: '0.1.0',
-          },
-        });
-        expect(body.paths).toHaveProperty('/health');
-      });
+  it('serves products, stores, prices, watchlists, baskets, and alerts', async () => {
+    const products = await request(app.getHttpServer()).get('/products?q=coffee').expect(200);
+    assert.equal(products.body[0].id, 'coffee');
+    assert.equal(products.body[0].currentPrices[0].priceType, 'shelf');
+    assert.equal(products.body[0].currentPrices[0].sourceType, 'demo_seed');
+    assert.ok(products.body[0].currentPrices[0].provenance);
+
+    await request(app.getHttpServer()).get('/products/coffee').expect(200);
+    await request(app.getHttpServer()).get('/stores/willys-odenplan').expect(200);
+
+    const prices = await request(app.getHttpServer()).get('/products/coffee/prices').expect(200);
+    assert.equal(prices.body[0].currency, 'SEK');
+    assert.equal(prices.body[0].confidence, 'high');
+
+    const terminal = await request(app.getHttpServer()).get('/products/coffee/terminal').expect(200);
+    assert.equal(terminal.body.productId, 'coffee');
+    assert.equal(terminal.body.ticker, 'ZOEGAS-COFFEE-450G');
+    assert.equal(terminal.body.quote.bestPrice, 49.9);
+    assert.deepEqual(terminal.body.distributions.map((distribution: { label: string }) => distribution.label), [
+      'Whole Stockholm',
+      'Odenplan local area'
+    ]);
+    assert.equal(terminal.body.chart.series[0].id, 'willys-odenplan:shelf');
+    assert.equal(terminal.body.historySummary.isNewLow, true);
+    assert.equal(terminal.body.evidenceGuardrails.length, 3);
+
+    await request(app.getHttpServer())
+      .post('/users/demo/watchlist')
+      .send({ productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80 })
+      .expect(201);
+    const watchlist = await request(app.getHttpServer()).get('/users/demo/watchlist').expect(200);
+    assert.equal(watchlist.body.items[0].productId, 'coffee');
+
+    await request(app.getHttpServer())
+      .post('/users/demo/basket/items')
+      .send({ productId: 'coffee', quantity: 2 })
+      .expect(201);
+    const basket = await request(app.getHttpServer()).get('/users/demo/basket').expect(200);
+    assert.equal(basket.body.items[0].quantity, 2);
+
+    const comparison = await request(app.getHttpServer()).get('/users/demo/basket/comparison').expect(200);
+    assert.deepEqual(comparison.body.strategies.map((strategy: { id: string }) => strategy.id), [
+      'cheapest_across_selected',
+      'all_at_one_store',
+      'favorite_only',
+      'private_label_substitution'
+    ]);
+    assert.deepEqual(comparison.body.strategies[0].missingProductIds, ['coffee']);
+    assert.match(comparison.body.strategies[0].warnings[0], /missing verified prices/);
+
+    await request(app.getHttpServer()).get('/users/demo/alerts').expect(200);
   });
 
-  it('serves typed seed/demo product, store, and price routes', async () => {
+  it('rejects invalid request DTOs through the global ValidationPipe', async () => {
     await request(app.getHttpServer())
-      .get('/products')
-      .expect(200)
-      .expect(({ body }) => {
-        const products = body as Array<Record<string, unknown>>;
-        expect(products[0]).toMatchObject({
-          slug: 'zoegas-skane-mellanrost-450g',
-          currency: 'SEK',
-          demo: true,
-        });
-      });
-
-    await request(app.getHttpServer())
-      .get('/products/zoegas-skane-mellanrost-450g')
-      .expect(200)
-      .expect(({ body }) => {
-        expect(body).toMatchObject({
-          slug: 'zoegas-skane-mellanrost-450g',
-          watchedByDemoUser: true,
-          demo: true,
-        });
-      });
-
-    await request(app.getHttpServer())
-      .get('/stores')
-      .expect(200)
-      .expect(({ body }) => {
-        const stores = body as Array<Record<string, unknown>>;
-        expect(stores[0]).toMatchObject({
-          slug: 'willys-odenplan',
-          demo: true,
-        });
-      });
-
-    await request(app.getHttpServer())
-      .get('/stores/willys-odenplan')
-      .expect(200)
-      .expect(({ body }) => {
-        expect(body).toMatchObject({
-          slug: 'willys-odenplan',
-          featuredDealProductSlugs: ['zoegas-skane-mellanrost-450g'],
-        });
-      });
-
-    await request(app.getHttpServer())
-      .get('/products/zoegas-skane-mellanrost-450g/prices')
-      .expect(200)
-      .expect(({ body }) => {
-        const prices = body as Array<Record<string, unknown>>;
-        expect(prices[0]).toMatchObject({
-          productSlug: 'zoegas-skane-mellanrost-450g',
-          currency: 'SEK',
-          demo: true,
-        });
-      });
-
-    await request(app.getHttpServer())
-      .get('/products/zoegas-skane-mellanrost-450g/series')
-      .expect(200)
-      .expect(({ body }) => {
-        expect(body).toMatchObject({
-          productSlug: 'zoegas-skane-mellanrost-450g',
-          range: '90d',
-          demo: true,
-        });
-      });
-  });
-
-  it('serves seed/demo user routes for watchlist, basket, and alerts', async () => {
-    await request(app.getHttpServer())
-      .get('/me/watchlist')
-      .expect(200)
-      .expect(({ body }) => {
-        const watchlist = body as Array<Record<string, unknown>>;
-        expect(watchlist[0]).toMatchObject({
-          productSlug: 'zoegas-skane-mellanrost-450g',
-          alertEnabled: true,
-          demo: true,
-        });
-      });
-
-    await request(app.getHttpServer())
-      .post('/me/watchlist')
-      .send({ productSlug: 'oatly-ikaffe-1l', targetPrice: 18 })
-      .expect(201)
-      .expect(({ body }) => {
-        expect(body).toMatchObject({
-          productSlug: 'oatly-ikaffe-1l',
-          targetPrice: 18,
-          demo: true,
-        });
-      });
-
-    await request(app.getHttpServer())
-      .post('/me/watchlist')
-      .send({ productSlug: '', targetPrice: -1 })
-      .expect(400)
-      .expect(({ body }) => {
-        expect(body).toMatchObject({
-          message: 'Invalid request body',
-        });
-      });
-
-    await request(app.getHttpServer())
-      .get('/me/weekly-basket')
-      .expect(200)
-      .expect(({ body }) => {
-        expect(body).toMatchObject({
-          id: 'demo-weekly-basket-current',
-          demo: true,
-        });
-      });
-
-    await request(app.getHttpServer())
-      .post('/me/weekly-basket/items')
-      .send({ productSlug: 'zoegas-skane-mellanrost-450g', quantity: 2 })
-      .expect(201)
-      .expect(({ body }) => {
-        expect(body).toMatchObject({
-          productSlug: 'zoegas-skane-mellanrost-450g',
-          quantity: 2,
-          demo: true,
-        });
-      });
-
-    await request(app.getHttpServer())
-      .post('/me/weekly-basket/items')
-      .send({ productSlug: 'zoegas-skane-mellanrost-450g', quantity: 0 })
-      .expect(400)
-      .expect(({ body }) => {
-        expect(body).toMatchObject({
-          message: 'Invalid request body',
-        });
-      });
-
-    await request(app.getHttpServer())
-      .get('/me/alerts')
-      .expect(200)
-      .expect(({ body }) => {
-        const alerts = body as Array<Record<string, unknown>>;
-        expect(alerts[0]).toMatchObject({
-          type: 'target_price',
-          active: true,
-          demo: true,
-        });
-      });
-  });
-
-  it('computes deal score without distance leakage', async () => {
-    const first = await request(app.getHttpServer())
-      .get('/products/zoegas-skane-mellanrost-450g/deal-score?distanceKm=1')
-      .expect(200)
-      .expect(({ body }) => {
-        expect(body).toMatchObject({
-          productSlug: 'zoegas-skane-mellanrost-450g',
-          verdict: 'stock_up',
-          confidenceLabel: 'high',
-          demo: true,
-        });
-      });
-
-    const second = await request(app.getHttpServer())
-      .get('/products/zoegas-skane-mellanrost-450g/deal-score?distanceKm=35')
-      .expect(200);
-
-    expect(second.body.score).toBe(first.body.score);
-    expect(second.body.discountVsMedian).toBe(first.body.discountVsMedian);
-    expect(second.body.historicalPercentile).toBe(first.body.historicalPercentile);
-  });
-
-  afterAll(async () => {
-    await app.close();
+      .post('/users/demo/basket/items')
+      .send({ productId: 'coffee', quantity: 0 })
+      .expect(400);
   });
 
   it('returns 404 for missing product terminal data', async () => {

@@ -568,6 +568,22 @@ export type DeploymentManifestValidationReport = {
   serviceNames: string[];
 };
 
+export type DeploymentManifestValidationReportSummary = {
+  status: DeploymentManifestValidationReport['status'];
+  serviceCount: number;
+  totalBlockers: number;
+  totalWarnings: number;
+  unsupportedVersion: number;
+  missingServices: number;
+  duplicateServices: number;
+  serviceMetadata: number;
+  invalidWorkspaces: number;
+  commandOrOutput: number;
+  healthChecks: number;
+  requiredEnv: number;
+  servicesWithoutRequiredEnv: number;
+};
+
 type HealthCheckShape = {
   path?: unknown;
   expectedStatus?: unknown;
@@ -625,5 +641,30 @@ export function validateDeploymentManifest(manifest: DeploymentManifest): Deploy
     blockers,
     warnings,
     serviceNames
+  };
+}
+
+export function summarizeDeploymentManifestValidationReport(
+  report: DeploymentManifestValidationReport
+): DeploymentManifestValidationReportSummary {
+  return {
+    status: report.status,
+    serviceCount: report.serviceNames.length,
+    totalBlockers: report.blockers.length,
+    totalWarnings: report.warnings.length,
+    unsupportedVersion: report.blockers.filter((blocker) => blocker === 'manifest_version_not_supported').length,
+    missingServices: report.blockers.filter((blocker) => blocker === 'services_missing').length,
+    duplicateServices: report.blockers.filter((blocker) => blocker.startsWith('duplicate_service:')).length,
+    serviceMetadata: report.blockers.filter((blocker) => blocker.startsWith('service_name_missing:') || blocker.startsWith('service_type_missing:')).length,
+    invalidWorkspaces: report.blockers.filter((blocker) => blocker.startsWith('workspace_invalid:')).length,
+    commandOrOutput: report.blockers.filter(
+      (blocker) =>
+        blocker.startsWith('start_command_missing:') ||
+        blocker.startsWith('build_command_missing:') ||
+        blocker.startsWith('output_directory_missing:')
+    ).length,
+    healthChecks: report.blockers.filter((blocker) => blocker.startsWith('health_check_')).length,
+    requiredEnv: report.blockers.filter((blocker) => blocker.startsWith('required_env_invalid:')).length,
+    servicesWithoutRequiredEnv: report.warnings.filter((warning) => warning.startsWith('no_required_env:')).length
   };
 }

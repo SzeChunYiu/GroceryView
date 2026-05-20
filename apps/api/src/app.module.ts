@@ -1,35 +1,30 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { AppController } from './app.controller';
-import { AlertsModule } from './alerts/alerts.module';
-import { BasketsModule } from './baskets/baskets.module';
-import { DatabaseModule } from './database/database.module';
-import { DealscoreModule } from './dealscore/dealscore.module';
-import { HealthModule } from './health/health.module';
-import { PricesModule } from './prices/prices.module';
-import { ProductsModule } from './products/products.module';
-import { StoresModule } from './stores/stores.module';
-import { UsersModule } from './users/users.module';
-import { WatchlistsModule } from './watchlists/watchlists.module';
-import { validateEnvironment } from './config/env.schema';
+import { AlertsModule } from './alerts/alerts.module.js';
+import { AppController } from './app.controller.js';
+import { BasketsModule } from './baskets/baskets.module.js';
+import { validateEnvironment } from './config/env.schema.js';
+import { DatabaseModule } from './database/database.module.js';
+import { HealthModule } from './health/health.module.js';
+import { PricesModule } from './prices/prices.module.js';
+import { ProductsModule } from './products/products.module.js';
+import { StoresModule } from './stores/stores.module.js';
+import { UsersModule } from './users/users.module.js';
+import { WatchlistsModule } from './watchlists/watchlists.module.js';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      validate: validateEnvironment,
-    }),
+    ConfigModule.forRoot({ isGlobal: true, validate: validateEnvironment }),
     DatabaseModule,
     HealthModule,
-    AlertsModule,
-    BasketsModule,
-    DealscoreModule,
-    PricesModule,
     ProductsModule,
     StoresModule,
+    PricesModule,
     UsersModule,
     WatchlistsModule,
+    BasketsModule,
+    AlertsModule
   ],
-  controllers: [AppController],
+  controllers: [AppController]
 })
 export class AppModule {}
