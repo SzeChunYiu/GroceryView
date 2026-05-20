@@ -462,6 +462,25 @@ export type SubscriptionCheckoutPlan =
       };
     };
 
+export type MobilePremiumEntitlementInput = {
+  userId: string;
+  userTier: UserTier;
+  platform: 'ios' | 'android';
+  billingProviderConfigured: boolean;
+  activeSubscriptionPlan?: SubscriptionPlan;
+  expiresAt?: string;
+  now: string;
+};
+
+export type MobilePremiumEntitlementPlan = {
+  userId: string;
+  platform: 'ios' | 'android';
+  premiumActive: boolean;
+  adPlan: AdPlacementPlan;
+  blockers: string[];
+  actions: Array<'hide_mobile_ads' | 'show_mobile_deals_ads' | 'start_premium_checkout' | 'refresh_subscription_status' | 'restore_purchase'>;
+};
+
 export function buildSubscriptionCheckoutPlan(input: SubscriptionCheckoutInput): SubscriptionCheckoutPlan {
   if (!input.billingProviderConfigured || !input.providerPriceId || !input.successUrl || !input.cancelUrl) {
     return {
@@ -480,5 +499,40 @@ export function buildSubscriptionCheckoutPlan(input: SubscriptionCheckoutInput):
       cancelUrl: input.cancelUrl,
       metadata: { plan: input.plan }
     }
+  };
+}
+
+export function buildMobilePremiumEntitlementPlan(input: MobilePremiumEntitlementInput): MobilePremiumEntitlementPlan {
+  if (!input.userId) throw new Error('userId is required.');
+  const blockers: string[] = [];
+  const actions: MobilePremiumEntitlementPlan['actions'] = [];
+  let premiumActive = input.userTier === 'premium';
+
+  if (input.expiresAt) {
+    const expiresAtMs = Date.parse(input.expiresAt);
+    const nowMs = Date.parse(input.now);
+    if (Number.isNaN(expiresAtMs)) throw new Error('expiresAt must be an ISO date.');
+    if (Number.isNaN(nowMs)) throw new Error('now must be an ISO date.');
+    premiumActive = premiumActive && expiresAtMs > nowMs;
+  }
+
+  if (premiumActive) {
+    actions.push('hide_mobile_ads', 'refresh_subscription_status');
+  } else {
+    actions.push('show_mobile_deals_ads');
+    if (input.billingProviderConfigured) {
+      actions.push('start_premium_checkout', 'restore_purchase');
+    } else {
+      blockers.push('mobile_billing_provider_not_configured');
+    }
+  }
+
+  return {
+    userId: input.userId,
+    platform: input.platform,
+    premiumActive,
+    adPlan: buildAdPlacementPlan({ userTier: premiumActive ? 'premium' : 'free', configuredProviders: ['admob'] }),
+    blockers,
+    actions
   };
 }
