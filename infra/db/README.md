@@ -27,6 +27,7 @@ Environment overrides:
 - `SEEDS_DIR`: seed directory, default `infra/db/seeds`.
 
 The verifier exits nonzero when Docker is missing, no migrations are present, PostgreSQL does not become ready, any migration or seed fails, or seed count assertions fail.
+`POSTGRES_DB`, `POSTGRES_USER`, and `POSTGRES_PASSWORD` must be nonempty so the temporary container and `psql` checks use explicit credentials.
 
 ## Runtime readiness smoke
 

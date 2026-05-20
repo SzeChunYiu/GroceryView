@@ -5,11 +5,18 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 MIGRATIONS_DIR="${MIGRATIONS_DIR:-${ROOT_DIR}/infra/db/migrations}"
 SEEDS_DIR="${SEEDS_DIR:-${ROOT_DIR}/infra/db/seeds}"
 POSTGIS_IMAGE="${POSTGIS_IMAGE:-postgis/postgis:18-3.6}"
-POSTGRES_DB="${POSTGRES_DB:-groceryview}"
-POSTGRES_USER="${POSTGRES_USER:-groceryview}"
-POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-groceryview}"
+POSTGRES_DB="${POSTGRES_DB-groceryview}"
+POSTGRES_USER="${POSTGRES_USER-groceryview}"
+POSTGRES_PASSWORD="${POSTGRES_PASSWORD-groceryview}"
 POSTGRES_READY_TIMEOUT_SECONDS="${POSTGRES_READY_TIMEOUT_SECONDS:-60}"
 CONTAINER_NAME="groceryview-migration-verify-$RANDOM-$$"
+
+for required_name in POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD; do
+  if [ -z "${!required_name}" ]; then
+    echo "$required_name must not be empty" >&2
+    exit 1
+  fi
+done
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "docker is required to verify database migrations" >&2
