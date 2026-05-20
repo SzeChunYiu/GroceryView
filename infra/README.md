@@ -48,6 +48,14 @@ GROCERYVIEW_WEB_URL=https://groceryview.example \
   infra/scripts/smoke-hosted-http.sh
 ```
 
+The same HTTP smoke also calls `/api/products/${GROCERYVIEW_TERMINAL_PRODUCT_ID:-coffee}/terminal` and requires product-terminal JSON with a matching `productId`, `ticker`, `quote`, `distributions`, and `chart`. Set `GROCERYVIEW_TERMINAL_PRODUCT_ID` when a deployment should prove a different seeded or backfilled product:
+
+```bash
+GROCERYVIEW_SERVER_URL=https://api.groceryview.example \
+GROCERYVIEW_TERMINAL_PRODUCT_ID=coffee \
+  infra/scripts/smoke-hosted-http.sh
+```
+
 After the hosted database has migrations applied, run the token-protected PostgreSQL readiness smoke:
 
 ```bash

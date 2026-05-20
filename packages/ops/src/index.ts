@@ -293,6 +293,7 @@ export function buildDeploymentSmokeEvidenceReport(input: DeploymentSmokeEvidenc
 export type HostedSmokeCommandPlanInput = {
   serverUrl: string;
   webUrl?: string;
+  terminalProductId?: string;
   includePostgresReadiness: boolean;
   metricsTokenEnvVar?: string;
   timeoutSeconds?: number;
@@ -311,17 +312,19 @@ function trimTrailingSlash(url: string): string {
 export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput): HostedSmokeCommandPlan {
   const timeout = input.timeoutSeconds ?? 15;
   const serverUrl = trimTrailingSlash(input.serverUrl);
+  const terminalProductId = input.terminalProductId ?? 'coffee';
   const commands = [
     [
       `GROCERYVIEW_SERVER_URL=${serverUrl}`,
       input.webUrl ? `GROCERYVIEW_WEB_URL=${trimTrailingSlash(input.webUrl)}` : undefined,
+      `GROCERYVIEW_TERMINAL_PRODUCT_ID=${terminalProductId}`,
       `HTTP_SMOKE_TIMEOUT_SECONDS=${timeout}`,
       'infra/scripts/smoke-hosted-http.sh'
     ]
       .filter(Boolean)
       .join(' ')
   ];
-  const evidence = ['hosted_api_health'];
+  const evidence = ['hosted_api_health', 'hosted_product_terminal'];
   const requiredSecrets: string[] = [];
 
   if (input.webUrl) evidence.push('hosted_web');
