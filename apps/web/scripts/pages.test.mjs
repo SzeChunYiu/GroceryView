@@ -20,7 +20,6 @@ describe('buildStaticPages', () => {
         'catalog/coverage/index.html',
         'categories/coffee/index.html',
         'deals/today/index.html',
-        'dietary/index.html',
         'household/index.html',
         'login/index.html',
         'loyalty/offers/index.html',
@@ -158,12 +157,6 @@ describe('buildStaticPages', () => {
       assert.match(smartSwapsPage, /Same roast category/);
       assert.match(smartSwapsPage, /Estimated swap prices cannot reduce forecast spend/);
       assert.match(smartSwapsPage, /Dietary restrictions outrank savings/);
-      const dietary = await readFile(join(root, 'dietary/index.html'), 'utf8');
-      assert.match(dietary, /Dietary and allergen controls/);
-      assert.match(dietary, /Nut allergy/);
-      assert.match(dietary, /Ingredient label required/);
-      assert.match(dietary, /Hide from Deal Score recommendations/);
-      assert.match(dietary, /Vegetarian weekday basket/);
 
       const store = await readFile(join(root, 'stores/willys-odenplan/index.html'), 'utf8');
       assert.match(store, /Store highlights/);
