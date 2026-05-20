@@ -36,8 +36,18 @@ describe('mobile app foundation', () => {
     assert.deepEqual(viewModel.searchResults.map((product) => product.ticker), ['ZOEGAS-COFFEE-450G']);
     assert.equal(viewModel.searchResults[0].bestPrice, 49.9);
     assert.equal(viewModel.selectedProduct?.currentPrices[0].storeId, 'willys-odenplan');
+    assert.equal(viewModel.selectedProduct?.priceTerminal.quote.bestPrice, 49.9);
+    assert.equal(viewModel.selectedProduct?.priceTerminal.quote.bestStoreName, 'Willys Odenplan');
+    assert.deepEqual(viewModel.selectedProduct?.priceTerminal.distributionSummaries.map((distribution) => distribution.label), [
+      'Whole Stockholm',
+      'Odenplan local area'
+    ]);
+    assert.equal(viewModel.selectedProduct?.priceTerminal.chartSummary.seriesCount, 1);
+    assert.equal(viewModel.selectedProduct?.priceTerminal.chartSummary.historyPointCount, 3);
+    assert.equal(viewModel.selectedProduct?.priceTerminal.chartSummary.isNewLow, true);
+    assert.equal(viewModel.selectedProduct?.priceTerminal.guardrails.length, 3);
     assert.deepEqual(viewModel.selectedProduct?.priceHistory.map((point) => point.lineStyle), ['solid', 'solid', 'solid']);
-    assert.deepEqual(viewModel.selectedProduct?.actions, ['add_to_weekly_basket', 'add_to_watchlist', 'compare_stores', 'scan_receipt_to_verify']);
+    assert.deepEqual(viewModel.selectedProduct?.actions, ['open_price_terminal', 'add_to_weekly_basket', 'add_to_watchlist', 'compare_stores', 'scan_receipt_to_verify']);
     assert.equal(viewModel.weeklyBasket.itemCount, 3);
     assert.equal(viewModel.weeklyBasket.cheapestTotal, 77.7);
     assert.equal(viewModel.weeklyBasket.bestSingleStore?.storeId, 'willys-odenplan');
@@ -69,6 +79,7 @@ describe('mobile app foundation', () => {
     assert.deepEqual(plan.routes.map((route) => route.path), [
       '/today',
       '/stores',
+      '/products/[id]/terminal',
       '/basket',
       '/scan/barcode',
       '/scan/receipt',
@@ -99,12 +110,19 @@ describe('mobile app foundation', () => {
     assert.equal(plan.authRequiredByDefault, true);
     assert.deepEqual(plan.screens.map((screen) => screen.route), [
       '/today',
+      '/products/[id]/terminal',
       '/basket',
       '/scan/barcode',
       '/scan/receipt',
       '/review-queue',
       '/profile'
     ]);
+
+    const terminal = plan.screens.find((screen) => screen.route === '/products/[id]/terminal');
+    assert.equal(terminal?.screen, 'ProductPriceTerminalScreen');
+    assert.match(terminal?.dataDependencies.join(','), /product_terminal_report/);
+    assert.deepEqual(terminal?.actions, ['open_price_terminal', 'open_product', 'compare_basket']);
+    assert.match(terminal?.offlineBehavior ?? '', /cached terminal report/i);
 
     const receipt = plan.screens.find((screen) => screen.route === '/scan/receipt');
     assert.equal(receipt?.primaryState, 'needs_provider');

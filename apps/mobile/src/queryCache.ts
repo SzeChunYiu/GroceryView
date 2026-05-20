@@ -1,6 +1,6 @@
-export type MobileQueryId = 'today' | 'search' | 'product' | 'basket' | 'budget';
+export type MobileQueryId = 'today' | 'search' | 'product' | 'productTerminal' | 'basket' | 'budget';
 
-export type MobileScreenRoute = '/today' | '/search' | '/products/[id]' | '/basket' | '/budget';
+export type MobileScreenRoute = '/today' | '/search' | '/products/[id]' | '/products/[id]/terminal' | '/basket' | '/budget';
 
 export type MobileQueryDefinition = {
   id: MobileQueryId;
@@ -28,6 +28,7 @@ export type MobileQueryKeyInput =
   | { id: 'today'; userId: string }
   | { id: 'search'; userId: string; query: string }
   | { id: 'product'; userId: string; productId: string }
+  | { id: 'productTerminal'; userId: string; productId: string }
   | { id: 'basket'; userId: string }
   | { id: 'budget'; userId: string };
 
@@ -66,6 +67,16 @@ const definitions: MobileQueryDefinition[] = [
     invalidatesOn: ['favorite_store_changed', 'watchlist_changed']
   },
   {
+    id: 'productTerminal',
+    route: '/products/[id]/terminal',
+    queryKey: ['mobile', 'product', 'terminal'],
+    staleTimeMs: 2 * minute,
+    gcTimeMs: 12 * hour,
+    persist: true,
+    networkMode: 'offlineFirst',
+    invalidatesOn: ['favorite_store_changed', 'watchlist_changed', 'receipt_synced']
+  },
+  {
     id: 'basket',
     route: '/basket',
     queryKey: ['mobile', 'basket'],
@@ -96,9 +107,10 @@ export function buildMobileQueryKey(input: MobileQueryKeyInput): readonly string
   if (!userSegment) throw new Error('userId is required.');
 
   if (input.id === 'search') return ['mobile', userSegment, 'search', normalizeSegment(input.query)];
-  if (input.id === 'product') {
+  if (input.id === 'product' || input.id === 'productTerminal') {
     const productSegment = normalizeSegment(input.productId);
     if (!productSegment) throw new Error('productId is required.');
+    if (input.id === 'productTerminal') return ['mobile', userSegment, 'product', productSegment, 'terminal'];
     return ['mobile', userSegment, 'product', productSegment];
   }
 
@@ -121,7 +133,7 @@ export function buildMobilePersistedCachePlan(userId: string): MobilePersistedCa
     storageKey: 'groceryview.mobile.query-cache.v1',
     schemaVersion: 1,
     userPartitionKey: `user:${userSegment}`,
-    hydrateOrder: ['today', 'basket', 'budget', 'search', 'product'],
+    hydrateOrder: ['today', 'basket', 'budget', 'search', 'product', 'productTerminal'],
     persistedQueryIds: definitions.filter((definition) => definition.persist).map((definition) => definition.id),
     maxPersistedAgeMs: 24 * hour,
     purgeOnSignOut: true,

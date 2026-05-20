@@ -1,4 +1,4 @@
-import { createGroceryViewApi } from '@groceryview/api';
+import { createGroceryViewApi, type ProductDetail, type ProductPriceTerminalReport } from '@groceryview/api';
 export { buildMobilePersistedCachePlan, buildMobileQueryKey, buildMobileQueryRegistry } from './queryCache.js';
 export type { MobilePersistedCachePlan, MobileQueryDefinition, MobileQueryId, MobileQueryKeyInput, MobileScreenRoute } from './queryCache.js';
 
@@ -49,6 +49,85 @@ export type MobileViewModel = {
 
 type MobileApi = ReturnType<typeof createGroceryViewApi>;
 
+export type MobilePriceTerminalSummary = {
+  quote: {
+    bestPrice: number | null;
+    bestStoreName: string | null;
+    unitPrice: string;
+    dealScore: number;
+    range52Week: { low: number; high: number } | null;
+    evidenceVolume: { currentPrices: number; historyPoints: number; verifiedHistoryPoints: number };
+  };
+  distributionSummaries: Array<{
+    scope: string;
+    label: string;
+    median: number;
+    currentPercentile: number;
+    sampleSize: number;
+    customerRead: string;
+  }>;
+  chartSummary: {
+    seriesCount: number;
+    markerCount: number;
+    historyPointCount: number;
+    windowStart?: string;
+    windowEnd?: string;
+    isNewLow: boolean;
+  };
+  guardrails: string[];
+};
+
+function buildMobilePriceTerminalSummary(product: ProductDetail, terminal: ProductPriceTerminalReport | null): MobilePriceTerminalSummary {
+  if (!terminal) {
+    return {
+      quote: {
+        bestPrice: product.currentPrices[0]?.price ?? null,
+        bestStoreName: product.currentPrices[0]?.storeName ?? null,
+        unitPrice: 'unknown',
+        dealScore: product.dealScore,
+        range52Week: null,
+        evidenceVolume: { currentPrices: product.currentPrices.length, historyPoints: product.history.length, verifiedHistoryPoints: product.history.filter((point) => point.verified).length }
+      },
+      distributionSummaries: [],
+      chartSummary: {
+        seriesCount: 0,
+        markerCount: 0,
+        historyPointCount: product.history.length,
+        isNewLow: false
+      },
+      guardrails: ['Product terminal report unavailable; use current prices as a fallback only.']
+    };
+  }
+
+  return {
+    quote: {
+      bestPrice: terminal.quote.bestPrice,
+      bestStoreName: terminal.quote.bestStoreName,
+      unitPrice: terminal.quote.unitPrice,
+      dealScore: terminal.quote.dealScore,
+      range52Week: terminal.quote.range52Week,
+      evidenceVolume: terminal.quote.evidenceVolume
+    },
+    distributionSummaries: terminal.distributions.map((distribution) => ({
+      scope: distribution.scope,
+      label: distribution.label,
+      median: distribution.median,
+      currentPercentile: distribution.currentPercentile,
+      sampleSize: distribution.sampleSize,
+      customerRead: distribution.customerRead
+    })),
+    chartSummary: {
+      seriesCount: terminal.chart.series.length,
+      markerCount: terminal.chart.series.reduce((total, series) => total + series.markers.length, 0),
+      historyPointCount: terminal.quote.evidenceVolume.historyPoints,
+      ...(terminal.chart.windowStart ? { windowStart: terminal.chart.windowStart } : {}),
+      ...(terminal.chart.windowEnd ? { windowEnd: terminal.chart.windowEnd } : {}),
+      isNewLow: Boolean(terminal.historySummary?.isNewLow)
+    },
+    guardrails: [...terminal.evidenceGuardrails]
+  };
+}
+
 export function createMobileViewModel(userId: string, api: MobileApi = createGroceryViewApi()): MobileViewModel {
   const market = api.getMarketOverview();
   return {
@@ -91,7 +170,8 @@ export type MobileDiscoveryViewModel = {
     dealScore: number;
     currentPrices: Array<{ storeId: string; storeName: string; price: number }>;
     priceHistory: Array<{ date: string; price: number; lineStyle: 'solid' | 'dotted' }>;
-    actions: Array<'add_to_weekly_basket' | 'add_to_watchlist' | 'compare_stores' | 'scan_receipt_to_verify'>;
+    priceTerminal: MobilePriceTerminalSummary;
+    actions: Array<'open_price_terminal' | 'add_to_weekly_basket' | 'add_to_watchlist' | 'compare_stores' | 'scan_receipt_to_verify'>;
   } | null;
   weeklyBasket: {
     itemCount: number;
@@ -155,7 +235,8 @@ export function createMobileDiscoveryViewModel(
             price: point.price,
             lineStyle: point.verified ? 'solid' : 'dotted'
           })),
-          actions: ['add_to_weekly_basket', 'add_to_watchlist', 'compare_stores', 'scan_receipt_to_verify']
+          priceTerminal: buildMobilePriceTerminalSummary(selectedProduct, api.getProductPriceTerminal(selectedProduct.id)),
+          actions: ['open_price_terminal', 'add_to_weekly_basket', 'add_to_watchlist', 'compare_stores', 'scan_receipt_to_verify']
         }
       : null,
     weeklyBasket: {
@@ -232,6 +313,7 @@ export type ExpoRoute = {
   path:
     | '/today'
     | '/stores'
+    | '/products/[id]/terminal'
     | '/basket'
     | '/scan/barcode'
     | '/scan/receipt'
@@ -254,6 +336,7 @@ export type MobileScreenState =
   | 'error';
 
 export type MobileScreenAction =
+  | 'open_price_terminal'
   | 'open_product'
   | 'compare_basket'
   | 'scan_barcode'
@@ -330,6 +413,7 @@ export function buildExpoReadinessPlan(): ExpoReadinessPlan {
     routes: [
       { path: '/today', screen: 'TodayScreen', purpose: 'Daily market overview, deals, budget, alerts, and recommendations', requiresAuth: true },
       { path: '/stores', screen: 'StoresScreen', purpose: 'Favorite and selected supermarket profiles', requiresAuth: true },
+      { path: '/products/[id]/terminal', screen: 'ProductPriceTerminalScreen', purpose: 'Stock-style product quote, distribution, and history terminal', requiresAuth: true },
       { path: '/basket', screen: 'BasketScreen', purpose: 'Weekly basket planning and smart swaps', requiresAuth: true },
       { path: '/scan/barcode', screen: 'BarcodeScanScreen', purpose: 'Barcode lookup and product comparison', requiresAuth: true },
       { path: '/scan/receipt', screen: 'ReceiptScanScreen', purpose: 'Receipt OCR review and budget impact', requiresAuth: true },
@@ -358,6 +442,16 @@ export function buildMobileScreenBlueprints(): MobileScreenBlueprintPlan {
       actions: ['open_product', 'compare_basket', 'scan_barcode'],
       providerRequirements: ['secure-session'],
       offlineBehavior: 'Show cached market snapshot with stale-data label.'
+    },
+    {
+      route: '/products/[id]/terminal',
+      screen: 'ProductPriceTerminalScreen',
+      primaryState: 'ready',
+      emptyState: 'Open a product from search, scan, basket, or alerts to view its price terminal.',
+      dataDependencies: ['product_terminal_report', 'price_chart_series', 'stockholm_distribution', 'local_distribution'],
+      actions: ['open_price_terminal', 'open_product', 'compare_basket'],
+      providerRequirements: ['secure-session'],
+      offlineBehavior: 'Show cached terminal report with stale-data label and block new price claims until refreshed.'
     },
     {
       route: '/basket',
