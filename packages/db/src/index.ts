@@ -170,6 +170,18 @@ export type BudgetRecord = {
   monthlyBudget: number;
 };
 
+export type SubscriptionEntitlementRecord = {
+  userId: string;
+  tier: 'free' | 'premium';
+  plan?: 'premium_monthly' | 'premium_yearly';
+  status: 'active' | 'past_due' | 'canceled';
+  currentPeriodEndsAt?: string;
+  provider?: 'stripe_compatible';
+  providerCustomerId?: string;
+  providerSubscriptionId?: string;
+  updatedAt: string;
+};
+
 export type WatchlistRecord = {
   productId: string;
   targetPrice?: number;
@@ -424,6 +436,8 @@ export type GroceryViewRepository = {
   getFavoriteStoreIds(userId: string): Promise<string[]>;
   upsertBudget(userId: string, budget: BudgetRecord): Promise<void>;
   getBudget(userId: string): Promise<BudgetRecord | null>;
+  upsertSubscriptionEntitlement(entitlement: SubscriptionEntitlementRecord): Promise<void>;
+  getSubscriptionEntitlement(userId: string): Promise<SubscriptionEntitlementRecord | null>;
   addWatchlistItem(userId: string, item: WatchlistRecord): Promise<void>;
   getWatchlist(userId: string): Promise<WatchlistRecord[]>;
   addBasketItem(userId: string, item: BasketRecord): Promise<void>;
@@ -487,6 +501,7 @@ export function createMemoryRepository(): GroceryViewRepository {
   const users = new Map<string, UserRecord>();
   const favoriteStores = new Map<string, Set<string>>();
   const budgets = new Map<string, BudgetRecord>();
+  const subscriptionEntitlements = new Map<string, SubscriptionEntitlementRecord>();
   const watchlists = new Map<string, WatchlistRecord[]>();
   const baskets = new Map<string, BasketRecord[]>();
   const humanReviewers = new Map<string, HumanReviewerRecord>();
@@ -521,6 +536,17 @@ export function createMemoryRepository(): GroceryViewRepository {
       requireUser(users, userId);
       const budget = budgets.get(userId);
       return budget ? { ...budget } : null;
+    },
+
+    async upsertSubscriptionEntitlement(entitlement) {
+      requireUser(users, entitlement.userId);
+      subscriptionEntitlements.set(entitlement.userId, { ...entitlement });
+    },
+
+    async getSubscriptionEntitlement(userId) {
+      requireUser(users, userId);
+      const entitlement = subscriptionEntitlements.get(userId);
+      return entitlement ? { ...entitlement } : null;
     },
 
     async addWatchlistItem(userId, item) {
@@ -602,6 +628,17 @@ export type QueryExecutor = {
 
 type FavoriteStoreRow = { store_id: string };
 type BudgetRow = { weekly_budget: string | number; monthly_budget: string | number };
+type SubscriptionEntitlementRow = {
+  user_id: string;
+  tier: SubscriptionEntitlementRecord['tier'];
+  plan: NonNullable<SubscriptionEntitlementRecord['plan']> | null;
+  status: SubscriptionEntitlementRecord['status'];
+  current_period_ends_at: string | Date | null;
+  provider: NonNullable<SubscriptionEntitlementRecord['provider']> | null;
+  provider_customer_id: string | null;
+  provider_subscription_id: string | null;
+  updated_at: string | Date;
+};
 type WatchlistRow = { product_id: string; target_price: string | number | null; alert_deal_score_at: number | null; favorite_stores_only: boolean };
 type BasketRow = { product_id: string; quantity: string | number };
 type HumanReviewerRow = { id: string; role: HumanReviewerRecord['role']; active: boolean };
@@ -832,6 +869,20 @@ function mapProductCatalog(row: ProductCatalogRow): ProductCatalogRecord {
   };
 }
 
+function mapSubscriptionEntitlement(row: SubscriptionEntitlementRow): SubscriptionEntitlementRecord {
+  return {
+    userId: row.user_id,
+    tier: row.tier,
+    ...(row.plan ? { plan: row.plan } : {}),
+    status: row.status,
+    ...(row.current_period_ends_at ? { currentPeriodEndsAt: asIso(row.current_period_ends_at) } : {}),
+    ...(row.provider ? { provider: row.provider } : {}),
+    ...(row.provider_customer_id ? { providerCustomerId: row.provider_customer_id } : {}),
+    ...(row.provider_subscription_id ? { providerSubscriptionId: row.provider_subscription_id } : {}),
+    updatedAt: asIso(row.updated_at)
+  };
+}
+
 function mapHumanReviewAssignment(row: HumanReviewAssignmentRow): HumanReviewAssignmentRecord {
   return {
     id: row.id,
@@ -922,6 +973,61 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
       const rows = await executor.query<BudgetRow>('select weekly_budget, monthly_budget from user_preferences where user_id = $1', [userId]);
       const row = rows[0];
       return row ? { weeklyBudget: Number(row.weekly_budget), monthlyBudget: Number(row.monthly_budget) } : null;
+    },
+
+    async upsertSubscriptionEntitlement(entitlement) {
+      await executor.query(
+        `insert into subscription_entitlements(
+           user_id,
+           tier,
+           plan,
+           status,
+           current_period_ends_at,
+           provider,
+           provider_customer_id,
+           provider_subscription_id,
+           updated_at
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+         on conflict (user_id) do update set
+           tier = excluded.tier,
+           plan = excluded.plan,
+           status = excluded.status,
+           current_period_ends_at = excluded.current_period_ends_at,
+           provider = excluded.provider,
+           provider_customer_id = excluded.provider_customer_id,
+           provider_subscription_id = excluded.provider_subscription_id,
+           updated_at = excluded.updated_at`,
+        [
+          entitlement.userId,
+          entitlement.tier,
+          entitlement.plan ?? null,
+          entitlement.status,
+          entitlement.currentPeriodEndsAt ?? null,
+          entitlement.provider ?? null,
+          entitlement.providerCustomerId ?? null,
+          entitlement.providerSubscriptionId ?? null,
+          entitlement.updatedAt
+        ]
+      );
+    },
+
+    async getSubscriptionEntitlement(userId) {
+      const rows = await executor.query<SubscriptionEntitlementRow>(
+        `select user_id,
+                tier,
+                plan,
+                status,
+                current_period_ends_at,
+                provider,
+                provider_customer_id,
+                provider_subscription_id,
+                updated_at
+         from subscription_entitlements
+         where user_id = $1`,
+        [userId]
+      );
+      const row = rows[0];
+      return row ? mapSubscriptionEntitlement(row) : null;
     },
 
     async addWatchlistItem(userId, item) {
@@ -1237,13 +1343,15 @@ export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'human_review_assignments',
   'human_reviewers',
   'community_reporter_trust',
+  'subscription_entitlements',
   'notification_tasks',
   'notification_suppressions'
 ] as const;
 
 export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '001_groceryview_schema',
-  '002_repository_support_schema'
+  '002_repository_support_schema',
+  '003_subscription_entitlements'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
@@ -1255,6 +1363,7 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
   const userId = `postgres-probe-user-${safeId}`;
   const assignmentId = `postgres-probe-assignment-${safeId}`;
   const suppressionId = `postgres-probe-suppression-${safeId}`;
+  const providerSubscriptionId = `postgres-probe-subscription-${safeId}`;
   const chainSlug = `postgres-probe-chain-${safeId}`;
   const productSlug = `postgres-probe-product-${safeId}`;
 
@@ -1267,6 +1376,29 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
         await repository.upsertBudget(userId, { weeklyBudget: 1000, monthlyBudget: 4000 });
         const budget = await repository.getBudget(userId);
         assertProbe(budget?.weeklyBudget === 1000 && budget.monthlyBudget === 4000, 'user budget round trip did not return the written values');
+      }
+    },
+    {
+      name: 'user_subscription_entitlement_round_trip',
+      async run(executor) {
+        const repository = createPostgresRepository(executor);
+        await repository.upsertUser({ id: userId, email: `${userId}@example.invalid` });
+        await repository.upsertSubscriptionEntitlement({
+          userId,
+          tier: 'premium',
+          plan: 'premium_monthly',
+          status: 'active',
+          currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
+          provider: 'stripe_compatible',
+          providerCustomerId: `postgres-probe-customer-${safeId}`,
+          providerSubscriptionId,
+          updatedAt: input.now
+        });
+        const entitlement = await repository.getSubscriptionEntitlement(userId);
+        assertProbe(
+          entitlement?.tier === 'premium' && entitlement.providerSubscriptionId === providerSubscriptionId,
+          'subscription entitlement round trip did not return the written values'
+        );
       }
     },
     {

@@ -18,6 +18,49 @@ describe('createMemoryRepository', () => {
     assert.deepEqual(await repo.getBasket('user-1'), [{ productId: 'coffee', quantity: 2 }]);
   });
 
+  it('upserts subscription entitlements by user for premium account enforcement', async () => {
+    const repo = createMemoryRepository();
+
+    await repo.upsertUser({ id: 'user-1', email: 'premium@example.com' });
+    await repo.upsertSubscriptionEntitlement({
+      userId: 'user-1',
+      tier: 'premium',
+      plan: 'premium_yearly',
+      status: 'active',
+      currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
+      provider: 'stripe_compatible',
+      providerCustomerId: 'cus_123',
+      providerSubscriptionId: 'sub_123',
+      updatedAt: '2026-05-20T00:00:00.000Z'
+    });
+
+    assert.deepEqual(await repo.getSubscriptionEntitlement('user-1'), {
+      userId: 'user-1',
+      tier: 'premium',
+      plan: 'premium_yearly',
+      status: 'active',
+      currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
+      provider: 'stripe_compatible',
+      providerCustomerId: 'cus_123',
+      providerSubscriptionId: 'sub_123',
+      updatedAt: '2026-05-20T00:00:00.000Z'
+    });
+
+    await repo.upsertSubscriptionEntitlement({
+      userId: 'user-1',
+      tier: 'free',
+      status: 'canceled',
+      updatedAt: '2026-05-21T00:00:00.000Z'
+    });
+
+    assert.deepEqual(await repo.getSubscriptionEntitlement('user-1'), {
+      userId: 'user-1',
+      tier: 'free',
+      status: 'canceled',
+      updatedAt: '2026-05-21T00:00:00.000Z'
+    });
+  });
+
   it('persists open human review assignments separately from completed work', async () => {
     const repo = createMemoryRepository();
 

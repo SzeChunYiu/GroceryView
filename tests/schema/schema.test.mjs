@@ -21,6 +21,7 @@ const requiredTables = [
   'receipt_items',
   'community_price_reports',
   'community_reporter_trust',
+  'subscription_entitlements',
   'notification_tasks',
   'notification_suppressions',
   'human_reviewers',
@@ -49,6 +50,10 @@ const requiredColumns = [
   'role',
   'reports_last_24_hours',
   'accepted_reports_last_30_days',
+  'tier',
+  'current_period_ends_at',
+  'provider_customer_id',
+  'provider_subscription_id',
   'send_at',
   'attempt_count',
   'max_attempts',
@@ -76,5 +81,12 @@ describe('db/schema.sql', () => {
 
   it('keeps one weekly basket per user and week for deterministic basket item writes', () => {
     assert.match(schema, /unique\s*\(\s*user_id\s*,\s*week_start\s*\)/);
+  });
+
+  it('stores subscription entitlements without card or secret data', () => {
+    assert.match(schema, /create table (if not exists )?subscription_entitlements\b/);
+    assert.match(schema, /tier text not null check \(tier in \('free', 'premium'\)\)/);
+    assert.match(schema, /provider text check \(provider in \('stripe_compatible'\)\)/);
+    assert.doesNotMatch(schema, /\b(card_number|cvc|client_secret|payment_method_secret)\b/);
   });
 });

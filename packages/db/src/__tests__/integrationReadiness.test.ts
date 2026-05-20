@@ -73,6 +73,21 @@ class RepositorySmokeQueryExecutor implements QueryExecutor {
     if (sql.includes('select weekly_budget')) {
       return [{ weekly_budget: '1000', monthly_budget: '4000' }] as T[];
     }
+    if (sql.includes('from subscription_entitlements')) {
+      return [
+        {
+          user_id: 'postgres-probe-user-run-42',
+          tier: 'premium',
+          plan: 'premium_monthly',
+          status: 'active',
+          current_period_ends_at: '2026-06-20T00:00:00.000Z',
+          provider: 'stripe_compatible',
+          provider_customer_id: 'postgres-probe-customer-run-42',
+          provider_subscription_id: 'postgres-probe-subscription-run-42',
+          updated_at: '2026-05-20T00:00:00.000Z'
+        }
+      ] as T[];
+    }
     if (sql.includes('from human_review_assignments')) {
       return [
         {
@@ -132,10 +147,12 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_table:products',
       'missing_table:raw_records',
       'missing_table:source_runs',
+      'missing_table:subscription_entitlements',
       'missing_table:user_preferences',
       'missing_table:watchlist_items',
       'missing_table:weekly_baskets',
       'missing_migration:002_repository_support_schema',
+      'missing_migration:003_subscription_entitlements',
       'repository_check_fail:human_review_assignment_round_trip',
       'repository_check_not_run:notification_suppression_round_trip'
     ]);
@@ -180,11 +197,13 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'table:products',
         'table:raw_records',
         'table:source_runs',
+        'table:subscription_entitlements',
         'table:user_preferences',
         'table:watchlist_items',
         'table:weekly_baskets',
         'migration:001_groceryview_schema',
         'migration:002_repository_support_schema',
+        'migration:003_subscription_entitlements',
         'repository_check:favorite_store_round_trip',
         'repository_check:human_review_assignment_round_trip',
         'repository_check:notification_suppression_round_trip',
@@ -301,6 +320,7 @@ describe('buildPostgresRepositorySmokeProbes', () => {
 
     assert.deepEqual(probes.map((probe) => probe.name), [
       'user_budget_round_trip',
+      'user_subscription_entitlement_round_trip',
       'human_review_assignment_round_trip',
       'notification_suppression_round_trip',
       'price_observation_pipeline_round_trip'
@@ -311,6 +331,7 @@ describe('buildPostgresRepositorySmokeProbes', () => {
     }
 
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-user-run-42')), true);
+    assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-subscription-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-assignment-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-suppression-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-chain-run-42')), true);
