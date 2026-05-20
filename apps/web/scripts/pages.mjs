@@ -187,6 +187,52 @@ window.GroceryViewFlowActions = (() => {
       setResult('privacy', 'Deletion plan failed: ' + error.message + '. Local plan preview preserved.');
     }
   };
+  const loadPrivacyFulfillmentFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('privacy', 'Local preview: connect the API session bridge before checking privacy request deadlines.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/privacy/request-fulfillment', config), {
+        method: 'POST',
+        headers: apiHeaders(config),
+        body: JSON.stringify({
+          slaDays: 30,
+          alertBeforeDays: 5,
+          requests: [
+            {
+              id: 'privacy-export-request',
+              userId: config.userId,
+              type: 'data_export',
+              receivedAt: '2026-04-19T12:00:00.000Z',
+              status: 'in_progress'
+            },
+            {
+              id: 'privacy-delete-request',
+              userId: config.userId,
+              type: 'account_deletion',
+              receivedAt: '2026-04-25T12:00:00.000Z',
+              status: 'received'
+            },
+            {
+              id: 'privacy-ad-request',
+              userId: config.userId,
+              type: 'ad_data_opt_out',
+              receivedAt: '2026-05-10T12:00:00.000Z',
+              status: 'received'
+            }
+          ]
+        })
+      });
+      const payload = await requireApiSuccess(response);
+      const overdueCount = Array.isArray(payload.overdueRequestIds) ? payload.overdueRequestIds.length : 0;
+      const dueSoonCount = Array.isArray(payload.dueSoonRequestIds) ? payload.dueSoonRequestIds.length : 0;
+      setResult('privacy', 'Connected API: privacy fulfillment has ' + overdueCount + ' overdue and ' + dueSoonCount + ' due-soon requests.');
+    } catch (error) {
+      setResult('privacy', 'Privacy request deadline check failed: ' + error.message + '. Local deadline preview preserved.');
+    }
+  };
   const processScannerUploadWithApi = async (form) => {
     const config = getApiConfig();
     if (!hasApiSession(config)) {
@@ -410,6 +456,10 @@ window.GroceryViewFlowActions = (() => {
         await loadDeletionPlanFromApi();
         return;
       }
+      if (flow === 'privacy' && action === 'check-fulfillment') {
+        await loadPrivacyFulfillmentFromApi();
+        return;
+      }
       if (flow === 'product-terminal' && action === 'load-product-terminal') {
         await loadProductTerminalFromApi(button);
         return;
@@ -600,7 +650,7 @@ const pages = [
     path: 'privacy/index.html',
     title: 'Privacy controls — GroceryView',
     description: 'GroceryView privacy controls for data export, account deletion, receipt redaction, and ad payload minimization.',
-    body: `<section class="card" data-groceryview-flow="privacy"><div class="eyebrow">Privacy</div><h1>Export or delete your data</h1><p class="lede">Download personal data, plan account deletion, and verify advertiser payloads stay aggregated and receipt-safe.</p><div class="grid"><div class="metric"><strong>Export</strong><span>watchlists, budgets, and baskets</span></div><div class="metric"><strong>Delete</strong><span>sensitive rows removed by plan</span></div><div class="metric"><strong>Ads</strong><span>no raw receipt leakage</span></div></div><div class="flow-panel" aria-label="Privacy actions"><button type="button" data-flow-action="download-export">Download export</button><button type="button" data-flow-action="plan-deletion">Plan account deletion</button></div><p class="flow-result" data-flow-result="privacy" aria-live="polite">Privacy actions require re-authentication before live execution.</p></section><section class="card" style="margin-top:16px"><h2>Control states</h2><table class="table"><thead><tr><th>Setting</th><th>State</th><th>Detail</th></tr></thead><tbody><tr><td>Receipt images</td><td>Auto-delete after review</td><td>7 day retention window</td></tr><tr><td>Location precision</td><td>District only</td><td>Street address hidden from exports</td></tr><tr><td>Price contribution</td><td>Anonymous</td><td>No account identifier in catalog backfill</td></tr></tbody></table></section>`
+    body: `<section class="card" data-groceryview-flow="privacy"><div class="eyebrow">Privacy</div><h1>Export or delete your data</h1><p class="lede">Download personal data, plan account deletion, and verify advertiser payloads stay aggregated and receipt-safe.</p><div class="grid"><div class="metric"><strong>Export</strong><span>watchlists, budgets, and baskets</span></div><div class="metric"><strong>Delete</strong><span>sensitive rows removed by plan</span></div><div class="metric"><strong>Ads</strong><span>no raw receipt leakage</span></div></div><div class="flow-panel" aria-label="Privacy actions"><button type="button" data-flow-action="download-export">Download export</button><button type="button" data-flow-action="plan-deletion">Plan account deletion</button><button type="button" data-flow-action="check-fulfillment">Check request deadlines</button></div><p class="flow-result" data-flow-result="privacy" aria-live="polite">Privacy actions require re-authentication before live execution.</p></section><section class="card" style="margin-top:16px"><h2>Request fulfillment deadlines</h2><table class="table"><thead><tr><th>Request</th><th>Status</th><th>Deadline state</th></tr></thead><tbody><tr><td>Data export</td><td>In progress</td><td>Overdue review</td></tr><tr><td>Account deletion</td><td>Received</td><td>Due soon</td></tr><tr><td>Ad data opt-out</td><td>Received</td><td>On track</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Control states</h2><table class="table"><thead><tr><th>Setting</th><th>State</th><th>Detail</th></tr></thead><tbody><tr><td>Receipt images</td><td>Auto-delete after review</td><td>7 day retention window</td></tr><tr><td>Location precision</td><td>District only</td><td>Street address hidden from exports</td></tr><tr><td>Price contribution</td><td>Anonymous</td><td>No account identifier in catalog backfill</td></tr></tbody></table></section>`
   },
   {
     path: 'basket/index.html',
