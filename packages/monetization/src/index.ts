@@ -16,6 +16,22 @@ export type AdPlacementPlan = {
   reason: string;
 };
 
+export type AdDeliveryCandidate = {
+  surface: AdSurface;
+  provider: AdProvider;
+  userTier: UserTier;
+  label?: string;
+  organicRankingSeparated: boolean;
+  affectsDealScore: boolean;
+};
+
+export type AdDeliveryComplianceReport = {
+  status: 'compliant' | 'blocked';
+  allowed: AdDeliveryCandidate[];
+  blocked: Array<{ candidate: AdDeliveryCandidate; reasons: string[] }>;
+  summary: string;
+};
+
 export type MonetizationProviderHealthStatus = 'pass' | 'fail' | 'not_run';
 
 export type MonetizationProviderReadinessInput = {
@@ -163,6 +179,31 @@ export function buildAdPlacementPlan(input: { userTier: UserTier; configuredProv
     excludedSurfaces,
     affectsDealScore: false,
     reason: slots.length > 0 ? 'Ads are allowed only in labeled non-critical surfaces.' : 'No ad providers configured.'
+  };
+}
+
+export function buildAdDeliveryComplianceReport(candidates: AdDeliveryCandidate[]): AdDeliveryComplianceReport {
+  const allowed: AdDeliveryCandidate[] = [];
+  const blocked: AdDeliveryComplianceReport['blocked'] = [];
+  const criticalSurfaces: AdSurface[] = ['deal_score', 'checkout_decision', 'basket_optimizer'];
+
+  for (const candidate of candidates) {
+    const reasons: string[] = [];
+    if (candidate.userTier === 'premium') reasons.push('premium_users_must_not_receive_ads');
+    if (criticalSurfaces.includes(candidate.surface)) reasons.push(`ad_surface_blocked:${candidate.surface}`);
+    if (candidate.label !== 'Sponsored') reasons.push('sponsored_label_required');
+    if (!candidate.organicRankingSeparated) reasons.push('organic_ranking_separation_required');
+    if (candidate.affectsDealScore) reasons.push('deal_score_must_not_be_affected');
+
+    if (reasons.length === 0) allowed.push(candidate);
+    else blocked.push({ candidate, reasons });
+  }
+
+  return {
+    status: blocked.length === 0 ? 'compliant' : 'blocked',
+    allowed,
+    blocked,
+    summary: blocked.length === 0 ? 'Ad delivery candidates comply with GroceryView trust policy.' : 'Ad delivery is blocked until trust policy violations are fixed.'
   };
 }
 
