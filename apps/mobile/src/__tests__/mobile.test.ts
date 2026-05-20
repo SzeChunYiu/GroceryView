@@ -1,7 +1,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { buildExpoReadinessPlan, buildMobileScreenBlueprints, buildMobileShell, buildScanResult, createMobileViewModel } from '../index.js';
+import { createGroceryViewApi } from '@groceryview/api';
+import { buildExpoReadinessPlan, buildMobileScreenBlueprints, buildMobileShell, buildScanResult, createMobileDiscoveryViewModel, createMobileViewModel } from '../index.js';
 
 describe('mobile app foundation', () => {
   it('defines the proposal bottom navigation and Today dashboard modules', () => {
@@ -18,6 +19,32 @@ describe('mobile app foundation', () => {
     assert.equal(viewModel.today.topDeals[0].ticker, 'ZOEGAS-COFFEE-450G');
     assert.equal(viewModel.scan.supportedModes.join(','), 'barcode,receipt');
     assert.equal(viewModel.basket.emptyStateAction, 'Add from deals or scan a barcode');
+  });
+
+  it('builds product discovery state for search, product price detail, basket comparison, budget, and watchlist alerts', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 55, alertDealScoreAt: 80, favoriteStoresOnly: true });
+    api.updateBudget('user-1', { weeklyBudget: 150, monthlyBudget: 600 });
+
+    const viewModel = createMobileDiscoveryViewModel({ userId: 'user-1', query: 'coffee', selectedProductId: 'coffee' }, api);
+
+    assert.deepEqual(viewModel.favoriteStores.map((store) => store.id), ['willys-odenplan', 'lidl-sveavagen']);
+    assert.deepEqual(viewModel.searchResults.map((product) => product.ticker), ['ZOEGAS-COFFEE-450G']);
+    assert.equal(viewModel.searchResults[0].bestPrice, 49.9);
+    assert.equal(viewModel.selectedProduct?.currentPrices[0].storeId, 'willys-odenplan');
+    assert.deepEqual(viewModel.selectedProduct?.priceHistory.map((point) => point.lineStyle), ['solid', 'solid', 'solid']);
+    assert.deepEqual(viewModel.selectedProduct?.actions, ['add_to_weekly_basket', 'add_to_watchlist', 'compare_stores', 'scan_receipt_to_verify']);
+    assert.equal(viewModel.weeklyBasket.itemCount, 3);
+    assert.equal(viewModel.weeklyBasket.cheapestTotal, 77.7);
+    assert.equal(viewModel.weeklyBasket.bestSingleStore?.storeId, 'willys-odenplan');
+    assert.equal(viewModel.weeklyBasket.savingsVsBestSingleStore, 2);
+    assert.equal(viewModel.budget.weeklyRemainingAfterEstimate, 72.3);
+    assert.equal(viewModel.budget.weeklyStatus, 'under');
+    assert.deepEqual(viewModel.watchlist.alertTypes, ['deal_score', 'new_52_week_low', 'target_price']);
   });
 
   it('builds barcode scan results with deal score, equivalent products, and actions', () => {
