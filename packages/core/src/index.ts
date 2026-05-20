@@ -49,6 +49,57 @@ export function scoreBand(score: number): ScoreBand {
   return { label: 'Not a real deal', verdict: 'Wait' };
 }
 
+export type DealOpportunityInput = {
+  productId: string;
+  productName: string;
+  storeId: string;
+  storeName: string;
+  currentPrice: number;
+  regularPrice: number;
+  dealScore: number;
+  sourceConfidence: number;
+  sponsoredPlacement?: boolean;
+};
+
+export type DealOpportunity = DealOpportunityInput & {
+  band: ScoreBand;
+  priceDrop: number;
+  discountPercent: number;
+  reason: string;
+};
+
+export function rankDealOpportunities(input: {
+  deals: DealOpportunityInput[];
+  minimumDealScore?: number;
+  minimumSourceConfidence?: number;
+}): DealOpportunity[] {
+  const minimumDealScore = input.minimumDealScore ?? 60;
+  const minimumSourceConfidence = input.minimumSourceConfidence ?? 0.5;
+
+  return input.deals
+    .filter((deal) => !deal.sponsoredPlacement)
+    .filter((deal) => deal.dealScore >= minimumDealScore)
+    .filter((deal) => deal.sourceConfidence >= minimumSourceConfidence)
+    .map((deal) => {
+      const priceDrop = roundMoney(Math.max(0, deal.regularPrice - deal.currentPrice));
+      const discountPercent = deal.regularPrice > 0 ? roundMoney((priceDrop / deal.regularPrice) * 100) : 0;
+      const band = scoreBand(deal.dealScore);
+
+      return {
+        ...deal,
+        band,
+        priceDrop,
+        discountPercent,
+        reason: `${deal.productName} is ${discountPercent}% below regular price at ${deal.storeName} with Deal Score ${deal.dealScore}.`
+      };
+    })
+    .sort((a, b) => {
+      if (b.dealScore !== a.dealScore) return b.dealScore - a.dealScore;
+      if (b.discountPercent !== a.discountPercent) return b.discountPercent - a.discountPercent;
+      return a.productName.localeCompare(b.productName);
+    });
+}
+
 export type StorePrice = {
   storeId: string;
   storeName: string;
