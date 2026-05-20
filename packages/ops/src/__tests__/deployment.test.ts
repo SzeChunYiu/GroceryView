@@ -110,22 +110,60 @@ describe('deployment ops foundation', () => {
         'smoke_test_not_run:api-health',
         'health_check_failed:api',
         'scheduled_job_failed:notification-worker',
+        'change_freeze_active:holiday-freeze',
+        'active_incident:sev1:inc-123',
         'rollback_plan_not_approved',
         'dns_not_configured',
         'observability_not_configured'
       ]),
       {
-        total: 10,
+        total: 12,
         missingSecrets: 1,
         missingArtifacts: 1,
         releaseValidation: 1,
         smokeTests: 1,
         healthChecks: 1,
         scheduledJobs: 1,
+        changeControls: 1,
+        incidents: 1,
         rollbackPlan: 1,
         deploymentPrerequisites: 3
       }
     );
+  });
+
+  it('surfaces change freezes and active severe incidents as deployment blockers', () => {
+    const report = buildDeploymentReadinessReport({
+      providerSelected: true,
+      requiredSecretsPresent: ['DATABASE_URL'],
+      requiredSecrets: ['DATABASE_URL'],
+      dnsConfigured: true,
+      healthChecks: [{ name: 'api', status: 'pass' }],
+      smokeTests: [{ name: 'health-endpoint', status: 'pass' }],
+      changeFreeze: { active: true, reason: 'holiday-freeze' },
+      activeIncidents: [
+        { id: 'inc-123', severity: 'sev1', status: 'mitigating' },
+        { id: 'inc-456', severity: 'sev3', status: 'investigating' },
+        { id: 'inc-789', severity: 'sev2', status: 'resolved' }
+      ],
+      observabilityConfigured: true
+    });
+
+    assert.deepEqual(report.status, 'blocked');
+    assert.deepEqual(report.blockers, ['change_freeze_active:holiday-freeze', 'active_incident:sev1:inc-123']);
+    assert.deepEqual(summarizeDeploymentReadinessReport(report).blockers, {
+      total: 2,
+      missingSecrets: 0,
+      missingArtifacts: 0,
+      releaseValidation: 0,
+      smokeTests: 0,
+      healthChecks: 0,
+      scheduledJobs: 0,
+      changeControls: 1,
+      incidents: 1,
+      rollbackPlan: 0,
+      deploymentPrerequisites: 0
+    });
   });
 
   it('summarizes readiness warnings and full readiness reports', () => {
@@ -155,6 +193,8 @@ describe('deployment ops foundation', () => {
         smokeTests: 0,
         healthChecks: 0,
         scheduledJobs: 2,
+        changeControls: 0,
+        incidents: 0,
         rollbackPlan: 0,
         deploymentPrerequisites: 3
       },

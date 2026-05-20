@@ -35,6 +35,8 @@ export type GateBlockerSummary = {
   smokeTests: number;
   healthChecks: number;
   scheduledJobs: number;
+  changeControls: number;
+  incidents: number;
   rollbackPlan: number;
   deploymentPrerequisites: number;
 };
@@ -61,6 +63,8 @@ export function summarizeGateBlockers(blockers: string[]): GateBlockerSummary {
       if (blocker.startsWith('smoke_test_') || blocker === 'no_smoke_tests_defined') summary.smokeTests += 1;
       if (blocker.startsWith('health_check_')) summary.healthChecks += 1;
       if (blocker.startsWith('scheduled_job_')) summary.scheduledJobs += 1;
+      if (blocker.startsWith('change_freeze_active:')) summary.changeControls += 1;
+      if (blocker.startsWith('active_incident:')) summary.incidents += 1;
       if (blocker === 'rollback_plan_not_approved') summary.rollbackPlan += 1;
       if (blocker === 'hosting_provider_not_selected' || blocker === 'dns_not_configured' || blocker === 'observability_not_configured') {
         summary.deploymentPrerequisites += 1;
@@ -75,6 +79,8 @@ export function summarizeGateBlockers(blockers: string[]): GateBlockerSummary {
       smokeTests: 0,
       healthChecks: 0,
       scheduledJobs: 0,
+      changeControls: 0,
+      incidents: 0,
       rollbackPlan: 0,
       deploymentPrerequisites: 0
     }
