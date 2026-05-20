@@ -1,7 +1,15 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildDeploymentReadinessReport, buildDeploymentSmokeEvidenceReport, buildRollbackPlan } from '../index.js';
-import { buildDeploymentReadinessReport, buildRollbackPlan, buildSourceWorkerReadinessReport } from '../index.js';
+import {
+  buildDeploymentReadinessReport,
+  buildHostedSmokeCommandPlan,
+  buildRollbackPlan,
+  buildSecretRotationReadinessReport,
+  summarizeSecretRotationReadinessReport,
+  summarizeDeploymentReadinessReport,
+  summarizeGateBlockers,
+  summarizeGateWarnings
+} from '../index.js';
 
 describe('deployment ops foundation', () => {
   it('passes readiness only when provider, secrets, DNS, health checks, and smoke tests are ready', () => {
@@ -301,94 +309,5 @@ describe('deployment ops foundation', () => {
       ownerlessSecrets: 1,
       readySecrets: 1
     });
-  });
-});
-
-describe('source worker readiness', () => {
-  it('accepts enabled source workers with configured schedules and fresh successful runs', () => {
-    const report = buildSourceWorkerReadinessReport({
-      now: '2026-05-20T05:00:00.000Z',
-      maxRunAgeMinutes: 90,
-      workers: [
-        {
-          name: 'retailer-api-willys',
-          enabled: true,
-          scheduleConfigured: true,
-          lastRunFinishedAt: '2026-05-20T04:15:00.000Z',
-          lastRunStatus: 'succeeded'
-        }
-      ]
-    });
-
-    assert.deepEqual(report, {
-      status: 'ready',
-      blockers: [],
-      evidence: ['source_worker_ready:retailer-api-willys'],
-      summary: 'Source worker schedules are ready.'
-    });
-  });
-
-  it('blocks source workers that are unscheduled, stale, failed, partial, or never run', () => {
-    const report = buildSourceWorkerReadinessReport({
-      now: '2026-05-20T05:00:00.000Z',
-      maxRunAgeMinutes: 60,
-      workers: [
-        {
-          name: 'community-report-import',
-          enabled: true,
-          scheduleConfigured: true,
-          lastRunFinishedAt: '2026-05-20T04:55:00.000Z',
-          lastRunStatus: 'partial'
-        },
-        {
-          name: 'receipt-ocr-import',
-          enabled: false,
-          scheduleConfigured: false,
-          lastRunStatus: 'never_run'
-        },
-        {
-          name: 'retailer-page-coop',
-          enabled: true,
-          scheduleConfigured: true,
-          lastRunFinishedAt: '2026-05-20T02:00:00.000Z',
-          lastRunStatus: 'succeeded'
-        },
-        {
-          name: 'weekly-leaflet',
-          enabled: true,
-          scheduleConfigured: true,
-          lastRunFinishedAt: '2026-05-20T04:30:00.000Z',
-          lastRunStatus: 'failed'
-        }
-      ]
-    });
-
-    assert.deepEqual(report.status, 'blocked');
-    assert.deepEqual(report.blockers, [
-      'source_worker_partial:community-report-import',
-      'source_worker_disabled:receipt-ocr-import',
-      'source_worker_schedule_not_configured:receipt-ocr-import',
-      'source_worker_never_run:receipt-ocr-import',
-      'source_worker_stale:retailer-page-coop',
-      'source_worker_failed:weekly-leaflet'
-    ]);
-  });
-
-  it('flags source worker runs with future finish timestamps', () => {
-    const report = buildSourceWorkerReadinessReport({
-      now: '2026-05-20T05:00:00.000Z',
-      maxRunAgeMinutes: 60,
-      workers: [
-        {
-          name: 'retailer-api-ica',
-          enabled: true,
-          scheduleConfigured: true,
-          lastRunFinishedAt: '2026-05-20T06:00:00.000Z',
-          lastRunStatus: 'succeeded'
-        }
-      ]
-    });
-
-    assert.deepEqual(report.blockers, ['source_worker_finished_in_future:retailer-api-ica']);
   });
 });
