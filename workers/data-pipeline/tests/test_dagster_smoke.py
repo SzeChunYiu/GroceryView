@@ -12,6 +12,7 @@ def test_dagster_smoke_expected_asset_contract() -> None:
     assert EXPECTED_ASSETS == {
         "latest_price_rollup",
         "normalized_products",
+        "price_observation_freshness",
         "price_observations",
         "quality_checks",
         "retailer_fetch_stubs",

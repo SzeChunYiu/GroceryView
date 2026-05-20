@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
+from datetime import datetime, timedelta, timezone
 from typing import Iterable
 
 try:
@@ -15,6 +16,7 @@ except ModuleNotFoundError:
 from .fixtures import FETCHED_AT, HERO_PRODUCTS, RETAILER_PRICE_SNAPSHOT, STOCKHOLM_STORES
 from .models import (
     LatestPriceRow,
+    ObservationFreshnessSummary,
     PriceObservationRow,
     PriceProvenance,
     ProductSeed,
@@ -235,6 +237,58 @@ def build_quality_checks(
     )
 
 
+def _parse_utc_datetime(value: object) -> datetime | None:
+    if not isinstance(value, str) or not value:
+        return None
+    normalized = f"{value[:-1]}+00:00" if value.endswith("Z") else value
+    try:
+        parsed = datetime.fromisoformat(normalized)
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        parsed = parsed.replace(tzinfo=timezone.utc)
+    return parsed.astimezone(timezone.utc)
+
+
+def build_observation_freshness_summary(
+    observations: Iterable[PriceObservationRow],
+    checked_at: str,
+    max_age_hours: int,
+) -> ObservationFreshnessSummary:
+    checked_at_dt = _parse_utc_datetime(checked_at)
+    max_age = timedelta(hours=max_age_hours)
+    observation_list = list(observations)
+    fresh_count = 0
+    stale_count = 0
+    future_count = 0
+    missing_observed_at_count = 0
+
+    for observation in observation_list:
+        observed_at = _parse_utc_datetime(observation.observed_at)
+        if observed_at is None or checked_at_dt is None:
+            missing_observed_at_count += 1
+            continue
+        age = checked_at_dt - observed_at
+        if age < timedelta(0):
+            future_count += 1
+        elif age > max_age:
+            stale_count += 1
+        else:
+            fresh_count += 1
+
+    blocked_count = stale_count + future_count + missing_observed_at_count
+    return ObservationFreshnessSummary(
+        status="ready" if blocked_count == 0 else "blocked",
+        observation_count=len(observation_list),
+        fresh_count=fresh_count,
+        stale_count=stale_count,
+        future_count=future_count,
+        missing_observed_at_count=missing_observed_at_count,
+        max_age_hours=max_age_hours,
+        checked_at=checked_at,
+    )
+
+
 def clamp_confidence(confidence: float) -> float:
     if confidence < 0:
         return 0
@@ -327,4 +381,17 @@ def quality_checks(
         for row in latest_price_rollup
     ]
     summary = build_quality_checks(fetch_stubs, observations, rollup)
+    return summary.to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
+def price_observation_freshness(price_observations: list[dict[str, object]]) -> dict[str, object]:
+    observations = [
+        PriceObservationRow(
+            provenance=PriceProvenance(**observation["provenance"]),
+            **{key: value for key, value in observation.items() if key != "provenance"},
+        )
+        for observation in price_observations
+    ]
+    summary = build_observation_freshness_summary(observations, checked_at=OBSERVED_AT, max_age_hours=48)
     return summary.to_dict()

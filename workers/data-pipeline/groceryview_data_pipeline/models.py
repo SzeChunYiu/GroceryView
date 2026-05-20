@@ -162,6 +162,22 @@ class QualityCheckSummary:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class ObservationFreshnessSummary:
+    status: Literal["ready", "blocked"]
+    observation_count: int
+    fresh_count: int
+    stale_count: int
+    future_count: int
+    missing_observed_at_count: int
+    max_age_hours: int
+    checked_at: str
+    demo: bool = True
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
 def utc_now() -> str:
     return datetime.now(tz=timezone.utc).isoformat()
 
