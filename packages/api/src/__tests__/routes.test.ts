@@ -120,6 +120,39 @@ describe('createGroceryViewApi', () => {
     assert.equal(detail?.dealScore, 73);
   });
 
+  it('serves category market reports with terminal-style mover evidence', () => {
+    const api = createGroceryViewApi();
+
+    const coffee = api.getCategoryMarket('coffee');
+
+    assert.equal(coffee?.category, 'coffee');
+    assert.equal(coffee?.city, 'Stockholm');
+    assert.equal(coffee?.productCount, 1);
+    assert.equal(coffee?.topDeal?.productId, 'coffee');
+    assert.deepEqual(coffee?.rows.map((row) => ({
+      productId: row.productId,
+      currentPrice: row.currentPrice,
+      dealScore: row.dealScore,
+      oneMonthMovePercent: row.oneMonthMovePercent,
+      range52WeekPositionPercent: row.range52WeekPositionPercent,
+      stockholmMedianGap: row.stockholmMedianGap,
+      verifiedHistoryPoints: row.verifiedHistoryPoints
+    })), [
+      {
+        productId: 'coffee',
+        currentPrice: 49.9,
+        dealScore: 82,
+        oneMonthMovePercent: -16.7,
+        range52WeekPositionPercent: 0,
+        stockholmMedianGap: -10,
+        verifiedHistoryPoints: 3
+      }
+    ]);
+    assert.match(coffee?.rows[0]?.customerRead ?? '', /49\.90 SEK at Willys Odenplan/);
+    assert.match(coffee?.guardrails[0] ?? '', /verified category rows/i);
+    assert.equal(api.getCategoryMarket('missing-category'), null);
+  });
+
   it('returns cheapest product prices first and uses the cheapest quote for watchlist alerts', () => {
     const api = createGroceryViewApi();
 

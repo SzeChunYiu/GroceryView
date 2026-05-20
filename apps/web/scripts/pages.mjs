@@ -25,6 +25,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-market-movers-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setCategoryMarketMetric = (metric, message) => {
+    const target = document.querySelector('[data-category-market-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setApiSessionResult = (message) => {
     const target = document.querySelector('[data-api-session-result]');
     if (target) target.textContent = message;
@@ -448,6 +452,39 @@ window.GroceryViewFlowActions = (() => {
       setResult('market-movers', 'Market movers API load failed: ' + error.message + '. Static mover board remains visible.');
     }
   };
+  const loadCategoryMarketFromApi = async (button) => {
+    const config = getApiConfig();
+    const panel = button.closest('[data-groceryview-flow="category-market"]');
+    const categoryId = panel?.dataset.category || 'coffee';
+    if (!config.apiBase) {
+      setResult('category-market', 'Local preview mode: connect the API session bridge before loading live category market numbers.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/categories/' + encodeURIComponent(categoryId) + '/market', config, false), {
+        method: 'GET',
+        headers: config.bearerToken ? apiHeaders(config) : { 'content-type': 'application/json' }
+      });
+      const payload = await requireApiSuccess(response);
+      const rows = Array.isArray(payload.rows) ? payload.rows : [];
+      const leader = rows[0] || {};
+      const range52Week = leader.range52Week;
+      const rangeMessage = range52Week && Number.isFinite(Number(range52Week.low)) && Number.isFinite(Number(range52Week.high))
+        ? formatPreciseSek(range52Week.low) + ' to ' + formatPreciseSek(range52Week.high) + ' · ' + formatUnsignedPercent(leader.range52WeekPositionPercent) + ' through range'
+        : '52W range unavailable';
+      const medianGap = Number.isFinite(Number(leader.stockholmMedianGap))
+        ? formatPreciseSek(leader.stockholmMedianGap) + ' vs Stockholm median'
+        : 'median gap unavailable';
+      const evidence = Number(leader.verifiedHistoryPoints || 0) + '/' + Number(leader.historyPoints || 0) + ' verified history points';
+      setCategoryMarketMetric('leader', (leader.productName || leader.ticker || 'Category leader') + ': ' + formatPreciseSek(leader.currentPrice) + ' · Deal Score ' + Number(leader.dealScore || 0) + ' · 1M move ' + formatPercent(leader.oneMonthMovePercent));
+      setCategoryMarketMetric('range', '52W range ' + rangeMessage);
+      setCategoryMarketMetric('median', medianGap);
+      setCategoryMarketMetric('evidence', evidence);
+      setResult('category-market', 'Connected category market loaded: ' + rows.length + ' ' + (payload.category || categoryId) + ' rows from /api/categories/' + categoryId + '/market; leader ' + (leader.ticker || leader.productId || 'n/a') + '.');
+    } catch (error) {
+      setResult('category-market', 'Category market API load failed: ' + error.message + '. Static category board remains visible.');
+    }
+  };
   const messages = {
     'toggle-alert': 'Alert rule updated locally; production save waits for authenticated account API.',
     'manage-subscription': 'Billing portal handoff prepared without exposing provider customer IDs.',
@@ -503,6 +540,10 @@ window.GroceryViewFlowActions = (() => {
       }
       if (flow === 'market-movers' && action === 'load-market-movers') {
         await loadMarketMoversFromApi();
+        return;
+      }
+      if (flow === 'category-market' && action === 'load-category-market') {
+        await loadCategoryMarketFromApi(button);
         return;
       }
       if (flow && action) setResult(flow, messages[action] || 'Action preview recorded.');
@@ -619,6 +660,9 @@ const productTerminalLivePanel = `
 
 const productPriceGuardrails = `
   <section class="card" style="margin-top:16px"><h2>Price evidence guardrails</h2><table class="table"><thead><tr><th>Signal</th><th>Displayed behavior</th></tr></thead><tbody><tr><td>Verified shelf or retailer page</td><td>Can contribute to current price, Deal Score, and basket totals.</td></tr><tr><td>Member or promotion price</td><td>Shown with explicit loyalty or campaign label before shoppers act.</td></tr><tr><td>Estimated or low-confidence row</td><td>Marked unverified and excluded from official shelf-price claims.</td></tr></tbody></table></section>`;
+
+const categoryMarketLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="category-market" data-category="coffee" style="margin-top:16px"><div class="eyebrow">Connected category market API</div><h2>Pull current coffee category numbers</h2><p class="lede">Fetch <code>/api/categories/coffee/market</code> to refresh category rows with current price, Deal Score, 1M move, 52-week position, Stockholm median gap, and verified-history evidence from the API instead of static copy.</p><div class="grid" aria-label="Live category market API metrics"><div class="metric"><strong data-category-market-leader>Waiting for API pull</strong><span>category leader</span></div><div class="metric"><strong data-category-market-range>Static 52W range preview</strong><span>52W position</span></div><div class="metric"><strong data-category-market-median>Static Stockholm median preview</strong><span>same-product median gap</span></div><div class="metric"><strong data-category-market-evidence>Static verified history preview</strong><span>verified category evidence</span></div></div><div class="flow-panel" aria-label="Connected category market actions"><button type="button" data-flow-action="load-category-market">Load live category market</button></div><p class="flow-result" data-flow-result="category-market" aria-live="polite">Local preview mode: connect the API session bridge before loading live category market numbers.</p></section>`;
 
 const pages = [
   {
@@ -799,7 +843,7 @@ const pages = [
     path: 'categories/coffee/index.html',
     title: 'Coffee deals in Stockholm — GroceryView',
     description: 'Coffee category page with price index, top deals, and percentile signals.',
-    body: `<section class="card"><div class="eyebrow">Category</div><h1>Stockholm Coffee Deals</h1><p class="lede">Coffee Index is at 91.6 with strong current promotions.</p><div class="grid"><div class="metric"><strong>-8.4%</strong><span>1M move</span></div><div class="metric"><strong>12th</strong><span>Historical percentile</span></div><div class="metric"><strong>Zoégas</strong><span>Top deal</span></div></div></section><section class="card" style="margin-top:16px"><h2>Category signals</h2><table class="table"><thead><tr><th>Product</th><th>Store</th><th>Price</th><th>Signal</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>Willys Odenplan</td><td>49.90 SEK</td><td>12th historical percentile</td></tr><tr><td>Garant Bryggkaffe 450g</td><td>Willys Odenplan</td><td>37.90 SEK</td><td>Private-label swap candidate</td></tr><tr><td>Arvid Nordquist 500g</td><td>Coop Farsta</td><td>59.90 SEK</td><td>Watchlist only</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Category</div><h1>Stockholm Coffee Deals</h1><p class="lede">Coffee Index is at 91.6 with strong current promotions.</p><div class="grid"><div class="metric"><strong>-8.4%</strong><span>1M move</span></div><div class="metric"><strong>12th</strong><span>Historical percentile</span></div><div class="metric"><strong>Zoégas</strong><span>Top deal</span></div></div></section><section class="card" style="margin-top:16px"><h2>Category signals</h2><table class="table"><thead><tr><th>Product</th><th>Store</th><th>Price</th><th>Signal</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>Willys Odenplan</td><td>49.90 SEK</td><td>12th historical percentile</td></tr><tr><td>Garant Bryggkaffe 450g</td><td>Willys Odenplan</td><td>37.90 SEK</td><td>Private-label swap candidate</td></tr><tr><td>Arvid Nordquist 500g</td><td>Coop Farsta</td><td>59.90 SEK</td><td>Watchlist only</td></tr></tbody></table></section>${categoryMarketLivePanel}`
   }
 ];
 

@@ -209,6 +209,18 @@ describe('buildStaticPages', () => {
       assert.match(category, /Category signals/);
       assert.match(category, /Private-label swap candidate/);
       assert.match(category, /Arvid Nordquist/);
+      assert.match(category, /Connected category market API/);
+      assert.match(category, /Load live category market/);
+      assert.match(category, /data-groceryview-flow="category-market"/);
+      assert.match(category, /data-category="coffee"/);
+      assert.match(category, /data-flow-action="load-category-market"/);
+      assert.match(category, /data-category-market-leader/);
+      assert.match(category, /data-category-market-range/);
+      assert.match(category, /data-category-market-evidence/);
+      assert.match(category, /fetch\(apiUrl\('\/api\/categories\/' \+ encodeURIComponent\(categoryId\) \+ '\/market'/);
+      assert.match(category, /range52WeekPositionPercent/);
+      assert.match(category, /stockholmMedianGap/);
+      assert.match(category, /Connected category market loaded/);
 
       const login = await readFile(join(root, 'login/index.html'), 'utf8');
       assert.match(login, /Sign in to GroceryView/);

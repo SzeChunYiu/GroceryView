@@ -124,6 +124,21 @@ describe('createHttpHandler', () => {
     assert.equal(marketBody.movers[0]?.stockholmMedianGap, -10);
     assert.equal(marketBody.movers[0]?.verifiedHistoryPoints, 3);
 
+    const categoryMarket = await handle(new Request('http://localhost/api/categories/coffee/market'));
+    assert.equal(categoryMarket.status, 200);
+    const categoryMarketBody = await json(categoryMarket) as {
+      category: string;
+      productCount: number;
+      topDeal: { productId: string; currentPrice: number; dealScore: number };
+      rows: Array<{ productId: string; oneMonthMovePercent: number; range52WeekPositionPercent: number; verifiedHistoryPoints: number }>;
+    };
+    assert.equal(categoryMarketBody.category, 'coffee');
+    assert.equal(categoryMarketBody.productCount, 1);
+    assert.deepEqual(categoryMarketBody.topDeal, { productId: 'coffee', currentPrice: 49.9, dealScore: 82 });
+    assert.deepEqual(categoryMarketBody.rows.map((row) => [row.productId, row.oneMonthMovePercent, row.range52WeekPositionPercent, row.verifiedHistoryPoints]), [
+      ['coffee', -16.7, 0, 3]
+    ]);
+
     const stores = await handle(new Request('http://localhost/api/stores'));
     assert.equal(stores.status, 200);
     assert.equal((await json(stores) as Array<{ id: string }>)[0].id, 'willys-odenplan');
