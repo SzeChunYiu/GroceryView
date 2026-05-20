@@ -14,6 +14,11 @@ export type SqlExecutor = {
   recordMigration(version: string): Promise<void>;
 };
 
+export const SCHEMA_MIGRATIONS_TABLE_SQL = `create table if not exists schema_migrations (
+  version text primary key,
+  applied_at timestamptz not null default now()
+)`;
+
 export function migrationVersionFromPath(path: string): string {
   const filename = path.split(/[\\/]/).filter(Boolean).at(-1);
   if (!filename || !filename.endsWith('.sql')) throw new Error(`Migration path must end in .sql: ${path}`);
@@ -130,6 +135,29 @@ export async function applyMigrations(executor: SqlExecutor, migrations: Migrati
   }
 
   return pending.map((migration) => migration.version);
+}
+
+export function createPostgresMigrationExecutor(executor: QueryExecutor): SqlExecutor {
+  async function ensureSchemaMigrationsTable(): Promise<void> {
+    await executor.query(SCHEMA_MIGRATIONS_TABLE_SQL);
+  }
+
+  return {
+    async getAppliedMigrationVersions() {
+      await ensureSchemaMigrationsTable();
+      const rows = await executor.query<MigrationVersionRow>('select version from schema_migrations order by version');
+      return rows.map((row) => row.version);
+    },
+
+    async execute(sql) {
+      await executor.query(sql);
+    },
+
+    async recordMigration(version) {
+      await ensureSchemaMigrationsTable();
+      await executor.query('insert into schema_migrations(version) values ($1) on conflict (version) do nothing', [version]);
+    }
+  };
 }
 
 export type UserRecord = {
