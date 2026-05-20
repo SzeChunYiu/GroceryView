@@ -2,7 +2,6 @@ import {
   buildPriceChartSeries,
   buildWatchlistAlerts,
   calculateDealScore,
-  calculateDealScoreV1,
   calculateFixedBasketIndex,
   compareBasketStrategies,
   createHouseholdState,
@@ -13,7 +12,14 @@ import {
   summarizeHousehold,
   type BasketComparisonResult,
   type BudgetSummary,
-  type DealScoreResult,
+  type PriceChartAdapterResult,
+  type PriceChartObservation,
+  type PriceHistorySummary,
+  type HouseholdBasketItem,
+  type HouseholdMember,
+  type HouseholdSnapshot,
+  type HouseholdSummary,
+  type HouseholdWatchlistItem,
   type SearchableProduct,
   type StorePrice,
   type WatchlistAlert,
@@ -38,7 +44,6 @@ export type Store = {
 export type ProductDetail = SearchableProduct & {
   currentPrices: StorePrice[];
   dealScore: number;
-  dealScoreV1: DealScoreResult;
   verdict: string;
   unitPrice: string;
   history: Array<{ date: string; price: number; verified: boolean }>;
@@ -348,7 +353,6 @@ const products: ProductDetail[] = [
       { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', price: 64.9 }
     ],
     dealScore: calculateDealScore({ currentCityPercentile: 8, knownPromoHistoryPercentile: 12, equivalentUnitPricePercentile: 18, discountDepthPercent: 25, sourceConfidence: 0.9 }),
-    dealScoreV1: calculateDealScoreV1({ currentCityPercentile: 8, knownPromoHistoryPercentile: 12, equivalentUnitPricePercentile: 18, discountDepthPercent: 25, sourceConfidence: 0.9 }),
     verdict: 'Buy',
     unitPrice: '110.89 SEK/kg',
     dealSignals: { currentCityPercentile: 8, knownPromoHistoryPercentile: 12, equivalentUnitPricePercentile: 18, discountDepthPercent: 25, sourceConfidence: 0.9 },
@@ -370,7 +374,6 @@ const products: ProductDetail[] = [
       { storeId: 'lidl-sveavagen', storeName: 'Lidl Sveavägen', price: 13.9 }
     ],
     dealScore: calculateDealScore({ currentCityPercentile: 18, knownPromoHistoryPercentile: 12, equivalentUnitPricePercentile: 35, discountDepthPercent: 8, sourceConfidence: 0.86 }),
-    dealScoreV1: calculateDealScoreV1({ currentCityPercentile: 18, knownPromoHistoryPercentile: 12, equivalentUnitPricePercentile: 35, discountDepthPercent: 8, sourceConfidence: 0.86 }),
     verdict: 'Buy',
     unitPrice: '14.90 SEK/l',
     dealSignals: { currentCityPercentile: 18, knownPromoHistoryPercentile: 12, equivalentUnitPricePercentile: 35, discountDepthPercent: 8, sourceConfidence: 0.86 },
@@ -392,7 +395,6 @@ const products: ProductDetail[] = [
       { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 56.9 }
     ],
     dealScore: calculateDealScore({ currentCityPercentile: 58, knownPromoHistoryPercentile: 61, equivalentUnitPricePercentile: 52, discountDepthPercent: 2, sourceConfidence: 0.72 }),
-    dealScoreV1: calculateDealScoreV1({ currentCityPercentile: 58, knownPromoHistoryPercentile: 61, equivalentUnitPricePercentile: 52, discountDepthPercent: 2, sourceConfidence: 0.72 }),
     verdict: 'Wait',
     unitPrice: '91.50 SEK/kg',
     dealSignals: { currentCityPercentile: 58, knownPromoHistoryPercentile: 61, equivalentUnitPricePercentile: 52, discountDepthPercent: 2, sourceConfidence: 0.72 },
@@ -840,7 +842,6 @@ export function createGroceryViewApi() {
             bestPrice: bestPrice?.price ?? null,
             bestStoreId: bestPrice?.storeId ?? null,
             dealScore: product.dealScore,
-            dealScoreV1: product.dealScoreV1,
             band: scoreBand(product.dealScore)
           };
         });
