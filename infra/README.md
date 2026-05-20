@@ -20,6 +20,18 @@ The script starts the core services, waits for healthy Postgres, Redis, and MinI
 
 GitHub Actions also runs this smoke check in `Local infrastructure smoke` for pull requests that change local infrastructure files.
 
+
+## Retailer connector smoke
+
+After a connector has approved legal/robots/data-agreement gates, build the ingestion package and run a real endpoint pull smoke without parsing or persisting product rows:
+
+```bash
+npm run build --workspace @groceryview/ingestion
+GROCERYVIEW_CONNECTOR_URL="https://provider.example/api/products" GROCERYVIEW_CONNECTOR_CHAIN_ID="willys" GROCERYVIEW_CONNECTOR_SOURCE_TYPE="official_api" GROCERYVIEW_CONNECTOR_LEGAL_REVIEW_STATUS="approved" GROCERYVIEW_CONNECTOR_HAS_DATA_AGREEMENT="true" infra/scripts/smoke-retailer-connector.sh
+```
+
+The script reuses the ingestion connector gate, refuses to fetch when required approvals are missing, performs the HTTP pull with a timeout, and prints status code, byte count, content hash, and raw snapshot reference for follow-up parser work.
+
 ## Smoke troubleshooting
 
 The smoke script prints Docker inspect state and the last compose logs for Postgres, Redis, MinIO, and the bucket initialization service before it exits nonzero.

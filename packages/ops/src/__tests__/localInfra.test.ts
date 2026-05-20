@@ -8,6 +8,7 @@ const infraReadme = readFileSync(new URL('../../../../infra/README.md', import.m
 const smokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-local-services.sh', import.meta.url), 'utf8');
 const hostedReadinessSmokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-hosted-readiness.sh', import.meta.url), 'utf8');
 const hostedHttpSmokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-hosted-http.sh', import.meta.url), 'utf8');
+const smokeRetailerConnectorScript = readFileSync(new URL('../../../../infra/scripts/smoke-retailer-connector.sh', import.meta.url), 'utf8');
 const smokeWorkflow = readFileSync(new URL('../../../../.github/workflows/local-infra-smoke.yml', import.meta.url), 'utf8');
 
 describe('local infrastructure compose', () => {
@@ -64,6 +65,8 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /### MinIO bucket initialization/);
     assert.match(infraReadme, /object-storage-init/);
     assert.match(infraReadme, /S3_BUCKET/);
+    assert.match(infraReadme, /## Retailer connector smoke/);
+    assert.match(infraReadme, /smoke-retailer-connector\.sh/);
   });
 
   it('ships a hosted PostgreSQL readiness smoke script for deployment evidence', () => {
@@ -74,6 +77,18 @@ describe('local infrastructure compose', () => {
     assert.match(hostedReadinessSmokeScript, /x-groceryview-metrics-token: \$METRICS_TOKEN/);
     assert.match(hostedReadinessSmokeScript, /curl -fsS/);
     assert.match(hostedReadinessSmokeScript, /"status"\[\[:space:\]\]\*:\[\[:space:\]\]\*"ready"/);
+  });
+
+  it('ships a retailer connector smoke script gated by source access approvals', () => {
+    assert.match(smokeRetailerConnectorScript, /GROCERYVIEW_CONNECTOR_URL/);
+    assert.match(smokeRetailerConnectorScript, /GROCERYVIEW_CONNECTOR_CHAIN_ID/);
+    assert.match(smokeRetailerConnectorScript, /GROCERYVIEW_CONNECTOR_LEGAL_REVIEW_STATUS/);
+    assert.match(smokeRetailerConnectorScript, /GROCERYVIEW_CONNECTOR_HAS_DATA_AGREEMENT/);
+    assert.match(smokeRetailerConnectorScript, /packages\/ingestion\/dist\/index\.js/);
+    assert.match(smokeRetailerConnectorScript, /planRetailerConnectorRun/);
+    assert.match(smokeRetailerConnectorScript, /fetchRetailerConnectorSnapshot/);
+    assert.match(smokeRetailerConnectorScript, /Connector smoke blocked before fetch/);
+    assert.match(smokeRetailerConnectorScript, /investigate_connector_http_status/);
   });
 
   it('ships a hosted HTTP smoke script for API health and optional web checks', () => {
