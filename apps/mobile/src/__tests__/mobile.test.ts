@@ -2,8 +2,16 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createGroceryViewApi } from '@groceryview/api';
-import { buildExpoReadinessPlan, buildMobileScreenBlueprints, buildMobileShell, buildScanResult, createMobileDiscoveryViewModel, createMobileViewModel } from '../index.js';
-import { buildExpoReadinessPlan, buildMobileOfflineSyncPlan, buildMobileShell, buildScanResult, createMobileViewModel } from '../index.js';
+import {
+  buildExpoReadinessPlan,
+  buildMobileOfflineSyncPlan,
+  buildMobileProviderReadinessReport,
+  buildMobileScreenBlueprints,
+  buildMobileShell,
+  buildScanResult,
+  createMobileDiscoveryViewModel,
+  createMobileViewModel
+} from '../index.js';
 
 describe('mobile app foundation', () => {
   it('defines the proposal bottom navigation and Today dashboard modules', () => {
@@ -140,6 +148,8 @@ describe('mobile app foundation', () => {
       '/scan/receipt',
       '/profile'
     ]);
+  });
+
   it('plans offline cache coverage and prioritized mobile sync queue', () => {
     const plan = buildMobileOfflineSyncPlan({
       userId: 'user-1',

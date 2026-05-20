@@ -808,7 +808,7 @@ export function buildMobileScreenBlueprints(): MobileScreenBlueprintPlan {
   };
 }
 
-export type MobileOfflineMutation = {
+export type MobileOfflineSyncMutation = {
   id: string;
   kind: 'add_to_basket' | 'remove_from_basket' | 'add_to_watchlist' | 'update_budget' | 'save_receipt_match';
   createdAt: string;
@@ -818,13 +818,13 @@ export type MobileOfflineSyncInput = {
   userId: string;
   offlineEnabled: boolean;
   secureStorageConfigured: boolean;
-  pendingMutations: MobileOfflineMutation[];
+  pendingMutations: MobileOfflineSyncMutation[];
 };
 
 export type MobileOfflineSyncPlan = {
   userId: string;
   cachedScreens: Array<'today' | 'stores' | 'basket' | 'scan' | 'profile'>;
-  mutationQueue: Array<MobileOfflineMutation & { syncPriority: 'high' | 'normal' }>;
+  mutationQueue: Array<MobileOfflineSyncMutation & { syncPriority: 'high' | 'normal' }>;
   blockers: string[];
   actions: Array<'cache_mobile_home' | 'queue_mutations' | 'sync_when_online' | 'prompt_enable_offline' | 'configure_secure_storage'>;
 };
