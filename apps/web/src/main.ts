@@ -97,12 +97,33 @@ const savingsLedgerRows = [
 
 const alerts = buildWatchlistAlerts({
   watchlist: [
-    { productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, favoriteStoresOnly: true },
-    { productId: 'butter', targetPrice: 45, alertDealScoreAt: 80, favoriteStoresOnly: false }
+    { productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, favoriteStoresOnly: true, allowedPriceTypes: ['shelf', 'promotion'] },
+    { productId: 'butter', targetPrice: 45, alertDealScoreAt: 80, favoriteStoresOnly: false, allowedPriceTypes: ['shelf'] }
   ],
   products: [
-    { productId: 'coffee', productName: 'Zoégas Coffee 450g', bestPrice: 49.9, bestStoreId: 'willys-odenplan', dealScore: 82, isNew52WeekLow: true },
-    { productId: 'butter', productName: 'Butter 600g', bestPrice: 54.9, bestStoreId: 'coop-odenplan', dealScore: 42, isNew52WeekLow: false }
+    {
+      productId: 'coffee',
+      productName: 'Zoégas Coffee 450g',
+      bestPrice: 49.9,
+      bestStoreId: 'willys-odenplan',
+      bestPriceType: 'promotion',
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 49.9, priceType: 'promotion' },
+        { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', price: 54.9, priceType: 'shelf' }
+      ],
+      dealScore: 82,
+      isNew52WeekLow: true
+    },
+    {
+      productId: 'butter',
+      productName: 'Butter 600g',
+      bestPrice: 54.9,
+      bestStoreId: 'coop-odenplan',
+      bestPriceType: 'shelf',
+      prices: [{ storeId: 'coop-odenplan', storeName: 'Coop Odenplan', price: 54.9, priceType: 'shelf' }],
+      dealScore: 42,
+      isNew52WeekLow: false
+    }
   ],
   favoriteStoreIds: ['willys-odenplan', 'lidl-sveavagen']
 });
@@ -144,10 +165,10 @@ const pantryRows = [
 ];
 
 const watchlistRows = [
-  { product: 'Zoégas Coffee 450g', target: '50 SEK', current: '49.90 SEK', trigger: 'Deal Score >= 80', status: 'Ready for push' },
-  { product: 'Butter 600g', target: '45 SEK', current: '54.90 SEK', trigger: '52-week low', status: 'Watching' },
-  { product: 'Eggs 12-pack', target: '35 SEK', current: '34.90 SEK', trigger: 'Favorite stores only', status: 'Ready for email' },
-  { product: 'Loose tomatoes', target: '29 SEK/kg', current: 'Estimated', trigger: 'Confidence >= 80%', status: 'Held for review' }
+  { product: 'Zoégas Coffee 450g', target: '50 SEK', current: '49.90 SEK', trigger: 'Deal Score >= 80', allowedPriceTypes: 'Shelf, promotion', status: 'Ready for push' },
+  { product: 'Butter 600g', target: '45 SEK', current: '54.90 SEK', trigger: '52-week low', allowedPriceTypes: 'Shelf only', status: 'Watching' },
+  { product: 'Eggs 12-pack', target: '35 SEK', current: '34.90 SEK', trigger: 'Favorite stores only', allowedPriceTypes: 'Shelf, retailer page', status: 'Ready for email' },
+  { product: 'Loose tomatoes', target: '29 SEK/kg', current: 'Estimated', trigger: 'Confidence >= 80%', allowedPriceTypes: 'Estimated blocked', status: 'Held for review' }
 ];
 
 const notificationInboxRows = [
@@ -2165,9 +2186,9 @@ app.innerHTML = `
         <h2>Watchlist workbench</h2>
         <p class="lede">Target-price rows show whether an alert is ready, still watching, or held because price evidence is estimated.</p>
         <table class="table">
-          <thead><tr><th>Product</th><th>Target</th><th>Current</th><th>Status</th></tr></thead>
+          <thead><tr><th>Product</th><th>Target</th><th>Current</th><th>Allowed price types</th><th>Status</th></tr></thead>
           <tbody>
-            ${watchlistRows.map((row) => `<tr><td><strong>${row.product}</strong><br><span class="footer-note">${row.trigger}</span></td><td>${row.target}</td><td>${row.current}</td><td><span class="status">${row.status}</span></td></tr>`).join('')}
+            ${watchlistRows.map((row) => `<tr><td><strong>${row.product}</strong><br><span class="footer-note">${row.trigger}</span></td><td>${row.target}</td><td>${row.current}</td><td>${row.allowedPriceTypes}</td><td><span class="status">${row.status}</span></td></tr>`).join('')}
           </tbody>
         </table>
       </div>
