@@ -17,6 +17,7 @@ from groceryview_data_pipeline.assets import (
     build_seed_stores,
     summarize_open_prices_artifact_import_plan,
     summarize_data_pipeline_quality_gate,
+    summarize_open_prices_hosted_smoke_plan,
     summarize_open_prices_ingestion_run_plan,
 )
 from groceryview_data_pipeline.models import LatestPriceRow, ObservationFreshnessSummary, PriceObservationRow, PriceProvenance
@@ -262,6 +263,25 @@ def test_open_prices_artifact_import_plan_summary_counts_database_import_require
         db_package_built=True,
     )
     assert summarize_open_prices_artifact_import_plan(ready).required_action_count == 0
+
+
+def test_open_prices_hosted_smoke_plan_summary_counts_hosted_evidence_requirements() -> None:
+    blocked = build_open_prices_hosted_smoke_plan(imported_terminal_product_id_present=True)
+    assert summarize_open_prices_hosted_smoke_plan(blocked).to_dict() == {
+        "status": "blocked",
+        "required_action_count": 2,
+        "required_env_count": 3,
+        "endpoint_count": 3,
+        "evidence_field_count": 6,
+        "demo": False,
+    }
+
+    ready = build_open_prices_hosted_smoke_plan(
+        deployment_url_present=True,
+        metrics_token_present=True,
+        imported_terminal_product_id_present=True,
+    )
+    assert summarize_open_prices_hosted_smoke_plan(ready).required_action_count == 0
 
 
 def test_open_prices_launch_readiness_rolls_up_all_open_prices_plans() -> None:
