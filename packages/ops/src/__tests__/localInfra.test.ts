@@ -156,6 +156,9 @@ describe('local infrastructure compose', () => {
   it('ships an Open Prices artifact import script for PostgreSQL persistence', () => {
     assert.match(importOpenPricesArtifactScript, /OPEN_PRICES_INPUT_PATH/);
     assert.match(importOpenPricesArtifactScript, /DATABASE_URL/);
+    assert.match(importOpenPricesArtifactScript, /OPEN_PRICES_IMPORT_DRY_RUN/);
+    assert.match(importOpenPricesArtifactScript, /status: 'dry_run'/);
+    assert.match(importOpenPricesArtifactScript, /acceptedObservationCount/);
     assert.match(importOpenPricesArtifactScript, /packages\/db\/dist\/index\.js/);
     assert.match(importOpenPricesArtifactScript, /persistOpenPricesArtifact/);
     assert.match(importOpenPricesArtifactScript, /createPgQueryExecutor/);
@@ -164,11 +167,16 @@ describe('local infrastructure compose', () => {
     assert.match(importOpenPricesArtifactScript, /Open Prices artifact import requires DATABASE_URL/);
   });
 
-  it('verifies official API source runs in migration smoke checks', () => {
+  it('verifies official API source runs and receipt constraints in migration smoke checks', () => {
     assert.match(verifyMigrationsScript, /insert into source_runs\(source_type, source_name, status\)/);
     assert.match(verifyMigrationsScript, /values \('official_api', 'Open Prices verifier', 'succeeded'\)/);
     assert.match(verifyMigrationsScript, /unsupported_source/);
     assert.match(verifyMigrationsScript, /source_runs official_api source type ok/);
+    assert.match(verifyMigrationsScript, /insert into receipt_uploads/);
+    assert.match(verifyMigrationsScript, /receipt-verifier-upload/);
+    assert.match(verifyMigrationsScript, /receipt_uploads status assertion failed/);
+    assert.match(verifyMigrationsScript, /receipt_items quantity assertion failed/);
+    assert.match(verifyMigrationsScript, /receipt upload constraints ok/);
   });
 
   it('ships a hosted HTTP smoke script for API health, product terminal, and optional web checks', () => {
