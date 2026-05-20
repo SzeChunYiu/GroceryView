@@ -50,6 +50,14 @@ describe('createGroceryViewApi', () => {
         productId: 'milk',
         productName: 'Arla Milk 1L',
         type: 'target_price',
+        severity: 'opportunity',
+        trigger: {
+          metric: 'price',
+          storeId: 'lidl-sveavagen',
+          storeName: 'Lidl Sveavagen',
+          threshold: 14,
+          value: 13.9
+        },
         message: 'Arla Milk 1L is 13.90 SEK at Lidl Sveavagen, below your 14.00 SEK target.'
       }
     ]);
