@@ -346,6 +346,56 @@ describe('createHttpHandler', () => {
     assert.match(JSON.stringify(await json(invalid)), /Unknown productId: missing-product/);
   });
 
+  it('creates private scan upload tickets before scan processing', async () => {
+    const handle = createHttpHandler(undefined, {
+      now: new Date('2026-05-20T08:00:00.000Z'),
+      scanUploadStorage: {
+        createUploadTicket: async (request) => ({
+          scanId: request.scanId,
+          uploadUrl: 'https://uploads.example/' + request.scanId + '?signature=redacted',
+          payloadUri: 'private-upload://' + request.scanId,
+          expiresAt: '2026-05-20T08:10:00.000Z',
+          maxBytes: 5_000_000,
+          headers: { 'content-type': request.contentType }
+        })
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/scans/upload-url?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ scanId: 'receipt-1', kind: 'receipt', contentType: 'image/jpeg', byteLength: 123456 })
+    }));
+    assert.equal(response.status, 200);
+    assert.deepEqual(await json(response), {
+      userId: 'user-1',
+      result: {
+        status: 'ready',
+        ticket: {
+          scanId: 'receipt-1',
+          uploadUrl: 'https://uploads.example/receipt-1?signature=redacted',
+          payloadUri: 'private-upload://receipt-1',
+          expiresAt: '2026-05-20T08:10:00.000Z',
+          maxBytes: 5_000_000,
+          headers: { 'content-type': 'image/jpeg' }
+        }
+      }
+    });
+
+    const missingStorage = await createHttpHandler(undefined, { now: new Date('2026-05-20T08:00:00.000Z') })(new Request('http://localhost/api/scans/upload-url?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ scanId: 'receipt-2', kind: 'receipt', contentType: 'image/png', byteLength: 42 })
+    }));
+    assert.equal(missingStorage.status, 200);
+    assert.deepEqual(await json(missingStorage), {
+      userId: 'user-1',
+      result: {
+        status: 'failed_no_storage',
+        kind: 'receipt',
+        reason: 'No scan upload storage provider configured.'
+      }
+    });
+  });
+
   it('processes scan uploads through configured providers and returns review work items', async () => {
     const handle = createHttpHandler(undefined, {
       now: new Date('2026-05-20T13:00:00.000Z'),

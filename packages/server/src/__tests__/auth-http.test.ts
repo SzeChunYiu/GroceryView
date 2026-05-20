@@ -25,6 +25,11 @@ describe('authenticated HTTP routes', () => {
       body: JSON.stringify({ scanId: 'scan-1', kind: 'barcode', payload: '0735000123456' })
     }));
     assert.equal(unauthenticatedScan.status, 401);
+    const unauthenticatedScanUpload = await handle(new Request('http://localhost/api/scans/upload-url?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ scanId: 'scan-1', kind: 'receipt', contentType: 'image/jpeg', byteLength: 1 })
+    }));
+    assert.equal(unauthenticatedScanUpload.status, 401);
 
     const wrongUserToken = await createSessionToken({ userId: 'user-2', expiresAt: '2099-01-01T00:00:00.000Z' }, 'secret');
     const forbidden = await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
@@ -52,6 +57,12 @@ describe('authenticated HTTP routes', () => {
       body: JSON.stringify({ scanId: 'scan-1', kind: 'barcode', payload: '0735000123456' })
     }));
     assert.equal(forbiddenScan.status, 403);
+    const forbiddenScanUpload = await handle(new Request('http://localhost/api/scans/upload-url?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${wrongUserToken}` },
+      body: JSON.stringify({ scanId: 'scan-1', kind: 'receipt', contentType: 'image/jpeg', byteLength: 1 })
+    }));
+    assert.equal(forbiddenScanUpload.status, 403);
 
     const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'secret');
     const authorized = await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
@@ -78,5 +89,11 @@ describe('authenticated HTTP routes', () => {
       body: JSON.stringify({ scanId: 'scan-1', kind: 'barcode', payload: '0735000123456' })
     }));
     assert.equal(authorizedScan.status, 200);
+    const authorizedScanUpload = await handle(new Request('http://localhost/api/scans/upload-url?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}` },
+      body: JSON.stringify({ scanId: 'scan-1', kind: 'receipt', contentType: 'image/jpeg', byteLength: 1 })
+    }));
+    assert.equal(authorizedScanUpload.status, 200);
   });
 });

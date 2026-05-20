@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildScanProviderReadinessReport, planScanReviewWorkItems, processScanUpload } from '../index.js';
+import { buildScanProviderReadinessReport, planScanReviewWorkItems, prepareScanUploadTicket, processScanUpload } from '../index.js';
 
 describe('buildScanProviderReadinessReport', () => {
   it('fails closed when barcode or receipt OCR providers are missing credentials or health checks', () => {
@@ -137,6 +137,81 @@ describe('processScanUpload', () => {
       kind: 'receipt',
       reason: 'No receipt OCR provider configured.'
     });
+  });
+});
+
+describe('prepareScanUploadTicket', () => {
+  it('creates provider-backed upload tickets for private scan payload storage', async () => {
+    const result = await prepareScanUploadTicket({
+      request: {
+        scanId: 'receipt-1',
+        kind: 'receipt',
+        contentType: 'image/jpeg',
+        byteLength: 123456,
+        requestedAt: '2026-05-20T08:00:00.000Z'
+      },
+      storage: {
+        createUploadTicket: async (request) => ({
+          scanId: request.scanId,
+          uploadUrl: 'https://uploads.example/receipt-1?signature=redacted',
+          payloadUri: 'private-upload://receipt-1',
+          expiresAt: '2026-05-20T08:10:00.000Z',
+          maxBytes: 5_000_000,
+          headers: { 'content-type': request.contentType }
+        })
+      }
+    });
+
+    assert.deepEqual(result, {
+      status: 'ready',
+      ticket: {
+        scanId: 'receipt-1',
+        uploadUrl: 'https://uploads.example/receipt-1?signature=redacted',
+        payloadUri: 'private-upload://receipt-1',
+        expiresAt: '2026-05-20T08:10:00.000Z',
+        maxBytes: 5_000_000,
+        headers: { 'content-type': 'image/jpeg' }
+      }
+    });
+  });
+
+  it('fails closed when upload storage is missing or requests are unsafe', async () => {
+    assert.deepEqual(
+      await prepareScanUploadTicket({
+        request: {
+          scanId: 'receipt-2',
+          kind: 'receipt',
+          contentType: 'image/png',
+          byteLength: 42,
+          requestedAt: '2026-05-20T08:00:00.000Z'
+        },
+        storage: undefined
+      }),
+      {
+        status: 'failed_no_storage',
+        kind: 'receipt',
+        reason: 'No scan upload storage provider configured.'
+      }
+    );
+
+    await assert.rejects(
+      () =>
+        prepareScanUploadTicket({
+          request: {
+            scanId: 'receipt-3',
+            kind: 'receipt',
+            contentType: 'text/plain',
+            byteLength: 42,
+            requestedAt: '2026-05-20T08:00:00.000Z'
+          },
+          storage: {
+            createUploadTicket: async () => {
+              throw new Error('should not call storage for unsafe content type');
+            }
+          }
+        }),
+      /contentType must be an allowed scan upload type/
+    );
   });
 });
 
