@@ -146,6 +146,42 @@ export const products = [
     confidence: 'medium',
     observedAt: '2026-05-19 11:30 CET',
     source: 'in-store shelf observation'
+  },
+  {
+    slug: 'eldorado-basmati-rice-1kg',
+    ticker: 'ELDORADO-BASMATI-RICE-1KG',
+    name: 'Eldorado Basmati Rice 1kg',
+    store: 'Matmissionen Hägersten',
+    price: '18.90 SEK',
+    unitPrice: '18.90 SEK/kg',
+    priceType: 'clearance shelf',
+    confidence: 'medium',
+    observedAt: '2026-05-20 12:20 CET',
+    source: 'community shelf observation'
+  },
+  {
+    slug: 'barilla-spaghetti-1kg',
+    ticker: 'BARILLA-SPAGHETTI-1KG',
+    name: 'Barilla Spaghetti 1kg',
+    store: 'City Gross Stockholm',
+    price: '27.90 SEK',
+    unitPrice: '27.90 SEK/kg',
+    priceType: 'online',
+    confidence: 'medium',
+    observedAt: '2026-05-20 10:50 CET',
+    source: 'online shelf observation'
+  },
+  {
+    slug: 'bregott-normalsaltat-600g',
+    ticker: 'BREGOTT-NORMALSALTAT-600G',
+    name: 'Bregott Normalsaltat 600g',
+    store: 'Willys Odenplan',
+    price: '56.90 SEK',
+    unitPrice: '94.83 SEK/kg',
+    priceType: 'member promo',
+    confidence: 'high',
+    observedAt: '2026-05-20 09:35 CET',
+    source: 'retailer flyer observation'
   }
 ];
 
@@ -197,6 +233,14 @@ export const stores = [
     format: 'big-box supermarket',
     bestCategory: 'Frozen',
     distanceLabel: '8.7 km from saved area'
+  },
+  {
+    slug: 'matmissionen-hagersten',
+    name: 'Matmissionen Hägersten',
+    district: 'Hägersten',
+    format: 'social supermarket',
+    bestCategory: 'Pantry',
+    distanceLabel: '5.8 km from saved area'
   }
 ];
 

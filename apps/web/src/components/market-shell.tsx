@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { BarChart3, MapPin, ScanSearch, ShoppingBasket } from 'lucide-react';
-import { categories, products } from '@/lib/demo-data';
+import { categories, products, stores } from '@/lib/demo-data';
 
 export function MarketShell() {
   return (
@@ -54,6 +54,29 @@ export function MarketShell() {
         <FeatureCard icon={<ShoppingBasket size={20} />} title="Basket planner" href="/weekly-basket">
           Weekly basket work can build on the same App Router shell and TanStack Query provider.
         </FeatureCard>
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="border-b border-market-ink/10 px-4 py-3">
+          <h2 className="text-lg font-black">Stockholm store tape</h2>
+          <p className="mt-1 text-sm text-market-ink/60">
+            Store coverage is visible on the homepage and links directly to each store profile.
+          </p>
+        </div>
+        <div className="grid gap-0 sm:grid-cols-2 lg:grid-cols-3">
+          {stores.map((store) => (
+            <Link
+              key={store.slug}
+              href={`/stores/${store.slug}`}
+              className="border-b border-market-ink/10 px-4 py-4 text-sm hover:bg-market-oat/45 sm:border-r"
+            >
+              <span className="block font-bold">{store.name}</span>
+              <span className="mt-1 block text-market-ink/60">
+                {store.district} · {store.bestCategory}
+              </span>
+            </Link>
+          ))}
+        </div>
       </section>
 
       <section className="rounded-lg border border-market-ink/10 bg-white">
