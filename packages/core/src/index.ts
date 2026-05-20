@@ -1483,6 +1483,129 @@ export function suggestDealBasedMeals(input: { deals: MealDeal[]; maxMealCost: n
   ];
 }
 
+export type ExpiryDealReport = {
+  id: string;
+  productId: string;
+  productName: string;
+  storeId: string;
+  storeName: string;
+  category: string;
+  originalPrice: number;
+  currentPrice: number;
+  markdownPercent: number;
+  expiresAt: string;
+  reportedAt: string;
+  distanceKm?: number;
+  verificationCount: number;
+  photoCount: number;
+};
+
+export type ExpiryDealRadarInput = {
+  reports: ExpiryDealReport[];
+  now: string;
+  favoriteStoreIds?: string[];
+  categoryFilter?: string[];
+  maxDistanceKm?: number;
+};
+
+export type ExpiryDealRadarItem = ExpiryDealReport & {
+  savings: number;
+  hoursUntilExpiry: number;
+  urgency: 'expires_today' | 'expires_soon' | 'fresh_markdown';
+  verification: 'verified' | 'needs_confirmation';
+  radarScore: number;
+};
+
+export type ExpiryDealRadarStore = {
+  storeId: string;
+  storeName: string;
+  topMarkdownPercent: number;
+  items: ExpiryDealRadarItem[];
+};
+
+export type ExpiryDealRadarAlert = {
+  reportId: string;
+  productId: string;
+  storeId: string;
+  type: 'expiry_markdown';
+  message: string;
+};
+
+export type ExpiryDealRadar = {
+  stores: ExpiryDealRadarStore[];
+  alerts: ExpiryDealRadarAlert[];
+  staleReportIds: string[];
+};
+
+export function buildExpiryDealRadar(input: ExpiryDealRadarInput): ExpiryDealRadar {
+  const now = new Date(input.now).getTime();
+  if (!Number.isFinite(now)) throw new Error('now must be a valid ISO date.');
+  const favoriteStores = new Set(input.favoriteStoreIds ?? []);
+  const categories = new Set((input.categoryFilter ?? []).map((category) => category.toLowerCase()));
+  const staleReportIds: string[] = [];
+  const items: ExpiryDealRadarItem[] = [];
+
+  for (const report of input.reports) {
+    const expiresAt = new Date(report.expiresAt).getTime();
+    const reportedAt = new Date(report.reportedAt).getTime();
+    if (!Number.isFinite(expiresAt) || !Number.isFinite(reportedAt)) throw new Error('report dates must be valid ISO dates.');
+    if (report.originalPrice <= 0 || report.currentPrice < 0) throw new Error('report prices must be non-negative and include a positive original price.');
+    if (favoriteStores.size > 0 && !favoriteStores.has(report.storeId)) continue;
+    if (categories.size > 0 && !categories.has(report.category.toLowerCase())) continue;
+    if (input.maxDistanceKm !== undefined && (report.distanceKm === undefined || report.distanceKm > input.maxDistanceKm)) continue;
+
+    const hoursUntilExpiry = Math.round(((expiresAt - now) / 3_600_000) * 100) / 100;
+    const reportAgeHours = (now - reportedAt) / 3_600_000;
+    if (hoursUntilExpiry < 0 || reportAgeHours > 24) {
+      staleReportIds.push(report.id);
+      continue;
+    }
+
+    const savings = roundMoney(report.originalPrice - report.currentPrice);
+    const expiryBoost = hoursUntilExpiry <= 12 ? 30 : hoursUntilExpiry <= 36 ? 18 : 8;
+    const verificationBoost = report.verificationCount >= 2 || report.photoCount >= 1 ? 15 : 0;
+    const freshnessBoost = Math.max(0, 12 - reportAgeHours);
+    const radarScore = Math.round(clamp(report.markdownPercent + expiryBoost + verificationBoost + freshnessBoost, 0, 100));
+
+    items.push({
+      ...report,
+      savings,
+      hoursUntilExpiry,
+      urgency: hoursUntilExpiry <= 12 ? 'expires_today' : hoursUntilExpiry <= 36 ? 'expires_soon' : 'fresh_markdown',
+      verification: verificationBoost > 0 ? 'verified' : 'needs_confirmation',
+      radarScore
+    });
+  }
+
+  const ranked = items.sort((a, b) => b.radarScore - a.radarScore || a.hoursUntilExpiry - b.hoursUntilExpiry);
+  const byStore = new Map<string, ExpiryDealRadarStore>();
+  for (const item of ranked) {
+    const store = byStore.get(item.storeId) ?? {
+      storeId: item.storeId,
+      storeName: item.storeName,
+      topMarkdownPercent: item.markdownPercent,
+      items: []
+    };
+    store.topMarkdownPercent = Math.max(store.topMarkdownPercent, item.markdownPercent);
+    store.items.push(item);
+    byStore.set(item.storeId, store);
+  }
+
+  return {
+    stores: [...byStore.values()].sort((a, b) => b.items[0].radarScore - a.items[0].radarScore),
+    alerts: ranked
+      .filter((item) => item.radarScore >= 75 && item.verification === 'verified')
+      .map((item) => ({
+        reportId: item.id,
+        productId: item.productId,
+        storeId: item.storeId,
+        type: 'expiry_markdown',
+        message: `${item.productName} is ${item.markdownPercent}% off at ${item.storeName} before expiry.`
+      })),
+    staleReportIds
+  };
+}
+
 export type PrivacyExportInput = {
   userId: string;
   favoriteStoreIds: string[];
