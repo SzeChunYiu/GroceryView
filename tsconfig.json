@@ -4,6 +4,8 @@
     "module": "NodeNext",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "strict": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
