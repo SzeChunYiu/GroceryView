@@ -101,31 +101,157 @@ export type ScanPipelineResult =
       reason: string;
     };
 
-export type MobileScanSessionItem = {
+export function buildScanProviderReadinessReport(input: ScanProviderReadinessInput): ScanProviderReadinessReport {
+  const blockers: string[] = [];
+  const evidence: string[] = [];
+  const providersByKind = new Map(input.providers.map((provider) => [provider.kind, provider]));
+
+  for (const kind of input.requiredProviders) {
+    const provider = providersByKind.get(kind);
+    if (!provider?.configured) {
+      blockers.push(`scan_provider_not_configured:${kind}`);
+    } else {
+      evidence.push(`scan_provider_configured:${kind}:${provider.providerName}`);
+    }
+
+    if (!provider?.credentialsPresent) {
+      blockers.push(`scan_provider_credentials_missing:${kind}`);
+    } else {
+      evidence.push(`scan_provider_credentials_present:${kind}`);
+    }
+
+    if (provider?.healthStatus === 'pass') {
+      evidence.push(`scan_provider_health_pass:${kind}`);
+    } else if (provider?.healthStatus === 'fail') {
+      blockers.push(`scan_provider_health_failed:${kind}`);
+    } else {
+      blockers.push(`scan_provider_health_not_run:${kind}`);
+    }
+  }
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    evidence,
+    warnings: [],
+    summary: blockers.length === 0 ? 'Scan providers are ready.' : 'Scan provider readiness is blocked.'
+  };
+}
+
+export type ScanReviewPriority = 'high' | 'medium' | 'low';
+
+export type ScanReviewWorkItem = {
+  id: string;
   scanId: string;
-  upload: ScanUpload;
+  kind: ScanUpload['kind'];
+  priority: ScanReviewPriority;
+  reason: string;
+  evidence: string[];
 };
 
-export type MobileScanSessionPlan = {
-  status: 'ready' | 'needs_review' | 'blocked';
-  runningTotal: number;
-  barcodeMatches: Array<{
-    scanId: string;
-    productId: string | null;
-    confidence: number;
-    needsHumanReview: boolean;
-  }>;
-  receiptReviews: Array<{
-    scanId: string;
-    totalAmount: number;
-    confidence: number;
-    lowConfidenceRows: string[];
-  }>;
-  blockers: Array<{ scanId: string; reason: string }>;
-  nextActions: Array<'continue_scanning' | 'review_matches' | 'configure_scan_provider' | 'compare_budget'>;
+export type ScanReviewWorkItemInput = {
+  scanId: string;
+  result: ScanPipelineResult;
 };
 
-const roundMoney = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
+const scanReviewPriorityRank: Record<ScanReviewPriority, number> = { high: 0, medium: 1, low: 2 };
+
+function priorityForScanConfidence(confidence: number): ScanReviewPriority {
+  if (confidence < 0.5) return 'high';
+  if (confidence < 0.8) return 'medium';
+  return 'low';
+}
+
+function validateScanConfidence(confidence: number, label: string): void {
+  if (!Number.isFinite(confidence) || confidence < 0 || confidence > 1) {
+    throw new Error(`${label} must be a number between 0 and 1.`);
+  }
+}
+
+const allowedScanUploadContentTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'application/pdf']);
+
+function validateScanUploadTicketRequest(request: ScanUploadTicketRequest): void {
+  if (!request.scanId.trim()) throw new Error('scanId is required.');
+  if (request.kind !== 'barcode' && request.kind !== 'receipt') throw new Error('kind must be barcode or receipt.');
+  if (!allowedScanUploadContentTypes.has(request.contentType)) throw new Error('contentType must be an allowed scan upload type.');
+  if (!Number.isInteger(request.byteLength) || request.byteLength <= 0) throw new Error('byteLength must be a positive integer.');
+  if (Number.isNaN(Date.parse(request.requestedAt))) throw new Error('requestedAt must be an ISO date.');
+}
+
+function validateScanUploadTicket(ticket: ScanUploadTicket): void {
+  if (!ticket.scanId.trim()) throw new Error('upload ticket scanId is required.');
+  if (!ticket.uploadUrl.trim()) throw new Error('upload ticket uploadUrl is required.');
+  if (!ticket.payloadUri.trim()) throw new Error('upload ticket payloadUri is required.');
+  if (Number.isNaN(Date.parse(ticket.expiresAt))) throw new Error('upload ticket expiresAt must be an ISO date.');
+  if (!Number.isInteger(ticket.maxBytes) || ticket.maxBytes <= 0) throw new Error('upload ticket maxBytes must be a positive integer.');
+}
+
+export async function prepareScanUploadTicket(input: {
+  request: ScanUploadTicketRequest;
+  storage?: ScanUploadStorage | undefined;
+}): Promise<ScanUploadTicketResult> {
+  validateScanUploadTicketRequest(input.request);
+
+  if (!input.storage) {
+    return {
+      status: 'failed_no_storage',
+      kind: input.request.kind,
+      reason: 'No scan upload storage provider configured.'
+    };
+  }
+
+  const ticket = await input.storage.createUploadTicket(input.request);
+  validateScanUploadTicket(ticket);
+  return { status: 'ready', ticket };
+}
+
+export function planScanReviewWorkItems(scans: ScanReviewWorkItemInput[]): ScanReviewWorkItem[] {
+  const items: ScanReviewWorkItem[] = [];
+
+  for (const scan of scans) {
+    if (!scan.scanId.trim()) throw new Error('scanId is required.');
+
+    if (scan.result.status === 'matched') {
+      validateScanConfidence(scan.result.confidence, 'barcode confidence');
+      if (!scan.result.needsHumanReview) continue;
+
+      const evidence = [`confidence:${scan.result.confidence}`];
+      if (scan.result.productId === null) evidence.push('product_match:missing');
+
+      items.push({
+        id: `scan-review-${scan.scanId}`,
+        scanId: scan.scanId,
+        kind: 'barcode',
+        priority: scan.result.productId === null ? 'high' : priorityForScanConfidence(scan.result.confidence),
+        reason:
+          scan.result.productId === null
+            ? 'Barcode lookup did not resolve to a product.'
+            : `Barcode lookup needs review at confidence ${scan.result.confidence}.`,
+        evidence
+      });
+      continue;
+    }
+
+    if (scan.result.status === 'parsed') {
+      validateScanConfidence(scan.result.confidence, 'receipt confidence');
+      if (!scan.result.needsHumanReview) continue;
+
+      items.push({
+        id: `scan-review-${scan.scanId}`,
+        scanId: scan.scanId,
+        kind: 'receipt',
+        priority: scan.result.lowConfidenceRows.length > 0 ? 'high' : priorityForScanConfidence(scan.result.confidence),
+        reason:
+          scan.result.lowConfidenceRows.length > 0
+            ? `Receipt has ${scan.result.lowConfidenceRows.length} low-confidence rows.`
+            : `Receipt OCR needs review at confidence ${scan.result.confidence}.`,
+        evidence: [`confidence:${scan.result.confidence}`, `total:${scan.result.totalAmount}`, ...scan.result.lowConfidenceRows.map((row) => `low_confidence_row:${row}`)]
+      });
+    }
+  }
+
+  return items.sort((left, right) => scanReviewPriorityRank[left.priority] - scanReviewPriorityRank[right.priority] || left.id.localeCompare(right.id));
+}
 
 export async function processScanUpload(input: { upload: ScanUpload; providers: ScanProviders }): Promise<ScanPipelineResult> {
   if (Number.isNaN(Date.parse(input.upload.uploadedAt))) throw new Error('uploadedAt must be an ISO date.');
@@ -153,64 +279,5 @@ export async function processScanUpload(input: { upload: ScanUpload; providers: 
     confidence: parsed.confidence,
     needsHumanReview: parsed.confidence < 0.8 || lowConfidenceRows.length > 0,
     lowConfidenceRows
-  };
-}
-
-export async function planMobileScanSession(input: {
-  scans: MobileScanSessionItem[];
-  providers: ScanProviders;
-  barcodePriceLookup?: (productId: string) => number | null;
-}): Promise<MobileScanSessionPlan> {
-  const barcodeMatches: MobileScanSessionPlan['barcodeMatches'] = [];
-  const receiptReviews: MobileScanSessionPlan['receiptReviews'] = [];
-  const blockers: MobileScanSessionPlan['blockers'] = [];
-  let runningTotal = 0;
-  let needsReview = false;
-
-  for (const item of input.scans) {
-    const result = await processScanUpload({ upload: item.upload, providers: input.providers });
-
-    if (result.status === 'failed_no_provider') {
-      blockers.push({ scanId: item.scanId, reason: result.reason });
-      continue;
-    }
-
-    if (result.kind === 'barcode') {
-      barcodeMatches.push({
-        scanId: item.scanId,
-        productId: result.productId,
-        confidence: result.confidence,
-        needsHumanReview: result.needsHumanReview
-      });
-      if (result.needsHumanReview) needsReview = true;
-      if (result.productId && input.barcodePriceLookup) {
-        runningTotal = roundMoney(runningTotal + (input.barcodePriceLookup(result.productId) ?? 0));
-      }
-      continue;
-    }
-
-    receiptReviews.push({
-      scanId: item.scanId,
-      totalAmount: result.totalAmount,
-      confidence: result.confidence,
-      lowConfidenceRows: result.lowConfidenceRows
-    });
-    runningTotal = roundMoney(runningTotal + result.totalAmount);
-    if (result.needsHumanReview) needsReview = true;
-  }
-
-  const nextActions: MobileScanSessionPlan['nextActions'] = [];
-  if (blockers.length > 0) nextActions.push('configure_scan_provider');
-  if (needsReview) nextActions.push('review_matches');
-  if (runningTotal > 0) nextActions.push('compare_budget');
-  if (blockers.length === 0) nextActions.push('continue_scanning');
-
-  return {
-    status: blockers.length > 0 ? 'blocked' : needsReview ? 'needs_review' : 'ready',
-    runningTotal,
-    barcodeMatches,
-    receiptReviews,
-    blockers,
-    nextActions
   };
 }
