@@ -13,6 +13,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Iterative PR + merge workflow | PR #1 through PR #36, PR #88 through PR #112, PR #119, PR #120, PR #123, PR #127, PR #132, PR #134 through PR #136, and PR #143 merged to `main` after this iteration | Done for shipped iterations |
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
+| Product price terminal UI | This PR, `apps/web/scripts/pages.mjs`, `apps/web/public/styles.css`, and web page-generation tests show a TradingView-style product page with quote strip, Stockholm/local distribution histogram, percentile table, candlestick-style history, range, freshness, and evidence-volume numbers | Completed by this PR merge |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
 | Deal Score report API | PR #316, `createGroceryViewApi().getDealScore()`, `/api/products/{id}/deal-score`, and server/OpenAPI tests expose the score, band, median discount, historical percentile, confidence, and customer-facing reasons | Shipped after merge |
 | Product comparison details API | PR #314, `createGroceryViewApi().getProductEquivalents()`, `/api/products/{id}/equivalents`, and server/OpenAPI tests expose comparable same-category products with best known price, best store, Deal Score, and explanation | Shipped after merge |
