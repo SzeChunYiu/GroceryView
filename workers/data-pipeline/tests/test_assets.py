@@ -834,5 +834,34 @@ def test_data_pipeline_quality_gate_digest_counts_blocker_classes() -> None:
         "duplicate_blockers": 0,
         "volume_blockers": 2,
         "ingestion_blockers": 0,
+        "schedule_health_blockers": 0,
         "demo": True,
     }
+
+    stores = build_seed_stores()
+    products = build_seed_products()
+    stubs = build_retailer_fetch_stubs(stores, products)
+    observations = build_price_observations(stubs, build_normalized_products(products))
+    latest = build_latest_price_rollup(observations)
+    schedule_gate = build_data_pipeline_quality_gate(
+        quality=build_quality_checks(stubs, observations, latest),
+        freshness=ObservationFreshnessSummary(
+            status="ready",
+            observation_count=len(observations),
+            fresh_count=len(observations),
+            stale_count=0,
+            future_count=0,
+            missing_observed_at_count=0,
+            max_age_hours=48,
+            checked_at="2026-05-20T10:00:00+00:00",
+        ),
+        coverage=build_observation_coverage_summary(observations, stores, products),
+        open_prices_schedule_health=build_open_prices_schedule_health_plan(
+            dagster_deployment_url_present=True,
+            ingestion_schedule_enabled=True,
+            import_readiness_schedule_enabled=True,
+        ),
+    )
+    schedule_digest = summarize_data_pipeline_quality_gate(schedule_gate)
+    assert schedule_digest.ingestion_blockers == 1
+    assert schedule_digest.schedule_health_blockers == 1
