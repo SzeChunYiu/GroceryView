@@ -368,6 +368,19 @@ const budgetModes = [
   { mode: 'Healthy Budget', guardrail: 'Respect diet constraints', suggestion: 'Nutrition-per-krona swap' }
 ];
 
+
+const businessSignals = [
+  { segment: 'Category price trends', metric: 'Coffee index -8.4% MTD', buyer: 'Retailer category team', guardrail: 'Aggregated district index' },
+  { segment: 'Brand vs private label', metric: 'Private label basket -5.8% vs base', buyer: 'CPG revenue manager', guardrail: 'No household-level exports' },
+  { segment: 'Promotion frequency', metric: 'Dairy promos 3.1x per month', buyer: 'Retail media analyst', guardrail: 'Organic ranking separated from ads' }
+];
+
+const communityReports = [
+  { product: 'Zoégas Coffee 450g', report: 'Wrong price', evidence: 'Shelf photo', status: 'Needs review', trust: 'trusted reporter' },
+  { product: 'Arla Milk 1L', report: 'Out of stock', evidence: 'Receipt mismatch', status: 'Queued', trust: 'new reporter' },
+  { product: 'Butter 600g', report: 'Promo expired', evidence: 'Retailer page', status: 'Accepted', trust: 'verified history' }
+];
+
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Missing #app root');
 
@@ -400,6 +413,24 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
         <h2>Scanner review desk</h2>
         <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
         <table class="table">
@@ -428,6 +459,24 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
         <h2>Review routing</h2>
         <p class="lede">Low-confidence captures are separated from verified shelf and retailer-page prices so estimated data cannot masquerade as official price evidence.</p>
         <div class="grid">
@@ -439,6 +488,24 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Human review operations</h2>
         <p class="lede">Admin reviewers see assignment ownership, SLA state, and the exact writeback action before a product match or community report changes catalog data.</p>
@@ -468,6 +535,24 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
         <h2>Receipt history</h2>
         <p class="lede">Receipt totals reconcile budgets only after review, and catalog price contribution stays blocked until line-item confidence is high enough.</p>
         <div class="grid">
@@ -488,6 +573,24 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Top movers and true deals</h2>
         <p class="lede"><a href="/deals/today/">Open today’s ranked deal board</a> for shopper actions and ranking guardrails. <a href="/prices/confidence/">Review price confidence rules</a>.</p>
@@ -529,6 +632,24 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
         <h2>Daily deal actions</h2>
         <p class="lede">Deal actions combine Deal Score, confidence, and basket fit so shoppers can act without treating estimates as verified prices.</p>
         <table class="table">
@@ -542,6 +663,24 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
         <h2>Category signals</h2>
         <p class="lede">Category pages expose the product, store, and signal that drives each index movement. <a href="/catalog/coverage/">Open catalog coverage</a>.</p>
         <table class="table">
@@ -554,6 +693,24 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Catalog coverage</h2>
         <p class="lede">Coverage rows show whether categories are ready for alerts, rankings, and forecast writebacks.</p>
@@ -614,6 +771,24 @@ app.innerHTML = `
 
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Watchlist alerts</h2>
         <p class="lede"><a href="/watchlist/">Open the watchlist workbench</a> for target prices, alert state, and confidence guardrails.</p>
@@ -695,6 +870,24 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
         <h2>Notification inbox</h2>
         <p class="lede"><a href="/notifications/inbox/">Open alert inbox</a> to audit delivered, held, and suppressed household notifications.</p>
         <table class="table">
@@ -728,6 +921,24 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
         <h2>Store highlights</h2>
         <p class="lede">Store cards separate verified shelf evidence, retailer-page prices, and estimates before they affect basket decisions.</p>
         <table class="table">
@@ -751,6 +962,24 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Store map</h2>
         <p class="lede">Mapped stores show district, basket fit, coverage, and pickup notes without changing Deal Score rankings.</p>
@@ -783,6 +1012,24 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Budget tracker</h2>
         <p class="lede">Weekly and monthly guardrails stay visible before basket forecasts become receipt-backed spend.</p>
@@ -830,6 +1077,24 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
         <h2>Nutrition per krona</h2>
         <p class="lede">Protein value ranks by nutrition per 10 SEK so cheap deals do not hide weak food value.</p>
         <table class="table">
@@ -847,6 +1112,24 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>My Stores Basket Index</h2>
         <p class="lede">Favorite-store basket index compares the same products across realistic Stockholm stores with confidence labels. Distance is context only and never changes Deal Score.</p>
@@ -883,6 +1166,34 @@ app.innerHTML = `
           <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
           <tbody>
             ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>B2B grocery analytics</h2>
+        <p class="lede">Aggregated, privacy-safe market signals for retail and CPG teams. No household-level data is ever exported. Deal Score is never sold or revealed as a ranking signal.</p>
+        <table class="table">
+          <thead><tr><th>Segment</th><th>Metric</th><th>Buyer</th><th>Guardrail</th></tr></thead>
+          <tbody>
+            ${businessSignals.map((s) => `<tr><td>${s.segment}</td><td>${s.metric}</td><td>${s.buyer}</td><td>${s.guardrail}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Partnership leads</h2>
+        <div class="grid">
+          <div class="metric"><strong>3</strong><span>active signal categories</span></div>
+          <div class="metric"><strong>0</strong><span>household exports</span></div>
+          <div class="metric"><strong>API</strong><span>delivery method</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Community price reports</h2>
+        <p class="lede">User-submitted price reports flow through a trust-ranked queue. Trusted reporters accelerate verification; new reporters require manual review before any price update.</p>
+        <table class="table">
+          <thead><tr><th>Product</th><th>Report type</th><th>Evidence</th><th>Status</th><th>Trust</th></tr></thead>
+          <tbody>
+            ${communityReports.map((r) => `<tr><td>${r.product}</td><td>${r.report}</td><td>${r.evidence}</td><td><span class="status">${r.status}</span></td><td>${r.trust}</td></tr>`).join('')}
           </tbody>
         </table>
       </div>
