@@ -24,11 +24,7 @@ describe('buildStaticPages', () => {
         'login/index.html',
         'loyalty/offers/index.html',
         'market/index.html',
-        'meal-plans/index.html',
-        'notifications/inbox/index.html',
-        'nutrition/allergens/index.html',
-        'pantry/index.html',
-        'prices/confidence/index.html',
+        'meals/index.html',
         'privacy/index.html',
         'products/coffee/index.html',
         'receipts/review/index.html',
@@ -157,6 +153,12 @@ describe('buildStaticPages', () => {
       assert.match(smartSwapsPage, /Same roast category/);
       assert.match(smartSwapsPage, /Estimated swap prices cannot reduce forecast spend/);
       assert.match(smartSwapsPage, /Dietary restrictions outrank savings/);
+
+      const meals = await readFile(join(root, 'meals/index.html'), 'utf8');
+      assert.match(meals, /Deal-based meal planner/);
+      assert.match(meals, /Chicken thighs pasta bowl/);
+      assert.match(meals, /34.90 SEK/);
+      assert.match(meals, /110 SEK meal cap/);
 
       const store = await readFile(join(root, 'stores/willys-odenplan/index.html'), 'utf8');
       assert.match(store, /Store highlights/);
