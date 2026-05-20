@@ -24,6 +24,35 @@ class RecordingPgPool {
 
   async query(text: string, values: unknown[] = []) {
     this.calls.push({ text, values });
+    if (text.includes('information_schema.tables')) {
+      return {
+        rows: [
+          'chains',
+          'products',
+          'source_runs',
+          'raw_records',
+          'observations',
+          'latest_prices',
+          'app_users',
+          'favorite_stores',
+          'user_preferences',
+          'watchlist_items',
+          'weekly_baskets',
+          'basket_items',
+          'human_review_assignments',
+          'human_reviewers',
+          'community_reporter_trust',
+          'subscription_entitlements',
+          'notification_tasks',
+          'notification_suppressions'
+        ].map((table_name) => ({ table_name }))
+      };
+    }
+    if (text.includes('select version from schema_migrations')) {
+      return {
+        rows: ['001_groceryview_schema', '002_repository_support_schema', '003_subscription_entitlements'].map((version) => ({ version }))
+      };
+    }
     if (text.includes('insert into subscription_entitlements')) {
       this.entitlementRow = {
         user_id: values[0],
@@ -292,6 +321,44 @@ describe('runtime config', () => {
     const writeCall = pool.calls.find((call) => call.text.includes('insert into subscription_entitlements'));
     assert.deepEqual(writeCall?.values.slice(0, 4), ['user-1', 'premium', 'premium_monthly', 'active']);
     assert.equal(writeCall?.text.includes('$1'), true);
+  });
+
+  it('exposes PostgreSQL readiness from the runtime DATABASE_URL pool without leaking secrets', async () => {
+    const pool = new RecordingPgPool();
+    const service = createRuntimeHttpService(
+      {
+        NODE_ENV: 'development',
+        PORT: '3000',
+        AUTH_SECRET: 'auth-secret',
+        DATABASE_URL: 'postgres://runtime-user:runtime-password@runtime-db.example/groceryview',
+        PUBLIC_WEB_URL: 'https://groceryview.example',
+        NOTIFICATION_WEBHOOK_SECRET: 'notification-secret',
+        BILLING_WEBHOOK_SECRET: 'billing-secret',
+        METRICS_TOKEN: 'metrics-secret'
+      },
+      { pgPoolFactory: () => pool }
+    );
+
+    try {
+      const response = await service.handler(new Request('http://localhost/api/readiness/postgres', {
+        headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
+      }));
+
+      assert.equal(response.status, 200);
+      const body = await response.json() as { status: string; evidence: string[]; blockers: string[]; summary: string };
+      assert.equal(body.status, 'ready');
+      assert.deepEqual(body.blockers, []);
+      assert.equal(body.evidence.includes('table:app_users'), true);
+      assert.equal(body.evidence.includes('migration:003_subscription_entitlements'), true);
+      assert.equal(JSON.stringify(body).includes('runtime-password'), false);
+    } finally {
+      await service.close();
+    }
+
+    assert.equal(pool.closed, true);
+    assert.equal(pool.calls.some((call) => call.text.includes('information_schema.tables')), true);
+    assert.equal(pool.calls.some((call) => call.text.includes('select version from schema_migrations')), true);
+    assert.equal(pool.calls.some((call) => /\b(insert|update|delete)\b/i.test(call.text)), false);
   });
 
   it('detects when the server module is executed directly as the deployment entrypoint', () => {
