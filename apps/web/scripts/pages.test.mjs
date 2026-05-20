@@ -23,7 +23,8 @@ describe('buildStaticPages', () => {
         'products/coffee/index.html',
         'scanner/index.html',
         'stores/compare/index.html',
-        'stores/willys-odenplan/index.html'
+        'stores/willys-odenplan/index.html',
+        'watchlist/index.html'
       ]);
 
       const product = await readFile(join(root, 'products/coffee/index.html'), 'utf8');
@@ -76,6 +77,13 @@ describe('buildStaticPages', () => {
       assert.match(account, /data-groceryview-flow="account"/);
       assert.match(account, /data-flow-action="toggle-alert"/);
       assert.match(account, /data-flow-result="account"/);
+
+      const watchlist = await readFile(join(root, 'watchlist/index.html'), 'utf8');
+      assert.match(watchlist, /Price watchlist workbench/);
+      assert.match(watchlist, /Tracked items/);
+      assert.match(watchlist, /Ready for push/);
+      assert.match(watchlist, /Held for review/);
+      assert.match(watchlist, /Estimated prices cannot trigger household notifications/);
 
       const household = await readFile(join(root, 'household/index.html'), 'utf8');
       assert.match(household, /Shared household basket/);
