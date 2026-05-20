@@ -65,6 +65,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-nutrition-value-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setPantryMetric = (metric, message) => {
+    const target = document.querySelector('[data-pantry-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setSavingsLedgerMetric = (metric, message) => {
     const target = document.querySelector('[data-savings-ledger-' + metric + ']');
     if (target) target.textContent = message;
@@ -829,6 +833,34 @@ window.GroceryViewFlowActions = (() => {
       setResult('nutrition-value', 'Nutrition value API load failed: ' + error.message + '. Static nutrition review remains visible.');
     }
   };
+  const loadPantryFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('pantry', 'Local preview mode: connect the API session bridge before loading live pantry replenishment.');
+      return;
+    }
+    try {
+      const asOf = new Date().toISOString();
+      const response = await fetch(apiUrl('/api/pantry/replenishment?asOf=' + encodeURIComponent(asOf), config), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const statuses = Array.isArray(payload.statuses) ? payload.statuses : [];
+      const replenishment = Array.isArray(payload.replenishment) ? payload.replenishment : [];
+      const expiringSoon = Array.isArray(payload.expiringSoonProductIds) ? payload.expiringSoonProductIds : [];
+      const lowOrExpired = statuses.filter((item) => item.status === 'low_stock' || item.status === 'expired');
+      const duplicateBlocks = replenishment.filter((item) => item.alreadyInBasket);
+      const dealBacked = replenishment.filter((item) => item.bestDeal);
+      const firstRestock = replenishment[0] || {};
+      setPantryMetric('summary', statuses.length + ' pantry rows · ' + lowOrExpired.length + ' low/expired · ' + expiringSoon.length + ' expiring soon');
+      setPantryMetric('restock', replenishment.length ? (firstRestock.name || firstRestock.productId || 'Restock') + ' x' + Number(firstRestock.quantityToBuy || 0) + ' ' + (firstRestock.unit || '') + ' · ' + (firstRestock.priority || 'unknown') + ' priority' : 'No live restock rows returned');
+      setPantryMetric('expiry', expiringSoon.length ? expiringSoon.join(', ') + ' expiring soon · ' + duplicateBlocks.length + ' already in basket · ' + dealBacked.length + ' deal-backed restocks' : 'No expiring rows · ' + duplicateBlocks.length + ' already in basket · ' + dealBacked.length + ' deal-backed restocks');
+      setResult('pantry', 'Connected pantry replenishment loaded: ' + statuses.length + ' inventory rows, ' + replenishment.length + ' restock actions, ' + expiringSoon.length + ' expiring soon.');
+    } catch (error) {
+      setResult('pantry', 'Pantry API load failed: ' + error.message + '. Static pantry inventory remains visible.');
+    }
+  };
   const loadSavingsLedgerFromApi = async () => {
     const config = getApiConfig();
     if (!hasApiSession(config)) {
@@ -1102,6 +1134,10 @@ window.GroceryViewFlowActions = (() => {
         await loadNutritionValueFromApi();
         return;
       }
+      if (flow === 'pantry' && action === 'load-pantry') {
+        await loadPantryFromApi();
+        return;
+      }
       if (flow === 'savings-ledger' && action === 'load-savings-ledger') {
         await loadSavingsLedgerFromApi();
         return;
@@ -1271,6 +1307,9 @@ const mealPlansLivePanel = `
 const nutritionValueLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="nutrition-value" style="margin-top:16px"><div class="eyebrow">Connected nutrition value API</div><h2>Pull live nutrition value</h2><p class="lede">Fetch <code>/api/nutrition/value?metric=protein</code> to compare protein per 10 SEK, sugar exposure, salt warnings, and guardrails before a cheap item is treated as a healthy grocery swap or meal-plan ingredient.</p><div class="grid" aria-label="Live nutrition value API metrics"><div class="metric"><strong data-nutrition-value-leader>Waiting for API pull</strong><span>best protein value per 10 SEK</span></div><div class="metric"><strong data-nutrition-value-ranking>Static nutrition ranking preview</strong><span>top value rows</span></div><div class="metric"><strong data-nutrition-value-warnings>Static warning preview</strong><span>sugar, salt, and allergen guardrails</span></div></div><div class="flow-panel" aria-label="Connected nutrition value actions"><button type="button" data-flow-action="load-nutrition-value">Load live nutrition value</button></div><p class="flow-result" data-flow-result="nutrition-value" aria-live="polite">Local preview mode: add an API base URL before loading live nutrition value rankings.</p></section>`;
 
+const pantryLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="pantry" style="margin-top:16px"><div class="eyebrow">Connected pantry API</div><h2>Pull live pantry replenishment</h2><p class="lede">Fetch <code>/api/pantry/replenishment</code> through the protected API session bridge to refresh live low-stock status, expiring-soon rows, restock quantities, duplicate basket blockers, and best-deal context before pantry suggestions modify a basket or meal plan.</p><div class="grid" aria-label="Live pantry replenishment API metrics"><div class="metric"><strong data-pantry-summary>Waiting for API pull</strong><span>inventory status mix</span></div><div class="metric"><strong data-pantry-restock>Static restock preview</strong><span>top restock action</span></div><div class="metric"><strong data-pantry-expiry>Static expiry preview</strong><span>expiry, duplicate, and deal context</span></div></div><div class="flow-panel" aria-label="Connected pantry actions"><button type="button" data-flow-action="load-pantry">Load live pantry replenishment</button></div><p class="flow-result" data-flow-result="pantry" aria-live="polite">Local preview mode: connect the API session bridge before loading live pantry replenishment.</p></section>`;
+
 const savingsLedgerLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="savings-ledger" style="margin-top:16px"><div class="eyebrow">Connected savings ledger API</div><h2>Pull live savings ledger</h2><p class="lede">Fetch protected <code>/api/budget/summary</code> and <code>/api/basket/compare</code> to reconcile budget remaining, next-basket estimate, split-basket forecast savings, verified assignment lines, and missing-product blockers before savings are treated as realized.</p><div class="grid" aria-label="Live savings ledger API metrics"><div class="metric"><strong data-savings-ledger-confirmed>Waiting for API pull</strong><span>budget actuals</span></div><div class="metric"><strong data-savings-ledger-forecast>Static forecast preview</strong><span>forecast savings and next basket</span></div><div class="metric"><strong data-savings-ledger-blockers>Static blocker preview</strong><span>assignment evidence and blockers</span></div></div><div class="flow-panel" aria-label="Connected savings ledger actions"><button type="button" data-flow-action="load-savings-ledger">Load live savings ledger</button></div><p class="flow-result" data-flow-result="savings-ledger" aria-live="polite">Local preview mode: connect the API session bridge and save a basket before loading live savings ledger.</p></section>`;
 
@@ -1330,7 +1369,7 @@ const pages = [
     path: 'pantry/index.html',
     title: 'Pantry inventory — GroceryView',
     description: 'Track GroceryView pantry stock, expiry risk, reorder thresholds, substitution candidates, and budget-safe replenishment actions.',
-    body: `<section class="card"><div class="eyebrow">Pantry</div><h1>Pantry inventory</h1><p class="lede">Track household staples already on hand before GroceryView recommends basket additions, swaps, or meal-plan ingredients.</p><div class="grid"><div class="metric"><strong>18</strong><span>tracked pantry items</span></div><div class="metric"><strong>4</strong><span>low-stock staples</span></div><div class="metric"><strong>2</strong><span>expiry risks</span></div></div></section><section class="card" style="margin-top:16px"><h2>Inventory signals</h2><table class="table"><thead><tr><th>Item</th><th>On hand</th><th>Reorder rule</th><th>Basket action</th><th>Status</th></tr></thead><tbody><tr><td>Rice 1kg</td><td>0.3 kg</td><td>Reorder below 0.5 kg</td><td>Add Lidl private-label rice</td><td>Low stock</td></tr><tr><td>Eggs</td><td>4 left</td><td>Needed for meal plan</td><td>Add verified 12-pack deal</td><td>Reorder</td></tr><tr><td>Tomatoes</td><td>2 days fresh</td><td>Use before expiry</td><td>Hold new produce line</td><td>Use first</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Pantry guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Use-on-hand first</td><td>Meal plans consume expiring pantry items before adding duplicate basket lines.</td></tr><tr><td>Verified reorder cost</td><td>Only verified shelf or fresh retailer-page prices can update replenishment budgets.</td></tr><tr><td>Allergen lock</td><td>Substitutions cannot bypass household dietary restrictions.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Pantry</div><h1>Pantry inventory</h1><p class="lede">Track household staples already on hand before GroceryView recommends basket additions, swaps, or meal-plan ingredients.</p><div class="grid"><div class="metric"><strong>18</strong><span>tracked pantry items</span></div><div class="metric"><strong>4</strong><span>low-stock staples</span></div><div class="metric"><strong>2</strong><span>expiry risks</span></div></div></section><section class="card" style="margin-top:16px"><h2>Inventory signals</h2><table class="table"><thead><tr><th>Item</th><th>On hand</th><th>Reorder rule</th><th>Basket action</th><th>Status</th></tr></thead><tbody><tr><td>Rice 1kg</td><td>0.3 kg</td><td>Reorder below 0.5 kg</td><td>Add Lidl private-label rice</td><td>Low stock</td></tr><tr><td>Eggs</td><td>4 left</td><td>Needed for meal plan</td><td>Add verified 12-pack deal</td><td>Reorder</td></tr><tr><td>Tomatoes</td><td>2 days fresh</td><td>Use before expiry</td><td>Hold new produce line</td><td>Use first</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Pantry guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Use-on-hand first</td><td>Meal plans consume expiring pantry items before adding duplicate basket lines.</td></tr><tr><td>Verified reorder cost</td><td>Only verified shelf or fresh retailer-page prices can update replenishment budgets.</td></tr><tr><td>Allergen lock</td><td>Substitutions cannot bypass household dietary restrictions.</td></tr></tbody></table></section>${pantryLivePanel}`
   },
   {
     path: 'watchlist/index.html',

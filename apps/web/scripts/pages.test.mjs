@@ -403,6 +403,15 @@ describe('buildStaticPages', () => {
       assert.match(pantry, /Rice 1kg/);
       assert.match(pantry, /Use before expiry/);
       assert.match(pantry, /Meal plans consume expiring pantry items before adding duplicate basket lines/);
+      assert.match(pantry, /Connected pantry API/);
+      assert.match(pantry, /Load live pantry replenishment/);
+      assert.match(pantry, /data-groceryview-flow="pantry"/);
+      assert.match(pantry, /data-flow-action="load-pantry"/);
+      assert.match(pantry, /data-pantry-summary/);
+      assert.match(pantry, /data-pantry-restock/);
+      assert.match(pantry, /data-pantry-expiry/);
+      assert.match(pantry, /fetch\(apiUrl\('\/api\/pantry\/replenishment/);
+      assert.match(pantry, /Connected pantry replenishment loaded/);
 
       const watchlist = await readFile(join(root, 'watchlist/index.html'), 'utf8');
       assert.match(watchlist, /Price watchlist workbench/);
