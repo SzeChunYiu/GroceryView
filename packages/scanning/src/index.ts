@@ -32,6 +32,31 @@ export type ScanProviders = {
   };
 };
 
+export type ScanUploadTicketRequest = {
+  scanId: string;
+  kind: ScanUpload['kind'];
+  contentType: string;
+  byteLength: number;
+  requestedAt: string;
+};
+
+export type ScanUploadTicket = {
+  scanId: string;
+  uploadUrl: string;
+  payloadUri: string;
+  expiresAt: string;
+  maxBytes: number;
+  headers: Record<string, string>;
+};
+
+export type ScanUploadStorage = {
+  createUploadTicket(request: ScanUploadTicketRequest): Promise<ScanUploadTicket>;
+};
+
+export type ScanUploadTicketResult =
+  | { status: 'ready'; ticket: ScanUploadTicket }
+  | { status: 'failed_no_storage'; kind: ScanUpload['kind']; reason: string };
+
 export type ScanProviderKind = keyof ScanProviders;
 export type ScanProviderHealthStatus = 'pass' | 'fail' | 'not_run';
 
@@ -141,6 +166,43 @@ function validateScanConfidence(confidence: number, label: string): void {
   if (!Number.isFinite(confidence) || confidence < 0 || confidence > 1) {
     throw new Error(`${label} must be a number between 0 and 1.`);
   }
+}
+
+const allowedScanUploadContentTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'application/pdf']);
+
+function validateScanUploadTicketRequest(request: ScanUploadTicketRequest): void {
+  if (!request.scanId.trim()) throw new Error('scanId is required.');
+  if (request.kind !== 'barcode' && request.kind !== 'receipt') throw new Error('kind must be barcode or receipt.');
+  if (!allowedScanUploadContentTypes.has(request.contentType)) throw new Error('contentType must be an allowed scan upload type.');
+  if (!Number.isInteger(request.byteLength) || request.byteLength <= 0) throw new Error('byteLength must be a positive integer.');
+  if (Number.isNaN(Date.parse(request.requestedAt))) throw new Error('requestedAt must be an ISO date.');
+}
+
+function validateScanUploadTicket(ticket: ScanUploadTicket): void {
+  if (!ticket.scanId.trim()) throw new Error('upload ticket scanId is required.');
+  if (!ticket.uploadUrl.trim()) throw new Error('upload ticket uploadUrl is required.');
+  if (!ticket.payloadUri.trim()) throw new Error('upload ticket payloadUri is required.');
+  if (Number.isNaN(Date.parse(ticket.expiresAt))) throw new Error('upload ticket expiresAt must be an ISO date.');
+  if (!Number.isInteger(ticket.maxBytes) || ticket.maxBytes <= 0) throw new Error('upload ticket maxBytes must be a positive integer.');
+}
+
+export async function prepareScanUploadTicket(input: {
+  request: ScanUploadTicketRequest;
+  storage?: ScanUploadStorage | undefined;
+}): Promise<ScanUploadTicketResult> {
+  validateScanUploadTicketRequest(input.request);
+
+  if (!input.storage) {
+    return {
+      status: 'failed_no_storage',
+      kind: input.request.kind,
+      reason: 'No scan upload storage provider configured.'
+    };
+  }
+
+  const ticket = await input.storage.createUploadTicket(input.request);
+  validateScanUploadTicket(ticket);
+  return { status: 'ready', ticket };
 }
 
 export function planScanReviewWorkItems(scans: ScanReviewWorkItemInput[]): ScanReviewWorkItem[] {

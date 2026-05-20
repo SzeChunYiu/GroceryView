@@ -183,11 +183,28 @@ window.GroceryViewFlowActions = (() => {
     const data = new FormData(form);
     const file = data.get('scanImage');
     const fileName = file && typeof file === 'object' && 'name' in file ? file.name : 'manual-scan';
+    const contentType = file && typeof file === 'object' && 'type' in file && file.type ? file.type : 'image/jpeg';
+    const byteLength = file && typeof file === 'object' && 'size' in file && Number.isFinite(file.size) && file.size > 0 ? file.size : 1;
+    const scanId = 'scanner-preview-' + Date.now();
     try {
+      const uploadTicket = await requireApiSuccess(await fetch(apiUrl('/api/scans/upload-url', config), {
+        method: 'POST',
+        headers: apiHeaders(config),
+        body: JSON.stringify({
+          scanId,
+          kind: 'receipt',
+          contentType,
+          byteLength,
+          requestedAt: new Date().toISOString()
+        })
+      }));
+      const ticket = uploadTicket.result?.status === 'ready' ? uploadTicket.result.ticket : null;
+      if (!ticket) throw new Error(uploadTicket.result?.reason || 'Scan upload storage is not configured.');
+
       const payload = {
-        scanId: 'scanner-preview-' + Date.now(),
+        scanId,
         kind: 'receipt',
-        payload: 'private-upload://scanner-preview/' + encodeURIComponent(fileName || 'manual-scan'),
+        payload: ticket.payloadUri || 'private-upload://scanner-preview/' + encodeURIComponent(fileName || 'manual-scan'),
         uploadedAt: new Date().toISOString()
       };
       const response = await fetch(apiUrl('/api/scans/process', config), {
@@ -197,7 +214,7 @@ window.GroceryViewFlowActions = (() => {
       });
       const result = await requireApiSuccess(response);
       const reviewCount = Array.isArray(result.reviewWorkItems) ? result.reviewWorkItems.length : 0;
-      setResult('scanner', 'Connected API: scan processed as ' + (result.result?.status || 'unknown') + ' with ' + reviewCount + ' review work items.');
+      setResult('scanner', 'Connected API: upload ticket stored as ' + (ticket.payloadUri || payload.payload) + '; scan processed as ' + (result.result?.status || 'unknown') + ' with ' + reviewCount + ' review work items.');
     } catch (error) {
       setResult('scanner', 'Scan API processing failed: ' + error.message + '. Local preview remains staged.');
     }

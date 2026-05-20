@@ -211,7 +211,9 @@ describe('buildStaticPages', () => {
       assert.match(scanner, /data-groceryview-flow="scanner"/);
       assert.match(scanner, /accept="image\/\*"/);
       assert.match(scanner, /data-flow-action="route-review"/);
+      assert.match(scanner, /fetch\(apiUrl\('\/api\/scans\/upload-url/);
       assert.match(scanner, /fetch\(apiUrl\('\/api\/scans\/process/);
+      assert.match(scanner, /payloadUri/);
       assert.match(scanner, /private-upload:\/\/scanner-preview/);
 
       const receiptReview = await readFile(join(root, 'receipts/review/index.html'), 'utf8');
