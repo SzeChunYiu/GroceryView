@@ -34,6 +34,7 @@ describe('buildStaticPages', () => {
         'receipts/review/index.html',
         'retailers/freshness/index.html',
         'routes/shopping/index.html',
+        'savings/ledger/index.html',
         'savings/smart-swaps/index.html',
         'scanner/index.html',
         'stores/compare/index.html',
@@ -142,6 +143,13 @@ describe('buildStaticPages', () => {
       assert.match(deals, /Deal Score/);
       assert.match(deals, /Ads excluded from ranking/);
       assert.match(deals, /Estimated rows held back/);
+
+      const savingsLedger = await readFile(join(root, 'savings/ledger/index.html'), 'utf8');
+      assert.match(savingsLedger, /Savings ledger/);
+      assert.match(savingsLedger, /Ledger entries/);
+      assert.match(savingsLedger, /Willys coffee promo/);
+      assert.match(savingsLedger, /Only verified receipts can move forecast savings into realized savings/);
+      assert.match(savingsLedger, /Low-confidence prices cannot increase savings totals/);
 
       const smartSwapsPage = await readFile(join(root, 'savings/smart-swaps/index.html'), 'utf8');
       assert.match(smartSwapsPage, /Smart grocery swaps/);

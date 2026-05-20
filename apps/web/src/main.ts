@@ -79,6 +79,12 @@ const smartSwaps = [
   { from: 'Eggs 12-pack', to: 'Lidl Eggs 12-pack', savings: 4, rule: 'Favorite-store match, same pack size' }
 ];
 
+const savingsLedgerRows = [
+  { source: 'Willys coffee promo', savings: '24 SEK', evidence: 'Verified receipt', writeback: 'Post to weekly actuals', status: 'Confirmed' },
+  { source: 'Lidl split basket eggs', savings: '16 SEK', evidence: 'Retailer page and receipt', writeback: 'Post to weekly actuals', status: 'Confirmed' },
+  { source: 'Estimated tomato swap', savings: '12 SEK', evidence: 'Low-confidence estimate', writeback: 'No writeback', status: 'Rejected' }
+];
+
 
 const alerts = buildWatchlistAlerts({
   watchlist: [
@@ -491,6 +497,14 @@ app.innerHTML = `
           <thead><tr><th>Swap</th><th>Saves</th><th>Rule</th></tr></thead>
           <tbody>
             ${smartSwaps.map((swap) => `<tr><td>${swap.from} → ${swap.to}</td><td>${swap.savings} SEK</td><td>${swap.rule}</td></tr>`).join('')}
+          </tbody>
+        </table>
+        <h2 style="margin-top:24px">Savings ledger</h2>
+        <p class="lede"><a href="/savings/ledger/">Open savings ledger</a> to separate confirmed receipt savings from rejected estimates.</p>
+        <table class="table">
+          <thead><tr><th>Source</th><th>Savings</th><th>Evidence</th><th>Writeback</th><th>Status</th></tr></thead>
+          <tbody>
+            ${savingsLedgerRows.map((row) => `<tr><td>${row.source}</td><td>${row.savings}</td><td>${row.evidence}</td><td>${row.writeback}</td><td><span class="status">${row.status}</span></td></tr>`).join('')}
           </tbody>
         </table>
       </div>
