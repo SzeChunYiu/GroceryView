@@ -111,6 +111,7 @@ describe('local infrastructure compose', () => {
     assert.match(hostedReadinessSmokeScript, /GROCERYVIEW_SERVER_URL/);
     assert.match(hostedReadinessSmokeScript, /METRICS_TOKEN/);
     assert.match(hostedReadinessSmokeScript, /READINESS_TIMEOUT_SECONDS/);
+    assert.match(hostedReadinessSmokeScript, /READINESS_TIMEOUT_SECONDS must be a positive integer/);
     assert.match(hostedReadinessSmokeScript, /\/api\/readiness\/postgres/);
     assert.match(hostedReadinessSmokeScript, /x-groceryview-metrics-token: \$METRICS_TOKEN/);
     assert.match(hostedReadinessSmokeScript, /curl -fsS/);
@@ -146,6 +147,7 @@ describe('local infrastructure compose', () => {
     assert.match(hostedHttpSmokeScript, /GROCERYVIEW_WEB_URL/);
     assert.match(hostedHttpSmokeScript, /GROCERYVIEW_TERMINAL_PRODUCT_ID/);
     assert.match(hostedHttpSmokeScript, /HTTP_SMOKE_TIMEOUT_SECONDS/);
+    assert.match(hostedHttpSmokeScript, /HTTP_SMOKE_TIMEOUT_SECONDS must be a positive integer/);
     assert.match(hostedHttpSmokeScript, /\/api\/health/);
     assert.match(hostedHttpSmokeScript, /\/api\/products\/\$\{GROCERYVIEW_TERMINAL_PRODUCT_ID\}\/terminal/);
     assert.match(hostedHttpSmokeScript, /curl -fsS/);

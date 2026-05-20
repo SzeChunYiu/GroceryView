@@ -15,6 +15,18 @@ if [ -z "$METRICS_TOKEN" ]; then
   exit 2
 fi
 
+case "$READINESS_TIMEOUT_SECONDS" in
+  ''|*[!0-9]*)
+    echo "READINESS_TIMEOUT_SECONDS must be a positive integer" >&2
+    exit 2
+    ;;
+esac
+
+if [ "$READINESS_TIMEOUT_SECONDS" -lt 1 ]; then
+  echo "READINESS_TIMEOUT_SECONDS must be a positive integer" >&2
+  exit 2
+fi
+
 endpoint="${GROCERYVIEW_SERVER_URL%/}/api/readiness/postgres"
 response="$(
   curl -fsS \
