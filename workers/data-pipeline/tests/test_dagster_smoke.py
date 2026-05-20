@@ -1,6 +1,6 @@
 import pytest
 
-from scripts.smoke_dagster_definitions import EXPECTED_ASSETS, main
+from scripts.smoke_dagster_definitions import EXPECTED_ASSETS, EXPECTED_SCHEDULES, main
 
 
 def test_dagster_smoke_lists_all_expected_assets() -> None:
@@ -23,4 +23,10 @@ def test_dagster_smoke_expected_asset_contract() -> None:
         "retailer_fetch_stubs",
         "seed_products",
         "seed_stores",
+    }
+
+
+def test_dagster_smoke_expected_schedule_contract() -> None:
+    assert EXPECTED_SCHEDULES == {
+        "open_prices_ingestion_schedule",
     }
