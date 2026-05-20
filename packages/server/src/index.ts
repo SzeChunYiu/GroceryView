@@ -959,6 +959,14 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'POST') return jsonResponse(api.compareBasket(user));
       }
 
+      if (path === '/api/basket/comparison-report') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(api.compareBasketReport(user));
+      }
+
       if (path === '/api/budget') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -1231,6 +1239,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
         delete: protectedOperation('Remove basket item.')
       },
       '/api/basket/compare': { post: protectedOperation('Compare basket strategies.') },
+      '/api/basket/comparison-report': { get: protectedOperation('Get basket comparison strategies with assignment and trust labels.') },
       '/api/budget': { patch: protectedOperation('Update budget.') },
       '/api/budget/categories': {
         get: protectedOperation('Get category budget summary.'),
