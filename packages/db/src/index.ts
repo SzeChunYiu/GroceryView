@@ -182,6 +182,41 @@ export type BasketRecord = {
   quantity: number;
 };
 
+export type PriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'estimated';
+
+export type PriceObservationRecord = {
+  productId: string;
+  chainId: string;
+  storeId?: string;
+  sourceRunId?: string;
+  rawRecordId?: string;
+  retailerProductRef?: string;
+  priceType: PriceType;
+  price: number;
+  regularPrice?: number;
+  unitPrice: number;
+  currency?: string;
+  quantity?: number;
+  quantityUnit?: string;
+  promotionText?: string;
+  promotionStartsOn?: string;
+  promotionEndsOn?: string;
+  memberRequired?: boolean;
+  observedAt: string;
+  validFrom?: string;
+  validUntil?: string;
+  confidence: number;
+  provenance: Record<string, unknown>;
+};
+
+export type PriceObservationWriteResult = {
+  observationId: string;
+};
+
+export type PostgresPriceObservationWriter = {
+  recordPriceObservation(observation: PriceObservationRecord): Promise<PriceObservationWriteResult>;
+};
+
 export type HumanReviewerRecord = {
   id: string;
   role: 'viewer' | 'moderator' | 'lead';
@@ -943,6 +978,115 @@ export type PostgresIntegrationReadinessReport = {
 
 type TableNameRow = { table_name: string };
 type MigrationVersionRow = { version: string };
+type ObservationIdRow = { id: string };
+
+export function createPostgresPriceObservationWriter(executor: QueryExecutor): PostgresPriceObservationWriter {
+  return {
+    async recordPriceObservation(observation) {
+      const provenanceJson = JSON.stringify(observation.provenance);
+      const rows = await executor.query<ObservationIdRow>(
+        `insert into observations(
+           product_id,
+           chain_id,
+           store_id,
+           source_run_id,
+           raw_record_id,
+           retailer_product_ref,
+           price_type,
+           price,
+           regular_price,
+           unit_price,
+           currency,
+           quantity,
+           quantity_unit,
+           promotion_text,
+           promotion_starts_on,
+           promotion_ends_on,
+           member_required,
+           observed_at,
+           valid_from,
+           valid_until,
+           confidence,
+           provenance
+         ) values (
+           $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
+           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22::jsonb
+         )
+         returning id`,
+        [
+          observation.productId,
+          observation.chainId,
+          observation.storeId ?? null,
+          observation.sourceRunId ?? null,
+          observation.rawRecordId ?? null,
+          observation.retailerProductRef ?? null,
+          observation.priceType,
+          observation.price,
+          observation.regularPrice ?? null,
+          observation.unitPrice,
+          observation.currency ?? 'SEK',
+          observation.quantity ?? null,
+          observation.quantityUnit ?? null,
+          observation.promotionText ?? null,
+          observation.promotionStartsOn ?? null,
+          observation.promotionEndsOn ?? null,
+          observation.memberRequired ?? false,
+          observation.observedAt,
+          observation.validFrom ?? null,
+          observation.validUntil ?? null,
+          observation.confidence,
+          provenanceJson
+        ]
+      );
+      const observationId = rows[0]?.id;
+      if (!observationId) throw new Error('Price observation insert did not return an id');
+
+      await executor.query(
+        `insert into latest_prices(
+           product_id,
+           chain_id,
+           store_id,
+           price_type,
+           observation_id,
+           price,
+           regular_price,
+           unit_price,
+           currency,
+           observed_at,
+           confidence,
+           provenance
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::jsonb)
+         on conflict (product_id, chain_id, store_id, price_type) do update set
+           observation_id = excluded.observation_id,
+           price = excluded.price,
+           regular_price = excluded.regular_price,
+           unit_price = excluded.unit_price,
+           currency = excluded.currency,
+           observed_at = excluded.observed_at,
+           confidence = excluded.confidence,
+           provenance = excluded.provenance,
+           updated_at = now()
+         where latest_prices.observed_at <= excluded.observed_at`,
+        [
+          observation.productId,
+          observation.chainId,
+          observation.storeId ?? null,
+          observation.priceType,
+          observationId,
+          observation.price,
+          observation.regularPrice ?? null,
+          observation.unitPrice,
+          observation.currency ?? 'SEK',
+          observation.observedAt,
+          observation.confidence,
+          provenanceJson
+        ]
+      );
+
+      return { observationId };
+    }
+  };
+}
 
 export async function collectPostgresIntegrationProbe(input: CollectPostgresIntegrationProbeInput): Promise<PostgresIntegrationProbe> {
   const requiredTables = [...(input.requiredTables ?? POSTGRES_INTEGRATION_REQUIRED_TABLES)];
