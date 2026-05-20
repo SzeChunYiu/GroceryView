@@ -48,7 +48,12 @@ class RecordingPgPool {
           'alert_rules',
           'pantry_items',
           'receipt_uploads',
-          'receipt_items'
+          'receipt_items',
+          'household_plans',
+          'household_members',
+          'household_basket_items',
+          'household_watchlist_items',
+          'household_favorite_stores'
         ].map((table_name) => ({ table_name }))
       };
     }
@@ -60,7 +65,8 @@ class RecordingPgPool {
           '003_subscription_entitlements',
           '004_alert_rules',
           '005_pantry_inventory',
-          '007_receipt_uploads'
+          '007_receipt_uploads',
+          '008_household_plans'
         ].map((version) => ({ version }))
       };
     }
@@ -386,10 +392,13 @@ describe('runtime config', () => {
       assert.equal(body.evidence.includes('table:pantry_items'), true);
       assert.equal(body.evidence.includes('table:receipt_uploads'), true);
       assert.equal(body.evidence.includes('table:receipt_items'), true);
+      assert.equal(body.evidence.includes('table:household_plans'), true);
+      assert.equal(body.evidence.includes('table:household_members'), true);
       assert.equal(body.evidence.includes('migration:003_subscription_entitlements'), true);
       assert.equal(body.evidence.includes('migration:004_alert_rules'), true);
       assert.equal(body.evidence.includes('migration:005_pantry_inventory'), true);
       assert.equal(body.evidence.includes('migration:007_receipt_uploads'), true);
+      assert.equal(body.evidence.includes('migration:008_household_plans'), true);
       assert.equal(JSON.stringify(body).includes('runtime-password'), false);
     } finally {
       await service.close();

@@ -188,6 +188,59 @@ class RepositorySmokeQueryExecutor implements QueryExecutor {
         }
       ] as T[];
     }
+    if (sql.includes('from household_plans')) {
+      return [
+        {
+          id: 'postgres-probe-household-run-42',
+          user_id: 'postgres-probe-user-run-42',
+          name: 'Postgres Probe Household',
+          weekly_budget: '800.00',
+          approval_limit: '400.00',
+          reviewer_user_id: 'postgres-probe-user-run-42',
+          created_at: '2026-05-20T00:00:00.000Z',
+          updated_at: '2026-05-20T00:00:00.000Z'
+        }
+      ] as T[];
+    }
+    if (sql.includes('from household_members')) {
+      return [
+        {
+          household_id: 'postgres-probe-household-run-42',
+          user_id: 'postgres-probe-user-run-42',
+          display_name: 'Postgres Probe User'
+        }
+      ] as T[];
+    }
+    if (sql.includes('from household_basket_items')) {
+      return [
+        {
+          household_id: 'postgres-probe-household-run-42',
+          line_position: 0,
+          product_id: 'postgres-probe-product-run-42',
+          quantity: '1.000',
+          added_by: 'postgres-probe-user-run-42'
+        }
+      ] as T[];
+    }
+    if (sql.includes('from household_watchlist_items')) {
+      return [
+        {
+          household_id: 'postgres-probe-household-run-42',
+          line_position: 0,
+          product_id: 'postgres-probe-product-run-42',
+          added_by: 'postgres-probe-user-run-42',
+          target_price: '50.00'
+        }
+      ] as T[];
+    }
+    if (sql.includes('from household_favorite_stores')) {
+      return [
+        {
+          household_id: 'postgres-probe-household-run-42',
+          store_id: 'postgres-probe-store-run-42'
+        }
+      ] as T[];
+    }
     return [] as T[];
   }
 }
@@ -212,6 +265,11 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_table:basket_items',
       'missing_table:chains',
       'missing_table:community_reporter_trust',
+      'missing_table:household_basket_items',
+      'missing_table:household_favorite_stores',
+      'missing_table:household_members',
+      'missing_table:household_plans',
+      'missing_table:household_watchlist_items',
       'missing_table:human_review_assignments',
       'missing_table:human_reviewers',
       'missing_table:latest_prices',
@@ -232,6 +290,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_migration:004_alert_rules',
       'missing_migration:005_pantry_inventory',
       'missing_migration:007_receipt_uploads',
+      'missing_migration:008_household_plans',
       'repository_check_fail:human_review_assignment_round_trip',
       'repository_check_not_run:notification_suppression_round_trip'
     ]);
@@ -268,6 +327,11 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'table:chains',
         'table:community_reporter_trust',
         'table:favorite_stores',
+        'table:household_basket_items',
+        'table:household_favorite_stores',
+        'table:household_members',
+        'table:household_plans',
+        'table:household_watchlist_items',
         'table:human_review_assignments',
         'table:human_reviewers',
         'table:latest_prices',
@@ -290,6 +354,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'migration:004_alert_rules',
         'migration:005_pantry_inventory',
         'migration:007_receipt_uploads',
+        'migration:008_household_plans',
         'repository_check:favorite_store_round_trip',
         'repository_check:human_review_assignment_round_trip',
         'repository_check:notification_suppression_round_trip',
@@ -491,6 +556,7 @@ describe('buildPostgresRepositorySmokeProbes', () => {
       'alert_rule_round_trip',
       'pantry_item_round_trip',
       'receipt_upload_round_trip',
+      'household_plan_round_trip',
       'price_observation_pipeline_round_trip'
     ]);
 
@@ -506,6 +572,7 @@ describe('buildPostgresRepositorySmokeProbes', () => {
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-pantry-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-receipt-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-receipt-item-run-42')), true);
+    assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-household-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-chain-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-product-run-42')), true);
   });

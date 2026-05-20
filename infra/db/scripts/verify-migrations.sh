@@ -69,6 +69,11 @@ REQUIRED_TABLES=(
   pantry_items
   receipt_uploads
   receipt_items
+  household_plans
+  household_members
+  household_basket_items
+  household_watchlist_items
+  household_favorite_stores
 )
 
 REQUIRED_EXTENSIONS=(
