@@ -447,6 +447,37 @@ export const weeklyBasket = [
   { slug: 'garant-havregryn-1kg',         qty: 1, total: '21.90 SEK', vsLastWeek: '-6.6%' }
 ];
 
+export const savingsPlaybook = [
+  {
+    title: 'Coffee stock-up window',
+    trigger: 'Coffee index is 8.4% under baseline',
+    action: 'Buy one extra Zoegas pack at Willys before promo expiry',
+    impact: '-10.00 SEK vs usual shelf',
+    href: '/products/zoegas-coffee-450g'
+  },
+  {
+    title: 'Breakfast basket shift',
+    trigger: 'Tempo oats row is high-confidence and under trend',
+    action: 'Move weekday breakfast staples to Hornstull when nearby',
+    impact: '-3.90 SEK per 1kg oats',
+    href: '/categories/breakfast'
+  },
+  {
+    title: 'Pantry split check',
+    trigger: 'Matmissionen rice is 7.2% below recent pantry index',
+    action: 'Split pantry top-ups from dairy trips when the route is practical',
+    impact: '-9.00 SEK vs big-box rice',
+    href: '/products/eldorado-basmati-rice-1kg'
+  },
+  {
+    title: 'Butter caution flag',
+    trigger: 'Butter index is 6.9% over baseline despite member pricing',
+    action: 'Delay extra Bregott purchases unless basket coverage is low',
+    impact: '+3.70 SEK risk per pack',
+    href: '/categories/butter'
+  }
+];
+
 export const householdSavings = {
   weeklyTotal: '438.50 SEK',
   vsLastWeek: '-19.20 SEK',
