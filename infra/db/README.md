@@ -26,3 +26,15 @@ Environment overrides:
 - `SEEDS_DIR`: seed directory, default `infra/db/seeds`.
 
 The verifier exits nonzero when Docker is missing, no migrations are present, PostgreSQL does not become ready, any migration or seed fails, or seed count assertions fail.
+
+## Runtime readiness smoke
+
+After a hosted server is deployed with `DATABASE_URL` and `METRICS_TOKEN`, call the token-protected readiness route to prove the live runtime can read the required PostgreSQL schema and migration metadata without exposing the database URL:
+
+```sh
+curl -fsS \
+  -H "x-groceryview-metrics-token: $METRICS_TOKEN" \
+  "$GROCERYVIEW_SERVER_URL/api/readiness/postgres"
+```
+
+The route returns HTTP 200 only when the required tables and migration versions are present. It returns HTTP 503 with explicit blockers when migrations are missing or the readiness provider cannot run.

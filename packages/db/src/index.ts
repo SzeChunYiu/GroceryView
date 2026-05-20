@@ -220,9 +220,77 @@ export type ProductCatalogListFilter = {
   limit?: number;
 };
 
+export type StoreCatalogRecord = {
+  storeId: string;
+  chainId: string;
+  chainSlug: string;
+  chainName: string;
+  slug: string;
+  externalRef?: string;
+  name: string;
+  addressLine1: string;
+  addressLine2?: string;
+  postalCode?: string;
+  city: string;
+  region?: string;
+  countryCode: string;
+  longitude?: number;
+  latitude?: number;
+  storeType: string;
+  openingHours: Record<string, unknown>;
+  onlineOrderUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type StoreCatalogListFilter = {
+  search?: string;
+  chainSlug?: string;
+  city?: string;
+  limit?: number;
+};
+
+export type ProductAliasSourceType = 'retailer' | 'receipt' | 'community' | 'import' | 'manual';
+
+export type ProductAliasRecord = {
+  aliasId: string;
+  productId: string;
+  alias: string;
+  normalizedAlias: string;
+  sourceType: ProductAliasSourceType;
+  sourceRef?: string;
+  matchConfidence: number;
+  reviewedAt?: string;
+  createdAt: string;
+};
+
+export type ProductAliasWriteRecord = {
+  productId: string;
+  alias: string;
+  normalizedAlias: string;
+  sourceType: ProductAliasSourceType;
+  sourceRef?: string;
+  matchConfidence: number;
+  reviewedAt?: string;
+};
+
+export type ProductAliasLookupFilter = {
+  normalizedAlias?: string;
+  productId?: string;
+  sourceType?: ProductAliasSourceType;
+  limit?: number;
+};
+
 export type PostgresCatalogReader = {
   getProductBySlug(slug: string): Promise<ProductCatalogRecord | null>;
   listProducts(filter?: ProductCatalogListFilter): Promise<ProductCatalogRecord[]>;
+  getStoreBySlug(slug: string): Promise<StoreCatalogRecord | null>;
+  listStores(filter?: StoreCatalogListFilter): Promise<StoreCatalogRecord[]>;
+};
+
+export type PostgresProductAliasRepository = {
+  upsertProductAlias(alias: ProductAliasWriteRecord): Promise<ProductAliasRecord>;
+  findProductAliases(filter: ProductAliasLookupFilter): Promise<ProductAliasRecord[]>;
 };
 
 export type PriceObservationRecord = {
@@ -768,6 +836,39 @@ type ProductCatalogRow = {
   created_at: string | Date;
   updated_at: string | Date;
 };
+type StoreCatalogRow = {
+  id: string;
+  chain_id: string;
+  chain_slug: string;
+  chain_name: string;
+  slug: string;
+  external_ref: string | null;
+  name: string;
+  address_line1: string;
+  address_line2: string | null;
+  postal_code: string | null;
+  city: string;
+  region: string | null;
+  country_code: string;
+  longitude: string | number | null;
+  latitude: string | number | null;
+  store_type: string;
+  opening_hours: Record<string, unknown> | string | null;
+  online_order_url: string | null;
+  created_at: string | Date;
+  updated_at: string | Date;
+};
+type ProductAliasRow = {
+  id: string;
+  product_id: string;
+  alias: string;
+  normalized_alias: string;
+  source_type: ProductAliasSourceType;
+  source_ref: string | null;
+  match_confidence: string | number;
+  reviewed_at: string | Date | null;
+  created_at: string | Date;
+};
 
 function asIso(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : value;
@@ -873,6 +974,45 @@ function mapProductCatalog(row: ProductCatalogRow): ProductCatalogRecord {
     ...(row.image_url ? { imageUrl: row.image_url } : {}),
     createdAt: asIso(row.created_at),
     updatedAt: asIso(row.updated_at)
+  };
+}
+
+function mapStoreCatalog(row: StoreCatalogRow): StoreCatalogRecord {
+  return {
+    storeId: row.id,
+    chainId: row.chain_id,
+    chainSlug: row.chain_slug,
+    chainName: row.chain_name,
+    slug: row.slug,
+    ...(row.external_ref ? { externalRef: row.external_ref } : {}),
+    name: row.name,
+    addressLine1: row.address_line1,
+    ...(row.address_line2 ? { addressLine2: row.address_line2 } : {}),
+    ...(row.postal_code ? { postalCode: row.postal_code } : {}),
+    city: row.city,
+    ...(row.region ? { region: row.region } : {}),
+    countryCode: row.country_code,
+    ...(row.longitude === null ? {} : { longitude: Number(row.longitude) }),
+    ...(row.latitude === null ? {} : { latitude: Number(row.latitude) }),
+    storeType: row.store_type,
+    openingHours: asRecord(row.opening_hours),
+    ...(row.online_order_url ? { onlineOrderUrl: row.online_order_url } : {}),
+    createdAt: asIso(row.created_at),
+    updatedAt: asIso(row.updated_at)
+  };
+}
+
+function mapProductAlias(row: ProductAliasRow): ProductAliasRecord {
+  return {
+    aliasId: row.id,
+    productId: row.product_id,
+    alias: row.alias,
+    normalizedAlias: row.normalized_alias,
+    sourceType: row.source_type,
+    ...(row.source_ref ? { sourceRef: row.source_ref } : {}),
+    matchConfidence: Number(row.match_confidence),
+    ...(row.reviewed_at ? { reviewedAt: asIso(row.reviewed_at) } : {}),
+    createdAt: asIso(row.created_at)
   };
 }
 
@@ -1328,6 +1468,139 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
         [filter.search ?? null, filter.categoryPath ?? null, limit]
       );
       return rows.map(mapProductCatalog);
+    },
+
+    async getStoreBySlug(slug) {
+      const rows = await executor.query<StoreCatalogRow>(
+        `select stores.id,
+                stores.chain_id,
+                chains.slug as chain_slug,
+                chains.name as chain_name,
+                stores.slug,
+                stores.external_ref,
+                stores.name,
+                stores.address_line1,
+                stores.address_line2,
+                stores.postal_code,
+                stores.city,
+                stores.region,
+                stores.country_code,
+                case when stores.position is null then null else ST_X(stores.position::geometry) end as longitude,
+                case when stores.position is null then null else ST_Y(stores.position::geometry) end as latitude,
+                stores.store_type,
+                stores.opening_hours,
+                stores.online_order_url,
+                stores.created_at,
+                stores.updated_at
+         from stores
+         join chains on chains.id = stores.chain_id
+         where stores.slug = $1`,
+        [slug]
+      );
+      const row = rows[0];
+      return row ? mapStoreCatalog(row) : null;
+    },
+
+    async listStores(filter = {}) {
+      const limit = Math.min(Math.max(filter.limit ?? 100, 1), 500);
+      const rows = await executor.query<StoreCatalogRow>(
+        `select stores.id,
+                stores.chain_id,
+                chains.slug as chain_slug,
+                chains.name as chain_name,
+                stores.slug,
+                stores.external_ref,
+                stores.name,
+                stores.address_line1,
+                stores.address_line2,
+                stores.postal_code,
+                stores.city,
+                stores.region,
+                stores.country_code,
+                case when stores.position is null then null else ST_X(stores.position::geometry) end as longitude,
+                case when stores.position is null then null else ST_Y(stores.position::geometry) end as latitude,
+                stores.store_type,
+                stores.opening_hours,
+                stores.online_order_url,
+                stores.created_at,
+                stores.updated_at
+         from stores
+         join chains on chains.id = stores.chain_id
+         where ($1::text is null or stores.name ilike '%' || $1 || '%' or stores.slug ilike '%' || $1 || '%')
+           and ($2::text is null or chains.slug = $2)
+           and ($3::text is null or stores.city = $3)
+         order by stores.city, chains.name, stores.name, stores.slug
+         limit $4`,
+        [filter.search ?? null, filter.chainSlug ?? null, filter.city ?? null, limit]
+      );
+      return rows.map(mapStoreCatalog);
+    }
+  };
+}
+
+export function createPostgresProductAliasRepository(executor: QueryExecutor): PostgresProductAliasRepository {
+  return {
+    async upsertProductAlias(alias) {
+      const rows = await executor.query<ProductAliasRow>(
+        `insert into aliases(
+           product_id,
+           alias,
+           normalized_alias,
+           source_type,
+           source_ref,
+           match_confidence,
+           reviewed_at
+         ) values ($1, $2, $3, $4, $5, $6, $7)
+         on conflict (normalized_alias, source_type, source_ref) do update set
+           product_id = excluded.product_id,
+           alias = excluded.alias,
+           match_confidence = excluded.match_confidence,
+           reviewed_at = excluded.reviewed_at
+         returning id,
+                   product_id,
+                   alias,
+                   normalized_alias,
+                   source_type,
+                   source_ref,
+                   match_confidence,
+                   reviewed_at,
+                   created_at`,
+        [
+          alias.productId,
+          alias.alias,
+          alias.normalizedAlias,
+          alias.sourceType,
+          alias.sourceRef ?? null,
+          alias.matchConfidence,
+          alias.reviewedAt ?? null
+        ]
+      );
+      const row = rows[0];
+      if (!row) throw new Error('Product alias upsert did not return a row');
+      return mapProductAlias(row);
+    },
+
+    async findProductAliases(filter) {
+      const limit = Math.min(Math.max(filter.limit ?? 25, 1), 100);
+      const rows = await executor.query<ProductAliasRow>(
+        `select id,
+                product_id,
+                alias,
+                normalized_alias,
+                source_type,
+                source_ref,
+                match_confidence,
+                reviewed_at,
+                created_at
+         from aliases
+         where ($1::text is null or normalized_alias = $1)
+           and ($2::uuid is null or product_id = $2::uuid)
+           and ($3::text is null or source_type = $3)
+         order by match_confidence desc, reviewed_at desc nulls last, created_at desc, id
+         limit $4`,
+        [filter.normalizedAlias ?? null, filter.productId ?? null, filter.sourceType ?? null, limit]
+      );
+      return rows.map(mapProductAlias);
     }
   };
 }
