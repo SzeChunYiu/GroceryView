@@ -134,6 +134,7 @@ describe('local infrastructure compose', () => {
     assert.match(smokeRetailerConnectorScript, /planRetailerConnectorRun/);
     assert.match(smokeRetailerConnectorScript, /fetchRetailerConnectorSnapshot/);
     assert.match(smokeRetailerConnectorScript, /Connector smoke blocked before fetch/);
+    assert.match(smokeRetailerConnectorScript, /GROCERYVIEW_CONNECTOR_TIMEOUT_SECONDS must be a positive integer/);
     assert.match(smokeRetailerConnectorScript, /investigate_connector_http_status/);
   });
 

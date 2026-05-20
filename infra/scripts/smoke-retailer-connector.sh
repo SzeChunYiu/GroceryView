@@ -5,6 +5,18 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 INGESTION_DIST="$ROOT_DIR/packages/ingestion/dist/index.js"
 CONNECTOR_TIMEOUT_SECONDS="${GROCERYVIEW_CONNECTOR_TIMEOUT_SECONDS:-15}"
 
+case "$CONNECTOR_TIMEOUT_SECONDS" in
+  ''|*[!0-9]*)
+    echo "GROCERYVIEW_CONNECTOR_TIMEOUT_SECONDS must be a positive integer" >&2
+    exit 2
+    ;;
+esac
+
+if [ "$CONNECTOR_TIMEOUT_SECONDS" -lt 1 ]; then
+  echo "GROCERYVIEW_CONNECTOR_TIMEOUT_SECONDS must be a positive integer" >&2
+  exit 2
+fi
+
 if [ -z "${GROCERYVIEW_CONNECTOR_URL:-}" ]; then
   echo "GROCERYVIEW_CONNECTOR_URL is required for retailer connector smoke" >&2
   exit 2

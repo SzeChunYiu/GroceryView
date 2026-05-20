@@ -29,7 +29,7 @@ npm run build --workspace @groceryview/ingestion
 GROCERYVIEW_CONNECTOR_URL="https://provider.example/api/products" GROCERYVIEW_CONNECTOR_CHAIN_ID="willys" GROCERYVIEW_CONNECTOR_SOURCE_TYPE="official_api" GROCERYVIEW_CONNECTOR_LEGAL_REVIEW_STATUS="approved" GROCERYVIEW_CONNECTOR_HAS_DATA_AGREEMENT="true" infra/scripts/smoke-retailer-connector.sh
 ```
 
-The script reuses the ingestion connector gate, refuses to fetch when required approvals are missing, performs the HTTP pull with a timeout, and prints status code, byte count, content hash, and raw snapshot reference for follow-up parser work.
+The script reuses the ingestion connector gate, refuses to fetch when required approvals are missing, performs the HTTP pull with a timeout, and prints status code, byte count, content hash, and raw snapshot reference for follow-up parser work. Set `GROCERYVIEW_CONNECTOR_TIMEOUT_SECONDS` to a positive integer to adjust the fetch timeout for slow provider endpoints.
 
 ## Open Prices real-data smoke
 
