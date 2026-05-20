@@ -37,6 +37,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-watchlist-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setDailyDealsMetric = (metric, message) => {
+    const target = document.querySelector('[data-daily-deals-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setApiSessionResult = (message) => {
     const target = document.querySelector('[data-api-session-result]');
     if (target) target.textContent = message;
@@ -575,6 +579,30 @@ window.GroceryViewFlowActions = (() => {
       setResult('watchlist', 'Watchlist API load failed: ' + error.message + '. Static watchlist board remains visible.');
     }
   };
+  const loadDailyDealsFromApi = async () => {
+    const config = getApiConfig();
+    if (!config.apiBase) {
+      setResult('daily-deals', 'Local preview mode: connect the API session bridge before loading live daily deals.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/market/overview', config, false), {
+        method: 'GET',
+        headers: config.bearerToken ? apiHeaders(config) : { 'content-type': 'application/json' }
+      });
+      const payload = await requireApiSuccess(response);
+      const topDeals = Array.isArray(payload.topDeals) ? payload.topDeals : [];
+      const leader = topDeals[0] || {};
+      const buyDeals = topDeals.filter((deal) => deal.band?.verdict === 'Buy');
+      const compareDeals = topDeals.filter((deal) => deal.band?.verdict === 'Compare');
+      setDailyDealsMetric('leader', (leader.ticker || leader.productId || 'Top deal') + ' · Deal Score ' + Number(leader.dealScore || 0) + ' · ' + (leader.band?.verdict || 'no verdict'));
+      setDailyDealsMetric('price', formatPreciseSek(leader.bestPrice) + ' at ' + (leader.bestStoreId || 'unknown store'));
+      setDailyDealsMetric('count', topDeals.length + ' ranked deals · ' + buyDeals.length + ' buy · ' + compareDeals.length + ' compare');
+      setResult('daily-deals', 'Connected daily deals loaded: ' + topDeals.length + ' top deals from /api/market/overview; leader ' + (leader.ticker || leader.productId || 'n/a') + '.');
+    } catch (error) {
+      setResult('daily-deals', 'Daily deals API load failed: ' + error.message + '. Static deal board remains visible.');
+    }
+  };
   const messages = {
     'toggle-alert': 'Alert rule updated locally; production save waits for authenticated account API.',
     'manage-subscription': 'Billing portal handoff prepared without exposing provider customer IDs.',
@@ -646,6 +674,10 @@ window.GroceryViewFlowActions = (() => {
       }
       if (flow === 'watchlist' && action === 'load-watchlist') {
         await loadWatchlistFromApi();
+        return;
+      }
+      if (flow === 'daily-deals' && action === 'load-daily-deals') {
+        await loadDailyDealsFromApi();
         return;
       }
       if (flow && action) setResult(flow, messages[action] || 'Action preview recorded.');
@@ -771,6 +803,9 @@ const priceFreshnessLivePanel = `
 
 const watchlistLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="watchlist" style="margin-top:16px"><div class="eyebrow">Connected watchlist API</div><h2>Pull live target and alert numbers</h2><p class="lede">Fetch <code>/api/watchlist</code> through the protected API session bridge to refresh tracked-item counts, target-price rules, active trigger values, favorite-store scope, and 52-week-low alert evidence from account data.</p><div class="grid" aria-label="Live watchlist API metrics"><div class="metric"><strong data-watchlist-summary>Waiting for API pull</strong><span>tracked items and alerts</span></div><div class="metric"><strong data-watchlist-target>Static target preview</strong><span>target price rules</span></div><div class="metric"><strong data-watchlist-trigger>Static trigger preview</strong><span>current trigger value</span></div><div class="metric"><strong data-watchlist-scope>Static scope preview</strong><span>favorite-store and 52W scope</span></div></div><div class="flow-panel" aria-label="Connected watchlist actions"><button type="button" data-flow-action="load-watchlist">Load live watchlist alerts</button></div><p class="flow-result" data-flow-result="watchlist" aria-live="polite">Local preview mode: connect the API session bridge before loading live watchlist alerts.</p></section>`;
+
+const dailyDealsLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="daily-deals" style="margin-top:16px"><div class="eyebrow">Connected daily deals API</div><h2>Pull live ranked deal board</h2><p class="lede">Fetch <code>/api/market/overview</code> to refresh the daily shopper board with top deal ticker, best price, Deal Score, verdict mix, and store evidence from the public market API.</p><div class="grid" aria-label="Live daily deals API metrics"><div class="metric"><strong data-daily-deals-leader>Waiting for API pull</strong><span>top ranked deal</span></div><div class="metric"><strong data-daily-deals-price>Static best-price preview</strong><span>price and store</span></div><div class="metric"><strong data-daily-deals-count>Static deal-count preview</strong><span>ranked deal count</span></div></div><div class="flow-panel" aria-label="Connected daily deals actions"><button type="button" data-flow-action="load-daily-deals">Load live deal board</button></div><p class="flow-result" data-flow-result="daily-deals" aria-live="polite">Local preview mode: connect the API session bridge before loading live daily deals.</p></section>`;
 
 const pages = [
   {
@@ -909,7 +944,7 @@ const pages = [
     path: 'deals/today/index.html',
     title: 'Today’s best grocery deals — GroceryView',
     description: 'Daily GroceryView deal board with Deal Score, source confidence, savings, and recommended shopper actions.',
-    body: `<section class="card"><div class="eyebrow">Daily deal board</div><h1>Today’s best grocery deals</h1><p class="lede">Prioritize verified discounts with strong Deal Scores, clear source confidence, and practical shopping actions.</p><div class="grid"><div class="metric"><strong>82</strong><span>top Deal Score</span></div><div class="metric"><strong>3</strong><span>verified deal rows</span></div><div class="metric"><strong>44 SEK</strong><span>basket savings</span></div></div></section><section class="card" style="margin-top:16px"><h2>Ranked deal actions</h2><table class="table"><thead><tr><th>Product</th><th>Store</th><th>Deal Score</th><th>Confidence</th><th>Action</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>Willys Odenplan</td><td>82</td><td>Verified shelf</td><td>Buy two for this week</td></tr><tr><td>Eggs 12-pack</td><td>Lidl Sveavägen</td><td>76</td><td>Retailer page</td><td>Add to split basket</td></tr><tr><td>Garant Bryggkaffe 450g</td><td>Willys Odenplan</td><td>73</td><td>Verified shelf</td><td>Use as private-label swap</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Deal guardrails</h2><table class="table"><thead><tr><th>Rule</th><th>Why it matters</th></tr></thead><tbody><tr><td>Ads excluded from ranking</td><td>Sponsored placements cannot increase Deal Score.</td></tr><tr><td>Estimated rows held back</td><td>Low-confidence prices must be reviewed before appearing as top deals.</td></tr><tr><td>Member prices labeled</td><td>Loyalty-only offers are separated from public shelf prices.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Daily deal board</div><h1>Today’s best grocery deals</h1><p class="lede">Prioritize verified discounts with strong Deal Scores, clear source confidence, and practical shopping actions.</p><div class="grid"><div class="metric"><strong>82</strong><span>top Deal Score</span></div><div class="metric"><strong>3</strong><span>verified deal rows</span></div><div class="metric"><strong>44 SEK</strong><span>basket savings</span></div></div></section><section class="card" style="margin-top:16px"><h2>Ranked deal actions</h2><table class="table"><thead><tr><th>Product</th><th>Store</th><th>Deal Score</th><th>Confidence</th><th>Action</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>Willys Odenplan</td><td>82</td><td>Verified shelf</td><td>Buy two for this week</td></tr><tr><td>Eggs 12-pack</td><td>Lidl Sveavägen</td><td>76</td><td>Retailer page</td><td>Add to split basket</td></tr><tr><td>Garant Bryggkaffe 450g</td><td>Willys Odenplan</td><td>73</td><td>Verified shelf</td><td>Use as private-label swap</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Deal guardrails</h2><table class="table"><thead><tr><th>Rule</th><th>Why it matters</th></tr></thead><tbody><tr><td>Ads excluded from ranking</td><td>Sponsored placements cannot increase Deal Score.</td></tr><tr><td>Estimated rows held back</td><td>Low-confidence prices must be reviewed before appearing as top deals.</td></tr><tr><td>Member prices labeled</td><td>Loyalty-only offers are separated from public shelf prices.</td></tr></tbody></table></section>${dailyDealsLivePanel}`
   },
   {
     path: 'savings/ledger/index.html',
