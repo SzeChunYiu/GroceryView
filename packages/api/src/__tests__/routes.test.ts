@@ -34,4 +34,25 @@ describe('createGroceryViewApi', () => {
     assert.equal(api.getBudgetSummary('user-1').weeklyBudget, 800);
     assert.equal(api.getIndex('stockholm-grocery-index')?.label, 'Stockholm Grocery Index');
   });
+
+  it('rejects invalid mutable route inputs before storing state', () => {
+    const api = createGroceryViewApi();
+
+    assert.throws(() => api.addFavoriteStore('user-1', 'missing-store'), /Unknown storeId/);
+    assert.throws(
+      () => api.addWatchlistItem('user-1', { productId: 'missing-product', targetPrice: 50, alertDealScoreAt: 80, favoriteStoresOnly: true }),
+      /Unknown productId/
+    );
+    assert.throws(
+      () => api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 0, alertDealScoreAt: 80, favoriteStoresOnly: true }),
+      /targetPrice must be positive/
+    );
+    assert.throws(() => api.addBasketItem('user-1', { productId: 'coffee', quantity: 0 }), /quantity must be an integer/);
+    assert.throws(() => api.updateBudget('user-1', { weeklyBudget: -1, monthlyBudget: 3200 }), /weeklyBudget/);
+
+    assert.deepEqual(api.getFavoriteStores('user-1'), []);
+    assert.deepEqual(api.getWatchlist('user-1').items, []);
+    assert.deepEqual(api.getBasket('user-1').items, []);
+    assert.equal(api.getBudgetSummary('user-1').weeklyBudget, 0);
+  });
 });
