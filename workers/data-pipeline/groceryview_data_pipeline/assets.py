@@ -589,6 +589,7 @@ def build_open_prices_launch_readiness_summary(
     ingestion_plan: OpenPricesIngestionRunPlan,
     artifact_import_plan: OpenPricesArtifactImportPlan,
     hosted_smoke_plan: OpenPricesHostedSmokePlan | None = None,
+    schedule_health_plan: OpenPricesScheduleHealthPlan | None = None,
 ) -> OpenPricesLaunchReadinessSummary:
     plans = {
         "open_prices_real_pull_plan": pull_plan,
@@ -597,6 +598,8 @@ def build_open_prices_launch_readiness_summary(
     }
     if hosted_smoke_plan is not None:
         plans["open_prices_hosted_smoke_plan"] = hosted_smoke_plan
+    if schedule_health_plan is not None:
+        plans["open_prices_schedule_health_plan"] = schedule_health_plan
     blockers_by_plan = {
         plan_name: list(plan.required_actions)
         for plan_name, plan in plans.items()
@@ -910,12 +913,14 @@ def open_prices_launch_readiness(
     open_prices_ingestion_run_plan: dict[str, object],
     open_prices_artifact_import_plan: dict[str, object],
     open_prices_hosted_smoke_plan: dict[str, object],
+    open_prices_schedule_health_plan: dict[str, object],
 ) -> dict[str, object]:
     summary = build_open_prices_launch_readiness_summary(
         OpenPricesPullPlan(**open_prices_real_pull_plan),
         OpenPricesIngestionRunPlan(**open_prices_ingestion_run_plan),
         OpenPricesArtifactImportPlan(**open_prices_artifact_import_plan),
         OpenPricesHostedSmokePlan(**open_prices_hosted_smoke_plan),
+        OpenPricesScheduleHealthPlan(**open_prices_schedule_health_plan),
     )
     return summary.to_dict()
 

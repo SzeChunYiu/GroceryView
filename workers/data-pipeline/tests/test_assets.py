@@ -366,17 +366,19 @@ def test_open_prices_launch_readiness_rolls_up_all_open_prices_plans() -> None:
     ingestion = build_open_prices_ingestion_run_plan(open_prices_user_agent_present=True)
     artifact_import = build_open_prices_artifact_import_plan(input_artifact_present=True)
     hosted_smoke = build_open_prices_hosted_smoke_plan()
+    schedule_health = build_open_prices_schedule_health_plan()
 
-    summary = build_open_prices_launch_readiness_summary(pull, ingestion, artifact_import, hosted_smoke)
+    summary = build_open_prices_launch_readiness_summary(pull, ingestion, artifact_import, hosted_smoke, schedule_health)
 
     assert summary.status == "blocked"
     assert summary.ready_plan_count == 1
-    assert summary.blocked_plan_count == 3
+    assert summary.blocked_plan_count == 4
     assert summary.checked_plans == [
         "open_prices_real_pull_plan",
         "open_prices_ingestion_run_plan",
         "open_prices_artifact_import_plan",
         "open_prices_hosted_smoke_plan",
+        "open_prices_schedule_health_plan",
     ]
     assert summary.blockers_by_plan == {
         "open_prices_ingestion_run_plan": [
@@ -393,11 +395,21 @@ def test_open_prices_launch_readiness_rolls_up_all_open_prices_plans() -> None:
             "set_metrics_token",
             "set_imported_terminal_product_id",
         ],
+        "open_prices_schedule_health_plan": [
+            "configure_dagster_deployment_url",
+            "enable_open_prices_ingestion_schedule",
+            "enable_open_prices_import_readiness_schedule",
+            "publish_open_prices_schedule_health_probe",
+        ],
     }
     assert summary.next_actions == [
         "build_groceryview_db_package",
+        "configure_dagster_deployment_url",
         "configure_raw_snapshot_storage",
+        "enable_open_prices_import_readiness_schedule",
+        "enable_open_prices_ingestion_schedule",
         "enable_open_prices_schedule",
+        "publish_open_prices_schedule_health_probe",
         "set_database_url",
         "set_groceryview_server_url",
         "set_imported_terminal_product_id",
@@ -426,6 +438,12 @@ def test_open_prices_launch_readiness_rolls_up_all_open_prices_plans() -> None:
             metrics_token_present=True,
             imported_terminal_product_id_present=True,
         ),
+        build_open_prices_schedule_health_plan(
+            dagster_deployment_url_present=True,
+            ingestion_schedule_enabled=True,
+            import_readiness_schedule_enabled=True,
+            schedule_health_probe_configured=True,
+        ),
     )
     assert ready.status == "ready"
     assert ready.blocked_plan_count == 0
@@ -438,15 +456,16 @@ def test_open_prices_launch_readiness_digest_counts_operator_signals() -> None:
         build_open_prices_ingestion_run_plan(open_prices_user_agent_present=True),
         build_open_prices_artifact_import_plan(input_artifact_present=True),
         build_open_prices_hosted_smoke_plan(),
+        build_open_prices_schedule_health_plan(),
     )
 
     assert summarize_open_prices_launch_readiness(summary).to_dict() == {
         "status": "blocked",
-        "checked_plan_count": 4,
+        "checked_plan_count": 5,
         "ready_plan_count": 1,
-        "blocked_plan_count": 3,
-        "next_action_count": 7,
-        "evidence_field_count": 22,
+        "blocked_plan_count": 4,
+        "next_action_count": 11,
+        "evidence_field_count": 28,
         "hosted_smoke_blocker_count": 3,
         "persistence_blocker_count": 5,
         "demo": False,
@@ -469,6 +488,12 @@ def test_open_prices_launch_readiness_digest_counts_operator_signals() -> None:
             deployment_url_present=True,
             metrics_token_present=True,
             imported_terminal_product_id_present=True,
+        ),
+        build_open_prices_schedule_health_plan(
+            dagster_deployment_url_present=True,
+            ingestion_schedule_enabled=True,
+            import_readiness_schedule_enabled=True,
+            schedule_health_probe_configured=True,
         ),
     )
     ready_digest = summarize_open_prices_launch_readiness(ready_summary)
