@@ -45,6 +45,7 @@ describe('buildStaticPages', () => {
         'stores/compare/index.html',
         'stores/map/index.html',
         'stores/willys-odenplan/index.html',
+        'watchlist/alerts/index.html',
         'watchlist/index.html'
       ]);
 
@@ -252,6 +253,13 @@ describe('buildStaticPages', () => {
       assert.match(watchlist, /Ready for push/);
       assert.match(watchlist, /Held for review/);
       assert.match(watchlist, /Estimated prices cannot trigger household notifications/);
+
+      const watchlistAlerts = await readFile(join(root, 'watchlist/alerts/index.html'), 'utf8');
+      assert.match(watchlistAlerts, /Watchlist alert rules/);
+      assert.match(watchlistAlerts, /Alert rule queue/);
+      assert.match(watchlistAlerts, /Coffee target price/);
+      assert.match(watchlistAlerts, /Estimated or low-confidence prices cannot send target-price alerts/);
+      assert.match(watchlistAlerts, /Suppressed provider tokens stop future sends until the device refreshes/);
 
       const notificationInbox = await readFile(join(root, 'notifications/inbox/index.html'), 'utf8');
       assert.match(notificationInbox, /Grocery alert inbox/);
