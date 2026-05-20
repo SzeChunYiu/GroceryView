@@ -519,7 +519,19 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
         input_artifact_present=True,
         db_package_built=True,
     )
-    ready_gate = build_data_pipeline_quality_gate(quality, freshness, coverage, ready_ingestion, ready_import)
+    ready_hosted_smoke = build_open_prices_hosted_smoke_plan(
+        deployment_url_present=True,
+        metrics_token_present=True,
+        imported_terminal_product_id_present=True,
+    )
+    ready_gate = build_data_pipeline_quality_gate(
+        quality,
+        freshness,
+        coverage,
+        ready_ingestion,
+        ready_import,
+        ready_hosted_smoke,
+    )
     assert ready_gate.to_dict() == {
         "status": "ready",
         "blockers": [],
@@ -531,6 +543,7 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
             "price_observation_coverage",
             "open_prices_ingestion_run_plan",
             "open_prices_artifact_import_plan",
+            "open_prices_hosted_smoke_plan",
         ],
         "demo": True,
     }
@@ -560,6 +573,19 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
     assert blocked_import_gate.status == "blocked"
     assert blocked_import_gate.blockers == ["open_prices_artifact_import_plan_blocked"]
     assert blocked_import_gate.checked_assets[-1] == "open_prices_artifact_import_plan"
+
+    blocked_hosted_smoke = build_open_prices_hosted_smoke_plan(imported_terminal_product_id_present=True)
+    blocked_hosted_gate = build_data_pipeline_quality_gate(
+        quality,
+        freshness,
+        coverage,
+        ready_ingestion,
+        ready_import,
+        blocked_hosted_smoke,
+    )
+    assert blocked_hosted_gate.status == "blocked"
+    assert blocked_hosted_gate.blockers == ["open_prices_hosted_smoke_plan_blocked"]
+    assert blocked_hosted_gate.checked_assets[-1] == "open_prices_hosted_smoke_plan"
 
 
 def test_data_pipeline_quality_gate_digest_counts_blocker_classes() -> None:

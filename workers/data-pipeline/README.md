@@ -13,6 +13,7 @@ Dagster scaffold for the GroceryView data-worker lane.
 - A data pipeline quality gate that combines provenance, freshness, rollup, and coverage checks.
 - The quality gate also checks `open_prices_ingestion_run_plan`, so scheduled Open Prices ingestion remains blocked until database, raw snapshot storage, User-Agent, and schedule gates are configured.
 - The quality gate also checks `open_prices_artifact_import_plan`, so the Open Prices handoff cannot pass until the PostgreSQL import command has its database URL, input artifact, and built DB package.
+- The quality gate also checks `open_prices_hosted_smoke_plan`, so launch readiness remains blocked until hosted API, imported product-terminal, and PostgreSQL readiness smoke prerequisites are configured.
 - Open Prices real-data pull plan asset with required User-Agent, endpoint, parser, smoke command, and evidence fields.
 - Open Prices artifact import plan asset with the PostgreSQL import command, required env, database targets, and persisted evidence fields.
 - Open Prices ingestion run plan asset with schedule, persistence targets, idempotency keys, and fail-closed deployment requirements.
