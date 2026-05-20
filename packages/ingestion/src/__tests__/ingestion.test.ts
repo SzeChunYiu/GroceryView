@@ -1,10 +1,15 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { gzipSync } from 'node:zlib';
 import {
+  buildOpenFoodFactsProductUrl,
   buildOpenPricesConnectorUrl,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
   confidenceForSource,
+  fetchOpenFoodFactsExportProducts,
+  fetchOpenFoodFactsProducts,
+  OPENFOODFACTS_EXPORT_URL,
   fetchRetailerConnectorSnapshot,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -41,6 +46,78 @@ describe('confidenceForSource', () => {
     assert.equal(confidenceForSource('flyer_campaign'), 0.7);
     assert.equal(confidenceForSource('manual_user_report'), 0.5);
     assert.equal(confidenceForSource('estimated'), 0.25);
+  });
+});
+
+describe('fetchOpenFoodFactsProducts', () => {
+  it('fetches product rows from the public product API with provenance', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify({
+        status: 1,
+        product: {
+          code: '7340083494406',
+          product_name: 'Havredryck choklad',
+          brands: 'Eldorado',
+          quantity: '1 l',
+          categories_tags: ['en:beverages', 'en:dairy-substitutes'],
+          labels_tags: ['en:vegan'],
+          nutriscore_grade: 'd',
+          image_front_url: 'https://images.openfoodfacts.org/images/products/734/008/349/4406/front_sv.11.400.jpg',
+          url: 'https://world.openfoodfacts.org/product/7340083494406/havredryck-choklad-eldorado'
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchOpenFoodFactsProducts({
+      codes: ['7340083494406'],
+      fetchImpl,
+      retrievedAt: '2026-05-20T23:29:26.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildOpenFoodFactsProductUrl('7340083494406'));
+    assert.deepEqual(rows, [{
+      code: '7340083494406',
+      name: 'Havredryck choklad',
+      brands: 'Eldorado',
+      quantity: '1 l',
+      categories: ['en:beverages', 'en:dairy-substitutes'],
+      labels: ['en:vegan'],
+      nutriscoreGrade: 'd',
+      imageUrl: 'https://images.openfoodfacts.org/images/products/734/008/349/4406/front_sv.11.400.jpg',
+      productUrl: 'https://world.openfoodfacts.org/product/7340083494406/havredryck-choklad-eldorado',
+      sourceUrl: buildOpenFoodFactsProductUrl('7340083494406'),
+      retrievedAt: '2026-05-20T23:29:26.000Z'
+    }]);
+  });
+});
+
+describe('fetchOpenFoodFactsExportProducts', () => {
+  it('streams real product rows from the official OpenFoodFacts TSV export', async () => {
+    const tsv = [
+      'code\turl\tproduct_name\tquantity\tbrands\tcategories_tags\tlabels_tags\tnutriscore_grade\timage_url',
+      '7340083494406\thttps://world.openfoodfacts.org/product/7340083494406/havredryck-choklad-eldorado\tHavredryck choklad\t1 l\tEldorado\ten:beverages,en:dairy-substitutes\ten:vegan\td\thttps://images.openfoodfacts.org/images/products/734/008/349/4406/front_sv.11.400.jpg'
+    ].join('\n');
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(gzipSync(tsv), { status: 200, headers: { 'content-type': 'application/gzip' } });
+    };
+
+    const rows = await fetchOpenFoodFactsExportProducts({
+      codes: ['7340083494406'],
+      fetchImpl,
+      maxRows: 1,
+      retrievedAt: '2026-05-20T23:32:06.000Z'
+    });
+
+    assert.equal(requestedUrls[0], OPENFOODFACTS_EXPORT_URL);
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].code, '7340083494406');
+    assert.equal(rows[0].name, 'Havredryck choklad');
+    assert.deepEqual(rows[0].categories, ['en:beverages', 'en:dairy-substitutes']);
+    assert.equal(rows[0].sourceUrl, `${OPENFOODFACTS_EXPORT_URL}#code=7340083494406`);
   });
 });
 

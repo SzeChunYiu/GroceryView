@@ -1,5 +1,7 @@
 import { createHash } from 'node:crypto';
 
+export * from './connectors/openfoodfacts.js';
+
 export type SourceType =
   | 'official_api'
   | 'retailer_online_page'

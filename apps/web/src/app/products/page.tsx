@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { pricedProducts, categoryLabels } from '@/lib/openprices-products';
+import { openFoodFactsProducts, openFoodFactsSource } from '@/lib/ingested/openfoodfacts';
 
 export const dynamic = 'force-static';
 
@@ -33,6 +34,9 @@ export default function ProductsIndexPage() {
           Every price below is an observed SEK price submitted by a real shopper, with date.
           Per-store linkage is being added as the ingestion pipeline matures.
         </p>
+        <p className="mt-2 text-sm font-semibold text-market-ink/55">
+          OpenFoodFacts export ingest: {openFoodFactsSource.rowCount} verified product rows retrieved {openFoodFactsSource.retrievedAt.slice(0, 10)}.
+        </p>
       </header>
 
       <section className="mb-8 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -47,6 +51,27 @@ export default function ProductsIndexPage() {
             </p>
           </Link>
         ))}
+      </section>
+
+      <section className="mb-8 rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid grid-cols-[2fr_1fr_1fr_0.8fr] border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
+          <span>OpenFoodFacts product</span>
+          <span>Brand</span>
+          <span>Quantity</span>
+          <span>Nutri-Score</span>
+        </div>
+        <ul className="divide-y divide-market-ink/5">
+          {openFoodFactsProducts.slice(0, 12).map((p) => (
+            <li key={p.code} className="grid grid-cols-[2fr_1fr_1fr_0.8fr] gap-3 px-4 py-2 text-sm hover:bg-market-oat/40">
+              <a href={p.productUrl} className="truncate font-semibold text-market-ink hover:text-market-mint" title={p.name}>
+                {p.name}
+              </a>
+              <span className="truncate text-market-ink/65">{p.brands || 'unknown'}</span>
+              <span className="truncate text-market-ink/65">{p.quantity || 'unknown'}</span>
+              <span className="text-xs font-black uppercase text-market-ink/55">{p.nutriscoreGrade}</span>
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="rounded-lg border border-market-ink/10 bg-white">
