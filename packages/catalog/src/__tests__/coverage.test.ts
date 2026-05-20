@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildCatalogCoverageReport, buildMyStoresCoverageReport } from '../index.js';
+import { buildCatalogCoverageReport, buildCatalogFreshnessReport } from '../index.js';
 
 describe('buildCatalogCoverageReport', () => {
   it('quantifies category, chain, and store coverage gaps against launch targets', () => {
@@ -80,5 +81,58 @@ describe('buildMyStoresCoverageReport', () => {
       coveragePercent: 41.67,
       mobileActions: ['show_my_stores_deals', 'backfill_favorite_store_prices', 'broaden_to_nearby_stores']
     });
+describe('buildCatalogFreshnessReport', () => {
+  it('flags stale and never-observed products for backfill', () => {
+    const report = buildCatalogFreshnessReport({
+      now: '2026-05-20T00:00:00.000Z',
+      maxAgeDays: 7,
+      products: [
+        { id: 'coffee', categoryId: 'pantry', lastObservedAt: '2026-05-19T00:00:00.000Z' },
+        { id: 'milk', categoryId: 'dairy', lastObservedAt: '2026-05-01T00:00:00.000Z' },
+        { id: 'eggs', categoryId: 'dairy' }
+      ]
+    });
+
+    assert.equal(report.status, 'stale');
+    assert.equal(report.productCount, 3);
+    assert.equal(report.freshCount, 1);
+    assert.equal(report.staleCount, 1);
+    assert.equal(report.neverObservedCount, 1);
+    assert.deepEqual(report.requiredActions, ['backfill_stale_catalog:eggs,milk']);
+    assert.deepEqual(
+      report.products.map((product) => ({ id: product.id, ageDays: product.ageDays, status: product.status })),
+      [
+        { id: 'eggs', ageDays: null, status: 'never_observed' },
+        { id: 'milk', ageDays: 19, status: 'stale' },
+        { id: 'coffee', ageDays: 1, status: 'fresh' }
+      ]
+    );
+  });
+
+  it('passes when every product is within the freshness window', () => {
+    const report = buildCatalogFreshnessReport({
+      now: '2026-05-20T00:00:00.000Z',
+      maxAgeDays: 3,
+      products: [
+        { id: 'coffee', categoryId: 'pantry', lastObservedAt: '2026-05-18T12:00:00.000Z' },
+        { id: 'milk', categoryId: 'dairy', lastObservedAt: '2026-05-19T00:00:00.000Z' }
+      ]
+    });
+
+    assert.equal(report.status, 'fresh');
+    assert.equal(report.freshCount, 2);
+    assert.deepEqual(report.requiredActions, []);
+  });
+
+  it('rejects future observation timestamps', () => {
+    assert.throws(
+      () =>
+        buildCatalogFreshnessReport({
+          now: '2026-05-20T00:00:00.000Z',
+          maxAgeDays: 3,
+          products: [{ id: 'coffee', categoryId: 'pantry', lastObservedAt: '2026-05-21T00:00:00.000Z' }]
+        }),
+      /lastObservedAt for coffee cannot be in the future/
+    );
   });
 });
