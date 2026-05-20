@@ -378,13 +378,24 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
         raw_snapshot_storage_present=True,
         schedule_enabled=True,
     )
-    ready_gate = build_data_pipeline_quality_gate(quality, freshness, coverage, ready_ingestion)
+    ready_import = build_open_prices_artifact_import_plan(
+        database_url_present=True,
+        input_artifact_present=True,
+        db_package_built=True,
+    )
+    ready_gate = build_data_pipeline_quality_gate(quality, freshness, coverage, ready_ingestion, ready_import)
     assert ready_gate.to_dict() == {
         "status": "ready",
         "blockers": [],
         "observation_count": len(observations),
         "latest_rollup_count": len(latest),
-        "checked_assets": ["quality_checks", "price_observation_freshness", "price_observation_coverage", "open_prices_ingestion_run_plan"],
+        "checked_assets": [
+            "quality_checks",
+            "price_observation_freshness",
+            "price_observation_coverage",
+            "open_prices_ingestion_run_plan",
+            "open_prices_artifact_import_plan",
+        ],
         "demo": True,
     }
 
@@ -407,6 +418,12 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
     assert blocked_open_prices_gate.status == "blocked"
     assert blocked_open_prices_gate.blockers == ["open_prices_ingestion_plan_blocked"]
     assert blocked_open_prices_gate.checked_assets[-1] == "open_prices_ingestion_run_plan"
+
+    blocked_import = build_open_prices_artifact_import_plan(input_artifact_present=True)
+    blocked_import_gate = build_data_pipeline_quality_gate(quality, freshness, coverage, ready_ingestion, blocked_import)
+    assert blocked_import_gate.status == "blocked"
+    assert blocked_import_gate.blockers == ["open_prices_artifact_import_plan_blocked"]
+    assert blocked_import_gate.checked_assets[-1] == "open_prices_artifact_import_plan"
 
 
 def test_data_pipeline_quality_gate_digest_counts_blocker_classes() -> None:
@@ -433,5 +450,6 @@ def test_data_pipeline_quality_gate_digest_counts_blocker_classes() -> None:
         "coverage_blockers": 1,
         "duplicate_blockers": 0,
         "volume_blockers": 2,
+        "ingestion_blockers": 0,
         "demo": True,
     }
