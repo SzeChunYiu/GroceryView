@@ -32,9 +32,11 @@ import {
 } from '@groceryview/core';
 import {
   formatNotificationOperationsMetrics,
+  parseNotificationSuppressionWebhook,
   processNotificationSuppressionEvent,
   type DeliveryChannel,
   type NotificationOperationsReport,
+  type NotificationSuppressionWebhookProvider,
   type NotificationSuppressionEventType,
   type NotificationSuppressionMutation
 } from '@groceryview/notifications';
@@ -142,6 +144,11 @@ function optionalDeliveryChannel(value: unknown): DeliveryChannel | undefined {
 function requiredSuppressionEventType(value: unknown): NotificationSuppressionEventType {
   if (value === 'unsubscribe' || value === 'bounce' || value === 'complaint' || value === 'resubscribe') return value;
   throw new Error('eventType must be unsubscribe, bounce, complaint, or resubscribe.');
+}
+
+function requiredSuppressionWebhookProvider(value: unknown): NotificationSuppressionWebhookProvider {
+  if (value === 'sendgrid' || value === 'ses') return value;
+  throw new Error('provider must be sendgrid or ses.');
 }
 
 function optionalNumber(value: unknown, field: string): number | undefined {
@@ -472,6 +479,37 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         );
       }
 
+      if (method === 'POST' && path === '/api/notifications/provider-suppression-events') {
+        if (!authOptions.notificationWebhookSecret) return errorResponse(503, 'Notification webhook secret is not configured.');
+
+        const rawBody = request.body ? await request.text() : '';
+        if (!hasValidNotificationWebhookSignature(request, rawBody, authOptions.notificationWebhookSecret)) {
+          return errorResponse(401, 'A valid notification webhook signature is required.');
+        }
+
+        const sink = authOptions.notificationSuppressionSink;
+        if (!sink) return errorResponse(503, 'Notification suppression sink is not configured.');
+
+        const provider = requiredSuppressionWebhookProvider(url.searchParams.get('provider'));
+        const events = parseNotificationSuppressionWebhook({
+          provider,
+          payload: JSON.parse(rawBody) as unknown,
+          receivedAt: (authOptions.now ?? new Date()).toISOString()
+        });
+        const suppressions = events.map((event) => processNotificationSuppressionEvent(event));
+        for (const suppression of suppressions) {
+          await sink.upsertNotificationSuppression(suppression);
+        }
+        return jsonResponse(
+          {
+            accepted: true,
+            persisted: suppressions.length,
+            suppressionIds: suppressions.map((suppression) => suppression.id)
+          },
+          { status: 202 }
+        );
+      }
+
       if (method === 'POST' && path === '/api/billing/subscription-events') {
         if (!authOptions.billingWebhookSecret) return errorResponse(503, 'Billing webhook secret is not configured.');
 
@@ -705,7 +743,8 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/human-review/assignments/{id}/decisions': { post: protectedOperation('Record a human-review decision.') },
       '/api/metrics/notifications': { get: metricsOperation('Export notification operations metrics.') },
       '/api/readiness/postgres': { get: metricsOperation('Check PostgreSQL schema and migration readiness without exposing database secrets.') },
-      '/api/notifications/suppression-events': { post: webhookOperation('Accept signed notification suppression provider events.') }
+      '/api/notifications/suppression-events': { post: webhookOperation('Accept signed normalized notification suppression events.') },
+      '/api/notifications/provider-suppression-events': { post: webhookOperation('Accept signed SendGrid or SES suppression payloads.') }
     }
   };
 }
