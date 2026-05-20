@@ -29,6 +29,7 @@ describe('buildStaticPages', () => {
         'meal-plans/index.html',
         'notifications/inbox/index.html',
         'nutrition/allergens/index.html',
+        'nutrition/labels/index.html',
         'pantry/index.html',
         'prices/anomalies/index.html',
         'prices/confidence/index.html',
@@ -281,6 +282,13 @@ describe('buildStaticPages', () => {
       assert.match(nutritionAllergens, /Peanut granola/);
       assert.match(nutritionAllergens, /Blocked allergens outrank price savings and Deal Score/);
       assert.match(nutritionAllergens, /Diet conflicts stop meal-plan and basket updates until reviewed/);
+
+      const nutritionLabels = await readFile(join(root, 'nutrition/labels/index.html'), 'utf8');
+      assert.match(nutritionLabels, /Nutrition label confidence/);
+      assert.match(nutritionLabels, /Label review queue/);
+      assert.match(nutritionLabels, /Greek yoghurt 1kg/);
+      assert.match(nutritionLabels, /Calories, protein, sugar, salt, and package size must be present/);
+      assert.match(nutritionLabels, /OCR-only label data cannot approve meal-plan swaps/);
 
       const household = await readFile(join(root, 'household/index.html'), 'utf8');
       assert.match(household, /Shared household basket/);
