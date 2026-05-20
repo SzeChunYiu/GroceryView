@@ -234,6 +234,15 @@ describe('buildStaticPages', () => {
       assert.match(storeComparison, /Verified coverage/);
       assert.match(storeComparison, /Low-confidence rows/);
       assert.match(storeComparison, /Low-confidence receipt rows stay out of Deal Score/);
+      assert.match(storeComparison, /Connected store comparison API/);
+      assert.match(storeComparison, /Load live store comparison/);
+      assert.match(storeComparison, /data-groceryview-flow="store-comparison"/);
+      assert.match(storeComparison, /data-flow-action="load-store-comparison"/);
+      assert.match(storeComparison, /data-store-comparison-best/);
+      assert.match(storeComparison, /data-store-comparison-split/);
+      assert.match(storeComparison, /data-store-comparison-coverage/);
+      assert.match(storeComparison, /fetch\(apiUrl\('\/api\/basket\/compare'/);
+      assert.match(storeComparison, /Connected store comparison loaded/);
 
       const storeMap = await readFile(join(root, 'stores/map/index.html'), 'utf8');
       assert.match(storeMap, /Stockholm store map/);
