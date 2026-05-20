@@ -269,6 +269,12 @@ const catalogCoverageRows = [
   { category: 'Pantry', products: 42, coverage: '74%', freshness: 'Fresh this week', action: 'Parse missing unit prices' }
 ];
 
+const retailerFreshnessRows = [
+  { retailer: 'Willys', lastScrape: '2026-05-20 07:45', health: 'Healthy', eligibleRows: '94%', action: 'Keep publishing' },
+  { retailer: 'ICA', lastScrape: '2026-05-20 07:30', health: 'Healthy', eligibleRows: '91%', action: 'Backfill loyalty labels' },
+  { retailer: 'Coop', lastScrape: '2026-05-19 18:20', health: 'Stale feed', eligibleRows: '73%', action: 'Pause new alerts' }
+];
+
 const index = calculateFixedBasketIndex({
   id: 'stockholm-grocery-index',
   label: 'Stockholm Grocery Index',
@@ -445,6 +451,16 @@ app.innerHTML = `
           <thead><tr><th>Category</th><th>Products</th><th>Coverage</th><th>Freshness</th><th>Action</th></tr></thead>
           <tbody>
             ${catalogCoverageRows.map((row) => `<tr><td>${row.category}</td><td>${row.products}</td><td>${row.coverage}</td><td>${row.freshness}</td><td>${row.action}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Retailer freshness</h2>
+        <p class="lede"><a href="/retailers/freshness/">Open retailer freshness</a> to audit parser health before stale rows power alerts.</p>
+        <table class="table">
+          <thead><tr><th>Retailer</th><th>Last scrape</th><th>Health</th><th>Eligible rows</th><th>Action</th></tr></thead>
+          <tbody>
+            ${retailerFreshnessRows.map((row) => `<tr><td>${row.retailer}</td><td>${row.lastScrape}</td><td><span class="status">${row.health}</span></td><td>${row.eligibleRows}</td><td>${row.action}</td></tr>`).join('')}
           </tbody>
         </table>
       </div>
