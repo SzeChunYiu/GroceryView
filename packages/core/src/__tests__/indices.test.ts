@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateBasketTypeIndices, calculateFixedBasketIndex } from '../index.js';
+import { calculateBrandTierIndices, calculateFixedBasketIndex } from '../index.js';
 
 describe('calculateFixedBasketIndex', () => {
   it('normalizes a fixed grocery basket against a base date', () => {
@@ -20,60 +20,32 @@ describe('calculateFixedBasketIndex', () => {
     assert.equal(index.confidence, 'medium');
   });
 
-  it('calculates lifestyle basket indices with chain, area, and driver signals', () => {
-    const indices = calculateBasketTypeIndices({
-      baseDate: '2026-01-01',
-      currentDate: '2026-05-20',
-      baskets: [
-        {
-          type: 'student',
-          label: 'Student Basket Index',
-          oneWeekMovementPercent: -1.8,
-          oneMonthMovementPercent: 2.4,
-          chainTotals: [
-            { chain: 'ICA', total: 412 },
-            { chain: 'Lidl', total: 374 },
-            { chain: 'Coop', total: 398 }
-          ],
-          areaTotals: [
-            { area: 'Odenplan', total: 392 },
-            { area: 'Kista', total: 368 }
-          ],
-          components: [
-            { productId: 'coffee', category: 'Coffee', baseUnitPrice: 100, currentUnitPrice: 92.8, weight: 2 },
-            { productId: 'pasta', category: 'Pasta', baseUnitPrice: 100, currentUnitPrice: 98, weight: 3 },
-            { productId: 'eggs', category: 'Eggs', baseUnitPrice: 100, currentUnitPrice: 103, weight: 1 }
-          ]
-        },
-        {
-          type: 'family',
-          label: 'Family Basket Index',
-          oneWeekMovementPercent: 0.6,
-          oneMonthMovementPercent: 3.1,
-          chainTotals: [
-            { chain: 'Willys', total: 1120 },
-            { chain: 'Hemköp', total: 1214 }
-          ],
-          areaTotals: [
-            { area: 'Solna', total: 1098 },
-            { area: 'Södermalm', total: 1180 }
-          ],
-          components: [
-            { productId: 'milk', category: 'Dairy', baseUnitPrice: 100, currentUnitPrice: 106, weight: 3 },
-            { productId: 'diapers', category: 'Baby', baseUnitPrice: 100, currentUnitPrice: 104, weight: 2 }
-          ]
-        }
-      ]
-    });
+  it('separates brand-tier indices and summarizes private-label savings', () => {
+    const summary = calculateBrandTierIndices([
+      { brandTier: 'national', category: 'Coffee', baseUnitPrice: 100, currentUnitPrice: 110 },
+      { brandTier: 'national', category: 'Pasta', baseUnitPrice: 100, currentUnitPrice: 105 },
+      { brandTier: 'national', category: 'Cleaning', baseUnitPrice: 100, currentUnitPrice: 120 },
+      { brandTier: 'premium', category: 'Coffee', baseUnitPrice: 100, currentUnitPrice: 135 },
+      { brandTier: 'premium', category: 'Pasta', baseUnitPrice: 100, currentUnitPrice: 130 },
+      { brandTier: 'premium', category: 'Cleaning', baseUnitPrice: 100, currentUnitPrice: 140 },
+      { brandTier: 'budget_private_label', category: 'Coffee', baseUnitPrice: 100, currentUnitPrice: 78 },
+      { brandTier: 'budget_private_label', category: 'Pasta', baseUnitPrice: 100, currentUnitPrice: 80 },
+      { brandTier: 'budget_private_label', category: 'Cleaning', baseUnitPrice: 100, currentUnitPrice: 82 },
+      { brandTier: 'standard_private_label', category: 'Coffee', baseUnitPrice: 100, currentUnitPrice: 90 },
+      { brandTier: 'standard_private_label', category: 'Pasta', baseUnitPrice: 100, currentUnitPrice: 88 },
+      { brandTier: 'standard_private_label', category: 'Cleaning', baseUnitPrice: 100, currentUnitPrice: 92 }
+    ]);
 
-    assert.equal(indices[0].label, 'Student Basket Index');
-    assert.equal(indices[0].value, 97.1);
-    assert.equal(indices[0].oneWeekMovementPercent, -1.8);
-    assert.equal(indices[0].oneMonthMovementPercent, 2.4);
-    assert.equal(indices[0].cheapestChain, 'Lidl');
-    assert.equal(indices[0].cheapestArea, 'Kista');
-    assert.equal(indices[0].biggestDriver, 'Coffee -7.2%');
-    assert.equal(indices[1].label, 'Family Basket Index');
-    assert.equal(indices[1].cheapestChain, 'Willys');
+    assert.deepEqual(summary.indices.map((index) => index.label), [
+      'Budget Private Label Index',
+      'Standard Private Label Index',
+      'National Brand Index',
+      'Premium Brand Index'
+    ]);
+    assert.equal(summary.indices[0].value, 80);
+    assert.equal(summary.indices[0].categoryCount, 3);
+    assert.equal(summary.privateLabelSavingsPercent, 23.71);
+    assert.deepEqual(summary.highestSavingsCategories, ['Cleaning', 'Coffee', 'Pasta']);
+    assert.equal(summary.premiumGapPercent, 58.82);
   });
 });
