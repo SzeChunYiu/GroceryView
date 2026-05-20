@@ -2,6 +2,7 @@ from groceryview_data_pipeline.assets import (
     build_latest_price_rollup,
     build_normalized_products,
     build_observation_freshness_summary,
+    build_open_prices_pull_plan,
     build_price_observations,
     build_quality_checks,
     build_retailer_fetch_stubs,
@@ -50,6 +51,27 @@ def test_data_pipeline_assets_cover_the_expected_lane_contract() -> None:
 
     round_tripped = PriceProvenance(**first_stub.provenance.to_dict())
     assert round_tripped.parser_version == first_stub.provenance.parser_version
+
+
+def test_open_prices_pull_plan_exposes_real_data_smoke_requirements() -> None:
+    plan = build_open_prices_pull_plan()
+
+    assert plan.status == "blocked"
+    assert plan.source_type == "open_data"
+    assert plan.parser_version == "open-prices-v1"
+    assert plan.endpoint_url == "https://prices.openfoodfacts.org/api/v1/prices?currency=SEK&size=10&location__osm_address_country_code=SE&order_by=-date"
+    assert plan.required_env == ["OPEN_PRICES_USER_AGENT"]
+    assert plan.required_actions == ["set_open_prices_user_agent", "run_open_prices_smoke"]
+    assert plan.smoke_command == "OPEN_PRICES_USER_AGENT=<app/version contact> infra/scripts/smoke-open-prices.sh"
+    assert plan.evidence_fields == [
+        "sourceUrl",
+        "statusCode",
+        "contentHash",
+        "rawSnapshotRef",
+        "acceptedCount",
+        "firstProduct",
+    ]
+    assert plan.to_dict()["demo"] is False
 
 
 def test_latest_price_rollup_picks_latest_observation() -> None:
