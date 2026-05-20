@@ -124,6 +124,50 @@ describe('createGroceryViewApi', () => {
     assert.deepEqual(api.getProductEquivalents('missing-product'), []);
   });
 
+  it('builds a price freshness report with stale backfill actions', () => {
+    const api = createGroceryViewApi();
+
+    assert.deepEqual(api.getPriceFreshnessReport('2026-05-20').summary, { fresh: 3, aging: 0, stale: 0 });
+
+    const report = api.getPriceFreshnessReport('2026-06-03T00:00:00.000Z');
+    assert.deepEqual(report.thresholds, { agingAfterDays: 7, staleAfterDays: 14 });
+    assert.deepEqual(report.summary, { fresh: 0, aging: 0, stale: 3 });
+    assert.deepEqual(report.backfillProductIds, ['butter', 'coffee', 'milk']);
+    assert.deepEqual(
+      report.products.map((product) => ({
+        productId: product.productId,
+        latestVerifiedPriceDate: product.latestVerifiedPriceDate,
+        ageDays: product.ageDays,
+        status: product.status,
+        action: product.action
+      })),
+      [
+        {
+          productId: 'coffee',
+          latestVerifiedPriceDate: '2026-05-19',
+          ageDays: 15,
+          status: 'stale',
+          action: 'prioritize_manual_or_feed_refresh'
+        },
+        {
+          productId: 'milk',
+          latestVerifiedPriceDate: '2026-05-19',
+          ageDays: 15,
+          status: 'stale',
+          action: 'prioritize_manual_or_feed_refresh'
+        },
+        {
+          productId: 'butter',
+          latestVerifiedPriceDate: '2026-05-19',
+          ageDays: 15,
+          status: 'stale',
+          action: 'prioritize_manual_or_feed_refresh'
+        }
+      ]
+    );
+    assert.throws(() => api.getPriceFreshnessReport('June 3, 2026'), /asOf must be an ISO timestamp/);
+  });
+
   it('supports favorite stores, watchlist, basket, budget, and index endpoints', () => {
     const api = createGroceryViewApi();
 

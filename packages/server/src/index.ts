@@ -676,6 +676,10 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return jsonResponse(api.getStoreDeals(decodeURIComponent(storeDealsMatch[1])));
       }
 
+      if (method === 'GET' && path === '/api/prices/freshness') {
+        return jsonResponse(api.getPriceFreshnessReport(url.searchParams.get('asOf') ?? undefined));
+      }
+
       if (method === 'GET' && path === '/api/products/search') {
         return jsonResponse(api.searchProducts(url.searchParams.get('q') ?? ''));
       }
@@ -960,6 +964,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/products/{id}/equivalents': { get: publicOperation('Get comparable products in the same category.') },
       '/api/products/{id}/prices': { get: publicOperation('Get product prices by store.') },
       '/api/products/{id}/history': { get: publicOperation('Get product price history.') },
+      '/api/prices/freshness': { get: publicOperation('Get price freshness and stale-price backfill queue.') },
       '/api/households/current': {
         get: protectedOperation('Get the signed-in user household plan.'),
         put: protectedOperation('Create or replace the signed-in user household plan and budget summary.')
