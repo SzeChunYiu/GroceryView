@@ -41,8 +41,7 @@ describe('createHttpHandler', () => {
         hasAuthSecret: true,
         hasNotificationWebhookSecret: true,
         hasBillingWebhookSecret: true,
-        hasMetricsToken: true,
-        hasScanUploadStorage: false
+        hasMetricsToken: true
       });
       assert.equal(JSON.stringify(body).includes('groceryview.example'), false);
     } finally {

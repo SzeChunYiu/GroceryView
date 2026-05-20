@@ -90,12 +90,7 @@ describe('runtime config', () => {
       PUBLIC_WEB_URL: 'https://groceryview.example',
       NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
-      METRICS_TOKEN: 'metrics-token',
-      S3_ENDPOINT: 'http://localhost:9000',
-      S3_REGION: 'us-east-1',
-      S3_BUCKET: 'groceryview-raw',
-      S3_ACCESS_KEY_ID: 'groceryview',
-      S3_SECRET_ACCESS_KEY: 'storage-secret'
+      METRICS_TOKEN: 'metrics-token'
     });
 
     assert.deepEqual(config, {
@@ -106,12 +101,7 @@ describe('runtime config', () => {
       publicWebUrl: 'https://groceryview.example',
       notificationWebhookSecret: 'webhook-secret',
       billingWebhookSecret: 'billing-webhook-secret',
-      metricsToken: 'metrics-token',
-      s3Endpoint: 'http://localhost:9000',
-      s3Region: 'us-east-1',
-      s3Bucket: 'groceryview-raw',
-      s3AccessKeyId: 'groceryview',
-      s3SecretAccessKey: 'storage-secret'
+      metricsToken: 'metrics-token'
     });
   });
 
@@ -173,8 +163,7 @@ describe('runtime config', () => {
       hasAuthSecret: false,
       hasNotificationWebhookSecret: false,
       hasBillingWebhookSecret: false,
-      hasMetricsToken: false,
-      hasScanUploadStorage: false
+      hasMetricsToken: false
     });
   });
 
@@ -201,8 +190,7 @@ describe('runtime config', () => {
       hasAuthSecret: true,
       hasNotificationWebhookSecret: true,
       hasBillingWebhookSecret: true,
-      hasMetricsToken: true,
-      hasScanUploadStorage: false
+      hasMetricsToken: true
     });
 
     const protectedAccountRoute = await handle(new Request('http://localhost/api/account/subscription-access?userId=user-1'));
@@ -212,71 +200,6 @@ describe('runtime config', () => {
       headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
     }));
     assert.equal(metricsRoute.status, 503);
-  });
-
-  it('wires S3-compatible scan upload tickets from runtime storage environment', async () => {
-    const authSecret = 'auth-secret';
-    const handle = createRuntimeHttpHandler(
-      {
-        NODE_ENV: 'development',
-        PORT: '3000',
-        AUTH_SECRET: authSecret,
-        DATABASE_URL: 'postgres://example',
-        PUBLIC_WEB_URL: 'https://groceryview.example',
-        NOTIFICATION_WEBHOOK_SECRET: 'notification-secret',
-        BILLING_WEBHOOK_SECRET: 'billing-secret',
-        METRICS_TOKEN: 'metrics-secret',
-        S3_ENDPOINT: 'http://localhost:9000',
-        S3_REGION: 'us-east-1',
-        S3_BUCKET: 'groceryview-raw',
-        S3_ACCESS_KEY_ID: 'groceryview',
-        S3_SECRET_ACCESS_KEY: 'storage-secret',
-        SCAN_UPLOAD_MAX_BYTES: '5000000'
-      },
-      { now: new Date('2026-05-20T08:30:00.000Z') }
-    );
-    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, authSecret);
-
-    const response = await handle(new Request('http://localhost/api/scans/upload-url?userId=user-1', {
-      method: 'POST',
-      headers: { authorization: `Bearer ${token}` },
-      body: JSON.stringify({
-        scanId: 'receipt-1',
-        kind: 'receipt',
-        contentType: 'image/jpeg',
-        byteLength: 123456
-      })
-    }));
-
-    assert.equal(response.status, 200);
-    const payload = await response.json() as {
-      result: {
-        status: string;
-        ticket: {
-          scanId: string;
-          uploadUrl: string;
-          payloadUri: string;
-          expiresAt: string;
-          maxBytes: number;
-          headers: Record<string, string>;
-        };
-      };
-    };
-    assert.equal(payload.result.status, 'ready');
-    assert.equal(payload.result.ticket.scanId, 'receipt-1');
-    assert.equal(payload.result.ticket.payloadUri, 's3://groceryview-raw/scan-uploads/receipt/receipt-1');
-    assert.equal(payload.result.ticket.expiresAt, '2026-05-20T08:40:00.000Z');
-    assert.equal(payload.result.ticket.maxBytes, 5_000_000);
-    assert.deepEqual(payload.result.ticket.headers, { 'content-type': 'image/jpeg' });
-    const uploadUrl = new URL(payload.result.ticket.uploadUrl);
-    assert.equal(uploadUrl.origin, 'http://localhost:9000');
-    assert.equal(uploadUrl.pathname, '/groceryview-raw/scan-uploads/receipt/receipt-1');
-    assert.equal(uploadUrl.searchParams.get('X-Amz-Algorithm'), 'AWS4-HMAC-SHA256');
-    assert.equal(uploadUrl.searchParams.get('X-Amz-SignedHeaders'), 'content-type;host');
-    assert.equal(uploadUrl.searchParams.get('X-Amz-Expires'), '600');
-    assert.match(uploadUrl.searchParams.get('X-Amz-Credential') ?? '', /^groceryview\/20260520\/us-east-1\/s3\/aws4_request$/);
-    assert.match(uploadUrl.searchParams.get('X-Amz-Signature') ?? '', /^[0-9a-f]{64}$/);
-    assert.equal(payload.result.ticket.uploadUrl.includes('storage-secret'), false);
   });
 
   it('wires repository-backed runtime sinks into account access and billing webhooks', async () => {
