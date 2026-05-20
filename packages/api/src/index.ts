@@ -35,10 +35,16 @@ import {
   type WatchlistItem
 } from '@groceryview/core';
 import {
+  buildAdDeliveryComplianceReport,
+  buildAdPlacementPlan,
   buildSubscriptionAccessPolicy,
+  type AdDeliveryComplianceReport,
+  type AdPlacementPlan,
+  type AdSurface,
   type SubscriptionAccessPolicy,
   type SubscriptionEntitlementSnapshot,
-  type SubscriptionPlan
+  type SubscriptionPlan,
+  type UserTier
 } from '@groceryview/monetization';
 
 export type Store = {
@@ -475,6 +481,19 @@ export type ReceiptReviewReport = {
   lineCount: number;
   matchedCount: number;
   needsReviewCount: number;
+  guardrails: string[];
+};
+
+export type AdDisclosureReport = {
+  userId: string;
+  userTier: UserTier;
+  placementPlan: AdPlacementPlan;
+  compliance: AdDeliveryComplianceReport;
+  allowedCount: number;
+  blockedCount: number;
+  excludedSurfaces: AdSurface[];
+  premiumAdsRemoved: boolean;
+  affectsDealScore: false;
   guardrails: string[];
 };
 
@@ -1378,6 +1397,57 @@ export function createGroceryViewApi() {
           'Member-only savings never overwrite verified public shelf evidence.',
           'Coupon-required offers need explicit action before checkout routing.',
           'Unlinked loyalty programs stay out of realized savings until the household confirms access.'
+        ]
+      };
+    },
+
+    getAdDisclosureReport(userId: string, entitlementOverride?: SubscriptionEntitlementSnapshot | null): AdDisclosureReport {
+      requireNonEmptyId(userId, 'userId');
+      const entitlement = entitlementOverride ?? subscriptionEntitlements.get(userId);
+      const userTier: UserTier = entitlement?.tier === 'premium' && entitlement.status === 'active' ? 'premium' : 'free';
+      const placementPlan = buildAdPlacementPlan({ userTier, configuredProviders: ['adsense', 'admob'] });
+      const deliverySlots = buildAdPlacementPlan({ userTier: 'free', configuredProviders: ['adsense', 'admob'] }).slots;
+      const candidateSlots = [
+        ...deliverySlots.map((slot) => ({
+          surface: slot.surface,
+          provider: slot.provider,
+          userTier,
+          label: slot.label,
+          organicRankingSeparated: slot.organicRankingSeparated,
+          affectsDealScore: false
+        })),
+        {
+          surface: 'deal_score' as const,
+          provider: 'adsense' as const,
+          userTier,
+          label: 'Sponsored',
+          organicRankingSeparated: true,
+          affectsDealScore: true
+        },
+        {
+          surface: 'checkout_decision' as const,
+          provider: 'admob' as const,
+          userTier,
+          label: 'Sponsored',
+          organicRankingSeparated: true,
+          affectsDealScore: false
+        }
+      ];
+      const compliance = buildAdDeliveryComplianceReport(candidateSlots);
+      return {
+        userId,
+        userTier,
+        placementPlan,
+        compliance,
+        allowedCount: compliance.allowed.length,
+        blockedCount: compliance.blocked.length,
+        excludedSurfaces: placementPlan.excludedSurfaces,
+        premiumAdsRemoved: userTier === 'premium' && placementPlan.slots.length === 0,
+        affectsDealScore: placementPlan.affectsDealScore,
+        guardrails: [
+          'Sponsored placements cannot change Deal Score, basket totals, or store ordering.',
+          'Premium entitlements remove non-critical ads before delivery.',
+          'Advertiser payloads stay aggregated and never include raw receipts.'
         ]
       };
     },

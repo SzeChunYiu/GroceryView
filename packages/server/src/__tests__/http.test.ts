@@ -157,6 +157,27 @@ describe('createHttpHandler', () => {
       ['private-label-milk', 'eligible', 7]
     ]);
 
+    const adDisclosure = await handle(new Request('http://localhost/api/ads/disclosure?userId=user-1'));
+    assert.equal(adDisclosure.status, 200);
+    const adDisclosureBody = await json(adDisclosure) as {
+      userId: string;
+      userTier: string;
+      allowedCount: number;
+      blockedCount: number;
+      premiumAdsRemoved: boolean;
+      affectsDealScore: boolean;
+      placementPlan: { slots: Array<{ surface: string; label: string }> };
+      guardrails: string[];
+    };
+    assert.equal(adDisclosureBody.userId, 'user-1');
+    assert.equal(adDisclosureBody.userTier, 'free');
+    assert.equal(adDisclosureBody.placementPlan.slots.length, 2);
+    assert.equal(adDisclosureBody.allowedCount, 2);
+    assert.equal(adDisclosureBody.blockedCount, 2);
+    assert.equal(adDisclosureBody.premiumAdsRemoved, false);
+    assert.equal(adDisclosureBody.affectsDealScore, false);
+    assert.match(adDisclosureBody.guardrails[0] ?? '', /Sponsored placements cannot change Deal Score/i);
+
     const receiptReview = await handle(new Request('http://localhost/api/receipts/review?userId=user-1'));
     assert.equal(receiptReview.status, 200);
     const receiptReviewBody = await json(receiptReview) as {
@@ -722,6 +743,17 @@ describe('createHttpHandler', () => {
     assert.deepEqual(premium.accountActions, ['show_manage_subscription']);
     assert.equal(premium.checkoutRequired, false);
     assert.equal(JSON.stringify(premium).includes('cus_internal_only'), false);
+
+    const adDisclosure = await json(await handle(new Request('http://localhost/api/ads/disclosure?userId=user-1'))) as {
+      userTier: string;
+      premiumAdsRemoved: boolean;
+      placementPlan: { slots: unknown[] };
+    };
+    assert.deepEqual(requestedUserIds, ['user-1', 'user-1']);
+    assert.equal(adDisclosure.userTier, 'premium');
+    assert.equal(adDisclosure.premiumAdsRemoved, true);
+    assert.deepEqual(adDisclosure.placementPlan.slots, []);
+    assert.equal(JSON.stringify(adDisclosure).includes('cus_internal_only'), false);
 
     const missing = await json(await handle(new Request('http://localhost/api/account/subscription-access?userId=user-2'))) as {
       enforcementReasons: string[];

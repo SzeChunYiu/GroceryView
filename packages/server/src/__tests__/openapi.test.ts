@@ -9,6 +9,7 @@ describe('buildOpenApiDocument', () => {
 
     assert.deepEqual(paths, [
       '/api/account/subscription-access',
+      '/api/ads/disclosure',
       '/api/auth/session',
       '/api/basket/compare',
       '/api/basket/current',
@@ -61,6 +62,8 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.components.securitySchemes.webhookSignature, { type: 'apiKey', in: 'header', name: 'x-groceryview-signature' });
     assert.deepEqual(doc.components.securitySchemes.billingWebhookSignature, { type: 'apiKey', in: 'header', name: 'x-groceryview-billing-signature' });
     assert.deepEqual(doc.paths['/api/account/subscription-access'].get?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/ads/disclosure'].get?.security, [{ bearerAuth: [] }]);
+    assert.match(doc.paths['/api/ads/disclosure'].get?.summary ?? '', /ad disclosure/i);
     assert.equal(doc.paths['/api/auth/session'].post?.security, undefined);
     assert.deepEqual(doc.paths['/api/billing/subscription-events'].post?.security, [{ billingWebhookSignature: [] }]);
     assert.deepEqual(doc.paths['/api/budget/categories'].get?.security, [{ bearerAuth: [] }]);
