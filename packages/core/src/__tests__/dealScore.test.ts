@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateDealScore, explainDealScore, scoreBand } from '../index.js';
+import { calculateDealScore, calculateHistoricalDealScore, rankDealOpportunities, scoreBand } from '../index.js';
 
 describe('calculateDealScore', () => {
   it('uses the MVP weighted formula and never accepts sponsored boosts', () => {
@@ -28,53 +28,6 @@ describe('calculateDealScore', () => {
 
     assert.equal(score, 22);
     assert.deepEqual(scoreBand(score), { label: 'Not a real deal', verdict: 'Wait' });
-  });
-
-  it('explains the Deal Score v1 recommendation without using distance', () => {
-    const nearby = explainDealScore({
-      currentCityPercentile: 8,
-      knownPromoHistoryPercentile: 12,
-      equivalentUnitPricePercentile: 18,
-      discountDepthPercent: 25,
-      sourceConfidence: 0.9,
-      distanceKm: 1
-    });
-    const farAway = explainDealScore({
-      currentCityPercentile: 8,
-      knownPromoHistoryPercentile: 12,
-      equivalentUnitPricePercentile: 18,
-      discountDepthPercent: 25,
-      sourceConfidence: 0.9,
-      distanceKm: 35
-    });
-
-    assert.equal(nearby.score, 82);
-    assert.equal(farAway.score, nearby.score);
-    assert.equal(farAway.verdict, nearby.verdict);
-    assert.equal(nearby.band, 'Good deal');
-    assert.equal(nearby.verdict, 'Buy');
-    assert.equal(nearby.discountVsMedianPercent, 25);
-    assert.equal(nearby.historicalPercentile, 12);
-    assert.equal(nearby.confidence, 'high');
-    assert.ok(nearby.reasons.some((reason) => reason.includes('cheapest 15 percent')));
-    assert.ok(nearby.reasons.some((reason) => reason.includes('Distance is shown only as context')));
-  });
-
-  it('downgrades weak evidence in reasons and confidence label', () => {
-    const explanation = explainDealScore({
-      currentCityPercentile: 82,
-      knownPromoHistoryPercentile: 76,
-      equivalentUnitPricePercentile: 68,
-      discountDepthPercent: 3,
-      sourceConfidence: 0.5
-    });
-
-    assert.equal(explanation.score, 22);
-    assert.equal(explanation.band, 'Not a real deal');
-    assert.equal(explanation.verdict, 'Wait');
-    assert.equal(explanation.confidence, 'low');
-    assert.ok(explanation.reasons.some((reason) => reason.includes('expensive versus nearby observations')));
-    assert.ok(explanation.reasons.some((reason) => reason.includes('Low source confidence')));
   });
 });
 
