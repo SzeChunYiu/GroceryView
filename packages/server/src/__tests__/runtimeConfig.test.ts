@@ -44,13 +44,14 @@ class RecordingPgPool {
           'community_reporter_trust',
           'subscription_entitlements',
           'notification_tasks',
-          'notification_suppressions'
+          'notification_suppressions',
+          'alert_rules'
         ].map((table_name) => ({ table_name }))
       };
     }
     if (text.includes('select version from schema_migrations')) {
       return {
-        rows: ['001_groceryview_schema', '002_repository_support_schema', '003_subscription_entitlements'].map((version) => ({ version }))
+        rows: ['001_groceryview_schema', '002_repository_support_schema', '003_subscription_entitlements', '004_alert_rules'].map((version) => ({ version }))
       };
     }
     if (text.includes('insert into subscription_entitlements')) {
