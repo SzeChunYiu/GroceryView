@@ -1079,6 +1079,61 @@ export function searchProducts(products: SearchableProduct[], query: string): Se
   });
 }
 
+export type AvailabilitySource = 'retailer_online' | 'receipt' | 'shelf_photo' | 'community_report' | 'estimated';
+export type AvailabilityStatus = 'in_stock' | 'low_stock' | 'out_of_stock' | 'unknown';
+
+export type StoreAvailabilityReport = {
+  productId: string;
+  storeId: string;
+  storeName: string;
+  status: AvailabilityStatus;
+  source: AvailabilitySource;
+  reportedAt: string;
+  trustScore: number;
+};
+
+export type ProductAvailabilitySummary = {
+  productId: string;
+  inStockStoreCount: number;
+  outOfStockStoreCount: number;
+  verifiedStoreCount: number;
+  bestStatus: AvailabilityStatus;
+  lastVerifiedAt?: string;
+  storeRows: Array<StoreAvailabilityReport & { verified: boolean }>;
+};
+
+const verifiedAvailabilitySources = new Set<AvailabilitySource>(['retailer_online', 'receipt', 'shelf_photo']);
+
+export function summarizeProductAvailability(input: {
+  productId: string;
+  reports: StoreAvailabilityReport[];
+}): ProductAvailabilitySummary {
+  const storeRows = input.reports
+    .filter((report) => report.productId === input.productId)
+    .map((report) => ({ ...report, verified: verifiedAvailabilitySources.has(report.source) && report.trustScore >= 0.7 }))
+    .sort((a, b) => b.trustScore - a.trustScore || b.reportedAt.localeCompare(a.reportedAt));
+
+  const verifiedRows = storeRows.filter((row) => row.verified);
+  const availableRows = storeRows.filter((row) => row.status === 'in_stock' || row.status === 'low_stock');
+  const bestStatus = availableRows.some((row) => row.status === 'in_stock')
+    ? 'in_stock'
+    : availableRows.some((row) => row.status === 'low_stock')
+      ? 'low_stock'
+      : storeRows.some((row) => row.status === 'out_of_stock')
+        ? 'out_of_stock'
+        : 'unknown';
+
+  return {
+    productId: input.productId,
+    inStockStoreCount: storeRows.filter((row) => row.status === 'in_stock').length,
+    outOfStockStoreCount: storeRows.filter((row) => row.status === 'out_of_stock').length,
+    verifiedStoreCount: verifiedRows.length,
+    bestStatus,
+    lastVerifiedAt: verifiedRows.map((row) => row.reportedAt).sort().at(-1),
+    storeRows
+  };
+}
+
 export type WatchlistItem = {
   productId: string;
   targetPrice?: number;
