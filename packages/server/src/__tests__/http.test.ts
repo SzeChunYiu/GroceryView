@@ -135,6 +135,21 @@ describe('createHttpHandler', () => {
     ]);
     assert.equal(nutritionBody.leader.productId, 'chicken');
 
+    const mealPlans = await handle(new Request('http://localhost/api/meal-plans/suggestions?userId=user-1&maxMealCost=120&servings=4'));
+    assert.equal(mealPlans.status, 200);
+    const mealPlansBody = await json(mealPlans) as {
+      userId: string;
+      suggestions: Array<{ title: string; estimatedCost: number; estimatedCostPerServing: number; ingredientProductIds: string[] }>;
+      ingredientProductIds: string[];
+      guardrails: string[];
+    };
+    assert.equal(mealPlansBody.userId, 'user-1');
+    assert.deepEqual(mealPlansBody.suggestions.map((meal) => [meal.title, meal.estimatedCost, meal.estimatedCostPerServing]), [
+      ['Chicken thighs pasta bowl', 104.7, 26.18]
+    ]);
+    assert.deepEqual(mealPlansBody.ingredientProductIds, ['chicken', 'pasta', 'tomatoes']);
+    assert.match(mealPlansBody.guardrails[0] ?? '', /never update a basket/i);
+
     const pantry = await handle(new Request('http://localhost/api/pantry/replenishment?userId=user-1&asOf=2026-05-20T08:00:00.000Z'));
     assert.equal(pantry.status, 200);
     const pantryBody = await json(pantry) as { statuses: Array<{ productId: string; status: string }>; replenishment: Array<{ productId: string; alreadyInBasket: boolean }>; expiringSoonProductIds: string[] };
