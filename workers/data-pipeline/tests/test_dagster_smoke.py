@@ -13,6 +13,7 @@ def test_dagster_smoke_expected_asset_contract() -> None:
         "latest_price_rollup",
         "normalized_products",
         "open_prices_real_pull_plan",
+        "price_observation_coverage",
         "price_observation_freshness",
         "price_observations",
         "quality_checks",

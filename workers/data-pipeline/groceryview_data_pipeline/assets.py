@@ -16,6 +16,7 @@ except ModuleNotFoundError:
 from .fixtures import FETCHED_AT, HERO_PRODUCTS, RETAILER_PRICE_SNAPSHOT, STOCKHOLM_STORES
 from .models import (
     LatestPriceRow,
+    ObservationCoverageSummary,
     ObservationFreshnessSummary,
     OpenPricesPullPlan,
     PriceObservationRow,
@@ -312,6 +313,31 @@ def build_open_prices_pull_plan(open_prices_user_agent_present: bool = False) ->
     )
 
 
+def build_observation_coverage_summary(
+    observations: Iterable[PriceObservationRow],
+    stores: Iterable[StoreSeed],
+    products: Iterable[ProductSeed],
+) -> ObservationCoverageSummary:
+    observation_list = list(observations)
+    expected_stores = {store.slug for store in stores}
+    expected_products = {product.slug for product in products}
+    covered_stores = {observation.store_slug for observation in observation_list}
+    covered_products = {observation.product_slug for observation in observation_list}
+    missing_store_count = len(expected_stores - covered_stores)
+    missing_product_count = len(expected_products - covered_products)
+
+    return ObservationCoverageSummary(
+        status="ready" if missing_store_count == 0 and missing_product_count == 0 else "partial",
+        observation_count=len(observation_list),
+        store_count=len(expected_stores),
+        covered_store_count=len(expected_stores & covered_stores),
+        missing_store_count=missing_store_count,
+        product_count=len(expected_products),
+        covered_product_count=len(expected_products & covered_products),
+        missing_product_count=missing_product_count,
+    )
+
+
 def clamp_confidence(confidence: float) -> float:
     if confidence < 0:
         return 0
@@ -423,3 +449,22 @@ def price_observation_freshness(price_observations: list[dict[str, object]]) -> 
 @asset(group_name=ASSET_GROUP)
 def open_prices_real_pull_plan() -> dict[str, object]:
     return build_open_prices_pull_plan(open_prices_user_agent_present=False).to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
+def price_observation_coverage(
+    seed_stores: list[dict[str, object]],
+    seed_products: list[dict[str, object]],
+    price_observations: list[dict[str, object]],
+) -> dict[str, object]:
+    stores = [StoreSeed(**store) for store in seed_stores]
+    products = [ProductSeed(**product) for product in seed_products]
+    observations = [
+        PriceObservationRow(
+            provenance=PriceProvenance(**observation["provenance"]),
+            **{key: value for key, value in observation.items() if key != "provenance"},
+        )
+        for observation in price_observations
+    ]
+    summary = build_observation_coverage_summary(observations, stores, products)
+    return summary.to_dict()
