@@ -147,6 +147,34 @@ window.GroceryViewFlowActions = (() => {
       setResult('privacy', 'Deletion plan failed: ' + error.message + '. Local plan preview preserved.');
     }
   };
+  const processScannerUploadWithApi = async (form) => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('scanner', 'Local preview: connect the API session bridge before routing scans through the server.');
+      return;
+    }
+    const data = new FormData(form);
+    const file = data.get('scanImage');
+    const fileName = file && typeof file === 'object' && 'name' in file ? file.name : 'manual-scan';
+    try {
+      const payload = {
+        scanId: 'scanner-preview-' + Date.now(),
+        kind: 'receipt',
+        payload: 'private-upload://scanner-preview/' + encodeURIComponent(fileName || 'manual-scan'),
+        uploadedAt: new Date().toISOString()
+      };
+      const response = await fetch(apiUrl('/api/scans/process', config), {
+        method: 'POST',
+        headers: apiHeaders(config),
+        body: JSON.stringify(payload)
+      });
+      const result = await requireApiSuccess(response);
+      const reviewCount = Array.isArray(result.reviewWorkItems) ? result.reviewWorkItems.length : 0;
+      setResult('scanner', 'Connected API: scan processed as ' + (result.result?.status || 'unknown') + ' with ' + reviewCount + ' review work items.');
+    } catch (error) {
+      setResult('scanner', 'Scan API processing failed: ' + error.message + '. Local preview remains staged.');
+    }
+  };
   const saveBasketToApi = async (form) => {
     const config = getApiConfig();
     if (!hasApiSession(config)) {
@@ -203,7 +231,7 @@ window.GroceryViewFlowActions = (() => {
       } else if (flow === 'basket') {
         setResult(flow, 'Basket preview recalculated at ' + formatSek(summarizeBasket(form)) + ' before checkout.');
       }
-      if (flow === 'scanner') setResult(flow, 'Upload preview staged; OCR provider stays gated until credentials are configured.');
+      if (flow === 'scanner') await processScannerUploadWithApi(form);
     });
   });
   document.querySelectorAll('[data-flow-action]').forEach((button) => {

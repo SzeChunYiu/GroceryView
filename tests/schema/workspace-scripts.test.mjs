@@ -16,7 +16,7 @@ describe('workspace package scripts', () => {
       assert.match(packages.api.scripts.test, new RegExp(`npm run build -w ${workspace.replace('/', '\\/')}`));
     }
 
-    for (const workspace of ['@groceryview/core', '@groceryview/monetization', '@groceryview/api', '@groceryview/auth']) {
+    for (const workspace of ['@groceryview/core', '@groceryview/monetization', '@groceryview/api', '@groceryview/auth', '@groceryview/scanning']) {
       assert.match(packages.server.scripts.test, new RegExp(`npm run build -w ${workspace.replace('/', '\\/')}`));
     }
 

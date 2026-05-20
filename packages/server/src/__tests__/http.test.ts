@@ -170,6 +170,53 @@ describe('createHttpHandler', () => {
     assert.deepEqual(plan.anonymizeTables, ['community_price_reports']);
   });
 
+  it('processes scan uploads through configured providers and returns review work items', async () => {
+    const handle = createHttpHandler(undefined, {
+      now: new Date('2026-05-20T13:00:00.000Z'),
+      scanProviders: {
+        barcode: {
+          lookup: async (barcode) => ({ barcode, productId: 'coffee', confidence: 0.93, needsHumanReview: false })
+        },
+        receiptOcr: {
+          parse: async () => ({
+            rows: [
+              { rawName: 'ZOEGAS 450G', itemTotal: 49.9, confidence: 0.91 },
+              { rawName: 'SMUDGED ITEM', itemTotal: 12.5, confidence: 0.41 }
+            ],
+            totalAmount: 62.4,
+            confidence: 0.66
+          })
+        }
+      }
+    });
+
+    const barcode = await json(await handle(new Request('http://localhost/api/scans/process?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ scanId: 'barcode-1', kind: 'barcode', payload: '0735000123456' })
+    }))) as { scanId: string; result: { status: string; productId: string }; reviewWorkItems: unknown[] };
+    assert.equal(barcode.scanId, 'barcode-1');
+    assert.deepEqual(barcode.reviewWorkItems, []);
+    assert.equal(barcode.result.status, 'matched');
+    assert.equal(barcode.result.productId, 'coffee');
+
+    const receipt = await json(await handle(new Request('http://localhost/api/scans/process?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ scanId: 'receipt-1', kind: 'receipt', payload: 'private-upload://receipt.jpg' })
+    }))) as { result: { status: string; lowConfidenceRows: string[] }; reviewWorkItems: Array<{ id: string; priority: string; evidence: string[] }> };
+    assert.equal(receipt.result.status, 'parsed');
+    assert.deepEqual(receipt.result.lowConfidenceRows, ['SMUDGED ITEM']);
+    assert.deepEqual(receipt.reviewWorkItems, [
+      {
+        id: 'scan-review-receipt-1',
+        scanId: 'receipt-1',
+        kind: 'receipt',
+        priority: 'high',
+        reason: 'Receipt has 1 low-confidence rows.',
+        evidence: ['confidence:0.66', 'total:62.4', 'low_confidence_row:SMUDGED ITEM']
+      }
+    ]);
+  });
+
   it('serves account subscription access from user-scoped entitlements', async () => {
     const api = createGroceryViewApi();
     api.upsertSubscriptionEntitlement('user-1', {
