@@ -168,6 +168,94 @@ export function buildAdPlacementPlan(input: { userTier: UserTier; configuredProv
 
 export type SubscriptionPlan = 'premium_monthly' | 'premium_yearly';
 
+export type SubscriptionEntitlementSnapshot = {
+  tier: UserTier;
+  plan?: SubscriptionPlan;
+  status: 'active' | 'past_due' | 'canceled';
+  currentPeriodEndsAt?: string;
+  provider?: 'stripe_compatible';
+  updatedAt: string;
+};
+
+export type SubscriptionAccessPolicy = {
+  userTier: UserTier;
+  premiumFeaturesEnabled: boolean;
+  adsRemoved: boolean;
+  checkoutRequired: boolean;
+  enforcementReasons: string[];
+  accountActions: Array<'show_upgrade' | 'show_renew' | 'show_billing_issue' | 'show_manage_subscription'>;
+  summary: string;
+};
+
+function buildFreeAccessPolicy(input: {
+  reason: string;
+  accountAction: SubscriptionAccessPolicy['accountActions'][number];
+  summary?: string;
+}): SubscriptionAccessPolicy {
+  return {
+    userTier: 'free',
+    premiumFeaturesEnabled: false,
+    adsRemoved: false,
+    checkoutRequired: true,
+    enforcementReasons: [input.reason],
+    accountActions: [input.accountAction],
+    summary: input.summary ?? 'Free tier access is enforced.'
+  };
+}
+
+function periodHasExpired(periodEnd: string | undefined, now: string): boolean {
+  if (!periodEnd) return false;
+  const periodEndMs = Date.parse(periodEnd);
+  const nowMs = Date.parse(now);
+  if (!Number.isFinite(periodEndMs) || !Number.isFinite(nowMs)) return true;
+  return periodEndMs < nowMs;
+}
+
+export function buildSubscriptionAccessPolicy(input: {
+  entitlement?: SubscriptionEntitlementSnapshot | null;
+  now: string;
+}): SubscriptionAccessPolicy {
+  const entitlement = input.entitlement;
+  if (!entitlement) {
+    return buildFreeAccessPolicy({
+      reason: 'missing_subscription_entitlement',
+      accountAction: 'show_upgrade',
+      summary: 'Free tier: no active subscription entitlement.'
+    });
+  }
+
+  if (entitlement.tier !== 'premium') {
+    return buildFreeAccessPolicy({
+      reason: `subscription_tier_not_premium:${entitlement.tier}`,
+      accountAction: 'show_upgrade'
+    });
+  }
+
+  if (entitlement.status !== 'active') {
+    return buildFreeAccessPolicy({
+      reason: `subscription_status_not_active:${entitlement.status}`,
+      accountAction: entitlement.status === 'past_due' ? 'show_billing_issue' : 'show_renew'
+    });
+  }
+
+  if (periodHasExpired(entitlement.currentPeriodEndsAt, input.now)) {
+    return buildFreeAccessPolicy({
+      reason: `subscription_period_expired:${entitlement.plan ?? 'unknown_plan'}`,
+      accountAction: 'show_renew'
+    });
+  }
+
+  return {
+    userTier: 'premium',
+    premiumFeaturesEnabled: true,
+    adsRemoved: true,
+    checkoutRequired: false,
+    enforcementReasons: [`active_subscription_entitlement:${entitlement.plan ?? 'unknown_plan'}`],
+    accountActions: ['show_manage_subscription'],
+    summary: 'Premium access is active.'
+  };
+}
+
 export type SubscriptionCheckoutInput = {
   userId: string;
   plan: SubscriptionPlan;
