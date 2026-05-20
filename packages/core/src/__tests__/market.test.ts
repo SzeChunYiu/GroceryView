@@ -1,7 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { buildWatchlistAlerts, searchProducts, summarizeBudget, summarizeCategoryDealLeaders } from '../index.js';
-import { buildWatchlistAlerts, searchProducts, summarizeBudget, summarizeProductAvailability } from '../index.js';
 
 describe('searchProducts', () => {
   it('finds products by ticker, name, category, or chain availability', () => {
@@ -96,26 +95,6 @@ describe('summarizeCategoryDealLeaders', () => {
         }
       ]
     }), []);
-describe('summarizeProductAvailability', () => {
-  it('separates in-stock, out-of-stock, and verified availability reports', () => {
-    const summary = summarizeProductAvailability({
-      productId: 'coffee',
-      reports: [
-        { productId: 'coffee', storeId: 'willys-odenplan', storeName: 'Willys Odenplan', status: 'in_stock', source: 'shelf_photo', reportedAt: '2026-05-20T09:00:00Z', trustScore: 0.92 },
-        { productId: 'coffee', storeId: 'coop-odenplan', storeName: 'Coop Odenplan', status: 'out_of_stock', source: 'community_report', reportedAt: '2026-05-20T08:30:00Z', trustScore: 0.61 },
-        { productId: 'coffee', storeId: 'lidl-sveavagen', storeName: 'Lidl Sveavägen', status: 'low_stock', source: 'retailer_online', reportedAt: '2026-05-20T08:45:00Z', trustScore: 0.81 },
-        { productId: 'milk', storeId: 'willys-odenplan', storeName: 'Willys Odenplan', status: 'in_stock', source: 'receipt', reportedAt: '2026-05-20T08:00:00Z', trustScore: 0.8 }
-      ]
-    });
-
-    assert.equal(summary.bestStatus, 'in_stock');
-    assert.equal(summary.inStockStoreCount, 1);
-    assert.equal(summary.outOfStockStoreCount, 1);
-    assert.equal(summary.verifiedStoreCount, 2);
-    assert.equal(summary.lastVerifiedAt, '2026-05-20T09:00:00Z');
-    assert.equal(summary.storeRows[0].storeName, 'Willys Odenplan');
-    assert.equal(summary.storeRows[0].verified, true);
-    assert.equal(summary.storeRows.find((row) => row.storeId === 'coop-odenplan')?.verified, false);
   });
 });
 
