@@ -20,6 +20,8 @@ export { buildMobileDeepLink, buildMobileRouteManifest, findMobileRoute } from '
 export type { MobileMvpRoute, MobileMvpRouteId, MobileMvpRoutePath, MobileRouteManifest, MobileRouteParam } from './routeManifest.js';
 export { buildMobilePermissionPlan, nextMobilePermissionPrompt, summarizeMobilePermissionPlan } from './permissions.js';
 export type { MobilePermissionKind, MobilePermissionPlan, MobilePermissionPrompt, MobilePermissionSnapshot, MobilePermissionState, MobilePermissionSurface } from './permissions.js';
+export { buildMobileNotificationPreferencePlan, summarizeMobileNotificationTopics } from './notifications.js';
+export type { MobileNotificationPreferenceInput, MobileNotificationPreferencePlan, MobileNotificationQuietHours, MobileNotificationTopic } from './notifications.js';
 export { buildMobilePersistedCachePlan, buildMobileQueryKey, buildMobileQueryRegistry } from './queryCache.js';
 export type { MobilePersistedCachePlan, MobileQueryDefinition, MobileQueryId, MobileQueryKeyInput, MobileScreenRoute } from './queryCache.js';
 
