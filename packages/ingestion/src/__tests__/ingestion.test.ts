@@ -6,6 +6,8 @@ import {
   cellCountForScbPxWebQueryFixture,
   confidenceForSource,
   fetchRetailerConnectorSnapshot,
+  groceryCategoryCoicopMappings,
+  groceryCategoryCoicopMappingsCanEmitStorePrices,
   ingestRetailerProduct,
   locatorFixturesCanAffectDealScore,
   normalizeUnitPrice,
@@ -23,6 +25,7 @@ import {
   runRetailerConnector,
   stockholmStoreLocatorFixtures,
   validateOfferSelectorFixtures,
+  validateGroceryCategoryCoicopMappings,
   scbCoicopFoodCategoryCodes,
   scbPxWebQueryFixtures,
   validateScbPxWebQueryFixtures,
@@ -406,6 +409,93 @@ describe('SCB PxWeb query fixtures', () => {
       cacheKeyForScbPxWebQueryFixture(scbPxWebQueryFixtures[0]),
       'scb:pxweb:v1:sv:PR/PR0101/PR0101A:KPI2020COICOP2M:json-stat2:VaruTjanstegrupp=item(01):ContentsCode=item(0000080C):Tid=top(12)'
     );
+  });
+});
+
+describe('Grocery category COICOP mappings', () => {
+  const seedHeroProductSlugs = [
+    'standardmjolk-1l',
+    'agg-12-pack',
+    'smor-500g',
+    'bryggkaffe-450g',
+    'kycklingfile-1kg',
+    'notfars-500g',
+    'pasta-500g',
+    'basmatiris-1kg',
+    'formbrod-rost-700g',
+    'hushallsost-1kg',
+    'bananer-1kg',
+    'tomater-500g',
+    'potatis-2kg',
+    'toalettpapper-8-pack',
+    'tvattmedel-color-1l',
+    'blojor-storlek-4',
+    'havredryck-1l',
+    'naturell-yoghurt-1kg',
+    'olivolja-500ml',
+    'fryst-pizza-350g'
+  ] as const;
+
+  it('validates current category and hero-product mappings', () => {
+    const validation = validateGroceryCategoryCoicopMappings(groceryCategoryCoicopMappings);
+
+    assert.equal(validation.status, 'valid');
+    assert.deepEqual(validation.issues, []);
+    assert.equal(validation.mappingIds.length, groceryCategoryCoicopMappings.length);
+  });
+
+  it('covers every seed hero product with a mapped or explicitly unmapped entry', () => {
+    const byHeroSlug = new Map(
+      groceryCategoryCoicopMappings
+        .filter((mapping) => mapping.scope === 'hero_product' && mapping.heroProductSlug)
+        .map((mapping) => [mapping.heroProductSlug, mapping])
+    );
+
+    for (const slug of seedHeroProductSlugs) {
+      const mapping = byHeroSlug.get(slug);
+      assert.ok(mapping, `${slug} mapping missing`);
+      assert.ok(mapping.mappingReason.length > 20);
+      if (mapping.mappingConfidence !== 'unmapped') {
+        assert.ok(mapping.scbCoicopCode, `${slug} SCB code missing`);
+        assert.ok(mapping.scbContentCode, `${slug} SCB content code missing`);
+      }
+    }
+  });
+
+  it('keeps category baselines separate from store and SKU prices', () => {
+    assert.equal(groceryCategoryCoicopMappingsCanEmitStorePrices(), false);
+    for (const mapping of groceryCategoryCoicopMappings) {
+      assert.equal(mapping.canUseForStorePrice, false);
+      if (mapping.mappingConfidence !== 'unmapped') {
+        assert.ok(mapping.scbCoicopCode);
+        assert.ok(scbCoicopFoodCategoryCodes.includes(mapping.scbCoicopCode));
+        assert.equal(mapping.scbTableId, 'KPI2020COICOPM');
+        assert.equal(mapping.scbContentCode, '0000080H');
+      }
+    }
+  });
+
+  it('makes broad pantry and frozen categories product-level decisions', () => {
+    const pantry = groceryCategoryCoicopMappings.find((mapping) => mapping.mappingId === 'category:pantry');
+    const frozen = groceryCategoryCoicopMappings.find((mapping) => mapping.mappingId === 'category:frozen');
+
+    assert.equal(pantry?.mappingConfidence, 'product_required');
+    assert.equal(pantry?.canUseForCategoryIndexBaseline, false);
+    assert.equal(frozen?.mappingConfidence, 'product_required');
+    assert.equal(frozen?.canUseForCategoryIndexBaseline, false);
+  });
+
+  it('keeps household non-food products outside food CPI and Livsmedelsverket outputs', () => {
+    for (const slug of ['toalettpapper-8-pack', 'tvattmedel-color-1l', 'blojor-storlek-4'] as const) {
+      const mapping = groceryCategoryCoicopMappings.find((candidate) => candidate.heroProductSlug === slug);
+
+      assert.ok(mapping);
+      assert.equal(mapping.mappingConfidence, 'unmapped');
+      assert.equal(mapping.canUseForCategoryIndexBaseline, false);
+      assert.equal(mapping.canUseForNutritionFacts, false);
+      assert.equal(mapping.scbCoicopCode, undefined);
+      assert.equal(mapping.livsmedelsverketFoodNumber, undefined);
+    }
   });
 });
 
