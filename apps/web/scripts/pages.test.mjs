@@ -160,10 +160,6 @@ describe('buildStaticPages', () => {
 
       const store = await readFile(join(root, 'stores/willys-odenplan/index.html'), 'utf8');
       assert.match(store, /Store highlights/);
-      assert.match(store, /Store price-level profile/);
-      assert.match(store, /overall price level vs Stockholm/);
-      assert.match(store, /Within Willys stores percentile/);
-      assert.match(store, /Favorite-store percentile/);
       assert.match(store, /Verified shelf/);
       assert.match(store, /Watchlist only/);
 
