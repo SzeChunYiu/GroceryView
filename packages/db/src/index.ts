@@ -226,11 +226,14 @@ export type SubscriptionEntitlementRecord = {
   updatedAt: string;
 };
 
+export type WatchlistAllowedPriceType = 'shelf' | 'member' | 'promotion' | 'estimated';
+
 export type WatchlistRecord = {
   productId: string;
   targetPrice?: number;
   alertDealScoreAt?: number;
   favoriteStoresOnly: boolean;
+  allowedPriceTypes?: WatchlistAllowedPriceType[];
 };
 
 export type BasketRecord = {
@@ -930,6 +933,24 @@ function requireUser(users: Map<string, UserRecord>, userId: string): void {
   if (!users.has(userId)) throw new Error(`User not found: ${userId}`);
 }
 
+const watchlistAllowedPriceTypes = ['shelf', 'member', 'promotion', 'estimated'] as const satisfies readonly WatchlistAllowedPriceType[];
+
+function normalizeWatchlistAllowedPriceTypes(value: readonly string[] | null | undefined): WatchlistAllowedPriceType[] {
+  const priceTypes = value ?? ['shelf'];
+  if (priceTypes.length === 0) throw new Error('allowedPriceTypes must not be empty.');
+  const allowed = new Set<string>(watchlistAllowedPriceTypes);
+  for (const priceType of priceTypes) {
+    if (!allowed.has(priceType)) {
+      throw new Error(`allowedPriceTypes must contain only: ${watchlistAllowedPriceTypes.join(', ')}.`);
+    }
+  }
+  return [...priceTypes] as WatchlistAllowedPriceType[];
+}
+
+function watchlistRecordForStorage(item: WatchlistRecord): WatchlistRecord {
+  return { ...item, allowedPriceTypes: normalizeWatchlistAllowedPriceTypes(item.allowedPriceTypes) };
+}
+
 export function createMemoryRepository(): GroceryViewRepository {
   const users = new Map<string, UserRecord>();
   const favoriteStores = new Map<string, Set<string>>();
@@ -987,7 +1008,7 @@ export function createMemoryRepository(): GroceryViewRepository {
 
     async addWatchlistItem(userId, item) {
       requireUser(users, userId);
-      watchlists.set(userId, [...(watchlists.get(userId) ?? []), { ...item }]);
+      watchlists.set(userId, [...(watchlists.get(userId) ?? []), watchlistRecordForStorage(item)]);
     },
 
     async getWatchlist(userId) {
@@ -1117,7 +1138,13 @@ type SubscriptionEntitlementRow = {
   provider_subscription_id: string | null;
   updated_at: string | Date;
 };
-type WatchlistRow = { product_id: string; target_price: string | number | null; alert_deal_score_at: number | null; favorite_stores_only: boolean };
+type WatchlistRow = {
+  product_id: string;
+  target_price: string | number | null;
+  alert_deal_score_at: number | null;
+  favorite_stores_only: boolean;
+  allowed_price_types: string[] | null;
+};
 type BasketRow = { product_id: string; quantity: string | number };
 type PantryItemRow = {
   id: string;
@@ -1690,23 +1717,25 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
     },
 
     async addWatchlistItem(userId, item) {
+      const allowedPriceTypes = normalizeWatchlistAllowedPriceTypes(item.allowedPriceTypes);
       await executor.query(
-        `insert into watchlist_items(user_id, product_id, target_price, alert_deal_score_at, favorite_stores_only)
-         values ($1, $2, $3, $4, $5)`,
-        [userId, item.productId, item.targetPrice ?? null, item.alertDealScoreAt ?? null, item.favoriteStoresOnly]
+        `insert into watchlist_items(user_id, product_id, target_price, alert_deal_score_at, favorite_stores_only, allowed_price_types)
+         values ($1, $2, $3, $4, $5, $6)`,
+        [userId, item.productId, item.targetPrice ?? null, item.alertDealScoreAt ?? null, item.favoriteStoresOnly, allowedPriceTypes]
       );
     },
 
     async getWatchlist(userId) {
       const rows = await executor.query<WatchlistRow>(
-        'select product_id, target_price, alert_deal_score_at, favorite_stores_only from watchlist_items where user_id = $1 order by id',
+        'select product_id, target_price, alert_deal_score_at, favorite_stores_only, allowed_price_types from watchlist_items where user_id = $1 order by id',
         [userId]
       );
       return rows.map((row) => ({
         productId: row.product_id,
         targetPrice: row.target_price === null ? undefined : Number(row.target_price),
         alertDealScoreAt: row.alert_deal_score_at ?? undefined,
-        favoriteStoresOnly: row.favorite_stores_only
+        favoriteStoresOnly: row.favorite_stores_only,
+        allowedPriceTypes: normalizeWatchlistAllowedPriceTypes(row.allowed_price_types)
       }));
     },
 

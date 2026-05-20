@@ -29,6 +29,10 @@ create table if not exists watchlist_items (
   target_price numeric(12, 2) check (target_price is null or target_price >= 0),
   alert_deal_score_at integer check (alert_deal_score_at between 0 and 100),
   favorite_stores_only boolean not null default true,
+  allowed_price_types text[] not null default array['shelf']::text[] check (
+    cardinality(allowed_price_types) > 0
+    and allowed_price_types <@ array['shelf', 'member', 'promotion', 'estimated']::text[]
+  ),
   created_at timestamptz not null default now()
 );
 

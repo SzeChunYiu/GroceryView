@@ -17,6 +17,17 @@ class RecordingQueryExecutor implements QueryExecutor {
   observationId: string | undefined = 'observation-1';
   sourceRunId: string | undefined = 'source-run-1';
   rawRecordId: string | undefined = 'raw-record-1';
+  chainId: string | undefined = 'chain-open-prices';
+  productId: string | undefined = 'product-open-prices';
+  watchlistRows: unknown[] = [
+    {
+      product_id: 'coffee',
+      target_price: '50.00',
+      alert_deal_score_at: 80,
+      favorite_stores_only: true,
+      allowed_price_types: ['shelf', 'promotion']
+    }
+  ];
   productRows: unknown[] = [
     {
       id: 'product-1',
@@ -249,6 +260,7 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('insert into aliases')) return this.aliasRows as T[];
     if (sql.includes('from aliases')) return this.aliasRows as T[];
     if (sql.includes('from subscription_entitlements')) return this.subscriptionEntitlementRows as T[];
+    if (sql.includes('from watchlist_items')) return this.watchlistRows as T[];
     if (sql.includes('select store_id')) return [{ store_id: 'willys-odenplan' }] as T[];
     if (sql.includes('select weekly_budget')) return [{ weekly_budget: '800', monthly_budget: '3200' }] as T[];
     if (sql.includes('insert into weekly_baskets')) return this.basketId === undefined ? ([] as T[]) : ([{ id: this.basketId }] as T[]);
@@ -330,6 +342,32 @@ describe('createPostgresRepository', () => {
 
     assert.equal(executor.calls.every((call) => call.sql.includes('$') || call.sql.startsWith('select')), true);
     assert.deepEqual(executor.calls[0].params, ['user-1', 'shopper@example.com']);
+  });
+
+  it('persists watchlist allowed price types through repository-backed storage', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.addWatchlistItem('user-1', {
+      productId: 'coffee',
+      targetPrice: 50,
+      alertDealScoreAt: 80,
+      favoriteStoresOnly: true,
+      allowedPriceTypes: ['shelf', 'promotion']
+    });
+
+    const insertCall = executor.calls.find((call) => call.sql.includes('insert into watchlist_items'));
+    assert.match(insertCall?.sql ?? '', /allowed_price_types/);
+    assert.deepEqual(insertCall?.params, ['user-1', 'coffee', 50, 80, true, ['shelf', 'promotion']]);
+    assert.deepEqual(await repo.getWatchlist('user-1'), [
+      {
+        productId: 'coffee',
+        targetPrice: 50,
+        alertDealScoreAt: 80,
+        favoriteStoresOnly: true,
+        allowedPriceTypes: ['shelf', 'promotion']
+      }
+    ]);
   });
 
   it('reuses the current weekly basket and inserts basket items with the returned id', async () => {

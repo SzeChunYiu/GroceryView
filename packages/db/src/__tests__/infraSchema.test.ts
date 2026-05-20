@@ -134,6 +134,9 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('alert_rules'), /user_id text not null references app_users\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('alert_rules'), /alert_type text not null check/);
     assert.match(repositoryTableDefinition('alert_rules'), /deal_score_threshold integer check/);
+    assert.match(repositoryTableDefinition('watchlist_items'), /allowed_price_types text\[\] not null default array\['shelf'\]::text\[\]/);
+    assert.match(repositoryTableDefinition('watchlist_items'), /allowed_price_types <@ array\['shelf', 'member', 'promotion', 'estimated'\]::text\[\]/);
+    assert.match(tableDefinition('watchlists'), /allowed_price_types text\[\] not null default array\['shelf'\]::text\[\]/);
     assert.match(repositoryTableDefinition('pantry_items'), /user_id text not null references app_users\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('pantry_items'), /category text not null check/);
     assert.match(repositoryTableDefinition('pantry_items'), /quantity numeric\(12, 3\) not null check \(quantity >= 0\)/);
