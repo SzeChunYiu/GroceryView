@@ -1,6 +1,7 @@
 from dagster import Definitions
 
 from .assets import (
+    data_pipeline_quality_gate,
     latest_price_rollup,
     open_prices_ingestion_run_plan,
     normalized_products,
@@ -29,5 +30,6 @@ defs = Definitions(
         open_prices_ingestion_run_plan,
         price_observation_coverage,
         price_observation_mix,
+        data_pipeline_quality_gate,
     ]
 )

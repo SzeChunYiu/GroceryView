@@ -15,6 +15,7 @@ except ModuleNotFoundError:
 
 from .fixtures import FETCHED_AT, HERO_PRODUCTS, RETAILER_PRICE_SNAPSHOT, STOCKHOLM_STORES
 from .models import (
+    DataPipelineQualityGateSummary,
     LatestPriceRow,
     ObservationCoverageSummary,
     ObservationFreshnessSummary,
@@ -422,6 +423,38 @@ def build_price_observation_mix_summary(observations: Iterable[PriceObservationR
     )
 
 
+def build_data_pipeline_quality_gate(
+    quality: QualityCheckSummary,
+    freshness: ObservationFreshnessSummary,
+    coverage: ObservationCoverageSummary,
+    min_observations: int = 1,
+) -> DataPipelineQualityGateSummary:
+    blockers: list[str] = []
+
+    if quality.observation_count < min_observations:
+        blockers.append("observations_below_minimum")
+    if quality.latest_rollup_count == 0:
+        blockers.append("latest_rollup_empty")
+    if quality.missing_provenance_count > 0:
+        blockers.append("price_observation_provenance_missing")
+    if quality.missing_fetch_stub_provenance_count > 0:
+        blockers.append("fetch_stub_provenance_missing")
+    if quality.duplicate_key_count > 0:
+        blockers.append("duplicate_product_store_observations")
+    if freshness.status == "blocked":
+        blockers.append("price_observation_freshness_blocked")
+    if coverage.status != "ready":
+        blockers.append("price_observation_coverage_partial")
+
+    return DataPipelineQualityGateSummary(
+        status="ready" if not blockers else "blocked",
+        blockers=blockers,
+        observation_count=quality.observation_count,
+        latest_rollup_count=quality.latest_rollup_count,
+        checked_assets=["quality_checks", "price_observation_freshness", "price_observation_coverage"],
+    )
+
+
 def clamp_confidence(confidence: float) -> float:
     if confidence < 0:
         return 0
@@ -574,4 +607,17 @@ def price_observation_mix(price_observations: list[dict[str, object]]) -> dict[s
         for observation in price_observations
     ]
     summary = build_price_observation_mix_summary(observations)
+    return summary.to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
+def data_pipeline_quality_gate(
+    quality_checks: dict[str, object],
+    price_observation_freshness: dict[str, object],
+    price_observation_coverage: dict[str, object],
+) -> dict[str, object]:
+    quality = QualityCheckSummary(**quality_checks)
+    freshness = ObservationFreshnessSummary(**price_observation_freshness)
+    coverage = ObservationCoverageSummary(**price_observation_coverage)
+    summary = build_data_pipeline_quality_gate(quality, freshness, coverage)
     return summary.to_dict()
