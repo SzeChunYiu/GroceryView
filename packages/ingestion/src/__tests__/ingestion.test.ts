@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { assertOfficialPriceIndexSource, buildDefaultFlyerSourcePlans, buildOfficialBaselineSourceRegistry, buildRetailerSourceRegistry, confidenceForSource, findRetailerSourceRegistryEntry, ingestRetailerProduct, normalizeUnitPrice, officialPriceIndexSources, planFlyerSourceFetch, planIngestionBatch, planRetailerSourceAccess } from '../index.js';
+import { assertOfficialPriceIndexSource, buildDefaultFlyerSourcePlans, buildOfficialBaselineSourceRegistry, buildRetailerConnectorReadinessReport, buildRetailerSourceRegistry, confidenceForSource, findRetailerSourceRegistryEntry, ingestRetailerProduct, normalizeUnitPrice, officialPriceIndexSources, planFlyerSourceFetch, planIngestionBatch, planRetailerSourceAccess } from '../index.js';
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
@@ -103,6 +103,86 @@ describe('planRetailerSourceAccess', () => {
       sourceType: 'retailer_online_page',
       reason: 'Retailer page ingestion requires robots.txt allow and approved legal review.',
       requiredActions: ['robots_txt_allow_required', 'legal_review_approval_required']
+    });
+  });
+});
+
+describe('buildRetailerConnectorReadinessReport', () => {
+  it('blocks launch when required retailer connectors lack credentials, health, or source approval', () => {
+    const report = buildRetailerConnectorReadinessReport({
+      requiredChains: ['willys', 'ica'],
+      connectors: [
+        {
+          chainId: 'willys',
+          sourceType: 'retailer_online_page',
+          configured: true,
+          credentialsPresent: true,
+          healthStatus: 'pass',
+          robotsTxtStatus: 'allow',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: false
+        },
+        {
+          chainId: 'ica',
+          sourceType: 'official_api',
+          configured: false,
+          credentialsPresent: false,
+          healthStatus: 'not_run',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'pending',
+          hasDataAgreement: false
+        }
+      ]
+    });
+
+    assert.deepEqual(report, {
+      status: 'blocked',
+      blockers: [
+        'retailer_connector_not_configured:ica',
+        'retailer_connector_credentials_missing:ica',
+        'retailer_connector_health_not_run:ica',
+        'retailer_source_access_blocked:ica:legal_review_approval_required',
+        'retailer_source_access_blocked:ica:data_agreement_required'
+      ],
+      evidence: [
+        'retailer_connector_configured:willys:retailer_online_page',
+        'retailer_connector_credentials_present:willys',
+        'retailer_connector_health_pass:willys',
+        'retailer_source_access_allowed:willys:retailer_online_page'
+      ],
+      warnings: [],
+      summary: 'Retailer connector readiness is blocked.'
+    });
+  });
+
+  it('passes only when all required retailer connectors and source gates are ready', () => {
+    const report = buildRetailerConnectorReadinessReport({
+      requiredChains: ['willys'],
+      connectors: [
+        {
+          chainId: 'willys',
+          sourceType: 'official_api',
+          configured: true,
+          credentialsPresent: true,
+          healthStatus: 'pass',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true
+        }
+      ]
+    });
+
+    assert.deepEqual(report, {
+      status: 'ready',
+      blockers: [],
+      evidence: [
+        'retailer_connector_configured:willys:official_api',
+        'retailer_connector_credentials_present:willys',
+        'retailer_connector_health_pass:willys',
+        'retailer_source_access_allowed:willys:official_api'
+      ],
+      warnings: [],
+      summary: 'Retailer connectors are ready.'
     });
   });
 });
