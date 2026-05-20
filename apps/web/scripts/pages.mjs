@@ -1812,6 +1812,12 @@ const pages = [
     body: `${productTerminalSections}${productTerminalLivePanel}${productPriceTable}${productPriceGuardrails}`
   },
   {
+    path: 'products/compare/index.html',
+    title: 'Compare grocery products — GroceryView',
+    description: 'Compare GroceryView products by equivalent unit price, package size, source confidence, dietary fit, and substitution guardrails.',
+    body: `<section class="card"><div class="eyebrow">Product comparison</div><h1>Compare grocery products</h1><p class="lede">Compare equivalent grocery items by verified unit price, package size, Deal Score, and household fit before adding a substitute to the basket.</p><div class="grid"><div class="metric"><strong>3</strong><span>comparable coffee rows</span></div><div class="metric"><strong>12 SEK</strong><span>best verified swap</span></div><div class="metric"><strong>1</strong><span>diet guardrail</span></div></div></section><section class="card" style="margin-top:16px"><h2>Comparable products</h2><table class="table"><thead><tr><th>Product</th><th>Package</th><th>Unit price</th><th>Confidence</th><th>Decision</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>450g</td><td>122.00 SEK/kg</td><td>Verified shelf</td><td>Reference product</td></tr><tr><td>Garant Bryggkaffe 450g</td><td>450g</td><td>84.22 SEK/kg</td><td>Verified shelf</td><td>Private-label swap</td></tr><tr><td>Arvid Nordquist 500g</td><td>500g</td><td>119.80 SEK/kg</td><td>Retailer page</td><td>Compare only</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Comparison guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Equivalent package basis</td><td>Products must normalize to the same unit before savings are shown.</td></tr><tr><td>Confidence floor</td><td>Estimated rows can display but cannot become the recommended substitute.</td></tr><tr><td>Household fit</td><td>Allergen or diet conflicts block a substitute even when the unit price is lower.</td></tr></tbody></table></section>`
+  },
+  {
     path: 'stores/willys-odenplan/index.html',
     title: 'Willys Odenplan store deals — GroceryView',
     description: 'Willys Odenplan profile with deal score, price level, and best categories.',
