@@ -23,6 +23,7 @@ describe('buildStaticPages', () => {
         'deals/today/index.html',
         'household/index.html',
         'login/index.html',
+        'loyalty/coupons/index.html',
         'loyalty/offers/index.html',
         'market/index.html',
         'meal-plans/index.html',
@@ -215,6 +216,13 @@ describe('buildStaticPages', () => {
       assert.match(billingStatus, /premium_monthly/);
       assert.match(billingStatus, /Missing or past-due entitlements keep checkout required/);
       assert.match(billingStatus, /Provider updates must be newer than stored entitlement state/);
+
+      const couponPlanner = await readFile(join(root, 'loyalty/coupons/index.html'), 'utf8');
+      assert.match(couponPlanner, /Coupon expiry planner/);
+      assert.match(couponPlanner, /Coupon action queue/);
+      assert.match(couponPlanner, /Coop Medmera dairy coupon/);
+      assert.match(couponPlanner, /Coupons expiring within 24 hours show before lower-value offers/);
+      assert.match(couponPlanner, /Coupon savings stay separate from verified public shelf prices/);
 
       const loyaltyOffers = await readFile(join(root, 'loyalty/offers/index.html'), 'utf8');
       assert.match(loyaltyOffers, /Loyalty offer tracker/);
