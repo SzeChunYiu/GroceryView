@@ -1,4 +1,19 @@
-import { createGroceryViewApi, type ProductDetail, type ProductPriceTerminalReport } from '@groceryview/api';
+import { createGroceryViewApi } from '@groceryview/api';
+export {
+  applyMobileMutationSyncResult,
+  planMobileOfflineMutation,
+  selectMobileMutationsForSync,
+  summarizeMobileOfflineMutations
+} from './offlineMutations.js';
+export type {
+  MobileMutationSyncResult,
+  MobileOfflineMutation,
+  MobileOfflineMutationInput,
+  MobileOfflineMutationPayload,
+  MobileOfflineMutationStatus,
+  MobileOfflineMutationSummary,
+  MobileOfflineMutationType
+} from './offlineMutations.js';
 export { buildMobilePersistedCachePlan, buildMobileQueryKey, buildMobileQueryRegistry } from './queryCache.js';
 export type { MobilePersistedCachePlan, MobileQueryDefinition, MobileQueryId, MobileQueryKeyInput, MobileScreenRoute } from './queryCache.js';
 
