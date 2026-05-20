@@ -192,6 +192,15 @@ describe('buildStaticPages', () => {
       assert.match(priceConfidence, /Verified shelf/);
       assert.match(priceConfidence, /Estimated and low-confidence rows are excluded/);
       assert.match(priceConfidence, /Only verified or fresh retailer-page prices can alert/);
+      assert.match(priceConfidence, /Connected price confidence API/);
+      assert.match(priceConfidence, /Load live confidence evidence/);
+      assert.match(priceConfidence, /data-groceryview-flow="price-confidence"/);
+      assert.match(priceConfidence, /data-flow-action="load-price-confidence"/);
+      assert.match(priceConfidence, /data-price-confidence-quote/);
+      assert.match(priceConfidence, /data-price-confidence-volume/);
+      assert.match(priceConfidence, /data-price-confidence-guardrails/);
+      assert.match(priceConfidence, /fetch\(apiUrl\('\/api\/products\/' \+ encodeURIComponent\(productId\) \+ '\/terminal\?asOf='/);
+      assert.match(priceConfidence, /Connected price confidence loaded/);
 
       const deals = await readFile(join(root, 'deals/today/index.html'), 'utf8');
       assert.match(deals, /Today’s best grocery deals/);

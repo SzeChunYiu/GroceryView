@@ -37,6 +37,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-price-freshness-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setPriceConfidenceMetric = (metric, message) => {
+    const target = document.querySelector('[data-price-confidence-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setWatchlistMetric = (metric, message) => {
     const target = document.querySelector('[data-watchlist-' + metric + ']');
     if (target) target.textContent = message;
@@ -476,6 +480,39 @@ window.GroceryViewFlowActions = (() => {
       setResult('product-terminal', 'Product terminal API load failed: ' + error.message + '. Static evidence remains visible.');
     }
   };
+  const loadPriceConfidenceFromApi = async (button) => {
+    const config = getApiConfig();
+    const panel = button.closest('[data-groceryview-flow="price-confidence"]');
+    const productId = panel?.dataset.productId || 'coffee';
+    const asOf = panel?.dataset.asOf || new Date().toISOString();
+    if (!config.apiBase) {
+      setResult('price-confidence', 'Local preview mode: connect the API session bridge before loading live price confidence evidence.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/products/' + encodeURIComponent(productId) + '/terminal?asOf=' + encodeURIComponent(asOf), config, false), {
+        method: 'GET',
+        headers: config.bearerToken ? apiHeaders(config) : { 'content-type': 'application/json' }
+      });
+      const payload = await requireApiSuccess(response);
+      const quote = payload.quote || {};
+      const evidenceVolume = quote.evidenceVolume || {};
+      const guardrails = Array.isArray(payload.evidenceGuardrails) ? payload.evidenceGuardrails : [];
+      const series = Array.isArray(payload.chart?.series) ? payload.chart.series : [];
+      const styles = [...new Set(series.map((item) => item.lineStyle).filter(Boolean))];
+      const bestPrice = quote.bestPrice == null ? 'no verified price' : formatPreciseSek(quote.bestPrice);
+      const currentPrices = Number(evidenceVolume.currentPrices || 0);
+      const historyPointCount = Number(evidenceVolume.historyPoints || 0);
+      const verifiedHistoryPointCount = Number(evidenceVolume.verifiedHistoryPoints || 0);
+      setPriceConfidenceMetric('quote', bestPrice + ' at ' + (quote.bestStoreName || 'unknown store') + ' · ' + (quote.band?.verdict || 'verdict pending'));
+      setPriceConfidenceMetric('volume', currentPrices + ' current price rows · ' + verifiedHistoryPointCount + '/' + historyPointCount + ' verified history points');
+      setPriceConfidenceMetric('guardrails', guardrails.length + ' guardrails · ' + (guardrails[0] || 'evidence rules unavailable'));
+      setPriceConfidenceMetric('chart', series.length + ' confidence-styled chart series · ' + (styles.length ? styles.join(', ') : 'style unavailable'));
+      setResult('price-confidence', 'Connected price confidence loaded: ' + currentPrices + ' current price rows, ' + verifiedHistoryPointCount + '/' + historyPointCount + ' verified history points, and ' + guardrails.length + ' guardrails.');
+    } catch (error) {
+      setResult('price-confidence', 'Price confidence API load failed: ' + error.message + '. Static confidence labels remain visible.');
+    }
+  };
   const loadMarketMoversFromApi = async () => {
     const config = getApiConfig();
     if (!config.apiBase) {
@@ -832,6 +869,10 @@ window.GroceryViewFlowActions = (() => {
         await loadProductTerminalFromApi(button);
         return;
       }
+      if (flow === 'price-confidence' && action === 'load-price-confidence') {
+        await loadPriceConfidenceFromApi(button);
+        return;
+      }
       if (flow === 'market-movers' && action === 'load-market-movers') {
         await loadMarketMoversFromApi();
         return;
@@ -987,6 +1028,9 @@ const productTerminalSections = `
 
 const productTerminalLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="product-terminal" data-product-id="coffee" style="margin-top:16px"><div class="eyebrow">Connected product terminal API</div><h2>Pull current API terminal numbers</h2><p class="lede">Use the API session bridge to fetch <code>/api/products/coffee/terminal</code> and refresh the customer-facing quote, 1M move, 52W range, Stockholm/local distribution, history evidence, and chart-series counts from the live API response.</p><div class="grid" aria-label="Live product terminal API metrics"><div class="metric"><strong data-product-terminal-quote>Waiting for API pull</strong><span>best API quote</span></div><div class="metric"><strong data-product-terminal-move>Static 1M move preview</strong><span>1M move and median gap</span></div><div class="metric"><strong data-product-terminal-range>Static 52W range preview</strong><span>52W range</span></div><div class="metric"><strong data-product-terminal-stockholm>Static Stockholm preview</strong><span>whole-city distribution</span></div><div class="metric"><strong data-product-terminal-chart>Static chart preview</strong><span>chart series and history</span></div><div class="metric"><strong data-product-terminal-evidence>Static verified history preview</strong><span>verified history</span></div></div><p class="footer-note" data-product-terminal-local>Local area distribution updates after the API pull.</p><div class="flow-panel" aria-label="Connected product terminal actions"><button type="button" data-flow-action="load-product-terminal">Load live terminal numbers</button></div><p class="flow-result" data-flow-result="product-terminal" aria-live="polite">Local preview mode: connect the API session bridge before loading live product terminal numbers.</p></section>`;
+
+const priceConfidenceLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="price-confidence" data-product-id="coffee" data-as-of="2026-05-20T00:00:00.000Z" style="margin-top:16px"><div class="eyebrow">Connected price confidence API</div><h2>Pull live confidence evidence</h2><p class="lede">Fetch <code>/api/products/coffee/terminal</code> to turn the confidence guide into live evidence: current price-row volume, verified-history ratio, Deal Score eligibility verdict, guardrail count, and chart confidence styling.</p><div class="grid" aria-label="Live price confidence API metrics"><div class="metric"><strong data-price-confidence-quote>Waiting for API pull</strong><span>quote and eligibility verdict</span></div><div class="metric"><strong data-price-confidence-volume>Static evidence-volume preview</strong><span>current rows and verified history</span></div><div class="metric"><strong data-price-confidence-guardrails>Static guardrail preview</strong><span>evidence rules protecting shoppers</span></div><div class="metric"><strong data-price-confidence-chart>Static chart-style preview</strong><span>confidence-styled chart series</span></div></div><div class="flow-panel" aria-label="Connected price confidence actions"><button type="button" data-flow-action="load-price-confidence">Load live confidence evidence</button></div><p class="flow-result" data-flow-result="price-confidence" aria-live="polite">Local preview mode: connect the API session bridge before loading live price confidence evidence.</p></section>`;
 
 const productPriceGuardrails = `
   <section class="card" style="margin-top:16px"><h2>Price evidence guardrails</h2><table class="table"><thead><tr><th>Signal</th><th>Displayed behavior</th></tr></thead><tbody><tr><td>Verified shelf or retailer page</td><td>Can contribute to current price, Deal Score, and basket totals.</td></tr><tr><td>Member or promotion price</td><td>Shown with explicit loyalty or campaign label before shoppers act.</td></tr><tr><td>Estimated or low-confidence row</td><td>Marked unverified and excluded from official shelf-price claims.</td></tr></tbody></table></section>`;
@@ -1152,7 +1196,7 @@ const pages = [
     path: 'prices/confidence/index.html',
     title: 'Price confidence guide — GroceryView',
     description: 'Explain GroceryView price confidence labels, source types, Deal Score eligibility, and user-facing trust decisions.',
-    body: `<section class="card"><div class="eyebrow">Price confidence</div><h1>Price confidence guide</h1><p class="lede">Understand how verified shelf, retailer-page, member, estimated, and low-confidence prices appear across deal boards and basket decisions.</p><div class="grid"><div class="metric"><strong>Verified</strong><span>can affect Deal Score</span></div><div class="metric"><strong>Estimated</strong><span>display only</span></div><div class="metric"><strong>Low</strong><span>review required</span></div></div></section><section class="card" style="margin-top:16px"><h2>Confidence labels</h2><table class="table"><thead><tr><th>Label</th><th>Source</th><th>Deal Score</th><th>User copy</th></tr></thead><tbody><tr><td>Verified shelf</td><td>Shelf photo or audited retailer page</td><td>Eligible</td><td>Official shelf evidence</td></tr><tr><td>Retailer page</td><td>Parsed public retailer page</td><td>Eligible when fresh</td><td>Retailer-page confidence</td></tr><tr><td>Member-only</td><td>Loyalty price or coupon</td><td>Separated</td><td>Requires membership context</td></tr><tr><td>Estimated</td><td>Model or stale observation</td><td>Ineligible</td><td>Estimate, do not rank</td></tr><tr><td>Low confidence</td><td>OCR or match uncertainty</td><td>Ineligible</td><td>Needs review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Trust decisions</h2><table class="table"><thead><tr><th>Decision</th><th>Rule</th></tr></thead><tbody><tr><td>Show in product page</td><td>All labels can appear with source metadata.</td></tr><tr><td>Trigger household alert</td><td>Only verified or fresh retailer-page prices can alert.</td></tr><tr><td>Rank in deal board</td><td>Estimated and low-confidence rows are excluded.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Price confidence</div><h1>Price confidence guide</h1><p class="lede">Understand how verified shelf, retailer-page, member, estimated, and low-confidence prices appear across deal boards and basket decisions.</p><div class="grid"><div class="metric"><strong>Verified</strong><span>can affect Deal Score</span></div><div class="metric"><strong>Estimated</strong><span>display only</span></div><div class="metric"><strong>Low</strong><span>review required</span></div></div></section><section class="card" style="margin-top:16px"><h2>Confidence labels</h2><table class="table"><thead><tr><th>Label</th><th>Source</th><th>Deal Score</th><th>User copy</th></tr></thead><tbody><tr><td>Verified shelf</td><td>Shelf photo or audited retailer page</td><td>Eligible</td><td>Official shelf evidence</td></tr><tr><td>Retailer page</td><td>Parsed public retailer page</td><td>Eligible when fresh</td><td>Retailer-page confidence</td></tr><tr><td>Member-only</td><td>Loyalty price or coupon</td><td>Separated</td><td>Requires membership context</td></tr><tr><td>Estimated</td><td>Model or stale observation</td><td>Ineligible</td><td>Estimate, do not rank</td></tr><tr><td>Low confidence</td><td>OCR or match uncertainty</td><td>Ineligible</td><td>Needs review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Trust decisions</h2><table class="table"><thead><tr><th>Decision</th><th>Rule</th></tr></thead><tbody><tr><td>Show in product page</td><td>All labels can appear with source metadata.</td></tr><tr><td>Trigger household alert</td><td>Only verified or fresh retailer-page prices can alert.</td></tr><tr><td>Rank in deal board</td><td>Estimated and low-confidence rows are excluded.</td></tr></tbody></table></section>${priceConfidenceLivePanel}`
   },
   {
     path: 'deals/today/index.html',
