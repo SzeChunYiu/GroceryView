@@ -181,6 +181,12 @@ const storeHighlights = [
   { store: 'Coop Farsta', category: 'Butter', signal: 'Above usual price', confidence: 'Estimated' }
 ];
 
+const categorySignals = [
+  { category: 'Coffee', product: 'Zoégas Coffee 450g', store: 'Willys Odenplan', price: '49.90 SEK', signal: '12th historical percentile' },
+  { category: 'Dairy', product: 'Arla Milk 1L', store: 'Lidl Sveavägen', price: '13.90 SEK', signal: 'Best favorite-store line' },
+  { category: 'Eggs', product: 'Eggs 12-pack', store: 'Lidl Sveavägen', price: '34.90 SEK', signal: 'Private-label swap candidate' }
+];
+
 const index = calculateFixedBasketIndex({
   id: 'stockholm-grocery-index',
   label: 'Stockholm Grocery Index',
@@ -297,6 +303,19 @@ app.innerHTML = `
         </table>
       </div>
 
+      <div class="card">
+        <h2>Category signals</h2>
+        <p class="lede">Category pages expose the product, store, and signal that drives each index movement.</p>
+        <table class="table">
+          <thead><tr><th>Category</th><th>Product</th><th>Store</th><th>Price</th><th>Signal</th></tr></thead>
+          <tbody>
+            ${categorySignals.map((signal) => `<tr><td>${signal.category}</td><td>${signal.product}</td><td>${signal.store}</td><td>${signal.price}</td><td>${signal.signal}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Weekly basket strategy</h2>
         <p class="lede">Cheapest by product across selected favorite stores. Distance is informational only and never reduces savings.</p>
