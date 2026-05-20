@@ -42,6 +42,9 @@ window.GroceryViewFlowActions = (() => {
     }
     return payload;
   };
+  const requireUploadSuccess = async (response) => {
+    if (!response.ok) throw new Error('Upload failed with HTTP ' + response.status);
+  };
   const configureApiSessionPanel = () => {
     const panel = document.querySelector('[data-api-session-panel]');
     if (!panel) return;
@@ -183,11 +186,34 @@ window.GroceryViewFlowActions = (() => {
     const data = new FormData(form);
     const file = data.get('scanImage');
     const fileName = file && typeof file === 'object' && 'name' in file ? file.name : 'manual-scan';
+    const contentType = file && typeof file === 'object' && 'type' in file && file.type ? file.type : 'image/jpeg';
+    const byteLength = file && typeof file === 'object' && 'size' in file && Number.isFinite(file.size) && file.size > 0 ? file.size : 1;
+    const scanId = 'scanner-preview-' + Date.now();
     try {
+      const uploadTicket = await requireApiSuccess(await fetch(apiUrl('/api/scans/upload-url', config), {
+        method: 'POST',
+        headers: apiHeaders(config),
+        body: JSON.stringify({
+          scanId,
+          kind: 'receipt',
+          contentType,
+          byteLength,
+          requestedAt: new Date().toISOString()
+        })
+      }));
+      const ticket = uploadTicket.result?.status === 'ready' ? uploadTicket.result.ticket : null;
+      if (!ticket) throw new Error(uploadTicket.result?.reason || 'Scan upload storage is not configured.');
+      const filePayload = file && typeof file === 'object' ? file : new Blob([]);
+      await requireUploadSuccess(await fetch(ticket.uploadUrl, {
+        method: 'PUT',
+        headers: ticket.headers || {},
+        body: filePayload
+      }));
+
       const payload = {
-        scanId: 'scanner-preview-' + Date.now(),
+        scanId,
         kind: 'receipt',
-        payload: 'private-upload://scanner-preview/' + encodeURIComponent(fileName || 'manual-scan'),
+        payload: ticket.payloadUri || 'private-upload://scanner-preview/' + encodeURIComponent(fileName || 'manual-scan'),
         uploadedAt: new Date().toISOString()
       };
       const response = await fetch(apiUrl('/api/scans/process', config), {
@@ -197,7 +223,7 @@ window.GroceryViewFlowActions = (() => {
       });
       const result = await requireApiSuccess(response);
       const reviewCount = Array.isArray(result.reviewWorkItems) ? result.reviewWorkItems.length : 0;
-      setResult('scanner', 'Connected API: scan processed as ' + (result.result?.status || 'unknown') + ' with ' + reviewCount + ' review work items.');
+      setResult('scanner', 'Connected API: uploaded scan bytes to private storage as ' + (ticket.payloadUri || payload.payload) + '; scan processed as ' + (result.result?.status || 'unknown') + ' with ' + reviewCount + ' review work items.');
     } catch (error) {
       setResult('scanner', 'Scan API processing failed: ' + error.message + '. Local preview remains staged.');
     }
@@ -351,6 +377,82 @@ const layout = ({ title, description, body }) => `<!doctype html>
   </body>
 </html>`;
 
+const productPriceRows = [
+  {
+    store: 'Willys Odenplan',
+    price: '49.90 SEK',
+    unitPrice: '110.89 SEK/kg',
+    priceType: 'Promo',
+    confidence: 'High confidence',
+    sourceTime: '2026-05-16 09:30 UTC',
+    sourceType: 'retailer_page',
+    label: 'Promo campaign',
+    note: 'Temporary promotion. Not presented as an official shelf price.',
+    tone: 'promo'
+  },
+  {
+    store: 'ICA Kvantum Liljeholmen',
+    price: '54.90 SEK',
+    unitPrice: '122.00 SEK/kg',
+    priceType: 'Shelf',
+    confidence: 'High confidence',
+    sourceTime: '2026-05-16 08:45 UTC',
+    sourceType: 'retailer_page',
+    label: 'Official shelf price',
+    note: 'Verified retailer source with current shelf treatment.',
+    tone: 'verified'
+  },
+  {
+    store: 'Coop Farsta',
+    price: '57.90 SEK',
+    unitPrice: '128.67 SEK/kg',
+    priceType: 'Estimated',
+    confidence: 'Low confidence',
+    sourceTime: '2026-05-15 17:20 UTC',
+    sourceType: 'estimated',
+    label: 'Unverified / estimated',
+    note: 'Estimated fallback. Never styled as an official shelf price.',
+    tone: 'estimated'
+  },
+  {
+    store: 'Hemkop T-Centralen',
+    price: '46.90 SEK',
+    unitPrice: '104.11 SEK/kg',
+    priceType: 'Member',
+    confidence: 'Medium confidence',
+    sourceTime: '2026-05-14 12:18 UTC',
+    sourceType: 'manual_admin',
+    label: 'Member-only',
+    note: 'Requires loyalty context and cannot be treated as a public shelf price.',
+    tone: 'member'
+  }
+];
+
+const productPriceTable = `
+  <div class="price-terminal">
+    <div class="price-summary">
+      <div>
+        <div class="eyebrow">Current best comparable price</div>
+        <h2>ICA Kvantum Liljeholmen - 54.90 SEK</h2>
+        <p class="lede">Best verified shelf source. Promo, member-only, estimated, and low-confidence observations are separated before comparison.</p>
+      </div>
+      <span class="status verified">Official shelf price</span>
+    </div>
+    <table class="table price-table">
+      <thead><tr><th>Store</th><th>Price</th><th>Unit</th><th>Type</th><th>Confidence</th><th>Source timestamp</th></tr></thead>
+      <tbody>
+        ${productPriceRows.map((row) => `<tr class="${row.tone}">
+          <td><strong>${row.store}</strong><br><span class="footer-note">${row.note}</span></td>
+          <td>${row.price}</td>
+          <td>${row.unitPrice}</td>
+          <td><span class="status ${row.tone}">${row.priceType}</span><br><span class="footer-note">${row.label}</span></td>
+          <td>${row.confidence}</td>
+          <td>${row.sourceTime}<br><span class="footer-note">${row.sourceType}</span></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
 const pages = [
   {
     path: 'login/index.html',
@@ -369,6 +471,12 @@ const pages = [
     title: 'Billing status — GroceryView',
     description: 'Review GroceryView subscription entitlement, checkout requirement, ad removal state, billing issue actions, and provider webhook status.',
     body: `<section class="card"><div class="eyebrow">Billing</div><h1>Billing status</h1><p class="lede">Audit subscription entitlement, checkout enforcement, ad removal, and provider webhook state before premium features are shown.</p><div class="grid"><div class="metric"><strong>Premium</strong><span>active entitlement</span></div><div class="metric"><strong>Ads off</strong><span>non-critical slots removed</span></div><div class="metric"><strong>0</strong><span>billing blockers</span></div></div></section><section class="card" style="margin-top:16px"><h2>Entitlement state</h2><table class="table"><thead><tr><th>Account</th><th>Plan</th><th>Status</th><th>Checkout</th><th>Action</th></tr></thead><tbody><tr><td>Household workspace</td><td>premium_monthly</td><td>Active</td><td>Not required</td><td>Show manage subscription</td></tr><tr><td>Solo price watch</td><td>free</td><td>No entitlement</td><td>Required</td><td>Show upgrade</td></tr><tr><td>Reviewer desk</td><td>premium_yearly</td><td>Past due</td><td>Required</td><td>Show billing issue</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Billing guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Fail closed</td><td>Missing or past-due entitlements keep checkout required.</td></tr><tr><td>Ads removed only for premium</td><td>Free and past-due accounts keep non-critical ad slots eligible.</td></tr><tr><td>Webhook freshness</td><td>Provider updates must be newer than stored entitlement state.</td></tr></tbody></table></section>`
+  },
+  {
+    path: 'loyalty/offers/index.html',
+    title: 'Loyalty offer tracker — GroceryView',
+    description: 'Track GroceryView member-only offers, coupon eligibility, membership requirements, basket impact, and loyalty-price guardrails.',
+    body: `<section class="card"><div class="eyebrow">Loyalty</div><h1>Loyalty offer tracker</h1><p class="lede">Review member-only prices, coupon eligibility, and basket impact before loyalty offers affect household savings decisions.</p><div class="grid"><div class="metric"><strong>3</strong><span>active member offers</span></div><div class="metric"><strong>38 SEK</strong><span>eligible savings</span></div><div class="metric"><strong>1</strong><span>needs membership confirmation</span></div></div></section><section class="card" style="margin-top:16px"><h2>Member offer queue</h2><table class="table"><thead><tr><th>Offer</th><th>Chain</th><th>Requirement</th><th>Savings</th><th>Status</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g Stammis price</td><td>ICA</td><td>ICA Stammis linked</td><td>7 SEK</td><td>Eligible</td></tr><tr><td>Coop Medmera dairy coupon</td><td>Coop</td><td>Clip coupon before checkout</td><td>12 SEK</td><td>Needs action</td></tr><tr><td>Willys Plus pantry bundle</td><td>Willys</td><td>Member account verified</td><td>19 SEK</td><td>Ready for basket</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Loyalty guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Separate public shelf price</td><td>Member-only savings never overwrite verified public shelf evidence.</td></tr><tr><td>Confirm membership</td><td>Unlinked programs stay out of basket savings until the household confirms access.</td></tr><tr><td>Coupon action required</td><td>Clip-required offers show an action before checkout routing.</td></tr></tbody></table></section>`
   },
   {
     path: 'watchlist/index.html',
@@ -458,7 +566,7 @@ const pages = [
     path: 'products/coffee/index.html',
     title: 'ZOEGAS-COFFEE-450G price history — GroceryView',
     description: 'Zoégas Coffee 450g price ticker with current prices, price history, and Deal Score.',
-    body: `<section class="card"><div class="eyebrow">Product ticker</div><h1>ZOEGAS-COFFEE-450G</h1><p class="lede">Current best price: 49.90 SEK at Willys Odenplan. Price rows separate verified shelf, member, promotion, and estimated evidence so GroceryView never presents unverified values as official shelf prices.</p><div class="grid"><div class="metric"><strong>82</strong><span>Deal Score</span></div><div class="metric"><strong>8th</strong><span>Stockholm percentile</span></div><div class="metric"><strong>6th</strong><span>Historical percentile</span></div></div></section><section class="card" style="margin-top:16px"><h2>Price chart</h2><div class="toolbar" aria-label="Chart range"><span class="pill">7D</span><span class="pill">30D</span><span class="pill">90D</span><span class="pill">1Y</span></div><svg class="price-chart" viewBox="0 0 720 260" role="img" aria-label="Multi-store coffee price history with promo markers and confidence styling"><line x1="44" y1="42" x2="44" y2="218" stroke="#37524b"/><line x1="44" y1="218" x2="690" y2="218" stroke="#37524b"/><polyline points="56,92 150,96 244,110 338,126 432,130 526,146 620,142" fill="none" stroke="#20d9a6" stroke-width="4"/><polyline points="56,112 150,116 244,121 338,128 432,137 526,151 620,157" fill="none" stroke="#7cf2ce" stroke-width="4"/><polyline points="56,80 150,88 244,102 338,118 432,132 526,138 620,150" fill="none" stroke="#ffca66" stroke-width="4" stroke-dasharray="8 8"/><circle cx="526" cy="146" r="8" fill="#20d9a6"/><circle cx="620" cy="150" r="8" fill="#ffca66"/><text x="536" y="132" fill="#ccfff0" font-size="13">promo marker</text><text x="54" y="236" fill="#88a49c" font-size="12">May 14</text><text x="300" y="236" fill="#88a49c" font-size="12">May 17</text><text x="584" y="236" fill="#88a49c" font-size="12">May 20</text></svg><table class="table"><thead><tr><th>Store line</th><th>Style</th><th>Confidence</th></tr></thead><tbody><tr><td>Willys Odenplan</td><td>Solid green</td><td>Verified shelf and promo observations</td></tr><tr><td>ICA Kvantum Torsplan</td><td>Solid mint</td><td>Retailer page observations</td></tr><tr><td>Coop Medborgarplatsen</td><td>Dotted amber</td><td>Estimated observations need review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Current store prices</h2><table class="table"><thead><tr><th>Store</th><th>Price</th><th>Unit price</th><th>Type</th><th>Confidence</th><th>Observed</th></tr></thead><tbody><tr><td>Willys Odenplan<br><span class="footer-note">Promo label: weekly coffee campaign</span></td><td>49.90 SEK</td><td>110.89 SEK/kg</td><td><span class="status">promotion</span></td><td>94% verified retailer page</td><td>2026-05-20 06:00</td></tr><tr><td>ICA Kvantum Torsplan<br><span class="footer-note">Member label: Stammis price</span></td><td>52.90 SEK</td><td>117.56 SEK/kg</td><td><span class="status">member</span></td><td>91% loyalty offer</td><td>2026-05-20 06:05</td></tr><tr><td>Coop Medborgarplatsen<br><span class="footer-note">Unverified estimate: do not treat as official shelf price</span></td><td>57.90 SEK</td><td>128.67 SEK/kg</td><td><span class="status">estimated</span></td><td>62% needs review</td><td>2026-05-20 05:55</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Price evidence guardrails</h2><table class="table"><thead><tr><th>Signal</th><th>Displayed behavior</th></tr></thead><tbody><tr><td>Verified shelf or retailer page</td><td>Can contribute to current price, Deal Score, and basket totals.</td></tr><tr><td>Member or promotion price</td><td>Shown with explicit loyalty or campaign label before shoppers act.</td></tr><tr><td>Estimated or low-confidence row</td><td>Marked unverified and excluded from official shelf-price claims.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Product ticker</div><h1>ZOEGAS-COFFEE-450G</h1><p class="lede">Current best verified shelf price: 54.90 SEK at ICA Kvantum Liljeholmen. Lower promo or member-only observations stay visible but are never implied to be official shelf prices.</p><div class="grid"><div class="metric"><strong>82</strong><span>Deal Score</span></div><div class="metric"><strong>8th</strong><span>Stockholm percentile</span></div><div class="metric"><strong>6th</strong><span>Historical percentile</span></div></div></section>${productPriceTable}`
   },
   {
     path: 'stores/willys-odenplan/index.html',

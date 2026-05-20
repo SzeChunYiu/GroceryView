@@ -72,6 +72,29 @@ export type ProductEquivalent = {
   reason: string;
 };
 
+export type PriceFreshnessStatus = 'fresh' | 'aging' | 'stale';
+
+export type ProductPriceFreshness = {
+  productId: string;
+  productName: string;
+  category: string;
+  latestVerifiedPriceDate: string | null;
+  ageDays: number | null;
+  status: PriceFreshnessStatus;
+  action: 'none' | 'schedule_price_check' | 'prioritize_manual_or_feed_refresh';
+};
+
+export type PriceFreshnessReport = {
+  asOf: string;
+  thresholds: {
+    agingAfterDays: number;
+    staleAfterDays: number;
+  };
+  summary: Record<PriceFreshnessStatus, number>;
+  products: ProductPriceFreshness[];
+  backfillProductIds: string[];
+};
+
 export type StoreDeal = {
   productId: string;
   ticker: string;
@@ -266,6 +289,7 @@ function optionalOneOf<T extends string>(value: unknown, label: string, allowed:
   return requireOneOf(value, label, allowed);
 }
 
+const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/;
 const isoTimestampPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
 
 function requireIsoTimestamp(value: unknown, label: string): string {
@@ -283,6 +307,16 @@ function requireIsoTimestamp(value: unknown, label: string): string {
 function optionalIsoTimestamp(value: unknown, label: string): string | undefined {
   if (value === undefined) return undefined;
   return requireIsoTimestamp(value, label);
+}
+
+function requireIsoDateOrTimestamp(value: string, label: string): string {
+  if (isoDatePattern.test(value) && Number.isFinite(Date.parse(`${value}T00:00:00.000Z`))) return value;
+  return requireIsoTimestamp(value, label);
+}
+
+function toUtcDay(value: string): number {
+  const parsed = isoDatePattern.test(value) ? Date.parse(`${value}T00:00:00.000Z`) : Date.parse(value);
+  return Math.floor(parsed / 86_400_000);
 }
 
 function normalizeSubscriptionEntitlement(input: SubscriptionEntitlementSnapshot): SubscriptionEntitlementSnapshot {
@@ -347,6 +381,17 @@ function productEquivalentFor(product: ProductDetail): ProductEquivalent {
     dealScore: product.dealScore,
     reason: `Same ${product.category} category with comparable current price evidence.`
   };
+}
+
+function latestVerifiedPriceDate(product: ProductDetail): string | null {
+  const verifiedDates = product.history.filter((point) => point.verified).map((point) => point.date);
+  return verifiedDates.sort().at(-1) ?? null;
+}
+
+function priceFreshnessStatus(ageDays: number | null): PriceFreshnessStatus {
+  if (ageDays === null || ageDays > 14) return 'stale';
+  if (ageDays > 7) return 'aging';
+  return 'fresh';
 }
 
 function cheapestPriceByProductId(productIds: string[]): Record<string, number> {
@@ -547,6 +592,44 @@ export function createGroceryViewApi() {
         .sort((left, right) => right.dealScore - left.dealScore || left.productName.localeCompare(right.productName));
     },
 
+    getPriceFreshnessReport(asOf = new Date().toISOString()): PriceFreshnessReport {
+      const normalizedAsOf = requireIsoDateOrTimestamp(asOf, 'asOf');
+      const asOfDay = toUtcDay(normalizedAsOf);
+      const rows = products.map((product) => {
+        const latestDate = latestVerifiedPriceDate(product);
+        const ageDays = latestDate ? Math.max(0, asOfDay - toUtcDay(latestDate)) : null;
+        const status = priceFreshnessStatus(ageDays);
+        return {
+          productId: product.id,
+          productName: product.name,
+          category: product.category,
+          latestVerifiedPriceDate: latestDate,
+          ageDays,
+          status,
+          action:
+            status === 'stale'
+              ? 'prioritize_manual_or_feed_refresh'
+              : status === 'aging'
+                ? 'schedule_price_check'
+                : 'none'
+        } satisfies ProductPriceFreshness;
+      });
+      const summary = rows.reduce<Record<PriceFreshnessStatus, number>>(
+        (counts, row) => ({ ...counts, [row.status]: counts[row.status] + 1 }),
+        { fresh: 0, aging: 0, stale: 0 }
+      );
+      return {
+        asOf: normalizedAsOf,
+        thresholds: { agingAfterDays: 7, staleAfterDays: 14 },
+        summary,
+        products: rows.sort((left, right) => (right.ageDays ?? Number.MAX_SAFE_INTEGER) - (left.ageDays ?? Number.MAX_SAFE_INTEGER)),
+        backfillProductIds: rows
+          .filter((row) => row.status !== 'fresh')
+          .map((row) => row.productId)
+          .sort()
+      };
+    },
+
     addFavoriteStore(userId: string, storeId: string) {
       requireNonEmptyId(userId, 'userId');
       requireKnownStore(storeId);
@@ -566,6 +649,15 @@ export function createGroceryViewApi() {
       requireOptionalPositiveFinite(item.targetPrice, 'targetPrice');
       requireScoreThreshold(item.alertDealScoreAt);
       watchlists.set(userId, [...(watchlists.get(userId) ?? []), item]);
+    },
+
+    removeWatchlistItem(userId: string, productId: string) {
+      requireNonEmptyId(userId, 'userId');
+      requireKnownProduct(productId);
+      const current = watchlists.get(userId) ?? [];
+      const remaining = current.filter((item) => item.productId !== productId);
+      watchlists.set(userId, remaining);
+      return { removed: remaining.length !== current.length };
     },
 
     getWatchlist(userId: string): { items: WatchlistItem[]; alerts: WatchlistAlert[] } {

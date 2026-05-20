@@ -14,3 +14,6 @@ packages/*/dist-test/
 apps/*/dist/
 packages/core/src/*.js
 apps/*/dist-test/
+__pycache__/
+*.py[cod]
+*.egg-info/

@@ -1,217 +1,330 @@
 from __future__ import annotations
 
-from decimal import Decimal, ROUND_HALF_UP
+from collections import defaultdict
+from typing import Iterable
 
-from .models import LatestPrice, PriceObservation, ProductSeed, QualityCheck, RawRetailerRecord, StoreSeed
+try:
+    from dagster import asset
+except ModuleNotFoundError:
+    def asset(**_kwargs):
+        def decorator(fn):
+            return fn
+
+        return decorator
+
+from .fixtures import FETCHED_AT, HERO_PRODUCTS, RETAILER_PRICE_SNAPSHOT, STOCKHOLM_STORES
+from .models import (
+    LatestPriceRow,
+    PriceObservationRow,
+    PriceProvenance,
+    ProductSeed,
+    QualityCheckSummary,
+    RetailerFetchStub,
+    StoreSeed,
+)
+
+ASSET_GROUP = "data_pipeline"
+OBSERVED_AT = FETCHED_AT
+PARSER_VERSION = "demo-retailer-stub-v1"
 
 
-def seed_stores() -> list[StoreSeed]:
+def build_seed_stores() -> list[StoreSeed]:
+    return sorted(
+        (StoreSeed(**store) for store in STOCKHOLM_STORES), key=lambda store: store.slug
+    )
+
+
+def build_seed_products() -> list[ProductSeed]:
+    return sorted(
+        (ProductSeed(**product) for product in HERO_PRODUCTS), key=lambda product: product.slug
+    )
+
+
+def _unit_price(price_amount: float, unit_size: float) -> float | None:
+    if unit_size <= 0:
+        return None
+    return round(price_amount / unit_size, 2)
+
+
+def build_retailer_fetch_stubs(
+    stores: Iterable[StoreSeed], products: Iterable[ProductSeed]
+) -> list[RetailerFetchStub]:
+    product_by_slug = {product.slug: product for product in products}
+    stubs: list[RetailerFetchStub] = []
+
+    for store in sorted(stores, key=lambda store: store.slug):
+        store_snapshot = RETAILER_PRICE_SNAPSHOT.get(store.slug, {})
+        for product_slug, price_snapshot in sorted(store_snapshot.items()):
+            product = product_by_slug.get(product_slug)
+            if product is None:
+                continue
+            observed_at = OBSERVED_AT
+            price_amount = float(price_snapshot["price_amount"])
+            confidence = float(price_snapshot["confidence"])
+            price_type = str(price_snapshot["price_type"])
+            confidence_label = str(price_snapshot["label"])
+            provenance = PriceProvenance(
+                source_type="retailer_page",
+                source_name=f"{store.chain} demo retailer page",
+                source_url=f"https://example.com/{store.slug}/{product.slug}",
+                source_run_id=f"demo-run-{store.slug}-{product.slug}",
+                raw_record_id=f"raw-{store.slug}-{product.slug}",
+                raw_snapshot_ref=f"s3://groceryview-raw/{store.slug}/{product.slug}.json",
+                fetched_at=FETCHED_AT,
+                observed_at=observed_at,
+                parser_version=PARSER_VERSION,
+            )
+            stubs.append(
+                RetailerFetchStub(
+                    store_slug=store.slug,
+                    product_slug=product.slug,
+                    price_amount=price_amount,
+                    unit=product.unit,
+                    unit_size=product.unit_size,
+                    unit_price_amount=_unit_price(price_amount, product.unit_size),
+                    unit_price_unit="kg" if product.category in {"fruit", "coffee"} else product.unit,
+                    price_type=price_type,
+                    source_type="retailer_page",
+                    confidence=clamp_confidence(confidence),
+                    confidence_label=confidence_label,
+                    member_only=price_type == "member",
+                    promotion_label="Demo promo" if price_type == "promotion" else None,
+                    valid_from=None,
+                    valid_to=None,
+                    provenance=provenance,
+                )
+            )
+
+    return stubs
+
+
+def build_normalized_products(products: Iterable[ProductSeed]) -> list[dict[str, object]]:
     return [
-        StoreSeed("store-willys-skanstull", "willys", "Willys", "Willys Skanstull", "Stockholm", Decimal("59.307600"), Decimal("18.076100")),
-        StoreSeed("store-ica-torsplan", "ica", "ICA", "ICA Kvantum Torsplan", "Stockholm", Decimal("59.345900"), Decimal("18.035700")),
-        StoreSeed("store-coop-medborgarplatsen", "coop", "Coop", "Coop Medborgarplatsen", "Stockholm", Decimal("59.314400"), Decimal("18.073600")),
+        {
+            "product_slug": product.slug,
+            "canonical_name": product.name,
+            "brand": product.brand,
+            "category": product.category,
+            "unit": product.unit,
+            "unit_size": product.unit_size,
+            "aliases": sorted({product.name.lower(), product.brand.lower()}),
+            "source_type": "manual_admin",
+        }
+        for product in products
     ]
 
 
-def seed_products() -> list[ProductSeed]:
-    return [
-        ProductSeed("prod-arabica-coffee-450g", "Bryggkaffe Mellanrost 450 g", "Zoegas", Decimal("450"), "g", "coffee"),
-        ProductSeed("prod-oat-milk-1l", "Havredryck 1 l", "Oatly", Decimal("1"), "l", "dairy_alternatives"),
-        ProductSeed("prod-basmati-rice-1kg", "Basmatiris 1 kg", "Garant", Decimal("1"), "kg", "pantry"),
-    ]
+def build_price_observations(
+    stubs: Iterable[RetailerFetchStub], normalized_products: Iterable[dict[str, object]]
+) -> list[PriceObservationRow]:
+    normalized_product_lookup = {
+        product["product_slug"]: product for product in normalized_products
+    }
+    observations: list[PriceObservationRow] = []
 
-
-def retailer_fetch_stubs() -> list[RawRetailerRecord]:
-    """Deterministic retailer fixture records; no live scraping or HTTP calls."""
-    return [
-        RawRetailerRecord(
-            source_run_id="stub-run-2026-05-20",
-            source_type="retailer_stub",
-            source_name="willys",
-            source_url="https://example.invalid/willys/stub/coffee",
-            external_ref="willys:coffee:450g",
-            observed_at="2026-05-20T06:00:00Z",
-            payload={
-                "productId": "prod-arabica-coffee-450g",
-                "chainId": "willys",
-                "storeId": "store-willys-skanstull",
-                "displayPrice": "49.90",
-                "regularPrice": "59.90",
-                "unitPrice": "110.89",
-                "priceType": "promotion",
-                "confidence": "0.94",
-            },
-            provenance={
-                "collector": "retailer_fetch_stubs",
-                "source_kind": "fixture",
-                "parser_version": "stub-v1",
-                "capture_method": "checked_in_fixture",
-            },
-        ),
-        RawRetailerRecord(
-            source_run_id="stub-run-2026-05-20",
-            source_type="retailer_stub",
-            source_name="ica",
-            source_url="https://example.invalid/ica/stub/oat-milk",
-            external_ref="ica:oat-milk:1l",
-            observed_at="2026-05-20T06:05:00Z",
-            payload={
-                "productId": "prod-oat-milk-1l",
-                "chainId": "ica",
-                "storeId": "store-ica-torsplan",
-                "displayPrice": "22.50",
-                "regularPrice": "22.50",
-                "unitPrice": "22.50",
-                "priceType": "shelf",
-                "confidence": "0.98",
-            },
-            provenance={
-                "collector": "retailer_fetch_stubs",
-                "source_kind": "fixture",
-                "parser_version": "stub-v1",
-                "capture_method": "checked_in_fixture",
-            },
-        ),
-        RawRetailerRecord(
-            source_run_id="stub-run-2026-05-20",
-            source_type="retailer_stub",
-            source_name="coop",
-            source_url="https://example.invalid/coop/stub/rice",
-            external_ref="coop:rice:1kg",
-            observed_at="2026-05-20T05:55:00Z",
-            payload={
-                "productId": "prod-basmati-rice-1kg",
-                "chainId": "coop",
-                "storeId": "store-coop-medborgarplatsen",
-                "displayPrice": "34.90",
-                "regularPrice": "34.90",
-                "unitPrice": "34.90",
-                "priceType": "online",
-                "confidence": "0.90",
-            },
-            provenance={
-                "collector": "retailer_fetch_stubs",
-                "source_kind": "fixture",
-                "parser_version": "stub-v1",
-                "capture_method": "checked_in_fixture",
-            },
-        ),
-    ]
-
-
-def _money(value: object, field_name: str) -> Decimal:
-    try:
-        amount = Decimal(str(value))
-    except Exception as exc:
-        raise ValueError(f"{field_name} must be a decimal-compatible value") from exc
-    if amount < 0:
-      raise ValueError(f"{field_name} must be non-negative")
-    return amount.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-
-
-def _confidence(value: object) -> Decimal:
-    score = Decimal(str(value))
-    if score < 0 or score > 1:
-        raise ValueError("confidence must be between 0 and 1")
-    return score.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
-
-
-def normalize_retailer_records(records: list[RawRetailerRecord]) -> list[PriceObservation]:
-    observations: list[PriceObservation] = []
-
-    for record in records:
-        payload = record.payload
-        price_type = str(payload["priceType"])
-        if price_type not in {"shelf", "online", "member", "promotion", "receipt", "community", "estimated"}:
-            raise ValueError(f"unsupported priceType for {record.external_ref}: {price_type}")
-
+    for stub in stubs:
+        normalized = normalized_product_lookup.get(stub.product_slug)
+        if normalized is None:
+            continue
+        unit = str(normalized["unit"])
+        unit_size = float(normalized["unit_size"])
         observations.append(
-            PriceObservation(
-                product_id=str(payload["productId"]),
-                chain_id=str(payload["chainId"]),
-                store_id=str(payload["storeId"]) if payload.get("storeId") else None,
-                raw_record_ref=record.external_ref,
-                price_type=price_type,  # type: ignore[arg-type]
-                price=_money(payload["displayPrice"], "displayPrice"),
-                regular_price=_money(payload["regularPrice"], "regularPrice") if payload.get("regularPrice") is not None else None,
-                unit_price=_money(payload["unitPrice"], "unitPrice"),
-                currency="SEK",
-                observed_at=record.observed_at,
-                confidence=_confidence(payload["confidence"]),
-                source_type=record.source_type,
-                source_name=record.source_name,
-                source_url=record.source_url,
-                provenance={
-                    **record.provenance,
-                    "source_run_id": record.source_run_id,
-                    "raw_record_ref": record.external_ref,
-                    "original_display_price": payload["displayPrice"],
-                },
+            PriceObservationRow(
+                product_slug=stub.product_slug,
+                store_slug=stub.store_slug,
+                price_amount=stub.price_amount,
+                unit=unit,
+                unit_price_amount=_unit_price(stub.price_amount, unit_size),
+                unit_price_unit=stub.unit_price_unit,
+                price_type=stub.price_type,
+                observed_at=stub.provenance.observed_at,
+                source_type=stub.source_type,
+                confidence=stub.confidence,
+                confidence_label=stub.confidence_label,
+                provenance=stub.provenance,
+                member_only=stub.member_only,
+                promotion_label=stub.promotion_label,
+                valid_from=stub.valid_from,
+                valid_to=stub.valid_to,
             )
         )
 
     return observations
 
 
-def build_latest_price_rollup(observations: list[PriceObservation]) -> list[LatestPrice]:
-    latest: dict[tuple[str, str, str | None, str], PriceObservation] = {}
+def build_latest_price_rollup(
+    observations: Iterable[PriceObservationRow],
+) -> list[LatestPriceRow]:
+    grouped: dict[tuple[str, str], PriceObservationRow] = {}
+
     for observation in observations:
-        key = (observation.product_id, observation.chain_id, observation.store_id, observation.price_type)
-        current = latest.get(key)
-        if current is None or (observation.observed_at, observation.raw_record_ref) > (current.observed_at, current.raw_record_ref):
-            latest[key] = observation
+        key = (observation.product_slug, observation.store_slug)
+        current = grouped.get(key)
+        if current is None:
+            grouped[key] = observation
+            continue
+        if (
+            observation.observed_at > current.observed_at
+            or (
+                observation.observed_at == current.observed_at
+                and observation.confidence > current.confidence
+            )
+        ):
+            grouped[key] = observation
 
     return [
-        LatestPrice(
-            product_id=observation.product_id,
-            chain_id=observation.chain_id,
-            store_id=observation.store_id,
-            price_type=observation.price_type,
-            observation_ref=observation.raw_record_ref,
-            price=observation.price,
-            regular_price=observation.regular_price,
-            unit_price=observation.unit_price,
-            currency=observation.currency,
+        LatestPriceRow(
+            product_slug=observation.product_slug,
+            store_slug=observation.store_slug,
             observed_at=observation.observed_at,
-            confidence=observation.confidence,
+            price_amount=observation.price_amount,
+            price_type=observation.price_type,
+            source_type=observation.source_type,
+            confidence_label=observation.confidence_label,
             provenance=observation.provenance,
         )
-        for observation in sorted(latest.values(), key=lambda item: (item.product_id, item.chain_id, item.store_id or "", item.price_type))
+        for observation in grouped.values()
     ]
 
 
-def collect_quality_checks(
-    stores: list[StoreSeed],
-    products: list[ProductSeed],
-    raw_records: list[RawRetailerRecord],
-    observations: list[PriceObservation],
-    latest_prices: list[LatestPrice],
-) -> list[QualityCheck]:
-    store_ids = {store.id for store in stores}
-    product_ids = {product.id for product in products}
+def build_quality_checks(
+    fetch_stubs: Iterable[RetailerFetchStub],
+    observations: Iterable[PriceObservationRow],
+    latest_rollup: Iterable[LatestPriceRow],
+) -> QualityCheckSummary:
+    observation_list = list(observations)
+    latest_list = list(latest_rollup)
+    fetch_stub_list = list(fetch_stubs)
 
-    missing_products = [observation.raw_record_ref for observation in observations if observation.product_id not in product_ids]
-    missing_stores = [
-        observation.raw_record_ref
-        for observation in observations
-        if observation.store_id is not None and observation.store_id not in store_ids
-    ]
+    def _is_complete_provenance(provenance: PriceProvenance) -> bool:
+        return (
+            bool(provenance.source_type)
+            and bool(provenance.source_name)
+            and bool(provenance.source_run_id)
+            and bool(provenance.raw_record_id)
+            and bool(provenance.observed_at)
+            and bool(provenance.fetched_at)
+            and bool(provenance.parser_version)
+        )
+
     missing_provenance = [
-        record.external_ref
-        for record in raw_records
-        if not record.provenance.get("parser_version") or not record.provenance.get("source_kind")
+        observation
+        for observation in observation_list
+        if not _is_complete_provenance(observation.provenance)
     ]
-    latest_keys = {(price.product_id, price.chain_id, price.store_id, price.price_type) for price in latest_prices}
-    observation_keys = {(item.product_id, item.chain_id, item.store_id, item.price_type) for item in observations}
+    missing_fetch_stub_provenance = [
+        stub
+        for stub in fetch_stub_list
+        if not _is_complete_provenance(stub.provenance)
+    ]
+    duplicate_keys: dict[tuple[str, str], int] = defaultdict(int)
+    for observation in observation_list:
+        duplicate_keys[(observation.product_slug, observation.store_slug)] += 1
 
-    return [
-        QualityCheck("observations_reference_seed_products", not missing_products, len(observations), missing_products),
-        QualityCheck("observations_reference_seed_stores", not missing_stores, len(observations), missing_stores),
-        QualityCheck("raw_records_include_parser_provenance", not missing_provenance, len(raw_records), missing_provenance),
-        QualityCheck(
-            "latest_prices_cover_observation_keys",
-            latest_keys == observation_keys,
-            len(latest_prices),
-            sorted(":".join(part or "online" for part in key) for key in observation_keys - latest_keys),
-        ),
+    duplicate_key_count = sum(1 for count in duplicate_keys.values() if count > 1)
+    source_types = sorted({observation.source_type for observation in observation_list})
+
+    return QualityCheckSummary(
+        observation_count=len(observation_list),
+        latest_rollup_count=len(latest_list),
+        missing_provenance_count=len(missing_provenance),
+        missing_fetch_stub_provenance_count=len(missing_fetch_stub_provenance),
+        duplicate_key_count=duplicate_key_count,
+        source_types=source_types,
+        fetch_stub_count=len(fetch_stub_list),
+    )
+
+
+def clamp_confidence(confidence: float) -> float:
+    if confidence < 0:
+        return 0
+    if confidence > 1:
+        return 1
+    return confidence
+
+
+@asset(group_name=ASSET_GROUP)
+def seed_stores() -> list[dict[str, object]]:
+    return [store.to_dict() for store in build_seed_stores()]
+
+
+@asset(group_name=ASSET_GROUP)
+def seed_products() -> list[dict[str, object]]:
+    return [product.to_dict() for product in build_seed_products()]
+
+
+@asset(group_name=ASSET_GROUP)
+def retailer_fetch_stubs(
+    seed_stores: list[dict[str, object]], seed_products: list[dict[str, object]]
+) -> list[dict[str, object]]:
+    stores = [StoreSeed(**store) for store in seed_stores]
+    products = [ProductSeed(**product) for product in seed_products]
+    return [stub.to_dict() for stub in build_retailer_fetch_stubs(stores, products)]
+
+
+@asset(group_name=ASSET_GROUP)
+def normalized_products(seed_products: list[dict[str, object]]) -> list[dict[str, object]]:
+    products = [ProductSeed(**product) for product in seed_products]
+    return build_normalized_products(products)
+
+
+@asset(group_name=ASSET_GROUP)
+def price_observations(
+    retailer_fetch_stubs: list[dict[str, object]],
+    normalized_products: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    stubs = [
+        RetailerFetchStub(
+            provenance=PriceProvenance(**stub["provenance"]),
+            **{key: value for key, value in stub.items() if key != "provenance"},
+        )
+        for stub in retailer_fetch_stubs
     ]
+    observations = build_price_observations(stubs, normalized_products)
+    return [observation.to_dict() for observation in observations]
+
+
+@asset(group_name=ASSET_GROUP)
+def latest_price_rollup(
+    price_observations: list[dict[str, object]],
+) -> list[dict[str, object]]:
+    observations = [
+        PriceObservationRow(
+            provenance=PriceProvenance(**observation["provenance"]),
+            **{key: value for key, value in observation.items() if key != "provenance"},
+        )
+        for observation in price_observations
+    ]
+    latest_rows = build_latest_price_rollup(observations)
+    return [latest_row.to_dict() for latest_row in latest_rows]
+
+
+@asset(group_name=ASSET_GROUP)
+def quality_checks(
+    retailer_fetch_stubs: list[dict[str, object]],
+    price_observations: list[dict[str, object]],
+    latest_price_rollup: list[dict[str, object]],
+) -> dict[str, object]:
+    fetch_stubs = [
+        RetailerFetchStub(
+            provenance=PriceProvenance(**stub["provenance"]),
+            **{key: value for key, value in stub.items() if key != "provenance"},
+        )
+        for stub in retailer_fetch_stubs
+    ]
+    observations = [
+        PriceObservationRow(
+            provenance=PriceProvenance(**observation["provenance"]),
+            **{key: value for key, value in observation.items() if key != "provenance"},
+        )
+        for observation in price_observations
+    ]
+    rollup = [
+        LatestPriceRow(
+            provenance=PriceProvenance(**row["provenance"]),
+            **{key: value for key, value in row.items() if key != "provenance"},
+        )
+        for row in latest_price_rollup
+    ]
+    summary = build_quality_checks(fetch_stubs, observations, rollup)
+    return summary.to_dict()

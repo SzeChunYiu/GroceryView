@@ -279,6 +279,29 @@ export type MobileScreenBlueprintPlan = {
   blockedWithoutProviders: Array<{ route: ExpoRoute['path']; providers: MobileScreenBlueprint['providerRequirements'] }>;
 };
 
+export type MobileProviderStatus = 'available' | 'missing' | 'denied' | 'not_configured';
+
+export type MobileProviderReadinessInput = {
+  providers: Partial<Record<MobileScreenBlueprint['providerRequirements'][number], MobileProviderStatus>>;
+};
+
+export type MobileProviderReadinessReport = {
+  status: 'ready' | 'blocked';
+  screenStates: Array<{
+    route: ExpoRoute['path'];
+    screen: ExpoRoute['screen'];
+    state: MobileScreenState;
+    missingProviders: MobileScreenBlueprint['providerRequirements'];
+    actions: MobileScreenAction[];
+  }>;
+  blockers: string[];
+  summary: string;
+};
+
+function blockedMobileState(missingProviders: MobileScreenBlueprint['providerRequirements']): MobileScreenState {
+  return missingProviders.includes('camera') ? 'needs_permission' : 'needs_provider';
+}
+
 export type ExpoBuildProfile = {
   distribution: 'internal' | 'store';
   channel: string;
@@ -392,5 +415,27 @@ export function buildMobileScreenBlueprints(): MobileScreenBlueprintPlan {
     blockedWithoutProviders: screens
       .filter((screen) => screen.providerRequirements.some((provider) => provider !== 'secure-session'))
       .map((screen) => ({ route: screen.route, providers: screen.providerRequirements }))
+  };
+}
+
+export function buildMobileProviderReadinessReport(input: MobileProviderReadinessInput): MobileProviderReadinessReport {
+  const plan = buildMobileScreenBlueprints();
+  const screenStates = plan.screens.map((screen) => {
+    const missingProviders = screen.providerRequirements.filter((provider) => input.providers[provider] !== 'available');
+    return {
+      route: screen.route,
+      screen: screen.screen,
+      state: missingProviders.length === 0 ? 'ready' as const : blockedMobileState(missingProviders),
+      missingProviders,
+      actions: missingProviders.length === 0 ? screen.actions : screen.actions.filter((action) => action === 'open_product')
+    };
+  });
+  const blockers = screenStates.flatMap((state) => state.missingProviders.map((provider) => `mobile_provider_missing:${state.route}:${provider}`));
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    screenStates,
+    blockers,
+    summary: blockers.length === 0 ? 'Mobile providers are ready.' : 'Mobile screens are blocked until required providers are available.'
   };
 }

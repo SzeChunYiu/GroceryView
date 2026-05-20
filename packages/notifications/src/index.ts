@@ -119,6 +119,15 @@ export type DeliveryResult =
       reason: string;
     };
 
+export type DeliveryResultSummary = {
+  total: number;
+  sent: number;
+  skipped: number;
+  failedNoProvider: number;
+  failedProviderError: number;
+  failed: number;
+};
+
 export type DeliverDueNotificationsInput = {
   now: string;
   notifications: DeliveryNotification[];
@@ -295,6 +304,26 @@ function buildMessage(notification: DeliveryNotification): DeliveryMessage {
       sendAt: notification.sendAt
     }
   };
+}
+
+export function summarizeDeliveryResults(results: DeliveryResult[]): DeliveryResultSummary {
+  return results.reduce<DeliveryResultSummary>(
+    (summary, result) => {
+      summary.total += 1;
+      if (result.status === 'sent') summary.sent += 1;
+      if (result.status === 'skipped_not_due') summary.skipped += 1;
+      if (result.status === 'failed_no_provider') {
+        summary.failedNoProvider += 1;
+        summary.failed += 1;
+      }
+      if (result.status === 'failed_provider_error') {
+        summary.failedProviderError += 1;
+        summary.failed += 1;
+      }
+      return summary;
+    },
+    { total: 0, sent: 0, skipped: 0, failedNoProvider: 0, failedProviderError: 0, failed: 0 }
+  );
 }
 
 function humanizeSubjectType(subjectType: HumanReviewSlaAssignment['subjectType']): string {
@@ -841,9 +870,8 @@ export function buildNotificationOperationsReport(input: NotificationOperationsR
     if (nowMs - sendAtMs > staleAfterMs) staleTaskIds.push(task.id);
   }
 
-  const providerFailures = input.deliveries.filter(
-    (delivery) => delivery.status === 'failed_no_provider' || delivery.status === 'failed_provider_error'
-  ).length;
+  const deliverySummary = summarizeDeliveryResults(input.deliveries);
+  const providerFailures = deliverySummary.failed;
   const blockers: string[] = [];
   const warnings: string[] = [];
 

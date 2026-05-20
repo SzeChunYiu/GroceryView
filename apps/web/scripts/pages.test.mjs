@@ -21,6 +21,7 @@ describe('buildStaticPages', () => {
         'deals/today/index.html',
         'household/index.html',
         'login/index.html',
+        'loyalty/offers/index.html',
         'market/index.html',
         'notifications/inbox/index.html',
         'prices/confidence/index.html',
@@ -38,26 +39,14 @@ describe('buildStaticPages', () => {
       const product = await readFile(join(root, 'products/coffee/index.html'), 'utf8');
       assert.match(product, /ZOEGAS-COFFEE-450G/);
       assert.match(product, /Deal Score/);
-      assert.match(product, /Price chart/);
-      assert.match(product, /7D/);
-      assert.match(product, /30D/);
-      assert.match(product, /90D/);
-      assert.match(product, /1Y/);
-      assert.match(product, /Multi-store coffee price history/);
-      assert.match(product, /promo marker/);
-      assert.match(product, /stroke-dasharray="8 8"/);
-      assert.match(product, /Willys Odenplan/);
-      assert.match(product, /ICA Kvantum Torsplan/);
-      assert.match(product, /Coop Medborgarplatsen/);
-      assert.match(product, /Estimated observations need review/);
-      assert.match(product, /Current store prices/);
-      assert.match(product, /Unit price/);
-      assert.match(product, /promotion/);
-      assert.match(product, /Member label: Stammis price/);
-      assert.match(product, /94% verified retailer page/);
-      assert.match(product, /2026-05-20 06:00/);
-      assert.match(product, /Unverified estimate: do not treat as official shelf price/);
-      assert.match(product, /excluded from official shelf-price claims/);
+      assert.match(product, /Current best verified shelf price: 54\.90 SEK/);
+      assert.match(product, /ICA Kvantum Liljeholmen - 54\.90 SEK/);
+      assert.match(product, /Official shelf price/);
+      assert.match(product, /Promo campaign/);
+      assert.match(product, /Member-only/);
+      assert.match(product, /Unverified \/ estimated/);
+      assert.match(product, /Estimated fallback\. Never styled as an official shelf price/);
+      assert.match(product, /2026-05-16 08:45 UTC/);
 
       const market = await readFile(join(root, 'market/index.html'), 'utf8');
       assert.match(market, /Stockholm Grocery Market/);
@@ -158,6 +147,13 @@ describe('buildStaticPages', () => {
       assert.match(billingStatus, /Missing or past-due entitlements keep checkout required/);
       assert.match(billingStatus, /Provider updates must be newer than stored entitlement state/);
 
+      const loyaltyOffers = await readFile(join(root, 'loyalty/offers/index.html'), 'utf8');
+      assert.match(loyaltyOffers, /Loyalty offer tracker/);
+      assert.match(loyaltyOffers, /Member offer queue/);
+      assert.match(loyaltyOffers, /ICA Stammis linked/);
+      assert.match(loyaltyOffers, /Clip coupon before checkout/);
+      assert.match(loyaltyOffers, /Member-only savings never overwrite verified public shelf evidence/);
+
       const watchlist = await readFile(join(root, 'watchlist/index.html'), 'utf8');
       assert.match(watchlist, /Price watchlist workbench/);
       assert.match(watchlist, /Tracked items/);
@@ -211,7 +207,12 @@ describe('buildStaticPages', () => {
       assert.match(scanner, /data-groceryview-flow="scanner"/);
       assert.match(scanner, /accept="image\/\*"/);
       assert.match(scanner, /data-flow-action="route-review"/);
+      assert.match(scanner, /fetch\(apiUrl\('\/api\/scans\/upload-url/);
+      assert.match(scanner, /fetch\(ticket\.uploadUrl/);
+      assert.match(scanner, /method: 'PUT'/);
+      assert.match(scanner, /body: filePayload/);
       assert.match(scanner, /fetch\(apiUrl\('\/api\/scans\/process/);
+      assert.match(scanner, /payloadUri/);
       assert.match(scanner, /private-upload:\/\/scanner-preview/);
 
       const receiptReview = await readFile(join(root, 'receipts/review/index.html'), 'utf8');

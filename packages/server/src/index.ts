@@ -43,7 +43,14 @@ import {
   type NotificationSuppressionEventType,
   type NotificationSuppressionMutation
 } from '@groceryview/notifications';
-import { planScanReviewWorkItems, processScanUpload, type ScanProviders, type ScanUpload } from '@groceryview/scanning';
+import {
+  planScanReviewWorkItems,
+  prepareScanUploadTicket,
+  processScanUpload,
+  type ScanProviders,
+  type ScanUpload,
+  type ScanUploadStorage
+} from '@groceryview/scanning';
 
 export type HttpHandler = (request: Request) => Promise<Response>;
 
@@ -73,6 +80,7 @@ export type AuthOptions = {
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   scanProviders?: ScanProviders;
+  scanUploadStorage?: ScanUploadStorage;
 };
 
 export type AuthProvider = 'magic_link' | 'passkey' | 'oidc';
@@ -727,6 +735,10 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return jsonResponse(api.getStoreDeals(decodeURIComponent(storeDealsMatch[1])));
       }
 
+      if (method === 'GET' && path === '/api/prices/freshness') {
+        return jsonResponse(api.getPriceFreshnessReport(url.searchParams.get('asOf') ?? undefined));
+      }
+
       if (method === 'GET' && path === '/api/products/search') {
         return jsonResponse(api.searchProducts(url.searchParams.get('q') ?? ''));
       }
@@ -894,6 +906,27 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'POST') return jsonResponse({ ...planAccountDeletion(user), destructiveAction: false, requiresReauthentication: true });
       }
 
+      if (path === '/api/scans/upload-url') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'POST') {
+          const body = await readJson(request);
+          const result = await prepareScanUploadTicket({
+            request: {
+              scanId: requiredString(body.scanId, 'scanId'),
+              kind: requiredScanKind(body.kind),
+              contentType: requiredString(body.contentType, 'contentType'),
+              byteLength: requiredNumber(body.byteLength, 'byteLength'),
+              requestedAt: optionalIsoTimestamp(body.requestedAt, 'requestedAt') ?? (authOptions.now ?? new Date()).toISOString()
+            },
+            storage: authOptions.scanUploadStorage
+          });
+          return jsonResponse({ userId: user, result });
+        }
+      }
+
       if (path === '/api/scans/process') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -1011,6 +1044,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/products/{id}/equivalents': { get: publicOperation('Get comparable products in the same category.') },
       '/api/products/{id}/prices': { get: publicOperation('Get product prices by store.') },
       '/api/products/{id}/history': { get: publicOperation('Get product price history.') },
+      '/api/prices/freshness': { get: publicOperation('Get price freshness and stale-price backfill queue.') },
       '/api/households/current': {
         get: protectedOperation('Get the signed-in user household plan.'),
         put: protectedOperation('Create or replace the signed-in user household plan and budget summary.')
@@ -1018,6 +1052,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
       '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
       '/api/scans/process': { post: protectedOperation('Process barcode or receipt scan payloads through configured providers and return review routing work.') },
+      '/api/scans/upload-url': { post: protectedOperation('Create a private upload ticket for barcode or receipt scan payload storage.') },
       '/api/users/{userId}/favorite-stores': {
         get: protectedOperation('List favorite stores.'),
         post: protectedOperation('Add favorite store.')

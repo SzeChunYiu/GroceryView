@@ -480,36 +480,24 @@ export function calculateFixedBasketIndex(input: FixedBasketIndexInput): FixedBa
   };
 }
 
-export type PriceHistorySourceType = 'shelf' | 'online' | 'flyer' | 'member' | 'receipt' | 'shelf_photo' | 'manual' | 'estimated';
-
 export type PriceHistoryPoint = {
   observedAt: string;
   price: number;
-  sourceType: PriceHistorySourceType;
-  confidence: number;
-};
-
-export type PriceHistorySummaryInput = {
-  points: PriceHistoryPoint[];
-  rangeDays: 30 | 90 | 365;
-  sourceType: PriceHistorySourceType;
-  asOf: string;
+  storeId?: string;
 };
 
 export type PriceHistorySummary = {
-  rangeDays: 30 | 90 | 365;
-  sourceType: PriceHistorySourceType;
-  pointCount: number;
-  low: number;
-  high: number;
-  average: number;
-  currentPrice: number;
-  currentPercentile: number;
-  averageConfidence: number;
-  limitedHistory: boolean;
-  windowStart: string;
-  windowEnd: string;
+  latestPrice: number;
+  previousPrice?: number;
+  changeFromPrevious: number;
+  lowestPrice: number;
+  highestPrice: number;
+  isNewLow: boolean;
+  observedCount: number;
+  latestObservedAt: string;
 };
+
+export type PriceChartSourceType = 'shelf' | 'online' | 'flyer' | 'member' | 'receipt' | 'shelf_photo' | 'manual' | 'estimated';
 
 export type PriceChartLineStyle = 'solid' | 'dashed' | 'dotted';
 
@@ -518,6 +506,8 @@ export type PriceChartMarkerType = 'promotion' | 'member' | 'new_low' | 'receipt
 export type PriceChartObservation = PriceHistoryPoint & {
   storeId: string;
   storeName: string;
+  sourceType: PriceChartSourceType;
+  confidence: number;
   provenanceLabel?: string;
   markerType?: PriceChartMarkerType;
   markerLabel?: string;
@@ -537,7 +527,7 @@ export type PriceChartMarker = {
   color: string;
   shape: 'circle' | 'arrowUp' | 'arrowDown';
   position: 'aboveBar' | 'belowBar' | 'inBar';
-  sourceType: PriceHistorySourceType;
+  sourceType: PriceChartSourceType;
   provenanceLabel?: string;
 };
 
@@ -545,7 +535,7 @@ export type PriceChartSeries = {
   id: string;
   storeId: string;
   storeName: string;
-  sourceType: PriceHistorySourceType;
+  sourceType: PriceChartSourceType;
   lineStyle: PriceChartLineStyle;
   points: PriceChartSeriesPoint[];
   markers: PriceChartMarker[];
@@ -571,7 +561,7 @@ const chartLineStyleWeight: Record<PriceChartLineStyle, number> = {
 };
 
 export function priceChartLineStyle(input: {
-  sourceType: PriceHistorySourceType;
+  sourceType: PriceChartSourceType;
   confidence: number;
 }): PriceChartLineStyle {
   const confidence = clamp(input.confidence, 0, 1);
@@ -580,43 +570,26 @@ export function priceChartLineStyle(input: {
   return 'solid';
 }
 
-export function summarizePriceHistory(input: PriceHistorySummaryInput): PriceHistorySummary {
-  const asOf = Date.parse(input.asOf);
-  if (Number.isNaN(asOf)) throw new Error('asOf must be an ISO date.');
-  const windowStartMs = asOf - input.rangeDays * 24 * 60 * 60 * 1000;
-  const filtered = input.points
-    .map((point) => ({ ...point, observedAtMs: Date.parse(point.observedAt) }))
-    .filter((point) => point.sourceType === input.sourceType)
-    .filter((point) => !Number.isNaN(point.observedAtMs))
-    .filter((point) => point.observedAtMs >= windowStartMs && point.observedAtMs <= asOf)
-    .sort((a, b) => a.observedAtMs - b.observedAtMs);
-
-  if (filtered.length === 0) throw new Error('At least one price history point is required for the selected source type and range.');
-
-  const prices = filtered.map((point) => point.price);
-  if (prices.some((price) => price < 0)) throw new Error('Price history points must be non-negative.');
-  const current = filtered[filtered.length - 1];
-  const sortedPrices = [...prices].sort((a, b) => a - b);
-  let currentRank = 0;
-  for (let index = 0; index < sortedPrices.length; index += 1) {
-    if (sortedPrices[index] <= current.price) currentRank = index;
+export function summarizePriceHistory(points: PriceHistoryPoint[]): PriceHistorySummary {
+  if (points.length === 0) {
+    throw new Error('At least one price history point is required.');
   }
-  const currentPercentile = sortedPrices.length === 1 ? 0 : Math.round((currentRank / (sortedPrices.length - 1)) * 100);
-  const oldest = filtered[0].observedAtMs;
+
+  const ordered = [...points].sort((a, b) => new Date(a.observedAt).getTime() - new Date(b.observedAt).getTime());
+  const latest = ordered.at(-1)!;
+  const previous = ordered.at(-2);
+  const previousPrices = ordered.slice(0, -1).map((point) => point.price);
+  const historicalLow = previousPrices.length > 0 ? Math.min(...previousPrices) : latest.price;
 
   return {
-    rangeDays: input.rangeDays,
-    sourceType: input.sourceType,
-    pointCount: filtered.length,
-    low: roundMoney(Math.min(...prices)),
-    high: roundMoney(Math.max(...prices)),
-    average: roundMoney(prices.reduce((sum, price) => sum + price, 0) / prices.length),
-    currentPrice: roundMoney(current.price),
-    currentPercentile,
-    averageConfidence: roundMoney(filtered.reduce((sum, point) => sum + clamp(point.confidence, 0, 1), 0) / filtered.length),
-    limitedHistory: filtered.length < 2 || oldest > windowStartMs,
-    windowStart: new Date(windowStartMs).toISOString(),
-    windowEnd: new Date(asOf).toISOString()
+    latestPrice: latest.price,
+    previousPrice: previous?.price,
+    changeFromPrevious: previous ? roundMoney(latest.price - previous.price) : 0,
+    lowestPrice: Math.min(...ordered.map((point) => point.price)),
+    highestPrice: Math.max(...ordered.map((point) => point.price)),
+    isNewLow: latest.price < historicalLow,
+    observedCount: ordered.length,
+    latestObservedAt: latest.observedAt
   };
 }
 
@@ -760,7 +733,7 @@ export function buildPriceChartSeries(input: PriceChartAdapterInput): PriceChart
   }
 
   const series = [...grouped.entries()].map(([key, observations]) => {
-    const [storeId, sourceType] = key.split('\u0000') as [string, PriceHistorySourceType];
+    const [storeId, sourceType] = key.split('\u0000') as [string, PriceChartSourceType];
     const sorted = [...observations].sort((a, b) => Date.parse(a.observedAt) - Date.parse(b.observedAt));
     const lowPrice = Math.min(...sorted.map((observation) => observation.price));
     const lineStyle = sorted

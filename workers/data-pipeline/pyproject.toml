@@ -1,12 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "groceryview-data-pipeline"
 version = "0.1.0"
-description = "Dagster-compatible GroceryView data pipeline worker scaffold"
+description = "Dagster assets for GroceryView retailer price ingestion demos."
 requires-python = ">=3.11"
 dependencies = [
-  "dagster>=1.10,<2"
+    "dagster>=1.8,<2",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+]
+
+[tool.setuptools.packages.find]
+include = ["groceryview_data_pipeline*"]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+
