@@ -384,6 +384,7 @@ app.innerHTML = `
           </tbody>
         </table>
         <h2 style="margin-top:24px">Smart swaps</h2>
+        <p class="lede"><a href="/savings/smart-swaps/">Open smart swaps</a> for equivalence, household fit, and confidence guardrails.</p>
         <table class="table">
           <thead><tr><th>Swap</th><th>Saves</th><th>Rule</th></tr></thead>
           <tbody>
