@@ -43,6 +43,7 @@ describe('buildStaticPages', () => {
         'savings/smart-swaps/index.html',
         'scanner/index.html',
         'stores/compare/index.html',
+        'stores/hours/index.html',
         'stores/map/index.html',
         'stores/willys-odenplan/index.html',
         'watchlist/alerts/index.html',
@@ -154,6 +155,13 @@ describe('buildStaticPages', () => {
       assert.match(storeComparison, /Verified coverage/);
       assert.match(storeComparison, /Low-confidence rows/);
       assert.match(storeComparison, /Low-confidence receipt rows stay out of Deal Score/);
+
+      const storeHours = await readFile(join(root, 'stores/hours/index.html'), 'utf8');
+      assert.match(storeHours, /Store hours and pickup windows/);
+      assert.match(storeHours, /Today’s store windows/);
+      assert.match(storeHours, /Willys Odenplan/);
+      assert.match(storeHours, /Holiday hours must be shown before a store becomes the default checkout stop/);
+      assert.match(storeHours, /Opening hours can change route timing but never Deal Score/);
 
       const storeMap = await readFile(join(root, 'stores/map/index.html'), 'utf8');
       assert.match(storeMap, /Stockholm store map/);
