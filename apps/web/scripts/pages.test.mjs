@@ -180,6 +180,15 @@ describe('buildStaticPages', () => {
       assert.match(deals, /Deal Score/);
       assert.match(deals, /Ads excluded from ranking/);
       assert.match(deals, /Estimated rows held back/);
+      assert.match(deals, /Connected daily deals API/);
+      assert.match(deals, /Load live deal board/);
+      assert.match(deals, /data-groceryview-flow="daily-deals"/);
+      assert.match(deals, /data-flow-action="load-daily-deals"/);
+      assert.match(deals, /data-daily-deals-leader/);
+      assert.match(deals, /data-daily-deals-price/);
+      assert.match(deals, /data-daily-deals-count/);
+      assert.match(deals, /fetch\(apiUrl\('\/api\/market\/overview'/);
+      assert.match(deals, /Connected daily deals loaded/);
 
       const savingsLedger = await readFile(join(root, 'savings/ledger/index.html'), 'utf8');
       assert.match(savingsLedger, /Savings ledger/);
