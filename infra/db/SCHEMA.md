@@ -51,7 +51,7 @@ Physical or online stores belonging to a chain.
 
 Key columns: `chain_id`, `slug`, `external_ref`, address fields, `position`, `store_type`, `opening_hours`, `online_order_url`.
 
-Indexes: `stores_position_gix` for location queries.
+Indexes: `stores_position_gix` for location queries, plus `stores_name_trgm_idx` and `stores_slug_trgm_idx` for fuzzy store search.
 
 ### `products`
 
@@ -59,7 +59,7 @@ Canonical product records used by search, charts, baskets, and matching.
 
 Key columns: `slug`, `canonical_name`, `brand`, `brand_owner`, `private_label_owner`, `barcode`, `category_path`, package fields, `comparable_unit`, `nutrition`, `image_url`.
 
-Indexes: `products_name_trgm_idx` for fuzzy product search.
+Indexes: `products_name_trgm_idx` and `products_slug_trgm_idx` for fuzzy product search.
 
 ### `aliases`
 

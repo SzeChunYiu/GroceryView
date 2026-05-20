@@ -1692,9 +1692,41 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
                 created_at,
                 updated_at
          from products
-         where ($1::text is null or canonical_name ilike '%' || $1 || '%' or slug ilike '%' || $1 || '%')
+         cross join (select nullif(trim($1::text), '') as term) as query
+         where (
+             query.term is null
+             or products.barcode = query.term
+             or products.canonical_name ilike '%' || query.term || '%'
+             or products.slug ilike '%' || query.term || '%'
+             or products.canonical_name % query.term
+             or products.slug % query.term
+             or exists (
+               select 1
+               from aliases
+               where aliases.product_id = products.id
+                 and (
+                   aliases.normalized_alias ilike '%' || lower(query.term) || '%'
+                   or aliases.normalized_alias % lower(query.term)
+                 )
+             )
+           )
            and ($2::text[] is null or category_path @> $2::text[])
-         order by canonical_name, slug
+         order by case
+                    when query.term is null then 5
+                    when products.barcode = query.term then 0
+                    when lower(products.canonical_name) = lower(query.term) then 1
+                    when lower(products.canonical_name) like lower(query.term) || '%' then 2
+                    when exists (
+                      select 1
+                      from aliases
+                      where aliases.product_id = products.id
+                        and aliases.normalized_alias % lower(query.term)
+                    ) then 3
+                    else 4
+                  end,
+                  greatest(similarity(products.canonical_name, coalesce(query.term, '')), similarity(products.slug, coalesce(query.term, ''))) desc,
+                  canonical_name,
+                  slug
          limit $3`,
         [filter.search ?? null, filter.categoryPath ?? null, limit]
       );
@@ -1757,10 +1789,30 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
                 stores.updated_at
          from stores
          join chains on chains.id = stores.chain_id
-         where ($1::text is null or stores.name ilike '%' || $1 || '%' or stores.slug ilike '%' || $1 || '%')
+         cross join (select nullif(trim($1::text), '') as query) as search
+         where (
+             search.query is null
+             or stores.name ilike '%' || search.query || '%'
+             or stores.slug ilike '%' || search.query || '%'
+             or chains.name ilike '%' || search.query || '%'
+             or stores.name % search.query
+             or stores.slug % search.query
+             or chains.name % search.query
+           )
            and ($2::text is null or chains.slug = $2)
            and ($3::text is null or stores.city = $3)
-         order by stores.city, chains.name, stores.name, stores.slug
+         order by case
+                    when search.query is null then 4
+                    when lower(stores.name) = lower(search.query) then 0
+                    when lower(stores.name) like lower(search.query) || '%' then 1
+                    when lower(chains.name) = lower(search.query) then 2
+                    else 3
+                  end,
+                  greatest(similarity(stores.name, coalesce(search.query, '')), similarity(stores.slug, coalesce(search.query, '')), similarity(chains.name, coalesce(search.query, ''))) desc,
+                  stores.city,
+                  chains.name,
+                  stores.name,
+                  stores.slug
          limit $4`,
         [filter.search ?? null, filter.chainSlug ?? null, filter.city ?? null, limit]
       );
