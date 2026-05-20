@@ -35,6 +35,30 @@ class RecordingQueryExecutor implements QueryExecutor {
       updated_at: '2026-05-20T07:01:00.000Z'
     }
   ];
+  storeRows: unknown[] = [
+    {
+      id: 'store-1',
+      chain_id: 'chain-1',
+      chain_slug: 'willys',
+      chain_name: 'Willys',
+      slug: 'willys-hemma-stockholm-torsplan',
+      external_ref: 'seed:willys:torsplan',
+      name: 'Willys Hemma Stockholm Torsplan',
+      address_line1: 'Norra Stationsgatan 90',
+      address_line2: null,
+      postal_code: '113 64',
+      city: 'Stockholm',
+      region: 'Stockholm',
+      country_code: 'SE',
+      longitude: '18.0346',
+      latitude: '59.3495',
+      store_type: 'supermarket',
+      opening_hours: '{"mon":"08:00-21:00"}',
+      online_order_url: 'https://example.invalid/willys/torsplan',
+      created_at: new Date('2026-05-20T06:00:00.000Z'),
+      updated_at: '2026-05-20T06:01:00.000Z'
+    }
+  ];
   sourceRunRows: unknown[] = [
     {
       id: 'source-run-1',
@@ -178,6 +202,7 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('insert into observations')) return this.observationId === undefined ? ([] as T[]) : ([{ id: this.observationId }] as T[]);
     if (sql.includes('from latest_prices')) return this.latestPriceRows as T[];
     if (sql.includes('from observations')) return this.observationHistoryRows as T[];
+    if (sql.includes('from stores')) return this.storeRows as T[];
     if (sql.includes('from products')) return this.productRows as T[];
     if (sql.includes('from subscription_entitlements')) return this.subscriptionEntitlementRows as T[];
     if (sql.includes('select store_id')) return [{ store_id: 'willys-odenplan' }] as T[];
@@ -579,6 +604,71 @@ describe('createPostgresCatalogReader', () => {
 
     assert.deepEqual(executor.calls[0]!.params, [null, null, 500]);
     assert.deepEqual(executor.calls[1]!.params, [null, null, 1]);
+  });
+
+  it('reads stores by slug with chain and coordinate metadata', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresCatalogReader(executor);
+
+    assert.deepEqual(await reader.getStoreBySlug('willys-hemma-stockholm-torsplan'), {
+      storeId: 'store-1',
+      chainId: 'chain-1',
+      chainSlug: 'willys',
+      chainName: 'Willys',
+      slug: 'willys-hemma-stockholm-torsplan',
+      externalRef: 'seed:willys:torsplan',
+      name: 'Willys Hemma Stockholm Torsplan',
+      addressLine1: 'Norra Stationsgatan 90',
+      postalCode: '113 64',
+      city: 'Stockholm',
+      region: 'Stockholm',
+      countryCode: 'SE',
+      longitude: 18.0346,
+      latitude: 59.3495,
+      storeType: 'supermarket',
+      openingHours: { mon: '08:00-21:00' },
+      onlineOrderUrl: 'https://example.invalid/willys/torsplan',
+      createdAt: '2026-05-20T06:00:00.000Z',
+      updatedAt: '2026-05-20T06:01:00.000Z'
+    });
+
+    assert.match(executor.calls[0]!.sql, /from stores/);
+    assert.match(executor.calls[0]!.sql, /join chains on chains\.id = stores\.chain_id/);
+    assert.match(executor.calls[0]!.sql, /where stores\.slug = \$1/);
+    assert.match(executor.calls[0]!.sql, /ST_X\(stores\.position::geometry\)/);
+    assert.deepEqual(executor.calls[0]!.params, ['willys-hemma-stockholm-torsplan']);
+  });
+
+  it('returns null when a store slug is unknown', async () => {
+    const executor = new RecordingQueryExecutor();
+    executor.storeRows = [];
+    const reader = createPostgresCatalogReader(executor);
+
+    assert.equal(await reader.getStoreBySlug('missing-store'), null);
+  });
+
+  it('lists stores with bounded search, chain, and city filters', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresCatalogReader(executor);
+
+    assert.equal((await reader.listStores({ search: 'torsplan', chainSlug: 'willys', city: 'Stockholm', limit: 25 })).length, 1);
+
+    assert.match(executor.calls[0]!.sql, /stores\.name ilike '%' \|\| \$1 \|\| '%'/);
+    assert.match(executor.calls[0]!.sql, /chains\.slug = \$2/);
+    assert.match(executor.calls[0]!.sql, /stores\.city = \$3/);
+    assert.match(executor.calls[0]!.sql, /order by stores\.city, chains\.name, stores\.name, stores\.slug/);
+    assert.deepEqual(executor.calls[0]!.params, ['torsplan', 'willys', 'Stockholm', 25]);
+  });
+
+  it('clamps store list limits to a safe range', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresCatalogReader(executor);
+
+    await reader.listStores({ limit: 5000 });
+    await reader.listStores({ limit: 0 });
+
+    assert.deepEqual(executor.calls[0]!.params, [null, null, null, 500]);
+    assert.deepEqual(executor.calls[1]!.params, [null, null, null, 1]);
   });
 });
 
