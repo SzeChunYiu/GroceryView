@@ -352,6 +352,39 @@ describe('createGroceryViewApi', () => {
     assert.deepEqual(api.getBasket('user-1').items, []);
   });
 
+  it('summarizes category budgets from the current basket and reports unbudgeted spend', () => {
+    const api = createGroceryViewApi();
+
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.addBasketItem('user-1', { productId: 'butter', quantity: 1 });
+    api.updateCategoryBudgets('user-1', [
+      { category: 'dairy', weeklyBudget: 70 },
+      { category: 'coffee', weeklyBudget: 40 },
+      { category: 'pantry', weeklyBudget: 120 }
+    ]);
+
+    assert.deepEqual(api.getCategoryBudgetSummary('user-1'), {
+      userId: 'user-1',
+      categories: [
+        { category: 'coffee', weeklyBudget: 40, estimatedSpend: 49.9, remaining: -9.9, status: 'over', productIds: ['coffee'] },
+        { category: 'dairy', weeklyBudget: 70, estimatedSpend: 82.7, remaining: -12.7, status: 'over', productIds: ['butter', 'milk'] },
+        { category: 'pantry', weeklyBudget: 120, estimatedSpend: 0, remaining: 120, status: 'under', productIds: [] }
+      ],
+      unbudgetedCategories: []
+    });
+
+    api.updateCategoryBudgets('user-1', [{ category: 'coffee', weeklyBudget: 60 }]);
+    assert.deepEqual(api.getCategoryBudgetSummary('user-1').unbudgetedCategories, [
+      { category: 'dairy', estimatedSpend: 82.7, productIds: ['butter', 'milk'] }
+    ]);
+    assert.throws(
+      () => api.updateCategoryBudgets('user-1', [{ category: 'coffee', weeklyBudget: 10 }, { category: ' coffee ', weeklyBudget: 20 }]),
+      /categories must be unique/
+    );
+    assert.throws(() => api.updateCategoryBudgets('user-1', [{ category: 'coffee', weeklyBudget: -1 }]), /weeklyBudget/);
+  });
+
   it('removes watched products and recomputes alerts from remaining items', () => {
     const api = createGroceryViewApi();
 
