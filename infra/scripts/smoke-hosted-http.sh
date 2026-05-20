@@ -11,6 +11,18 @@ if [ -z "$GROCERYVIEW_SERVER_URL" ]; then
   exit 2
 fi
 
+case "$HTTP_SMOKE_TIMEOUT_SECONDS" in
+  ''|*[!0-9]*)
+    echo "HTTP_SMOKE_TIMEOUT_SECONDS must be a positive integer" >&2
+    exit 2
+    ;;
+esac
+
+if [ "$HTTP_SMOKE_TIMEOUT_SECONDS" -lt 1 ]; then
+  echo "HTTP_SMOKE_TIMEOUT_SECONDS must be a positive integer" >&2
+  exit 2
+fi
+
 api_health_url="${GROCERYVIEW_SERVER_URL%/}/api/health"
 api_health_response="$(
   curl -fsS \
