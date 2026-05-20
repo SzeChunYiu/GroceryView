@@ -136,6 +136,12 @@ const scannerReviews = [
   }
 ];
 
+const receiptReviewRows = [
+  { line: 'Arla Milk 1L', match: 'ARLA-MILK-1L', confidence: 98, budgetAction: 'Post to weekly actuals', catalogAction: 'Update verified price' },
+  { line: 'Coop loyalty discount', match: 'receipt discount', confidence: 84, budgetAction: 'Apply receipt total only', catalogAction: 'No shelf price update' },
+  { line: 'Loose tomatoes', match: 'unknown produce', confidence: 54, budgetAction: 'Hold from forecast', catalogAction: 'Route to human review' }
+];
+
 const humanReviewAssignments = [
   {
     id: 'assignment-review-match-1-moderator-1',
@@ -259,7 +265,7 @@ app.innerHTML = `
     <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Scanner review desk</h2>
-        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices.</p>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
         <table class="table">
           <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
           <tbody>
@@ -272,6 +278,19 @@ app.innerHTML = `
           </tbody>
         </table>
       </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Review routing</h2>
         <p class="lede">Low-confidence captures are separated from verified shelf and retailer-page prices so estimated data cannot masquerade as official price evidence.</p>

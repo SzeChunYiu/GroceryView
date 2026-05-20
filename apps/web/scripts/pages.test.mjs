@@ -22,6 +22,7 @@ describe('buildStaticPages', () => {
         'market/index.html',
         'privacy/index.html',
         'products/coffee/index.html',
+        'receipts/review/index.html',
         'scanner/index.html',
         'stores/compare/index.html',
         'stores/willys-odenplan/index.html',
@@ -119,6 +120,13 @@ describe('buildStaticPages', () => {
       assert.match(scanner, /data-groceryview-flow="scanner"/);
       assert.match(scanner, /accept="image\/\*"/);
       assert.match(scanner, /data-flow-action="route-review"/);
+
+      const receiptReview = await readFile(join(root, 'receipts/review/index.html'), 'utf8');
+      assert.match(receiptReview, /Receipt review desk/);
+      assert.match(receiptReview, /Line-item decisions/);
+      assert.match(receiptReview, /Post to weekly actuals/);
+      assert.match(receiptReview, /Route to human review/);
+      assert.match(receiptReview, /Cannot update catalog or Deal Score/);
 
       const humanReview = await readFile(join(root, 'admin/human-review/index.html'), 'utf8');
       assert.match(humanReview, /Human review operations/);
