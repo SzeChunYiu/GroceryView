@@ -106,6 +106,29 @@ describe('createHttpHandler', () => {
     assert.equal(budget.weeklyRemainingAfterEstimate, 750.1);
   });
 
+  it('serves user-scoped privacy export and deletion plans from protected account data', async () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 50, favoriteStoresOnly: true });
+    const handle = createHttpHandler(api, { now: new Date('2026-05-20T12:00:00.000Z') });
+
+    const exported = await json(await handle(new Request('http://localhost/api/privacy/export?userId=user-1'))) as {
+      generatedAt: string;
+      sections: Array<{ name: string; records: Array<Record<string, unknown>> }>;
+    };
+    assert.equal(exported.generatedAt, '2026-05-20T12:00:00.000Z');
+    assert.deepEqual(exported.sections.find((section) => section.name === 'favorite_stores')?.records, [{ storeId: 'willys-odenplan' }]);
+    assert.deepEqual(exported.sections.find((section) => section.name === 'watchlist')?.records, [{ productId: 'coffee' }]);
+
+    const deletion = await handle(new Request('http://localhost/api/privacy/deletion-plan?userId=user-1', { method: 'POST' }));
+    assert.equal(deletion.status, 200);
+    const plan = await json(deletion) as { userId: string; deleteFromTables: string[]; anonymizeTables: string[]; destructiveAction: boolean };
+    assert.equal(plan.userId, 'user-1');
+    assert.equal(plan.destructiveAction, false);
+    assert.ok(plan.deleteFromTables.includes('receipt_uploads'));
+    assert.deepEqual(plan.anonymizeTables, ['community_price_reports']);
+  });
+
   it('serves account subscription access from user-scoped entitlements', async () => {
     const api = createGroceryViewApi();
     api.upsertSubscriptionEntitlement('user-1', {
