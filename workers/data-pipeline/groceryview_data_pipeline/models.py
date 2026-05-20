@@ -213,6 +213,37 @@ class OpenPricesIngestionRunPlan:
 
 
 @dataclass(frozen=True)
+class OpenPricesArtifactImportPlan:
+    status: Literal["ready", "blocked"]
+    source_asset: str
+    import_command: str
+    required_env: list[str]
+    required_actions: list[str]
+    required_packages: list[str]
+    database_targets: list[str]
+    evidence_fields: list[str]
+    demo: bool = False
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class OpenPricesIngestionRunPlanSummary:
+    status: Literal["ready", "blocked"]
+    required_action_count: int
+    required_env_count: int
+    materialization_asset_count: int
+    persistence_target_count: int
+    evidence_field_count: int
+    schedule_cron: str
+    demo: bool = False
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class ObservationCoverageSummary:
     status: Literal["ready", "partial"]
     observation_count: int
@@ -249,6 +280,22 @@ class DataPipelineQualityGateSummary:
     observation_count: int
     latest_rollup_count: int
     checked_assets: list[str]
+    demo: bool = True
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class DataPipelineQualityGateDigest:
+    status: Literal["ready", "blocked"]
+    total_blockers: int
+    provenance_blockers: int
+    freshness_blockers: int
+    coverage_blockers: int
+    duplicate_blockers: int
+    volume_blockers: int
+    ingestion_blockers: int
     demo: bool = True
 
     def to_dict(self) -> dict[str, object]:

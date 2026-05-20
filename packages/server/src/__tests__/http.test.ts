@@ -19,7 +19,7 @@ describe('createHttpHandler', () => {
     const previousNodeEnv = process.env.NODE_ENV;
     process.env.DATABASE_URL = 'postgres://user:secret@localhost:5432/groceryview';
     process.env.PUBLIC_WEB_URL = 'https://groceryview.example';
-    process.env.NODE_ENV = 'test';
+    (process.env as Record<string, string | undefined>).NODE_ENV = 'test';
 
     try {
       const handle = createHttpHandler(undefined, {
@@ -57,9 +57,9 @@ describe('createHttpHandler', () => {
         process.env.PUBLIC_WEB_URL = previousPublicWebUrl;
       }
       if (previousNodeEnv === undefined) {
-        delete process.env.NODE_ENV;
+        delete (process.env as Record<string, string | undefined>).NODE_ENV;
       } else {
-        process.env.NODE_ENV = previousNodeEnv;
+        (process.env as Record<string, string | undefined>).NODE_ENV = previousNodeEnv;
       }
     }
   });
@@ -147,6 +147,7 @@ describe('createHttpHandler', () => {
     assert.equal(storeDeals.status, 200);
     assert.deepEqual((await json(storeDeals) as Array<{ productId: string; storeId: string }>).map((deal) => [deal.productId, deal.storeId]), [
       ['coffee', 'willys-odenplan'],
+      ['private-label-milk', 'willys-odenplan'],
       ['milk', 'willys-odenplan'],
       ['butter', 'willys-odenplan']
     ]);
@@ -200,6 +201,15 @@ describe('createHttpHandler', () => {
     assert.equal(equivalents.status, 200);
     assert.deepEqual(await json(equivalents), [
       {
+        productId: 'private-label-milk',
+        productName: 'Garant Milk 1L',
+        category: 'dairy',
+        bestPrice: 12.9,
+        bestStoreId: 'willys-odenplan',
+        dealScore: 73,
+        reason: 'Same dairy category with comparable current price evidence.'
+      },
+      {
         productId: 'butter',
         productName: 'Butter 600g',
         category: 'dairy',
@@ -215,7 +225,7 @@ describe('createHttpHandler', () => {
     assert.deepEqual(await json(freshness), {
       asOf: '2026-06-03T00:00:00.000Z',
       thresholds: { agingAfterDays: 7, staleAfterDays: 14 },
-      summary: { fresh: 0, aging: 0, stale: 3 },
+      summary: { fresh: 0, aging: 0, stale: 4 },
       products: [
         {
           productId: 'coffee',
@@ -236,6 +246,15 @@ describe('createHttpHandler', () => {
           action: 'prioritize_manual_or_feed_refresh'
         },
         {
+          productId: 'private-label-milk',
+          productName: 'Garant Milk 1L',
+          category: 'dairy',
+          latestVerifiedPriceDate: '2026-05-19',
+          ageDays: 15,
+          status: 'stale',
+          action: 'prioritize_manual_or_feed_refresh'
+        },
+        {
           productId: 'butter',
           productName: 'Butter 600g',
           category: 'dairy',
@@ -245,7 +264,7 @@ describe('createHttpHandler', () => {
           action: 'prioritize_manual_or_feed_refresh'
         }
       ],
-      backfillProductIds: ['butter', 'coffee', 'milk']
+      backfillProductIds: ['butter', 'coffee', 'milk', 'private-label-milk']
     });
 
     const index = await handle(new Request('http://localhost/api/indices/stockholm-grocery-index'));
@@ -288,6 +307,13 @@ describe('createHttpHandler', () => {
       method: 'POST',
       body: JSON.stringify({ storeId: 'willys-odenplan' })
     }))).status, 201);
+    assert.equal((await handle(new Request('http://localhost/api/users/user-1/favorite-stores', {
+      method: 'POST',
+      body: JSON.stringify({ storeId: 'lidl-sveavagen' })
+    }))).status, 201);
+    assert.equal((await handle(new Request('http://localhost/api/users/user-1/favorite-stores/lidl-sveavagen', {
+      method: 'DELETE'
+    }))).status, 200);
 
     assert.equal((await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
       method: 'POST',

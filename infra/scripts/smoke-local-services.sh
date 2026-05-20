@@ -12,6 +12,18 @@ POSTGRES_USER="${POSTGRES_USER:-groceryview}"
 S3_BUCKET="${S3_BUCKET:-groceryview-raw}"
 WAIT_SECONDS="${WAIT_SECONDS:-90}"
 
+case "$WAIT_SECONDS" in
+  ''|*[!0-9]*)
+    echo "WAIT_SECONDS must be a positive integer" >&2
+    exit 1
+    ;;
+esac
+
+if [ "$WAIT_SECONDS" -lt 1 ]; then
+  echo "WAIT_SECONDS must be a positive integer" >&2
+  exit 1
+fi
+
 if ! command -v docker >/dev/null 2>&1; then
   echo "docker is required to smoke-test local services" >&2
   exit 127

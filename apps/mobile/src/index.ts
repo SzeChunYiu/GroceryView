@@ -14,6 +14,8 @@ export type {
   MobileOfflineMutationSummary,
   MobileOfflineMutationType
 } from './offlineMutations.js';
+export { buildMobileDeepLink, buildMobileRouteManifest, findMobileRoute } from './routeManifest.js';
+export type { MobileMvpRoute, MobileMvpRouteId, MobileMvpRoutePath, MobileRouteManifest, MobileRouteParam } from './routeManifest.js';
 export { buildMobilePersistedCachePlan, buildMobileQueryKey, buildMobileQueryRegistry } from './queryCache.js';
 export type { MobilePersistedCachePlan, MobileQueryDefinition, MobileQueryId, MobileQueryKeyInput, MobileScreenRoute } from './queryCache.js';
 
@@ -307,6 +309,112 @@ export function createMobileDiscoveryViewModel(
       alertCount: watchlist.alerts.length,
       alertTypes: [...new Set(watchlist.alerts.map((alert) => alert.type))].sort()
     }
+  };
+}
+
+export type MobileProductPriceTerminalViewModel = {
+  productId: string;
+  ticker: string;
+  title: string;
+  asOf: string;
+  quote: {
+    bestPriceLabel: string;
+    bestStoreName: string | null;
+    unitPrice: string;
+    dealVerdict: string;
+    dealScore: number;
+    oneMonthMoveLabel: string;
+    range52WeekLabel: string;
+  };
+  evidence: {
+    currentPrices: number;
+    historyPoints: number;
+    verifiedHistoryPoints: number;
+    latestObservedAt: string | null;
+    isNewLow: boolean;
+    guardrails: string[];
+  };
+  distributions: Array<{
+    scope: ProductPriceTerminalReport['distributions'][number]['scope'];
+    label: string;
+    sampleSize: number;
+    currentPercentile: number;
+    cheaperThanPercent: number;
+    medianPrice: number;
+    customerRead: string;
+  }>;
+  chartSeries: Array<{
+    id: string;
+    storeName: string;
+    lineStyle: ProductPriceTerminalReport['chart']['series'][number]['lineStyle'];
+    pointCount: number;
+    latestPrice: number | null;
+    markerCount: number;
+  }>;
+  actions: Array<'add_to_watchlist' | 'add_to_weekly_basket' | 'compare_stores' | 'scan_receipt_to_verify'>;
+};
+
+function formatPriceLabel(price: number | null): string {
+  return price === null ? 'No verified price' : `${price.toFixed(2)} SEK`;
+}
+
+function formatSignedPercent(value: number | null): string {
+  if (value === null) return 'No movement yet';
+  const prefix = value > 0 ? '+' : '';
+  return `${prefix}${value.toFixed(1)}%`;
+}
+
+function formatRangeLabel(range: ProductPriceTerminalReport['quote']['range52Week']): string {
+  return range ? `${range.low.toFixed(2)}-${range.high.toFixed(2)} SEK` : 'No range yet';
+}
+
+export function createMobileProductPriceTerminalViewModel(
+  productId: string,
+  api: MobileApi = createGroceryViewApi()
+): MobileProductPriceTerminalViewModel | null {
+  const terminal = api.getProductPriceTerminal(productId);
+  if (!terminal) return null;
+
+  return {
+    productId: terminal.productId,
+    ticker: terminal.ticker,
+    title: terminal.productName,
+    asOf: terminal.asOf,
+    quote: {
+      bestPriceLabel: formatPriceLabel(terminal.quote.bestPrice),
+      bestStoreName: terminal.quote.bestStoreName,
+      unitPrice: terminal.quote.unitPrice,
+      dealVerdict: terminal.quote.band.verdict,
+      dealScore: terminal.quote.dealScore,
+      oneMonthMoveLabel: formatSignedPercent(terminal.quote.oneMonthMovePercent),
+      range52WeekLabel: formatRangeLabel(terminal.quote.range52Week)
+    },
+    evidence: {
+      currentPrices: terminal.quote.evidenceVolume.currentPrices,
+      historyPoints: terminal.quote.evidenceVolume.historyPoints,
+      verifiedHistoryPoints: terminal.quote.evidenceVolume.verifiedHistoryPoints,
+      latestObservedAt: terminal.historySummary?.latestObservedAt ?? null,
+      isNewLow: terminal.historySummary?.isNewLow ?? false,
+      guardrails: terminal.evidenceGuardrails
+    },
+    distributions: terminal.distributions.map((distribution) => ({
+      scope: distribution.scope,
+      label: distribution.label,
+      sampleSize: distribution.sampleSize,
+      currentPercentile: distribution.currentPercentile,
+      cheaperThanPercent: distribution.cheaperThanPercent,
+      medianPrice: distribution.median,
+      customerRead: distribution.customerRead
+    })),
+    chartSeries: terminal.chart.series.map((series) => ({
+      id: series.id,
+      storeName: series.storeName,
+      lineStyle: series.lineStyle,
+      pointCount: series.points.length,
+      latestPrice: series.points.at(-1)?.value ?? null,
+      markerCount: series.markers.length
+    })),
+    actions: ['add_to_watchlist', 'add_to_weekly_basket', 'compare_stores', 'scan_receipt_to_verify']
   };
 }
 

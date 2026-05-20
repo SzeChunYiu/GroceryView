@@ -12,7 +12,9 @@ Dagster scaffold for the GroceryView data-worker lane.
 - Price observation mix summaries for source, confidence, member, and promotion breakdowns.
 - A data pipeline quality gate that combines provenance, freshness, rollup, and coverage checks.
 - The quality gate also checks `open_prices_ingestion_run_plan`, so scheduled Open Prices ingestion remains blocked until database, raw snapshot storage, User-Agent, and schedule gates are configured.
+- The quality gate also checks `open_prices_artifact_import_plan`, so the Open Prices handoff cannot pass until the PostgreSQL import command has its database URL, input artifact, and built DB package.
 - Open Prices real-data pull plan asset with required User-Agent, endpoint, parser, smoke command, and evidence fields.
+- Open Prices artifact import plan asset with the PostgreSQL import command, required env, database targets, and persisted evidence fields.
 - Open Prices ingestion run plan asset with schedule, persistence targets, idempotency keys, and fail-closed deployment requirements.
 - An `open_prices_ingestion_schedule` Dagster schedule contract that targets the Open Prices pull, ingestion plan, observations, latest-price rollup, freshness, and coverage assets every six hours.
 - A `dagster dev` entrypoint that boots the local webserver.
@@ -41,6 +43,7 @@ Example Dagster assets in this lane:
 - `price_observation_freshness`
 - `price_observation_mix`
 - `open_prices_real_pull_plan`
+- `open_prices_artifact_import_plan`
 - `open_prices_ingestion_run_plan`
 
 Example Dagster schedules in this lane:
@@ -58,6 +61,10 @@ Example Dagster schedules in this lane:
 When those gates are ready, the planned run materializes the Open Prices pull, persists raw snapshots/source-run evidence, writes normalized price observations, refreshes latest-price rollups, and emits freshness/coverage evidence. The idempotency key uses source type, source URL, content hash, parser version, and observed timestamp so reruns do not duplicate accepted price rows.
 
 `open_prices_ingestion_schedule` is defined with cron `17 */6 * * *` in UTC and targets the same assets listed in the run plan. The schedule contract is included in the Dagster smoke verifier so accidental removal blocks release validation once Dagster is installed in the worker environment.
+
+## Open Prices artifact import plan
+
+`open_prices_artifact_import_plan` exposes the PostgreSQL handoff for a saved Open Prices artifact. It remains blocked until `DATABASE_URL`, `OPEN_PRICES_INPUT_PATH`, and a built `@groceryview/db` package are available. The command plan uses `infra/scripts/import-open-prices-artifact.sh` and expects persisted evidence for source run, accepted rows, raw records, observations, products, and chains.
 
 ## Tests
 

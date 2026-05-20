@@ -6,6 +6,7 @@ EXPECTED_ASSETS = {
     "data_pipeline_quality_gate",
     "latest_price_rollup",
     "normalized_products",
+    "open_prices_artifact_import_plan",
     "open_prices_ingestion_run_plan",
     "open_prices_real_pull_plan",
     "price_observation_coverage",

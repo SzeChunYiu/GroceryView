@@ -136,6 +136,16 @@ describe('buildStaticPages', () => {
       assert.match(market, /Private Label Index/);
       assert.match(market, /Premium Brand Index/);
       assert.match(market, /private-label savings vs national brands/);
+      assert.match(market, /Connected grocery indices API/);
+      assert.match(market, /Load live grocery indices/);
+      assert.match(market, /data-groceryview-flow="market-indices"/);
+      assert.match(market, /data-flow-action="load-market-indices"/);
+      assert.match(market, /data-market-index-value/);
+      assert.match(market, /data-market-index-movement/);
+      assert.match(market, /data-market-index-confidence/);
+      assert.match(market, /fetch\(apiUrl\('\/api\/indices'/);
+      assert.match(market, /movementPercent/);
+      assert.match(market, /components/);
 
       const catalogCoverage = await readFile(join(root, 'catalog/coverage/index.html'), 'utf8');
       assert.match(catalogCoverage, /Catalog coverage dashboard/);
@@ -166,6 +176,15 @@ describe('buildStaticPages', () => {
       assert.match(shoppingRoute, /Lidl Sveavägen/);
       assert.match(shoppingRoute, /Route time can reorder stops but cannot change product deal ranking/);
       assert.match(shoppingRoute, /Unverified prices cannot justify an extra route stop/);
+      assert.match(shoppingRoute, /Connected route planner API/);
+      assert.match(shoppingRoute, /Load live route plan/);
+      assert.match(shoppingRoute, /data-groceryview-flow="route-planner"/);
+      assert.match(shoppingRoute, /data-flow-action="load-route-plan"/);
+      assert.match(shoppingRoute, /data-route-plan-stops/);
+      assert.match(shoppingRoute, /data-route-plan-total/);
+      assert.match(shoppingRoute, /data-route-plan-assignments/);
+      assert.match(shoppingRoute, /fetch\(apiUrl\('\/api\/basket\/compare'/);
+      assert.match(shoppingRoute, /Connected route plan loaded/);
 
       const priceConfidence = await readFile(join(root, 'prices/confidence/index.html'), 'utf8');
       assert.match(priceConfidence, /Price confidence guide/);
@@ -173,6 +192,15 @@ describe('buildStaticPages', () => {
       assert.match(priceConfidence, /Verified shelf/);
       assert.match(priceConfidence, /Estimated and low-confidence rows are excluded/);
       assert.match(priceConfidence, /Only verified or fresh retailer-page prices can alert/);
+      assert.match(priceConfidence, /Connected price confidence API/);
+      assert.match(priceConfidence, /Load live confidence evidence/);
+      assert.match(priceConfidence, /data-groceryview-flow="price-confidence"/);
+      assert.match(priceConfidence, /data-flow-action="load-price-confidence"/);
+      assert.match(priceConfidence, /data-price-confidence-quote/);
+      assert.match(priceConfidence, /data-price-confidence-volume/);
+      assert.match(priceConfidence, /data-price-confidence-guardrails/);
+      assert.match(priceConfidence, /fetch\(apiUrl\('\/api\/products\/' \+ encodeURIComponent\(productId\) \+ '\/terminal\?asOf='/);
+      assert.match(priceConfidence, /Connected price confidence loaded/);
 
       const deals = await readFile(join(root, 'deals/today/index.html'), 'utf8');
       assert.match(deals, /Today’s best grocery deals/);
@@ -208,6 +236,15 @@ describe('buildStaticPages', () => {
       assert.match(store, /Store highlights/);
       assert.match(store, /Verified shelf/);
       assert.match(store, /Watchlist only/);
+      assert.match(store, /Connected store deals API/);
+      assert.match(store, /Load live store deals/);
+      assert.match(store, /data-groceryview-flow="store-deals"/);
+      assert.match(store, /data-flow-action="load-store-deals"/);
+      assert.match(store, /data-store-deals-leader/);
+      assert.match(store, /data-store-deals-count/);
+      assert.match(store, /data-store-deals-verdict/);
+      assert.match(store, /fetch\(apiUrl\('\/api\/stores\/' \+ encodeURIComponent\(storeId\) \+ '\/deals'/);
+      assert.match(store, /Connected store deals loaded/);
 
       const storeComparison = await readFile(join(root, 'stores/compare/index.html'), 'utf8');
       assert.match(storeComparison, /Compare Stockholm stores/);
@@ -215,6 +252,15 @@ describe('buildStaticPages', () => {
       assert.match(storeComparison, /Verified coverage/);
       assert.match(storeComparison, /Low-confidence rows/);
       assert.match(storeComparison, /Low-confidence receipt rows stay out of Deal Score/);
+      assert.match(storeComparison, /Connected store comparison API/);
+      assert.match(storeComparison, /Load live store comparison/);
+      assert.match(storeComparison, /data-groceryview-flow="store-comparison"/);
+      assert.match(storeComparison, /data-flow-action="load-store-comparison"/);
+      assert.match(storeComparison, /data-store-comparison-best/);
+      assert.match(storeComparison, /data-store-comparison-split/);
+      assert.match(storeComparison, /data-store-comparison-coverage/);
+      assert.match(storeComparison, /fetch\(apiUrl\('\/api\/basket\/compare'/);
+      assert.match(storeComparison, /Connected store comparison loaded/);
 
       const storeMap = await readFile(join(root, 'stores/map/index.html'), 'utf8');
       assert.match(storeMap, /Stockholm store map/);
@@ -222,6 +268,15 @@ describe('buildStaticPages', () => {
       assert.match(storeMap, /Willys Odenplan/);
       assert.match(storeMap, /No travel-time penalty in Deal Score/);
       assert.match(storeMap, /Pickup notes separate from prices/);
+      assert.match(storeMap, /Connected store map API/);
+      assert.match(storeMap, /Load live store map/);
+      assert.match(storeMap, /data-groceryview-flow="store-map"/);
+      assert.match(storeMap, /data-flow-action="load-store-map"/);
+      assert.match(storeMap, /data-store-map-count/);
+      assert.match(storeMap, /data-store-map-districts/);
+      assert.match(storeMap, /data-store-map-confidence/);
+      assert.match(storeMap, /fetch\(apiUrl\('\/api\/stores', config, false\)/);
+      assert.match(storeMap, /Connected store map loaded/);
 
       const category = await readFile(join(root, 'categories/coffee/index.html'), 'utf8');
       assert.match(category, /Category signals/);

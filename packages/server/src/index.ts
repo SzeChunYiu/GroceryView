@@ -854,6 +854,15 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
+      const favoriteStoreDeleteMatch = path.match(/^\/api\/users\/([^/]+)\/favorite-stores\/([^/]+)$/);
+      if (favoriteStoreDeleteMatch && method === 'DELETE') {
+        const routeUserId = decodeURIComponent(favoriteStoreDeleteMatch[1]);
+        const authError = await authorizeUser(request, routeUserId);
+        if (authError) return authError;
+        api.removeFavoriteStore(routeUserId, decodeURIComponent(favoriteStoreDeleteMatch[2]));
+        return jsonResponse(api.getFavoriteStores(routeUserId));
+      }
+
       if (path === '/api/watchlist') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -1195,6 +1204,9 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/users/{userId}/favorite-stores': {
         get: protectedOperation('List favorite stores.'),
         post: protectedOperation('Add favorite store.')
+      },
+      '/api/users/{userId}/favorite-stores/{storeId}': {
+        delete: protectedOperation('Remove favorite store.')
       },
       '/api/watchlist': {
         get: protectedOperation('Get watchlist and alerts.'),

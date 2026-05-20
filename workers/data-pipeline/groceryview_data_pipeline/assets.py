@@ -15,11 +15,14 @@ except ModuleNotFoundError:
 
 from .fixtures import FETCHED_AT, HERO_PRODUCTS, RETAILER_PRICE_SNAPSHOT, STOCKHOLM_STORES
 from .models import (
+    DataPipelineQualityGateDigest,
     DataPipelineQualityGateSummary,
     LatestPriceRow,
     ObservationCoverageSummary,
     ObservationFreshnessSummary,
+    OpenPricesArtifactImportPlan,
     OpenPricesIngestionRunPlan,
+    OpenPricesIngestionRunPlanSummary,
     OpenPricesPullPlan,
     PriceObservationRow,
     PriceObservationMixSummary,
@@ -379,6 +382,59 @@ def build_open_prices_ingestion_run_plan(
     )
 
 
+def build_open_prices_artifact_import_plan(
+    *,
+    database_url_present: bool = False,
+    input_artifact_present: bool = False,
+    db_package_built: bool = False,
+) -> OpenPricesArtifactImportPlan:
+    required_actions: list[str] = []
+    if not database_url_present:
+        required_actions.append("set_database_url")
+    if not input_artifact_present:
+        required_actions.append("provide_open_prices_input_artifact")
+    if not db_package_built:
+        required_actions.append("build_groceryview_db_package")
+
+    return OpenPricesArtifactImportPlan(
+        status="ready" if not required_actions else "blocked",
+        source_asset="open_prices_real_pull_plan",
+        import_command="npm run build --workspace @groceryview/db && DATABASE_URL=<postgres-url> OPEN_PRICES_INPUT_PATH=<artifact.json> infra/scripts/import-open-prices-artifact.sh",
+        required_env=["DATABASE_URL", "OPEN_PRICES_INPUT_PATH"],
+        required_actions=required_actions,
+        required_packages=["@groceryview/db", "pg"],
+        database_targets=[
+            "source_runs",
+            "raw_records",
+            "products",
+            "aliases",
+            "observations",
+            "latest_prices",
+        ],
+        evidence_fields=[
+            "status",
+            "sourceRunId",
+            "acceptedCount",
+            "rawRecordCount",
+            "observationCount",
+            "productCount",
+            "chainCount",
+        ],
+    )
+
+
+def summarize_open_prices_ingestion_run_plan(plan: OpenPricesIngestionRunPlan) -> OpenPricesIngestionRunPlanSummary:
+    return OpenPricesIngestionRunPlanSummary(
+        status=plan.status,
+        required_action_count=len(plan.required_actions),
+        required_env_count=len(plan.required_env),
+        materialization_asset_count=len(plan.materialization_assets),
+        persistence_target_count=len(plan.persistence_targets),
+        evidence_field_count=len(plan.evidence_fields),
+        schedule_cron=plan.schedule_cron,
+    )
+
+
 def build_observation_coverage_summary(
     observations: Iterable[PriceObservationRow],
     stores: Iterable[StoreSeed],
@@ -428,6 +484,7 @@ def build_data_pipeline_quality_gate(
     freshness: ObservationFreshnessSummary,
     coverage: ObservationCoverageSummary,
     open_prices_ingestion: OpenPricesIngestionRunPlan | None = None,
+    open_prices_import: OpenPricesArtifactImportPlan | None = None,
     min_observations: int = 1,
 ) -> DataPipelineQualityGateSummary:
     blockers: list[str] = []
@@ -448,6 +505,8 @@ def build_data_pipeline_quality_gate(
         blockers.append("price_observation_coverage_partial")
     if open_prices_ingestion is not None and open_prices_ingestion.status != "ready":
         blockers.append("open_prices_ingestion_plan_blocked")
+    if open_prices_import is not None and open_prices_import.status != "ready":
+        blockers.append("open_prices_artifact_import_plan_blocked")
 
     return DataPipelineQualityGateSummary(
         status="ready" if not blockers else "blocked",
@@ -459,7 +518,21 @@ def build_data_pipeline_quality_gate(
             "price_observation_freshness",
             "price_observation_coverage",
             *([] if open_prices_ingestion is None else ["open_prices_ingestion_run_plan"]),
+            *([] if open_prices_import is None else ["open_prices_artifact_import_plan"]),
         ],
+    )
+
+
+def summarize_data_pipeline_quality_gate(gate: DataPipelineQualityGateSummary) -> DataPipelineQualityGateDigest:
+    return DataPipelineQualityGateDigest(
+        status=gate.status,
+        total_blockers=len(gate.blockers),
+        provenance_blockers=sum(1 for blocker in gate.blockers if "provenance" in blocker),
+        freshness_blockers=sum(1 for blocker in gate.blockers if "freshness" in blocker),
+        coverage_blockers=sum(1 for blocker in gate.blockers if "coverage" in blocker),
+        duplicate_blockers=sum(1 for blocker in gate.blockers if blocker.startswith("duplicate_")),
+        volume_blockers=sum(1 for blocker in gate.blockers if blocker in {"observations_below_minimum", "latest_rollup_empty"}),
+        ingestion_blockers=sum(1 for blocker in gate.blockers if blocker.startswith("open_prices_")),
     )
 
 
@@ -587,6 +660,15 @@ def open_prices_ingestion_run_plan(open_prices_real_pull_plan: dict[str, object]
 
 
 @asset(group_name=ASSET_GROUP)
+def open_prices_artifact_import_plan(open_prices_real_pull_plan: dict[str, object]) -> dict[str, object]:
+    return build_open_prices_artifact_import_plan(
+        database_url_present=False,
+        input_artifact_present=open_prices_real_pull_plan.get("status") == "ready",
+        db_package_built=False,
+    ).to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
 def price_observation_coverage(
     seed_stores: list[dict[str, object]],
     seed_products: list[dict[str, object]],
@@ -624,10 +706,12 @@ def data_pipeline_quality_gate(
     price_observation_freshness: dict[str, object],
     price_observation_coverage: dict[str, object],
     open_prices_ingestion_run_plan: dict[str, object],
+    open_prices_artifact_import_plan: dict[str, object],
 ) -> dict[str, object]:
     quality = QualityCheckSummary(**quality_checks)
     freshness = ObservationFreshnessSummary(**price_observation_freshness)
     coverage = ObservationCoverageSummary(**price_observation_coverage)
     open_prices_ingestion = OpenPricesIngestionRunPlan(**open_prices_ingestion_run_plan)
-    summary = build_data_pipeline_quality_gate(quality, freshness, coverage, open_prices_ingestion)
+    open_prices_import = OpenPricesArtifactImportPlan(**open_prices_artifact_import_plan)
+    summary = build_data_pipeline_quality_gate(quality, freshness, coverage, open_prices_ingestion, open_prices_import)
     return summary.to_dict()

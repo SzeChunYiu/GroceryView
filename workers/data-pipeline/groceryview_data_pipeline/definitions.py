@@ -3,6 +3,7 @@ from dagster import AssetSelection, Definitions, ScheduleDefinition, define_asse
 from .assets import (
     data_pipeline_quality_gate,
     latest_price_rollup,
+    open_prices_artifact_import_plan,
     open_prices_ingestion_run_plan,
     normalized_products,
     open_prices_real_pull_plan,
@@ -46,6 +47,7 @@ defs = Definitions(
         quality_checks,
         price_observation_freshness,
         open_prices_real_pull_plan,
+        open_prices_artifact_import_plan,
         open_prices_ingestion_run_plan,
         price_observation_coverage,
         price_observation_mix,

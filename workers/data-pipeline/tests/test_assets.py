@@ -4,6 +4,7 @@ from groceryview_data_pipeline.assets import (
     build_normalized_products,
     build_observation_coverage_summary,
     build_observation_freshness_summary,
+    build_open_prices_artifact_import_plan,
     build_open_prices_ingestion_run_plan,
     build_open_prices_pull_plan,
     build_price_observation_mix_summary,
@@ -12,6 +13,8 @@ from groceryview_data_pipeline.assets import (
     build_retailer_fetch_stubs,
     build_seed_products,
     build_seed_stores,
+    summarize_data_pipeline_quality_gate,
+    summarize_open_prices_ingestion_run_plan,
 )
 from groceryview_data_pipeline.models import LatestPriceRow, ObservationFreshnessSummary, PriceObservationRow, PriceProvenance
 
@@ -137,6 +140,65 @@ def test_open_prices_ingestion_run_plan_blocks_until_persistence_and_schedule_ar
     )
     assert ready.status == "ready"
     assert ready.required_actions == []
+
+
+def test_open_prices_artifact_import_plan_exposes_database_import_contract() -> None:
+    plan = build_open_prices_artifact_import_plan(input_artifact_present=True)
+
+    assert plan.status == "blocked"
+    assert plan.source_asset == "open_prices_real_pull_plan"
+    assert plan.import_command == "npm run build --workspace @groceryview/db && DATABASE_URL=<postgres-url> OPEN_PRICES_INPUT_PATH=<artifact.json> infra/scripts/import-open-prices-artifact.sh"
+    assert plan.required_env == ["DATABASE_URL", "OPEN_PRICES_INPUT_PATH"]
+    assert plan.required_actions == ["set_database_url", "build_groceryview_db_package"]
+    assert plan.required_packages == ["@groceryview/db", "pg"]
+    assert plan.database_targets == [
+        "source_runs",
+        "raw_records",
+        "products",
+        "aliases",
+        "observations",
+        "latest_prices",
+    ]
+    assert plan.evidence_fields == [
+        "status",
+        "sourceRunId",
+        "acceptedCount",
+        "rawRecordCount",
+        "observationCount",
+        "productCount",
+        "chainCount",
+    ]
+    assert plan.to_dict()["demo"] is False
+
+    ready = build_open_prices_artifact_import_plan(
+        database_url_present=True,
+        input_artifact_present=True,
+        db_package_built=True,
+    )
+    assert ready.status == "ready"
+    assert ready.required_actions == []
+
+
+def test_open_prices_ingestion_run_plan_summary_counts_operator_requirements() -> None:
+    blocked = build_open_prices_ingestion_run_plan(open_prices_user_agent_present=True)
+    assert summarize_open_prices_ingestion_run_plan(blocked).to_dict() == {
+        "status": "blocked",
+        "required_action_count": 3,
+        "required_env_count": 4,
+        "materialization_asset_count": 5,
+        "persistence_target_count": 5,
+        "evidence_field_count": 8,
+        "schedule_cron": "17 */6 * * *",
+        "demo": False,
+    }
+
+    ready = build_open_prices_ingestion_run_plan(
+        open_prices_user_agent_present=True,
+        database_url_present=True,
+        raw_snapshot_storage_present=True,
+        schedule_enabled=True,
+    )
+    assert summarize_open_prices_ingestion_run_plan(ready).required_action_count == 0
 
 
 def test_latest_price_rollup_picks_latest_observation() -> None:
@@ -339,13 +401,24 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
         raw_snapshot_storage_present=True,
         schedule_enabled=True,
     )
-    ready_gate = build_data_pipeline_quality_gate(quality, freshness, coverage, ready_ingestion)
+    ready_import = build_open_prices_artifact_import_plan(
+        database_url_present=True,
+        input_artifact_present=True,
+        db_package_built=True,
+    )
+    ready_gate = build_data_pipeline_quality_gate(quality, freshness, coverage, ready_ingestion, ready_import)
     assert ready_gate.to_dict() == {
         "status": "ready",
         "blockers": [],
         "observation_count": len(observations),
         "latest_rollup_count": len(latest),
-        "checked_assets": ["quality_checks", "price_observation_freshness", "price_observation_coverage", "open_prices_ingestion_run_plan"],
+        "checked_assets": [
+            "quality_checks",
+            "price_observation_freshness",
+            "price_observation_coverage",
+            "open_prices_ingestion_run_plan",
+            "open_prices_artifact_import_plan",
+        ],
         "demo": True,
     }
 
@@ -368,3 +441,38 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
     assert blocked_open_prices_gate.status == "blocked"
     assert blocked_open_prices_gate.blockers == ["open_prices_ingestion_plan_blocked"]
     assert blocked_open_prices_gate.checked_assets[-1] == "open_prices_ingestion_run_plan"
+
+    blocked_import = build_open_prices_artifact_import_plan(input_artifact_present=True)
+    blocked_import_gate = build_data_pipeline_quality_gate(quality, freshness, coverage, ready_ingestion, blocked_import)
+    assert blocked_import_gate.status == "blocked"
+    assert blocked_import_gate.blockers == ["open_prices_artifact_import_plan_blocked"]
+    assert blocked_import_gate.checked_assets[-1] == "open_prices_artifact_import_plan"
+
+
+def test_data_pipeline_quality_gate_digest_counts_blocker_classes() -> None:
+    gate = build_data_pipeline_quality_gate(
+        quality=build_quality_checks([], [], []),
+        freshness=ObservationFreshnessSummary(
+            status="blocked",
+            observation_count=0,
+            fresh_count=0,
+            stale_count=0,
+            future_count=0,
+            missing_observed_at_count=0,
+            max_age_hours=48,
+            checked_at="2026-05-20T10:00:00+00:00",
+        ),
+        coverage=build_observation_coverage_summary([], build_seed_stores(), build_seed_products()),
+    )
+
+    assert summarize_data_pipeline_quality_gate(gate).to_dict() == {
+        "status": "blocked",
+        "total_blockers": 4,
+        "provenance_blockers": 0,
+        "freshness_blockers": 1,
+        "coverage_blockers": 1,
+        "duplicate_blockers": 0,
+        "volume_blockers": 2,
+        "ingestion_blockers": 0,
+        "demo": True,
+    }
