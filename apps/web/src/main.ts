@@ -6,6 +6,7 @@ import {
   compareBasketStrategies,
   scoreBand,
   searchProducts,
+  suggestDealBasedMeals,
   summarizeBudget,
   summarizeHumanReviewSla
 } from '@groceryview/core';
@@ -286,30 +287,15 @@ const storeHighlights = [
   { store: 'Coop Farsta', category: 'Butter', signal: 'Above usual price', confidence: 'Estimated' }
 ];
 
-const storeComparisons = [
-  { store: 'Willys Odenplan', basketTotal: 742, verifiedCoverage: 82, lowConfidenceRows: 2, bestCategory: 'Coffee', shopperFit: 'Primary weekly basket' },
-  { store: 'Lidl Sveavägen', basketTotal: 729, verifiedCoverage: 76, lowConfidenceRows: 3, bestCategory: 'Eggs and dairy', shopperFit: 'Cheapest split basket' },
-  { store: 'Coop Farsta', basketTotal: 781, verifiedCoverage: 68, lowConfidenceRows: 5, bestCategory: 'Member promos', shopperFit: 'Review before checkout' }
-];
-
-const storeMapRows = [
-  { store: 'Willys Odenplan', district: 'Vasastan', fit: 'Coffee and pantry', coverage: '82%', note: 'Primary weekly basket' },
-  { store: 'Lidl Sveavägen', district: 'Norrmalm', fit: 'Eggs and dairy', coverage: '76%', note: 'Split basket stop' },
-  { store: 'ICA Kvantum Liljeholmen', district: 'Liljeholmen', fit: 'Milk and produce', coverage: '74%', note: 'Transit-friendly backup' }
-];
-
-const categorySignals = [
-  { category: 'Coffee', product: 'Zoégas Coffee 450g', store: 'Willys Odenplan', price: '49.90 SEK', signal: '12th historical percentile' },
-  { category: 'Dairy', product: 'Arla Milk 1L', store: 'Lidl Sveavägen', price: '13.90 SEK', signal: 'Best favorite-store line' },
-  { category: 'Eggs', product: 'Eggs 12-pack', store: 'Lidl Sveavägen', price: '34.90 SEK', signal: 'Private-label swap candidate' }
-];
-
-const catalogCoverageRows = [
-  { category: 'Coffee', products: 18, coverage: '89%', freshness: 'Fresh today', action: 'Keep monitoring' },
-  { category: 'Dairy', products: 24, coverage: '81%', freshness: 'Fresh today', action: 'Backfill member prices' },
-  { category: 'Produce', products: 31, coverage: '62%', freshness: 'Mixed', action: 'Route receipt photos to review' },
-  { category: 'Pantry', products: 42, coverage: '74%', freshness: 'Fresh this week', action: 'Parse missing unit prices' }
-];
+const mealPlan = suggestDealBasedMeals({
+  deals: [
+    { productId: 'chicken', name: 'Chicken thighs', category: 'protein', price: 69.9, dealScore: 91 },
+    { productId: 'pasta', name: 'Pasta', category: 'pantry', price: 14.9, dealScore: 82 },
+    { productId: 'tomatoes', name: 'Tomatoes', category: 'vegetables', price: 19.9, dealScore: 79 }
+  ],
+  maxMealCost: 110,
+  servings: 3
+});
 
 const retailerFreshnessRows = [
   { retailer: 'Willys', lastScrape: '2026-05-20 07:45', health: 'Healthy', eligibleRows: '94%', action: 'Keep publishing' },
@@ -336,6 +322,31 @@ const index = calculateFixedBasketIndex({
     { productId: 'private-label', baseUnitPrice: 100, currentUnitPrice: 94.2, weight: 1 }
   ]
 });
+
+const categorySignals = [
+  { category: 'Coffee', product: 'Zoégas Coffee 450g', store: 'Willys Odenplan', price: '49.90 SEK', signal: '12th historical percentile' },
+  { category: 'Dairy', product: 'Arla Milk 1L', store: 'Lidl Sveavägen', price: '13.90 SEK', signal: 'Best favorite-store line' },
+  { category: 'Eggs', product: 'Eggs 12-pack', store: 'Lidl Sveavägen', price: '34.90 SEK', signal: 'Private-label swap candidate' }
+];
+
+const storeComparisons = [
+  { store: 'Willys Odenplan', basketTotal: 742, verifiedCoverage: 82, lowConfidenceRows: 2, bestCategory: 'Coffee', shopperFit: 'Primary weekly basket' },
+  { store: 'Lidl Sveavägen', basketTotal: 729, verifiedCoverage: 76, lowConfidenceRows: 3, bestCategory: 'Eggs and dairy', shopperFit: 'Cheapest split basket' },
+  { store: 'Coop Farsta', basketTotal: 781, verifiedCoverage: 68, lowConfidenceRows: 5, bestCategory: 'Member promos', shopperFit: 'Review before checkout' }
+];
+
+const storeMapRows = [
+  { store: 'Willys Odenplan', district: 'Vasastan', fit: 'Coffee and pantry', coverage: '82%', note: 'Primary weekly basket' },
+  { store: 'Lidl Sveavägen', district: 'Norrmalm', fit: 'Eggs and dairy', coverage: '76%', note: 'Split basket stop' },
+  { store: 'ICA Kvantum Liljeholmen', district: 'Liljeholmen', fit: 'Milk and produce', coverage: '74%', note: 'Transit-friendly backup' }
+];
+
+const catalogCoverageRows = [
+  { category: 'Coffee', products: 18, coverage: '89%', freshness: 'Fresh today', action: 'Keep monitoring' },
+  { category: 'Dairy', products: 24, coverage: '81%', freshness: 'Fresh today', action: 'Backfill member prices' },
+  { category: 'Produce', products: 31, coverage: '62%', freshness: 'Mixed', action: 'Route receipt photos to review' },
+  { category: 'Pantry', products: 42, coverage: '74%', freshness: 'Fresh this week', action: 'Parse missing unit prices' }
+];
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Missing #app root');
@@ -776,6 +787,21 @@ app.innerHTML = `
               <td>${category.planned.toFixed(2)} SEK</td>
               <td>${category.spent.toFixed(2)} SEK</td>
               <td><span class="status">${category.status}</span></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Meal plan from deals</h2>
+        <p class="lede">Generate budget meals from current high-scoring deals while keeping the per-serving cost visible.</p>
+        <table class="table">
+          <thead><tr><th>Meal</th><th>Ingredients</th><th>Total</th><th>Serving</th></tr></thead>
+          <tbody>
+            ${mealPlan.map((meal) => `<tr>
+              <td>${meal.title}</td>
+              <td>${meal.ingredientProductIds.join(', ')}</td>
+              <td>${meal.estimatedCost.toFixed(2)} SEK</td>
+              <td>${meal.estimatedCostPerServing.toFixed(2)} SEK</td>
             </tr>`).join('')}
           </tbody>
         </table>
