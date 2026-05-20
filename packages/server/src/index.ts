@@ -1,11 +1,21 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { createGroceryViewApi } from '@groceryview/api';
-import { parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
+import { createGroceryViewApi, type HouseholdPlanRequest } from '@groceryview/api';
+import { createSessionToken, parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
+import {
+  checkPostgresIntegrationReadiness,
+  createPgQueryExecutor,
+  createPostgresRepository,
+  type PgLikeClient,
+  type PostgresIntegrationReadinessReport,
+  type QueryExecutor
+} from '@groceryview/db';
 import {
   buildSubscriptionAccessPolicy,
+  parseStripeCompatibleSubscriptionEvent,
   processBillingSubscriptionEvent,
   type BillingSubscriptionEntitlementMutation,
   type BillingSubscriptionEvent,
@@ -16,6 +26,8 @@ import {
 import {
   applyHumanReviewDecision,
   authorizeHumanReviewAction,
+  buildPrivacyExport,
+  planAccountDeletion,
   summarizeHumanReviewSla,
   type HumanReviewAssignment,
   type HumanReviewDecision,
@@ -27,10 +39,18 @@ import {
   processNotificationSuppressionEvent,
   type DeliveryChannel,
   type NotificationOperationsReport,
-  type NotificationSuppressionEventType,
   type NotificationSuppressionWebhookProvider,
+  type NotificationSuppressionEventType,
   type NotificationSuppressionMutation
 } from '@groceryview/notifications';
+import {
+  planScanReviewWorkItems,
+  prepareScanUploadTicket,
+  processScanUpload,
+  type ScanProviders,
+  type ScanUpload,
+  type ScanUploadStorage
+} from '@groceryview/scanning';
 
 export type HttpHandler = (request: Request) => Promise<Response>;
 
@@ -38,6 +58,7 @@ export type AuthOptions = {
   runtimeConfig?: RuntimeConfig;
   authSecret?: string;
   now?: Date;
+  authSessionExchange?: AuthSessionExchangeVerifier;
   subscriptionEntitlementRepository?: {
     getSubscriptionEntitlement(userId: string): Promise<SubscriptionEntitlementLookupRecord | null>;
   };
@@ -51,11 +72,33 @@ export type AuthOptions = {
     upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
   };
   billingWebhookSecret?: string;
+  billingPriceIdPlanMap?: Partial<Record<string, SubscriptionPlan>>;
   billingSubscriptionSink?: {
     upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
   };
   notificationMetricsToken?: string;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
+  postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
+  scanProviders?: ScanProviders;
+  scanUploadStorage?: ScanUploadStorage;
+};
+
+export type AuthProvider = 'magic_link' | 'passkey' | 'oidc';
+
+export type AuthProviderAssertion = {
+  provider: AuthProvider;
+  assertion: string;
+  email?: string;
+};
+
+export type VerifiedAuthProviderUser = {
+  userId: string;
+  email?: string;
+  expiresAt?: string;
+};
+
+export type AuthSessionExchangeVerifier = {
+  verify(assertion: AuthProviderAssertion): Promise<VerifiedAuthProviderUser>;
 };
 
 export type SubscriptionEntitlementLookupRecord = SubscriptionEntitlementSnapshot & {
@@ -64,8 +107,32 @@ export type SubscriptionEntitlementLookupRecord = SubscriptionEntitlementSnapsho
   providerSubscriptionId?: string;
 };
 
+export type RuntimePersistenceRepository = {
+  getSubscriptionEntitlement(userId: string): Promise<SubscriptionEntitlementLookupRecord | null>;
+  upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
+  getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
+  listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
+  saveHumanReviewAssignment(assignment: HumanReviewAssignment): Promise<void>;
+  upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
+};
+
+export type RuntimePgPool = PgLikeClient & {
+  end(): Promise<void> | void;
+};
+
+export type RuntimePgPoolFactory = (databaseUrl: string) => RuntimePgPool;
+
+export type RuntimeHandlerOptions = {
+  now?: Date;
+  repository?: RuntimePersistenceRepository;
+  notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
+  postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
+  pgPoolFactory?: RuntimePgPoolFactory;
+};
+
 type JsonRecord = Record<string, unknown>;
 
+const require = createRequire(import.meta.url);
 const jsonHeaders = { 'content-type': 'application/json; charset=utf-8' };
 
 function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
@@ -96,13 +163,19 @@ function parseJsonObject(text: string): JsonRecord {
   return parsed as JsonRecord;
 }
 
-function parseJsonValue(text: string): unknown {
-  return JSON.parse(text) as unknown;
-}
-
 function requiredString(value: unknown, field: string): string {
   if (typeof value !== 'string' || value.trim() === '') throw new Error(`${field} is required.`);
   return value;
+}
+
+function requiredScanKind(value: unknown): ScanUpload['kind'] {
+  if (value === 'barcode' || value === 'receipt') return value;
+  throw new Error('kind must be barcode or receipt.');
+}
+
+function requiredAuthProvider(value: unknown): AuthProvider {
+  if (value === 'magic_link' || value === 'passkey' || value === 'oidc') return value;
+  throw new Error('provider must be magic_link, passkey, or oidc.');
 }
 
 function optionalDeliveryChannel(value: unknown): DeliveryChannel | undefined {
@@ -116,10 +189,9 @@ function requiredSuppressionEventType(value: unknown): NotificationSuppressionEv
   throw new Error('eventType must be unsubscribe, bounce, complaint, or resubscribe.');
 }
 
-function optionalSuppressionWebhookProvider(value: string | null): NotificationSuppressionWebhookProvider | undefined {
-  if (value === null || value === '') return undefined;
-  if (value === 'sendgrid' || value === 'ses') return value;
-  throw new Error('provider query parameter must be sendgrid or ses.');
+function requiredSuppressionWebhookProvider(value: unknown): NotificationSuppressionWebhookProvider {
+  if (value === 'sendgrid' || value === 'ses' || value === 'expo') return value;
+  throw new Error('provider must be sendgrid, ses, or expo.');
 }
 
 function optionalNumber(value: unknown, field: string): number | undefined {
@@ -166,6 +238,68 @@ function requiredIsoTimestamp(value: unknown, field: string): string {
 function optionalIsoTimestamp(value: unknown, field: string): string | undefined {
   if (value === undefined) return undefined;
   return requiredIsoTimestamp(value, field);
+}
+
+function authProviderAssertionFromBody(body: JsonRecord): AuthProviderAssertion {
+  const email = optionalString(body.email, 'email');
+  return {
+    provider: requiredAuthProvider(body.provider),
+    assertion: requiredString(body.assertion, 'assertion'),
+    ...(email ? { email } : {})
+  };
+}
+
+function defaultSessionExpiresAt(now: Date): string {
+  return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+}
+
+function requiredRecordArray(value: unknown, field: string): JsonRecord[] {
+  if (!Array.isArray(value)) throw new Error(`${field} must be an array.`);
+  return value.map((item, index) => {
+    if (item === null || typeof item !== 'object' || Array.isArray(item)) {
+      throw new Error(`${field}[${index}] must be an object.`);
+    }
+    return item as JsonRecord;
+  });
+}
+
+function optionalRecordArray(value: unknown, field: string): JsonRecord[] | undefined {
+  if (value === undefined) return undefined;
+  return requiredRecordArray(value, field);
+}
+
+function optionalStringArray(value: unknown, field: string): string[] | undefined {
+  if (value === undefined) return undefined;
+  if (!Array.isArray(value)) throw new Error(`${field} must be an array.`);
+  return value.map((item, index) => requiredString(item, `${field}[${index}]`));
+}
+
+function householdPlanRequestFromBody(body: JsonRecord): HouseholdPlanRequest {
+  return {
+    householdId: requiredString(body.householdId, 'householdId'),
+    name: requiredString(body.name, 'name'),
+    weeklyBudget: requiredNumber(body.weeklyBudget, 'weeklyBudget'),
+    approvalLimit: requiredNumber(body.approvalLimit, 'approvalLimit'),
+    reviewer: requiredString(body.reviewer, 'reviewer'),
+    members: requiredRecordArray(body.members, 'members').map((member) => ({
+      userId: requiredString(member.userId, 'members.userId'),
+      displayName: requiredString(member.displayName, 'members.displayName')
+    })),
+    basketItems: (optionalRecordArray(body.basketItems, 'basketItems') ?? []).map((item) => ({
+      productId: requiredString(item.productId, 'basketItems.productId'),
+      quantity: requiredNumber(item.quantity, 'basketItems.quantity'),
+      addedBy: requiredString(item.addedBy, 'basketItems.addedBy')
+    })),
+    watchlistItems: (optionalRecordArray(body.watchlistItems, 'watchlistItems') ?? []).map((item) => {
+      const targetPrice = optionalNumber(item.targetPrice, 'watchlistItems.targetPrice');
+      return {
+        productId: requiredString(item.productId, 'watchlistItems.productId'),
+        addedBy: requiredString(item.addedBy, 'watchlistItems.addedBy'),
+        ...(targetPrice === undefined ? {} : { targetPrice })
+      };
+    }),
+    sharedFavoriteStoreIds: optionalStringArray(body.sharedFavoriteStoreIds, 'sharedFavoriteStoreIds') ?? []
+  };
 }
 
 function userIdFrom(url: URL): string | Response {
@@ -318,6 +452,20 @@ function parseBillingSubscriptionEvent(body: JsonRecord): BillingSubscriptionEve
   };
 }
 
+function parseBillingSubscriptionWebhookBody(body: JsonRecord, authOptions: AuthOptions): BillingSubscriptionEvent {
+  rejectSensitiveBillingEventFields(body);
+  if (body.provider !== undefined) return parseBillingSubscriptionEvent(body);
+
+  const receivedAt = (authOptions.now ?? new Date()).toISOString();
+  const event = parseStripeCompatibleSubscriptionEvent({
+    payload: body,
+    receivedAt,
+    priceIdPlanMap: authOptions.billingPriceIdPlanMap
+  });
+  if (!event) throw new Error('Unsupported billing subscription webhook event.');
+  return event;
+}
+
 export function createHttpHandler(api = createGroceryViewApi(), authOptions: AuthOptions = {}): HttpHandler {
   const requireSession = async (request: Request): Promise<SessionPayload | Response> => {
     if (!authOptions.authSecret) return errorResponse(503, 'Auth secret is not configured.');
@@ -367,6 +515,31 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         );
       }
 
+      if (path === '/api/auth/session') {
+        if (method === 'POST') {
+          if (!authOptions.authSecret) return errorResponse(503, 'Auth secret is not configured.');
+          if (!authOptions.authSessionExchange) return errorResponse(503, 'Auth session exchange is not configured.');
+          const assertion = authProviderAssertionFromBody(await readJson(request));
+          let verified: VerifiedAuthProviderUser;
+          try {
+            verified = await authOptions.authSessionExchange.verify(assertion);
+          } catch {
+            return errorResponse(401, 'Auth provider assertion rejected.');
+          }
+          const userId = requiredString(verified.userId, 'verifiedUser.userId');
+          const email = optionalString(verified.email, 'verifiedUser.email');
+          const expiresAt = optionalIsoTimestamp(verified.expiresAt, 'verifiedUser.expiresAt') ?? defaultSessionExpiresAt(authOptions.now ?? new Date());
+          const accessToken = await createSessionToken({ userId, ...(email ? { email } : {}), expiresAt }, authOptions.authSecret);
+          return jsonResponse({
+            userId,
+            ...(email ? { email } : {}),
+            tokenType: 'Bearer',
+            accessToken,
+            expiresAt
+          });
+        }
+      }
+
       if (method === 'GET' && path === '/api/market/overview') return jsonResponse(api.getMarketOverview());
       if (method === 'GET' && path === '/api/stores') return jsonResponse(api.getStores());
 
@@ -397,6 +570,29 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           formatNotificationOperationsMetrics(await authOptions.notificationMetricsProvider(), { service: 'groceryview-server' }),
           { status: 200, headers: { 'content-type': 'text/plain; version=0.0.4; charset=utf-8' } }
         );
+      }
+
+      if (method === 'GET' && path === '/api/readiness/postgres') {
+        if (!authOptions.notificationMetricsToken) return errorResponse(503, 'PostgreSQL readiness token is not configured.');
+        if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
+          return errorResponse(401, 'A valid PostgreSQL readiness token is required.');
+        }
+        if (!authOptions.postgresReadinessProvider) return errorResponse(503, 'PostgreSQL readiness provider is not configured.');
+
+        try {
+          const report = await authOptions.postgresReadinessProvider();
+          return jsonResponse(postgresReadinessResponse(report), { status: report.status === 'ready' ? 200 : 503 });
+        } catch {
+          return jsonResponse(
+            postgresReadinessResponse({
+              status: 'blocked',
+              blockers: ['postgres_readiness_probe_failed'],
+              evidence: [],
+              summary: 'PostgreSQL integration contract is blocked.'
+            }),
+            { status: 503 }
+          );
+        }
       }
 
       if (method === 'GET' && path === '/api/human-review/assignments') {
@@ -462,36 +658,51 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         const sink = authOptions.notificationSuppressionSink;
         if (!sink) return errorResponse(503, 'Notification suppression sink is not configured.');
 
-        const provider = optionalSuppressionWebhookProvider(url.searchParams.get('provider'));
-        if (provider) {
-          const suppressions = parseNotificationSuppressionWebhook({
-            provider,
-            payload: parseJsonValue(rawBody),
-            receivedAt: (authOptions.now ?? new Date()).toISOString()
-          }).map(processNotificationSuppressionEvent);
-          for (const suppression of suppressions) {
-            await sink.upsertNotificationSuppression(suppression);
-          }
-          return jsonResponse(
-            { accepted: true, persisted: true, suppressionCount: suppressions.length, suppressionIds: suppressions.map((item) => item.id) },
-            { status: 202 }
-          );
-        } else {
-          const body = parseJsonObject(rawBody);
-          const suppression = processNotificationSuppressionEvent({
-            provider: requiredString(body.provider, 'provider'),
-            providerEventId: requiredString(body.providerEventId, 'providerEventId'),
-            eventType: requiredSuppressionEventType(body.eventType),
-            recipient: requiredString(body.recipient, 'recipient'),
-            channel: optionalDeliveryChannel(body.channel),
-            occurredAt: requiredString(body.occurredAt, 'occurredAt')
-          });
-          await sink.upsertNotificationSuppression(suppression);
-          return jsonResponse(
-            { accepted: true, persisted: true, suppressionId: suppression.id, active: suppression.active },
-            { status: 202 }
-          );
+        const body = parseJsonObject(rawBody);
+        const suppression = processNotificationSuppressionEvent({
+          provider: requiredString(body.provider, 'provider'),
+          providerEventId: requiredString(body.providerEventId, 'providerEventId'),
+          eventType: requiredSuppressionEventType(body.eventType),
+          recipient: requiredString(body.recipient, 'recipient'),
+          channel: optionalDeliveryChannel(body.channel),
+          occurredAt: requiredString(body.occurredAt, 'occurredAt')
+        });
+        await sink.upsertNotificationSuppression(suppression);
+        return jsonResponse(
+          { accepted: true, persisted: true, suppressionId: suppression.id, active: suppression.active },
+          { status: 202 }
+        );
+      }
+
+      if (method === 'POST' && path === '/api/notifications/provider-suppression-events') {
+        if (!authOptions.notificationWebhookSecret) return errorResponse(503, 'Notification webhook secret is not configured.');
+
+        const rawBody = request.body ? await request.text() : '';
+        if (!hasValidNotificationWebhookSignature(request, rawBody, authOptions.notificationWebhookSecret)) {
+          return errorResponse(401, 'A valid notification webhook signature is required.');
         }
+
+        const sink = authOptions.notificationSuppressionSink;
+        if (!sink) return errorResponse(503, 'Notification suppression sink is not configured.');
+
+        const provider = requiredSuppressionWebhookProvider(url.searchParams.get('provider'));
+        const events = parseNotificationSuppressionWebhook({
+          provider,
+          payload: JSON.parse(rawBody) as unknown,
+          receivedAt: (authOptions.now ?? new Date()).toISOString()
+        });
+        const suppressions = events.map((event) => processNotificationSuppressionEvent(event));
+        for (const suppression of suppressions) {
+          await sink.upsertNotificationSuppression(suppression);
+        }
+        return jsonResponse(
+          {
+            accepted: true,
+            persisted: suppressions.length,
+            suppressionIds: suppressions.map((suppression) => suppression.id)
+          },
+          { status: 202 }
+        );
       }
 
       if (method === 'POST' && path === '/api/billing/subscription-events') {
@@ -505,7 +716,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         const sink = authOptions.billingSubscriptionSink;
         if (!sink) return errorResponse(503, 'Billing subscription sink is not configured.');
 
-        const entitlement = processBillingSubscriptionEvent(parseBillingSubscriptionEvent(parseJsonObject(rawBody)));
+        const entitlement = processBillingSubscriptionEvent(parseBillingSubscriptionWebhookBody(parseJsonObject(rawBody), authOptions));
         await sink.upsertSubscriptionEntitlement(entitlement);
         return jsonResponse(
           { accepted: true, persisted: true, userId: entitlement.userId, status: entitlement.status },
@@ -519,6 +730,15 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return store ? jsonResponse(store) : errorResponse(404, 'Store not found.');
       }
 
+      const storeDealsMatch = path.match(/^\/api\/stores\/([^/]+)\/deals$/);
+      if (method === 'GET' && storeDealsMatch) {
+        return jsonResponse(api.getStoreDeals(decodeURIComponent(storeDealsMatch[1])));
+      }
+
+      if (method === 'GET' && path === '/api/prices/freshness') {
+        return jsonResponse(api.getPriceFreshnessReport(url.searchParams.get('asOf') ?? undefined));
+      }
+
       if (method === 'GET' && path === '/api/products/search') {
         return jsonResponse(api.searchProducts(url.searchParams.get('q') ?? ''));
       }
@@ -530,10 +750,33 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       }
 
       const productPricesMatch = path.match(/^\/api\/products\/([^/]+)\/prices$/);
-      if (method === 'GET' && productPricesMatch) return jsonResponse(api.getProductPrices(decodeURIComponent(productPricesMatch[1])));
+      if (method === 'GET' && productPricesMatch) {
+        const productId = decodeURIComponent(productPricesMatch[1]);
+        if (!api.getProduct(productId)) return errorResponse(404, 'Product not found.');
+        return jsonResponse(api.getProductPrices(productId));
+      }
 
       const productHistoryMatch = path.match(/^\/api\/products\/([^/]+)\/history$/);
-      if (method === 'GET' && productHistoryMatch) return jsonResponse(api.getProductHistory(decodeURIComponent(productHistoryMatch[1])));
+      if (method === 'GET' && productHistoryMatch) {
+        const productId = decodeURIComponent(productHistoryMatch[1]);
+        if (!api.getProduct(productId)) return errorResponse(404, 'Product not found.');
+        return jsonResponse(api.getProductHistory(productId));
+      }
+
+
+      const productTerminalMatch = path.match(/^\/api\/products\/([^/]+)\/terminal$/);
+      if (method === 'GET' && productTerminalMatch) {
+        const report = api.getProductPriceTerminal(decodeURIComponent(productTerminalMatch[1]), {
+          asOf: url.searchParams.get('asOf') ?? undefined
+        });
+        return report ? jsonResponse(report) : errorResponse(404, 'Product not found.');
+      }
+
+      const productDealScoreMatch = path.match(/^\/api\/products\/([^/]+)\/deal-score$/);
+      if (method === 'GET' && productDealScoreMatch) {
+        const report = api.getDealScore(decodeURIComponent(productDealScoreMatch[1]));
+        return report ? jsonResponse(report) : errorResponse(404, 'Product not found.');
+      }
 
       const productEquivalentsMatch = path.match(/^\/api\/products\/([^/]+)\/equivalents$/);
       if (method === 'GET' && productEquivalentsMatch) {
@@ -667,6 +910,97 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(api.getBudgetSummary(user));
       }
 
+      if (path === '/api/households/current') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') {
+          const plan = api.getHouseholdPlan(user);
+          return plan ? jsonResponse({ userId: user, ...plan }) : errorResponse(404, 'Household plan not found.');
+        }
+        if (method === 'PUT') {
+          const body = await readJson(request);
+          return jsonResponse({ userId: user, ...api.upsertHouseholdPlan(user, householdPlanRequestFromBody(body)) });
+        }
+      }
+
+      if (path === '/api/privacy/export') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') {
+          const householdPlan = api.getHouseholdPlan(user);
+          return jsonResponse(
+            buildPrivacyExport(
+              {
+                userId: user,
+                favoriteStoreIds: api.getFavoriteStores(user).map((store) => store.id),
+                watchlistProductIds: api.getWatchlist(user).items.map((item) => item.productId),
+                receiptIds: [],
+                householdIds: householdPlan ? [householdPlan.household.id] : []
+              },
+              (authOptions.now ?? new Date()).toISOString()
+            )
+          );
+        }
+      }
+
+      if (path === '/api/privacy/deletion-plan') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'POST') return jsonResponse({ ...planAccountDeletion(user), destructiveAction: false, requiresReauthentication: true });
+      }
+
+      if (path === '/api/scans/upload-url') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'POST') {
+          const body = await readJson(request);
+          const result = await prepareScanUploadTicket({
+            request: {
+              scanId: requiredString(body.scanId, 'scanId'),
+              kind: requiredScanKind(body.kind),
+              contentType: requiredString(body.contentType, 'contentType'),
+              byteLength: requiredNumber(body.byteLength, 'byteLength'),
+              requestedAt: optionalIsoTimestamp(body.requestedAt, 'requestedAt') ?? (authOptions.now ?? new Date()).toISOString()
+            },
+            storage: authOptions.scanUploadStorage
+          });
+          return jsonResponse({ userId: user, result });
+        }
+      }
+
+      if (path === '/api/scans/process') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'POST') {
+          const body = await readJson(request);
+          const scanId = requiredString(body.scanId, 'scanId');
+          const result = await processScanUpload({
+            upload: {
+              kind: requiredScanKind(body.kind),
+              payload: requiredString(body.payload, 'payload'),
+              uploadedAt: optionalIsoTimestamp(body.uploadedAt, 'uploadedAt') ?? (authOptions.now ?? new Date()).toISOString()
+            },
+            providers: authOptions.scanProviders ?? {}
+          });
+          return jsonResponse({
+            userId: user,
+            scanId,
+            result,
+            reviewWorkItems: planScanReviewWorkItems([{ scanId, result }])
+          });
+        }
+      }
+
       if (method === 'GET' && path === '/api/indices') return jsonResponse(api.getIndices());
       const indexMatch = path.match(/^\/api\/indices\/([^/]+)$/);
       if (method === 'GET' && indexMatch) {
@@ -710,7 +1044,7 @@ export type OpenApiSecurityRequirement = {
   billingWebhookSignature?: never[];
 };
 
-export type OpenApiPathItem = Partial<Record<'get' | 'post' | 'patch' | 'delete', OpenApiOperation>>;
+export type OpenApiPathItem = Partial<Record<'get' | 'post' | 'put' | 'patch' | 'delete', OpenApiOperation>>;
 
 export type OpenApiDocument = {
   openapi: '3.1.0';
@@ -746,15 +1080,29 @@ export function buildOpenApiDocument(): OpenApiDocument {
     },
     paths: {
       '/api/health': { get: publicOperation('Get API runtime health without exposing secrets.') },
+      '/api/auth/session': { post: publicOperation('Exchange a verified auth provider assertion for a short-lived bearer session.') },
       '/api/market/overview': { get: publicOperation('Get Stockholm grocery market overview.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
       '/api/billing/subscription-events': { post: billingWebhookOperation('Accept signed billing subscription events and persist entitlement updates.') },
       '/api/stores/{id}': { get: publicOperation('Get store profile.') },
+      '/api/stores/{id}/deals': { get: publicOperation('Get ranked in-store deals for one store.') },
       '/api/products/search': { get: publicOperation('Search products.') },
       '/api/products/{id}': { get: publicOperation('Get product detail.') },
+      '/api/products/{id}/deal-score': { get: publicOperation('Get Deal Score v1 report with customer-facing reasons.') },
+      '/api/products/{id}/equivalents': { get: publicOperation('Get comparable products in the same category.') },
       '/api/products/{id}/prices': { get: publicOperation('Get product prices by store.') },
       '/api/products/{id}/history': { get: publicOperation('Get product price history.') },
+      '/api/products/{id}/terminal': { get: publicOperation('Get product price terminal distribution, quote, and chart data.') },
+      '/api/prices/freshness': { get: publicOperation('Get price freshness and stale-price backfill queue.') },
+      '/api/households/current': {
+        get: protectedOperation('Get the signed-in user household plan.'),
+        put: protectedOperation('Create or replace the signed-in user household plan and budget summary.')
+      },
+      '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
+      '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
+      '/api/scans/process': { post: protectedOperation('Process barcode or receipt scan payloads through configured providers and return review routing work.') },
+      '/api/scans/upload-url': { post: protectedOperation('Create a private upload ticket for barcode or receipt scan payload storage.') },
       '/api/users/{userId}/favorite-stores': {
         get: protectedOperation('List favorite stores.'),
         post: protectedOperation('Add favorite store.')
@@ -781,7 +1129,9 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/human-review/assignments': { get: protectedOperation('List open human-review assignments and SLA status.') },
       '/api/human-review/assignments/{id}/decisions': { post: protectedOperation('Record a human-review decision.') },
       '/api/metrics/notifications': { get: metricsOperation('Export notification operations metrics.') },
-      '/api/notifications/suppression-events': { post: webhookOperation('Accept signed notification suppression provider events.') }
+      '/api/readiness/postgres': { get: metricsOperation('Check PostgreSQL schema and migration readiness without exposing database secrets.') },
+      '/api/notifications/suppression-events': { post: webhookOperation('Accept signed normalized notification suppression events.') },
+      '/api/notifications/provider-suppression-events': { post: webhookOperation('Accept signed SendGrid, SES, or Expo suppression payloads.') }
     }
   };
 }
@@ -836,27 +1186,124 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
   };
 }
 
-export function buildRuntimeAuthOptions(config: RuntimeConfig): AuthOptions {
+export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): AuthOptions {
   return {
     runtimeConfig: config,
     authSecret: config.authSecret,
+    now: options.now,
     notificationWebhookSecret: config.notificationWebhookSecret,
     billingWebhookSecret: config.billingWebhookSecret,
-    notificationMetricsToken: config.metricsToken
+    notificationMetricsToken: config.metricsToken,
+    notificationMetricsProvider: options.notificationMetricsProvider,
+    postgresReadinessProvider: options.postgresReadinessProvider
   };
 }
 
-export function createRuntimeHttpHandler(env: Record<string, string | undefined> = process.env): HttpHandler {
-  return createHttpHandler(undefined, buildRuntimeAuthOptions(loadRuntimeConfig(env)));
+function createDefaultPgPool(databaseUrl: string): RuntimePgPool {
+  const pg = require('pg') as { Pool?: new (config: { connectionString: string }) => RuntimePgPool };
+  if (!pg.Pool) throw new Error('pg Pool export is not available.');
+  return new pg.Pool({ connectionString: databaseUrl });
 }
 
-export function createRuntimeNodeServer(env: Record<string, string | undefined> = process.env) {
-  return createNodeServer(createRuntimeHttpHandler(env));
+function noopClose(): Promise<void> {
+  return Promise.resolve();
 }
 
-export function startNodeServerFromEnv(env: Record<string, string | undefined> = process.env) {
+export function buildRepositoryBackedAuthOptions(
+  config: RuntimeConfig,
+  repository: RuntimePersistenceRepository,
+  options: RuntimeHandlerOptions = {}
+): AuthOptions {
+  return {
+    ...buildRuntimeAuthOptions(config, options),
+    subscriptionEntitlementRepository: {
+      getSubscriptionEntitlement: (userId) => repository.getSubscriptionEntitlement(userId)
+    },
+    humanReviewRepository: {
+      getHumanReviewer: (reviewerId) => repository.getHumanReviewer(reviewerId),
+      listOpenHumanReviewAssignments: () => repository.listOpenHumanReviewAssignments(),
+      saveHumanReviewAssignment: (assignment) => repository.saveHumanReviewAssignment(assignment)
+    },
+    notificationSuppressionSink: {
+      upsertNotificationSuppression: (suppression) => repository.upsertNotificationSuppression(suppression)
+    },
+    billingSubscriptionSink: {
+      upsertSubscriptionEntitlement: (entitlement) => repository.upsertSubscriptionEntitlement(entitlement)
+    }
+  };
+}
+
+export function buildRuntimeRequestAuthOptions(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): AuthOptions {
+  return options.repository ? buildRepositoryBackedAuthOptions(config, options.repository, options) : buildRuntimeAuthOptions(config, options);
+}
+
+function createRuntimeRepositoryResource(config: RuntimeConfig, options: RuntimeHandlerOptions): {
+  repository?: RuntimePersistenceRepository;
+  postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
+  close(): Promise<void>;
+} {
+  if (options.repository || !config.databaseUrl) return { close: noopClose };
+
+  const pool = (options.pgPoolFactory ?? createDefaultPgPool)(config.databaseUrl);
+  const executor: QueryExecutor = createPgQueryExecutor(pool);
+  return {
+    repository: createPostgresRepository(executor),
+    postgresReadinessProvider: () => checkPostgresIntegrationReadiness({ executor, repositoryProbes: [] }),
+    async close() {
+      await pool.end();
+    }
+  };
+}
+
+function createRuntimeHttpServiceFromConfig(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): RuntimeHttpService {
+  const resource = createRuntimeRepositoryResource(config, options);
+  const runtimeOptions: RuntimeHandlerOptions = {
+    ...options,
+    ...(resource.repository ? { repository: resource.repository } : {}),
+    postgresReadinessProvider: options.postgresReadinessProvider ?? resource.postgresReadinessProvider
+  };
+  const authOptions = buildRuntimeRequestAuthOptions(config, runtimeOptions);
+  return {
+    handler: createHttpHandler(undefined, authOptions),
+    close: resource.close
+  };
+}
+
+export type RuntimeHttpService = {
+  handler: HttpHandler;
+  close(): Promise<void>;
+};
+
+export function createRuntimeHttpService(
+  env: Record<string, string | undefined> = process.env,
+  options: RuntimeHandlerOptions = {}
+): RuntimeHttpService {
+  return createRuntimeHttpServiceFromConfig(loadRuntimeConfig(env), options);
+}
+
+export function createRuntimeHttpHandler(
+  env: Record<string, string | undefined> = process.env,
+  options: RuntimeHandlerOptions = {}
+): HttpHandler {
+  return createRuntimeHttpService(env, options).handler;
+}
+
+export function createRuntimeNodeServer(env: Record<string, string | undefined> = process.env, options: RuntimeHandlerOptions = {}) {
+  const service = createRuntimeHttpService(env, options);
+  const server = createNodeServer(service.handler);
+  server.on('close', () => {
+    void service.close();
+  });
+  return server;
+}
+
+export function startNodeServerFromEnv(env: Record<string, string | undefined> = process.env, options: RuntimeHandlerOptions = {}) {
   const config = loadRuntimeConfig(env);
-  const server = createNodeServer(createHttpHandler(undefined, buildRuntimeAuthOptions(config)));
+  const service = createRuntimeHttpServiceFromConfig(config, options);
+  const server = createNodeServer(service.handler);
+  server.on('close', () => {
+    void service.close();
+  });
   server.listen(config.port);
   return server;
 }
@@ -871,6 +1318,7 @@ export type HealthReport = {
   service: 'groceryview-server';
   environment: RuntimeConfig['nodeEnv'];
   hasDatabase: boolean;
+  hasPublicWebUrl: boolean;
   hasAuthSecret: boolean;
   hasNotificationWebhookSecret: boolean;
   hasBillingWebhookSecret: boolean;
@@ -883,6 +1331,7 @@ export function buildHealthReport(config: RuntimeConfig): HealthReport {
     service: 'groceryview-server',
     environment: config.nodeEnv,
     hasDatabase: Boolean(config.databaseUrl),
+    hasPublicWebUrl: Boolean(config.publicWebUrl),
     hasAuthSecret: Boolean(config.authSecret),
     hasNotificationWebhookSecret: Boolean(config.notificationWebhookSecret),
     hasBillingWebhookSecret: Boolean(config.billingWebhookSecret),
