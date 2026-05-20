@@ -37,8 +37,10 @@ describe('buildStaticPages', () => {
         'savings/ledger/index.html',
         'savings/smart-swaps/index.html',
         'scanner/index.html',
+        'stores/compare/index.html',
+        'stores/map/index.html',
         'stores/willys-odenplan/index.html',
-        'verification/index.html'
+        'watchlist/index.html'
       ]);
 
       const product = await readFile(join(root, 'products/coffee/index.html'), 'utf8');
@@ -155,14 +157,6 @@ describe('buildStaticPages', () => {
       assert.match(smartSwapsPage, /Same roast category/);
       assert.match(smartSwapsPage, /Estimated swap prices cannot reduce forecast spend/);
       assert.match(smartSwapsPage, /Dietary restrictions outrank savings/);
-
-      const verification = await readFile(join(root, 'verification/index.html'), 'utf8');
-      assert.match(verification, /Price verification queue/);
-      assert.match(verification, /Verified shelf photo/);
-      assert.match(verification, /Needs human review/);
-      assert.match(verification, /Disputed/);
-      assert.match(verification, /Low confidence/);
-      assert.match(verification, /Hold out of Deal Score/);
 
       const store = await readFile(join(root, 'stores/willys-odenplan/index.html'), 'utf8');
       assert.match(store, /Store highlights/);
