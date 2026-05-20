@@ -14,6 +14,7 @@ describe('buildStaticPages', () => {
         'account/index.html',
         'admin/human-review/index.html',
         'basket/index.html',
+        'budget/forecast/index.html',
         'categories/coffee/index.html',
         'deals/today/index.html',
         'household/index.html',
@@ -102,6 +103,13 @@ describe('buildStaticPages', () => {
       assert.match(basket, /data-groceryview-flow="basket"/);
       assert.match(basket, /name="coffeeQuantity"/);
       assert.match(basket, /data-flow-result="basket"/);
+
+      const budgetForecast = await readFile(join(root, 'budget/forecast/index.html'), 'utf8');
+      assert.match(budgetForecast, /Grocery budget forecast/);
+      assert.match(budgetForecast, /Forecast ledger/);
+      assert.match(budgetForecast, /Month-end projection/);
+      assert.match(budgetForecast, /Correction plan/);
+      assert.match(budgetForecast, /Needs review before forecast credit/);
 
       const scanner = await readFile(join(root, 'scanner/index.html'), 'utf8');
       assert.match(scanner, /Barcode and receipt scanner/);
