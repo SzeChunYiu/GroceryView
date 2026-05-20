@@ -1,5 +1,7 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { createGroceryViewApi } from '@groceryview/api';
 import { parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
 import {
@@ -31,6 +33,7 @@ import {
 export type HttpHandler = (request: Request) => Promise<Response>;
 
 export type AuthOptions = {
+  runtimeConfig?: RuntimeConfig;
   authSecret?: string;
   now?: Date;
   subscriptionEntitlementRepository?: {
@@ -285,16 +288,18 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
 
     try {
       if (method === 'GET' && path === '/api/health') {
+        const runtimeConfig = authOptions.runtimeConfig;
         return jsonResponse(
           buildHealthReport({
-            nodeEnv: (process.env.NODE_ENV ?? 'development') as RuntimeConfig['nodeEnv'],
-            port: Number(process.env.PORT ?? '3000'),
-            authSecret: authOptions.authSecret ?? process.env.AUTH_SECRET,
-            databaseUrl: process.env.DATABASE_URL,
-            publicWebUrl: process.env.PUBLIC_WEB_URL,
-            notificationWebhookSecret: authOptions.notificationWebhookSecret ?? process.env.NOTIFICATION_WEBHOOK_SECRET,
-            billingWebhookSecret: authOptions.billingWebhookSecret ?? process.env.BILLING_WEBHOOK_SECRET,
-            metricsToken: authOptions.notificationMetricsToken ?? process.env.METRICS_TOKEN
+            nodeEnv: runtimeConfig?.nodeEnv ?? ((process.env.NODE_ENV ?? 'development') as RuntimeConfig['nodeEnv']),
+            port: runtimeConfig?.port ?? Number(process.env.PORT ?? '3000'),
+            authSecret: authOptions.authSecret ?? runtimeConfig?.authSecret ?? process.env.AUTH_SECRET,
+            databaseUrl: runtimeConfig?.databaseUrl ?? process.env.DATABASE_URL,
+            publicWebUrl: runtimeConfig?.publicWebUrl ?? process.env.PUBLIC_WEB_URL,
+            notificationWebhookSecret:
+              authOptions.notificationWebhookSecret ?? runtimeConfig?.notificationWebhookSecret ?? process.env.NOTIFICATION_WEBHOOK_SECRET,
+            billingWebhookSecret: authOptions.billingWebhookSecret ?? runtimeConfig?.billingWebhookSecret ?? process.env.BILLING_WEBHOOK_SECRET,
+            metricsToken: authOptions.notificationMetricsToken ?? runtimeConfig?.metricsToken ?? process.env.METRICS_TOKEN
           })
         );
       }
@@ -683,6 +688,36 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
   };
 }
 
+export function buildRuntimeAuthOptions(config: RuntimeConfig): AuthOptions {
+  return {
+    runtimeConfig: config,
+    authSecret: config.authSecret,
+    notificationWebhookSecret: config.notificationWebhookSecret,
+    billingWebhookSecret: config.billingWebhookSecret,
+    notificationMetricsToken: config.metricsToken
+  };
+}
+
+export function createRuntimeHttpHandler(env: Record<string, string | undefined> = process.env): HttpHandler {
+  return createHttpHandler(undefined, buildRuntimeAuthOptions(loadRuntimeConfig(env)));
+}
+
+export function createRuntimeNodeServer(env: Record<string, string | undefined> = process.env) {
+  return createNodeServer(createRuntimeHttpHandler(env));
+}
+
+export function startNodeServerFromEnv(env: Record<string, string | undefined> = process.env) {
+  const config = loadRuntimeConfig(env);
+  const server = createNodeServer(createHttpHandler(undefined, buildRuntimeAuthOptions(config)));
+  server.listen(config.port);
+  return server;
+}
+
+export function isDirectServerEntrypoint(moduleUrl: string, argvEntry: string | undefined = process.argv[1]): boolean {
+  if (!argvEntry) return false;
+  return pathToFileURL(resolve(argvEntry)).href === moduleUrl;
+}
+
 export type HealthReport = {
   status: 'ok';
   service: 'groceryview-server';
@@ -705,4 +740,8 @@ export function buildHealthReport(config: RuntimeConfig): HealthReport {
     hasBillingWebhookSecret: Boolean(config.billingWebhookSecret),
     hasMetricsToken: Boolean(config.metricsToken)
   };
+}
+
+if (isDirectServerEntrypoint(import.meta.url)) {
+  startNodeServerFromEnv();
 }
