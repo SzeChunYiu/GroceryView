@@ -419,6 +419,47 @@ describe('createMemoryRepository', () => {
       }
     ]);
   });
+
+  it('persists household plans with shared lines and member attribution', async () => {
+    const repo = createMemoryRepository();
+
+    await repo.upsertUser({ id: 'user-1', email: 'household@example.com' });
+    await repo.upsertHouseholdPlan({
+      householdId: 'house-1',
+      userId: 'user-1',
+      name: 'Odenplan Household',
+      weeklyBudget: 800,
+      approvalLimit: 400,
+      reviewer: 'user-1',
+      members: [
+        { userId: 'user-1', displayName: 'Alex' },
+        { userId: 'partner', displayName: 'Mina' }
+      ],
+      basketItems: [{ productId: 'milk', quantity: 2, addedBy: 'partner' }],
+      watchlistItems: [{ productId: 'coffee', addedBy: 'user-1', targetPrice: 50 }],
+      sharedFavoriteStoreIds: ['lidl-sveavagen', 'willys-odenplan'],
+      createdAt: '2026-05-20T08:00:00.000Z',
+      updatedAt: '2026-05-20T08:01:00.000Z'
+    });
+
+    assert.deepEqual(await repo.getHouseholdPlan('user-1'), {
+      householdId: 'house-1',
+      userId: 'user-1',
+      name: 'Odenplan Household',
+      weeklyBudget: 800,
+      approvalLimit: 400,
+      reviewer: 'user-1',
+      members: [
+        { userId: 'user-1', displayName: 'Alex' },
+        { userId: 'partner', displayName: 'Mina' }
+      ],
+      basketItems: [{ productId: 'milk', quantity: 2, addedBy: 'partner' }],
+      watchlistItems: [{ productId: 'coffee', addedBy: 'user-1', targetPrice: 50 }],
+      sharedFavoriteStoreIds: ['lidl-sveavagen', 'willys-odenplan'],
+      createdAt: '2026-05-20T08:00:00.000Z',
+      updatedAt: '2026-05-20T08:01:00.000Z'
+    });
+  });
 });
 
 describe('applyNotificationTaskAcknowledgements', () => {

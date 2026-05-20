@@ -11,13 +11,14 @@ const entitlementMigration = readFileSync(join(repoRoot, 'infra/db/migrations/00
 const alertRulesMigration = readFileSync(join(repoRoot, 'infra/db/migrations/004_alert_rules.sql'), 'utf8').toLowerCase();
 const pantryInventoryMigration = readFileSync(join(repoRoot, 'infra/db/migrations/005_pantry_inventory.sql'), 'utf8').toLowerCase();
 const receiptUploadsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/007_receipt_uploads.sql'), 'utf8').toLowerCase();
+const householdPlansMigration = readFileSync(join(repoRoot, 'infra/db/migrations/008_household_plans.sql'), 'utf8').toLowerCase();
 const migrationsDir = join(repoRoot, 'infra/db/migrations');
 const allMigrations = readdirSync(migrationsDir)
   .filter((entry) => entry.endsWith('.sql'))
   .sort()
   .map((entry) => readFileSync(join(migrationsDir, entry), 'utf8').toLowerCase())
   .join('\n');
-const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}`;
+const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}`;
 const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
 
@@ -54,7 +55,12 @@ const repositoryTables = [
   'alert_rules',
   'pantry_items',
   'receipt_uploads',
-  'receipt_items'
+  'receipt_items',
+  'household_plans',
+  'household_members',
+  'household_basket_items',
+  'household_watchlist_items',
+  'household_favorite_stores'
 ];
 
 function tableDefinition(table: string): string {
@@ -145,6 +151,13 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('receipt_items'), /receipt_id text not null references receipt_uploads\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('receipt_items'), /quantity numeric\(12, 3\) not null check \(quantity > 0\)/);
     assert.match(repositoryTableDefinition('receipt_items'), /match_confidence numeric\(5, 4\) check \(match_confidence is null or match_confidence between 0 and 1\)/);
+    assert.match(repositoryTableDefinition('household_plans'), /user_id text not null references app_users\(id\) on delete cascade/);
+    assert.match(repositoryTableDefinition('household_plans'), /weekly_budget numeric\(12, 2\) not null check \(weekly_budget >= 0\)/);
+    assert.match(repositoryTableDefinition('household_plans'), /approval_limit numeric\(12, 2\) not null check \(approval_limit >= 0\)/);
+    assert.match(repositoryTableDefinition('household_members'), /primary key \(household_id, user_id\)/);
+    assert.match(repositoryTableDefinition('household_basket_items'), /quantity numeric\(12, 3\) not null check \(quantity > 0\)/);
+    assert.match(repositoryTableDefinition('household_watchlist_items'), /target_price numeric\(12, 2\) check \(target_price is null or target_price >= 0\)/);
+    assert.match(repositoryTableDefinition('household_favorite_stores'), /primary key \(household_id, store_id\)/);
   });
 
   it('indexes repository workflow lookups used by adapters and workers', () => {
@@ -160,6 +173,10 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(receiptUploadsMigration, /receipt_uploads_user_purchased_idx on receipt_uploads \(user_id, purchased_at desc, id\)/);
     assert.match(receiptUploadsMigration, /receipt_uploads_status_idx on receipt_uploads \(status, updated_at desc, id\)/);
     assert.match(receiptUploadsMigration, /receipt_items_receipt_idx on receipt_items \(receipt_id, id\)/);
+    assert.match(householdPlansMigration, /household_plans_user_idx on household_plans \(user_id\)/);
+    assert.match(householdPlansMigration, /household_members_user_idx on household_members \(user_id, household_id\)/);
+    assert.match(householdPlansMigration, /household_basket_items_product_idx on household_basket_items \(product_id, household_id\)/);
+    assert.match(householdPlansMigration, /household_watchlist_items_product_idx on household_watchlist_items \(product_id, household_id\)/);
   });
 
   it('keeps the migration verifier aligned with catalog and repository tables', () => {

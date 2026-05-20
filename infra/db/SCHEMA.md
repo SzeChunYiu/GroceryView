@@ -258,3 +258,41 @@ Line items parsed from receipt scans, including optional product matches.
 Key columns: `receipt_id`, `raw_name`, `product_id`, `canonical_name`, `quantity`, `item_total`, `match_confidence`.
 
 Indexes: `receipt_items_receipt_idx` for receipt detail reads.
+
+### `household_plans`
+
+Account-scoped household planning header with shared budget and approval policy.
+
+Key columns: `user_id`, `name`, `weekly_budget`, `approval_limit`, `reviewer_user_id`, `created_at`, `updated_at`.
+
+Indexes: `household_plans_user_idx` for signed-in user household reads.
+
+### `household_members`
+
+Members attached to a household plan for attribution and reviewer validation.
+
+Key columns: `household_id`, `user_id`, `display_name`.
+
+Indexes: `household_members_user_idx` for member-to-household lookups.
+
+### `household_basket_items`
+
+Shared household basket lines with member attribution.
+
+Key columns: `household_id`, `line_position`, `product_id`, `quantity`, `added_by`.
+
+Indexes: `household_basket_items_product_idx` for product impact lookups.
+
+### `household_watchlist_items`
+
+Shared household watchlist lines with optional target prices.
+
+Key columns: `household_id`, `line_position`, `product_id`, `added_by`, `target_price`.
+
+Indexes: `household_watchlist_items_product_idx` for product alert lookups.
+
+### `household_favorite_stores`
+
+Shared favorite stores for household basket and alert filtering.
+
+Key columns: `household_id`, `store_id`.

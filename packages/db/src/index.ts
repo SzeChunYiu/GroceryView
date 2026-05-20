@@ -277,6 +277,38 @@ export type ReceiptUploadRecord = {
   items: ReceiptItemRecord[];
 };
 
+export type HouseholdMemberRecord = {
+  userId: string;
+  displayName: string;
+};
+
+export type HouseholdBasketItemRecord = {
+  productId: string;
+  quantity: number;
+  addedBy: string;
+};
+
+export type HouseholdWatchlistItemRecord = {
+  productId: string;
+  addedBy: string;
+  targetPrice?: number;
+};
+
+export type HouseholdPlanRecord = {
+  householdId: string;
+  userId: string;
+  name: string;
+  weeklyBudget: number;
+  approvalLimit: number;
+  reviewer: string;
+  members: HouseholdMemberRecord[];
+  basketItems: HouseholdBasketItemRecord[];
+  watchlistItems: HouseholdWatchlistItemRecord[];
+  sharedFavoriteStoreIds: string[];
+  createdAt: string;
+  updatedAt: string;
+};
+
 export type PriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'estimated';
 
 export type ProductCatalogRecord = {
@@ -742,6 +774,8 @@ export type GroceryViewRepository = {
   listPantryItems(userId: string): Promise<PantryItemRecord[]>;
   upsertReceiptUpload(upload: ReceiptUploadRecord): Promise<void>;
   listReceiptUploads(userId: string): Promise<ReceiptUploadRecord[]>;
+  upsertHouseholdPlan(plan: HouseholdPlanRecord): Promise<void>;
+  getHouseholdPlan(userId: string): Promise<HouseholdPlanRecord | null>;
   upsertHumanReviewer(reviewer: HumanReviewerRecord): Promise<void>;
   getHumanReviewer(reviewerId: string): Promise<HumanReviewerRecord | null>;
   upsertCommunityReporterTrust(trust: CommunityReporterTrustRecord): Promise<void>;
@@ -939,6 +973,7 @@ export function createMemoryRepository(): GroceryViewRepository {
   const baskets = new Map<string, BasketRecord[]>();
   const pantryItems = new Map<string, PantryItemRecord>();
   const receiptUploads = new Map<string, ReceiptUploadRecord>();
+  const householdPlans = new Map<string, HouseholdPlanRecord>();
   const humanReviewers = new Map<string, HumanReviewerRecord>();
   const communityReporterTrust = new Map<string, CommunityReporterTrustRecord>();
   const notificationTasks = new Map<string, NotificationTaskRecord>();
@@ -1032,6 +1067,31 @@ export function createMemoryRepository(): GroceryViewRepository {
         .filter((upload) => upload.userId === userId)
         .sort((a, b) => b.purchasedAt.localeCompare(a.purchasedAt) || a.id.localeCompare(b.id))
         .map((upload) => ({ ...upload, items: upload.items.map((item) => ({ ...item })) }));
+    },
+
+    async upsertHouseholdPlan(plan) {
+      requireUser(users, plan.userId);
+      householdPlans.set(plan.userId, {
+        ...plan,
+        members: plan.members.map((member) => ({ ...member })),
+        basketItems: plan.basketItems.map((item) => ({ ...item })),
+        watchlistItems: plan.watchlistItems.map((item) => ({ ...item })),
+        sharedFavoriteStoreIds: [...plan.sharedFavoriteStoreIds]
+      });
+    },
+
+    async getHouseholdPlan(userId) {
+      requireUser(users, userId);
+      const plan = householdPlans.get(userId);
+      return plan
+        ? {
+            ...plan,
+            members: plan.members.map((member) => ({ ...member })),
+            basketItems: plan.basketItems.map((item) => ({ ...item })),
+            watchlistItems: plan.watchlistItems.map((item) => ({ ...item })),
+            sharedFavoriteStoreIds: [...plan.sharedFavoriteStoreIds]
+          }
+        : null;
     },
 
     async saveHumanReviewAssignment(assignment) {
@@ -1154,6 +1214,32 @@ type ReceiptItemRow = {
   item_total: string | number;
   match_confidence: string | number | null;
 };
+type HouseholdPlanRow = {
+  id: string;
+  user_id: string;
+  name: string;
+  weekly_budget: string | number;
+  approval_limit: string | number;
+  reviewer_user_id: string;
+  created_at: string | Date;
+  updated_at: string | Date;
+};
+type HouseholdMemberRow = { household_id: string; user_id: string; display_name: string };
+type HouseholdBasketItemRow = {
+  household_id: string;
+  line_position: string | number;
+  product_id: string;
+  quantity: string | number;
+  added_by: string;
+};
+type HouseholdWatchlistItemRow = {
+  household_id: string;
+  line_position: string | number;
+  product_id: string;
+  added_by: string;
+  target_price: string | number | null;
+};
+type HouseholdFavoriteStoreRow = { household_id: string; store_id: string };
 type HumanReviewerRow = { id: string; role: HumanReviewerRecord['role']; active: boolean };
 type NotificationTaskRow = {
   id: string;
@@ -1583,6 +1669,29 @@ function mapReceiptUpload(row: ReceiptUploadRow, items: ReceiptItemRecord[]): Re
   };
 }
 
+function mapHouseholdPlan(
+  row: HouseholdPlanRow,
+  members: HouseholdMemberRecord[],
+  basketItems: HouseholdBasketItemRecord[],
+  watchlistItems: HouseholdWatchlistItemRecord[],
+  sharedFavoriteStoreIds: string[]
+): HouseholdPlanRecord {
+  return {
+    householdId: row.id,
+    userId: row.user_id,
+    name: row.name,
+    weeklyBudget: Number(row.weekly_budget),
+    approvalLimit: Number(row.approval_limit),
+    reviewer: row.reviewer_user_id,
+    members,
+    basketItems,
+    watchlistItems,
+    sharedFavoriteStoreIds,
+    createdAt: asIso(row.created_at),
+    updatedAt: asIso(row.updated_at)
+  };
+}
+
 function mapAlertRule(row: AlertRuleRow): AlertRuleRecord {
   return {
     id: row.id,
@@ -1849,6 +1958,116 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
         itemsByReceiptId.set(item.receiptId, items);
       }
       return receiptRows.map((row) => mapReceiptUpload(row, itemsByReceiptId.get(row.id) ?? []));
+    },
+
+    async upsertHouseholdPlan(plan) {
+      await executor.query(
+        `insert into household_plans(
+           id, user_id, name, weekly_budget, approval_limit, reviewer_user_id, created_at, updated_at
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8)
+         on conflict (id) do update set
+           user_id = excluded.user_id,
+           name = excluded.name,
+           weekly_budget = excluded.weekly_budget,
+           approval_limit = excluded.approval_limit,
+           reviewer_user_id = excluded.reviewer_user_id,
+           updated_at = excluded.updated_at`,
+        [
+          plan.householdId,
+          plan.userId,
+          plan.name,
+          plan.weeklyBudget,
+          plan.approvalLimit,
+          plan.reviewer,
+          plan.createdAt,
+          plan.updatedAt
+        ]
+      );
+      await executor.query('delete from household_favorite_stores where household_id = $1', [plan.householdId]);
+      await executor.query('delete from household_watchlist_items where household_id = $1', [plan.householdId]);
+      await executor.query('delete from household_basket_items where household_id = $1', [plan.householdId]);
+      await executor.query('delete from household_members where household_id = $1', [plan.householdId]);
+
+      for (const member of plan.members) {
+        await executor.query(
+          'insert into household_members(household_id, user_id, display_name) values ($1, $2, $3)',
+          [plan.householdId, member.userId, member.displayName]
+        );
+      }
+      for (const [linePosition, item] of plan.basketItems.entries()) {
+        await executor.query(
+          `insert into household_basket_items(household_id, line_position, product_id, quantity, added_by)
+           values ($1, $2, $3, $4, $5)`,
+          [plan.householdId, linePosition, item.productId, item.quantity, item.addedBy]
+        );
+      }
+      for (const [linePosition, item] of plan.watchlistItems.entries()) {
+        await executor.query(
+          `insert into household_watchlist_items(household_id, line_position, product_id, added_by, target_price)
+           values ($1, $2, $3, $4, $5)`,
+          [plan.householdId, linePosition, item.productId, item.addedBy, item.targetPrice ?? null]
+        );
+      }
+      for (const storeId of plan.sharedFavoriteStoreIds) {
+        await executor.query(
+          'insert into household_favorite_stores(household_id, store_id) values ($1, $2) on conflict (household_id, store_id) do nothing',
+          [plan.householdId, storeId]
+        );
+      }
+    },
+
+    async getHouseholdPlan(userId) {
+      const planRows = await executor.query<HouseholdPlanRow>(
+        `select id, user_id, name, weekly_budget, approval_limit, reviewer_user_id, created_at, updated_at
+         from household_plans
+         where user_id = $1`,
+        [userId]
+      );
+      const plan = planRows[0];
+      if (!plan) return null;
+      const householdId = plan.id;
+      const [memberRows, basketRows, watchlistRows, favoriteStoreRows] = await Promise.all([
+        executor.query<HouseholdMemberRow>(
+          `select household_id, user_id, display_name
+           from household_members
+           where household_id = $1
+           order by user_id`,
+          [householdId]
+        ),
+        executor.query<HouseholdBasketItemRow>(
+          `select household_id, line_position, product_id, quantity, added_by
+           from household_basket_items
+           where household_id = $1
+           order by line_position`,
+          [householdId]
+        ),
+        executor.query<HouseholdWatchlistItemRow>(
+          `select household_id, line_position, product_id, added_by, target_price
+           from household_watchlist_items
+           where household_id = $1
+           order by line_position`,
+          [householdId]
+        ),
+        executor.query<HouseholdFavoriteStoreRow>(
+          `select household_id, store_id
+           from household_favorite_stores
+           where household_id = $1
+           order by store_id`,
+          [householdId]
+        )
+      ]);
+
+      return mapHouseholdPlan(
+        plan,
+        memberRows.map((row) => ({ userId: row.user_id, displayName: row.display_name })),
+        basketRows.map((row) => ({ productId: row.product_id, quantity: Number(row.quantity), addedBy: row.added_by })),
+        watchlistRows.map((row) => ({
+          productId: row.product_id,
+          addedBy: row.added_by,
+          ...(row.target_price === null ? {} : { targetPrice: Number(row.target_price) })
+        })),
+        favoriteStoreRows.map((row) => row.store_id)
+      );
     },
 
     async saveHumanReviewAssignment(assignment) {
@@ -2615,7 +2834,12 @@ export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'alert_rules',
   'pantry_items',
   'receipt_uploads',
-  'receipt_items'
+  'receipt_items',
+  'household_plans',
+  'household_members',
+  'household_basket_items',
+  'household_watchlist_items',
+  'household_favorite_stores'
 ] as const;
 
 export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
@@ -2624,7 +2848,8 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '003_subscription_entitlements',
   '004_alert_rules',
   '005_pantry_inventory',
-  '007_receipt_uploads'
+  '007_receipt_uploads',
+  '008_household_plans'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
@@ -2640,6 +2865,7 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
   const pantryItemId = `postgres-probe-pantry-${safeId}`;
   const receiptId = `postgres-probe-receipt-${safeId}`;
   const receiptItemId = `postgres-probe-receipt-item-${safeId}`;
+  const householdId = `postgres-probe-household-${safeId}`;
   const providerSubscriptionId = `postgres-probe-subscription-${safeId}`;
   const chainSlug = `postgres-probe-chain-${safeId}`;
   const productSlug = `postgres-probe-product-${safeId}`;
@@ -2788,6 +3014,32 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
         assertProbe(
           receipts.some((receipt) => receipt.id === receiptId && receipt.items.some((item) => item.id === receiptItemId)),
           'receipt upload probe row was not readable'
+        );
+      }
+    },
+    {
+      name: 'household_plan_round_trip',
+      async run(executor) {
+        const repository = createPostgresRepository(executor);
+        await repository.upsertUser({ id: userId, email: `${userId}@example.invalid` });
+        await repository.upsertHouseholdPlan({
+          householdId,
+          userId,
+          name: 'Postgres Probe Household',
+          weeklyBudget: 800,
+          approvalLimit: 400,
+          reviewer: userId,
+          members: [{ userId, displayName: 'Postgres Probe User' }],
+          basketItems: [{ productId: `postgres-probe-product-${safeId}`, quantity: 1, addedBy: userId }],
+          watchlistItems: [{ productId: `postgres-probe-product-${safeId}`, addedBy: userId, targetPrice: 50 }],
+          sharedFavoriteStoreIds: [`postgres-probe-store-${safeId}`],
+          createdAt: input.now,
+          updatedAt: input.now
+        });
+        const householdPlan = await repository.getHouseholdPlan(userId);
+        assertProbe(
+          householdPlan?.householdId === householdId && householdPlan.members.some((member) => member.userId === userId),
+          'household plan probe row was not readable'
         );
       }
     },

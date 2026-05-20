@@ -73,6 +73,73 @@ class RecordingQueryExecutor implements QueryExecutor {
       created_at: '2026-05-20T07:29:00.000Z'
     }
   ];
+  pantryItemRows: unknown[] = [
+    {
+      id: 'pantry-coffee',
+      user_id: 'user-1',
+      product_id: 'coffee',
+      name: 'Coffee',
+      category: 'pantry',
+      quantity: '1.000',
+      unit: 'bag',
+      minimum_quantity: '1.000',
+      target_quantity: '3.000',
+      expires_on: '2026-07-01',
+      updated_at: '2026-05-20T08:00:00.000Z'
+    }
+  ];
+  receiptUploadRows: unknown[] = [
+    {
+      id: 'receipt-1',
+      user_id: 'user-1',
+      store_id: 'willys-odenplan',
+      image_uri: 'scan://receipts/receipt-1.jpg',
+      purchased_at: new Date('2026-05-20T08:00:00.000Z'),
+      total_amount: '64.90',
+      ocr_confidence: '0.9400',
+      status: 'parsed',
+      created_at: '2026-05-20T08:01:00.000Z',
+      updated_at: '2026-05-20T08:02:00.000Z'
+    }
+  ];
+  receiptItemRows: unknown[] = [
+    {
+      id: 'receipt-item-1',
+      receipt_id: 'receipt-1',
+      raw_name: 'BRYGGKAFFE 450G',
+      product_id: 'coffee',
+      canonical_name: 'Bryggkaffe 450 g',
+      quantity: '1.000',
+      item_total: '64.90',
+      match_confidence: '0.9100'
+    }
+  ];
+  householdPlanRows: unknown[] = [
+    {
+      id: 'house-1',
+      user_id: 'user-1',
+      name: 'Odenplan Household',
+      weekly_budget: '800.00',
+      approval_limit: '400.00',
+      reviewer_user_id: 'user-1',
+      created_at: new Date('2026-05-20T08:00:00.000Z'),
+      updated_at: '2026-05-20T08:01:00.000Z'
+    }
+  ];
+  householdMemberRows: unknown[] = [
+    { household_id: 'house-1', user_id: 'partner', display_name: 'Mina' },
+    { household_id: 'house-1', user_id: 'user-1', display_name: 'Alex' }
+  ];
+  householdBasketItemRows: unknown[] = [
+    { household_id: 'house-1', line_position: 0, product_id: 'milk', quantity: '2.000', added_by: 'partner' }
+  ];
+  householdWatchlistItemRows: unknown[] = [
+    { household_id: 'house-1', line_position: 0, product_id: 'coffee', added_by: 'user-1', target_price: '50.00' }
+  ];
+  householdFavoriteStoreRows: unknown[] = [
+    { household_id: 'house-1', store_id: 'lidl-sveavagen' },
+    { household_id: 'house-1', store_id: 'willys-odenplan' }
+  ];
   sourceRunRows: unknown[] = [
     {
       id: 'source-run-1',
@@ -297,6 +364,14 @@ class RecordingQueryExecutor implements QueryExecutor {
       ] as T[];
     }
     if (sql.includes('from alert_rules')) return this.alertRuleRows as T[];
+    if (sql.includes('from pantry_items')) return this.pantryItemRows as T[];
+    if (sql.includes('from receipt_uploads')) return this.receiptUploadRows as T[];
+    if (sql.includes('from receipt_items')) return this.receiptItemRows as T[];
+    if (sql.includes('from household_plans')) return this.householdPlanRows as T[];
+    if (sql.includes('from household_members')) return this.householdMemberRows as T[];
+    if (sql.includes('from household_basket_items')) return this.householdBasketItemRows as T[];
+    if (sql.includes('from household_watchlist_items')) return this.householdWatchlistItemRows as T[];
+    if (sql.includes('from household_favorite_stores')) return this.householdFavoriteStoreRows as T[];
     if (sql.includes('from human_review_assignments')) {
       return [
         {
@@ -630,6 +705,193 @@ describe('createPostgresRepository', () => {
       '2026-05-20T08:00:00.000Z'
     ]);
     assert.deepEqual(executor.calls[1].params, ['user-1']);
+  });
+
+  it('persists and lists pantry inventory items', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertPantryItem({
+      id: 'pantry-coffee',
+      userId: 'user-1',
+      productId: 'coffee',
+      name: 'Coffee',
+      category: 'pantry',
+      quantity: 1,
+      unit: 'bag',
+      minimumQuantity: 1,
+      targetQuantity: 3,
+      expiresOn: '2026-07-01',
+      updatedAt: '2026-05-20T08:00:00.000Z'
+    });
+
+    assert.deepEqual(await repo.listPantryItems('user-1'), [
+      {
+        id: 'pantry-coffee',
+        userId: 'user-1',
+        productId: 'coffee',
+        name: 'Coffee',
+        category: 'pantry',
+        quantity: 1,
+        unit: 'bag',
+        minimumQuantity: 1,
+        targetQuantity: 3,
+        expiresOn: '2026-07-01',
+        updatedAt: '2026-05-20T08:00:00.000Z'
+      }
+    ]);
+    assert.deepEqual(executor.calls[0].params, [
+      'pantry-coffee',
+      'user-1',
+      'coffee',
+      'Coffee',
+      'pantry',
+      1,
+      'bag',
+      1,
+      3,
+      '2026-07-01',
+      '2026-05-20T08:00:00.000Z'
+    ]);
+    assert.deepEqual(executor.calls[1].params, ['user-1']);
+  });
+
+  it('persists and lists receipt uploads with parsed items', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertReceiptUpload({
+      id: 'receipt-1',
+      userId: 'user-1',
+      storeId: 'willys-odenplan',
+      imageUri: 'scan://receipts/receipt-1.jpg',
+      purchasedAt: '2026-05-20T08:00:00.000Z',
+      totalAmount: 64.9,
+      ocrConfidence: 0.94,
+      status: 'parsed',
+      createdAt: '2026-05-20T08:01:00.000Z',
+      updatedAt: '2026-05-20T08:02:00.000Z',
+      items: [
+        {
+          id: 'receipt-item-1',
+          receiptId: 'receipt-1',
+          rawName: 'BRYGGKAFFE 450G',
+          productId: 'coffee',
+          canonicalName: 'Bryggkaffe 450 g',
+          quantity: 1,
+          itemTotal: 64.9,
+          matchConfidence: 0.91
+        }
+      ]
+    });
+
+    assert.deepEqual(await repo.listReceiptUploads('user-1'), [
+      {
+        id: 'receipt-1',
+        userId: 'user-1',
+        storeId: 'willys-odenplan',
+        imageUri: 'scan://receipts/receipt-1.jpg',
+        purchasedAt: '2026-05-20T08:00:00.000Z',
+        totalAmount: 64.9,
+        ocrConfidence: 0.94,
+        status: 'parsed',
+        createdAt: '2026-05-20T08:01:00.000Z',
+        updatedAt: '2026-05-20T08:02:00.000Z',
+        items: [
+          {
+            id: 'receipt-item-1',
+            receiptId: 'receipt-1',
+            rawName: 'BRYGGKAFFE 450G',
+            productId: 'coffee',
+            canonicalName: 'Bryggkaffe 450 g',
+            quantity: 1,
+            itemTotal: 64.9,
+            matchConfidence: 0.91
+          }
+        ]
+      }
+    ]);
+    assert.deepEqual(executor.calls[0].params, [
+      'receipt-1',
+      'user-1',
+      'willys-odenplan',
+      'scan://receipts/receipt-1.jpg',
+      '2026-05-20T08:00:00.000Z',
+      64.9,
+      0.94,
+      'parsed',
+      '2026-05-20T08:01:00.000Z',
+      '2026-05-20T08:02:00.000Z'
+    ]);
+    assert.deepEqual(executor.calls[1].params, ['receipt-1']);
+    assert.deepEqual(executor.calls[2].params, [
+      'receipt-item-1',
+      'receipt-1',
+      'BRYGGKAFFE 450G',
+      'coffee',
+      'Bryggkaffe 450 g',
+      1,
+      64.9,
+      0.91
+    ]);
+    assert.deepEqual(executor.calls[3].params, ['user-1']);
+    assert.deepEqual(executor.calls[4].params, [['receipt-1']]);
+  });
+
+  it('persists and reads household plans with shared lines', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertHouseholdPlan({
+      householdId: 'house-1',
+      userId: 'user-1',
+      name: 'Odenplan Household',
+      weeklyBudget: 800,
+      approvalLimit: 400,
+      reviewer: 'user-1',
+      members: [
+        { userId: 'user-1', displayName: 'Alex' },
+        { userId: 'partner', displayName: 'Mina' }
+      ],
+      basketItems: [{ productId: 'milk', quantity: 2, addedBy: 'partner' }],
+      watchlistItems: [{ productId: 'coffee', addedBy: 'user-1', targetPrice: 50 }],
+      sharedFavoriteStoreIds: ['lidl-sveavagen', 'willys-odenplan'],
+      createdAt: '2026-05-20T08:00:00.000Z',
+      updatedAt: '2026-05-20T08:01:00.000Z'
+    });
+
+    assert.deepEqual(await repo.getHouseholdPlan('user-1'), {
+      householdId: 'house-1',
+      userId: 'user-1',
+      name: 'Odenplan Household',
+      weeklyBudget: 800,
+      approvalLimit: 400,
+      reviewer: 'user-1',
+      members: [
+        { userId: 'partner', displayName: 'Mina' },
+        { userId: 'user-1', displayName: 'Alex' }
+      ],
+      basketItems: [{ productId: 'milk', quantity: 2, addedBy: 'partner' }],
+      watchlistItems: [{ productId: 'coffee', addedBy: 'user-1', targetPrice: 50 }],
+      sharedFavoriteStoreIds: ['lidl-sveavagen', 'willys-odenplan'],
+      createdAt: '2026-05-20T08:00:00.000Z',
+      updatedAt: '2026-05-20T08:01:00.000Z'
+    });
+    assert.deepEqual(executor.calls[0].params, [
+      'house-1',
+      'user-1',
+      'Odenplan Household',
+      800,
+      400,
+      'user-1',
+      '2026-05-20T08:00:00.000Z',
+      '2026-05-20T08:01:00.000Z'
+    ]);
+    assert.deepEqual(executor.calls[5].params, ['house-1', 'user-1', 'Alex']);
+    assert.deepEqual(executor.calls[7].params, ['house-1', 0, 'milk', 2, 'partner']);
+    assert.deepEqual(executor.calls[8].params, ['house-1', 0, 'coffee', 'user-1', 50]);
+    assert.deepEqual(executor.calls[10].params, ['house-1', 'willys-odenplan']);
+    assert.deepEqual(executor.calls[11].params, ['user-1']);
   });
 });
 
