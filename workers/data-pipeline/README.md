@@ -18,6 +18,7 @@ Dagster scaffold for the GroceryView data-worker lane.
 - Open Prices ingestion run plan asset with schedule, persistence targets, idempotency keys, and fail-closed deployment requirements.
 - Open Prices launch readiness summary that rolls the pull, scheduled ingestion, and artifact import plans into one blocker list for operators.
 - An `open_prices_ingestion_schedule` Dagster schedule contract that targets the Open Prices pull, ingestion plan, observations, latest-price rollup, freshness, and coverage assets every six hours.
+- An `open_prices_import_readiness_schedule` Dagster schedule contract that targets the Open Prices import plan, launch readiness summary, and data-pipeline quality gate every six hours after the ingestion plan window.
 - A `dagster dev` entrypoint that boots the local webserver.
 - Deterministic seed/order behavior so local materializations are reproducible.
 
@@ -50,6 +51,7 @@ Example Dagster assets in this lane:
 
 Example Dagster schedules in this lane:
 - `open_prices_ingestion_schedule`
+- `open_prices_import_readiness_schedule`
 
 ## Open Prices ingestion run plan
 
@@ -69,6 +71,8 @@ When those gates are ready, the planned run materializes the Open Prices pull, p
 ## Open Prices artifact import plan
 
 `open_prices_artifact_import_plan` exposes the PostgreSQL handoff for a saved Open Prices artifact. It remains blocked until `DATABASE_URL`, `OPEN_PRICES_INPUT_PATH`, and a built `@groceryview/db` package are available. The command plan uses `infra/scripts/import-open-prices-artifact.sh` and expects persisted evidence for source run, accepted rows, raw records, observations, products, and chains.
+
+`open_prices_import_readiness_schedule` is defined with cron `47 */6 * * *` in UTC. It targets the import plan, ingestion plan, launch readiness summary, quality checks, freshness, coverage, and `data_pipeline_quality_gate` so scheduled worker validation keeps the PostgreSQL handoff blocked until the import prerequisites are satisfied.
 
 ## Tests
 

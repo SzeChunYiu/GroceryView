@@ -30,11 +30,32 @@ open_prices_ingestion_job = define_asset_job(
     ),
 )
 
+open_prices_import_readiness_job = define_asset_job(
+    "open_prices_import_readiness_job",
+    selection=AssetSelection.keys(
+        "open_prices_real_pull_plan",
+        "open_prices_artifact_import_plan",
+        "open_prices_ingestion_run_plan",
+        "open_prices_launch_readiness",
+        "quality_checks",
+        "price_observation_freshness",
+        "price_observation_coverage",
+        "data_pipeline_quality_gate",
+    ),
+)
+
 open_prices_ingestion_schedule = ScheduleDefinition(
     job=open_prices_ingestion_job,
     cron_schedule="17 */6 * * *",
     execution_timezone="UTC",
     name="open_prices_ingestion_schedule",
+)
+
+open_prices_import_readiness_schedule = ScheduleDefinition(
+    job=open_prices_import_readiness_job,
+    cron_schedule="47 */6 * * *",
+    execution_timezone="UTC",
+    name="open_prices_import_readiness_schedule",
 )
 
 defs = Definitions(
@@ -55,6 +76,6 @@ defs = Definitions(
         price_observation_mix,
         data_pipeline_quality_gate,
     ],
-    jobs=[open_prices_ingestion_job],
-    schedules=[open_prices_ingestion_schedule],
+    jobs=[open_prices_ingestion_job, open_prices_import_readiness_job],
+    schedules=[open_prices_ingestion_schedule, open_prices_import_readiness_schedule],
 )

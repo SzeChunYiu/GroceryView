@@ -21,6 +21,7 @@ EXPECTED_ASSETS = {
 }
 
 EXPECTED_SCHEDULES = {
+    "open_prices_import_readiness_schedule",
     "open_prices_ingestion_schedule",
 }
 

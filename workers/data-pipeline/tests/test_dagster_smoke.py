@@ -30,5 +30,6 @@ def test_dagster_smoke_expected_asset_contract() -> None:
 
 def test_dagster_smoke_expected_schedule_contract() -> None:
     assert EXPECTED_SCHEDULES == {
+        "open_prices_import_readiness_schedule",
         "open_prices_ingestion_schedule",
     }
