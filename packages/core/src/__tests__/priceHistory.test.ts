@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPriceChartSeries, priceChartLineStyle, summarizePriceHistory } from '../index.js';
+import { buildPriceChartSeries, priceChartLineStyle, summarizePriceHistory, summarizePriceHistoryConfidence } from '../index.js';
 
 describe('summarizePriceHistory', () => {
   it('summarizes latest price movement and new-low status from unordered observations', () => {
@@ -130,5 +130,118 @@ describe('priceChartLineStyle', () => {
     assert.equal(priceChartLineStyle({ sourceType: 'online', confidence: 0.65 }), 'dashed');
     assert.equal(priceChartLineStyle({ sourceType: 'estimated', confidence: 0.9 }), 'dotted');
     assert.equal(priceChartLineStyle({ sourceType: 'manual', confidence: 0.2 }), 'dotted');
+  });
+});
+
+describe('summarizePriceHistoryConfidence', () => {
+  it('labels complete single-source history as high confidence', () => {
+    const disclosure = summarizePriceHistoryConfidence({
+      rangeDays: 30,
+      firstObservedAt: '2026-04-20T00:00:00.000Z',
+      lastObservedAt: '2026-05-20T00:00:00.000Z',
+      observationCount: 8,
+      sourceTypesIncluded: ['shelf'],
+      expectedSourceTypes: ['shelf']
+    });
+
+    assert.equal(disclosure.confidenceState, 'high_confidence_history');
+    assert.equal(disclosure.headlineCopy, 'High confidence history');
+    assert.equal(disclosure.canClaimLowestInWindow, true);
+    assert.equal(disclosure.legalCopyMode, 'lowest_in_window');
+  });
+
+  it('discloses limited history and avoids lowest-in-window copy', () => {
+    const disclosure = summarizePriceHistoryConfidence({
+      rangeDays: 30,
+      firstObservedAt: '2026-05-02T00:00:00.000Z',
+      lastObservedAt: '2026-05-20T00:00:00.000Z',
+      observationCount: 5,
+      sourceTypesIncluded: ['online'],
+      expectedSourceTypes: ['online']
+    });
+
+    assert.equal(disclosure.confidenceState, 'limited_history');
+    assert.equal(disclosure.detailCopy, 'We have observed this item for 19 days, so older lows may be missing.');
+    assert.equal(disclosure.canClaimLowestInWindow, false);
+    assert.equal(disclosure.legalCopyMode, 'observed_low_only');
+  });
+
+  it('discloses sparse observations', () => {
+    const disclosure = summarizePriceHistoryConfidence({
+      rangeDays: 30,
+      firstObservedAt: '2026-04-20T00:00:00.000Z',
+      lastObservedAt: '2026-05-20T00:00:00.000Z',
+      observationCount: 2,
+      sourceTypesIncluded: ['receipt'],
+      expectedSourceTypes: ['receipt']
+    });
+
+    assert.equal(disclosure.confidenceState, 'sparse_observations');
+    assert.equal(disclosure.detailCopy, 'Only 2 price observations are available in this range.');
+    assert.equal(disclosure.canClaimLowestInWindow, false);
+  });
+
+  it('discloses missing shelf evidence', () => {
+    const disclosure = summarizePriceHistoryConfidence({
+      rangeDays: 90,
+      firstObservedAt: '2026-02-20T00:00:00.000Z',
+      lastObservedAt: '2026-05-20T00:00:00.000Z',
+      observationCount: 12,
+      sourceTypesIncluded: ['flyer', 'online'],
+      expectedSourceTypes: ['shelf', 'online', 'flyer']
+    });
+
+    assert.equal(disclosure.confidenceState, 'missing_source_evidence');
+    assert.equal(disclosure.headlineCopy, 'No shelf-price evidence');
+    assert.deepEqual(disclosure.sourceTypesMissing, ['shelf']);
+    assert.equal(disclosure.canClaimLowestInWindow, false);
+  });
+
+  it('discloses no observed offer and confirmed out-of-stock gaps', () => {
+    const noOffer = summarizePriceHistoryConfidence({
+      rangeDays: 30,
+      observationCount: 0,
+      sourceTypesIncluded: [],
+      expectedSourceTypes: ['online']
+    });
+    const outOfStock = summarizePriceHistoryConfidence({
+      rangeDays: 30,
+      firstObservedAt: '2026-04-20T00:00:00.000Z',
+      lastObservedAt: '2026-05-20T00:00:00.000Z',
+      observationCount: 6,
+      sourceTypesIncluded: ['online'],
+      availabilityGapCount: 1,
+      hasConfirmedOutOfStock: true
+    });
+
+    assert.equal(noOffer.confidenceState, 'no_observed_offer');
+    assert.equal(noOffer.detailCopy, 'We did not observe an available offer for this source during this period.');
+    assert.equal(outOfStock.headlineCopy, 'Confirmed out of stock');
+    assert.equal(outOfStock.availabilityGapCount, 1);
+    assert.equal(outOfStock.canClaimLowestInWindow, false);
+  });
+
+  it('discloses estimated points and member-only exclusions', () => {
+    const estimated = summarizePriceHistoryConfidence({
+      rangeDays: 30,
+      firstObservedAt: '2026-04-20T00:00:00.000Z',
+      lastObservedAt: '2026-05-20T00:00:00.000Z',
+      observationCount: 4,
+      sourceTypesIncluded: ['estimated']
+    });
+    const memberExcluded = summarizePriceHistoryConfidence({
+      rangeDays: 30,
+      firstObservedAt: '2026-04-20T00:00:00.000Z',
+      lastObservedAt: '2026-05-20T00:00:00.000Z',
+      observationCount: 4,
+      sourceTypesIncluded: ['online'],
+      hasMemberOnlyExcluded: true
+    });
+
+    assert.equal(estimated.confidenceState, 'estimated_price');
+    assert.equal(estimated.canClaimLowestInWindow, false);
+    assert.equal(memberExcluded.confidenceState, 'member_price_excluded');
+    assert.equal(memberExcluded.detailCopy, 'Personalized or login-only offers are not included in this default history.');
+    assert.equal(memberExcluded.canClaimLowestInWindow, false);
   });
 });
