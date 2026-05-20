@@ -22,6 +22,8 @@ export { buildMobilePermissionPlan, nextMobilePermissionPrompt, summarizeMobileP
 export type { MobilePermissionKind, MobilePermissionPlan, MobilePermissionPrompt, MobilePermissionSnapshot, MobilePermissionState, MobilePermissionSurface } from './permissions.js';
 export { buildMobileNotificationPreferencePlan, summarizeMobileNotificationTopics } from './notifications.js';
 export type { MobileNotificationPreferenceInput, MobileNotificationPreferencePlan, MobileNotificationQuietHours, MobileNotificationTopic } from './notifications.js';
+export { buildMobileReceiptReviewPlan, selectMobileReceiptReviewRows } from './receipts.js';
+export type { MobileReceiptReview, MobileReceiptReviewInput, MobileReceiptReviewItem, MobileReceiptReviewPlan } from './receipts.js';
 export { buildMobilePersistedCachePlan, buildMobileQueryKey, buildMobileQueryRegistry } from './queryCache.js';
 export type { MobilePersistedCachePlan, MobileQueryDefinition, MobileQueryId, MobileQueryKeyInput, MobileScreenRoute } from './queryCache.js';
 
