@@ -741,6 +741,12 @@ export type SmartSwapInput = {
   candidates: Array<ProductMatchInput & { unitPrice: number }>;
   acceptPrivateLabel: 'yes' | 'no' | 'maybe';
   minimumSavingsPercent: number;
+  privateLabelPreference?: PrivateLabelPreference;
+};
+
+export type PrivateLabelPreference = {
+  acceptedTiers: BrandTier[];
+  blockedCategories: string[];
 };
 
 export type SmartSwapRecommendation = {
@@ -755,12 +761,20 @@ function isPrivateLabel(tier: BrandTier): boolean {
   return tier === 'standard_private_label' || tier === 'budget_private_label' || tier === 'organic_private_label' || tier === 'discount_chain_label';
 }
 
+function privateLabelAllowed(input: SmartSwapInput, candidate: ProductMatchInput): boolean {
+  if (!isPrivateLabel(candidate.brandTier)) return true;
+  if (input.acceptPrivateLabel === 'no') return false;
+  if (input.privateLabelPreference?.blockedCategories.includes(candidate.category)) return false;
+  if (input.privateLabelPreference && !input.privateLabelPreference.acceptedTiers.includes(candidate.brandTier)) return false;
+  if (input.acceptPrivateLabel === 'maybe' && candidate.brandTier === 'budget_private_label') return false;
+  return true;
+}
+
 export function recommendSmartSwaps(input: SmartSwapInput): SmartSwapRecommendation[] {
-  if (input.acceptPrivateLabel === 'no') return [];
   const recommendations: SmartSwapRecommendation[] = [];
 
   for (const candidate of input.candidates) {
-    if (isPrivateLabel(candidate.brandTier) && input.acceptPrivateLabel === 'maybe' && candidate.brandTier === 'budget_private_label') continue;
+    if (!privateLabelAllowed(input, candidate)) continue;
     const match = classifyProductMatch({ source: input.source, candidate });
     if (match.mode === 'not_recommended') continue;
     const savingsPercent = Math.round(((input.source.unitPrice - candidate.unitPrice) / input.source.unitPrice) * 10000) / 100;
