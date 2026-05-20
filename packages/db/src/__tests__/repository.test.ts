@@ -1,6 +1,11 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { applyNotificationTaskAcknowledgements, buildSourceRunHealthReport, createMemoryRepository } from '../index.js';
+import {
+  applyNotificationTaskAcknowledgements,
+  buildSourceRunHealthReport,
+  createMemoryRepository,
+  summarizeSourceRunHealthReport
+} from '../index.js';
 
 describe('createMemoryRepository', () => {
   it('persists users, favorite stores, budgets, watchlist items, and baskets', async () => {
@@ -420,6 +425,27 @@ describe('buildSourceRunHealthReport', () => {
       latestSuccessfulRunId: 'source-run-1',
       latestSuccessfulFinishedAt: '2026-05-20T08:05:00.000Z'
     });
+    assert.deepEqual(summarizeSourceRunHealthReport(report), {
+      status: 'healthy',
+      blockers: {
+        total: 0,
+        failed: 0,
+        partial: 0,
+        stale: 0,
+        stuckRunning: 0,
+        missingFinishedAt: 0,
+        startedInFuture: 0,
+        finishedInFuture: 0
+      },
+      evidence: {
+        total: 1,
+        succeeded: 1
+      },
+      running: 0,
+      stale: 0,
+      latestSuccessfulRunId: 'source-run-1',
+      latestSuccessfulFinishedAt: '2026-05-20T08:05:00.000Z'
+    });
   });
 
   it('blocks failed, partial, stale, and stuck running source runs', () => {
@@ -478,5 +504,81 @@ describe('buildSourceRunHealthReport', () => {
     assert.deepEqual(report.staleRunIds, ['stale-run']);
     assert.equal(report.latestSuccessfulRunId, 'stale-run');
     assert.equal(report.latestSuccessfulFinishedAt, '2026-05-20T06:05:00.000Z');
+    assert.deepEqual(summarizeSourceRunHealthReport(report), {
+      status: 'blocked',
+      blockers: {
+        total: 4,
+        failed: 1,
+        partial: 1,
+        stale: 1,
+        stuckRunning: 1,
+        missingFinishedAt: 0,
+        startedInFuture: 0,
+        finishedInFuture: 0
+      },
+      evidence: {
+        total: 0,
+        succeeded: 0
+      },
+      running: 1,
+      stale: 1,
+      latestSuccessfulRunId: 'stale-run',
+      latestSuccessfulFinishedAt: '2026-05-20T06:05:00.000Z'
+    });
+  });
+
+  it('summarizes source run timing blockers for operator dashboards', () => {
+    const report = buildSourceRunHealthReport({
+      now: '2026-05-20T08:30:00.000Z',
+      maxRunningMinutes: 30,
+      staleAfterMinutes: 90,
+      runs: [
+        {
+          sourceRunId: 'future-start',
+          sourceType: 'retailer_api',
+          sourceName: 'Future start',
+          startedAt: '2026-05-20T08:45:00.000Z',
+          status: 'running',
+          provenance: {}
+        },
+        {
+          sourceRunId: 'missing-finish',
+          sourceType: 'retailer_page',
+          sourceName: 'Missing finish',
+          startedAt: '2026-05-20T08:00:00.000Z',
+          status: 'failed',
+          provenance: {}
+        },
+        {
+          sourceRunId: 'future-finish',
+          sourceType: 'weekly_leaflet',
+          sourceName: 'Future finish',
+          startedAt: '2026-05-20T08:00:00.000Z',
+          finishedAt: '2026-05-20T08:45:00.000Z',
+          status: 'succeeded',
+          provenance: {}
+        }
+      ]
+    });
+
+    assert.deepEqual(summarizeSourceRunHealthReport(report), {
+      status: 'blocked',
+      blockers: {
+        total: 3,
+        failed: 0,
+        partial: 0,
+        stale: 0,
+        stuckRunning: 0,
+        missingFinishedAt: 1,
+        startedInFuture: 1,
+        finishedInFuture: 1
+      },
+      evidence: {
+        total: 0,
+        succeeded: 0
+      },
+      running: 0,
+      stale: 0
+    });
   });
 });

@@ -458,6 +458,28 @@ export type SourceRunHealthReport = {
   latestSuccessfulFinishedAt?: string;
 };
 
+export type SourceRunHealthSummary = {
+  status: SourceRunHealthReport['status'];
+  blockers: {
+    total: number;
+    failed: number;
+    partial: number;
+    stale: number;
+    stuckRunning: number;
+    missingFinishedAt: number;
+    startedInFuture: number;
+    finishedInFuture: number;
+  };
+  evidence: {
+    total: number;
+    succeeded: number;
+  };
+  running: number;
+  stale: number;
+  latestSuccessfulRunId?: string;
+  latestSuccessfulFinishedAt?: string;
+};
+
 export type FinishSourceRunRecord = {
   sourceRunId: string;
   finishedAt?: string;
@@ -712,6 +734,46 @@ export function buildSourceRunHealthReport(input: SourceRunHealthInput): SourceR
     staleRunIds,
     ...(latestSuccessfulRunId && latestSuccessfulFinishedAt ? { latestSuccessfulRunId, latestSuccessfulFinishedAt } : {})
   };
+}
+
+export function summarizeSourceRunHealthReport(report: SourceRunHealthReport): SourceRunHealthSummary {
+  const summary: SourceRunHealthSummary = {
+    status: report.status,
+    blockers: {
+      total: report.blockers.length,
+      failed: 0,
+      partial: 0,
+      stale: 0,
+      stuckRunning: 0,
+      missingFinishedAt: 0,
+      startedInFuture: 0,
+      finishedInFuture: 0
+    },
+    evidence: {
+      total: report.evidence.length,
+      succeeded: 0
+    },
+    running: report.runningRunIds.length,
+    stale: report.staleRunIds.length,
+    ...(report.latestSuccessfulRunId ? { latestSuccessfulRunId: report.latestSuccessfulRunId } : {}),
+    ...(report.latestSuccessfulFinishedAt ? { latestSuccessfulFinishedAt: report.latestSuccessfulFinishedAt } : {})
+  };
+
+  for (const blocker of report.blockers) {
+    if (blocker.startsWith('source_run_failed:')) summary.blockers.failed += 1;
+    if (blocker.startsWith('source_run_partial:')) summary.blockers.partial += 1;
+    if (blocker.startsWith('source_run_stale:')) summary.blockers.stale += 1;
+    if (blocker.startsWith('source_run_stuck_running:')) summary.blockers.stuckRunning += 1;
+    if (blocker.startsWith('source_run_missing_finished_at:')) summary.blockers.missingFinishedAt += 1;
+    if (blocker.startsWith('source_run_started_in_future:')) summary.blockers.startedInFuture += 1;
+    if (blocker.startsWith('source_run_finished_in_future:')) summary.blockers.finishedInFuture += 1;
+  }
+
+  for (const evidence of report.evidence) {
+    if (evidence.startsWith('source_run_succeeded:')) summary.evidence.succeeded += 1;
+  }
+
+  return summary;
 }
 
 function requireUser(users: Map<string, UserRecord>, userId: string): void {
