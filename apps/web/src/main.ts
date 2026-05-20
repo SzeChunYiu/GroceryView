@@ -110,6 +110,12 @@ const billingStatusRows = [
   { account: 'Reviewer desk', plan: 'premium_yearly', status: 'Past due', checkout: 'Required', action: 'Show billing issue' }
 ];
 
+const adDisclosureRows = [
+  { surface: 'Daily deals', placement: 'Sponsored banner', label: 'Sponsored', premium: 'Hidden for premium', rule: 'Never affects Deal Score' },
+  { surface: 'Product page', placement: 'Brand offer card', label: 'Ad', premium: 'Hidden for premium', rule: 'Separated from price rows' },
+  { surface: 'Store map', placement: 'Promoted pickup note', label: 'Sponsored', premium: 'Visible only when useful', rule: 'No route ranking boost' }
+];
+
 const loyaltyOfferRows = [
   { offer: 'Zoégas Coffee 450g Stammis price', chain: 'ICA', requirement: 'ICA Stammis linked', savings: '7 SEK', status: 'Eligible' },
   { offer: 'Coop Medmera dairy coupon', chain: 'Coop', requirement: 'Clip coupon before checkout', savings: '12 SEK', status: 'Needs action' },
@@ -589,6 +595,16 @@ app.innerHTML = `
           <thead><tr><th>Account</th><th>Plan</th><th>Status</th><th>Checkout</th><th>Action</th></tr></thead>
           <tbody>
             ${billingStatusRows.map((row) => `<tr><td>${row.account}</td><td>${row.plan}</td><td><span class="status">${row.status}</span></td><td>${row.checkout}</td><td>${row.action}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Ad disclosure</h2>
+        <p class="lede"><a href="/ads/disclosure/">Open ad disclosure</a> to verify labels, premium removal, and ranking separation.</p>
+        <table class="table">
+          <thead><tr><th>Surface</th><th>Placement</th><th>Label</th><th>Premium</th><th>Rule</th></tr></thead>
+          <tbody>
+            ${adDisclosureRows.map((row) => `<tr><td>${row.surface}</td><td>${row.placement}</td><td><span class="status">${row.label}</span></td><td>${row.premium}</td><td>${row.rule}</td></tr>`).join('')}
           </tbody>
         </table>
       </div>
