@@ -36,7 +36,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Privacy controls | PR #18, privacy tests | Planning shipped |
 | API contract manifest | PR #19, `buildOpenApiDocument` | Foundation shipped |
 | Deployment runtime config | PR #20, deploy manifest/runtime tests | Foundation shipped |
-| Server runtime entrypoint | PR #272, `createRuntimeHttpHandler()`, direct `node packages/server/dist/index.js` execution guard, and env-backed health/auth option wiring make the deploy start command executable | Pending merge |
+| Server runtime entrypoint | PR #272, `createRuntimeHttpHandler()`, direct `node packages/server/dist/index.js` execution guard, and env-backed health/auth option wiring make the deploy start command executable | Shipped after merge |
 | CI verification | PR #21, `.github/workflows/ci.yml` | Shipped |
 | Deploy workflow skeleton | PR #22, `.github/workflows/deploy.yml` | Provider-neutral skeleton shipped |
 | Completion audit | PR #23, `docs/status/completion-audit.md` | Shipped |
