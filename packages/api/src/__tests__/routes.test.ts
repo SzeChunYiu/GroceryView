@@ -19,6 +19,28 @@ describe('createGroceryViewApi', () => {
     assert.equal(detail?.dealScore, 82);
   });
 
+  it('returns cheapest product prices first and uses the cheapest quote for watchlist alerts', () => {
+    const api = createGroceryViewApi();
+
+    const milkPrices = api.getProductPrices('milk');
+    assert.deepEqual(
+      milkPrices.map((price) => price.storeId),
+      ['lidl-sveavagen', 'willys-odenplan']
+    );
+
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addWatchlistItem('user-1', { productId: 'milk', targetPrice: 14, favoriteStoresOnly: true });
+
+    assert.deepEqual(api.getWatchlist('user-1').alerts, [
+      {
+        productId: 'milk',
+        productName: 'Arla Milk 1L',
+        type: 'target_price',
+        message: 'Arla Milk 1L is 13.90 SEK at Lidl Sveavagen, below your 14.00 SEK target.'
+      }
+    ]);
+  });
+
   it('supports favorite stores, watchlist, basket, budget, and index endpoints', () => {
     const api = createGroceryViewApi();
 
