@@ -4,6 +4,7 @@ from groceryview_data_pipeline.assets import (
     build_normalized_products,
     build_observation_coverage_summary,
     build_observation_freshness_summary,
+    build_open_prices_artifact_import_plan,
     build_open_prices_ingestion_run_plan,
     build_open_prices_pull_plan,
     build_price_observation_mix_summary,
@@ -135,6 +136,43 @@ def test_open_prices_ingestion_run_plan_blocks_until_persistence_and_schedule_ar
         database_url_present=True,
         raw_snapshot_storage_present=True,
         schedule_enabled=True,
+    )
+    assert ready.status == "ready"
+    assert ready.required_actions == []
+
+
+def test_open_prices_artifact_import_plan_exposes_database_import_contract() -> None:
+    plan = build_open_prices_artifact_import_plan(input_artifact_present=True)
+
+    assert plan.status == "blocked"
+    assert plan.source_asset == "open_prices_real_pull_plan"
+    assert plan.import_command == "npm run build --workspace @groceryview/db && DATABASE_URL=<postgres-url> OPEN_PRICES_INPUT_PATH=<artifact.json> infra/scripts/import-open-prices-artifact.sh"
+    assert plan.required_env == ["DATABASE_URL", "OPEN_PRICES_INPUT_PATH"]
+    assert plan.required_actions == ["set_database_url", "build_groceryview_db_package"]
+    assert plan.required_packages == ["@groceryview/db", "pg"]
+    assert plan.database_targets == [
+        "source_runs",
+        "raw_records",
+        "products",
+        "aliases",
+        "observations",
+        "latest_prices",
+    ]
+    assert plan.evidence_fields == [
+        "status",
+        "sourceRunId",
+        "acceptedCount",
+        "rawRecordCount",
+        "observationCount",
+        "productCount",
+        "chainCount",
+    ]
+    assert plan.to_dict()["demo"] is False
+
+    ready = build_open_prices_artifact_import_plan(
+        database_url_present=True,
+        input_artifact_present=True,
+        db_package_built=True,
     )
     assert ready.status == "ready"
     assert ready.required_actions == []
