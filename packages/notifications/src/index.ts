@@ -245,6 +245,21 @@ export type PersistedNotificationTask = {
   status: 'queued' | 'delivered' | 'dead_lettered' | 'suppressed';
 };
 
+export type DeadLetterReplayPlanInput = {
+  now: string;
+  replayAt?: string;
+  maxReplayAttempts: number;
+  tasks: PersistedNotificationTask[];
+};
+
+export type DeadLetterReplayPlan = {
+  replayable: PersistedNotificationTask[];
+  skipped: Array<{
+    taskId: string;
+    reason: 'not_dead_lettered' | 'attempt_limit_reached' | 'invalid_send_at';
+  }>;
+};
+
 export type NotificationTaskRepository = {
   listDueNotificationTasks(now: string): Promise<PersistedNotificationTask[]>;
   listActiveNotificationSuppressions(): Promise<NotificationSuppression[]>;
@@ -541,6 +556,44 @@ function nextAttemptAt(now: string, retryDelayMinutes: number): string {
     throw new Error('retryDelayMinutes must be positive.');
   }
   return new Date(nowMs + retryDelayMinutes * 60_000).toISOString();
+}
+
+export function planDeadLetterNotificationReplay(input: DeadLetterReplayPlanInput): DeadLetterReplayPlan {
+  if (Number.isNaN(Date.parse(input.now))) throw new Error('now must be an ISO date.');
+  const replayAt = input.replayAt ?? input.now;
+  if (Number.isNaN(Date.parse(replayAt))) throw new Error('replayAt must be an ISO date.');
+  if (!Number.isInteger(input.maxReplayAttempts) || input.maxReplayAttempts <= 0) {
+    throw new Error('maxReplayAttempts must be a positive integer.');
+  }
+
+  const replayable: PersistedNotificationTask[] = [];
+  const skipped: DeadLetterReplayPlan['skipped'] = [];
+
+  for (const task of [...input.tasks].sort((a, b) => a.id.localeCompare(b.id))) {
+    if (task.status !== 'dead_lettered') {
+      skipped.push({ taskId: task.id, reason: 'not_dead_lettered' });
+      continue;
+    }
+
+    if (task.attemptCount >= input.maxReplayAttempts) {
+      skipped.push({ taskId: task.id, reason: 'attempt_limit_reached' });
+      continue;
+    }
+
+    if (Number.isNaN(Date.parse(task.sendAt))) {
+      skipped.push({ taskId: task.id, reason: 'invalid_send_at' });
+      continue;
+    }
+
+    replayable.push({
+      ...task,
+      status: 'queued',
+      sendAt: replayAt,
+      attemptCount: 0
+    });
+  }
+
+  return { replayable, skipped };
 }
 
 function deliveryReason(result: DeliveryResult): string {
