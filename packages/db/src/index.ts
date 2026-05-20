@@ -184,6 +184,28 @@ export type BasketRecord = {
 
 export type PriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'estimated';
 
+export type ProductCatalogRecord = {
+  productId: string;
+  slug: string;
+  canonicalName: string;
+  brand?: string;
+  brandOwner?: string;
+  privateLabelOwner?: string;
+  barcode?: string;
+  categoryPath: string[];
+  packageSize?: number;
+  packageUnit?: string;
+  comparableUnit: string;
+  nutrition: Record<string, unknown>;
+  imageUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type PostgresCatalogReader = {
+  getProductBySlug(slug: string): Promise<ProductCatalogRecord | null>;
+};
+
 export type PriceObservationRecord = {
   productId: string;
   chainId: string;
@@ -685,6 +707,23 @@ type SourceRunRow = {
   provenance: Record<string, unknown> | string | null;
   error_message: string | null;
 };
+type ProductCatalogRow = {
+  id: string;
+  slug: string;
+  canonical_name: string;
+  brand: string | null;
+  brand_owner: string | null;
+  private_label_owner: string | null;
+  barcode: string | null;
+  category_path: string[];
+  package_size: string | number | null;
+  package_unit: string | null;
+  comparable_unit: string;
+  nutrition: Record<string, unknown> | string | null;
+  image_url: string | null;
+  created_at: string | Date;
+  updated_at: string | Date;
+};
 
 function asIso(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : value;
@@ -770,6 +809,26 @@ function mapSourceRun(row: SourceRunRow): SourceRunReadRecord {
     status: row.status,
     provenance: asRecord(row.provenance),
     ...(row.error_message ? { errorMessage: row.error_message } : {})
+  };
+}
+
+function mapProductCatalog(row: ProductCatalogRow): ProductCatalogRecord {
+  return {
+    productId: row.id,
+    slug: row.slug,
+    canonicalName: row.canonical_name,
+    ...(row.brand ? { brand: row.brand } : {}),
+    ...(row.brand_owner ? { brandOwner: row.brand_owner } : {}),
+    ...(row.private_label_owner ? { privateLabelOwner: row.private_label_owner } : {}),
+    ...(row.barcode ? { barcode: row.barcode } : {}),
+    categoryPath: [...row.category_path],
+    ...(row.package_size === null ? {} : { packageSize: Number(row.package_size) }),
+    ...(row.package_unit ? { packageUnit: row.package_unit } : {}),
+    comparableUnit: row.comparable_unit,
+    nutrition: asRecord(row.nutrition),
+    ...(row.image_url ? { imageUrl: row.image_url } : {}),
+    createdAt: asIso(row.created_at),
+    updatedAt: asIso(row.updated_at)
   };
 }
 
@@ -1099,6 +1158,35 @@ export function createPgQueryExecutor(client: PgLikeClient): QueryExecutor {
     async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
       const result = await client.query(sql, params);
       return result.rows as T[];
+    }
+  };
+}
+
+export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCatalogReader {
+  return {
+    async getProductBySlug(slug) {
+      const rows = await executor.query<ProductCatalogRow>(
+        `select id,
+                slug,
+                canonical_name,
+                brand,
+                brand_owner,
+                private_label_owner,
+                barcode,
+                category_path,
+                package_size,
+                package_unit,
+                comparable_unit,
+                nutrition,
+                image_url,
+                created_at,
+                updated_at
+         from products
+         where slug = $1`,
+        [slug]
+      );
+      const row = rows[0];
+      return row ? mapProductCatalog(row) : null;
     }
   };
 }
