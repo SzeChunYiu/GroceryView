@@ -44,13 +44,14 @@ class RecordingPgPool {
           'community_reporter_trust',
           'subscription_entitlements',
           'notification_tasks',
-          'notification_suppressions'
+          'notification_suppressions',
+          'alert_rules'
         ].map((table_name) => ({ table_name }))
       };
     }
     if (text.includes('select version from schema_migrations')) {
       return {
-        rows: ['001_groceryview_schema', '002_repository_support_schema', '003_subscription_entitlements'].map((version) => ({ version }))
+        rows: ['001_groceryview_schema', '002_repository_support_schema', '003_subscription_entitlements', '004_alert_rules'].map((version) => ({ version }))
       };
     }
     if (text.includes('insert into subscription_entitlements')) {
@@ -369,7 +370,9 @@ describe('runtime config', () => {
       assert.equal(body.status, 'ready');
       assert.deepEqual(body.blockers, []);
       assert.equal(body.evidence.includes('table:app_users'), true);
+      assert.equal(body.evidence.includes('table:alert_rules'), true);
       assert.equal(body.evidence.includes('migration:003_subscription_entitlements'), true);
+      assert.equal(body.evidence.includes('migration:004_alert_rules'), true);
       assert.equal(JSON.stringify(body).includes('runtime-password'), false);
     } finally {
       await service.close();

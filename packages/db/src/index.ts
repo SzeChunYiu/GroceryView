@@ -1878,13 +1878,15 @@ export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'community_reporter_trust',
   'subscription_entitlements',
   'notification_tasks',
-  'notification_suppressions'
+  'notification_suppressions',
+  'alert_rules'
 ] as const;
 
 export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '001_groceryview_schema',
   '002_repository_support_schema',
-  '003_subscription_entitlements'
+  '003_subscription_entitlements',
+  '004_alert_rules'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
@@ -1896,6 +1898,7 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
   const userId = `postgres-probe-user-${safeId}`;
   const assignmentId = `postgres-probe-assignment-${safeId}`;
   const suppressionId = `postgres-probe-suppression-${safeId}`;
+  const alertRuleId = `postgres-probe-alert-${safeId}`;
   const providerSubscriptionId = `postgres-probe-subscription-${safeId}`;
   const chainSlug = `postgres-probe-chain-${safeId}`;
   const productSlug = `postgres-probe-product-${safeId}`;
@@ -1968,6 +1971,26 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
         });
         const suppressions = await repository.listActiveNotificationSuppressions();
         assertProbe(suppressions.some((suppression) => suppression.id === suppressionId), 'notification suppression probe row was not readable');
+      }
+    },
+    {
+      name: 'alert_rule_round_trip',
+      async run(executor) {
+        const repository = createPostgresRepository(executor);
+        await repository.upsertUser({ id: userId, email: `${userId}@example.invalid` });
+        await repository.upsertAlertRule({
+          id: alertRuleId,
+          userId,
+          productId: `postgres-probe-product-${safeId}`,
+          channel: 'push',
+          alertType: 'target_price',
+          targetPrice: 49.9,
+          active: true,
+          createdAt: input.now,
+          updatedAt: input.now
+        });
+        const alertRules = await repository.listActiveAlertRules(userId);
+        assertProbe(alertRules.some((rule) => rule.id === alertRuleId), 'alert rule probe row was not readable');
       }
     },
     {
