@@ -25,11 +25,13 @@ describe('buildOpenApiDocument', () => {
       '/api/human-review/assignments/{id}/decisions',
       '/api/indices',
       '/api/indices/{id}',
+      '/api/loyalty/offers',
       '/api/market/overview',
       '/api/metrics/notifications',
       '/api/notifications/provider-suppression-events',
       '/api/notifications/suppression-events',
       '/api/nutrition/value',
+      '/api/pantry/replenishment',
       '/api/prices/freshness',
       '/api/privacy/deletion-plan',
       '/api/privacy/export',
@@ -42,6 +44,7 @@ describe('buildOpenApiDocument', () => {
       '/api/products/{id}/prices',
       '/api/products/{id}/terminal',
       '/api/readiness/postgres',
+      '/api/receipts/review',
       '/api/scans/process',
       '/api/scans/upload-url',
       '/api/stores',
@@ -85,6 +88,12 @@ describe('buildOpenApiDocument', () => {
     assert.equal(doc.paths['/api/market/overview'].get?.security, undefined);
     assert.equal(doc.paths['/api/nutrition/value'].get?.security, undefined);
     assert.match(doc.paths['/api/nutrition/value'].get?.summary ?? '', /nutrition.*krona/i);
+    assert.deepEqual(doc.paths['/api/pantry/replenishment'].get?.security, [{ bearerAuth: [] }]);
+    assert.match(doc.paths['/api/pantry/replenishment'].get?.summary ?? '', /pantry replenishment/i);
+    assert.deepEqual(doc.paths['/api/loyalty/offers'].get?.security, [{ bearerAuth: [] }]);
+    assert.match(doc.paths['/api/loyalty/offers'].get?.summary ?? '', /loyalty offers/i);
+    assert.deepEqual(doc.paths['/api/receipts/review'].get?.security, [{ bearerAuth: [] }]);
+    assert.match(doc.paths['/api/receipts/review'].get?.summary ?? '', /receipt review/i);
     assert.equal(doc.paths['/api/categories/{category}/market'].get?.security, undefined);
     assert.match(doc.paths['/api/categories/{category}/market'].get?.summary ?? '', /category market/i);
   });

@@ -361,6 +361,63 @@ describe('createMemoryRepository', () => {
       }
     ]);
   });
+
+  it('persists receipt uploads with parsed line items', async () => {
+    const repo = createMemoryRepository();
+
+    await repo.upsertUser({ id: 'user-1', email: 'receipts@example.com' });
+    await repo.upsertReceiptUpload({
+      id: 'receipt-1',
+      userId: 'user-1',
+      storeId: 'willys-odenplan',
+      imageUri: 'scan://receipts/receipt-1.jpg',
+      purchasedAt: '2026-05-20T08:00:00.000Z',
+      totalAmount: 64.9,
+      ocrConfidence: 0.94,
+      status: 'parsed',
+      createdAt: '2026-05-20T08:01:00.000Z',
+      updatedAt: '2026-05-20T08:02:00.000Z',
+      items: [
+        {
+          id: 'receipt-item-1',
+          receiptId: 'receipt-1',
+          rawName: 'BRYGGKAFFE 450G',
+          productId: 'coffee',
+          canonicalName: 'Bryggkaffe 450 g',
+          quantity: 1,
+          itemTotal: 64.9,
+          matchConfidence: 0.91
+        }
+      ]
+    });
+
+    assert.deepEqual(await repo.listReceiptUploads('user-1'), [
+      {
+        id: 'receipt-1',
+        userId: 'user-1',
+        storeId: 'willys-odenplan',
+        imageUri: 'scan://receipts/receipt-1.jpg',
+        purchasedAt: '2026-05-20T08:00:00.000Z',
+        totalAmount: 64.9,
+        ocrConfidence: 0.94,
+        status: 'parsed',
+        createdAt: '2026-05-20T08:01:00.000Z',
+        updatedAt: '2026-05-20T08:02:00.000Z',
+        items: [
+          {
+            id: 'receipt-item-1',
+            receiptId: 'receipt-1',
+            rawName: 'BRYGGKAFFE 450G',
+            productId: 'coffee',
+            canonicalName: 'Bryggkaffe 450 g',
+            quantity: 1,
+            itemTotal: 64.9,
+            matchConfidence: 0.91
+          }
+        ]
+      }
+    ]);
+  });
 });
 
 describe('applyNotificationTaskAcknowledgements', () => {

@@ -10,13 +10,14 @@ const repositoryMigration = readFileSync(join(repoRoot, 'infra/db/migrations/002
 const entitlementMigration = readFileSync(join(repoRoot, 'infra/db/migrations/003_subscription_entitlements.sql'), 'utf8').toLowerCase();
 const alertRulesMigration = readFileSync(join(repoRoot, 'infra/db/migrations/004_alert_rules.sql'), 'utf8').toLowerCase();
 const pantryInventoryMigration = readFileSync(join(repoRoot, 'infra/db/migrations/005_pantry_inventory.sql'), 'utf8').toLowerCase();
+const receiptUploadsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/007_receipt_uploads.sql'), 'utf8').toLowerCase();
 const migrationsDir = join(repoRoot, 'infra/db/migrations');
 const allMigrations = readdirSync(migrationsDir)
   .filter((entry) => entry.endsWith('.sql'))
   .sort()
   .map((entry) => readFileSync(join(migrationsDir, entry), 'utf8').toLowerCase())
   .join('\n');
-const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}`;
+const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}`;
 const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
 
@@ -51,7 +52,9 @@ const repositoryTables = [
   'notification_tasks',
   'notification_suppressions',
   'alert_rules',
-  'pantry_items'
+  'pantry_items',
+  'receipt_uploads',
+  'receipt_items'
 ];
 
 function tableDefinition(table: string): string {
@@ -135,6 +138,13 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('pantry_items'), /category text not null check/);
     assert.match(repositoryTableDefinition('pantry_items'), /quantity numeric\(12, 3\) not null check \(quantity >= 0\)/);
     assert.match(repositoryTableDefinition('pantry_items'), /target_quantity numeric\(12, 3\) check \(target_quantity is null or target_quantity >= 0\)/);
+    assert.match(repositoryTableDefinition('receipt_uploads'), /user_id text not null references app_users\(id\) on delete cascade/);
+    assert.match(repositoryTableDefinition('receipt_uploads'), /total_amount numeric\(12, 2\) not null check \(total_amount >= 0\)/);
+    assert.match(repositoryTableDefinition('receipt_uploads'), /ocr_confidence numeric\(5, 4\) not null check \(ocr_confidence between 0 and 1\)/);
+    assert.match(repositoryTableDefinition('receipt_uploads'), /status text not null check/);
+    assert.match(repositoryTableDefinition('receipt_items'), /receipt_id text not null references receipt_uploads\(id\) on delete cascade/);
+    assert.match(repositoryTableDefinition('receipt_items'), /quantity numeric\(12, 3\) not null check \(quantity > 0\)/);
+    assert.match(repositoryTableDefinition('receipt_items'), /match_confidence numeric\(5, 4\) check \(match_confidence is null or match_confidence between 0 and 1\)/);
   });
 
   it('indexes repository workflow lookups used by adapters and workers', () => {
@@ -147,6 +157,9 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(alertRulesMigration, /alert_rules_active_user_idx on alert_rules \(user_id, active, product_id, alert_type, id\)/);
     assert.match(pantryInventoryMigration, /pantry_items_user_idx on pantry_items \(user_id, product_id\)/);
     assert.match(pantryInventoryMigration, /pantry_items_expiry_idx on pantry_items \(expires_on\) where expires_on is not null/);
+    assert.match(receiptUploadsMigration, /receipt_uploads_user_purchased_idx on receipt_uploads \(user_id, purchased_at desc, id\)/);
+    assert.match(receiptUploadsMigration, /receipt_uploads_status_idx on receipt_uploads \(status, updated_at desc, id\)/);
+    assert.match(receiptUploadsMigration, /receipt_items_receipt_idx on receipt_items \(receipt_id, id\)/);
   });
 
   it('keeps the migration verifier aligned with catalog and repository tables', () => {

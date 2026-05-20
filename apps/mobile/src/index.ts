@@ -16,6 +16,8 @@ export type {
 } from './offlineMutations.js';
 export { buildMobileDeepLink, buildMobileRouteManifest, findMobileRoute } from './routeManifest.js';
 export type { MobileMvpRoute, MobileMvpRouteId, MobileMvpRoutePath, MobileRouteManifest, MobileRouteParam } from './routeManifest.js';
+export { buildMobilePermissionPlan, nextMobilePermissionPrompt, summarizeMobilePermissionPlan } from './permissions.js';
+export type { MobilePermissionKind, MobilePermissionPlan, MobilePermissionPrompt, MobilePermissionSnapshot, MobilePermissionState, MobilePermissionSurface } from './permissions.js';
 export { buildMobilePersistedCachePlan, buildMobileQueryKey, buildMobileQueryRegistry } from './queryCache.js';
 export type { MobilePersistedCachePlan, MobileQueryDefinition, MobileQueryId, MobileQueryKeyInput, MobileScreenRoute } from './queryCache.js';
 
@@ -874,6 +876,67 @@ export function buildMobilePrivacyRequestPlan(input: MobilePrivacyRequestInput):
   };
 }
 
+
+export type MobileOfflineSyncMutation = {
+  id: string;
+  kind: 'add_to_basket' | 'remove_from_basket' | 'add_to_watchlist' | 'update_budget' | 'save_receipt_match';
+  createdAt: string;
+};
+
+export type MobileOfflineSyncInput = {
+  userId: string;
+  offlineEnabled: boolean;
+  secureStorageConfigured: boolean;
+  pendingMutations: MobileOfflineSyncMutation[];
+};
+
+export type MobileOfflineSyncPlan = {
+  userId: string;
+  cachedScreens: Array<'today' | 'stores' | 'basket' | 'scan' | 'profile'>;
+  mutationQueue: Array<MobileOfflineSyncMutation & { syncPriority: 'high' | 'normal' }>;
+  blockers: string[];
+  actions: Array<'cache_mobile_home' | 'queue_mutations' | 'sync_when_online' | 'prompt_enable_offline' | 'configure_secure_storage'>;
+};
+
+export function buildMobileOfflineSyncPlan(input: MobileOfflineSyncInput): MobileOfflineSyncPlan {
+  if (!input.userId) throw new Error('userId is required.');
+
+  const blockers: string[] = [];
+  const actions: MobileOfflineSyncPlan['actions'] = [];
+  const cachedScreens: MobileOfflineSyncPlan['cachedScreens'] = [];
+
+  if (!input.offlineEnabled) {
+    blockers.push('mobile_offline_mode_disabled');
+    actions.push('prompt_enable_offline');
+  }
+
+  if (!input.secureStorageConfigured) {
+    blockers.push('secure_storage_not_configured');
+    actions.push('configure_secure_storage');
+  }
+
+  if (blockers.length === 0) {
+    cachedScreens.push('today', 'stores', 'basket', 'scan', 'profile');
+    actions.push('cache_mobile_home');
+  }
+
+  const mutationQueue: MobileOfflineSyncPlan['mutationQueue'] = input.pendingMutations.map((mutation) => ({
+    ...mutation,
+    syncPriority: mutation.kind === 'save_receipt_match' || mutation.kind === 'update_budget' ? 'high' : 'normal'
+  }));
+
+  if (mutationQueue.length > 0) {
+    actions.push('queue_mutations', 'sync_when_online');
+  }
+
+  return {
+    userId: input.userId,
+    cachedScreens,
+    mutationQueue,
+    blockers,
+    actions
+  };
+}
 export function buildMobileProviderReadinessReport(input: MobileProviderReadinessInput): MobileProviderReadinessReport {
   const plan = buildMobileScreenBlueprints();
   const screenStates = plan.screens.map((screen) => {

@@ -6,6 +6,8 @@ import {
   compareBasketStrategies,
   createHouseholdState,
   rankNutritionPerKrona,
+  planPantryReplenishment,
+  reviewReceiptScan,
   scoreBand,
   searchProducts,
   summarizeBudget,
@@ -16,6 +18,7 @@ import {
   type PriceChartAdapterResult,
   type PriceChartObservation,
   type PriceHistorySummary,
+  type ReceiptReview,
   type HouseholdBasketItem,
   type HouseholdMember,
   type HouseholdSnapshot,
@@ -24,6 +27,8 @@ import {
   type NutritionMetric,
   type NutritionProduct,
   type NutritionRank,
+  type PantryInventoryItem,
+  type PantryPlan,
   type SearchableProduct,
   type StorePrice,
   type WatchlistAlert,
@@ -441,6 +446,38 @@ export type NutritionValueReport = {
   guardrails: string[];
 };
 
+export type LoyaltyOfferStatus = 'eligible' | 'needs_coupon' | 'needs_membership';
+
+export type LoyaltyOffer = {
+  productId: string;
+  productName: string;
+  chain: string;
+  publicShelfPrice: number;
+  memberPrice: number;
+  savings: number;
+  requirement: string;
+  status: LoyaltyOfferStatus;
+  actionRequired: boolean;
+};
+
+export type LoyaltyOfferReport = {
+  userId: string;
+  offers: LoyaltyOffer[];
+  totalEligibleSavings: number;
+  requiresActionCount: number;
+  membershipRequiredCount: number;
+  guardrails: string[];
+};
+
+export type ReceiptReviewReport = {
+  userId: string;
+  review: ReceiptReview;
+  lineCount: number;
+  matchedCount: number;
+  needsReviewCount: number;
+  guardrails: string[];
+};
+
 const stores: Store[] = [
   { id: 'willys-odenplan', name: 'Willys Odenplan', chain: 'willys', district: 'Odenplan', address: 'Odenplan, Stockholm', confidence: 'high' },
   { id: 'lidl-sveavagen', name: 'Lidl Sveavägen', chain: 'lidl', district: 'Norrmalm', address: 'Sveavägen, Stockholm', confidence: 'medium' },
@@ -536,6 +573,52 @@ const nutritionProducts: NutritionProduct[] = [
   { productId: 'chicken', name: 'Chicken thighs', price: 69.9, nutritionPerPackage: { proteinGrams: 160, calories: 900, fiberGrams: 0, sugarGrams: 0, saltGrams: 2.4 } },
   { productId: 'eggs', name: 'Eggs 12-pack', price: 34.9, nutritionPerPackage: { proteinGrams: 75, calories: 840, fiberGrams: 0, sugarGrams: 1, saltGrams: 1.8 } },
   { productId: 'yogurt', name: 'Greek yogurt', price: 34.9, nutritionPerPackage: { proteinGrams: 55, calories: 380, fiberGrams: 0, sugarGrams: 16, saltGrams: 0.5 } }
+];
+
+const defaultPantry: PantryInventoryItem[] = [
+  { productId: 'coffee', name: 'Zoégas Coffee 450g', category: 'pantry', quantity: 1, unit: 'pack', minimumQuantity: 1, targetQuantity: 3 },
+  { productId: 'milk', name: 'Arla Milk 1L', category: 'dairy', quantity: 1, unit: 'l', minimumQuantity: 1, targetQuantity: 2, expiresAt: '2026-05-22T08:00:00.000Z' },
+  { productId: 'butter', name: 'Butter 600g', category: 'dairy', quantity: 1, unit: 'pack', minimumQuantity: 0.5, targetQuantity: 2 }
+];
+
+const defaultPantryUsage = [
+  { productId: 'coffee', quantityUsed: 0.5, usedAt: '2026-05-19T07:00:00.000Z' }
+];
+
+const loyaltyOffers: LoyaltyOffer[] = [
+  {
+    productId: 'coffee',
+    productName: 'Zoégas Coffee 450g',
+    chain: 'ica',
+    publicShelfPrice: 56.9,
+    memberPrice: 49.9,
+    savings: 7,
+    requirement: 'ICA Stammis linked',
+    status: 'eligible',
+    actionRequired: false
+  },
+  {
+    productId: 'milk',
+    productName: 'Arla Milk 1L',
+    chain: 'coop',
+    publicShelfPrice: 25.9,
+    memberPrice: 13.9,
+    savings: 12,
+    requirement: 'Clip Coop Medmera coupon before checkout',
+    status: 'needs_coupon',
+    actionRequired: true
+  },
+  {
+    productId: 'private-label-milk',
+    productName: 'Garant Milk 1L',
+    chain: 'willys',
+    publicShelfPrice: 19.9,
+    memberPrice: 12.9,
+    savings: 7,
+    requirement: 'Willys Plus member account verified',
+    status: 'eligible',
+    actionRequired: false
+  }
 ];
 
 const index = calculateFixedBasketIndex({
@@ -1250,6 +1333,89 @@ export function createGroceryViewApi() {
           'Verified nutrition labels cannot override allergen locks or household diet rules.',
           'Salt and sugar warnings remain visible even when a product has strong value per krona.',
           'Nutrition value is advisory and cannot rewrite basket or meal-plan decisions without user confirmation.'
+        ]
+      };
+    },
+
+    getPantryReplenishment(userId: string, asOf = '2026-05-20T08:00:00.000Z'): PantryPlan {
+      requireNonEmptyId(userId, 'userId');
+      const basketItems = baskets.get(userId) ?? [];
+      const household: HouseholdSnapshot = {
+        id: userId,
+        name: `${userId} pantry`,
+        weeklyBudget: budgets.get(userId)?.weeklyBudget ?? 0,
+        members: [{ userId, displayName: userId }],
+        basketItems: basketItems.map((item) => ({ productId: item.productId, quantity: item.quantity, addedBy: userId })),
+        watchlistItems: (watchlists.get(userId) ?? []).map((item) => ({ productId: item.productId, targetPrice: item.targetPrice, addedBy: userId })),
+        sharedFavoriteStoreIds: this.getFavoriteStores(userId).map((store) => store.id)
+      };
+      const deals = products.flatMap((product) => {
+        const bestPrice = bestPriceFor(product);
+        return bestPrice
+          ? [{ productId: product.id, storeId: bestPrice.storeId, storeName: bestPrice.storeName, price: bestPrice.price, dealScore: product.dealScore }]
+          : [];
+      });
+      return planPantryReplenishment({
+        now: asOf,
+        household,
+        pantry: defaultPantry,
+        usage: defaultPantryUsage,
+        deals
+      });
+    },
+
+    getLoyaltyOfferReport(userId: string): LoyaltyOfferReport {
+      requireNonEmptyId(userId, 'userId');
+      return {
+        userId,
+        offers: loyaltyOffers.map((offer) => ({ ...offer })),
+        totalEligibleSavings: loyaltyOffers
+          .filter((offer) => offer.status !== 'needs_membership')
+          .reduce((sum, offer) => roundPrice(sum + offer.savings), 0),
+        requiresActionCount: loyaltyOffers.filter((offer) => offer.actionRequired).length,
+        membershipRequiredCount: 1,
+        guardrails: [
+          'Member-only savings never overwrite verified public shelf evidence.',
+          'Coupon-required offers need explicit action before checkout routing.',
+          'Unlinked loyalty programs stay out of realized savings until the household confirms access.'
+        ]
+      };
+    },
+
+    getReceiptReviewReport(userId: string): ReceiptReviewReport {
+      requireNonEmptyId(userId, 'userId');
+      const review = reviewReceiptScan({
+        receipt: {
+          storeId: 'willys-odenplan',
+          purchasedAt: '2026-05-19T16:00:00.000Z',
+          totalAmount: 642,
+          ocrConfidence: 0.82,
+          rows: [
+            { rawName: 'ZOEGA SKANEROST', quantity: 1, itemTotal: 49.9 },
+            { rawName: 'CHEESE 500G', quantity: 1, itemTotal: 78 },
+            { rawName: 'SMUDGED ITEM', quantity: 1, itemTotal: 18 }
+          ]
+        },
+        aliases: [
+          { rawName: 'ZOEGA SKANEROST', productId: 'coffee', canonicalName: 'Zoégas Coffee 450g', matchConfidence: 0.9 },
+          { rawName: 'CHEESE 500G', productId: 'cheese', canonicalName: 'Cheese 500g', matchConfidence: 0.7 }
+        ],
+        localMedians: { coffee: 64.9, cheese: 60 },
+        weeklyBudget: 800,
+        weekSpendBeforeReceipt: 120
+      });
+      const matchedCount = review.matchedItems.filter((item) => item.productId !== null).length;
+      const needsReviewCount = review.matchedItems.filter((item) => item.productId === null || item.matchConfidence < 0.8).length;
+      return {
+        userId,
+        review,
+        lineCount: review.matchedItems.length,
+        matchedCount,
+        needsReviewCount,
+        guardrails: [
+          'Low confidence receipt rows cannot update catalog or Deal Score.',
+          'Loyalty discount lines affect receipt totals without overwriting public shelf prices.',
+          'Only verified product matches can update household spend and product price history.'
         ]
       };
     },

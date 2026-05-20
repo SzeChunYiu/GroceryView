@@ -355,6 +355,12 @@ const nutritionDeals = rankNutritionPerKrona([
   { productId: 'yogurt', name: 'Greek yogurt', price: 34.9, nutritionPerPackage: { proteinGrams: 55, calories: 380, fiberGrams: 0, sugarGrams: 16, saltGrams: 0.5 } }
 ], 'protein');
 
+const myStoresBasketIndex = [
+  { store: 'Willys Odenplan', basketTotal: 742, indexValue: 96.8, confidence: 'Verified shelf' },
+  { store: 'Lidl Sveavägen', basketTotal: 754, indexValue: 98.3, confidence: 'Retailer page' },
+  { store: 'Coop Farsta', basketTotal: 811, indexValue: 105.6, confidence: 'Estimated' }
+];
+
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Missing #app root');
 
@@ -828,6 +834,27 @@ app.innerHTML = `
               <td>${deal.price.toFixed(2)} SEK</td>
               <td>${deal.saltWarning ? 'Salt warning' : `${deal.sugarPerPackage}g sugar/package`}</td>
             </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>My Stores Basket Index</h2>
+        <p class="lede">Favorite-store basket index compares the same products across realistic Stockholm stores with confidence labels. Distance is context only and never changes Deal Score.</p>
+        <div class="grid">
+          <div class="metric"><strong>96.8</strong><span>best favorite-store index</span></div>
+          <div class="metric"><strong>69 SEK</strong><span>spread across favorite stores</span></div>
+          <div class="metric"><strong>0</strong><span>distance score weight</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Favorite-store spread</h2>
+        <table class="table">
+          <thead><tr><th>Store</th><th>Basket</th><th>Index</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${myStoresBasketIndex.map((store) => `<tr><td>${store.store}</td><td>${store.basketTotal} SEK</td><td>${store.indexValue}</td><td><span class="status">${store.confidence}</span></td></tr>`).join('')}
           </tbody>
         </table>
       </div>
