@@ -348,6 +348,13 @@ const catalogCoverageRows = [
   { category: 'Pantry', products: 42, coverage: '74%', freshness: 'Fresh this week', action: 'Parse missing unit prices' }
 ];
 
+const budgetModes = [
+  { mode: 'Strict Budget', guardrail: 'Warn before optional overspend', suggestion: 'Private-label swap first' },
+  { mode: 'Student Budget', guardrail: 'Keep basket under 500 SEK', suggestion: 'Cheapest protein per krona' },
+  { mode: 'Family Budget', guardrail: 'Owner approval over 400 SEK', suggestion: 'Bulk recurring staples' },
+  { mode: 'Healthy Budget', guardrail: 'Respect diet constraints', suggestion: 'Nutrition-per-krona swap' }
+];
+
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Missing #app root');
 
@@ -803,6 +810,27 @@ app.innerHTML = `
               <td>${meal.estimatedCost.toFixed(2)} SEK</td>
               <td>${meal.estimatedCostPerServing.toFixed(2)} SEK</td>
             </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
+        <table class="table">
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
+          <tbody>
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
           </tbody>
         </table>
       </div>
