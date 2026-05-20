@@ -763,6 +763,15 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return jsonResponse(api.getProductHistory(productId));
       }
 
+
+      const productTerminalMatch = path.match(/^\/api\/products\/([^/]+)\/terminal$/);
+      if (method === 'GET' && productTerminalMatch) {
+        const report = api.getProductPriceTerminal(decodeURIComponent(productTerminalMatch[1]), {
+          asOf: url.searchParams.get('asOf') ?? undefined
+        });
+        return report ? jsonResponse(report) : errorResponse(404, 'Product not found.');
+      }
+
       const productDealScoreMatch = path.match(/^\/api\/products\/([^/]+)\/deal-score$/);
       if (method === 'GET' && productDealScoreMatch) {
         const report = api.getDealScore(decodeURIComponent(productDealScoreMatch[1]));
@@ -1044,6 +1053,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/products/{id}/equivalents': { get: publicOperation('Get comparable products in the same category.') },
       '/api/products/{id}/prices': { get: publicOperation('Get product prices by store.') },
       '/api/products/{id}/history': { get: publicOperation('Get product price history.') },
+      '/api/products/{id}/terminal': { get: publicOperation('Get product price terminal distribution, quote, and chart data.') },
       '/api/prices/freshness': { get: publicOperation('Get price freshness and stale-price backfill queue.') },
       '/api/households/current': {
         get: protectedOperation('Get the signed-in user household plan.'),
