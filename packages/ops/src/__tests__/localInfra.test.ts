@@ -98,6 +98,7 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /OPEN_PRICES_OUTPUT_PATH/);
     assert.match(infraReadme, /import-open-prices-artifact\.sh/);
     assert.match(infraReadme, /OPEN_PRICES_INPUT_PATH/);
+    assert.match(infraReadme, /OPEN_PRICES_IMPORT_RESULT_PATH/);
     assert.match(infraReadme, /acceptedObservations/);
   });
 
@@ -163,8 +164,11 @@ describe('local infrastructure compose', () => {
     assert.match(importOpenPricesArtifactScript, /OPEN_PRICES_INPUT_PATH/);
     assert.match(importOpenPricesArtifactScript, /DATABASE_URL/);
     assert.match(importOpenPricesArtifactScript, /OPEN_PRICES_IMPORT_DRY_RUN/);
+    assert.match(importOpenPricesArtifactScript, /OPEN_PRICES_IMPORT_RESULT_PATH/);
+    assert.match(importOpenPricesArtifactScript, /Open Prices import result artifact written/);
     assert.match(importOpenPricesArtifactScript, /status: 'dry_run'/);
     assert.match(importOpenPricesArtifactScript, /acceptedObservationCount/);
+    assert.match(importOpenPricesArtifactScript, /writeFile/);
     assert.match(importOpenPricesArtifactScript, /packages\/db\/dist\/index\.js/);
     assert.match(importOpenPricesArtifactScript, /persistOpenPricesArtifact/);
     assert.match(importOpenPricesArtifactScript, /createPgQueryExecutor/);
