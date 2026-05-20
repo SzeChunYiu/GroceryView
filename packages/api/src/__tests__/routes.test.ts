@@ -10,6 +10,17 @@ describe('createGroceryViewApi', () => {
     assert.equal(market.city, 'Stockholm');
     assert.ok(market.topDeals.length >= 3);
     assert.equal(market.indices[0].id, 'stockholm-grocery-index');
+    assert.deepEqual(
+      market.topDeals.find((deal) => deal.productId === 'milk'),
+      {
+        productId: 'milk',
+        ticker: 'ARLA-MILK-1L',
+        bestPrice: 13.9,
+        bestStoreId: 'lidl-sveavagen',
+        dealScore: 73,
+        band: { label: 'Fair deal', verdict: 'Compare' }
+      }
+    );
 
     const search = api.searchProducts('coffee');
     assert.equal(search[0].ticker, 'ZOEGAS-COFFEE-450G');
