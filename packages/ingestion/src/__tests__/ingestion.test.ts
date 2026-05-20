@@ -27,6 +27,9 @@ describe('ingestRetailerProduct', () => {
     const output = ingestRetailerProduct({
       sourceType: 'retailer_online_page',
       observedAt: '2026-05-19T16:00:00.000Z',
+      parserVersion: 'retailer-page-parser-v1',
+      rawSnapshotRef: 's3://groceryview-raw/willys/coffee-2026-05-19.json',
+      sourceRunId: 'source-run-2026-05-19',
       chainId: 'willys',
       storeId: 'willys-odenplan',
       retailerProductId: 'wil-zoegas-450',
@@ -48,19 +51,53 @@ describe('ingestRetailerProduct', () => {
     assert.equal(output.alias.matchConfidence, 0.85);
     assert.equal(output.priceObservation.unitPrice, 110.8889);
     assert.equal(output.priceObservation.confidenceScore, 0.85);
+    assert.equal(output.priceObservation.priceType, 'online');
+    assert.deepEqual(output.priceObservation.provenance, {
+      sourceType: 'retailer_online_page',
+      sourceUrl: 'https://example.test/coffee',
+      observedAt: '2026-05-19T16:00:00.000Z',
+      parserVersion: 'retailer-page-parser-v1',
+      rawSnapshotRef: 's3://groceryview-raw/willys/coffee-2026-05-19.json',
+      sourceRunId: 'source-run-2026-05-19'
+    });
     assert.deepEqual(output.promotionObservation && {
       promoPrice: output.promotionObservation.promoPrice,
       regularPriceClaimed: output.promotionObservation.regularPriceClaimed,
-      memberOnly: output.promotionObservation.memberOnly
-    }, { promoPrice: 49.9, regularPriceClaimed: 69.9, memberOnly: false });
+      memberOnly: output.promotionObservation.memberOnly,
+      priceType: output.promotionObservation.priceType,
+      provenance: output.promotionObservation.provenance
+    }, {
+      promoPrice: 49.9,
+      regularPriceClaimed: 69.9,
+      memberOnly: false,
+      priceType: 'online',
+      provenance: output.priceObservation.provenance
+    });
+  });
+
+  it('rejects records that cannot preserve parser and raw snapshot provenance', () => {
+    assert.throws(() => ingestRetailerProduct({
+      sourceType: 'manual_user_report',
+      observedAt: '2026-05-19T16:00:00.000Z',
+      parserVersion: '',
+      rawSnapshotRef: '',
+      chainId: 'coop',
+      rawName: 'Milk',
+      canonicalName: 'Milk 1L',
+      productId: 'milk',
+      categoryId: 'dairy',
+      packageSize: 1,
+      packageUnit: 'l',
+      price: 14.9
+    }), /parserVersion is required/);
   });
 });
 
 describe('planIngestionBatch', () => {
   it('separates valid records from rejected records with reasons', () => {
     const plan = planIngestionBatch([
-      { sourceType: 'manual_user_report', observedAt: '2026-05-19T16:00:00.000Z', chainId: 'coop', rawName: 'Milk', canonicalName: 'Milk 1L', productId: 'milk', categoryId: 'dairy', packageSize: 1, packageUnit: 'l', price: 14.9 },
-      { sourceType: 'manual_user_report', observedAt: 'bad-date', chainId: 'coop', rawName: '', canonicalName: 'Bad', productId: 'bad', categoryId: 'dairy', packageSize: 0, packageUnit: 'l', price: -1 }
+      { sourceType: 'manual_user_report', observedAt: '2026-05-19T16:00:00.000Z', parserVersion: 'manual-v1', rawSnapshotRef: 'manual://milk', chainId: 'coop', rawName: 'Milk', canonicalName: 'Milk 1L', productId: 'milk', categoryId: 'dairy', packageSize: 1, packageUnit: 'l', price: 14.9 },
+      { sourceType: 'manual_user_report', observedAt: 'bad-date', parserVersion: 'manual-v1', rawSnapshotRef: 'manual://bad', chainId: 'coop', rawName: '', canonicalName: 'Bad', productId: 'bad', categoryId: 'dairy', packageSize: 0, packageUnit: 'l', price: -1 }
     ]);
 
     assert.equal(plan.accepted.length, 1);

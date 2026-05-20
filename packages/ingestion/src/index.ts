@@ -550,6 +550,9 @@ export function normalizeUnitPrice(input: UnitInput): UnitPrice {
 export type RetailerProductInput = {
   sourceType: SourceType;
   observedAt: string;
+  parserVersion: string;
+  rawSnapshotRef: string;
+  sourceRunId?: string;
   chainId: string;
   storeId?: string;
   retailerProductId?: string;
@@ -565,6 +568,25 @@ export type RetailerProductInput = {
   promoText?: string;
   memberOnly?: boolean;
   sourceUrl?: string;
+};
+
+export type PriceType =
+  | 'online'
+  | 'flyer'
+  | 'member'
+  | 'in_store'
+  | 'receipt'
+  | 'shelf_photo'
+  | 'manual'
+  | 'estimated';
+
+export type PriceProvenance = {
+  sourceType: SourceType;
+  sourceUrl?: string;
+  observedAt: string;
+  parserVersion: string;
+  rawSnapshotRef: string;
+  sourceRunId?: string;
 };
 
 export type IngestedProduct = {
@@ -598,8 +620,13 @@ export type IngestedPriceObservation = {
   promoPrice?: number;
   memberPrice?: number;
   promoType?: string;
+  priceType: PriceType;
   sourceType: SourceType;
   sourceUrl?: string;
+  parserVersion: string;
+  rawSnapshotRef: string;
+  sourceRunId?: string;
+  provenance: PriceProvenance;
   confidenceScore: number;
   isOnlinePrice: boolean;
   isInstorePrice: boolean;
@@ -613,7 +640,9 @@ export type IngestedPromotionObservation = {
   regularPriceClaimed?: number;
   promoText: string;
   memberOnly: boolean;
+  priceType: PriceType;
   sourceType: SourceType;
+  provenance: PriceProvenance;
   confidenceScore: number;
 };
 
@@ -630,7 +659,21 @@ function validateInput(input: RetailerProductInput): void {
   if (!input.productId.trim()) throw new Error('productId is required.');
   if (!input.categoryId.trim()) throw new Error('categoryId is required.');
   if (!input.chainId.trim()) throw new Error('chainId is required.');
+  if (!input.parserVersion.trim()) throw new Error('parserVersion is required.');
+  if (!input.rawSnapshotRef.trim()) throw new Error('rawSnapshotRef is required.');
   if (Number.isNaN(Date.parse(input.observedAt))) throw new Error('observedAt must be an ISO date.');
+}
+
+function priceTypeForSource(input: RetailerProductInput, hasPromotion: boolean): PriceType {
+  if (input.sourceType === 'estimated') return 'estimated';
+  if (input.sourceType === 'receipt_scan') return 'receipt';
+  if (input.sourceType === 'shelf_photo') return 'shelf_photo';
+  if (input.sourceType === 'manual_user_report') return 'manual';
+  if (input.sourceType === 'flyer_campaign') return input.memberOnly ? 'member' : 'flyer';
+  if (input.sourceType === 'official_api' || input.sourceType === 'retailer_online_page') {
+    return hasPromotion && input.memberOnly ? 'member' : 'online';
+  }
+  return 'estimated';
 }
 
 export function ingestRetailerProduct(input: RetailerProductInput): IngestionOutput {
@@ -638,6 +681,15 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
   const confidence = confidenceForSource(input.sourceType);
   const normalized = normalizeUnitPrice(input);
   const hasPromotion = input.regularPrice !== undefined && input.regularPrice > input.price;
+  const priceType = priceTypeForSource(input, hasPromotion);
+  const provenance: PriceProvenance = {
+    sourceType: input.sourceType,
+    sourceUrl: input.sourceUrl,
+    observedAt: input.observedAt,
+    parserVersion: input.parserVersion,
+    rawSnapshotRef: input.rawSnapshotRef,
+    sourceRunId: input.sourceRunId
+  };
 
   return {
     product: {
@@ -668,8 +720,13 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       regularPrice: input.regularPrice,
       promoPrice: hasPromotion ? input.price : undefined,
       promoType: hasPromotion ? 'discount' : undefined,
+      priceType,
       sourceType: input.sourceType,
       sourceUrl: input.sourceUrl,
+      parserVersion: input.parserVersion,
+      rawSnapshotRef: input.rawSnapshotRef,
+      sourceRunId: input.sourceRunId,
+      provenance,
       confidenceScore: confidence,
       isOnlinePrice: input.sourceType === 'official_api' || input.sourceType === 'retailer_online_page',
       isInstorePrice: input.sourceType === 'receipt_scan' || input.sourceType === 'shelf_photo' || input.sourceType === 'manual_user_report'
@@ -683,7 +740,9 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
           regularPriceClaimed: input.regularPrice,
           promoText: input.promoText ?? 'Promotion observed',
           memberOnly: input.memberOnly ?? false,
+          priceType,
           sourceType: input.sourceType,
+          provenance,
           confidenceScore: confidence
         }
       : null
