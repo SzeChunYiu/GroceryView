@@ -8,7 +8,7 @@ infra/db/scripts/verify-migrations.sh
 
 The script starts a temporary `postgis/postgis:18-3.6` container, waits for PostgreSQL readiness, and applies every `*.sql` file in `infra/db/migrations` in lexical order with `psql -v ON_ERROR_STOP=1`.
 
-After migrations are applied, the verifier asserts that the catalog, provenance, app repository, review, and notification tables expected by the product schema exist in `public`.
+After migrations are applied, the verifier records each migration basename in `schema_migrations` and asserts that the catalog, provenance, app repository, review, and notification tables expected by the product schema exist in `public`.
 
 When `infra/db/seeds/*.sql` exists, the script applies seed files after migrations and asserts the starter data surface:
 
