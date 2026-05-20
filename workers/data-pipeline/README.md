@@ -75,7 +75,7 @@ When those gates are ready, the planned run materializes the Open Prices pull, p
 
 `open_prices_launch_readiness` combines the pull plan, scheduled ingestion plan, artifact import plan, and hosted smoke plan into one readiness summary. It reports ready/blocked plan counts, blockers grouped by plan, deduplicated next actions, and the full evidence-field set needed before Open Prices data can safely power product prices. `open_prices_launch_readiness_digest` emits compact counts from the same summary for dashboards and alert routing.
 
-`open_prices_schedule_health_plan` blocks hosted scheduled-worker proof until the Dagster deployment URL, both Open Prices schedules, and a health probe for last tick/run age are configured.
+`open_prices_schedule_health_plan` blocks hosted scheduled-worker proof until the Dagster deployment URL, both Open Prices schedules, and a health probe for last tick/run age are configured. Its summary counts required actions, environment variables, source assets, schedules, and evidence fields for operator dashboards.
 
 ## Open Prices artifact import plan
 
