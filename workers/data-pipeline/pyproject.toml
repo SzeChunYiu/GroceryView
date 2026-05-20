@@ -1,0 +1,12 @@
+[project]
+name = "groceryview-data-pipeline"
+version = "0.1.0"
+description = "Dagster-compatible GroceryView data pipeline worker scaffold"
+requires-python = ">=3.11"
+dependencies = [
+  "dagster>=1.10,<2"
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
