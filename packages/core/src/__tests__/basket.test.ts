@@ -37,6 +37,14 @@ describe('compareBasketStrategies', () => {
       total: 79.7,
       itemCount: 2
     });
+    assert.deepEqual(result.bestSingleStore, {
+      storeId: 'willys-odenplan',
+      storeName: 'Willys Odenplan',
+      total: 79.7,
+      itemCount: 2
+    });
+    assert.equal(result.savingsVsBestSingleStore, 2);
+    assert.equal(result.splitStoreCount, 2);
   });
 });
 
