@@ -128,6 +128,70 @@ export type StoreLocatorFixtureValidation = {
   chainIds: RetailerChainId[];
   issues: string[];
 };
+
+export type OfferSelectorArtifactFormat = 'server_html' | 'next_data' | 'pdf_flyer' | 'nuxt_html' | 'react_shell';
+export type OfferSelectorFieldName =
+  | 'offer_id'
+  | 'product_title'
+  | 'brand_or_preamble'
+  | 'package_size'
+  | 'comparison_price_text'
+  | 'offer_price_text'
+  | 'ordinary_price_text'
+  | 'image_url'
+  | 'category'
+  | 'campaign_week'
+  | 'member_only_label'
+  | 'max_purchase_text';
+export type OfferSelectorValueKind = 'text' | 'number' | 'url' | 'date_range' | 'boolean';
+export type OfferSelectorReviewFlag =
+  | 'requires_store_selection'
+  | 'requires_authentication'
+  | 'member_only_or_personalized'
+  | 'client_hydrated_only'
+  | 'pdf_only'
+  | 'ambiguous_price_text'
+  | 'ordinary_price_claim_present'
+  | 'third_party_or_search_snippet'
+  | 'skeleton_or_error_state';
+
+export type OfferSelectorEvidence = {
+  evidenceId: string;
+  selector: string;
+  description: string;
+  sourceLocation: OfferSelectorArtifactFormat;
+};
+
+export type OfferSelectorCandidateField = {
+  field: OfferSelectorFieldName;
+  valueKind: OfferSelectorValueKind;
+  selectorEvidenceId: string;
+  candidateOnly: true;
+};
+
+export type OfferSelectorFixture = {
+  fixtureId: string;
+  chainId: RetailerChainId;
+  sourceUrl: string;
+  artifactFormat: OfferSelectorArtifactFormat;
+  pageMarker: string;
+  capturedAt: string;
+  rawSnapshotRef: string;
+  contentDigest: string;
+  robotsPolicyRef: string;
+  sourcePolicy: RetailerSourcePolicyLabel;
+  selectorEvidence: OfferSelectorEvidence[];
+  candidateFields: OfferSelectorCandidateField[];
+  reviewFlags: OfferSelectorReviewFlag[];
+  emitsOfferFacts: false;
+};
+
+export type OfferSelectorFixtureValidation = {
+  status: 'valid' | 'invalid';
+  chainIds: RetailerChainId[];
+  issues: string[];
+};
+
 export type FlyerSourceFormat = 'weekly_offer_html' | 'store_offer_html' | 'digital_flyer' | 'member_offer' | 'app_offer' | 'app_rendered_offer_html';
 export type FlyerSourcePlanInput = {
   chainId: RetailerChainId;
@@ -541,6 +605,166 @@ export const stockholmStoreLocatorFixtures: StoreLocatorFixture[] = [
   }
 ];
 
+export const offerSelectorFixtures: OfferSelectorFixture[] = [
+  {
+    fixtureId: 'ica-kvantum-kista-offer-html',
+    chainId: 'ica',
+    sourceUrl: 'https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/',
+    artifactFormat: 'server_html',
+    pageMarker: 'meta[name="pageType"][content="OfferPage"]',
+    capturedAt: '2026-05-20T18:05:00.000Z',
+    rawSnapshotRef: 'fixtures/offer-selectors/ica/kvantum-kista-offers.html',
+    contentDigest: 'sha256:fixture-ica-kvantum-kista-offers',
+    robotsPolicyRef: 'ica:offer',
+    sourcePolicy: 'fixture_review',
+    selectorEvidence: [
+      {
+        evidenceId: 'ica-data-promotion-card',
+        selector: '[data-promotion-id][data-promotion-name]',
+        description: 'Rendered store offer cards expose promotion identifiers and names in server HTML.',
+        sourceLocation: 'server_html'
+      },
+      {
+        evidenceId: 'ica-price-splash',
+        selector: '.price-splash .sr-only',
+        description: 'Accessible price splash text carries candidate offer price text.',
+        sourceLocation: 'server_html'
+      }
+    ],
+    candidateFields: [
+      { field: 'offer_id', valueKind: 'text', selectorEvidenceId: 'ica-data-promotion-card', candidateOnly: true },
+      { field: 'product_title', valueKind: 'text', selectorEvidenceId: 'ica-data-promotion-card', candidateOnly: true },
+      { field: 'offer_price_text', valueKind: 'text', selectorEvidenceId: 'ica-price-splash', candidateOnly: true }
+    ],
+    reviewFlags: ['ordinary_price_claim_present', 'ambiguous_price_text'],
+    emitsOfferFacts: false
+  },
+  {
+    fixtureId: 'willys-erbjudanden-ehandel-next-data',
+    chainId: 'willys',
+    sourceUrl: 'https://www.willys.se/erbjudanden/ehandel',
+    artifactFormat: 'next_data',
+    pageMarker: '__NEXT_DATA__.page=/erbjudanden/[mode]',
+    capturedAt: '2026-05-20T18:05:00.000Z',
+    rawSnapshotRef: 'fixtures/offer-selectors/willys/erbjudanden-ehandel.html',
+    contentDigest: 'sha256:fixture-willys-erbjudanden-ehandel',
+    robotsPolicyRef: 'willys:offer',
+    sourcePolicy: 'fixture_review',
+    selectorEvidence: [
+      {
+        evidenceId: 'willys-next-mode',
+        selector: 'script#__NEXT_DATA__',
+        description: 'Next data records the e-commerce offer route and mode but not reviewed offer rows.',
+        sourceLocation: 'next_data'
+      }
+    ],
+    candidateFields: [],
+    reviewFlags: ['requires_store_selection', 'client_hydrated_only'],
+    emitsOfferFacts: false
+  },
+  {
+    fixtureId: 'coop-daglivs-weekly-pdf',
+    chainId: 'coop',
+    sourceUrl: 'https://dr.coop.se/Butik/Coop-Daglivs?c=2026-19',
+    artifactFormat: 'pdf_flyer',
+    pageMarker: 'content-type: application/pdf',
+    capturedAt: '2026-05-20T18:05:00.000Z',
+    rawSnapshotRef: 'fixtures/offer-selectors/coop/daglivs-2026-19.pdf',
+    contentDigest: 'sha256:fixture-coop-daglivs-2026-19',
+    robotsPolicyRef: 'coop:offer',
+    sourcePolicy: 'fixture_review',
+    selectorEvidence: [
+      {
+        evidenceId: 'coop-pdf-content-type',
+        selector: 'response.headers.content-type',
+        description: 'Weekly offer artifact is a PDF and needs PDF-specific review before extraction.',
+        sourceLocation: 'pdf_flyer'
+      }
+    ],
+    candidateFields: [{ field: 'campaign_week', valueKind: 'text', selectorEvidenceId: 'coop-pdf-content-type', candidateOnly: true }],
+    reviewFlags: ['pdf_only'],
+    emitsOfferFacts: false
+  },
+  {
+    fixtureId: 'hemkop-erbjudanden-next-data',
+    chainId: 'hemkop',
+    sourceUrl: 'https://www.hemkop.se/erbjudanden',
+    artifactFormat: 'next_data',
+    pageMarker: '__NEXT_DATA__.page=/erbjudanden',
+    capturedAt: '2026-05-20T18:05:00.000Z',
+    rawSnapshotRef: 'fixtures/offer-selectors/hemkop/erbjudanden.html',
+    contentDigest: 'sha256:fixture-hemkop-erbjudanden',
+    robotsPolicyRef: 'hemkop:offer',
+    sourcePolicy: 'fixture_review',
+    selectorEvidence: [
+      {
+        evidenceId: 'hemkop-next-cms-fallback',
+        selector: 'script#__NEXT_DATA__',
+        description: 'Next data records CMS fallback and weekly flyer component namespaces, not reviewed offer rows.',
+        sourceLocation: 'next_data'
+      }
+    ],
+    candidateFields: [],
+    reviewFlags: ['requires_store_selection', 'client_hydrated_only'],
+    emitsOfferFacts: false
+  },
+  {
+    fixtureId: 'lidl-public-campaign-html',
+    chainId: 'lidl',
+    sourceUrl: 'https://www.lidl.se/c/',
+    artifactFormat: 'nuxt_html',
+    pageMarker: 'script[type="application/ld+json"]',
+    capturedAt: '2026-05-20T18:05:00.000Z',
+    rawSnapshotRef: 'fixtures/offer-selectors/lidl/public-campaign.html',
+    contentDigest: 'sha256:fixture-lidl-public-campaign',
+    robotsPolicyRef: 'lidl:offer',
+    sourcePolicy: 'fixture_review',
+    selectorEvidence: [
+      {
+        evidenceId: 'lidl-jsonld',
+        selector: 'script[type="application/ld+json"]',
+        description: 'Public page exposes structured page metadata alongside campaign HTML.',
+        sourceLocation: 'nuxt_html'
+      },
+      {
+        evidenceId: 'lidl-campaign-copy',
+        selector: '[class*="campaign"], [class*="offer"]',
+        description: 'Campaign copy and price tokens are present but need duplicate and member-offer review.',
+        sourceLocation: 'nuxt_html'
+      }
+    ],
+    candidateFields: [
+      { field: 'product_title', valueKind: 'text', selectorEvidenceId: 'lidl-campaign-copy', candidateOnly: true },
+      { field: 'offer_price_text', valueKind: 'text', selectorEvidenceId: 'lidl-campaign-copy', candidateOnly: true }
+    ],
+    reviewFlags: ['ambiguous_price_text', 'member_only_or_personalized'],
+    emitsOfferFacts: false
+  },
+  {
+    fixtureId: 'citygross-weekly-react-shell',
+    chainId: 'city_gross',
+    sourceUrl: 'https://www.citygross.se/matvaror/veckans-erbjudande',
+    artifactFormat: 'react_shell',
+    pageMarker: 'window.SERVER_DATA',
+    capturedAt: '2026-05-20T18:05:00.000Z',
+    rawSnapshotRef: 'fixtures/offer-selectors/city-gross/veckans-erbjudande.html',
+    contentDigest: 'sha256:fixture-citygross-weekly-shell',
+    robotsPolicyRef: 'city_gross:offer',
+    sourcePolicy: 'fixture_review',
+    selectorEvidence: [
+      {
+        evidenceId: 'citygross-shell-state',
+        selector: 'window.SERVER_DATA',
+        description: 'Initial shell state appears before store selection and must not be treated as offer rows.',
+        sourceLocation: 'react_shell'
+      }
+    ],
+    candidateFields: [],
+    reviewFlags: ['requires_store_selection', 'client_hydrated_only', 'skeleton_or_error_state'],
+    emitsOfferFacts: false
+  }
+];
+
 export function validateStoreLocatorFixtures(fixtures: StoreLocatorFixture[]): StoreLocatorFixtureValidation {
   const issues: string[] = [];
   const requiredChains: RetailerChainId[] = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
@@ -573,6 +797,48 @@ export function validateStoreLocatorFixtures(fixtures: StoreLocatorFixture[]): S
 }
 
 export function locatorFixturesCanAffectDealScore(): false {
+  return false;
+}
+
+export function validateOfferSelectorFixtures(fixtures: OfferSelectorFixture[]): OfferSelectorFixtureValidation {
+  const issues: string[] = [];
+  const requiredChains: RetailerChainId[] = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
+  const chainIds = [...new Set(fixtures.map((fixture) => fixture.chainId))].sort() as RetailerChainId[];
+
+  for (const chainId of requiredChains) {
+    if (!chainIds.includes(chainId)) issues.push(`missing_chain:${chainId}`);
+  }
+
+  for (const fixture of fixtures) {
+    if (!fixture.sourceUrl.startsWith('https://')) issues.push(`invalid_source_url:${fixture.fixtureId}`);
+    if (!fixture.rawSnapshotRef.startsWith('fixtures/offer-selectors/')) issues.push(`invalid_raw_snapshot_ref:${fixture.fixtureId}`);
+    if (!fixture.contentDigest.startsWith('sha256:')) issues.push(`missing_content_digest:${fixture.fixtureId}`);
+    if (!fixture.pageMarker.trim()) issues.push(`missing_page_marker:${fixture.fixtureId}`);
+    if (fixture.robotsPolicyRef !== `${fixture.chainId}:offer`) issues.push(`invalid_robots_policy_ref:${fixture.fixtureId}`);
+    if (Number.isNaN(Date.parse(fixture.capturedAt))) issues.push(`invalid_captured_at:${fixture.fixtureId}`);
+    if (fixture.emitsOfferFacts !== false) issues.push(`emits_offer_facts:${fixture.fixtureId}`);
+
+    const evidenceIds = new Set(fixture.selectorEvidence.map((evidence) => evidence.evidenceId));
+    if (evidenceIds.size !== fixture.selectorEvidence.length) issues.push(`duplicate_selector_evidence:${fixture.fixtureId}`);
+    for (const evidence of fixture.selectorEvidence) {
+      if (!evidence.selector.trim()) issues.push(`missing_selector:${fixture.fixtureId}:${evidence.evidenceId}`);
+      if (!evidence.description.trim()) issues.push(`missing_selector_description:${fixture.fixtureId}:${evidence.evidenceId}`);
+      if (evidence.sourceLocation !== fixture.artifactFormat) issues.push(`evidence_format_mismatch:${fixture.fixtureId}:${evidence.evidenceId}`);
+    }
+    for (const field of fixture.candidateFields) {
+      if (!field.candidateOnly) issues.push(`non_candidate_field:${fixture.fixtureId}:${field.field}`);
+      if (!evidenceIds.has(field.selectorEvidenceId)) issues.push(`missing_field_evidence:${fixture.fixtureId}:${field.field}`);
+    }
+  }
+
+  return {
+    status: issues.length === 0 ? 'valid' : 'invalid',
+    chainIds,
+    issues
+  };
+}
+
+export function offerSelectorFixturesCanEmitOfferFacts(): false {
   return false;
 }
 

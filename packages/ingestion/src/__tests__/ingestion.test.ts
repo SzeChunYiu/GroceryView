@@ -7,6 +7,8 @@ import {
   ingestRetailerProduct,
   locatorFixturesCanAffectDealScore,
   normalizeUnitPrice,
+  offerSelectorFixtures,
+  offerSelectorFixturesCanEmitOfferFacts,
   parseOpenPricesSnapshot,
   parseRetailerProductJsonSnapshot,
   planIngestionBatch,
@@ -16,6 +18,7 @@ import {
   retailerRobotsPolicyMatrix,
   runRetailerConnector,
   stockholmStoreLocatorFixtures,
+  validateOfferSelectorFixtures,
   validateStoreLocatorFixtures
 } from '../index.js';
 
@@ -251,6 +254,55 @@ describe('store locator fixtures', () => {
 
   it('keeps locator coverage out of default Deal Score ranking', () => {
     assert.equal(locatorFixturesCanAffectDealScore(), false);
+  });
+});
+
+describe('offer selector fixtures', () => {
+  it('covers every target retailer with immutable selector fixture provenance', () => {
+    const validation = validateOfferSelectorFixtures(offerSelectorFixtures);
+
+    assert.deepEqual(validation, {
+      status: 'valid',
+      chainIds: ['city_gross', 'coop', 'hemkop', 'ica', 'lidl', 'willys'],
+      issues: []
+    });
+    assert.equal(offerSelectorFixtures.length, 6);
+    for (const fixture of offerSelectorFixtures) {
+      assert.match(fixture.sourceUrl, /^https:\/\//);
+      assert.match(fixture.rawSnapshotRef, /^fixtures\/offer-selectors\//);
+      assert.match(fixture.contentDigest, /^sha256:/);
+      assert.equal(fixture.robotsPolicyRef, `${fixture.chainId}:offer`);
+      assert.equal(Number.isNaN(Date.parse(fixture.capturedAt)), false);
+    }
+  });
+
+  it('keeps candidate fields tied to selector evidence and out of emitted offer facts', () => {
+    for (const fixture of offerSelectorFixtures) {
+      const evidenceIds = new Set(fixture.selectorEvidence.map((evidence) => evidence.evidenceId));
+      assert.equal(fixture.emitsOfferFacts, false);
+      for (const field of fixture.candidateFields) {
+        assert.equal(field.candidateOnly, true);
+        assert.ok(evidenceIds.has(field.selectorEvidenceId));
+      }
+    }
+
+    assert.equal(offerSelectorFixturesCanEmitOfferFacts(), false);
+  });
+
+  it('models ambiguous public offer artifacts as review-only fixtures', () => {
+    const byChain = new Map(offerSelectorFixtures.map((fixture) => [fixture.chainId, fixture]));
+
+    assert.equal(byChain.get('ica')?.artifactFormat, 'server_html');
+    assert.ok(byChain.get('ica')?.candidateFields.some((field) => field.field === 'offer_price_text'));
+    assert.equal(byChain.get('willys')?.artifactFormat, 'next_data');
+    assert.deepEqual(byChain.get('willys')?.candidateFields, []);
+    assert.equal(byChain.get('coop')?.artifactFormat, 'pdf_flyer');
+    assert.ok(byChain.get('coop')?.reviewFlags.includes('pdf_only'));
+    assert.equal(byChain.get('hemkop')?.artifactFormat, 'next_data');
+    assert.equal(byChain.get('lidl')?.artifactFormat, 'nuxt_html');
+    assert.ok(byChain.get('lidl')?.reviewFlags.includes('member_only_or_personalized'));
+    assert.equal(byChain.get('city_gross')?.artifactFormat, 'react_shell');
+    assert.ok(byChain.get('city_gross')?.reviewFlags.includes('skeleton_or_error_state'));
   });
 });
 
