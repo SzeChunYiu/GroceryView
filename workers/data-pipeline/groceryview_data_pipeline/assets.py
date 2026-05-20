@@ -523,6 +523,7 @@ def build_open_prices_schedule_health_plan(
     dagster_deployment_url_present: bool = False,
     ingestion_schedule_enabled: bool = False,
     import_readiness_schedule_enabled: bool = False,
+    schedule_health_max_age_configured: bool = False,
     schedule_health_probe_configured: bool = False,
 ) -> OpenPricesScheduleHealthPlan:
     required_actions: list[str] = []
@@ -532,6 +533,8 @@ def build_open_prices_schedule_health_plan(
         required_actions.append("enable_open_prices_ingestion_schedule")
     if not import_readiness_schedule_enabled:
         required_actions.append("enable_open_prices_import_readiness_schedule")
+    if not schedule_health_max_age_configured:
+        required_actions.append("configure_open_prices_schedule_health_max_age")
     if not schedule_health_probe_configured:
         required_actions.append("publish_open_prices_schedule_health_probe")
 
