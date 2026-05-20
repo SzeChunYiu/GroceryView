@@ -705,6 +705,48 @@ describe('createGroceryViewApi', () => {
     assert.match(report.guardrails[1], /Distance/);
   });
 
+  it('quotes the current basket at a single store with missing-price labels', () => {
+    const api = createGroceryViewApi();
+
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.addBasketItem('user-1', { productId: 'butter', quantity: 1 });
+
+    assert.deepEqual(api.quoteBasketAtStore('user-1', 'willys-odenplan'), {
+      userId: 'user-1',
+      storeId: 'willys-odenplan',
+      storeName: 'Willys Odenplan',
+      currency: 'SEK',
+      itemCount: 3,
+      pricedItemCount: 3,
+      total: 86.7,
+      priceGapVsCheapestComplete: 4,
+      lines: [
+        { productId: 'milk', productName: 'Arla Milk 1L', quantity: 2, unitPrice: 14.9, lineTotal: 29.8, priceLabel: 'verified_shelf' },
+        { productId: 'butter', productName: 'Butter 600g', quantity: 1, unitPrice: 56.9, lineTotal: 56.9, priceLabel: 'verified_shelf' }
+      ],
+      missingProductIds: [],
+      warnings: ['All basket items have verified shelf prices at this store.']
+    });
+
+    assert.deepEqual(api.quoteBasketAtStore('user-1', 'lidl-sveavagen'), {
+      userId: 'user-1',
+      storeId: 'lidl-sveavagen',
+      storeName: 'Lidl Sveavägen',
+      currency: 'SEK',
+      itemCount: 3,
+      pricedItemCount: 2,
+      total: null,
+      priceGapVsCheapestComplete: null,
+      lines: [
+        { productId: 'milk', productName: 'Arla Milk 1L', quantity: 2, unitPrice: 13.9, lineTotal: 27.8, priceLabel: 'verified_shelf' },
+        { productId: 'butter', productName: 'Butter 600g', quantity: 1, unitPrice: null, lineTotal: null, priceLabel: 'missing_price' }
+      ],
+      missingProductIds: ['butter'],
+      warnings: ['Some basket items are missing verified shelf prices at this store.']
+    });
+    assert.throws(() => api.quoteBasketAtStore('user-1', 'missing-store'), /Unknown storeId/);
+  });
+
   it('removes watched products and recomputes alerts from remaining items', () => {
     const api = createGroceryViewApi();
 

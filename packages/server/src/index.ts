@@ -1157,6 +1157,15 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(api.getLocalOfferBasketReport(user, url.searchParams.get('asOf') ?? undefined));
       }
 
+      const basketStoreQuoteMatch = path.match(/^\/api\/basket\/stores\/([^/]+)\/quote$/);
+      if (basketStoreQuoteMatch) {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(api.quoteBasketAtStore(user, decodeURIComponent(basketStoreQuoteMatch[1])));
+      }
+
       if (path === '/api/budget') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -1441,6 +1450,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/basket/compare': { post: protectedOperation('Compare basket strategies.') },
       '/api/basket/comparison-report': { get: protectedOperation('Get basket comparison strategies with assignment and trust labels.') },
       '/api/basket/local-offers': { get: protectedOperation('Get local offer basket coverage, freshness, confidence, and savings by selected stores.') },
+      '/api/basket/stores/{storeId}/quote': { get: protectedOperation('Quote the current basket at one store with missing-price labels.') },
       '/api/budget': { patch: protectedOperation('Update budget.') },
       '/api/budget/categories': {
         get: protectedOperation('Get category budget summary.'),

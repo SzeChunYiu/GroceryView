@@ -277,6 +277,29 @@ export type LocalOfferBasketReport = LocalOfferBasketSummary & {
   guardrails: string[];
 };
 
+export type StoreBasketQuoteLine = {
+  productId: string;
+  productName: string;
+  quantity: number;
+  unitPrice: number | null;
+  lineTotal: number | null;
+  priceLabel: 'verified_shelf' | 'missing_price';
+};
+
+export type StoreBasketQuote = {
+  userId: string;
+  storeId: string;
+  storeName: string;
+  currency: 'SEK';
+  itemCount: number;
+  pricedItemCount: number;
+  total: number | null;
+  priceGapVsCheapestComplete: number | null;
+  lines: StoreBasketQuoteLine[];
+  missingProductIds: string[];
+  warnings: string[];
+};
+
 export type ProductEquivalent = {
   productId: string;
   productName: string;
@@ -1450,6 +1473,57 @@ function buildBasketComparisonReport(userId: string, favoriteStoreIds: string[],
   };
 }
 
+function buildStoreBasketQuote(userId: string, storeId: string, userItems: BasketItemRequest[]): StoreBasketQuote {
+  requireKnownStore(storeId);
+  const store = stores.find((candidate) => candidate.id === storeId);
+  if (!store) throw new Error(`Unknown storeId: ${storeId}`);
+
+  const lines = userItems.map((item): StoreBasketQuoteLine => {
+    const product = products.find((candidate) => candidate.id === item.productId);
+    const price = product?.currentPrices.find((candidate) => candidate.storeId === storeId);
+    if (!product || !price) {
+      return {
+        productId: item.productId,
+        productName: productName(item.productId),
+        quantity: item.quantity,
+        unitPrice: null,
+        lineTotal: null,
+        priceLabel: 'missing_price'
+      };
+    }
+    return {
+      productId: item.productId,
+      productName: product.name,
+      quantity: item.quantity,
+      unitPrice: price.price,
+      lineTotal: roundPrice(price.price * item.quantity),
+      priceLabel: 'verified_shelf'
+    };
+  });
+  const missingProductIds = lines.filter((line) => line.lineTotal === null).map((line) => line.productId);
+  const total = missingProductIds.length === 0
+    ? roundPrice(lines.reduce((sum, line) => sum + (line.lineTotal ?? 0), 0))
+    : null;
+  const allStoreIds = stores.map((candidate) => candidate.id);
+  const cheapestComplete = compareBasketStrategies({ favoriteStoreIds: allStoreIds, items: basketInputItems(userItems) }).cheapestByProduct.total;
+
+  return {
+    userId,
+    storeId,
+    storeName: store.name,
+    currency: 'SEK',
+    itemCount: userItems.reduce((sum, item) => sum + item.quantity, 0),
+    pricedItemCount: lines.filter((line) => line.lineTotal !== null).reduce((sum, line) => sum + line.quantity, 0),
+    total,
+    priceGapVsCheapestComplete: total !== null ? roundPrice(total - cheapestComplete) : null,
+    lines,
+    missingProductIds,
+    warnings: missingProductIds.length > 0
+      ? ['Some basket items are missing verified shelf prices at this store.']
+      : ['All basket items have verified shelf prices at this store.']
+  };
+}
+
 function storeDealsFor(storeId: string): StoreDeal[] {
   requireKnownStore(storeId);
   return products
@@ -2026,6 +2100,11 @@ export function createGroceryViewApi() {
           'Stale or missing offer lines remain visible instead of being treated as available current prices.'
         ]
       };
+    },
+
+    quoteBasketAtStore(userId: string, storeId: string): StoreBasketQuote {
+      requireNonEmptyId(userId, 'userId');
+      return buildStoreBasketQuote(userId, storeId, baskets.get(userId) ?? []);
     },
 
     updateBudget(userId: string, patch: UserBudgetPatch) {
