@@ -539,6 +539,47 @@ describe('createPostgresCatalogReader', () => {
 
     assert.equal(await reader.getProductBySlug('missing-product'), null);
   });
+
+  it('lists products with bounded search and category filters', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresCatalogReader(executor);
+
+    assert.deepEqual(await reader.listProducts({ search: 'kaffe', categoryPath: ['Pantry', 'Coffee'], limit: 25 }), [
+      {
+        productId: 'product-1',
+        slug: 'bryggkaffe-450g',
+        canonicalName: 'Bryggkaffe mellanrost 450 g',
+        brand: 'Rosteriet',
+        privateLabelOwner: 'Willys',
+        barcode: '0731000000000',
+        categoryPath: ['Pantry', 'Coffee'],
+        packageSize: 450,
+        packageUnit: 'g',
+        comparableUnit: 'kg',
+        nutrition: { caffeineMg: 85 },
+        imageUrl: 'https://example.invalid/coffee.png',
+        createdAt: '2026-05-20T07:00:00.000Z',
+        updatedAt: '2026-05-20T07:01:00.000Z'
+      }
+    ]);
+
+    assert.match(executor.calls[0]!.sql, /from products/);
+    assert.match(executor.calls[0]!.sql, /canonical_name ilike '%' \|\| \$1 \|\| '%'/);
+    assert.match(executor.calls[0]!.sql, /category_path @> \$2::text\[\]/);
+    assert.match(executor.calls[0]!.sql, /order by canonical_name, slug/);
+    assert.deepEqual(executor.calls[0]!.params, ['kaffe', ['Pantry', 'Coffee'], 25]);
+  });
+
+  it('clamps product list limits to a safe range', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresCatalogReader(executor);
+
+    await reader.listProducts({ limit: 5000 });
+    await reader.listProducts({ limit: 0 });
+
+    assert.deepEqual(executor.calls[0]!.params, [null, null, 500]);
+    assert.deepEqual(executor.calls[1]!.params, [null, null, 1]);
+  });
 });
 
 describe('createPostgresSourceRecordWriter', () => {

@@ -214,8 +214,15 @@ export type ProductCatalogRecord = {
   updatedAt: string;
 };
 
+export type ProductCatalogListFilter = {
+  search?: string;
+  categoryPath?: string[];
+  limit?: number;
+};
+
 export type PostgresCatalogReader = {
   getProductBySlug(slug: string): Promise<ProductCatalogRecord | null>;
+  listProducts(filter?: ProductCatalogListFilter): Promise<ProductCatalogRecord[]>;
 };
 
 export type PriceObservationRecord = {
@@ -1293,6 +1300,34 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
       );
       const row = rows[0];
       return row ? mapProductCatalog(row) : null;
+    },
+
+    async listProducts(filter = {}) {
+      const limit = Math.min(Math.max(filter.limit ?? 100, 1), 500);
+      const rows = await executor.query<ProductCatalogRow>(
+        `select id,
+                slug,
+                canonical_name,
+                brand,
+                brand_owner,
+                private_label_owner,
+                barcode,
+                category_path,
+                package_size,
+                package_unit,
+                comparable_unit,
+                nutrition,
+                image_url,
+                created_at,
+                updated_at
+         from products
+         where ($1::text is null or canonical_name ilike '%' || $1 || '%' or slug ilike '%' || $1 || '%')
+           and ($2::text[] is null or category_path @> $2::text[])
+         order by canonical_name, slug
+         limit $3`,
+        [filter.search ?? null, filter.categoryPath ?? null, limit]
+      );
+      return rows.map(mapProductCatalog);
     }
   };
 }
