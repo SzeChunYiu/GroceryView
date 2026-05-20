@@ -3,6 +3,7 @@ from __future__ import annotations
 import sys
 
 EXPECTED_ASSETS = {
+    "data_pipeline_quality_gate",
     "latest_price_rollup",
     "normalized_products",
     "open_prices_ingestion_run_plan",

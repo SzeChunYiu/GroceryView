@@ -10,6 +10,7 @@ def test_dagster_smoke_lists_all_expected_assets() -> None:
 
 def test_dagster_smoke_expected_asset_contract() -> None:
     assert EXPECTED_ASSETS == {
+        "data_pipeline_quality_gate",
         "latest_price_rollup",
         "normalized_products",
         "open_prices_ingestion_run_plan",

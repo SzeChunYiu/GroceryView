@@ -1,4 +1,5 @@
 from groceryview_data_pipeline.assets import (
+    build_data_pipeline_quality_gate,
     build_latest_price_rollup,
     build_normalized_products,
     build_observation_coverage_summary,
@@ -12,7 +13,7 @@ from groceryview_data_pipeline.assets import (
     build_seed_products,
     build_seed_stores,
 )
-from groceryview_data_pipeline.models import LatestPriceRow, PriceObservationRow, PriceProvenance
+from groceryview_data_pipeline.models import LatestPriceRow, ObservationFreshnessSummary, PriceObservationRow, PriceProvenance
 
 
 def test_data_pipeline_assets_cover_the_expected_lane_contract() -> None:
@@ -319,3 +320,39 @@ def test_price_observation_mix_summary_counts_price_evidence_breakdowns() -> Non
     assert summary.price_types["promotion"] == summary.promotion_count
     assert summary.confidence_labels["verified"] >= 1
     assert summary.member_only_count == sum(1 for observation in observations if observation.member_only)
+
+
+def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_checks() -> None:
+    stores = build_seed_stores()
+    products = build_seed_products()
+    stubs = build_retailer_fetch_stubs(stores, products)
+    normalized_products = build_normalized_products(products)
+    observations = build_price_observations(stubs, normalized_products)
+    latest = build_latest_price_rollup(observations)
+    quality = build_quality_checks(stubs, observations, latest)
+    freshness = build_observation_freshness_summary(observations, checked_at="2026-05-19T10:00:00+00:00", max_age_hours=48)
+    coverage = build_observation_coverage_summary(observations, stores, products)
+
+    ready_gate = build_data_pipeline_quality_gate(quality, freshness, coverage)
+    assert ready_gate.to_dict() == {
+        "status": "ready",
+        "blockers": [],
+        "observation_count": len(observations),
+        "latest_rollup_count": len(latest),
+        "checked_assets": ["quality_checks", "price_observation_freshness", "price_observation_coverage"],
+        "demo": True,
+    }
+
+    stale_freshness = ObservationFreshnessSummary(
+        status="blocked",
+        observation_count=len(observations),
+        fresh_count=0,
+        stale_count=len(observations),
+        future_count=0,
+        missing_observed_at_count=0,
+        max_age_hours=1,
+        checked_at="2026-05-20T10:00:00+00:00",
+    )
+    blocked_gate = build_data_pipeline_quality_gate(quality, stale_freshness, coverage)
+    assert blocked_gate.status == "blocked"
+    assert blocked_gate.blockers == ["price_observation_freshness_blocked"]

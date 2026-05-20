@@ -242,6 +242,19 @@ class PriceObservationMixSummary:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class DataPipelineQualityGateSummary:
+    status: Literal["ready", "blocked"]
+    blockers: list[str]
+    observation_count: int
+    latest_rollup_count: int
+    checked_assets: list[str]
+    demo: bool = True
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
 def utc_now() -> str:
     return datetime.now(tz=timezone.utc).isoformat()
 

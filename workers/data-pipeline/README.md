@@ -10,6 +10,7 @@ Dagster scaffold for the GroceryView data-worker lane.
 - Observation coverage summaries for seeded stores and products.
 - Price observation freshness summaries for stale or future-dated worker outputs.
 - Price observation mix summaries for source, confidence, member, and promotion breakdowns.
+- A data pipeline quality gate that combines provenance, freshness, rollup, and coverage checks.
 - Open Prices real-data pull plan asset with required User-Agent, endpoint, parser, smoke command, and evidence fields.
 - Open Prices ingestion run plan asset with schedule, persistence targets, idempotency keys, and fail-closed deployment requirements.
 - A `dagster dev` entrypoint that boots the local webserver.
@@ -33,6 +34,7 @@ Example Dagster assets in this lane:
 - `price_observations`
 - `latest_price_rollup`
 - `quality_checks`
+- `data_pipeline_quality_gate`
 - `price_observation_coverage`
 - `price_observation_freshness`
 - `price_observation_mix`
