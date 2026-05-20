@@ -1,33 +1,37 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPostgresIntegrationReadinessReport } from '../index.js';
+import {
+  POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS,
+  POSTGRES_INTEGRATION_REQUIRED_TABLES,
+  buildPostgresIntegrationReadinessReport,
+  collectPostgresIntegrationProbe,
+  type QueryExecutor
+} from '../index.js';
 
-const requiredTables = [
-  'app_users',
-  'favorite_stores',
-  'human_review_assignments',
-  'human_reviewers',
-  'community_reporter_trust',
-  'notification_tasks',
-  'notification_suppressions'
-];
+class ProbeQueryExecutor implements QueryExecutor {
+  calls: Array<{ sql: string; params: unknown[] }> = [];
 
-const requiredMigrationVersions = [
-  '001_initial_schema',
-  '003_human_review_assignments',
-  '004_human_reviewers',
-  '005_community_reporter_trust',
-  '006_notification_tasks',
-  '007_notification_suppressions',
-  '008_notification_task_suppressed_status'
-];
+  async query<T>(sql: string, params: unknown[] = []) {
+    this.calls.push({ sql, params });
+    if (sql.includes('information_schema.tables')) {
+      return [{ table_name: 'app_users' }, { table_name: 'notification_tasks' }] as T[];
+    }
+    if (sql.includes('schema_migrations')) {
+      return [{ version: '001_initial_schema' }, { version: '006_notification_tasks' }] as T[];
+    }
+    if (sql.includes('select 1 as ok')) {
+      return [{ ok: 1 }] as T[];
+    }
+    throw new Error('probe failed');
+  }
+}
 
 describe('buildPostgresIntegrationReadinessReport', () => {
   it('fails closed with concrete blockers for missing schema, migrations, and repository probes', () => {
     const report = buildPostgresIntegrationReadinessReport({
-      requiredTables,
+      requiredTables: [...POSTGRES_INTEGRATION_REQUIRED_TABLES],
       existingTables: ['app_users', 'favorite_stores', 'notification_tasks'],
-      requiredMigrationVersions,
+      requiredMigrationVersions: [...POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS],
       appliedMigrationVersions: ['001_initial_schema', '006_notification_tasks'],
       repositoryChecks: [
         { name: 'upsert_user', status: 'pass' },
@@ -62,10 +66,10 @@ describe('buildPostgresIntegrationReadinessReport', () => {
 
   it('marks the integration contract ready only when every probe passes', () => {
     const report = buildPostgresIntegrationReadinessReport({
-      requiredTables,
-      existingTables: [...requiredTables],
-      requiredMigrationVersions,
-      appliedMigrationVersions: [...requiredMigrationVersions],
+      requiredTables: [...POSTGRES_INTEGRATION_REQUIRED_TABLES],
+      existingTables: [...POSTGRES_INTEGRATION_REQUIRED_TABLES],
+      requiredMigrationVersions: [...POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS],
+      appliedMigrationVersions: [...POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS],
       repositoryChecks: [
         { name: 'upsert_user', status: 'pass' },
         { name: 'favorite_store_round_trip', status: 'pass' },
@@ -99,5 +103,42 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       ],
       summary: 'PostgreSQL integration contract is ready.'
     });
+  });
+});
+
+describe('collectPostgresIntegrationProbe', () => {
+  it('collects schema, migration, and repository probe evidence from a live executor', async () => {
+    const executor = new ProbeQueryExecutor();
+    const probe = await collectPostgresIntegrationProbe({
+      executor,
+      repositoryProbes: [
+        {
+          name: 'user_read_probe',
+          async run(queryExecutor) {
+            await queryExecutor.query('select 1 as ok');
+          }
+        },
+        {
+          name: 'suppression_read_probe',
+          async run(queryExecutor) {
+            await queryExecutor.query('select * from notification_suppressions limit 1');
+          }
+        }
+      ]
+    });
+
+    assert.deepEqual(probe, {
+      requiredTables: [...POSTGRES_INTEGRATION_REQUIRED_TABLES],
+      existingTables: ['app_users', 'notification_tasks'],
+      requiredMigrationVersions: [...POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS],
+      appliedMigrationVersions: ['001_initial_schema', '006_notification_tasks'],
+      repositoryChecks: [
+        { name: 'user_read_probe', status: 'pass' },
+        { name: 'suppression_read_probe', status: 'fail' }
+      ]
+    });
+    assert.deepEqual(executor.calls[0].params[0], [...POSTGRES_INTEGRATION_REQUIRED_TABLES]);
+    assert.match(executor.calls[0].sql, /information_schema\.tables/);
+    assert.match(executor.calls[1].sql, /schema_migrations/);
   });
 });

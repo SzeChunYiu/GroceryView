@@ -1,8 +1,96 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildAdPlacementPlan, buildSubscriptionCheckoutPlan } from '../index.js';
+import {
+  buildAdPlacementPlan,
+  buildMonetizationProviderReadinessReport,
+  buildSubscriptionCheckoutPlan
+} from '../index.js';
 
 describe('monetization foundation', () => {
+  it('fails closed when monetization provider credentials, webhooks, or health checks are missing', () => {
+    const report = buildMonetizationProviderReadinessReport({
+      requiredAdProviders: ['adsense', 'admob'],
+      requiredSubscriptionPlans: ['premium_monthly', 'premium_yearly'],
+      adProviders: [
+        { provider: 'adsense', configured: true, credentialsPresent: true, healthStatus: 'pass' },
+        { provider: 'admob', configured: false, credentialsPresent: false, healthStatus: 'not_run' }
+      ],
+      billingProvider: {
+        providerName: 'stripe_compatible',
+        configured: true,
+        credentialsPresent: false,
+        webhookConfigured: false,
+        healthStatus: 'fail',
+        priceIds: { premium_monthly: 'price_monthly_123' }
+      }
+    });
+
+    assert.deepEqual(report, {
+      status: 'blocked',
+      blockers: [
+        'ad_provider_not_configured:admob',
+        'ad_provider_credentials_missing:admob',
+        'ad_provider_health_not_run:admob',
+        'billing_provider_credentials_missing:stripe_compatible',
+        'billing_webhook_not_configured:stripe_compatible',
+        'billing_provider_health_failed:stripe_compatible',
+        'billing_price_missing:premium_yearly'
+      ],
+      evidence: [
+        'ad_provider_configured:adsense',
+        'ad_provider_credentials_present:adsense',
+        'ad_provider_health_pass:adsense',
+        'billing_provider_configured:stripe_compatible',
+        'billing_price_present:premium_monthly'
+      ],
+      warnings: [],
+      summary: 'Monetization provider readiness is blocked.'
+    });
+  });
+
+  it('passes only when ad and billing providers are configured, credentialed, and healthy', () => {
+    const report = buildMonetizationProviderReadinessReport({
+      requiredAdProviders: ['adsense', 'admob'],
+      requiredSubscriptionPlans: ['premium_monthly', 'premium_yearly'],
+      adProviders: [
+        { provider: 'adsense', configured: true, credentialsPresent: true, healthStatus: 'pass' },
+        { provider: 'admob', configured: true, credentialsPresent: true, healthStatus: 'pass' }
+      ],
+      billingProvider: {
+        providerName: 'stripe_compatible',
+        configured: true,
+        credentialsPresent: true,
+        webhookConfigured: true,
+        healthStatus: 'pass',
+        priceIds: {
+          premium_monthly: 'price_monthly_123',
+          premium_yearly: 'price_yearly_123'
+        }
+      }
+    });
+
+    assert.deepEqual(report, {
+      status: 'ready',
+      blockers: [],
+      evidence: [
+        'ad_provider_configured:adsense',
+        'ad_provider_credentials_present:adsense',
+        'ad_provider_health_pass:adsense',
+        'ad_provider_configured:admob',
+        'ad_provider_credentials_present:admob',
+        'ad_provider_health_pass:admob',
+        'billing_provider_configured:stripe_compatible',
+        'billing_provider_credentials_present:stripe_compatible',
+        'billing_webhook_configured:stripe_compatible',
+        'billing_provider_health_pass:stripe_compatible',
+        'billing_price_present:premium_monthly',
+        'billing_price_present:premium_yearly'
+      ],
+      warnings: [],
+      summary: 'Monetization providers are ready.'
+    });
+  });
+
   it('plans ads only in non-critical surfaces and labels provider slots', () => {
     const plan = buildAdPlacementPlan({
       userTier: 'free',
