@@ -248,6 +248,64 @@ fi
 
 echo "source_runs official_api source type ok"
 
+docker exec "$CONTAINER_NAME" \
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 \
+  -c "insert into app_users(id, email)
+      values ('receipt-verifier-user', 'receipt-verifier@example.com')
+      on conflict (id) do nothing" >/dev/null
+
+docker exec "$CONTAINER_NAME" \
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 \
+  -c "insert into receipt_uploads(
+        id, user_id, image_uri, purchased_at, total_amount, ocr_confidence, status, created_at, updated_at
+      )
+      values (
+        'receipt-verifier-upload',
+        'receipt-verifier-user',
+        's3://groceryview-receipts/verifier.jpg',
+        now(),
+        42.50,
+        0.8750,
+        'uploaded',
+        now(),
+        now()
+      )" >/dev/null
+
+docker exec "$CONTAINER_NAME" \
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 \
+  -c "insert into receipt_items(id, receipt_id, raw_name, quantity, item_total, match_confidence)
+      values ('receipt-verifier-item', 'receipt-verifier-upload', 'Verifier item', 1, 42.50, 0.8750)" >/dev/null
+
+if docker exec "$CONTAINER_NAME" \
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 \
+  -c "insert into receipt_uploads(
+        id, user_id, image_uri, purchased_at, total_amount, ocr_confidence, status, created_at, updated_at
+      )
+      values (
+        'receipt-verifier-bad-status',
+        'receipt-verifier-user',
+        's3://groceryview-receipts/bad-status.jpg',
+        now(),
+        1.00,
+        0.5000,
+        'ignored',
+        now(),
+        now()
+      )" >/dev/null 2>&1; then
+  echo "receipt_uploads status assertion failed: ignored was accepted" >&2
+  exit 1
+fi
+
+if docker exec "$CONTAINER_NAME" \
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 \
+  -c "insert into receipt_items(id, receipt_id, raw_name, quantity, item_total, match_confidence)
+      values ('receipt-verifier-bad-item', 'receipt-verifier-upload', 'Bad item', 0, 1.00, 0.5000)" >/dev/null 2>&1; then
+  echo "receipt_items quantity assertion failed: zero quantity was accepted" >&2
+  exit 1
+fi
+
+echo "receipt upload constraints ok"
+
 if [ -d "$SEEDS_DIR" ]; then
   mapfile -t SEEDS < <(find "$SEEDS_DIR" -maxdepth 1 -type f -name '*.sql' | sort)
 else
