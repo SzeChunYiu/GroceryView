@@ -53,6 +53,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-budget-summary-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setSavingsLedgerMetric = (metric, message) => {
+    const target = document.querySelector('[data-savings-ledger-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setSmartSwapsMetric = (metric, message) => {
     const target = document.querySelector('[data-smart-swaps-' + metric + ']');
     if (target) target.textContent = message;
@@ -710,6 +714,37 @@ window.GroceryViewFlowActions = (() => {
       setResult('budget-summary', 'Budget summary API load failed: ' + error.message + '. Static budget forecast remains visible.');
     }
   };
+  const loadSavingsLedgerFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('savings-ledger', 'Local preview mode: connect the API session bridge and save a basket before loading live savings ledger.');
+      return;
+    }
+    try {
+      const [budget, comparison] = await Promise.all([
+        requireApiSuccess(await fetch(apiUrl('/api/budget/summary', config), {
+          method: 'GET',
+          headers: apiHeaders(config)
+        })),
+        requireApiSuccess(await fetch(apiUrl('/api/basket/compare', config), {
+          method: 'POST',
+          headers: apiHeaders(config)
+        }))
+      ]);
+      const cheapest = comparison.cheapestByProduct || {};
+      const assignments = Array.isArray(cheapest.assignments) ? cheapest.assignments : [];
+      const missing = Array.isArray(comparison.missingProductIds) ? comparison.missingProductIds : [];
+      const splitSavings = Number(comparison.savingsVsBestSingleStore || 0);
+      const forecastSavings = Math.max(0, splitSavings);
+      const forecastStatus = missing.length ? 'blocked by missing products' : 'eligible forecast';
+      setSavingsLedgerMetric('confirmed', 'Weekly actual remaining ' + formatSek(budget.weeklyRemainingActual) + ' · monthly actual remaining ' + formatSek(budget.monthlyRemainingActual));
+      setSavingsLedgerMetric('forecast', 'Forecast savings ' + formatSek(forecastSavings) + ' · next basket ' + formatSek(budget.estimatedBasketTotal) + ' · ' + forecastStatus);
+      setSavingsLedgerMetric('blockers', missing.length + ' missing products · ' + assignments.length + ' verified assignment lines · split stores ' + Number(comparison.splitStoreCount || 0));
+      setResult('savings-ledger', 'Connected savings ledger loaded: forecast savings ' + formatSek(forecastSavings) + ', next basket ' + formatSek(budget.estimatedBasketTotal) + ', ' + missing.length + ' blockers.');
+    } catch (error) {
+      setResult('savings-ledger', 'Savings ledger API load failed: ' + error.message + '. Static ledger remains visible.');
+    }
+  };
   const loadSmartSwapsFromApi = async (button) => {
     const config = getApiConfig();
     const panel = button.closest('[data-groceryview-flow="smart-swaps"]');
@@ -940,6 +975,10 @@ window.GroceryViewFlowActions = (() => {
         await loadBudgetSummaryFromApi();
         return;
       }
+      if (flow === 'savings-ledger' && action === 'load-savings-ledger') {
+        await loadSavingsLedgerFromApi();
+        return;
+      }
       if (flow === 'smart-swaps' && action === 'load-smart-swaps') {
         await loadSmartSwapsFromApi(button);
         return;
@@ -1095,6 +1134,9 @@ const dailyDealsLivePanel = `
 
 const budgetSummaryLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="budget-summary" style="margin-top:16px"><div class="eyebrow">Connected budget API</div><h2>Pull live household budget summary</h2><p class="lede">Fetch <code>/api/budget/summary</code> through the protected API session bridge to refresh weekly budget, month-to-date spend, next-basket estimate, remaining buffers, and over/under status from account data.</p><div class="grid" aria-label="Live budget summary API metrics"><div class="metric"><strong data-budget-summary-weekly>Waiting for API pull</strong><span>weekly budget status</span></div><div class="metric"><strong data-budget-summary-monthly>Static monthly preview</strong><span>monthly budget status</span></div><div class="metric"><strong data-budget-summary-estimate>Static basket estimate preview</strong><span>next basket buffer</span></div></div><div class="flow-panel" aria-label="Connected budget summary actions"><button type="button" data-flow-action="load-budget-summary">Load live budget summary</button></div><p class="flow-result" data-flow-result="budget-summary" aria-live="polite">Local preview mode: connect the API session bridge before loading live budget summary.</p></section>`;
+
+const savingsLedgerLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="savings-ledger" style="margin-top:16px"><div class="eyebrow">Connected savings ledger API</div><h2>Pull live savings ledger</h2><p class="lede">Fetch protected <code>/api/budget/summary</code> and <code>/api/basket/compare</code> to reconcile budget remaining, next-basket estimate, split-basket forecast savings, verified assignment lines, and missing-product blockers before savings are treated as realized.</p><div class="grid" aria-label="Live savings ledger API metrics"><div class="metric"><strong data-savings-ledger-confirmed>Waiting for API pull</strong><span>budget actuals</span></div><div class="metric"><strong data-savings-ledger-forecast>Static forecast preview</strong><span>forecast savings and next basket</span></div><div class="metric"><strong data-savings-ledger-blockers>Static blocker preview</strong><span>assignment evidence and blockers</span></div></div><div class="flow-panel" aria-label="Connected savings ledger actions"><button type="button" data-flow-action="load-savings-ledger">Load live savings ledger</button></div><p class="flow-result" data-flow-result="savings-ledger" aria-live="polite">Local preview mode: connect the API session bridge and save a basket before loading live savings ledger.</p></section>`;
 
 const smartSwapsLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="smart-swaps" data-product-id="milk" style="margin-top:16px"><div class="eyebrow">Connected smart swaps API</div><h2>Pull live swap candidates</h2><p class="lede">Fetch <code>/api/products/milk/equivalents</code> plus the current product terminal quote to rank comparable products by best known price, Deal Score, estimated savings versus the current best quote, and equivalence reason.</p><div class="grid" aria-label="Live smart swaps API metrics"><div class="metric"><strong data-smart-swaps-best>Waiting for API pull</strong><span>best comparable product</span></div><div class="metric"><strong data-smart-swaps-count>Static candidate preview</strong><span>live comparable-product count</span></div><div class="metric"><strong data-smart-swaps-confidence>Static score preview</strong><span>Deal Score and savings evidence</span></div><div class="metric"><strong data-smart-swaps-reason>Static reason preview</strong><span>equivalence rule</span></div></div><div class="flow-panel" aria-label="Connected smart swaps actions"><button type="button" data-flow-action="load-smart-swaps">Load live swap candidates</button></div><p class="flow-result" data-flow-result="smart-swaps" aria-live="polite">Local preview mode: connect the API session bridge before loading live swap candidates.</p></section>`;
@@ -1254,7 +1296,7 @@ const pages = [
     path: 'savings/ledger/index.html',
     title: 'Savings ledger — GroceryView',
     description: 'Track GroceryView realized savings from verified receipts, pending forecasts, rejected estimates, and household budget impact.',
-    body: `<section class="card"><div class="eyebrow">Savings ledger</div><h1>Savings ledger</h1><p class="lede">Separate receipt-confirmed savings from forecasted, loyalty-only, or low-confidence savings before they update household budget history.</p><div class="grid"><div class="metric"><strong>96 SEK</strong><span>confirmed this week</span></div><div class="metric"><strong>18 SEK</strong><span>forecast pending</span></div><div class="metric"><strong>12 SEK</strong><span>rejected estimate</span></div></div></section><section class="card" style="margin-top:16px"><h2>Ledger entries</h2><table class="table"><thead><tr><th>Source</th><th>Savings</th><th>Evidence</th><th>Budget writeback</th><th>Status</th></tr></thead><tbody><tr><td>Willys coffee promo</td><td>24 SEK</td><td>Verified receipt</td><td>Post to weekly actuals</td><td>Confirmed</td></tr><tr><td>Lidl split basket eggs</td><td>16 SEK</td><td>Retailer page and receipt</td><td>Post to weekly actuals</td><td>Confirmed</td></tr><tr><td>Estimated tomato swap</td><td>12 SEK</td><td>Low-confidence estimate</td><td>No writeback</td><td>Rejected</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Savings guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Receipt confirmation</td><td>Only verified receipts can move forecast savings into realized savings.</td></tr><tr><td>Estimate rejection</td><td>Low-confidence prices cannot increase savings totals.</td></tr><tr><td>Loyalty separation</td><td>Member-only savings stay labeled until access is confirmed.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Savings ledger</div><h1>Savings ledger</h1><p class="lede">Separate receipt-confirmed savings from forecasted, loyalty-only, or low-confidence savings before they update household budget history.</p><div class="grid"><div class="metric"><strong>96 SEK</strong><span>confirmed this week</span></div><div class="metric"><strong>18 SEK</strong><span>forecast pending</span></div><div class="metric"><strong>12 SEK</strong><span>rejected estimate</span></div></div></section><section class="card" style="margin-top:16px"><h2>Ledger entries</h2><table class="table"><thead><tr><th>Source</th><th>Savings</th><th>Evidence</th><th>Budget writeback</th><th>Status</th></tr></thead><tbody><tr><td>Willys coffee promo</td><td>24 SEK</td><td>Verified receipt</td><td>Post to weekly actuals</td><td>Confirmed</td></tr><tr><td>Lidl split basket eggs</td><td>16 SEK</td><td>Retailer page and receipt</td><td>Post to weekly actuals</td><td>Confirmed</td></tr><tr><td>Estimated tomato swap</td><td>12 SEK</td><td>Low-confidence estimate</td><td>No writeback</td><td>Rejected</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Savings guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Receipt confirmation</td><td>Only verified receipts can move forecast savings into realized savings.</td></tr><tr><td>Estimate rejection</td><td>Low-confidence prices cannot increase savings totals.</td></tr><tr><td>Loyalty separation</td><td>Member-only savings stay labeled until access is confirmed.</td></tr></tbody></table></section>${savingsLedgerLivePanel}`
   },
   {
     path: 'savings/smart-swaps/index.html',
