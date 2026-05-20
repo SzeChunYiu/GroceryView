@@ -17,6 +17,7 @@ from .fixtures import FETCHED_AT, HERO_PRODUCTS, RETAILER_PRICE_SNAPSHOT, STOCKH
 from .models import (
     LatestPriceRow,
     ObservationFreshnessSummary,
+    OpenPricesPullPlan,
     PriceObservationRow,
     PriceProvenance,
     ProductSeed,
@@ -28,6 +29,8 @@ from .models import (
 ASSET_GROUP = "data_pipeline"
 OBSERVED_AT = FETCHED_AT
 PARSER_VERSION = "demo-retailer-stub-v1"
+OPEN_PRICES_PARSER_VERSION = "open-prices-v1"
+OPEN_PRICES_ENDPOINT_URL = "https://prices.openfoodfacts.org/api/v1/prices?currency=SEK&size=10&location__osm_address_country_code=SE&order_by=-date"
 
 
 def build_seed_stores() -> list[StoreSeed]:
@@ -289,6 +292,26 @@ def build_observation_freshness_summary(
     )
 
 
+def build_open_prices_pull_plan(open_prices_user_agent_present: bool = False) -> OpenPricesPullPlan:
+    return OpenPricesPullPlan(
+        status="ready" if open_prices_user_agent_present else "blocked",
+        source_type="open_data",
+        endpoint_url=OPEN_PRICES_ENDPOINT_URL,
+        parser_version=OPEN_PRICES_PARSER_VERSION,
+        required_env=["OPEN_PRICES_USER_AGENT"],
+        required_actions=[] if open_prices_user_agent_present else ["set_open_prices_user_agent", "run_open_prices_smoke"],
+        smoke_command="OPEN_PRICES_USER_AGENT=<app/version contact> infra/scripts/smoke-open-prices.sh",
+        evidence_fields=[
+            "sourceUrl",
+            "statusCode",
+            "contentHash",
+            "rawSnapshotRef",
+            "acceptedCount",
+            "firstProduct",
+        ],
+    )
+
+
 def clamp_confidence(confidence: float) -> float:
     if confidence < 0:
         return 0
@@ -395,3 +418,8 @@ def price_observation_freshness(price_observations: list[dict[str, object]]) -> 
     ]
     summary = build_observation_freshness_summary(observations, checked_at=OBSERVED_AT, max_age_hours=48)
     return summary.to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
+def open_prices_real_pull_plan() -> dict[str, object]:
+    return build_open_prices_pull_plan(open_prices_user_agent_present=False).to_dict()

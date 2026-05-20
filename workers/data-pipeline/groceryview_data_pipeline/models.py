@@ -178,6 +178,22 @@ class ObservationFreshnessSummary:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class OpenPricesPullPlan:
+    status: Literal["ready", "blocked"]
+    source_type: SourceType
+    endpoint_url: str
+    parser_version: str
+    required_env: list[str]
+    required_actions: list[str]
+    smoke_command: str
+    evidence_fields: list[str]
+    demo: bool = False
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
 def utc_now() -> str:
     return datetime.now(tz=timezone.utc).isoformat()
 
