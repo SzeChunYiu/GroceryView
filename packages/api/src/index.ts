@@ -351,6 +351,35 @@ export type ProductPriceTerminalReport = {
   evidenceGuardrails: string[];
 };
 
+export type ProductPriceSpreadRow = {
+  storeId: string;
+  storeName: string;
+  price: number;
+  rank: number;
+  deltaFromBest: number;
+  deltaFromBestPercent: number;
+  priceLabel: 'best' | 'above_best';
+};
+
+export type ProductPriceSpreadReport = {
+  productId: string;
+  ticker: string;
+  productName: string;
+  currency: 'SEK';
+  sampleSize: number;
+  bestStoreId: string | null;
+  bestStoreName: string | null;
+  bestPrice: number | null;
+  highestStoreId: string | null;
+  highestStoreName: string | null;
+  highestPrice: number | null;
+  spread: number;
+  spreadPercent: number;
+  rows: ProductPriceSpreadRow[];
+  customerRead: string;
+  guardrails: string[];
+};
+
 export type MarketMover = {
   productId: string;
   ticker: string;
@@ -985,6 +1014,51 @@ function productPriceTerminalFor(product: ProductDetail, asOf?: string): Product
       'Verified shelf or retailer-page prices can power current quote, Deal Score, and basket totals.',
       'Member, promotion, estimated, and low-confidence rows must stay explicitly labeled before customer action.',
       'Distribution and chart samples include sample size and provenance-aware confidence styling.'
+    ]
+  };
+}
+
+function productPriceSpreadFor(product: ProductDetail): ProductPriceSpreadReport {
+  const sortedPrices = sortPricesByValue(product.currentPrices);
+  const bestPrice = sortedPrices[0] ?? null;
+  const highestPrice = sortedPrices.at(-1) ?? null;
+  const spread = bestPrice && highestPrice ? roundPrice(highestPrice.price - bestPrice.price) : 0;
+  const spreadPercent = bestPrice && bestPrice.price > 0 ? roundPercent((spread / bestPrice.price) * 100) : 0;
+  const rows = sortedPrices.map((price, index) => {
+    const deltaFromBest = bestPrice ? roundPrice(price.price - bestPrice.price) : 0;
+    return {
+      storeId: price.storeId,
+      storeName: price.storeName,
+      price: price.price,
+      rank: index + 1,
+      deltaFromBest,
+      deltaFromBestPercent: bestPrice && bestPrice.price > 0 ? roundPercent((deltaFromBest / bestPrice.price) * 100) : 0,
+      priceLabel: index === 0 ? 'best' as const : 'above_best' as const
+    };
+  });
+
+  return {
+    productId: product.id,
+    ticker: product.ticker,
+    productName: product.name,
+    currency: 'SEK',
+    sampleSize: rows.length,
+    bestStoreId: bestPrice?.storeId ?? null,
+    bestStoreName: bestPrice?.storeName ?? null,
+    bestPrice: bestPrice?.price ?? null,
+    highestStoreId: highestPrice?.storeId ?? null,
+    highestStoreName: highestPrice?.storeName ?? null,
+    highestPrice: highestPrice?.price ?? null,
+    spread,
+    spreadPercent,
+    rows,
+    customerRead: bestPrice && highestPrice
+      ? `${product.name} ranges ${spread.toFixed(2)} SEK across ${rows.length} verified store quotes; ${bestPrice.storeName} is cheapest at ${bestPrice.price.toFixed(2)} SEK.`
+      : `${product.name} has no verified store spread yet.`,
+    guardrails: [
+      'Price spread compares only current verified store quotes for the selected product.',
+      'Spread rankings do not change Deal Score or basket routing without the product-specific price evidence.',
+      'Missing stores stay out of the spread sample until a current quote is verified.'
     ]
   };
 }
@@ -1727,6 +1801,12 @@ export function createGroceryViewApi() {
       const product = this.getProduct(id);
       if (!product) return null;
       return productPriceTerminalFor(product, options.asOf);
+    },
+
+    getProductPriceSpread(id: string): ProductPriceSpreadReport | null {
+      const product = this.getProduct(id);
+      if (!product) return null;
+      return productPriceSpreadFor(product);
     },
 
     getDealScore(productId: string, options: { distanceKm?: number } = {}): DealScoreReport | null {

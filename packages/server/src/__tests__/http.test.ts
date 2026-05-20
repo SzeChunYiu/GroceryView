@@ -286,7 +286,30 @@ describe('createHttpHandler', () => {
       ]
     });
 
-
+    const priceSpread = await handle(new Request('http://localhost/api/products/coffee/price-spread'));
+    assert.equal(priceSpread.status, 200);
+    const priceSpreadBody = await json(priceSpread) as {
+      productId: string;
+      sampleSize: number;
+      bestStoreId: string;
+      highestStoreId: string;
+      spread: number;
+      spreadPercent: number;
+      rows: Array<{ storeId: string; rank: number; deltaFromBest: number; priceLabel: string }>;
+      guardrails: string[];
+    };
+    assert.equal(priceSpreadBody.productId, 'coffee');
+    assert.equal(priceSpreadBody.sampleSize, 3);
+    assert.equal(priceSpreadBody.bestStoreId, 'willys-odenplan');
+    assert.equal(priceSpreadBody.highestStoreId, 'coop-odenplan');
+    assert.equal(priceSpreadBody.spread, 15);
+    assert.equal(priceSpreadBody.spreadPercent, 30.1);
+    assert.deepEqual(priceSpreadBody.rows.map((row) => [row.storeId, row.rank, row.deltaFromBest, row.priceLabel]), [
+      ['willys-odenplan', 1, 0, 'best'],
+      ['lidl-sveavagen', 2, 10, 'above_best'],
+      ['coop-odenplan', 3, 15, 'above_best']
+    ]);
+    assert.match(priceSpreadBody.guardrails[0] ?? '', /verified store quotes/i);
 
     const terminal = await handle(new Request('http://localhost/api/products/coffee/terminal?asOf=2026-05-19T00:00:00.000Z'));
     assert.equal(terminal.status, 200);
@@ -400,6 +423,10 @@ describe('createHttpHandler', () => {
     const terminal = await handle(new Request('http://localhost/api/products/missing-product/terminal'));
     assert.equal(terminal.status, 404);
     assert.deepEqual(await json(terminal), { error: 'Product not found.' });
+
+    const priceSpread = await handle(new Request('http://localhost/api/products/missing-product/price-spread'));
+    assert.equal(priceSpread.status, 404);
+    assert.deepEqual(await json(priceSpread), { error: 'Product not found.' });
 
     const dealScore = await handle(new Request('http://localhost/api/products/missing-product/deal-score'));
     assert.equal(dealScore.status, 404);
