@@ -68,6 +68,100 @@ describe('createGroceryViewApi', () => {
     assert.equal(api.getIndex('stockholm-grocery-index')?.label, 'Stockholm Grocery Index');
   });
 
+  it('resolves account subscription access from stored entitlements and fails closed without one', () => {
+    const api = createGroceryViewApi();
+
+    assert.deepEqual(api.getSubscriptionAccess('user-1', '2026-05-20T00:00:00.000Z'), {
+      userTier: 'free',
+      premiumFeaturesEnabled: false,
+      adsRemoved: false,
+      checkoutRequired: true,
+      enforcementReasons: ['missing_subscription_entitlement'],
+      accountActions: ['show_upgrade'],
+      summary: 'Free tier: no active subscription entitlement.'
+    });
+
+    api.upsertSubscriptionEntitlement('user-1', {
+      tier: 'premium',
+      plan: 'premium_monthly',
+      status: 'active',
+      currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
+      provider: 'stripe_compatible',
+      updatedAt: '2026-05-20T00:00:00.000Z'
+    });
+
+    assert.deepEqual(api.getSubscriptionAccess('user-1', '2026-05-20T00:00:00.000Z'), {
+      userTier: 'premium',
+      premiumFeaturesEnabled: true,
+      adsRemoved: true,
+      checkoutRequired: false,
+      enforcementReasons: ['active_subscription_entitlement:premium_monthly'],
+      accountActions: ['show_manage_subscription'],
+      summary: 'Premium access is active.'
+    });
+
+    api.upsertSubscriptionEntitlement('user-1', {
+      tier: 'premium',
+      plan: 'premium_monthly',
+      status: 'past_due',
+      currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
+      provider: 'stripe_compatible',
+      updatedAt: '2026-05-21T00:00:00.000Z'
+    });
+
+    assert.deepEqual(api.getSubscriptionAccess('user-1', '2026-05-21T00:00:00.000Z'), {
+      userTier: 'free',
+      premiumFeaturesEnabled: false,
+      adsRemoved: false,
+      checkoutRequired: true,
+      enforcementReasons: ['subscription_status_not_active:past_due'],
+      accountActions: ['show_billing_issue'],
+      summary: 'Free tier access is enforced.'
+    });
+  });
+
+  it('rejects invalid subscription entitlement updates before replacing account access state', () => {
+    const api = createGroceryViewApi();
+    api.upsertSubscriptionEntitlement('user-1', {
+      tier: 'premium',
+      plan: 'premium_yearly',
+      status: 'active',
+      currentPeriodEndsAt: '2027-05-20T00:00:00.000Z',
+      provider: 'stripe_compatible',
+      updatedAt: '2026-05-20T00:00:00.000Z'
+    });
+
+    assert.throws(
+      () =>
+        api.upsertSubscriptionEntitlement('user-1', {
+          tier: 'premium',
+          plan: 'premium_yearly',
+          status: 'active',
+          currentPeriodEndsAt: 'not-a-date',
+          provider: 'stripe_compatible',
+          updatedAt: '2026-05-20T00:00:00.000Z'
+        }),
+      /currentPeriodEndsAt must be an ISO timestamp/
+    );
+    assert.throws(
+      () =>
+        api.upsertSubscriptionEntitlement('user-1', {
+          tier: 'premium',
+          plan: 'premium_yearly',
+          status: 'active',
+          currentPeriodEndsAt: '2027-05-20T00:00:00.000Z',
+          provider: 'stripe_compatible',
+          updatedAt: 'May 20, 2026'
+        }),
+      /updatedAt must be an ISO timestamp/
+    );
+    assert.throws(() => api.getSubscriptionAccess('user-1', 'May 21, 2026'), /now must be an ISO timestamp/);
+
+    assert.deepEqual(api.getSubscriptionAccess('user-1', '2026-05-21T00:00:00.000Z').enforcementReasons, [
+      'active_subscription_entitlement:premium_yearly'
+    ]);
+  });
+
   it('rejects invalid mutable route inputs before storing state', () => {
     const api = createGroceryViewApi();
 

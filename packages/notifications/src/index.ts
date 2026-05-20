@@ -30,6 +30,14 @@ export type NotificationSuppressionEvent = {
   occurredAt: string;
 };
 
+export type NotificationSuppressionWebhookProvider = 'sendgrid' | 'ses' | 'expo';
+
+export type ParseNotificationSuppressionWebhookInput = {
+  provider: NotificationSuppressionWebhookProvider;
+  payload: unknown;
+  receivedAt: string;
+};
+
 export type NotificationSuppressionMutation = NotificationSuppression & {
   id: string;
   updatedAt: string;
@@ -353,6 +361,150 @@ function suppressionReasonForEvent(eventType: NotificationSuppressionEventType):
   if (eventType === 'unsubscribe' || eventType === 'resubscribe') return 'unsubscribed';
   if (eventType === 'bounce') return 'bounce';
   return 'complaint';
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function readString(record: Record<string, unknown>, key: string): string | undefined {
+  const value = record[key];
+  return typeof value === 'string' && value.trim() ? value : undefined;
+}
+
+function isoFromUnixSeconds(value: unknown): string | undefined {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return undefined;
+  return new Date(value * 1000).toISOString();
+}
+
+function validIsoOrFallback(value: string | undefined, fallback: string): string {
+  const candidate = value ?? fallback;
+  if (Number.isNaN(Date.parse(candidate))) throw new Error('receivedAt must be an ISO date.');
+  return candidate;
+}
+
+function providerEventId(record: Record<string, unknown>, keys: string[], fallbackParts: string[]): string {
+  for (const key of keys) {
+    const value = readString(record, key);
+    if (value) return value;
+  }
+  return fallbackParts.filter(Boolean).join(':');
+}
+
+function parseSendgridSuppressionWebhook(input: ParseNotificationSuppressionWebhookInput): NotificationSuppressionEvent[] {
+  const records = Array.isArray(input.payload) ? input.payload : [input.payload];
+  const eventTypes: Record<string, NotificationSuppressionEventType> = {
+    bounce: 'bounce',
+    'spam report': 'complaint',
+    unsubscribe: 'unsubscribe',
+    group_unsubscribe: 'unsubscribe',
+    group_resubscribe: 'resubscribe'
+  };
+  const events: NotificationSuppressionEvent[] = [];
+
+  for (const raw of records) {
+    if (!isRecord(raw)) continue;
+    const eventName = readString(raw, 'event');
+    const eventType = eventName ? eventTypes[eventName] : undefined;
+    const recipient = readString(raw, 'email');
+    if (!eventType || !recipient) continue;
+
+    const occurredAt = validIsoOrFallback(isoFromUnixSeconds(raw.timestamp), input.receivedAt);
+    events.push({
+      provider: 'sendgrid',
+      providerEventId: providerEventId(raw, ['sg_event_id'], [readString(raw, 'sg_message_id') ?? '', recipient, eventName ?? '', occurredAt]),
+      eventType,
+      recipient,
+      channel: 'email',
+      occurredAt
+    });
+  }
+
+  return events;
+}
+
+function parseSesMessage(payload: unknown): unknown {
+  if (!isRecord(payload)) return payload;
+  const message = readString(payload, 'Message');
+  if (!message) return payload;
+  try {
+    return JSON.parse(message) as unknown;
+  } catch {
+    return payload;
+  }
+}
+
+function parseSesSuppressionWebhook(input: ParseNotificationSuppressionWebhookInput): NotificationSuppressionEvent[] {
+  const record = parseSesMessage(input.payload);
+  if (!isRecord(record)) return [];
+
+  const eventName = readString(record, 'eventType') ?? readString(record, 'notificationType');
+  const eventType: NotificationSuppressionEventType | undefined =
+    eventName === 'Bounce' ? 'bounce' : eventName === 'Complaint' ? 'complaint' : undefined;
+  if (!eventType) return [];
+
+  const detail = isRecord(record[eventType]) ? record[eventType] : undefined;
+  const recipientsKey = eventType === 'bounce' ? 'bouncedRecipients' : 'complainedRecipients';
+  const recipients = Array.isArray(detail?.[recipientsKey]) ? detail[recipientsKey] : [];
+  const mail = isRecord(record.mail) ? record.mail : {};
+  const occurredAt = validIsoOrFallback(readString(detail ?? {}, 'timestamp') ?? readString(mail, 'timestamp'), input.receivedAt);
+  const feedbackId = readString(detail ?? {}, 'feedbackId');
+  const messageId = readString(mail, 'messageId');
+
+  return recipients.flatMap((recipient, index) => {
+    if (!isRecord(recipient)) return [];
+    const email = readString(recipient, 'emailAddress');
+    if (!email) return [];
+    return [{
+      provider: 'ses',
+      providerEventId: feedbackId ?? [messageId ?? 'ses-message', eventName ?? eventType, String(index), email].join(':'),
+      eventType,
+      recipient: email,
+      channel: 'email',
+      occurredAt
+    }];
+  });
+}
+
+function expoReceiptRecords(payload: unknown): Array<{ receiptId: string; record: Record<string, unknown> }> {
+  if (Array.isArray(payload)) {
+    return payload.flatMap((record, index) => (isRecord(record) ? [{ receiptId: readString(record, 'id') ?? `expo-receipt-${index}`, record }] : []));
+  }
+
+  if (!isRecord(payload)) return [];
+  const receipts = isRecord(payload.receipts) ? payload.receipts : payload;
+  return Object.entries(receipts).flatMap(([receiptId, record]) => (isRecord(record) ? [{ receiptId, record }] : []));
+}
+
+function parseExpoSuppressionWebhook(input: ParseNotificationSuppressionWebhookInput): NotificationSuppressionEvent[] {
+  const events: NotificationSuppressionEvent[] = [];
+  for (const { receiptId, record } of expoReceiptRecords(input.payload)) {
+    const status = readString(record, 'status');
+    const details = isRecord(record.details) ? record.details : {};
+    const error = readString(details, 'error') ?? readString(record, 'error');
+    const recipient = readString(record, 'to') ?? readString(record, 'recipient') ?? readString(record, 'pushToken');
+
+    if (status !== 'error' || error !== 'DeviceNotRegistered' || !recipient) continue;
+
+    events.push({
+      provider: 'expo',
+      providerEventId: providerEventId(record, ['id'], [receiptId, recipient, error]),
+      eventType: 'unsubscribe',
+      recipient,
+      channel: 'push',
+      occurredAt: validIsoOrFallback(readString(record, 'occurredAt'), input.receivedAt)
+    });
+  }
+  return events;
+}
+
+export function parseNotificationSuppressionWebhook(
+  input: ParseNotificationSuppressionWebhookInput
+): NotificationSuppressionEvent[] {
+  if (Number.isNaN(Date.parse(input.receivedAt))) throw new Error('receivedAt must be an ISO date.');
+  if (input.provider === 'sendgrid') return parseSendgridSuppressionWebhook(input);
+  if (input.provider === 'ses') return parseSesSuppressionWebhook(input);
+  return parseExpoSuppressionWebhook(input);
 }
 
 export function processNotificationSuppressionEvent(event: NotificationSuppressionEvent): NotificationSuppressionMutation {

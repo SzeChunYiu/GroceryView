@@ -4,6 +4,7 @@ import {
   createPostgresCatalogReader,
   createPostgresPriceObservationWriter,
   createPostgresPriceReader,
+  createPostgresProductAliasRepository,
   createPostgresRepository,
   createPostgresSourceRecordReader,
   createPostgresSourceRecordWriter,
@@ -33,6 +34,43 @@ class RecordingQueryExecutor implements QueryExecutor {
       image_url: 'https://example.invalid/coffee.png',
       created_at: new Date('2026-05-20T07:00:00.000Z'),
       updated_at: '2026-05-20T07:01:00.000Z'
+    }
+  ];
+  storeRows: unknown[] = [
+    {
+      id: 'store-1',
+      chain_id: 'chain-1',
+      chain_slug: 'willys',
+      chain_name: 'Willys',
+      slug: 'willys-hemma-stockholm-torsplan',
+      external_ref: 'seed:willys:torsplan',
+      name: 'Willys Hemma Stockholm Torsplan',
+      address_line1: 'Norra Stationsgatan 90',
+      address_line2: null,
+      postal_code: '113 64',
+      city: 'Stockholm',
+      region: 'Stockholm',
+      country_code: 'SE',
+      longitude: '18.0346',
+      latitude: '59.3495',
+      store_type: 'supermarket',
+      opening_hours: '{"mon":"08:00-21:00"}',
+      online_order_url: 'https://example.invalid/willys/torsplan',
+      created_at: new Date('2026-05-20T06:00:00.000Z'),
+      updated_at: '2026-05-20T06:01:00.000Z'
+    }
+  ];
+  aliasRows: unknown[] = [
+    {
+      id: 'alias-1',
+      product_id: 'product-1',
+      alias: 'ZOEGA SKANEROST',
+      normalized_alias: 'zoega skanerost',
+      source_type: 'receipt',
+      source_ref: 'receipt-ocr',
+      match_confidence: '0.9100',
+      reviewed_at: new Date('2026-05-20T07:30:00.000Z'),
+      created_at: '2026-05-20T07:29:00.000Z'
     }
   ];
   sourceRunRows: unknown[] = [
@@ -178,7 +216,10 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('insert into observations')) return this.observationId === undefined ? ([] as T[]) : ([{ id: this.observationId }] as T[]);
     if (sql.includes('from latest_prices')) return this.latestPriceRows as T[];
     if (sql.includes('from observations')) return this.observationHistoryRows as T[];
+    if (sql.includes('from stores')) return this.storeRows as T[];
     if (sql.includes('from products')) return this.productRows as T[];
+    if (sql.includes('insert into aliases')) return this.aliasRows as T[];
+    if (sql.includes('from aliases')) return this.aliasRows as T[];
     if (sql.includes('from subscription_entitlements')) return this.subscriptionEntitlementRows as T[];
     if (sql.includes('select store_id')) return [{ store_id: 'willys-odenplan' }] as T[];
     if (sql.includes('select weekly_budget')) return [{ weekly_budget: '800', monthly_budget: '3200' }] as T[];
@@ -538,6 +579,202 @@ describe('createPostgresCatalogReader', () => {
     const reader = createPostgresCatalogReader(executor);
 
     assert.equal(await reader.getProductBySlug('missing-product'), null);
+  });
+
+  it('lists products with bounded search and category filters', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresCatalogReader(executor);
+
+    assert.deepEqual(await reader.listProducts({ search: 'kaffe', categoryPath: ['Pantry', 'Coffee'], limit: 25 }), [
+      {
+        productId: 'product-1',
+        slug: 'bryggkaffe-450g',
+        canonicalName: 'Bryggkaffe mellanrost 450 g',
+        brand: 'Rosteriet',
+        privateLabelOwner: 'Willys',
+        barcode: '0731000000000',
+        categoryPath: ['Pantry', 'Coffee'],
+        packageSize: 450,
+        packageUnit: 'g',
+        comparableUnit: 'kg',
+        nutrition: { caffeineMg: 85 },
+        imageUrl: 'https://example.invalid/coffee.png',
+        createdAt: '2026-05-20T07:00:00.000Z',
+        updatedAt: '2026-05-20T07:01:00.000Z'
+      }
+    ]);
+
+    assert.match(executor.calls[0]!.sql, /from products/);
+    assert.match(executor.calls[0]!.sql, /canonical_name ilike '%' \|\| \$1 \|\| '%'/);
+    assert.match(executor.calls[0]!.sql, /category_path @> \$2::text\[\]/);
+    assert.match(executor.calls[0]!.sql, /order by canonical_name, slug/);
+    assert.deepEqual(executor.calls[0]!.params, ['kaffe', ['Pantry', 'Coffee'], 25]);
+  });
+
+  it('clamps product list limits to a safe range', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresCatalogReader(executor);
+
+    await reader.listProducts({ limit: 5000 });
+    await reader.listProducts({ limit: 0 });
+
+    assert.deepEqual(executor.calls[0]!.params, [null, null, 500]);
+    assert.deepEqual(executor.calls[1]!.params, [null, null, 1]);
+  });
+
+  it('reads stores by slug with chain and coordinate metadata', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresCatalogReader(executor);
+
+    assert.deepEqual(await reader.getStoreBySlug('willys-hemma-stockholm-torsplan'), {
+      storeId: 'store-1',
+      chainId: 'chain-1',
+      chainSlug: 'willys',
+      chainName: 'Willys',
+      slug: 'willys-hemma-stockholm-torsplan',
+      externalRef: 'seed:willys:torsplan',
+      name: 'Willys Hemma Stockholm Torsplan',
+      addressLine1: 'Norra Stationsgatan 90',
+      postalCode: '113 64',
+      city: 'Stockholm',
+      region: 'Stockholm',
+      countryCode: 'SE',
+      longitude: 18.0346,
+      latitude: 59.3495,
+      storeType: 'supermarket',
+      openingHours: { mon: '08:00-21:00' },
+      onlineOrderUrl: 'https://example.invalid/willys/torsplan',
+      createdAt: '2026-05-20T06:00:00.000Z',
+      updatedAt: '2026-05-20T06:01:00.000Z'
+    });
+
+    assert.match(executor.calls[0]!.sql, /from stores/);
+    assert.match(executor.calls[0]!.sql, /join chains on chains\.id = stores\.chain_id/);
+    assert.match(executor.calls[0]!.sql, /where stores\.slug = \$1/);
+    assert.match(executor.calls[0]!.sql, /ST_X\(stores\.position::geometry\)/);
+    assert.deepEqual(executor.calls[0]!.params, ['willys-hemma-stockholm-torsplan']);
+  });
+
+  it('returns null when a store slug is unknown', async () => {
+    const executor = new RecordingQueryExecutor();
+    executor.storeRows = [];
+    const reader = createPostgresCatalogReader(executor);
+
+    assert.equal(await reader.getStoreBySlug('missing-store'), null);
+  });
+
+  it('lists stores with bounded search, chain, and city filters', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresCatalogReader(executor);
+
+    assert.equal((await reader.listStores({ search: 'torsplan', chainSlug: 'willys', city: 'Stockholm', limit: 25 })).length, 1);
+
+    assert.match(executor.calls[0]!.sql, /stores\.name ilike '%' \|\| \$1 \|\| '%'/);
+    assert.match(executor.calls[0]!.sql, /chains\.slug = \$2/);
+    assert.match(executor.calls[0]!.sql, /stores\.city = \$3/);
+    assert.match(executor.calls[0]!.sql, /order by stores\.city, chains\.name, stores\.name, stores\.slug/);
+    assert.deepEqual(executor.calls[0]!.params, ['torsplan', 'willys', 'Stockholm', 25]);
+  });
+
+  it('clamps store list limits to a safe range', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresCatalogReader(executor);
+
+    await reader.listStores({ limit: 5000 });
+    await reader.listStores({ limit: 0 });
+
+    assert.deepEqual(executor.calls[0]!.params, [null, null, null, 500]);
+    assert.deepEqual(executor.calls[1]!.params, [null, null, null, 1]);
+  });
+});
+
+describe('createPostgresProductAliasRepository', () => {
+  it('upserts product aliases with parameterized SQL and maps the returned row', async () => {
+    const executor = new RecordingQueryExecutor();
+    const aliases = createPostgresProductAliasRepository(executor);
+
+    assert.deepEqual(
+      await aliases.upsertProductAlias({
+        productId: 'product-1',
+        alias: 'ZOEGA SKANEROST',
+        normalizedAlias: 'zoega skanerost',
+        sourceType: 'receipt',
+        sourceRef: 'receipt-ocr',
+        matchConfidence: 0.91,
+        reviewedAt: '2026-05-20T07:30:00.000Z'
+      }),
+      {
+        aliasId: 'alias-1',
+        productId: 'product-1',
+        alias: 'ZOEGA SKANEROST',
+        normalizedAlias: 'zoega skanerost',
+        sourceType: 'receipt',
+        sourceRef: 'receipt-ocr',
+        matchConfidence: 0.91,
+        reviewedAt: '2026-05-20T07:30:00.000Z',
+        createdAt: '2026-05-20T07:29:00.000Z'
+      }
+    );
+
+    assert.match(executor.calls[0]!.sql, /insert into aliases/);
+    assert.match(executor.calls[0]!.sql, /on conflict \(normalized_alias, source_type, source_ref\) do update/);
+    assert.match(executor.calls[0]!.sql, /returning id/);
+    assert.deepEqual(executor.calls[0]!.params, [
+      'product-1',
+      'ZOEGA SKANEROST',
+      'zoega skanerost',
+      'receipt',
+      'receipt-ocr',
+      0.91,
+      '2026-05-20T07:30:00.000Z'
+    ]);
+  });
+
+  it('fails closed when an alias upsert does not return a row', async () => {
+    const executor = new RecordingQueryExecutor();
+    executor.aliasRows = [];
+    const aliases = createPostgresProductAliasRepository(executor);
+
+    await assert.rejects(
+      () =>
+        aliases.upsertProductAlias({
+          productId: 'product-1',
+          alias: 'Unknown',
+          normalizedAlias: 'unknown',
+          sourceType: 'manual',
+          matchConfidence: 0.5
+        }),
+      /Product alias upsert did not return a row/
+    );
+  });
+
+  it('finds product aliases with bounded lookup filters', async () => {
+    const executor = new RecordingQueryExecutor();
+    const aliases = createPostgresProductAliasRepository(executor);
+
+    assert.equal(
+      (await aliases.findProductAliases({ normalizedAlias: 'zoega skanerost', productId: 'product-1', sourceType: 'receipt', limit: 10 }))
+        .length,
+      1
+    );
+
+    assert.match(executor.calls[0]!.sql, /from aliases/);
+    assert.match(executor.calls[0]!.sql, /normalized_alias = \$1/);
+    assert.match(executor.calls[0]!.sql, /product_id = \$2::uuid/);
+    assert.match(executor.calls[0]!.sql, /source_type = \$3/);
+    assert.match(executor.calls[0]!.sql, /order by match_confidence desc, reviewed_at desc nulls last, created_at desc, id/);
+    assert.deepEqual(executor.calls[0]!.params, ['zoega skanerost', 'product-1', 'receipt', 10]);
+  });
+
+  it('clamps product alias lookup limits to a safe range', async () => {
+    const executor = new RecordingQueryExecutor();
+    const aliases = createPostgresProductAliasRepository(executor);
+
+    await aliases.findProductAliases({ limit: 5000 });
+    await aliases.findProductAliases({ limit: 0 });
+
+    assert.deepEqual(executor.calls[0]!.params, [null, null, null, 100]);
+    assert.deepEqual(executor.calls[1]!.params, [null, null, null, 1]);
   });
 });
 

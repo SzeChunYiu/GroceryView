@@ -177,6 +177,145 @@ export type SubscriptionEntitlementSnapshot = {
   updatedAt: string;
 };
 
+export type BillingSubscriptionEventType = 'subscription.active' | 'subscription.past_due' | 'subscription.canceled';
+
+export type BillingSubscriptionEvent = {
+  provider: 'stripe_compatible';
+  providerEventId: string;
+  type: BillingSubscriptionEventType;
+  userId: string;
+  plan?: SubscriptionPlan;
+  currentPeriodEndsAt?: string;
+  providerCustomerId?: string;
+  providerSubscriptionId?: string;
+  occurredAt: string;
+};
+
+export type BillingSubscriptionEntitlementMutation = SubscriptionEntitlementSnapshot & {
+  userId: string;
+  providerCustomerId?: string;
+  providerSubscriptionId?: string;
+};
+
+export type ParseStripeCompatibleSubscriptionEventInput = {
+  payload: unknown;
+  receivedAt: string;
+  priceIdPlanMap?: Partial<Record<string, SubscriptionPlan>>;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function readString(record: Record<string, unknown>, key: string): string | undefined {
+  const value = record[key];
+  return typeof value === 'string' && value.trim() ? value : undefined;
+}
+
+function readNumber(record: Record<string, unknown>, key: string): number | undefined {
+  const value = record[key];
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
+function isSubscriptionPlan(value: string | undefined): value is SubscriptionPlan {
+  return value === 'premium_monthly' || value === 'premium_yearly';
+}
+
+function unixSecondsToIso(value: number | undefined, fallback: string): string {
+  if (value === undefined) return fallback;
+  return new Date(value * 1000).toISOString();
+}
+
+function firstStripePriceId(subscription: Record<string, unknown>): string | undefined {
+  const items = isRecord(subscription.items) ? subscription.items : {};
+  const data = Array.isArray(items.data) ? items.data : [];
+  for (const item of data) {
+    if (!isRecord(item)) continue;
+    const price = isRecord(item.price) ? item.price : {};
+    const priceId = readString(price, 'id');
+    if (priceId) return priceId;
+  }
+  return undefined;
+}
+
+function planFromStripeSubscription(
+  subscription: Record<string, unknown>,
+  priceIdPlanMap: Partial<Record<string, SubscriptionPlan>>
+): SubscriptionPlan | undefined {
+  const metadata = isRecord(subscription.metadata) ? subscription.metadata : {};
+  const metadataPlan = readString(metadata, 'plan');
+  if (isSubscriptionPlan(metadataPlan)) return metadataPlan;
+  const priceId = firstStripePriceId(subscription);
+  return priceId ? priceIdPlanMap[priceId] : undefined;
+}
+
+function billingTypeForStripeEvent(eventType: string | undefined, status: string | undefined): BillingSubscriptionEventType | null {
+  if (eventType === 'customer.subscription.deleted' || status === 'canceled') return 'subscription.canceled';
+  if (eventType !== 'customer.subscription.created' && eventType !== 'customer.subscription.updated') return null;
+  if (status === 'active' || status === 'trialing') return 'subscription.active';
+  if (status === 'past_due' || status === 'unpaid' || status === 'incomplete' || status === 'incomplete_expired') return 'subscription.past_due';
+  return null;
+}
+
+export function parseStripeCompatibleSubscriptionEvent(
+  input: ParseStripeCompatibleSubscriptionEventInput
+): BillingSubscriptionEvent | null {
+  if (Number.isNaN(Date.parse(input.receivedAt))) throw new Error('receivedAt must be an ISO date.');
+  if (!isRecord(input.payload)) return null;
+
+  const eventType = readString(input.payload, 'type');
+  const data = isRecord(input.payload.data) ? input.payload.data : {};
+  const subscription = isRecord(data.object) ? data.object : {};
+  const billingType = billingTypeForStripeEvent(eventType, readString(subscription, 'status'));
+  if (!billingType) return null;
+
+  const metadata = isRecord(subscription.metadata) ? subscription.metadata : {};
+  const userId = readString(metadata, 'userId');
+  if (!userId) throw new Error('Stripe subscription metadata.userId is required.');
+
+  const plan = planFromStripeSubscription(subscription, input.priceIdPlanMap ?? {});
+  if (billingType !== 'subscription.canceled' && !plan) {
+    throw new Error('Stripe subscription plan metadata or known price id is required.');
+  }
+
+  const subscriptionId = readString(subscription, 'id');
+  const customerId = typeof subscription.customer === 'string' ? subscription.customer : undefined;
+  const currentPeriodEndsAt = unixSecondsToIso(readNumber(subscription, 'current_period_end'), input.receivedAt);
+
+  return {
+    provider: 'stripe_compatible',
+    providerEventId: readString(input.payload, 'id') ?? `${eventType}:${subscriptionId ?? userId}`,
+    type: billingType,
+    userId,
+    ...(plan ? { plan } : {}),
+    ...(billingType !== 'subscription.canceled' ? { currentPeriodEndsAt } : {}),
+    ...(customerId ? { providerCustomerId: customerId } : {}),
+    ...(subscriptionId ? { providerSubscriptionId: subscriptionId } : {}),
+    occurredAt: unixSecondsToIso(readNumber(input.payload, 'created'), input.receivedAt)
+  };
+}
+
+export function processBillingSubscriptionEvent(event: BillingSubscriptionEvent): BillingSubscriptionEntitlementMutation {
+  const statusByEventType: Record<BillingSubscriptionEventType, SubscriptionEntitlementSnapshot['status']> = {
+    'subscription.active': 'active',
+    'subscription.past_due': 'past_due',
+    'subscription.canceled': 'canceled'
+  };
+  const status = statusByEventType[event.type];
+
+  return {
+    userId: event.userId,
+    tier: 'premium',
+    ...(event.plan ? { plan: event.plan } : {}),
+    status,
+    ...(event.currentPeriodEndsAt ? { currentPeriodEndsAt: event.currentPeriodEndsAt } : {}),
+    provider: event.provider,
+    ...(event.providerCustomerId ? { providerCustomerId: event.providerCustomerId } : {}),
+    ...(event.providerSubscriptionId ? { providerSubscriptionId: event.providerSubscriptionId } : {}),
+    updatedAt: event.occurredAt
+  };
+}
+
 export type SubscriptionAccessPolicy = {
   userTier: UserTier;
   premiumFeaturesEnabled: boolean;

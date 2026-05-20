@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { processScanUpload } from '../index.js';
+import { planScanReviewWorkItems, processScanUpload } from '../index.js';
 
 describe('processScanUpload', () => {
   it('routes barcode scans through barcode provider and returns lookup confidence', async () => {
@@ -60,5 +60,129 @@ describe('processScanUpload', () => {
       kind: 'receipt',
       reason: 'No receipt OCR provider configured.'
     });
+  });
+});
+
+describe('planScanReviewWorkItems', () => {
+  it('prioritizes unresolved barcode scans and low-confidence receipt rows for review', () => {
+    const items = planScanReviewWorkItems([
+      {
+        scanId: 'barcode-1',
+        result: {
+          status: 'matched',
+          kind: 'barcode',
+          productId: null,
+          confidence: 0.72,
+          needsHumanReview: true
+        }
+      },
+      {
+        scanId: 'receipt-1',
+        result: {
+          status: 'parsed',
+          kind: 'receipt',
+          totalAmount: 62.4,
+          confidence: 0.66,
+          needsHumanReview: true,
+          lowConfidenceRows: ['SMUDGED ITEM']
+        }
+      },
+      {
+        scanId: 'barcode-2',
+        result: {
+          status: 'matched',
+          kind: 'barcode',
+          productId: 'coffee',
+          confidence: 0.93,
+          needsHumanReview: false
+        }
+      }
+    ]);
+
+    assert.deepEqual(items, [
+      {
+        id: 'scan-review-barcode-1',
+        scanId: 'barcode-1',
+        kind: 'barcode',
+        priority: 'high',
+        reason: 'Barcode lookup did not resolve to a product.',
+        evidence: ['confidence:0.72', 'product_match:missing']
+      },
+      {
+        id: 'scan-review-receipt-1',
+        scanId: 'receipt-1',
+        kind: 'receipt',
+        priority: 'high',
+        reason: 'Receipt has 1 low-confidence rows.',
+        evidence: ['confidence:0.66', 'total:62.4', 'low_confidence_row:SMUDGED ITEM']
+      }
+    ]);
+  });
+
+  it('keeps medium-priority review work for uncertain matched scans without row-level evidence', () => {
+    const items = planScanReviewWorkItems([
+      {
+        scanId: 'barcode-3',
+        result: {
+          status: 'matched',
+          kind: 'barcode',
+          productId: 'coffee',
+          confidence: 0.64,
+          needsHumanReview: true
+        }
+      },
+      {
+        scanId: 'receipt-2',
+        result: {
+          status: 'parsed',
+          kind: 'receipt',
+          totalAmount: 105,
+          confidence: 0.78,
+          needsHumanReview: true,
+          lowConfidenceRows: []
+        }
+      }
+    ]);
+
+    assert.deepEqual(items.map((item) => ({ id: item.id, priority: item.priority, reason: item.reason })), [
+      { id: 'scan-review-barcode-3', priority: 'medium', reason: 'Barcode lookup needs review at confidence 0.64.' },
+      { id: 'scan-review-receipt-2', priority: 'medium', reason: 'Receipt OCR needs review at confidence 0.78.' }
+    ]);
+  });
+
+  it('rejects malformed scan review inputs', () => {
+    assert.throws(
+      () =>
+        planScanReviewWorkItems([
+          {
+            scanId: ' ',
+            result: {
+              status: 'matched',
+              kind: 'barcode',
+              productId: 'coffee',
+              confidence: 0.8,
+              needsHumanReview: true
+            }
+          }
+        ]),
+      /scanId is required/
+    );
+
+    assert.throws(
+      () =>
+        planScanReviewWorkItems([
+          {
+            scanId: 'barcode-4',
+            result: {
+              status: 'matched',
+              kind: 'barcode',
+              productId: 'coffee',
+              confidence: 1.2,
+              needsHumanReview: true
+            }
+          }
+        ]),
+      /barcode confidence must be a number between 0 and 1/
+    );
   });
 });

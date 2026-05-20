@@ -6,12 +6,15 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "test": "npm run build -w @groceryview/core && npm run build -w @groceryview/api && npm run build -w @groceryview/auth && npm run build -w @groceryview/notifications && tsc -p tsconfig.test.json && node --test dist-test/__tests__/*.test.js"
+    "test": "npm run build -w @groceryview/core && npm run build -w @groceryview/monetization && npm run build -w @groceryview/api && npm run build -w @groceryview/auth && npm run build -w @groceryview/notifications && npm run build -w @groceryview/db && tsc -p tsconfig.test.json && node --test dist-test/__tests__/*.test.js"
   },
   "dependencies": {
     "@groceryview/api": "0.1.0",
     "@groceryview/auth": "0.1.0",
     "@groceryview/core": "0.1.0",
-    "@groceryview/notifications": "0.1.0"
+    "@groceryview/db": "0.1.0",
+    "@groceryview/monetization": "0.1.0",
+    "@groceryview/notifications": "0.1.0",
+    "pg": "^8.21.0"
   }
 }
