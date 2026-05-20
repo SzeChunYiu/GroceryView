@@ -7,6 +7,7 @@ EXPECTED_ASSETS = {
     "latest_price_rollup",
     "normalized_products",
     "open_prices_artifact_import_plan",
+    "open_prices_hosted_smoke_plan",
     "open_prices_ingestion_run_plan",
     "open_prices_launch_readiness",
     "open_prices_real_pull_plan",

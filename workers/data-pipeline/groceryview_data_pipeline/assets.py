@@ -21,6 +21,7 @@ from .models import (
     ObservationCoverageSummary,
     ObservationFreshnessSummary,
     OpenPricesArtifactImportPlan,
+    OpenPricesHostedSmokePlan,
     OpenPricesIngestionRunPlan,
     OpenPricesIngestionRunPlanSummary,
     OpenPricesLaunchReadinessSummary,
@@ -424,6 +425,52 @@ def build_open_prices_artifact_import_plan(
     )
 
 
+def build_open_prices_hosted_smoke_plan(
+    *,
+    deployment_url_present: bool = False,
+    metrics_token_present: bool = False,
+    imported_terminal_product_id_present: bool = False,
+) -> OpenPricesHostedSmokePlan:
+    required_actions: list[str] = []
+    if not deployment_url_present:
+        required_actions.append("set_groceryview_server_url")
+    if not metrics_token_present:
+        required_actions.append("set_metrics_token")
+    if not imported_terminal_product_id_present:
+        required_actions.append("set_imported_terminal_product_id")
+
+    return OpenPricesHostedSmokePlan(
+        status="ready" if not required_actions else "blocked",
+        source_asset="open_prices_artifact_import_plan",
+        smoke_command=(
+            "GROCERYVIEW_SERVER_URL=<https://api.example.com> "
+            "GROCERYVIEW_TERMINAL_PRODUCT_ID=<imported-product-id> "
+            "infra/scripts/smoke-hosted-http.sh && "
+            "GROCERYVIEW_SERVER_URL=<https://api.example.com> "
+            "METRICS_TOKEN=<token> infra/scripts/smoke-hosted-readiness.sh"
+        ),
+        required_env=[
+            "GROCERYVIEW_SERVER_URL",
+            "GROCERYVIEW_TERMINAL_PRODUCT_ID",
+            "METRICS_TOKEN",
+        ],
+        required_actions=required_actions,
+        endpoints=[
+            "/api/health",
+            "/api/products/{GROCERYVIEW_TERMINAL_PRODUCT_ID}/terminal",
+            "/api/readiness/postgres",
+        ],
+        evidence_fields=[
+            "apiHealthStatus",
+            "terminalProductId",
+            "terminalQuote",
+            "terminalDistribution",
+            "terminalChart",
+            "postgresReadinessStatus",
+        ],
+    )
+
+
 def summarize_open_prices_ingestion_run_plan(plan: OpenPricesIngestionRunPlan) -> OpenPricesIngestionRunPlanSummary:
     return OpenPricesIngestionRunPlanSummary(
         status=plan.status,
@@ -440,12 +487,15 @@ def build_open_prices_launch_readiness_summary(
     pull_plan: OpenPricesPullPlan,
     ingestion_plan: OpenPricesIngestionRunPlan,
     artifact_import_plan: OpenPricesArtifactImportPlan,
+    hosted_smoke_plan: OpenPricesHostedSmokePlan | None = None,
 ) -> OpenPricesLaunchReadinessSummary:
     plans = {
         "open_prices_real_pull_plan": pull_plan,
         "open_prices_ingestion_run_plan": ingestion_plan,
         "open_prices_artifact_import_plan": artifact_import_plan,
     }
+    if hosted_smoke_plan is not None:
+        plans["open_prices_hosted_smoke_plan"] = hosted_smoke_plan
     blockers_by_plan = {
         plan_name: list(plan.required_actions)
         for plan_name, plan in plans.items()
@@ -705,15 +755,26 @@ def open_prices_artifact_import_plan(open_prices_real_pull_plan: dict[str, objec
 
 
 @asset(group_name=ASSET_GROUP)
+def open_prices_hosted_smoke_plan(open_prices_artifact_import_plan: dict[str, object]) -> dict[str, object]:
+    return build_open_prices_hosted_smoke_plan(
+        deployment_url_present=False,
+        metrics_token_present=False,
+        imported_terminal_product_id_present=open_prices_artifact_import_plan.get("status") == "ready",
+    ).to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
 def open_prices_launch_readiness(
     open_prices_real_pull_plan: dict[str, object],
     open_prices_ingestion_run_plan: dict[str, object],
     open_prices_artifact_import_plan: dict[str, object],
+    open_prices_hosted_smoke_plan: dict[str, object],
 ) -> dict[str, object]:
     summary = build_open_prices_launch_readiness_summary(
         OpenPricesPullPlan(**open_prices_real_pull_plan),
         OpenPricesIngestionRunPlan(**open_prices_ingestion_run_plan),
         OpenPricesArtifactImportPlan(**open_prices_artifact_import_plan),
+        OpenPricesHostedSmokePlan(**open_prices_hosted_smoke_plan),
     )
     return summary.to_dict()
 
