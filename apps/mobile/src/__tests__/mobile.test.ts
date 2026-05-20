@@ -6,6 +6,7 @@ import {
   buildExpoReadinessPlan,
   buildMobileOfflineSyncPlan,
   buildMobileProviderReadinessReport,
+  buildMobilePrivacyRequestPlan,
   buildMobileScreenBlueprints,
   buildMobileShell,
   buildScanResult,
@@ -150,7 +151,60 @@ describe('mobile app foundation', () => {
     ]);
   });
 
-  it('plans offline cache coverage and prioritized mobile sync queue', () => {
+  it('plans authenticated mobile privacy exports from the privacy route', () => {
+    const plan = buildMobilePrivacyRequestPlan({
+      userId: 'user-1',
+      requestType: 'export_data',
+      authenticated: true,
+      networkOnline: true
+    });
+
+    assert.equal(plan.route, '/privacy');
+    assert.equal(plan.confirmationRequired, false);
+    assert.deepEqual(plan.exportSections, ['profile', 'favorite_stores', 'watchlist', 'receipts', 'households']);
+    assert.deepEqual(plan.actions, ['download_export']);
+    assert.deepEqual(plan.blockers, []);
+  });
+
+  it('blocks mobile account deletion until the user confirms the destructive action', () => {
+    const plan = buildMobilePrivacyRequestPlan({
+      userId: 'user-1',
+      requestType: 'delete_account',
+      authenticated: true,
+      networkOnline: true
+    });
+
+    assert.equal(plan.confirmationRequired, true);
+    assert.deepEqual(plan.blockers, ['account_deletion_confirmation_required']);
+    assert.deepEqual(plan.actions, ['confirm_account_deletion']);
+  });
+
+  it('fails closed for mobile privacy requests that are offline or unauthenticated', () => {
+    const plan = buildMobilePrivacyRequestPlan({
+      userId: 'user-1',
+      requestType: 'ad_privacy',
+      authenticated: false,
+      networkOnline: false
+    });
+
+    assert.deepEqual(plan.blockers, ['mobile_reauthentication_required', 'network_required_for_privacy_request']);
+    assert.deepEqual(plan.actions, ['reauthenticate', 'retry_online']);
+  });
+
+  it('schedules receipt image cleanup only after privacy prerequisites pass', () => {
+    const plan = buildMobilePrivacyRequestPlan({
+      userId: 'user-1',
+      requestType: 'receipt_retention',
+      authenticated: true,
+      networkOnline: true,
+      receiptImageRetentionDays: 7
+    });
+
+    assert.deepEqual(plan.actions, ['schedule_receipt_image_cleanup']);
+    assert.deepEqual(plan.blockers, []);
+  });
+
+it('plans offline cache coverage and prioritized mobile sync queue', () => {
     const plan = buildMobileOfflineSyncPlan({
       userId: 'user-1',
       offlineEnabled: true,
