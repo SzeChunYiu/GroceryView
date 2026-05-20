@@ -46,6 +46,7 @@ print_service_diagnostics() {
 
 fail_with_diagnostics() {
   echo "$1" >&2
+  echo "Troubleshooting: infra/README.md#smoke-troubleshooting" >&2
   print_service_diagnostics
   exit 1
 }
