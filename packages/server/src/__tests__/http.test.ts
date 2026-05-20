@@ -453,6 +453,25 @@ describe('createHttpHandler', () => {
     const comparison = await json(await handle(new Request('http://localhost/api/basket/compare?userId=user-1', { method: 'POST' }))) as { cheapestByProduct: { total: number } };
     assert.equal(comparison.cheapestByProduct.total, 99.8);
 
+    const comparisonReport = await json(await handle(new Request('http://localhost/api/basket/comparison-report?userId=user-1'))) as {
+      currency: string;
+      favoriteStoreIds: string[];
+      strategies: Array<{ id: string; assignments: Array<{ productId: string; lineTotal: number; priceLabel: string }> }>;
+    };
+    assert.equal(comparisonReport.currency, 'SEK');
+    assert.deepEqual(comparisonReport.favoriteStoreIds, ['willys-odenplan']);
+    assert.deepEqual(comparisonReport.strategies.map((strategy) => strategy.id), [
+      'cheapest_across_selected',
+      'all_at_one_store',
+      'favorite_only',
+      'private_label_substitution'
+    ]);
+    assert.deepEqual(comparisonReport.strategies[0]?.assignments.map((assignment) => ({
+      productId: assignment.productId,
+      lineTotal: assignment.lineTotal,
+      priceLabel: assignment.priceLabel
+    })), [{ productId: 'coffee', lineTotal: 99.8, priceLabel: 'verified_shelf' }]);
+
     const budget = await json(await handle(new Request('http://localhost/api/budget/summary?userId=user-1'))) as { weeklyRemainingAfterEstimate: number };
     assert.equal(budget.weeklyRemainingAfterEstimate, 700.2);
 
