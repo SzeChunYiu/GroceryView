@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildDeploymentReadinessReport,
+  buildHostedSmokeCommandPlan,
   buildRollbackPlan,
   summarizeDeploymentReadinessReport,
   summarizeGateBlockers,
@@ -224,6 +225,25 @@ describe('deployment ops foundation', () => {
         'Run smoke tests before re-enabling traffic.'
       ],
       requiresManualDatabaseRecovery: true
+    });
+  });
+
+  it('builds hosted smoke command plans without embedding secret token values', () => {
+    const plan = buildHostedSmokeCommandPlan({
+      serverUrl: 'https://api.groceryview.example/',
+      webUrl: 'https://groceryview.example',
+      includePostgresReadiness: true,
+      metricsTokenEnvVar: 'PROD_METRICS_TOKEN',
+      timeoutSeconds: 20
+    });
+
+    assert.deepEqual(plan, {
+      commands: [
+        'GROCERYVIEW_SERVER_URL=https://api.groceryview.example GROCERYVIEW_WEB_URL=https://groceryview.example HTTP_SMOKE_TIMEOUT_SECONDS=20 infra/scripts/smoke-hosted-http.sh',
+        'GROCERYVIEW_SERVER_URL=https://api.groceryview.example METRICS_TOKEN=$PROD_METRICS_TOKEN READINESS_TIMEOUT_SECONDS=20 infra/scripts/smoke-hosted-readiness.sh'
+      ],
+      requiredSecrets: ['PROD_METRICS_TOKEN'],
+      evidence: ['hosted_api_health', 'hosted_web', 'hosted_postgres_readiness']
     });
   });
 });
