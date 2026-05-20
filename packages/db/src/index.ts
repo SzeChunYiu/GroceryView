@@ -838,13 +838,8 @@ export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
 ] as const;
 
 export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
-  '001_initial_schema',
-  '003_human_review_assignments',
-  '004_human_reviewers',
-  '005_community_reporter_trust',
-  '006_notification_tasks',
-  '007_notification_suppressions',
-  '008_notification_task_suppressed_status'
+  '001_groceryview_schema',
+  '002_repository_support_schema'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
