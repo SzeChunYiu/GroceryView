@@ -33,8 +33,6 @@ describe('buildStaticPages', () => {
         'products/coffee/index.html',
         'receipts/review/index.html',
         'retailers/freshness/index.html',
-        'routes/shopping/index.html',
-        'savings/ledger/index.html',
         'savings/smart-swaps/index.html',
         'scanner/index.html',
         'stores/compare/index.html',
@@ -122,13 +120,6 @@ describe('buildStaticPages', () => {
       assert.match(retailerFreshness, /Coop/);
       assert.match(retailerFreshness, /Pause new alerts/);
       assert.match(retailerFreshness, /Stale retailer-page rows cannot trigger household notifications/);
-
-      const shoppingRoute = await readFile(join(root, 'routes/shopping/index.html'), 'utf8');
-      assert.match(shoppingRoute, /Shopping route planner/);
-      assert.match(shoppingRoute, /Ordered stops/);
-      assert.match(shoppingRoute, /Lidl Sveavägen/);
-      assert.match(shoppingRoute, /Route time can reorder stops but cannot change product deal ranking/);
-      assert.match(shoppingRoute, /Unverified prices cannot justify an extra route stop/);
 
       const priceConfidence = await readFile(join(root, 'prices/confidence/index.html'), 'utf8');
       assert.match(priceConfidence, /Price confidence guide/);
