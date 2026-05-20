@@ -1,49 +1,81 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { planScanReviewWorkItems, processScanUpload } from '../index.js';
-import { planScanUploadBatch, processScanUpload } from '../index.js';
+import { buildScanProviderReadinessReport, planScanReviewWorkItems, prepareScanUploadTicket, processScanUpload } from '../index.js';
 
-describe('planScanUploadBatch', () => {
-  it('accepts unique valid uploads and rejects duplicate scan payloads', () => {
-    const plan = planScanUploadBatch({
-      knownFingerprints: ['barcode:0735000000001'],
-      uploads: [
-        { kind: 'barcode', payload: '0735000000002', uploadedAt: '2026-05-19T10:00:00.000Z' },
-        { kind: 'barcode', payload: '0735000000002', uploadedAt: '2026-05-19T10:01:00.000Z' },
-        { kind: 'barcode', payload: '0735000000001', uploadedAt: '2026-05-19T10:02:00.000Z' },
-        { kind: 'receipt', payload: 'file://receipt.jpg', uploadedAt: '2026-05-19T10:03:00.000Z' }
+describe('buildScanProviderReadinessReport', () => {
+  it('fails closed when barcode or receipt OCR providers are missing credentials or health checks', () => {
+    const report = buildScanProviderReadinessReport({
+      requiredProviders: ['barcode', 'receiptOcr'],
+      providers: [
+        {
+          kind: 'barcode',
+          providerName: 'gs1-compatible-lookup',
+          configured: true,
+          credentialsPresent: true,
+          healthStatus: 'pass'
+        },
+        {
+          kind: 'receiptOcr',
+          providerName: 'cloud-ocr',
+          configured: false,
+          credentialsPresent: false,
+          healthStatus: 'not_run'
+        }
       ]
     });
 
-    assert.deepEqual(
-      plan.accepted.map((item) => ({ kind: item.kind, fingerprint: item.fingerprint, status: item.status })),
-      [
-        { kind: 'barcode', fingerprint: 'barcode:0735000000002', status: 'accepted' },
-        { kind: 'receipt', fingerprint: 'receipt:file://receipt.jpg', status: 'accepted' }
-      ]
-    );
-    assert.deepEqual(
-      plan.rejected.map((item) => ({ fingerprint: item.fingerprint, reason: item.reason })),
-      [
-        { fingerprint: 'barcode:0735000000002', reason: 'duplicate_payload' },
-        { fingerprint: 'barcode:0735000000001', reason: 'duplicate_payload' }
-      ]
-    );
+    assert.deepEqual(report, {
+      status: 'blocked',
+      blockers: [
+        'scan_provider_not_configured:receiptOcr',
+        'scan_provider_credentials_missing:receiptOcr',
+        'scan_provider_health_not_run:receiptOcr'
+      ],
+      evidence: [
+        'scan_provider_configured:barcode:gs1-compatible-lookup',
+        'scan_provider_credentials_present:barcode',
+        'scan_provider_health_pass:barcode'
+      ],
+      warnings: [],
+      summary: 'Scan provider readiness is blocked.'
+    });
   });
 
-  it('rejects empty payloads and invalid upload timestamps before provider work', () => {
-    const plan = planScanUploadBatch({
-      uploads: [
-        { kind: 'receipt', payload: ' ', uploadedAt: '2026-05-19T10:00:00.000Z' },
-        { kind: 'barcode', payload: '0735000000002', uploadedAt: 'not-a-date' }
+  it('passes only when all required scan providers are configured, credentialed, and healthy', () => {
+    const report = buildScanProviderReadinessReport({
+      requiredProviders: ['barcode', 'receiptOcr'],
+      providers: [
+        {
+          kind: 'barcode',
+          providerName: 'gs1-compatible-lookup',
+          configured: true,
+          credentialsPresent: true,
+          healthStatus: 'pass'
+        },
+        {
+          kind: 'receiptOcr',
+          providerName: 'cloud-ocr',
+          configured: true,
+          credentialsPresent: true,
+          healthStatus: 'pass'
+        }
       ]
     });
 
-    assert.equal(plan.accepted.length, 0);
-    assert.deepEqual(
-      plan.rejected.map((item) => item.reason),
-      ['empty_payload', 'invalid_uploaded_at']
-    );
+    assert.deepEqual(report, {
+      status: 'ready',
+      blockers: [],
+      evidence: [
+        'scan_provider_configured:barcode:gs1-compatible-lookup',
+        'scan_provider_credentials_present:barcode',
+        'scan_provider_health_pass:barcode',
+        'scan_provider_configured:receiptOcr:cloud-ocr',
+        'scan_provider_credentials_present:receiptOcr',
+        'scan_provider_health_pass:receiptOcr'
+      ],
+      warnings: [],
+      summary: 'Scan providers are ready.'
+    });
   });
 });
 
