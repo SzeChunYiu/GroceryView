@@ -4,6 +4,7 @@ import {
   categories,
   householdSavings,
   products,
+  savingsPlaybook,
   sourceCoverage,
   stockholmAreas,
   stores,
@@ -282,6 +283,33 @@ export function MarketShell() {
             </Link>
           );
         })}
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="border-b border-market-ink/10 px-4 py-3">
+          <h2 className="text-lg font-black">Savings playbook</h2>
+          <p className="mt-1 text-sm text-market-ink/60">
+            Driver-backed actions translate price movement into concrete shopping decisions.
+          </p>
+        </div>
+        <div className="grid gap-0 md:grid-cols-2">
+          {savingsPlaybook.map((play) => (
+            <Link
+              key={play.title}
+              href={play.href}
+              className="border-b border-market-ink/10 px-4 py-4 text-sm hover:bg-market-oat/45 md:border-r"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <span className="font-black">{play.title}</span>
+                <span className="shrink-0 rounded-full bg-market-mint/15 px-2 py-1 text-xs font-bold text-market-ink/65">
+                  {play.impact}
+                </span>
+              </div>
+              <p className="mt-3 font-semibold text-market-ink/70">{play.trigger}</p>
+              <p className="mt-2 leading-6 text-market-ink/60">{play.action}</p>
+            </Link>
+          ))}
+        </div>
       </section>
 
       <div className="flex items-center gap-2 rounded-lg border border-market-ink/10 bg-white p-4 text-sm text-market-ink/70">

@@ -77,6 +77,20 @@ describe('Next.js web scaffold', () => {
     assert.match(marketShell, /Weekly basket tape/);
   });
 
+  it('surfaces savings playbook actions on the homepage', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+
+    const playbookSection = demoData.split('export const savingsPlaybook = ')[1] ?? '';
+    const playbookRows = playbookSection.match(/title: '[^']+'/g) ?? [];
+
+    assert.ok(playbookRows.length >= 4, 'homepage driver data should expose at least 4 savings playbook actions');
+    assert.match(demoData, /Coffee stock-up window/);
+    assert.match(demoData, /Butter caution flag/);
+    assert.match(marketShell, /savingsPlaybook\.map/);
+    assert.match(marketShell, /Savings playbook/);
+  });
+
   it('surfaces source coverage rows on the homepage', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
