@@ -385,6 +385,17 @@ describe('buildStaticPages', () => {
       assert.match(mealPlans, /Tuesday pasta bake/);
       assert.match(mealPlans, /Needs coffee promo confirmation/);
       assert.match(mealPlans, /Estimated produce prices cannot reduce the weekly meal budget/);
+      assert.match(mealPlans, /Connected meal plan API/);
+      assert.match(mealPlans, /Load live meal plan budget/);
+      assert.match(mealPlans, /data-groceryview-flow="meal-plans"/);
+      assert.match(mealPlans, /data-flow-action="load-meal-plans"/);
+      assert.match(mealPlans, /data-meal-plans-budget/);
+      assert.match(mealPlans, /data-meal-plans-basket/);
+      assert.match(mealPlans, /data-meal-plans-deals/);
+      assert.match(mealPlans, /fetch\(apiUrl\('\/api\/budget\/summary'/);
+      assert.match(mealPlans, /fetch\(apiUrl\('\/api\/basket\/compare'/);
+      assert.match(mealPlans, /fetch\(apiUrl\('\/api\/market\/overview'/);
+      assert.match(mealPlans, /Connected meal plan budget loaded/);
 
       const pantry = await readFile(join(root, 'pantry/index.html'), 'utf8');
       assert.match(pantry, /Pantry inventory/);

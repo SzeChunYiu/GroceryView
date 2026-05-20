@@ -57,6 +57,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-budget-summary-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setMealPlansMetric = (metric, message) => {
+    const target = document.querySelector('[data-meal-plans-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setSavingsLedgerMetric = (metric, message) => {
     const target = document.querySelector('[data-savings-ledger-' + metric + ']');
     if (target) target.textContent = message;
@@ -760,6 +764,43 @@ window.GroceryViewFlowActions = (() => {
       setResult('budget-summary', 'Budget summary API load failed: ' + error.message + '. Static budget forecast remains visible.');
     }
   };
+  const loadMealPlansFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('meal-plans', 'Local preview mode: connect the API session bridge and save a basket before loading live meal plan budget.');
+      return;
+    }
+    try {
+      const [budget, comparison, market] = await Promise.all([
+        requireApiSuccess(await fetch(apiUrl('/api/budget/summary', config), {
+          method: 'GET',
+          headers: apiHeaders(config)
+        })),
+        requireApiSuccess(await fetch(apiUrl('/api/basket/compare', config), {
+          method: 'POST',
+          headers: apiHeaders(config)
+        })),
+        requireApiSuccess(await fetch(apiUrl('/api/market/overview', config, false), {
+          method: 'GET',
+          headers: config.bearerToken ? apiHeaders(config) : { 'content-type': 'application/json' }
+        }))
+      ]);
+      const cheapest = comparison.cheapestByProduct || {};
+      const assignments = Array.isArray(cheapest.assignments) ? cheapest.assignments : [];
+      const missing = Array.isArray(comparison.missingProductIds) ? comparison.missingProductIds : [];
+      const splitSavings = Number(comparison.savingsVsBestSingleStore || 0);
+      const topDeals = Array.isArray(market.topDeals) ? market.topDeals : [];
+      const mealDealIds = new Set(['coffee', 'milk', 'eggs']);
+      const mealDeals = topDeals.filter((deal) => mealDealIds.has(deal.productId));
+      const bestMealDeal = mealDeals[0] || topDeals[0] || {};
+      setMealPlansMetric('budget', 'Weekly buffer after planned basket ' + formatSek(budget.weeklyRemainingAfterEstimate) + ' · next basket ' + formatSek(budget.estimatedBasketTotal) + ' · ' + (budget.weeklyStatus || 'unknown'));
+      setMealPlansMetric('basket', assignments.length + ' verified ingredient lines · split stores ' + Number(comparison.splitStoreCount || 0) + ' · saves ' + formatSek(Math.max(0, splitSavings)) + ' · missing ' + missing.length);
+      setMealPlansMetric('deals', mealDeals.length + ' meal-relevant deals · leader ' + (bestMealDeal.ticker || bestMealDeal.productId || 'n/a') + ' at ' + formatPreciseSek(bestMealDeal.bestPrice));
+      setResult('meal-plans', 'Connected meal plan budget loaded: weekly buffer ' + formatSek(budget.weeklyRemainingAfterEstimate) + ', ' + assignments.length + ' verified ingredient lines, ' + mealDeals.length + ' meal-relevant deals.');
+    } catch (error) {
+      setResult('meal-plans', 'Meal plan API load failed: ' + error.message + '. Static meal plan remains visible.');
+    }
+  };
   const loadSavingsLedgerFromApi = async () => {
     const config = getApiConfig();
     if (!hasApiSession(config)) {
@@ -1025,6 +1066,10 @@ window.GroceryViewFlowActions = (() => {
         await loadBudgetSummaryFromApi();
         return;
       }
+      if (flow === 'meal-plans' && action === 'load-meal-plans') {
+        await loadMealPlansFromApi();
+        return;
+      }
       if (flow === 'savings-ledger' && action === 'load-savings-ledger') {
         await loadSavingsLedgerFromApi();
         return;
@@ -1188,6 +1233,9 @@ const dailyDealsLivePanel = `
 const budgetSummaryLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="budget-summary" style="margin-top:16px"><div class="eyebrow">Connected budget API</div><h2>Pull live household budget summary</h2><p class="lede">Fetch <code>/api/budget/summary</code> through the protected API session bridge to refresh weekly budget, month-to-date spend, next-basket estimate, remaining buffers, and over/under status from account data.</p><div class="grid" aria-label="Live budget summary API metrics"><div class="metric"><strong data-budget-summary-weekly>Waiting for API pull</strong><span>weekly budget status</span></div><div class="metric"><strong data-budget-summary-monthly>Static monthly preview</strong><span>monthly budget status</span></div><div class="metric"><strong data-budget-summary-estimate>Static basket estimate preview</strong><span>next basket buffer</span></div></div><div class="flow-panel" aria-label="Connected budget summary actions"><button type="button" data-flow-action="load-budget-summary">Load live budget summary</button></div><p class="flow-result" data-flow-result="budget-summary" aria-live="polite">Local preview mode: connect the API session bridge before loading live budget summary.</p></section>`;
 
+const mealPlansLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="meal-plans" style="margin-top:16px"><div class="eyebrow">Connected meal plan API</div><h2>Pull live meal plan budget</h2><p class="lede">Fetch protected <code>/api/budget/summary</code> and <code>/api/basket/compare</code> plus public <code>/api/market/overview</code> to refresh weekly meal budget buffer, verified ingredient coverage, split-store savings, missing-product blockers, and meal-relevant deal signals from live API data.</p><div class="grid" aria-label="Live meal plan API metrics"><div class="metric"><strong data-meal-plans-budget>Waiting for API pull</strong><span>weekly budget buffer and next basket</span></div><div class="metric"><strong data-meal-plans-basket>Static ingredient coverage preview</strong><span>verified ingredient lines and blockers</span></div><div class="metric"><strong data-meal-plans-deals>Static meal deal preview</strong><span>meal-relevant deal signals</span></div></div><div class="flow-panel" aria-label="Connected meal plan actions"><button type="button" data-flow-action="load-meal-plans">Load live meal plan budget</button></div><p class="flow-result" data-flow-result="meal-plans" aria-live="polite">Local preview mode: connect the API session bridge and save a basket before loading live meal plan budget.</p></section>`;
+
 const savingsLedgerLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="savings-ledger" style="margin-top:16px"><div class="eyebrow">Connected savings ledger API</div><h2>Pull live savings ledger</h2><p class="lede">Fetch protected <code>/api/budget/summary</code> and <code>/api/basket/compare</code> to reconcile budget remaining, next-basket estimate, split-basket forecast savings, verified assignment lines, and missing-product blockers before savings are treated as realized.</p><div class="grid" aria-label="Live savings ledger API metrics"><div class="metric"><strong data-savings-ledger-confirmed>Waiting for API pull</strong><span>budget actuals</span></div><div class="metric"><strong data-savings-ledger-forecast>Static forecast preview</strong><span>forecast savings and next basket</span></div><div class="metric"><strong data-savings-ledger-blockers>Static blocker preview</strong><span>assignment evidence and blockers</span></div></div><div class="flow-panel" aria-label="Connected savings ledger actions"><button type="button" data-flow-action="load-savings-ledger">Load live savings ledger</button></div><p class="flow-result" data-flow-result="savings-ledger" aria-live="polite">Local preview mode: connect the API session bridge and save a basket before loading live savings ledger.</p></section>`;
 
@@ -1241,7 +1289,7 @@ const pages = [
     path: 'meal-plans/index.html',
     title: 'Meal plan builder — GroceryView',
     description: 'Plan GroceryView weekly meals from verified basket prices, household dietary constraints, prep windows, and budget guardrails.',
-    body: `<section class="card"><div class="eyebrow">Meal planning</div><h1>Meal plan builder</h1><p class="lede">Turn a weekly grocery basket into planned meals while preserving verified-price budgets, household diet rules, and prep constraints.</p><div class="grid"><div class="metric"><strong>4</strong><span>planned dinners</span></div><div class="metric"><strong>684 SEK</strong><span>verified ingredient spend</span></div><div class="metric"><strong>116 SEK</strong><span>budget buffer</span></div></div></section><section class="card" style="margin-top:16px"><h2>Weekly meal plan</h2><table class="table"><thead><tr><th>Meal</th><th>Key basket items</th><th>Cost</th><th>Household fit</th><th>Status</th></tr></thead><tbody><tr><td>Tuesday pasta bake</td><td>Tomatoes, milk, private-label cheese</td><td>142 SEK</td><td>Vegetarian</td><td>Ready</td></tr><tr><td>Thursday egg bowls</td><td>Eggs, rice, frozen vegetables</td><td>118 SEK</td><td>School lunch staples</td><td>Ready</td></tr><tr><td>Saturday coffee brunch</td><td>Zoégas Coffee 450g, eggs, bread</td><td>176 SEK</td><td>Favorite-store pickup</td><td>Needs coffee promo confirmation</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Planning guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Verified ingredient costs</td><td>Estimated produce prices cannot reduce the weekly meal budget.</td></tr><tr><td>Diet rules first</td><td>Household restrictions block incompatible recipe swaps before savings are considered.</td></tr><tr><td>Prep window</td><td>Meals requiring long prep stay out of weekday recommendations.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Meal planning</div><h1>Meal plan builder</h1><p class="lede">Turn a weekly grocery basket into planned meals while preserving verified-price budgets, household diet rules, and prep constraints.</p><div class="grid"><div class="metric"><strong>4</strong><span>planned dinners</span></div><div class="metric"><strong>684 SEK</strong><span>verified ingredient spend</span></div><div class="metric"><strong>116 SEK</strong><span>budget buffer</span></div></div></section><section class="card" style="margin-top:16px"><h2>Weekly meal plan</h2><table class="table"><thead><tr><th>Meal</th><th>Key basket items</th><th>Cost</th><th>Household fit</th><th>Status</th></tr></thead><tbody><tr><td>Tuesday pasta bake</td><td>Tomatoes, milk, private-label cheese</td><td>142 SEK</td><td>Vegetarian</td><td>Ready</td></tr><tr><td>Thursday egg bowls</td><td>Eggs, rice, frozen vegetables</td><td>118 SEK</td><td>School lunch staples</td><td>Ready</td></tr><tr><td>Saturday coffee brunch</td><td>Zoégas Coffee 450g, eggs, bread</td><td>176 SEK</td><td>Favorite-store pickup</td><td>Needs coffee promo confirmation</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Planning guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Verified ingredient costs</td><td>Estimated produce prices cannot reduce the weekly meal budget.</td></tr><tr><td>Diet rules first</td><td>Household restrictions block incompatible recipe swaps before savings are considered.</td></tr><tr><td>Prep window</td><td>Meals requiring long prep stay out of weekday recommendations.</td></tr></tbody></table></section>${mealPlansLivePanel}`
   },
   {
     path: 'pantry/index.html',
