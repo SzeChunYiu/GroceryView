@@ -1,4 +1,15 @@
-import { buildWatchlistAlerts, calculateDealScore, calculateFixedBasketIndex, compareBasketStrategies, scoreBand, searchProducts, suggestDealBasedMeals, summarizeBudget } from '@groceryview/core';
+import {
+  applyHumanReviewDecision,
+  buildWatchlistAlerts,
+  calculateDealScore,
+  calculateFixedBasketIndex,
+  compareBasketStrategies,
+  scoreBand,
+  searchProducts,
+  suggestDealBasedMeals,
+  summarizeBudget,
+  summarizeHumanReviewSla
+} from '@groceryview/core';
 
 type ProductRow = {
   ticker: string;
@@ -293,6 +304,12 @@ const index = calculateFixedBasketIndex({
     { productId: 'private-label', baseUnitPrice: 100, currentUnitPrice: 94.2, weight: 1 }
   ]
 });
+
+const categorySignals = [
+  { category: 'Coffee', product: 'Zoégas Coffee 450g', store: 'Willys Odenplan', price: '49.90 SEK', signal: '12th historical percentile' },
+  { category: 'Dairy', product: 'Arla Milk 1L', store: 'Lidl Sveavägen', price: '13.90 SEK', signal: 'Best favorite-store line' },
+  { category: 'Eggs', product: 'Eggs 12-pack', store: 'Lidl Sveavägen', price: '34.90 SEK', signal: 'Private-label swap candidate' }
+];
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Missing #app root');
