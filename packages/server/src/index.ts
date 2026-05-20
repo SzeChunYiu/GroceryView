@@ -7,11 +7,15 @@ import { createGroceryViewApi, type CategoryBudgetPatch, type HouseholdPlanReque
 import { createSessionToken, parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
 import {
   checkPostgresIntegrationReadiness,
+  checkSourceRunHealth,
   createPgQueryExecutor,
   createPostgresRepository,
+  createPostgresSourceRecordReader,
   type PgLikeClient,
   type PostgresIntegrationReadinessReport,
-  type QueryExecutor
+  type QueryExecutor,
+  type SourceRunHealthCheckResult,
+  type SourceRunHealthReport
 } from '@groceryview/db';
 import {
   buildSubscriptionAccessPolicy,
@@ -86,6 +90,7 @@ export type AuthOptions = {
   notificationMetricsToken?: string;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
+  sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   scanProviders?: ScanProviders;
   scanUploadStorage?: ScanUploadStorage;
 };
@@ -134,6 +139,7 @@ export type RuntimeHandlerOptions = {
   repository?: RuntimePersistenceRepository;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
+  sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   pgPoolFactory?: RuntimePgPoolFactory;
 };
 
@@ -510,6 +516,40 @@ function postgresReadinessResponse(report: PostgresIntegrationReadinessReport): 
   };
 }
 
+function sourceRunHealthFailureResponse(): SourceRunHealthCheckResult {
+  const report: SourceRunHealthReport = {
+    status: 'blocked',
+    blockers: ['source_run_health_probe_failed'],
+    evidence: [],
+    runningRunIds: [],
+    staleRunIds: []
+  };
+  return {
+    report,
+    summary: {
+      status: report.status,
+      blockers: {
+        total: 1,
+        failed: 0,
+        partial: 0,
+        stale: 0,
+        stuckRunning: 0,
+        missingFinishedAt: 0,
+        startedInFuture: 0,
+        finishedInFuture: 0
+      },
+      evidence: {
+        total: 0,
+        succeeded: 0
+      },
+      running: 0,
+      stale: 0
+    },
+    runCount: 0,
+    filter: { limit: 0 }
+  };
+}
+
 const sensitiveBillingEventFields = new Set([
   'cardnumber',
   'card',
@@ -762,6 +802,21 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
             }),
             { status: 503 }
           );
+        }
+      }
+
+      if (method === 'GET' && path === '/api/readiness/source-runs') {
+        if (!authOptions.notificationMetricsToken) return errorResponse(503, 'Source run readiness token is not configured.');
+        if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
+          return errorResponse(401, 'A valid source run readiness token is required.');
+        }
+        if (!authOptions.sourceRunHealthProvider) return errorResponse(503, 'Source run health provider is not configured.');
+
+        try {
+          const result = await authOptions.sourceRunHealthProvider();
+          return jsonResponse(result, { status: result.report.status === 'healthy' ? 200 : 503 });
+        } catch {
+          return jsonResponse(sourceRunHealthFailureResponse(), { status: 503 });
         }
       }
 
@@ -1378,6 +1433,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/human-review/assignments/{id}/decisions': { post: protectedOperation('Record a human-review decision.') },
       '/api/metrics/notifications': { get: metricsOperation('Export notification operations metrics.') },
       '/api/readiness/postgres': { get: metricsOperation('Check PostgreSQL schema and migration readiness without exposing database secrets.') },
+      '/api/readiness/source-runs': { get: metricsOperation('Check source run freshness and terminal status without exposing source secrets.') },
       '/api/notifications/suppression-events': { post: webhookOperation('Accept signed normalized notification suppression events.') },
       '/api/notifications/provider-suppression-events': { post: webhookOperation('Accept signed SendGrid, SES, or Expo suppression payloads.') }
     }
@@ -1443,7 +1499,8 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     billingWebhookSecret: config.billingWebhookSecret,
     notificationMetricsToken: config.metricsToken,
     notificationMetricsProvider: options.notificationMetricsProvider,
-    postgresReadinessProvider: options.postgresReadinessProvider
+    postgresReadinessProvider: options.postgresReadinessProvider,
+    sourceRunHealthProvider: options.sourceRunHealthProvider
   };
 }
 
@@ -1488,15 +1545,25 @@ export function buildRuntimeRequestAuthOptions(config: RuntimeConfig, options: R
 function createRuntimeRepositoryResource(config: RuntimeConfig, options: RuntimeHandlerOptions): {
   repository?: RuntimePersistenceRepository;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
+  sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   close(): Promise<void>;
 } {
   if (options.repository || !config.databaseUrl) return { close: noopClose };
 
   const pool = (options.pgPoolFactory ?? createDefaultPgPool)(config.databaseUrl);
   const executor: QueryExecutor = createPgQueryExecutor(pool);
+  const sourceRecordReader = createPostgresSourceRecordReader(executor);
   return {
     repository: createPostgresRepository(executor),
     postgresReadinessProvider: () => checkPostgresIntegrationReadiness({ executor, repositoryProbes: [] }),
+    sourceRunHealthProvider: () =>
+      checkSourceRunHealth({
+        reader: sourceRecordReader,
+        now: new Date().toISOString(),
+        maxRunningMinutes: 120,
+        staleAfterMinutes: 24 * 60,
+        filter: { limit: 100 }
+      }),
     async close() {
       await pool.end();
     }
@@ -1508,7 +1575,8 @@ function createRuntimeHttpServiceFromConfig(config: RuntimeConfig, options: Runt
   const runtimeOptions: RuntimeHandlerOptions = {
     ...options,
     ...(resource.repository ? { repository: resource.repository } : {}),
-    postgresReadinessProvider: options.postgresReadinessProvider ?? resource.postgresReadinessProvider
+    postgresReadinessProvider: options.postgresReadinessProvider ?? resource.postgresReadinessProvider,
+    sourceRunHealthProvider: options.sourceRunHealthProvider ?? resource.sourceRunHealthProvider
   };
   const authOptions = buildRuntimeRequestAuthOptions(config, runtimeOptions);
   return {
