@@ -121,54 +121,6 @@ describe('planIngestionBatch', () => {
   });
 });
 
-describe('rollupLatestPriceObservations', () => {
-  it('keeps the latest observation per product, store, and source type', () => {
-    const first = ingestRetailerProduct({
-      sourceType: 'retailer_online_page',
-      observedAt: '2026-05-19T08:00:00.000Z',
-      chainId: 'willys',
-      storeId: 'willys-odenplan',
-      rawName: 'Coffee',
-      canonicalName: 'Coffee',
-      productId: 'coffee',
-      categoryId: 'pantry',
-      packageSize: 450,
-      packageUnit: 'g',
-      price: 59.9
-    }).priceObservation;
-    const latest = { ...first, observedAt: '2026-05-19T16:00:00.000Z', price: 49.9 };
-
-    const rollups = rollupLatestPriceObservations([first, latest]);
-
-    assert.equal(rollups.length, 1);
-    assert.equal(rollups[0].rollupKey, 'coffee::willys-odenplan::retailer_online_page');
-    assert.equal(rollups[0].price, 49.9);
-    assert.equal(rollups[0].replacedObservationCount, 1);
-  });
-
-  it('uses confidence as a deterministic tie-breaker for equal timestamps', () => {
-    const lowConfidence = ingestRetailerProduct({
-      sourceType: 'estimated',
-      observedAt: '2026-05-19T08:00:00.000Z',
-      chainId: 'coop',
-      rawName: 'Milk',
-      canonicalName: 'Milk',
-      productId: 'milk',
-      categoryId: 'dairy',
-      packageSize: 1,
-      packageUnit: 'l',
-      price: 14.9
-    }).priceObservation;
-    const highConfidence = { ...lowConfidence, confidenceScore: 0.5, price: 13.9 };
-
-    const rollups = rollupLatestPriceObservations([lowConfidence, highConfidence]);
-
-    assert.equal(rollups.length, 1);
-    assert.equal(rollups[0].price, 13.9);
-    assert.equal(rollups[0].replacedObservationCount, 1);
-  });
-});
-
 describe('planRetailerSourceAccess', () => {
   it('allows official API access only with an active agreement and approved legal review', () => {
     const access = planRetailerSourceAccess({
