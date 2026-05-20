@@ -329,6 +329,7 @@ def test_open_prices_schedule_health_plan_blocks_until_worker_schedules_are_obse
     assert plan.required_actions == [
         "configure_dagster_deployment_url",
         "enable_open_prices_import_readiness_schedule",
+        "configure_open_prices_schedule_health_max_age",
         "publish_open_prices_schedule_health_probe",
     ]
     assert plan.evidence_fields == [
@@ -346,6 +347,7 @@ def test_open_prices_schedule_health_plan_blocks_until_worker_schedules_are_obse
         dagster_deployment_url_present=True,
         ingestion_schedule_enabled=True,
         import_readiness_schedule_enabled=True,
+        schedule_health_max_age_configured=True,
         schedule_health_probe_configured=True,
     )
     assert ready.status == "ready"
@@ -357,7 +359,7 @@ def test_open_prices_schedule_health_plan_summary_counts_schedule_requirements()
 
     assert summarize_open_prices_schedule_health_plan(blocked).to_dict() == {
         "status": "blocked",
-        "required_action_count": 3,
+        "required_action_count": 4,
         "required_env_count": 4,
         "source_asset_count": 2,
         "schedule_count": 2,
@@ -370,6 +372,7 @@ def test_open_prices_schedule_health_plan_summary_counts_schedule_requirements()
         dagster_deployment_url_present=True,
         ingestion_schedule_enabled=True,
         import_readiness_schedule_enabled=True,
+        schedule_health_max_age_configured=True,
         schedule_health_probe_configured=True,
     )
     assert summarize_open_prices_schedule_health_plan(ready).required_action_count == 0
@@ -413,12 +416,14 @@ def test_open_prices_launch_readiness_rolls_up_all_open_prices_plans() -> None:
             "configure_dagster_deployment_url",
             "enable_open_prices_ingestion_schedule",
             "enable_open_prices_import_readiness_schedule",
+            "configure_open_prices_schedule_health_max_age",
             "publish_open_prices_schedule_health_probe",
         ],
     }
     assert summary.next_actions == [
         "build_groceryview_db_package",
         "configure_dagster_deployment_url",
+        "configure_open_prices_schedule_health_max_age",
         "configure_raw_snapshot_storage",
         "enable_open_prices_import_readiness_schedule",
         "enable_open_prices_ingestion_schedule",
@@ -462,6 +467,7 @@ def test_open_prices_launch_readiness_rolls_up_all_open_prices_plans() -> None:
             dagster_deployment_url_present=True,
             ingestion_schedule_enabled=True,
             import_readiness_schedule_enabled=True,
+            schedule_health_max_age_configured=True,
             schedule_health_probe_configured=True,
         ),
     )
@@ -484,12 +490,12 @@ def test_open_prices_launch_readiness_digest_counts_operator_signals() -> None:
         "checked_plan_count": 5,
         "ready_plan_count": 1,
         "blocked_plan_count": 4,
-        "next_action_count": 11,
+        "next_action_count": 12,
         "evidence_field_count": 28,
         "evidence_artifact_count": 4,
         "hosted_smoke_blocker_count": 3,
         "persistence_blocker_count": 5,
-        "schedule_health_blocker_count": 4,
+        "schedule_health_blocker_count": 5,
         "demo": False,
     }
 
@@ -515,6 +521,7 @@ def test_open_prices_launch_readiness_digest_counts_operator_signals() -> None:
             dagster_deployment_url_present=True,
             ingestion_schedule_enabled=True,
             import_readiness_schedule_enabled=True,
+            schedule_health_max_age_configured=True,
             schedule_health_probe_configured=True,
         ),
     )
@@ -741,6 +748,7 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
         dagster_deployment_url_present=True,
         ingestion_schedule_enabled=True,
         import_readiness_schedule_enabled=True,
+        schedule_health_max_age_configured=True,
         schedule_health_probe_configured=True,
     )
     ready_gate = build_data_pipeline_quality_gate(
@@ -812,6 +820,7 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
         dagster_deployment_url_present=True,
         ingestion_schedule_enabled=True,
         import_readiness_schedule_enabled=True,
+        schedule_health_max_age_configured=True,
     )
     blocked_schedule_gate = build_data_pipeline_quality_gate(
         quality,
@@ -878,6 +887,7 @@ def test_data_pipeline_quality_gate_digest_counts_blocker_classes() -> None:
             dagster_deployment_url_present=True,
             ingestion_schedule_enabled=True,
             import_readiness_schedule_enabled=True,
+            schedule_health_max_age_configured=True,
         ),
     )
     schedule_digest = summarize_data_pipeline_quality_gate(schedule_gate)
