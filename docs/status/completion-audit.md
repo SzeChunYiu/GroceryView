@@ -14,6 +14,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Product proposal source | `PROPOSAL.md` | Present |
 | MVP web dashboard | PR #1, `apps/web` | Foundation shipped |
 | Core Deal Score, basket comparison, indices | PR #1, `packages/core` tests | Foundation shipped |
+| Deal Score report API | PR #316, `createGroceryViewApi().getDealScore()`, `/api/products/{id}/deal-score`, and server/OpenAPI tests expose the score, band, median discount, historical percentile, confidence, and customer-facing reasons | Shipped after merge |
 | Watchlist, alerts, budget summaries | PR #2, PR #11 | Foundation shipped |
 | API foundation | PR #3, `packages/api` | Foundation shipped |
 | API mutable route input validation | PR #132, `packages/api` route validation tests | Shipped after merge |

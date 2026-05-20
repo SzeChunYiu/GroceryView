@@ -29,6 +29,7 @@ describe('buildOpenApiDocument', () => {
       '/api/privacy/export',
       '/api/products/search',
       '/api/products/{id}',
+      '/api/products/{id}/deal-score',
       '/api/products/{id}/history',
       '/api/products/{id}/prices',
       '/api/readiness/postgres',

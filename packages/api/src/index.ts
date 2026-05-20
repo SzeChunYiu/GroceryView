@@ -42,6 +42,24 @@ export type ProductDetail = SearchableProduct & {
   verdict: string;
   unitPrice: string;
   history: Array<{ date: string; price: number; verified: boolean }>;
+  dealSignals: {
+    currentCityPercentile: number;
+    knownPromoHistoryPercentile: number;
+    equivalentUnitPricePercentile: number;
+    discountDepthPercent: number;
+    sourceConfidence: number;
+  };
+};
+
+export type DealScoreReport = {
+  productId: string;
+  score: number;
+  band: ReturnType<typeof scoreBand>;
+  verdict: ReturnType<typeof scoreBand>['verdict'];
+  discountVsMedianPercent: number;
+  historicalPercentile: number;
+  confidence: number;
+  reasons: string[];
 };
 
 export type StoreDeal = {
@@ -113,6 +131,7 @@ const products: ProductDetail[] = [
     dealScore: calculateDealScore({ currentCityPercentile: 8, knownPromoHistoryPercentile: 12, equivalentUnitPricePercentile: 18, discountDepthPercent: 25, sourceConfidence: 0.9 }),
     verdict: 'Buy',
     unitPrice: '110.89 SEK/kg',
+    dealSignals: { currentCityPercentile: 8, knownPromoHistoryPercentile: 12, equivalentUnitPricePercentile: 18, discountDepthPercent: 25, sourceConfidence: 0.9 },
     history: [
       { date: '2026-04-01', price: 69.9, verified: true },
       { date: '2026-05-01', price: 59.9, verified: true },
@@ -133,6 +152,7 @@ const products: ProductDetail[] = [
     dealScore: calculateDealScore({ currentCityPercentile: 18, knownPromoHistoryPercentile: 12, equivalentUnitPricePercentile: 35, discountDepthPercent: 8, sourceConfidence: 0.86 }),
     verdict: 'Buy',
     unitPrice: '14.90 SEK/l',
+    dealSignals: { currentCityPercentile: 18, knownPromoHistoryPercentile: 12, equivalentUnitPricePercentile: 35, discountDepthPercent: 8, sourceConfidence: 0.86 },
     history: [
       { date: '2026-04-01', price: 16.9, verified: true },
       { date: '2026-05-19', price: 14.9, verified: true }
@@ -153,6 +173,7 @@ const products: ProductDetail[] = [
     dealScore: calculateDealScore({ currentCityPercentile: 58, knownPromoHistoryPercentile: 61, equivalentUnitPricePercentile: 52, discountDepthPercent: 2, sourceConfidence: 0.72 }),
     verdict: 'Wait',
     unitPrice: '91.50 SEK/kg',
+    dealSignals: { currentCityPercentile: 58, knownPromoHistoryPercentile: 61, equivalentUnitPricePercentile: 52, discountDepthPercent: 2, sourceConfidence: 0.72 },
     history: [
       { date: '2026-04-01', price: 52.9, verified: true },
       { date: '2026-05-19', price: 54.9, verified: true }
@@ -279,6 +300,30 @@ function sortPricesByValue(prices: StorePrice[]) {
 
 function bestPriceFor(product: ProductDetail) {
   return sortPricesByValue(product.currentPrices)[0] ?? null;
+}
+
+function medianPrice(prices: StorePrice[]): number | null {
+  if (prices.length === 0) return null;
+  const sorted = sortPricesByValue(prices).map((price) => price.price);
+  const middle = Math.floor(sorted.length / 2);
+  if (sorted.length % 2 === 1) return sorted[middle]!;
+  return (sorted[middle - 1]! + sorted[middle]!) / 2;
+}
+
+function roundPercent(value: number): number {
+  return Math.round((value + Number.EPSILON) * 10) / 10;
+}
+
+function buildDealScoreReasons(product: ProductDetail, bestPrice: StorePrice | null, band: ReturnType<typeof scoreBand>): string[] {
+  const reasons = [
+    `${product.name} is in the ${product.dealSignals.currentCityPercentile}th city price percentile.`,
+    `Historical promo percentile is ${product.dealSignals.knownPromoHistoryPercentile}.`,
+    `Equivalent unit-price percentile is ${product.dealSignals.equivalentUnitPricePercentile}.`,
+    `Source confidence is ${Math.round(product.dealSignals.sourceConfidence * 100)}%.`,
+    `Default verdict is ${band.verdict}.`
+  ];
+  if (bestPrice) reasons.unshift(`Best current quote is ${bestPrice.price.toFixed(2)} SEK at ${bestPrice.storeName}.`);
+  return reasons;
 }
 
 function cheapestPriceByProductId(productIds: string[]): Record<string, number> {
@@ -445,6 +490,29 @@ export function createGroceryViewApi() {
 
     getProductHistory(id: string) {
       return this.getProduct(id)?.history ?? [];
+    },
+
+    getDealScore(productId: string, options: { distanceKm?: number } = {}): DealScoreReport | null {
+      const product = this.getProduct(productId);
+      if (!product) return null;
+      void options.distanceKm;
+
+      const bestPrice = bestPriceFor(product);
+      const median = medianPrice(product.currentPrices);
+      const band = scoreBand(product.dealScore);
+      const discountVsMedianPercent =
+        bestPrice && median && median > 0 ? roundPercent(((median - bestPrice.price) / median) * 100) : 0;
+
+      return {
+        productId: product.id,
+        score: product.dealScore,
+        band,
+        verdict: band.verdict,
+        discountVsMedianPercent,
+        historicalPercentile: product.dealSignals.knownPromoHistoryPercentile,
+        confidence: product.dealSignals.sourceConfidence,
+        reasons: buildDealScoreReasons(product, bestPrice, band)
+      };
     },
 
     addFavoriteStore(userId: string, storeId: string) {
