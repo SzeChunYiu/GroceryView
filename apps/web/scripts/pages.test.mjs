@@ -101,6 +101,17 @@ describe('buildStaticPages', () => {
       assert.match(styles, /\.status\.verified/);
       assert.match(styles, /\.flow-panel/);
 
+      const basket = await readFile(join(root, 'basket/index.html'), 'utf8');
+      assert.match(basket, /Favorite-store comparison/);
+      assert.match(basket, /Cheapest by product across selected stores/);
+      assert.match(basket, /Distance is informational only and never reduces the ranked savings/);
+      assert.match(basket, /Zoegas Coffee 450g/);
+      assert.match(basket, /Basket lines/);
+      assert.match(basket, /Lidl Sveavägen/);
+      assert.match(basket, /14\.00 SEK/);
+      assert.match(basket, /Smart swaps/);
+      assert.match(basket, /Lower confidence, needs confirmation/);
+
       const market = await readFile(join(root, 'market/index.html'), 'utf8');
       assert.match(market, /Stockholm Grocery Market/);
       assert.match(market, /Coffee Index/);
