@@ -123,6 +123,13 @@ describe('buildStaticPages', () => {
       assert.match(retailerFreshness, /Pause new alerts/);
       assert.match(retailerFreshness, /Stale retailer-page rows cannot trigger household notifications/);
 
+      const shoppingRoute = await readFile(join(root, 'routes/shopping/index.html'), 'utf8');
+      assert.match(shoppingRoute, /Shopping route planner/);
+      assert.match(shoppingRoute, /Ordered stops/);
+      assert.match(shoppingRoute, /Lidl Sveavägen/);
+      assert.match(shoppingRoute, /Route time can reorder stops but cannot change product deal ranking/);
+      assert.match(shoppingRoute, /Unverified prices cannot justify an extra route stop/);
+
       const priceConfidence = await readFile(join(root, 'prices/confidence/index.html'), 'utf8');
       assert.match(priceConfidence, /Price confidence guide/);
       assert.match(priceConfidence, /Confidence labels/);
@@ -136,6 +143,13 @@ describe('buildStaticPages', () => {
       assert.match(deals, /Deal Score/);
       assert.match(deals, /Ads excluded from ranking/);
       assert.match(deals, /Estimated rows held back/);
+
+      const savingsLedger = await readFile(join(root, 'savings/ledger/index.html'), 'utf8');
+      assert.match(savingsLedger, /Savings ledger/);
+      assert.match(savingsLedger, /Ledger entries/);
+      assert.match(savingsLedger, /Willys coffee promo/);
+      assert.match(savingsLedger, /Only verified receipts can move forecast savings into realized savings/);
+      assert.match(savingsLedger, /Low-confidence prices cannot increase savings totals/);
 
       const smartSwapsPage = await readFile(join(root, 'savings/smart-swaps/index.html'), 'utf8');
       assert.match(smartSwapsPage, /Smart grocery swaps/);
