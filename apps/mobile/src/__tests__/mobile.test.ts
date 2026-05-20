@@ -2,7 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createGroceryViewApi } from '@groceryview/api';
-import { buildExpoReadinessPlan, buildMobileProviderReadinessReport, buildMobileScreenBlueprints, buildMobileShell, buildScanResult, createMobileDiscoveryViewModel, createMobileViewModel } from '../index.js';
+import { buildExpoReadinessPlan, buildMobileProviderReadinessReport, buildMobileScreenBlueprints, buildMobileShell, buildScanResult, createMobileDiscoveryViewModel, createMobileViewModel, loadMobileProductTerminal } from '../index.js';
 
 describe('mobile app foundation', () => {
   it('defines the proposal bottom navigation and Today dashboard modules', () => {
@@ -55,6 +55,46 @@ describe('mobile app foundation', () => {
     assert.equal(viewModel.budget.weeklyRemainingAfterEstimate, 72.3);
     assert.equal(viewModel.budget.weeklyStatus, 'under');
     assert.deepEqual(viewModel.watchlist.alertTypes, ['deal_score', 'new_52_week_low', 'target_price']);
+  });
+
+  it('loads connected product terminal numbers from the public API route for mobile product detail', async () => {
+    const api = createGroceryViewApi();
+    const terminal = api.getProductPriceTerminal('coffee');
+    assert.ok(terminal);
+    const requestedUrls: string[] = [];
+
+    const summary = await loadMobileProductTerminal({
+      apiBase: 'https://api.groceryview.example',
+      productId: 'coffee',
+      asOf: '2026-05-19T00:00:00.000Z',
+      bearerToken: 'session-token',
+      fetcher: async (url, init) => {
+        requestedUrls.push(String(url));
+        assert.equal(init?.method, 'GET');
+        assert.deepEqual(init?.headers, { authorization: 'Bearer session-token' });
+        return new Response(JSON.stringify(terminal), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.deepEqual(requestedUrls, ['https://api.groceryview.example/api/products/coffee/terminal?asOf=2026-05-19T00%3A00%3A00.000Z']);
+    assert.equal(summary.quote.bestPrice, 49.9);
+    assert.equal(summary.distributionSummaries[0].currentPercentile, 8);
+    assert.equal(summary.chartSummary.historyPointCount, 3);
+    assert.equal(summary.chartSummary.isNewLow, true);
+    assert.match(summary.guardrails.join(' '), /Verified shelf/);
+  });
+
+  it('fails closed for missing mobile terminal API configuration or route errors', async () => {
+    await assert.rejects(() => loadMobileProductTerminal({ apiBase: ' ', productId: 'coffee' }), /apiBase is required/);
+    await assert.rejects(() => loadMobileProductTerminal({ apiBase: 'https://api.groceryview.example', productId: ' ' }), /productId is required/);
+    await assert.rejects(
+      () => loadMobileProductTerminal({
+        apiBase: 'https://api.groceryview.example',
+        productId: 'missing-product',
+        fetcher: async () => new Response(JSON.stringify({ error: 'Product not found.' }), { status: 404 })
+      }),
+      /Product not found/
+    );
   });
 
   it('builds barcode scan results with deal score, equivalent products, and actions', () => {
