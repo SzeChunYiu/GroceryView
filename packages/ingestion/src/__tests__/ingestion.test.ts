@@ -4,12 +4,15 @@ import {
   confidenceForSource,
   fetchRetailerConnectorSnapshot,
   ingestRetailerProduct,
+  locatorFixturesCanAffectDealScore,
   normalizeUnitPrice,
   parseRetailerProductJsonSnapshot,
   planIngestionBatch,
   planRetailerConnectorRun,
   planRetailerSourceAccess,
-  runRetailerConnector
+  runRetailerConnector,
+  stockholmStoreLocatorFixtures,
+  validateStoreLocatorFixtures
 } from '../index.js';
 
 describe('confidenceForSource', () => {
@@ -151,6 +154,43 @@ describe('planRetailerSourceAccess', () => {
       reason: 'Retailer page ingestion requires robots.txt allow and approved legal review.',
       requiredActions: ['robots_txt_allow_required', 'legal_review_approval_required']
     });
+  });
+});
+
+describe('store locator fixtures', () => {
+  it('covers every target Stockholm chain with immutable raw snapshot provenance', () => {
+    const validation = validateStoreLocatorFixtures(stockholmStoreLocatorFixtures);
+
+    assert.deepEqual(validation, {
+      status: 'valid',
+      chainIds: ['city_gross', 'coop', 'hemkop', 'ica', 'lidl', 'willys'],
+      issues: []
+    });
+    assert.equal(stockholmStoreLocatorFixtures.length, 6);
+    for (const fixture of stockholmStoreLocatorFixtures) {
+      assert.match(fixture.sourceUrl, /^https:\/\//);
+      assert.match(fixture.rawSnapshotRef, /^fixtures\/store-locators\//);
+      assert.match(fixture.contentDigest, /^sha256:/);
+      assert.equal(Number.isNaN(Date.parse(fixture.capturedAt)), false);
+    }
+  });
+
+  it('makes unresolved identifiers, missing hours, and special-hour gaps explicit', () => {
+    const unresolved = stockholmStoreLocatorFixtures.filter((fixture) => fixture.storeIdentifierStatus !== 'resolved');
+
+    assert.ok(unresolved.length > 0);
+    for (const fixture of unresolved) {
+      assert.ok(fixture.confidenceReasons.includes('identifier_unresolved'));
+    }
+    for (const fixture of stockholmStoreLocatorFixtures.filter((fixture) => fixture.openingHours.length === 0)) {
+      assert.ok(fixture.confidenceReasons.includes('hours_missing'));
+      assert.ok(fixture.confidenceReasons.includes('special_hours_unknown'));
+      assert.equal(fixture.specialHoursUnknown, true);
+    }
+  });
+
+  it('keeps locator coverage out of default Deal Score ranking', () => {
+    assert.equal(locatorFixturesCanAffectDealScore(), false);
   });
 });
 
