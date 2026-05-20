@@ -198,328 +198,71 @@ export function planRetailerSourceAccess(input: RetailerSourceAccessInput): Reta
       };
 }
 
-export function buildRetailerConnectorReadinessReport(input: RetailerConnectorReadinessInput): RetailerConnectorReadinessReport {
-  const blockers: string[] = [];
-  const evidence: string[] = [];
-  const connectorsByChain = new Map(input.connectors.map((connector) => [connector.chainId, connector]));
+export type RetailerConnectorKind = 'official_api' | 'retailer_online_page' | 'flyer_campaign';
 
-  for (const chainId of input.requiredChains) {
-    const connector = connectorsByChain.get(chainId);
-    if (!connector) {
-      blockers.push(`retailer_connector_missing:${chainId}`);
-      continue;
-    }
+export type RetailerConnectorPlanInput = RetailerSourceAccessInput & {
+  connectorId: string;
+  requestedAt: string;
+  endpointUrl?: string;
+  parserVersion: string;
+  previousRunKeys?: string[];
+};
 
-    if (!connector.configured) blockers.push(`retailer_connector_not_configured:${chainId}`);
-    else evidence.push(`retailer_connector_configured:${chainId}:${connector.sourceType}`);
-
-    if (!connector.credentialsPresent) blockers.push(`retailer_connector_credentials_missing:${chainId}`);
-    else evidence.push(`retailer_connector_credentials_present:${chainId}`);
-
-    if (connector.healthStatus === 'pass') evidence.push(`retailer_connector_health_pass:${chainId}`);
-    else if (connector.healthStatus === 'fail') blockers.push(`retailer_connector_health_failed:${chainId}`);
-    else blockers.push(`retailer_connector_health_not_run:${chainId}`);
-
-    const access = planRetailerSourceAccess(connector);
-    if (access.status === 'allowed') {
-      evidence.push(`retailer_source_access_allowed:${chainId}:${connector.sourceType}`);
-    } else {
-      blockers.push(...access.requiredActions.map((action) => `retailer_source_access_blocked:${chainId}:${action}`));
-    }
-  }
-
-  return {
-    status: blockers.length === 0 ? 'ready' : 'blocked',
-    blockers,
-    evidence,
-    warnings: [],
-    summary: blockers.length === 0 ? 'Retailer connectors are ready.' : 'Retailer connector readiness is blocked.'
+export type RetailerConnectorRunPlan = {
+  status: 'ready' | 'blocked' | 'duplicate';
+  connectorId: string;
+  chainId: string;
+  sourceType: RetailerConnectorKind;
+  runKey: string;
+  sourceRunId: string;
+  provenance: {
+    sourceType: RetailerConnectorKind;
+    sourceUrl?: string;
+    capturedAt: string;
+    parserVersion: string;
   };
+  requiredActions: string[];
+};
+
+function stableKeyPart(value: string): string {
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'unknown';
 }
 
-const DEFAULT_ROBOTS_CHECKED_AT = '2026-05-20T00:00:00.000Z';
+export function planRetailerConnectorRun(input: RetailerConnectorPlanInput): RetailerConnectorRunPlan {
+  if (!input.connectorId.trim()) throw new Error('connectorId is required.');
+  if (!input.parserVersion.trim()) throw new Error('parserVersion is required.');
+  if (Number.isNaN(Date.parse(input.requestedAt))) throw new Error('requestedAt must be an ISO date.');
 
-const RETAILER_SOURCE_REGISTRY: RetailerSourceRegistryEntry[] = [
-  {
-    chainId: 'ica',
-    displayName: 'ICA',
-    surfaces: ['store_locator', 'online_product', 'weekly_offer'],
-    sourceUrls: ['https://www.ica.se/butiker/', 'https://www.ica.se/handla/', 'https://www.ica.se/erbjudanden/'],
-    robotsPolicy: {
-      robotsUrl: 'https://www.ica.se/robots.txt',
-      status: 'unknown',
-      disallowedPaths: [],
-      checkedAt: DEFAULT_ROBOTS_CHECKED_AT
-    },
-    legalReviewStatus: 'pending',
-    stubOnly: true
-  },
-  {
-    chainId: 'willys',
-    displayName: 'Willys',
-    ownerGroup: 'Axfood',
-    surfaces: ['store_locator', 'online_product', 'weekly_offer', 'flyer', 'member_offer'],
-    sourceUrls: ['https://www.willys.se/artikel/om-willys-appen', 'https://www.willys.se/artikel/hemleverans', 'https://www.willys.se/erbjudanden/butik'],
-    robotsPolicy: {
-      robotsUrl: 'https://www.willys.se/robots.txt',
-      status: 'allow',
-      crawlDelaySeconds: 10,
-      visitTimeUtc: '0400-0845',
-      disallowedPaths: ['/kassa/', '/varukorg', '/mitt-konto/', '/mina-kop/', '/mina-listor/', '/delad-lista/', '/minavanligastevaror', '/o/', '/sok'],
-      checkedAt: DEFAULT_ROBOTS_CHECKED_AT
-    },
-    legalReviewStatus: 'pending',
-    stubOnly: true
-  },
-  {
-    chainId: 'coop',
-    displayName: 'Coop',
-    surfaces: ['store_locator', 'online_product', 'weekly_offer'],
-    sourceUrls: ['https://www.coop.se/butiker-erbjudanden/', 'https://www.coop.se/handla/'],
-    robotsPolicy: {
-      robotsUrl: 'https://www.coop.se/robots.txt',
-      status: 'unknown',
-      disallowedPaths: [],
-      checkedAt: DEFAULT_ROBOTS_CHECKED_AT
-    },
-    legalReviewStatus: 'pending',
-    stubOnly: true
-  },
-  {
-    chainId: 'hemkop',
-    displayName: 'Hemkop',
-    ownerGroup: 'Axfood',
-    surfaces: ['store_locator', 'online_product', 'weekly_offer', 'flyer'],
-    sourceUrls: ['https://www.hemkop.se/handla', 'https://www.hemkop.se/artikel/anvandarvillkor'],
-    robotsPolicy: {
-      robotsUrl: 'https://www.hemkop.se/robots.txt',
-      status: 'allow',
-      crawlDelaySeconds: 10,
-      visitTimeUtc: '0400-0845',
-      disallowedPaths: ['/kassa/', '/varukorg/', '/mina-sidor/', '/min-order/', '/o/', '/*?sort=', '/*?q=', '/dev-info', '/beta/'],
-      checkedAt: DEFAULT_ROBOTS_CHECKED_AT
-    },
-    legalReviewStatus: 'pending',
-    stubOnly: true
-  },
-  {
-    chainId: 'lidl',
-    displayName: 'Lidl Sweden',
-    surfaces: ['store_locator', 'weekly_offer', 'flyer', 'member_offer'],
-    sourceUrls: ['https://www.lidl.se/', 'https://www.lidl.se/c/'],
-    robotsPolicy: {
-      robotsUrl: 'https://www.lidl.se/robots.txt',
-      status: 'unknown',
-      disallowedPaths: [],
-      checkedAt: DEFAULT_ROBOTS_CHECKED_AT
-    },
-    legalReviewStatus: 'pending',
-    stubOnly: true
-  },
-  {
-    chainId: 'city_gross',
-    displayName: 'City Gross',
-    ownerGroup: 'Axfood',
-    surfaces: ['store_locator', 'online_product', 'weekly_offer'],
-    sourceUrls: ['https://www.citygross.se/', 'https://www.citygross.se/butiker'],
-    robotsPolicy: {
-      robotsUrl: 'https://www.citygross.se/robots.txt',
-      status: 'allow',
-      disallowedPaths: ['/mina-sidor/', '/loop54/'],
-      checkedAt: DEFAULT_ROBOTS_CHECKED_AT
-    },
-    legalReviewStatus: 'pending',
-    stubOnly: true
-  }
-];
+  const access = planRetailerSourceAccess(input);
+  const datePart = input.requestedAt.slice(0, 10);
+  const runKey = [
+    stableKeyPart(input.chainId),
+    stableKeyPart(input.sourceType),
+    stableKeyPart(input.connectorId),
+    datePart
+  ].join(':');
+  const sourceRunId = `source-run:${runKey}`;
 
-export function buildRetailerSourceRegistry(): RetailerSourceRegistryEntry[] {
-  return RETAILER_SOURCE_REGISTRY.map((entry) => ({
-    ...entry,
-    surfaces: [...entry.surfaces],
-    sourceUrls: [...entry.sourceUrls],
-    robotsPolicy: {
-      ...entry.robotsPolicy,
-      disallowedPaths: [...entry.robotsPolicy.disallowedPaths]
-    }
-  }));
-}
-
-export function findRetailerSourceRegistryEntry(chainId: RetailerChainId): RetailerSourceRegistryEntry {
-  const entry = RETAILER_SOURCE_REGISTRY.find((candidate) => candidate.chainId === chainId);
-  if (!entry) throw new Error(`Retailer source registry entry not found: ${chainId}`);
-  return buildRetailerSourceRegistry().find((candidate) => candidate.chainId === chainId)!;
-}
-
-function sourceHost(sourceUrl: string): string {
-  try {
-    return new URL(sourceUrl).host;
-  } catch {
-    throw new Error('sourceUrl must be an absolute URL.');
-  }
-}
-
-export function planFlyerSourceFetch(input: FlyerSourcePlanInput): FlyerSourcePlan {
-  if (Number.isNaN(Date.parse(input.retrievedAt))) throw new Error('retrievedAt must be an ISO date.');
-  const registryEntry = findRetailerSourceRegistryEntry(input.chainId);
-  return {
+  const base = {
+    connectorId: input.connectorId,
     chainId: input.chainId,
-    sourceUrl: input.sourceUrl,
-    sourceHost: sourceHost(input.sourceUrl),
-    format: input.format,
-    retrievedAt: input.retrievedAt,
-    storeId: input.storeId,
-    retailerStoreKey: input.retailerStoreKey,
-    requiresStoreSelection: input.requiresStoreSelection ?? false,
-    requiresAuthentication: input.requiresAuthentication ?? false,
-    memberOnly: input.memberOnly ?? false,
-    rawSnapshotRef: input.rawSnapshotRef ?? null,
-    contentHash: input.contentHash ?? null,
-    parserVersion: input.parserVersion ?? '0.1.0',
-    robotsPolicy: {
-      ...registryEntry.robotsPolicy,
-      disallowedPaths: [...registryEntry.robotsPolicy.disallowedPaths]
+    sourceType: input.sourceType,
+    runKey,
+    sourceRunId,
+    provenance: {
+      sourceType: input.sourceType,
+      sourceUrl: input.endpointUrl,
+      capturedAt: input.requestedAt,
+      parserVersion: input.parserVersion
     },
-    legalReviewStatus: registryEntry.legalReviewStatus,
-    emitsProductFacts: false
+    requiredActions: access.requiredActions
   };
-}
 
-export function buildDefaultFlyerSourcePlans(retrievedAt = DEFAULT_ROBOTS_CHECKED_AT): FlyerSourcePlan[] {
-  return [
-    planFlyerSourceFetch({
-      chainId: 'ica',
-      sourceUrl: 'https://www.ica.se/butiker/erbjudanden/',
-      format: 'weekly_offer_html',
-      retrievedAt,
-      requiresStoreSelection: true
-    }),
-    planFlyerSourceFetch({
-      chainId: 'willys',
-      sourceUrl: 'https://www.willys.se/erbjudanden/butik',
-      format: 'store_offer_html',
-      retrievedAt,
-      requiresStoreSelection: true
-    }),
-    planFlyerSourceFetch({
-      chainId: 'hemkop',
-      sourceUrl: 'https://www.hemkop.se/handla',
-      format: 'digital_flyer',
-      retrievedAt
-    }),
-    planFlyerSourceFetch({
-      chainId: 'lidl',
-      sourceUrl: 'https://www.lidl.se/c/lidl-plus/s10017033',
-      format: 'member_offer',
-      retrievedAt,
-      requiresAuthentication: true,
-      memberOnly: true
-    }),
-    planFlyerSourceFetch({
-      chainId: 'willys',
-      sourceUrl: 'https://www.willys.se/artikel/om-willys-appen',
-      format: 'app_offer',
-      retrievedAt,
-      requiresAuthentication: true,
-      memberOnly: true
-    }),
-    planFlyerSourceFetch({
-      chainId: 'city_gross',
-      sourceUrl: 'https://www.citygross.se/reklamblad',
-      format: 'app_rendered_offer_html',
-      retrievedAt
-    }),
-    planFlyerSourceFetch({
-      chainId: 'coop',
-      sourceUrl: 'https://dr.coop.se/Butik/?store=105740',
-      format: 'store_offer_html',
-      retrievedAt,
-      retailerStoreKey: '105740',
-      requiresStoreSelection: true
-    })
-  ];
-}
-
-const OFFICIAL_BASELINE_SOURCES: OfficialBaselineSource[] = [
-  {
-    id: 'scb-cpi-food-nonalcoholic-2020',
-    authority: 'SCB',
-    name: 'Consumer Price Index (CPI), food and non-alcoholic beverages, 2020=100',
-    kind: 'price_index',
-    datasetUrl: 'https://www.statistikdatabasen.scb.se/pxweb/en/ssd/START__PR__PR0101__PR0101A/KPI2020EPG01M/',
-    apiUrl: 'https://www.scb.se/en/services/open-data-api/pxwebapi/pxwebapi-2.0',
-    license: 'CC0',
-    requiresAttribution: false,
-    categoryScope: 'national_food_and_non_alcoholic_beverages',
-    canGenerateStorePrices: false,
-    canGenerateSkuPrices: false
-  },
-  {
-    id: 'scb-pxweb-api',
-    authority: 'SCB',
-    name: 'Statistics Sweden PxWeb API',
-    kind: 'price_index',
-    datasetUrl: 'https://www.scb.se/en/services/open-data-api/',
-    apiUrl: 'https://www.scb.se/en/services/open-data-api/pxwebapi/pxwebapi-2.0',
-    license: 'CC0',
-    requiresAttribution: false,
-    categoryScope: 'official_statistics_query_transport',
-    canGenerateStorePrices: false,
-    canGenerateSkuPrices: false
-  },
-  {
-    id: 'sjv-kpi-j-ppi-j-food',
-    authority: 'Jordbruksverket',
-    name: 'Prisindex och priser på livsmedelsområdet KPI-J/PPI-J',
-    kind: 'price_index',
-    datasetUrl: 'https://jordbruksverket.se/om-jordbruksverket/jordbruksverkets-officiella-statistik/jordbruksverkets-statistikrapporter/statistik/2025-12-15-prisindex-och-priser-pa-livsmedelsomradet--ars--och-manadsstatistik---202510',
-    license: 'OFFICIAL_STATISTICS_TERMS_PENDING',
-    requiresAttribution: true,
-    attribution: 'Jordbruksverket',
-    categoryScope: 'agriculture_regulated_food_indices',
-    canGenerateStorePrices: false,
-    canGenerateSkuPrices: false
-  },
-  {
-    id: 'eurostat-hicp-food',
-    authority: 'Eurostat',
-    name: 'Harmonised Indices of Consumer Prices food categories',
-    kind: 'price_index',
-    datasetUrl: 'https://ec.europa.eu/eurostat/web/hicp',
-    license: 'OFFICIAL_STATISTICS_TERMS_PENDING',
-    requiresAttribution: true,
-    attribution: 'Eurostat',
-    categoryScope: 'international_hicp_food_comparison',
-    canGenerateStorePrices: false,
-    canGenerateSkuPrices: false
-  },
-  {
-    id: 'slv-food-composition',
-    authority: 'Livsmedelsverket',
-    name: 'Swedish Food Composition Database',
-    kind: 'taxonomy',
-    datasetUrl: 'https://www.livsmedelsverket.se/en/about-us/open-data/food-composition-data/',
-    apiUrl: 'https://dataportal.livsmedelsverket.se/livsmedel/swagger/index.html',
-    license: 'CC_BY_4_0',
-    requiresAttribution: true,
-    attribution: 'Livsmedelsverket',
-    categoryScope: 'food_taxonomy_and_composition',
-    canGenerateStorePrices: false,
-    canGenerateSkuPrices: false
+  if (access.status === 'blocked') return { ...base, status: 'blocked' };
+  if ((input.previousRunKeys ?? []).includes(runKey)) {
+    return { ...base, status: 'duplicate', requiredActions: ['skip_duplicate_connector_run'] };
   }
-];
-
-export function buildOfficialBaselineSourceRegistry(): OfficialBaselineSource[] {
-  return OFFICIAL_BASELINE_SOURCES.map((source) => ({ ...source }));
-}
-
-export function officialPriceIndexSources(): OfficialBaselineSource[] {
-  return buildOfficialBaselineSourceRegistry().filter((source) => source.kind === 'price_index');
-}
-
-export function assertOfficialPriceIndexSource(source: OfficialBaselineSource): OfficialBaselineSource {
-  if (source.kind !== 'price_index') throw new Error(`Official source is not a price index: ${source.id}`);
-  return source;
+  return { ...base, status: 'ready' };
 }
 
 export type UnitInput = {
