@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { compareBasketStrategies, summarizeLocalOfferBasket, summarizeStoreBasketCoverage } from '../index.js';
+import { compareBasketStrategies, summarizeBasketPriceSpreads } from '../index.js';
 
 describe('compareBasketStrategies', () => {
   it('compares favorite-store baskets without penalizing distance', () => {
@@ -37,96 +37,82 @@ describe('compareBasketStrategies', () => {
       total: 79.7,
       itemCount: 2
     });
-    assert.deepEqual(result.bestSingleStore, {
-      storeId: 'willys-odenplan',
-      storeName: 'Willys Odenplan',
-      total: 79.7,
-      itemCount: 2
-    });
-    assert.equal(result.savingsVsBestSingleStore, 2);
-    assert.equal(result.splitStoreCount, 2);
   });
 });
 
-describe('summarizeStoreBasketCoverage', () => {
-  it('compares favorite stores by basket coverage and known total', () => {
-    const summary = summarizeStoreBasketCoverage({
+describe('summarizeBasketPriceSpreads', () => {
+  it('ranks favorite-store products by savings opportunity', () => {
+    const summary = summarizeBasketPriceSpreads({
       favoriteStoreIds: ['willys-odenplan', 'lidl-sveavagen', 'coop-odenplan'],
       items: [
         {
           productId: 'coffee',
-          quantity: 1,
+          quantity: 2,
           prices: [
             { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 49.9 },
-            { storeId: 'lidl-sveavagen', storeName: 'Lidl Sveavägen', price: 59.9 }
+            { storeId: 'lidl-sveavagen', storeName: 'Lidl Sveavägen', price: 59.9 },
+            { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', price: 64.9 }
           ]
         },
         {
           productId: 'milk',
-          quantity: 2,
+          quantity: 3,
           prices: [
             { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 14.9 },
-            { storeId: 'lidl-sveavagen', storeName: 'Lidl Sveavägen', price: 13.9 },
-            { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', price: 15.9 }
+            { storeId: 'lidl-sveavagen', storeName: 'Lidl Sveavägen', price: 13.9 }
           ]
         },
         {
           productId: 'butter',
           quantity: 1,
           prices: [
-            { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 42.9 },
-            { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', price: 39.9 }
+            { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', price: 42.9 }
+          ]
+        },
+        {
+          productId: 'eggs',
+          quantity: 1,
+          prices: [
+            { storeId: 'hemkop-city', storeName: 'Hemköp City', price: 34.9 }
           ]
         }
       ]
     });
 
-    assert.deepEqual(summary.fullCoverageStoreIds, ['willys-odenplan']);
-    assert.deepEqual(summary.stores.map((store) => store.storeId), [
-      'willys-odenplan',
-      'coop-odenplan',
-      'lidl-sveavagen'
-    ]);
-    assert.deepEqual(summary.bestCoverage, {
-      storeId: 'willys-odenplan',
-      storeName: 'Willys Odenplan',
-      knownTotal: 122.6,
-      availableProductIds: ['coffee', 'milk', 'butter'],
-      missingProductIds: [],
-      coveragePercent: 100
-    });
-    assert.deepEqual(summary.stores[1], {
-      storeId: 'coop-odenplan',
-      storeName: 'Coop Odenplan',
-      knownTotal: 71.7,
-      availableProductIds: ['milk', 'butter'],
-      missingProductIds: ['coffee'],
-      coveragePercent: 66.67
+    assert.equal(summary.totalPotentialSavings, 33);
+    assert.deepEqual(summary.missingProductIds, ['eggs']);
+    assert.deepEqual(summary.spreads.map((spread) => spread.productId), ['coffee', 'milk']);
+    assert.deepEqual(summary.largestSpread, {
+      productId: 'coffee',
+      quantity: 2,
+      cheapestStoreId: 'willys-odenplan',
+      cheapestStoreName: 'Willys Odenplan',
+      cheapestUnitPrice: 49.9,
+      highestStoreId: 'coop-odenplan',
+      highestStoreName: 'Coop Odenplan',
+      highestUnitPrice: 64.9,
+      spreadPerUnit: 15,
+      spreadForQuantity: 30,
+      spreadPercent: 23.11,
+      storeCount: 3
     });
   });
 
-  it('handles an empty basket as full coverage for favorite stores', () => {
-    assert.deepEqual(summarizeStoreBasketCoverage({
+  it('returns an empty spread summary when no product has competing favorite-store prices', () => {
+    assert.deepEqual(summarizeBasketPriceSpreads({
       favoriteStoreIds: ['willys-odenplan'],
-      items: []
+      items: [
+        {
+          productId: 'coffee',
+          quantity: 1,
+          prices: [{ storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 49.9 }]
+        }
+      ]
     }), {
-      stores: [{
-        storeId: 'willys-odenplan',
-        storeName: 'Willys Odenplan',
-        knownTotal: 0,
-        availableProductIds: [],
-        missingProductIds: [],
-        coveragePercent: 100
-      }],
-      bestCoverage: {
-        storeId: 'willys-odenplan',
-        storeName: 'Willys Odenplan',
-        knownTotal: 0,
-        availableProductIds: [],
-        missingProductIds: [],
-        coveragePercent: 100
-      },
-      fullCoverageStoreIds: ['willys-odenplan']
+      spreads: [],
+      totalPotentialSavings: 0,
+      largestSpread: undefined,
+      missingProductIds: []
     });
   });
 });

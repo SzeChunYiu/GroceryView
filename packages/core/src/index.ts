@@ -61,12 +61,6 @@ export type HistoricalDealScore = {
 
 const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
 const roundMoney = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
-const formatSek = (value: number): string => `${value.toFixed(2)} SEK`;
-const storeNameFromId = (storeId: string): string =>
-  storeId
-    .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
 
 export function calculateDealScore(input: DealScoreInput): number {
   const currentCityStrength = 100 - clamp(input.currentCityPercentile, 0, 100);
@@ -94,164 +88,6 @@ export function scoreBand(score: number): ScoreBand {
   if (normalized >= 60) return { label: 'Fair deal', verdict: 'Compare' };
   if (normalized >= 40) return { label: 'Normal price', verdict: 'Normal' };
   return { label: 'Not a real deal', verdict: 'Wait' };
-}
-
-export function calculateHistoricalDealScore(input: HistoricalDealScoreInput): HistoricalDealScore {
-  if (input.currentUnitPrice < 0) throw new Error('Current unit price must be non-negative.');
-  const asOf = Date.parse(input.asOf);
-  if (Number.isNaN(asOf)) throw new Error('asOf must be an ISO date.');
-
-  const parsedHistory = input.history
-    .map((point) => ({ ...point, observedAtMs: Date.parse(point.observedAt) }))
-    .filter((point) => !Number.isNaN(point.observedAtMs) && point.observedAtMs <= asOf)
-    .sort((a, b) => a.observedAtMs - b.observedAtMs);
-  if (parsedHistory.length === 0) throw new Error('At least one historical unit-price point is required.');
-  if (parsedHistory.some((point) => point.unitPrice < 0)) throw new Error('Historical unit prices must be non-negative.');
-
-  const reasons = new Set<DealScoreReasonCode>();
-  const warnings = new Set<DealScoreReasonCode>();
-  const historyPrices = parsedHistory.map((point) => point.unitPrice);
-  const medianUnitPrice = median(historyPrices);
-  const percentilePrices = [...historyPrices, input.currentUnitPrice].sort((a, b) => a - b);
-  let rank = 0;
-  for (let index = 0; index < percentilePrices.length; index += 1) {
-    if (percentilePrices[index] <= input.currentUnitPrice) rank = index;
-  }
-  const currentPercentile = percentilePrices.length === 1 ? 0 : Math.round((rank / (percentilePrices.length - 1)) * 100);
-  const medianDiscountPercent = medianUnitPrice > 0
-    ? roundMoney(((medianUnitPrice - input.currentUnitPrice) / medianUnitPrice) * 100)
-    : 0;
-
-  const thirtyDayStart = asOf - 30 * 24 * 60 * 60 * 1000;
-  const thirtyDayPrices = parsedHistory
-    .filter((point) => point.observedAtMs >= thirtyDayStart)
-    .map((point) => point.unitPrice);
-  const observedThirtyDayLow = thirtyDayPrices.length === 0 ? undefined : roundMoney(Math.min(...thirtyDayPrices));
-  const thirtyDayLowDiscountPercent = observedThirtyDayLow === undefined || observedThirtyDayLow <= 0
-    ? undefined
-    : roundMoney(((observedThirtyDayLow - input.currentUnitPrice) / observedThirtyDayLow) * 100);
-
-  if (currentPercentile <= 20) reasons.add('low_percentile');
-  if (medianDiscountPercent >= 5) reasons.add('below_median');
-  if (observedThirtyDayLow !== undefined && input.currentUnitPrice <= observedThirtyDayLow) reasons.add('below_30_day_low');
-  if (observedThirtyDayLow !== undefined && input.currentUnitPrice > observedThirtyDayLow && input.currentUnitPrice <= observedThirtyDayLow * 1.03) reasons.add('near_30_day_low');
-  if (input.distanceKm !== undefined) reasons.add('distance_excluded');
-  if (input.perishableShortLife) reasons.add('perishable_short_history');
-
-  const sourceTypes = new Set(parsedHistory.map((point) => point.sourceType));
-  let cap = 100;
-  if (parsedHistory.length < 3 && !input.perishableShortLife) {
-    cap = Math.min(cap, 60);
-    warnings.add('limited_history');
-  }
-  if (input.sourceConfidence < 0.5) {
-    cap = Math.min(cap, 50);
-    warnings.add('low_confidence');
-  }
-  if (sourceTypes.size > 1) {
-    cap = Math.min(cap, 70);
-    warnings.add('mixed_source_types');
-  }
-  if (input.sourceType === 'estimated' || input.sourceType === 'manual') {
-    cap = Math.min(cap, 60);
-    warnings.add('source_type_cap');
-  }
-  if (
-    input.claimedRegularUnitPrice !== undefined &&
-    observedThirtyDayLow !== undefined &&
-    input.claimedRegularUnitPrice > observedThirtyDayLow
-  ) {
-    cap = Math.min(cap, 70);
-    warnings.add('claimed_regular_price_unverified');
-  }
-
-  const percentileStrength = 100 - currentPercentile;
-  const medianDiscountStrength = clamp(medianDiscountPercent * 3, 0, 100);
-  const thirtyDayStrength = observedThirtyDayLow === undefined
-    ? 0
-    : input.currentUnitPrice <= observedThirtyDayLow
-      ? 100
-      : input.currentUnitPrice <= observedThirtyDayLow * 1.03 ? 70 : 0;
-  const sourceQuality = clamp(input.sourceConfidence, 0, 1) * 70 + Math.min(1, parsedHistory.length / 5) * 30;
-  const rawScore = Math.round(
-    percentileStrength * 0.35 +
-      medianDiscountStrength * 0.25 +
-      thirtyDayStrength * 0.2 +
-      sourceQuality * 0.2
-  );
-  const score = Math.min(rawScore, cap);
-
-  return {
-    score,
-    band: scoreBand(score),
-    currentPercentile,
-    medianUnitPrice: roundMoney(medianUnitPrice),
-    medianDiscountPercent,
-    observedThirtyDayLow,
-    thirtyDayLowDiscountPercent,
-    observationCount: parsedHistory.length,
-    cappedAt: cap < rawScore ? cap : undefined,
-    reasons: [...reasons],
-    warnings: [...warnings]
-  };
-}
-
-function median(values: number[]): number {
-  const sorted = [...values].sort((a, b) => a - b);
-  const middle = Math.floor(sorted.length / 2);
-  if (sorted.length % 2 === 1) return sorted[middle];
-  return (sorted[middle - 1] + sorted[middle]) / 2;
-}
-
-export type DealOpportunityInput = {
-  productId: string;
-  productName: string;
-  storeId: string;
-  storeName: string;
-  currentPrice: number;
-  regularPrice: number;
-  dealScore: number;
-  sourceConfidence: number;
-  sponsoredPlacement?: boolean;
-};
-
-export type DealOpportunity = DealOpportunityInput & {
-  band: ScoreBand;
-  priceDrop: number;
-  discountPercent: number;
-  reason: string;
-};
-
-export function rankDealOpportunities(input: {
-  deals: DealOpportunityInput[];
-  minimumDealScore?: number;
-  minimumSourceConfidence?: number;
-}): DealOpportunity[] {
-  const minimumDealScore = input.minimumDealScore ?? 60;
-  const minimumSourceConfidence = input.minimumSourceConfidence ?? 0.5;
-
-  return input.deals
-    .filter((deal) => !deal.sponsoredPlacement)
-    .filter((deal) => deal.dealScore >= minimumDealScore)
-    .filter((deal) => deal.sourceConfidence >= minimumSourceConfidence)
-    .map((deal) => {
-      const priceDrop = roundMoney(Math.max(0, deal.regularPrice - deal.currentPrice));
-      const discountPercent = deal.regularPrice > 0 ? roundMoney((priceDrop / deal.regularPrice) * 100) : 0;
-      const band = scoreBand(deal.dealScore);
-
-      return {
-        ...deal,
-        band,
-        priceDrop,
-        discountPercent,
-        reason: `${deal.productName} is ${discountPercent}% below regular price at ${deal.storeName} with Deal Score ${deal.dealScore}.`
-      };
-    })
-    .sort((a, b) => {
-      if (b.dealScore !== a.dealScore) return b.dealScore - a.dealScore;
-      if (b.discountPercent !== a.discountPercent) return b.discountPercent - a.discountPercent;
-      return a.productName.localeCompare(b.productName);
-    });
 }
 
 export type StorePrice = {
@@ -296,25 +132,29 @@ export type SingleStoreOption = {
 export type BasketComparisonResult = {
   cheapestByProduct: BasketStrategy;
   singleStoreOptions: SingleStoreOption[];
-  bestSingleStore?: SingleStoreOption;
-  savingsVsBestSingleStore: number;
-  splitStoreCount: number;
   missingProductIds: string[];
 };
 
-export type StoreBasketCoverage = {
-  storeId: string;
-  storeName: string;
-  knownTotal: number;
-  availableProductIds: string[];
-  missingProductIds: string[];
-  coveragePercent: number;
+export type BasketPriceSpread = {
+  productId: string;
+  quantity: number;
+  cheapestStoreId: string;
+  cheapestStoreName: string;
+  cheapestUnitPrice: number;
+  highestStoreId: string;
+  highestStoreName: string;
+  highestUnitPrice: number;
+  spreadPerUnit: number;
+  spreadForQuantity: number;
+  spreadPercent: number;
+  storeCount: number;
 };
 
-export type StoreBasketCoverageSummary = {
-  stores: StoreBasketCoverage[];
-  bestCoverage?: StoreBasketCoverage;
-  fullCoverageStoreIds: string[];
+export type BasketPriceSpreadSummary = {
+  spreads: BasketPriceSpread[];
+  totalPotentialSavings: number;
+  largestSpread?: BasketPriceSpread;
+  missingProductIds: string[];
 };
 
 export type LocalOfferSourceType = 'shelf' | 'online' | 'flyer' | 'member' | 'receipt' | 'shelf_photo' | 'manual' | 'estimated';
@@ -417,73 +257,61 @@ export function compareBasketStrategies(input: BasketComparisonInput): BasketCom
     });
   }
 
-  const cheapestByProduct = {
-    total: roundMoney(assignments.reduce((sum, item) => sum + item.lineTotal, 0)),
-    assignments
-  };
-  const singleStoreOptions = [...storeTotals.values()].sort((a, b) => a.total - b.total);
-  const bestSingleStore = singleStoreOptions.find((option) => option.itemCount === assignments.length);
-
   return {
-    cheapestByProduct,
-    singleStoreOptions,
-    bestSingleStore,
-    savingsVsBestSingleStore: bestSingleStore ? roundMoney(bestSingleStore.total - cheapestByProduct.total) : 0,
-    splitStoreCount: new Set(assignments.map((assignment) => assignment.storeId)).size,
+    cheapestByProduct: {
+      total: roundMoney(assignments.reduce((sum, item) => sum + item.lineTotal, 0)),
+      assignments
+    },
+    singleStoreOptions: [...storeTotals.values()].sort((a, b) => a.total - b.total),
     missingProductIds
   };
 }
 
-export function summarizeStoreBasketCoverage(input: BasketComparisonInput): StoreBasketCoverageSummary {
-  const coverageByStore = new Map<string, StoreBasketCoverage>();
-
-  for (const storeId of input.favoriteStoreIds) {
-    coverageByStore.set(storeId, {
-      storeId,
-      storeName: storeNameFromId(storeId),
-      knownTotal: 0,
-      availableProductIds: [],
-      missingProductIds: [],
-      coveragePercent: input.items.length === 0 ? 100 : 0
-    });
-  }
+export function summarizeBasketPriceSpreads(input: BasketComparisonInput): BasketPriceSpreadSummary {
+  const favoriteSet = new Set(input.favoriteStoreIds);
+  const missingProductIds: string[] = [];
+  const spreads: BasketPriceSpread[] = [];
 
   for (const item of input.items) {
-    for (const storeId of input.favoriteStoreIds) {
-      const coverage = coverageByStore.get(storeId);
-      if (!coverage) continue;
-
-      const price = item.prices.find((candidate) => candidate.storeId === storeId);
-      if (!price) {
-        coverage.missingProductIds.push(item.productId);
-        continue;
-      }
-
-      coverage.storeName = price.storeName;
-      coverage.knownTotal = roundMoney(coverage.knownTotal + price.price * item.quantity);
-      coverage.availableProductIds.push(item.productId);
+    const eligiblePrices = item.prices.filter((price) => favoriteSet.has(price.storeId));
+    if (eligiblePrices.length === 0) {
+      missingProductIds.push(item.productId);
+      continue;
     }
+    if (eligiblePrices.length === 1) continue;
+
+    const sortedPrices = [...eligiblePrices].sort((a, b) => a.price - b.price);
+    const cheapest = sortedPrices[0];
+    const highest = sortedPrices[sortedPrices.length - 1];
+    const spreadPerUnit = roundMoney(highest.price - cheapest.price);
+    if (spreadPerUnit <= 0) continue;
+
+    spreads.push({
+      productId: item.productId,
+      quantity: item.quantity,
+      cheapestStoreId: cheapest.storeId,
+      cheapestStoreName: cheapest.storeName,
+      cheapestUnitPrice: cheapest.price,
+      highestStoreId: highest.storeId,
+      highestStoreName: highest.storeName,
+      highestUnitPrice: highest.price,
+      spreadPerUnit,
+      spreadForQuantity: roundMoney(spreadPerUnit * item.quantity),
+      spreadPercent: roundMoney((spreadPerUnit / highest.price) * 100),
+      storeCount: eligiblePrices.length
+    });
   }
 
-  const stores = [...coverageByStore.values()]
-    .map((coverage) => ({
-      ...coverage,
-      coveragePercent: input.items.length === 0
-        ? 100
-        : roundMoney((coverage.availableProductIds.length / input.items.length) * 100)
-    }))
-    .sort((a, b) => {
-      if (b.coveragePercent !== a.coveragePercent) return b.coveragePercent - a.coveragePercent;
-      if (a.knownTotal !== b.knownTotal) return a.knownTotal - b.knownTotal;
-      return a.storeName.localeCompare(b.storeName);
-    });
+  const rankedSpreads = spreads.sort((a, b) => {
+    if (b.spreadForQuantity !== a.spreadForQuantity) return b.spreadForQuantity - a.spreadForQuantity;
+    return b.spreadPerUnit - a.spreadPerUnit;
+  });
 
   return {
-    stores,
-    bestCoverage: stores[0],
-    fullCoverageStoreIds: stores
-      .filter((coverage) => coverage.missingProductIds.length === 0)
-      .map((coverage) => coverage.storeId)
+    spreads: rankedSpreads,
+    totalPotentialSavings: roundMoney(rankedSpreads.reduce((sum, spread) => sum + spread.spreadForQuantity, 0)),
+    largestSpread: rankedSpreads[0],
+    missingProductIds
   };
 }
 
@@ -634,296 +462,6 @@ export function calculateFixedBasketIndex(input: FixedBasketIndexInput): FixedBa
   };
 }
 
-export type PriceHistoryPoint = {
-  observedAt: string;
-  price: number;
-  storeId?: string;
-};
-
-export type PriceHistorySummary = {
-  latestPrice: number;
-  previousPrice?: number;
-  changeFromPrevious: number;
-  lowestPrice: number;
-  highestPrice: number;
-  isNewLow: boolean;
-  observedCount: number;
-  latestObservedAt: string;
-};
-
-export type PriceChartSourceType = 'shelf' | 'online' | 'flyer' | 'member' | 'receipt' | 'shelf_photo' | 'manual' | 'estimated';
-
-export type PriceChartLineStyle = 'solid' | 'dashed' | 'dotted';
-
-export type PriceChartMarkerType = 'promotion' | 'member' | 'new_low' | 'receipt_confirmed' | 'source_warning';
-
-export type PriceChartObservation = PriceHistoryPoint & {
-  storeId: string;
-  storeName: string;
-  sourceType: PriceChartSourceType;
-  confidence: number;
-  provenanceLabel?: string;
-  markerType?: PriceChartMarkerType;
-  markerLabel?: string;
-};
-
-export type PriceChartSeriesPoint = {
-  time: string;
-  value: number;
-  confidence: number;
-  provenanceLabel?: string;
-};
-
-export type PriceChartMarker = {
-  time: string;
-  type: PriceChartMarkerType;
-  text: string;
-  color: string;
-  shape: 'circle' | 'arrowUp' | 'arrowDown';
-  position: 'aboveBar' | 'belowBar' | 'inBar';
-  sourceType: PriceChartSourceType;
-  provenanceLabel?: string;
-};
-
-export type PriceChartSeries = {
-  id: string;
-  storeId: string;
-  storeName: string;
-  sourceType: PriceChartSourceType;
-  lineStyle: PriceChartLineStyle;
-  points: PriceChartSeriesPoint[];
-  markers: PriceChartMarker[];
-};
-
-export type PriceChartAdapterInput = {
-  observations: PriceChartObservation[];
-  asOf?: string;
-  rangeDays?: 7 | 30 | 90 | 365;
-  markerLimitPerSeries?: number;
-};
-
-export type PriceChartAdapterResult = {
-  series: PriceChartSeries[];
-  windowStart?: string;
-  windowEnd?: string;
-};
-
-const chartLineStyleWeight: Record<PriceChartLineStyle, number> = {
-  solid: 0,
-  dashed: 1,
-  dotted: 2
-};
-
-export function priceChartLineStyle(input: {
-  sourceType: PriceChartSourceType;
-  confidence: number;
-}): PriceChartLineStyle {
-  const confidence = clamp(input.confidence, 0, 1);
-  if (input.sourceType === 'estimated' || input.sourceType === 'manual' || confidence < 0.5) return 'dotted';
-  if (input.sourceType === 'shelf_photo' || confidence < 0.8) return 'dashed';
-  return 'solid';
-}
-
-export function summarizePriceHistory(points: PriceHistoryPoint[]): PriceHistorySummary {
-  if (points.length === 0) {
-    throw new Error('At least one price history point is required.');
-  }
-
-  const ordered = [...points].sort((a, b) => new Date(a.observedAt).getTime() - new Date(b.observedAt).getTime());
-  const latest = ordered.at(-1)!;
-  const previous = ordered.at(-2);
-  const previousPrices = ordered.slice(0, -1).map((point) => point.price);
-  const historicalLow = previousPrices.length > 0 ? Math.min(...previousPrices) : latest.price;
-
-  return {
-    latestPrice: latest.price,
-    previousPrice: previous?.price,
-    changeFromPrevious: previous ? roundMoney(latest.price - previous.price) : 0,
-    lowestPrice: Math.min(...ordered.map((point) => point.price)),
-    highestPrice: Math.max(...ordered.map((point) => point.price)),
-    isNewLow: latest.price < historicalLow,
-    observedCount: ordered.length,
-    latestObservedAt: latest.observedAt
-  };
-}
-
-function chartMarkersForObservation(observation: PriceChartObservation, isNewLow: boolean): PriceChartMarker[] {
-  const markers: PriceChartMarker[] = [];
-  const sourceMarker = sourceTypeMarker(observation);
-  if (sourceMarker) markers.push(sourceMarker);
-  if (isNewLow) {
-    markers.push({
-      time: observation.observedAt,
-      type: 'new_low',
-      text: 'New low',
-      color: '#0f766e',
-      shape: 'arrowUp',
-      position: 'belowBar',
-      sourceType: observation.sourceType,
-      provenanceLabel: observation.provenanceLabel
-    });
-  }
-  if (clamp(observation.confidence, 0, 1) < 0.5) {
-    markers.push({
-      time: observation.observedAt,
-      type: 'source_warning',
-      text: observation.markerLabel ?? 'Low confidence',
-      color: '#b45309',
-      shape: 'circle',
-      position: 'inBar',
-      sourceType: observation.sourceType,
-      provenanceLabel: observation.provenanceLabel
-    });
-  }
-  if (observation.markerType && !markers.some((marker) => marker.type === observation.markerType)) {
-    markers.push({
-      time: observation.observedAt,
-      type: observation.markerType,
-      text: observation.markerLabel ?? markerText(observation.markerType),
-      color: markerColor(observation.markerType),
-      shape: observation.markerType === 'new_low' ? 'arrowUp' : 'circle',
-      position: observation.markerType === 'new_low' ? 'belowBar' : 'aboveBar',
-      sourceType: observation.sourceType,
-      provenanceLabel: observation.provenanceLabel
-    });
-  }
-  return markers;
-}
-
-function sourceTypeMarker(observation: PriceChartObservation): PriceChartMarker | undefined {
-  if (observation.sourceType === 'flyer') {
-    return {
-      time: observation.observedAt,
-      type: 'promotion',
-      text: observation.markerLabel ?? 'Flyer',
-      color: '#2563eb',
-      shape: 'circle',
-      position: 'aboveBar',
-      sourceType: observation.sourceType,
-      provenanceLabel: observation.provenanceLabel
-    };
-  }
-  if (observation.sourceType === 'member') {
-    return {
-      time: observation.observedAt,
-      type: 'member',
-      text: observation.markerLabel ?? 'Member',
-      color: '#7c3aed',
-      shape: 'circle',
-      position: 'aboveBar',
-      sourceType: observation.sourceType,
-      provenanceLabel: observation.provenanceLabel
-    };
-  }
-  if (observation.sourceType === 'receipt') {
-    return {
-      time: observation.observedAt,
-      type: 'receipt_confirmed',
-      text: observation.markerLabel ?? 'Receipt',
-      color: '#16a34a',
-      shape: 'circle',
-      position: 'inBar',
-      sourceType: observation.sourceType,
-      provenanceLabel: observation.provenanceLabel
-    };
-  }
-  return undefined;
-}
-
-function markerText(type: PriceChartMarkerType): string {
-  if (type === 'promotion') return 'Promo';
-  if (type === 'member') return 'Member';
-  if (type === 'new_low') return 'New low';
-  if (type === 'receipt_confirmed') return 'Receipt';
-  return 'Source';
-}
-
-function markerColor(type: PriceChartMarkerType): string {
-  if (type === 'promotion') return '#2563eb';
-  if (type === 'member') return '#7c3aed';
-  if (type === 'new_low') return '#0f766e';
-  if (type === 'receipt_confirmed') return '#16a34a';
-  return '#b45309';
-}
-
-function markerPriority(type: PriceChartMarkerType): number {
-  if (type === 'source_warning') return 0;
-  if (type === 'new_low') return 1;
-  if (type === 'promotion' || type === 'member') return 2;
-  return 3;
-}
-
-function limitChartMarkers(markers: PriceChartMarker[], limit: number): PriceChartMarker[] {
-  if (markers.length <= limit) return markers;
-  return [...markers]
-    .sort((a, b) => {
-      const priority = markerPriority(a.type) - markerPriority(b.type);
-      if (priority !== 0) return priority;
-      return Date.parse(b.time) - Date.parse(a.time);
-    })
-    .slice(0, limit)
-    .sort((a, b) => Date.parse(a.time) - Date.parse(b.time));
-}
-
-export function buildPriceChartSeries(input: PriceChartAdapterInput): PriceChartAdapterResult {
-  const asOfMs = input.asOf ? Date.parse(input.asOf) : undefined;
-  if (input.asOf && Number.isNaN(asOfMs)) throw new Error('asOf must be an ISO date.');
-  const windowStartMs = asOfMs !== undefined && input.rangeDays !== undefined
-    ? asOfMs - input.rangeDays * 24 * 60 * 60 * 1000
-    : undefined;
-  const markerLimitPerSeries = input.markerLimitPerSeries ?? 12;
-  if (markerLimitPerSeries < 0) throw new Error('markerLimitPerSeries must be non-negative.');
-
-  const grouped = new Map<string, PriceChartObservation[]>();
-  for (const observation of input.observations) {
-    const observedAtMs = Date.parse(observation.observedAt);
-    if (Number.isNaN(observedAtMs)) throw new Error('Price chart observations must use ISO observedAt dates.');
-    if (observation.price < 0) throw new Error('Price chart observations must use non-negative prices.');
-    if (windowStartMs !== undefined && observedAtMs < windowStartMs) continue;
-    if (asOfMs !== undefined && observedAtMs > asOfMs) continue;
-
-    const key = `${observation.storeId}\u0000${observation.sourceType}`;
-    grouped.set(key, [...(grouped.get(key) ?? []), observation]);
-  }
-
-  const series = [...grouped.entries()].map(([key, observations]) => {
-    const [storeId, sourceType] = key.split('\u0000') as [string, PriceChartSourceType];
-    const sorted = [...observations].sort((a, b) => Date.parse(a.observedAt) - Date.parse(b.observedAt));
-    const lowPrice = Math.min(...sorted.map((observation) => observation.price));
-    const lineStyle = sorted
-      .map((observation) => priceChartLineStyle(observation))
-      .reduce((worst, candidate) =>
-        chartLineStyleWeight[candidate] > chartLineStyleWeight[worst] ? candidate : worst
-      );
-    const rawMarkers = sorted.flatMap((observation) => chartMarkersForObservation(observation, observation.price === lowPrice));
-
-    return {
-      id: `${storeId}:${sourceType}`,
-      storeId,
-      storeName: sorted[0].storeName,
-      sourceType,
-      lineStyle,
-      points: sorted.map((observation) => ({
-        time: observation.observedAt,
-        value: roundMoney(observation.price),
-        confidence: clamp(observation.confidence, 0, 1),
-        provenanceLabel: observation.provenanceLabel
-      })),
-      markers: limitChartMarkers(rawMarkers, markerLimitPerSeries)
-    } satisfies PriceChartSeries;
-  }).sort((a, b) => {
-    const storeCompare = a.storeName.localeCompare(b.storeName);
-    if (storeCompare !== 0) return storeCompare;
-    return a.sourceType.localeCompare(b.sourceType);
-  });
-
-  return {
-    series,
-    windowStart: windowStartMs === undefined ? undefined : new Date(windowStartMs).toISOString(),
-    windowEnd: asOfMs === undefined ? undefined : new Date(asOfMs).toISOString()
-  };
-}
-
 export type BrandTier = 'national' | 'premium' | 'standard_private_label' | 'budget_private_label' | 'organic_private_label' | 'discount_chain_label';
 
 export type BrandTierPriceObservation = {
@@ -1018,50 +556,6 @@ export type SearchableProduct = {
   availableChains: string[];
 };
 
-export type CategoryDealCandidate = {
-  productId: string;
-  productName: string;
-  category: string;
-  storeName: string;
-  price: number;
-  dealScore: number;
-  sourceConfidence: number;
-};
-
-export type CategoryDealLeader = CategoryDealCandidate & {
-  signal: string;
-};
-
-export function summarizeCategoryDealLeaders(input: {
-  candidates: CategoryDealCandidate[];
-  minimumSourceConfidence?: number;
-}): CategoryDealLeader[] {
-  const minimumSourceConfidence = input.minimumSourceConfidence ?? 0.5;
-  const leaderByCategory = new Map<string, CategoryDealCandidate>();
-
-  for (const candidate of input.candidates) {
-    if (candidate.sourceConfidence < minimumSourceConfidence) continue;
-    const current = leaderByCategory.get(candidate.category);
-    if (
-      !current ||
-      candidate.dealScore > current.dealScore ||
-      (candidate.dealScore === current.dealScore && candidate.price < current.price) ||
-      (candidate.dealScore === current.dealScore &&
-        candidate.price === current.price &&
-        candidate.productName.localeCompare(current.productName) < 0)
-    ) {
-      leaderByCategory.set(candidate.category, candidate);
-    }
-  }
-
-  return [...leaderByCategory.values()]
-    .map((candidate) => ({
-      ...candidate,
-      signal: `${scoreBand(candidate.dealScore).label} at ${formatSek(candidate.price)}`
-    }))
-    .sort((a, b) => a.category.localeCompare(b.category));
-}
-
 export function searchProducts(products: SearchableProduct[], query: string): SearchableProduct[] {
   const terms = query
     .toLowerCase()
@@ -1099,16 +593,15 @@ export type WatchlistAlert = {
   productId: string;
   productName: string;
   type: 'target_price' | 'deal_score' | 'new_52_week_low';
-  severity: 'info' | 'opportunity' | 'urgent';
-  trigger: {
-    metric: 'price' | 'deal_score' | 'price_history';
-    value: number | string;
-    threshold?: number;
-    storeId?: string;
-    storeName?: string;
-  };
   message: string;
 };
+
+const formatSek = (value: number): string => `${value.toFixed(2)} SEK`;
+const storeNameFromId = (storeId: string): string =>
+  storeId
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
 
 export function buildWatchlistAlerts(input: {
   watchlist: WatchlistItem[];
@@ -1125,20 +618,11 @@ export function buildWatchlistAlerts(input: {
     if (item.favoriteStoresOnly && !favoriteStoreSet.has(product.bestStoreId)) continue;
 
     if (item.targetPrice !== undefined && product.bestPrice <= item.targetPrice) {
-      const storeName = storeNameFromId(product.bestStoreId);
       alerts.push({
         productId: product.productId,
         productName: product.productName,
         type: 'target_price',
-        severity: product.bestPrice <= item.targetPrice * 0.9 ? 'urgent' : 'opportunity',
-        trigger: {
-          metric: 'price',
-          value: product.bestPrice,
-          threshold: item.targetPrice,
-          storeId: product.bestStoreId,
-          storeName
-        },
-        message: `${product.productName} is ${formatSek(product.bestPrice)} at ${storeName}, below your ${formatSek(item.targetPrice)} target.`
+        message: `${product.productName} is ${formatSek(product.bestPrice)} at ${storeNameFromId(product.bestStoreId)}, below your ${formatSek(item.targetPrice)} target.`
       });
     }
 
@@ -1147,14 +631,6 @@ export function buildWatchlistAlerts(input: {
         productId: product.productId,
         productName: product.productName,
         type: 'deal_score',
-        severity: product.dealScore >= 90 ? 'urgent' : 'opportunity',
-        trigger: {
-          metric: 'deal_score',
-          value: product.dealScore,
-          threshold: item.alertDealScoreAt,
-          storeId: product.bestStoreId,
-          storeName: storeNameFromId(product.bestStoreId)
-        },
         message: `${product.productName} has Deal Score ${product.dealScore}, meeting your ${item.alertDealScoreAt}+ alert.`
       });
     }
@@ -1164,13 +640,6 @@ export function buildWatchlistAlerts(input: {
         productId: product.productId,
         productName: product.productName,
         type: 'new_52_week_low',
-        severity: 'urgent',
-        trigger: {
-          metric: 'price_history',
-          value: 'new_52_week_low',
-          storeId: product.bestStoreId,
-          storeName: storeNameFromId(product.bestStoreId)
-        },
         message: `${product.productName} is at a new 52-week low.`
       });
     }
@@ -1359,12 +828,6 @@ export type SmartSwapInput = {
   candidates: Array<ProductMatchInput & { unitPrice: number }>;
   acceptPrivateLabel: 'yes' | 'no' | 'maybe';
   minimumSavingsPercent: number;
-  privateLabelPreference?: PrivateLabelPreference;
-};
-
-export type PrivateLabelPreference = {
-  acceptedTiers: BrandTier[];
-  blockedCategories: string[];
 };
 
 export type SmartSwapRecommendation = {
@@ -1379,20 +842,12 @@ function isPrivateLabel(tier: BrandTier): boolean {
   return tier === 'standard_private_label' || tier === 'budget_private_label' || tier === 'organic_private_label' || tier === 'discount_chain_label';
 }
 
-function privateLabelAllowed(input: SmartSwapInput, candidate: ProductMatchInput): boolean {
-  if (!isPrivateLabel(candidate.brandTier)) return true;
-  if (input.acceptPrivateLabel === 'no') return false;
-  if (input.privateLabelPreference?.blockedCategories.includes(candidate.category)) return false;
-  if (input.privateLabelPreference && !input.privateLabelPreference.acceptedTiers.includes(candidate.brandTier)) return false;
-  if (input.acceptPrivateLabel === 'maybe' && candidate.brandTier === 'budget_private_label') return false;
-  return true;
-}
-
 export function recommendSmartSwaps(input: SmartSwapInput): SmartSwapRecommendation[] {
+  if (input.acceptPrivateLabel === 'no') return [];
   const recommendations: SmartSwapRecommendation[] = [];
 
   for (const candidate of input.candidates) {
-    if (!privateLabelAllowed(input, candidate)) continue;
+    if (isPrivateLabel(candidate.brandTier) && input.acceptPrivateLabel === 'maybe' && candidate.brandTier === 'budget_private_label') continue;
     const match = classifyProductMatch({ source: input.source, candidate });
     if (match.mode === 'not_recommended') continue;
     const savingsPercent = Math.round(((input.source.unitPrice - candidate.unitPrice) / input.source.unitPrice) * 10000) / 100;
@@ -1976,136 +1431,6 @@ export function summarizeHousehold(snapshot: HouseholdSnapshot, priceByProductId
   };
 }
 
-export type PantryInventoryItem = {
-  productId: string;
-  name: string;
-  category: string;
-  quantity: number;
-  unit: 'each' | 'kg' | 'g' | 'l' | 'ml' | 'pack';
-  minimumQuantity: number;
-  targetQuantity?: number;
-  expiresAt?: string;
-  lastPurchasedAt?: string;
-};
-
-export type PantryUsageEvent = {
-  productId: string;
-  quantityUsed: number;
-  usedAt: string;
-};
-
-export type PantryDeal = {
-  productId: string;
-  storeId: string;
-  storeName: string;
-  price: number;
-  dealScore?: number;
-};
-
-export type PantryStatus = 'in_stock' | 'low_stock' | 'expiring_soon' | 'expired';
-
-export type PantryInventoryStatus = PantryInventoryItem & {
-  remainingQuantity: number;
-  status: PantryStatus;
-  daysUntilExpiry?: number;
-};
-
-export type PantryReplenishment = {
-  productId: string;
-  name: string;
-  quantityToBuy: number;
-  unit: PantryInventoryItem['unit'];
-  priority: 'high' | 'medium' | 'low';
-  reason: string;
-  alreadyInBasket: boolean;
-  bestDeal?: PantryDeal;
-};
-
-export type PantryPlan = {
-  householdId?: string;
-  statuses: PantryInventoryStatus[];
-  replenishment: PantryReplenishment[];
-  expiringSoonProductIds: string[];
-};
-
-export function planPantryReplenishment(input: {
-  pantry: PantryInventoryItem[];
-  usage?: PantryUsageEvent[];
-  deals?: PantryDeal[];
-  now: string;
-  household?: HouseholdSnapshot;
-  expiringSoonDays?: number;
-}): PantryPlan {
-  const nowMs = Date.parse(input.now);
-  if (Number.isNaN(nowMs)) throw new Error('now must be an ISO date.');
-  const expiringSoonDays = input.expiringSoonDays ?? 3;
-  const usageByProduct = new Map<string, number>();
-  for (const event of input.usage ?? []) {
-    if (event.quantityUsed < 0) throw new Error('quantityUsed must be non-negative.');
-    if (Number.isNaN(Date.parse(event.usedAt))) throw new Error('usedAt must be an ISO date.');
-    usageByProduct.set(event.productId, roundMoney((usageByProduct.get(event.productId) ?? 0) + event.quantityUsed));
-  }
-
-  const basketProductIds = new Set((input.household?.basketItems ?? []).map((item) => item.productId));
-  const dealByProduct = new Map<string, PantryDeal>();
-  for (const deal of input.deals ?? []) {
-    const current = dealByProduct.get(deal.productId);
-    if (!current || (deal.dealScore ?? 0) > (current.dealScore ?? 0) || ((deal.dealScore ?? 0) === (current.dealScore ?? 0) && deal.price < current.price)) {
-      dealByProduct.set(deal.productId, { ...deal });
-    }
-  }
-
-  const statuses = input.pantry.map((item): PantryInventoryStatus => {
-    if (item.quantity < 0 || item.minimumQuantity < 0) throw new Error('pantry quantities must be non-negative.');
-    const remainingQuantity = Math.max(0, roundMoney(item.quantity - (usageByProduct.get(item.productId) ?? 0)));
-    const daysUntilExpiry = item.expiresAt === undefined ? undefined : Math.ceil((Date.parse(item.expiresAt) - nowMs) / 86_400_000);
-    if (daysUntilExpiry !== undefined && Number.isNaN(daysUntilExpiry)) throw new Error(`expiresAt must be an ISO date for ${item.productId}.`);
-    const status: PantryStatus =
-      daysUntilExpiry !== undefined && daysUntilExpiry < 0
-        ? 'expired'
-        : daysUntilExpiry !== undefined && daysUntilExpiry <= expiringSoonDays
-          ? 'expiring_soon'
-          : remainingQuantity <= item.minimumQuantity
-            ? 'low_stock'
-            : 'in_stock';
-    return {
-      ...item,
-      remainingQuantity,
-      status,
-      ...(daysUntilExpiry !== undefined ? { daysUntilExpiry } : {})
-    };
-  });
-
-  const replenishment = statuses
-    .filter((item) => item.status === 'low_stock' || item.status === 'expired')
-    .map((item): PantryReplenishment => {
-      const targetQuantity = item.targetQuantity ?? item.minimumQuantity * 2;
-      const quantityToBuy = Math.max(1, roundMoney(targetQuantity - item.remainingQuantity));
-      const alreadyInBasket = basketProductIds.has(item.productId);
-      return {
-        productId: item.productId,
-        name: item.name,
-        quantityToBuy,
-        unit: item.unit,
-        priority: item.status === 'expired' ? 'high' : item.remainingQuantity === 0 ? 'high' : 'medium',
-        reason: item.status === 'expired' ? 'Expired pantry item should be replaced.' : 'Pantry item is at or below its minimum quantity.',
-        alreadyInBasket,
-        ...(dealByProduct.has(item.productId) ? { bestDeal: dealByProduct.get(item.productId) } : {})
-      };
-    })
-    .sort((a, b) => {
-      const priorityRank = { high: 0, medium: 1, low: 2 };
-      return priorityRank[a.priority] - priorityRank[b.priority] || a.name.localeCompare(b.name);
-    });
-
-  return {
-    householdId: input.household?.id,
-    statuses,
-    replenishment,
-    expiringSoonProductIds: statuses.filter((item) => item.status === 'expiring_soon').map((item) => item.productId)
-  };
-}
-
 export type AdSurface =
   | 'market_feed'
   | 'product_page_bottom'
@@ -2229,129 +1554,6 @@ export function suggestDealBasedMeals(input: { deals: MealDeal[]; maxMealCost: n
       reason: 'Uses high-scoring current deals across protein, pantry, and vegetables.'
     }
   ];
-}
-
-export type ExpiryDealReport = {
-  id: string;
-  productId: string;
-  productName: string;
-  storeId: string;
-  storeName: string;
-  category: string;
-  originalPrice: number;
-  currentPrice: number;
-  markdownPercent: number;
-  expiresAt: string;
-  reportedAt: string;
-  distanceKm?: number;
-  verificationCount: number;
-  photoCount: number;
-};
-
-export type ExpiryDealRadarInput = {
-  reports: ExpiryDealReport[];
-  now: string;
-  favoriteStoreIds?: string[];
-  categoryFilter?: string[];
-  maxDistanceKm?: number;
-};
-
-export type ExpiryDealRadarItem = ExpiryDealReport & {
-  savings: number;
-  hoursUntilExpiry: number;
-  urgency: 'expires_today' | 'expires_soon' | 'fresh_markdown';
-  verification: 'verified' | 'needs_confirmation';
-  radarScore: number;
-};
-
-export type ExpiryDealRadarStore = {
-  storeId: string;
-  storeName: string;
-  topMarkdownPercent: number;
-  items: ExpiryDealRadarItem[];
-};
-
-export type ExpiryDealRadarAlert = {
-  reportId: string;
-  productId: string;
-  storeId: string;
-  type: 'expiry_markdown';
-  message: string;
-};
-
-export type ExpiryDealRadar = {
-  stores: ExpiryDealRadarStore[];
-  alerts: ExpiryDealRadarAlert[];
-  staleReportIds: string[];
-};
-
-export function buildExpiryDealRadar(input: ExpiryDealRadarInput): ExpiryDealRadar {
-  const now = new Date(input.now).getTime();
-  if (!Number.isFinite(now)) throw new Error('now must be a valid ISO date.');
-  const favoriteStores = new Set(input.favoriteStoreIds ?? []);
-  const categories = new Set((input.categoryFilter ?? []).map((category) => category.toLowerCase()));
-  const staleReportIds: string[] = [];
-  const items: ExpiryDealRadarItem[] = [];
-
-  for (const report of input.reports) {
-    const expiresAt = new Date(report.expiresAt).getTime();
-    const reportedAt = new Date(report.reportedAt).getTime();
-    if (!Number.isFinite(expiresAt) || !Number.isFinite(reportedAt)) throw new Error('report dates must be valid ISO dates.');
-    if (report.originalPrice <= 0 || report.currentPrice < 0) throw new Error('report prices must be non-negative and include a positive original price.');
-    if (favoriteStores.size > 0 && !favoriteStores.has(report.storeId)) continue;
-    if (categories.size > 0 && !categories.has(report.category.toLowerCase())) continue;
-    if (input.maxDistanceKm !== undefined && (report.distanceKm === undefined || report.distanceKm > input.maxDistanceKm)) continue;
-
-    const hoursUntilExpiry = Math.round(((expiresAt - now) / 3_600_000) * 100) / 100;
-    const reportAgeHours = (now - reportedAt) / 3_600_000;
-    if (hoursUntilExpiry < 0 || reportAgeHours > 24) {
-      staleReportIds.push(report.id);
-      continue;
-    }
-
-    const savings = roundMoney(report.originalPrice - report.currentPrice);
-    const expiryBoost = hoursUntilExpiry <= 12 ? 30 : hoursUntilExpiry <= 36 ? 18 : 8;
-    const verificationBoost = report.verificationCount >= 2 || report.photoCount >= 1 ? 15 : 0;
-    const freshnessBoost = Math.max(0, 12 - reportAgeHours);
-    const radarScore = Math.round(clamp(report.markdownPercent + expiryBoost + verificationBoost + freshnessBoost, 0, 100));
-
-    items.push({
-      ...report,
-      savings,
-      hoursUntilExpiry,
-      urgency: hoursUntilExpiry <= 12 ? 'expires_today' : hoursUntilExpiry <= 36 ? 'expires_soon' : 'fresh_markdown',
-      verification: verificationBoost > 0 ? 'verified' : 'needs_confirmation',
-      radarScore
-    });
-  }
-
-  const ranked = items.sort((a, b) => b.radarScore - a.radarScore || a.hoursUntilExpiry - b.hoursUntilExpiry);
-  const byStore = new Map<string, ExpiryDealRadarStore>();
-  for (const item of ranked) {
-    const store = byStore.get(item.storeId) ?? {
-      storeId: item.storeId,
-      storeName: item.storeName,
-      topMarkdownPercent: item.markdownPercent,
-      items: []
-    };
-    store.topMarkdownPercent = Math.max(store.topMarkdownPercent, item.markdownPercent);
-    store.items.push(item);
-    byStore.set(item.storeId, store);
-  }
-
-  return {
-    stores: [...byStore.values()].sort((a, b) => b.items[0].radarScore - a.items[0].radarScore),
-    alerts: ranked
-      .filter((item) => item.radarScore >= 75 && item.verification === 'verified')
-      .map((item) => ({
-        reportId: item.id,
-        productId: item.productId,
-        storeId: item.storeId,
-        type: 'expiry_markdown',
-        message: `${item.productName} is ${item.markdownPercent}% off at ${item.storeName} before expiry.`
-      })),
-    staleReportIds
-  };
 }
 
 export type PrivacyExportInput = {
