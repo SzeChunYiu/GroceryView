@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildWatchlistAlerts, searchProducts, summarizeBudget, summarizeStoreDealHighlights } from '../index.js';
+import { buildWatchlistAlerts, searchProducts, summarizeBudget, summarizeCategoryDealLeaders } from '../index.js';
 
 describe('searchProducts', () => {
   it('finds products by ticker, name, category, or chain availability', () => {
@@ -137,27 +137,6 @@ describe('buildWatchlistAlerts', () => {
         trigger: { metric: 'price_history', value: 'new_52_week_low', storeId: 'willys-odenplan', storeName: 'Willys Odenplan' },
         message: 'Zoégas Coffee 450g is at a new 52-week low.'
       }
-    ]);
-  });
-});
-
-describe('summarizeStoreDealHighlights', () => {
-  it('groups discount deals by store and ranks each store by savings strength', () => {
-    const highlights = summarizeStoreDealHighlights([
-      { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', productId: 'coffee', productName: 'Coffee', price: 49.9, usualPrice: 59.9, dealScore: 82 },
-      { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', productId: 'milk', productName: 'Milk', price: 14.9, usualPrice: 16.9, dealScore: 61 },
-      { storeId: 'coop-farsta', storeName: 'Coop Farsta', productId: 'butter', productName: 'Butter', price: 39.9, usualPrice: 54.9, dealScore: 91 },
-      { storeId: 'coop-farsta', storeName: 'Coop Farsta', productId: 'oats', productName: 'Oats', price: 29.9, usualPrice: 29.9, dealScore: 40 }
-    ], 1);
-
-    assert.deepEqual(highlights.map((store) => ({
-      storeId: store.storeId,
-      averageSavingsPercent: store.averageSavingsPercent,
-      topProductIds: store.topDeals.map((deal) => deal.productId),
-      topSavings: store.topDeals.map((deal) => deal.savingsPercent)
-    })), [
-      { storeId: 'coop-farsta', averageSavingsPercent: 27.32, topProductIds: ['butter'], topSavings: [27.32] },
-      { storeId: 'willys-odenplan', averageSavingsPercent: 16.69, topProductIds: ['coffee'], topSavings: [16.69] }
     ]);
   });
 });

@@ -1179,53 +1179,6 @@ export function buildWatchlistAlerts(input: {
   return alerts;
 }
 
-export type StoreDealCandidate = {
-  storeId: string;
-  storeName: string;
-  productId: string;
-  productName: string;
-  price: number;
-  usualPrice: number;
-  dealScore: number;
-};
-
-export type StoreDealHighlight = {
-  storeId: string;
-  storeName: string;
-  topDeals: Array<StoreDealCandidate & { savingsPercent: number }>;
-  averageSavingsPercent: number;
-};
-
-export function summarizeStoreDealHighlights(deals: StoreDealCandidate[], limitPerStore = 3): StoreDealHighlight[] {
-  const byStore = new Map<string, StoreDealCandidate[]>();
-
-  for (const deal of deals) {
-    if (deal.usualPrice <= 0 || deal.price >= deal.usualPrice) continue;
-    const current = byStore.get(deal.storeId) ?? [];
-    current.push(deal);
-    byStore.set(deal.storeId, current);
-  }
-
-  return [...byStore.entries()]
-    .map(([storeId, storeDeals]) => {
-      const rankedDeals = storeDeals
-        .map((deal) => ({
-          ...deal,
-          savingsPercent: Math.round(((deal.usualPrice - deal.price) / deal.usualPrice) * 10000) / 100
-        }))
-        .sort((a, b) => b.dealScore - a.dealScore || b.savingsPercent - a.savingsPercent);
-      const topDeals = rankedDeals.slice(0, limitPerStore);
-
-      return {
-        storeId,
-        storeName: storeDeals[0]!.storeName,
-        topDeals,
-        averageSavingsPercent: topDeals.length === 0 ? 0 : roundMoney(topDeals.reduce((sum, deal) => sum + deal.savingsPercent, 0) / topDeals.length)
-      };
-    })
-    .sort((a, b) => b.averageSavingsPercent - a.averageSavingsPercent || b.topDeals[0]!.dealScore - a.topDeals[0]!.dealScore);
-}
-
 export type BudgetInput = {
   weeklyBudget: number;
   monthlyBudget: number;
