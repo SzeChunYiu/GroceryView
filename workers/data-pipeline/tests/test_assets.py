@@ -3,6 +3,7 @@ from groceryview_data_pipeline.assets import (
     build_normalized_products,
     build_observation_coverage_summary,
     build_observation_freshness_summary,
+    build_open_prices_ingestion_run_plan,
     build_open_prices_pull_plan,
     build_price_observation_mix_summary,
     build_price_observations,
@@ -74,6 +75,67 @@ def test_open_prices_pull_plan_exposes_real_data_smoke_requirements() -> None:
         "firstProduct",
     ]
     assert plan.to_dict()["demo"] is False
+
+
+def test_open_prices_ingestion_run_plan_blocks_until_persistence_and_schedule_are_configured() -> None:
+    plan = build_open_prices_ingestion_run_plan(open_prices_user_agent_present=True)
+
+    assert plan.status == "blocked"
+    assert plan.source_asset == "open_prices_real_pull_plan"
+    assert plan.schedule_cron == "17 */6 * * *"
+    assert plan.freshness_sla_hours == 8
+    assert plan.required_env == [
+        "OPEN_PRICES_USER_AGENT",
+        "DATABASE_URL",
+        "GROCERYVIEW_RAW_SNAPSHOT_BUCKET",
+        "OPEN_PRICES_SCHEDULE_ENABLED",
+    ]
+    assert plan.required_actions == [
+        "set_database_url",
+        "configure_raw_snapshot_storage",
+        "enable_open_prices_schedule",
+    ]
+    assert plan.materialization_assets == [
+        "open_prices_real_pull_plan",
+        "price_observations",
+        "latest_price_rollup",
+        "price_observation_freshness",
+        "price_observation_coverage",
+    ]
+    assert plan.persistence_targets == [
+        "raw_snapshots",
+        "source_runs",
+        "raw_price_records",
+        "price_observations",
+        "latest_prices",
+    ]
+    assert plan.idempotency_key_fields == [
+        "source_type",
+        "source_url",
+        "content_hash",
+        "parser_version",
+        "observed_at",
+    ]
+    assert plan.evidence_fields == [
+        "runKey",
+        "sourceUrl",
+        "contentHash",
+        "rawSnapshotRef",
+        "acceptedCount",
+        "persistedObservationCount",
+        "latestRollupCount",
+        "freshnessStatus",
+    ]
+    assert plan.to_dict()["demo"] is False
+
+    ready = build_open_prices_ingestion_run_plan(
+        open_prices_user_agent_present=True,
+        database_url_present=True,
+        raw_snapshot_storage_present=True,
+        schedule_enabled=True,
+    )
+    assert ready.status == "ready"
+    assert ready.required_actions == []
 
 
 def test_latest_price_rollup_picks_latest_observation() -> None:

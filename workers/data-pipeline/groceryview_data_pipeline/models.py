@@ -195,6 +195,24 @@ class OpenPricesPullPlan:
 
 
 @dataclass(frozen=True)
+class OpenPricesIngestionRunPlan:
+    status: Literal["ready", "blocked"]
+    source_asset: str
+    schedule_cron: str
+    freshness_sla_hours: int
+    required_env: list[str]
+    required_actions: list[str]
+    materialization_assets: list[str]
+    persistence_targets: list[str]
+    idempotency_key_fields: list[str]
+    evidence_fields: list[str]
+    demo: bool = False
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class ObservationCoverageSummary:
     status: Literal["ready", "partial"]
     observation_count: int
