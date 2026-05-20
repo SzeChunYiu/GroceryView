@@ -14,11 +14,12 @@ Dagster scaffold for the GroceryView data-worker lane.
 - The quality gate also checks `open_prices_ingestion_run_plan`, so scheduled Open Prices ingestion remains blocked until database, raw snapshot storage, User-Agent, and schedule gates are configured.
 - The quality gate also checks `open_prices_artifact_import_plan`, so the Open Prices handoff cannot pass until the PostgreSQL import command has its database URL, input artifact, and built DB package.
 - The quality gate also checks `open_prices_hosted_smoke_plan`, so launch readiness remains blocked until hosted API, imported product-terminal, and PostgreSQL readiness smoke prerequisites are configured.
+- The quality gate also checks `open_prices_schedule_health_plan`, so hosted scheduled-worker proof remains blocked until both Open Prices schedules and their health probe are configured.
 - Open Prices real-data pull plan asset with required User-Agent, endpoint, parser, smoke command, and evidence fields.
 - Open Prices artifact import plan asset with the PostgreSQL import command, required env, database targets, and persisted evidence fields.
 - Open Prices ingestion run plan asset with schedule, persistence targets, idempotency keys, and fail-closed deployment requirements.
 - Open Prices hosted smoke plan asset with the hosted API, imported product-terminal, and PostgreSQL readiness smoke commands.
-- Open Prices launch readiness summary that rolls the pull, scheduled ingestion, artifact import, and hosted smoke plans into one blocker list for operators.
+- Open Prices launch readiness summary that rolls the pull, scheduled ingestion, artifact import, hosted smoke, and schedule health plans into one blocker list for operators.
 - Open Prices launch readiness digest with dashboard-friendly counts for checked plans, remaining actions, evidence fields, hosted-smoke blockers, and persistence blockers.
 - Open Prices schedule health plan asset with the Dagster deployment URL, schedule enablement flags, and last-run evidence needed before hosted scheduled-worker proof can pass.
 - An `open_prices_ingestion_schedule` Dagster schedule contract that targets the Open Prices pull, ingestion plan, observations, latest-price rollup, freshness, and coverage assets every six hours.

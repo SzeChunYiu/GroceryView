@@ -713,6 +713,12 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
         metrics_token_present=True,
         imported_terminal_product_id_present=True,
     )
+    ready_schedule_health = build_open_prices_schedule_health_plan(
+        dagster_deployment_url_present=True,
+        ingestion_schedule_enabled=True,
+        import_readiness_schedule_enabled=True,
+        schedule_health_probe_configured=True,
+    )
     ready_gate = build_data_pipeline_quality_gate(
         quality,
         freshness,
@@ -720,6 +726,7 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
         ready_ingestion,
         ready_import,
         ready_hosted_smoke,
+        ready_schedule_health,
     )
     assert ready_gate.to_dict() == {
         "status": "ready",
@@ -733,6 +740,7 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
             "open_prices_ingestion_run_plan",
             "open_prices_artifact_import_plan",
             "open_prices_hosted_smoke_plan",
+            "open_prices_schedule_health_plan",
         ],
         "demo": True,
     }
@@ -775,6 +783,24 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
     assert blocked_hosted_gate.status == "blocked"
     assert blocked_hosted_gate.blockers == ["open_prices_hosted_smoke_plan_blocked"]
     assert blocked_hosted_gate.checked_assets[-1] == "open_prices_hosted_smoke_plan"
+
+    blocked_schedule_health = build_open_prices_schedule_health_plan(
+        dagster_deployment_url_present=True,
+        ingestion_schedule_enabled=True,
+        import_readiness_schedule_enabled=True,
+    )
+    blocked_schedule_gate = build_data_pipeline_quality_gate(
+        quality,
+        freshness,
+        coverage,
+        ready_ingestion,
+        ready_import,
+        ready_hosted_smoke,
+        blocked_schedule_health,
+    )
+    assert blocked_schedule_gate.status == "blocked"
+    assert blocked_schedule_gate.blockers == ["open_prices_schedule_health_plan_blocked"]
+    assert blocked_schedule_gate.checked_assets[-1] == "open_prices_schedule_health_plan"
 
 
 def test_data_pipeline_quality_gate_digest_counts_blocker_classes() -> None:
