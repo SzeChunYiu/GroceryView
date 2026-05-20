@@ -925,6 +925,12 @@ export type CollectPostgresIntegrationProbeInput = {
 export type CheckPostgresIntegrationReadinessInput = CollectPostgresIntegrationProbeInput;
 
 export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
+  'chains',
+  'products',
+  'source_runs',
+  'raw_records',
+  'observations',
+  'latest_prices',
   'app_users',
   'favorite_stores',
   'user_preferences',
@@ -952,6 +958,8 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
   const userId = `postgres-probe-user-${safeId}`;
   const assignmentId = `postgres-probe-assignment-${safeId}`;
   const suppressionId = `postgres-probe-suppression-${safeId}`;
+  const chainSlug = `postgres-probe-chain-${safeId}`;
+  const productSlug = `postgres-probe-product-${safeId}`;
 
   return [
     {
@@ -999,6 +1007,72 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
         const suppressions = await repository.listActiveNotificationSuppressions();
         assertProbe(suppressions.some((suppression) => suppression.id === suppressionId), 'notification suppression probe row was not readable');
       }
+    },
+    {
+      name: 'price_observation_pipeline_round_trip',
+      async run(executor) {
+        const chainRows = await executor.query<ProbeIdRow>(
+          `insert into chains(slug, name, country_code)
+           values ($1, $2, 'SE')
+           on conflict (slug) do update set name = excluded.name, updated_at = now()
+           returning id`,
+          [chainSlug, `Postgres Probe Chain ${safeId}`]
+        );
+        const chainId = chainRows[0]?.id;
+        assertProbe(Boolean(chainId), 'price observation probe chain id was not returned');
+
+        const productRows = await executor.query<ProbeIdRow>(
+          `insert into products(slug, canonical_name, comparable_unit)
+           values ($1, $2, 'pcs')
+           on conflict (slug) do update set canonical_name = excluded.canonical_name, updated_at = now()
+           returning id`,
+          [productSlug, `Postgres Probe Product ${safeId}`]
+        );
+        const productId = productRows[0]?.id;
+        assertProbe(Boolean(productId), 'price observation probe product id was not returned');
+
+        const sourceWriter = createPostgresSourceRecordWriter(executor);
+        const priceWriter = createPostgresPriceObservationWriter(executor);
+        const sourceRun = await sourceWriter.createSourceRun({
+          sourceType: 'manual_seed',
+          sourceName: 'Postgres integration probe',
+          startedAt: input.now,
+          finishedAt: input.now,
+          status: 'succeeded',
+          provenance: { runId: input.runId, probe: 'price_observation_pipeline_round_trip' }
+        });
+        const rawRecord = await sourceWriter.upsertRawRecord({
+          sourceRunId: sourceRun.sourceRunId,
+          recordType: 'price',
+          observedAt: input.now,
+          payload: { chainSlug, productSlug, price: 12.34 },
+          payloadHash: `postgres-probe-price-${safeId}`,
+          provenance: { runId: input.runId }
+        });
+        const observation = await priceWriter.recordPriceObservation({
+          productId,
+          chainId,
+          sourceRunId: sourceRun.sourceRunId,
+          rawRecordId: rawRecord.rawRecordId,
+          retailerProductRef: `postgres-probe-ref-${safeId}`,
+          priceType: 'online',
+          price: 12.34,
+          unitPrice: 12.34,
+          observedAt: input.now,
+          confidence: 0.99,
+          provenance: { runId: input.runId, sourceRunId: sourceRun.sourceRunId, rawRecordId: rawRecord.rawRecordId }
+        });
+        const latestRows = await executor.query<LatestPriceProbeRow>(
+          `select observation_id
+           from latest_prices
+           where product_id = $1 and chain_id = $2 and store_id is null and price_type = 'online'`,
+          [productId, chainId]
+        );
+        assertProbe(
+          latestRows.some((row) => row.observation_id === observation.observationId),
+          'latest price probe row did not reference the written observation'
+        );
+      }
     }
   ];
 }
@@ -1012,6 +1086,8 @@ export type PostgresIntegrationReadinessReport = {
 
 type TableNameRow = { table_name: string };
 type MigrationVersionRow = { version: string };
+type ProbeIdRow = { id: string };
+type LatestPriceProbeRow = { observation_id: string };
 type ObservationIdRow = { id: string };
 type SourceRunIdRow = { id: string };
 type RawRecordIdRow = { id: string };

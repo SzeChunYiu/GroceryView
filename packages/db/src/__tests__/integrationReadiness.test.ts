@@ -52,6 +52,24 @@ class RepositorySmokeQueryExecutor implements QueryExecutor {
   async query<T>(sql: string, params: unknown[] = []) {
     this.calls.push({ sql, params });
     if (!this.readable) return [] as T[];
+    if (sql.includes('insert into chains')) {
+      return [{ id: 'chain-1' }] as T[];
+    }
+    if (sql.includes('insert into products')) {
+      return [{ id: 'product-1' }] as T[];
+    }
+    if (sql.includes('insert into source_runs')) {
+      return [{ id: 'source-run-1' }] as T[];
+    }
+    if (sql.includes('insert into raw_records')) {
+      return [{ id: 'raw-record-1' }] as T[];
+    }
+    if (sql.includes('insert into observations')) {
+      return [{ id: 'observation-1' }] as T[];
+    }
+    if (sql.includes('from latest_prices')) {
+      return [{ observation_id: 'observation-1' }] as T[];
+    }
     if (sql.includes('select weekly_budget')) {
       return [{ weekly_budget: '1000', monthly_budget: '4000' }] as T[];
     }
@@ -104,10 +122,16 @@ describe('buildPostgresIntegrationReadinessReport', () => {
     assert.equal(report.status, 'blocked');
     assert.deepEqual(report.blockers, [
       'missing_table:basket_items',
+      'missing_table:chains',
       'missing_table:community_reporter_trust',
       'missing_table:human_review_assignments',
       'missing_table:human_reviewers',
+      'missing_table:latest_prices',
       'missing_table:notification_suppressions',
+      'missing_table:observations',
+      'missing_table:products',
+      'missing_table:raw_records',
+      'missing_table:source_runs',
       'missing_table:user_preferences',
       'missing_table:watchlist_items',
       'missing_table:weekly_baskets',
@@ -144,12 +168,18 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       evidence: [
         'table:app_users',
         'table:basket_items',
+        'table:chains',
         'table:community_reporter_trust',
         'table:favorite_stores',
         'table:human_review_assignments',
         'table:human_reviewers',
+        'table:latest_prices',
         'table:notification_suppressions',
         'table:notification_tasks',
+        'table:observations',
+        'table:products',
+        'table:raw_records',
+        'table:source_runs',
         'table:user_preferences',
         'table:watchlist_items',
         'table:weekly_baskets',
@@ -272,7 +302,8 @@ describe('buildPostgresRepositorySmokeProbes', () => {
     assert.deepEqual(probes.map((probe) => probe.name), [
       'user_budget_round_trip',
       'human_review_assignment_round_trip',
-      'notification_suppression_round_trip'
+      'notification_suppression_round_trip',
+      'price_observation_pipeline_round_trip'
     ]);
 
     for (const probe of probes) {
@@ -282,6 +313,8 @@ describe('buildPostgresRepositorySmokeProbes', () => {
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-user-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-assignment-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-suppression-run-42')), true);
+    assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-chain-run-42')), true);
+    assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-product-run-42')), true);
   });
 
   it('fails closed when a smoke probe cannot read back its write', async () => {
