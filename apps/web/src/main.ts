@@ -91,6 +91,20 @@ const alertPreferences = [
   { rule: 'Receipt review reminder', channel: 'Push', quietHours: 'Immediate', scope: 'Household queue' }
 ];
 
+const watchlistRows = [
+  { product: 'Zoégas Coffee 450g', target: '50 SEK', current: '49.90 SEK', trigger: 'Deal Score >= 80', status: 'Ready for push' },
+  { product: 'Butter 600g', target: '45 SEK', current: '54.90 SEK', trigger: '52-week low', status: 'Watching' },
+  { product: 'Eggs 12-pack', target: '35 SEK', current: '34.90 SEK', trigger: 'Favorite stores only', status: 'Ready for email' },
+  { product: 'Loose tomatoes', target: '29 SEK/kg', current: 'Estimated', trigger: 'Confidence >= 80%', status: 'Held for review' }
+];
+
+const notificationInboxRows = [
+  { alert: 'Coffee below 50 SEK', channel: 'Push', status: 'Delivered', reason: 'Verified shelf price' },
+  { alert: 'Eggs favorite-store drop', channel: 'Email', status: 'Delivered', reason: 'Retailer page confidence' },
+  { alert: 'Receipt review reminder', channel: 'Push', status: 'Held', reason: 'Quiet hours 21:00-07:00' },
+  { alert: 'Butter target price', channel: 'Push', status: 'Suppressed', reason: 'Provider token invalid' }
+];
+
 const budget = summarizeBudget({
   weeklyBudget: 800,
   monthlyBudget: 3200,
@@ -98,6 +112,12 @@ const budget = summarizeBudget({
   receiptTotalsThisWeek: [321, 180],
   receiptTotalsThisMonth: [321, 180, 760, 690]
 });
+
+const budgetForecastRows = [
+  { period: 'This week actuals', budget: '800 SEK', value: `${budget.weeklyActualSpend} SEK`, variance: `${budget.weeklyRemainingActual} SEK left`, status: budget.weeklyStatus },
+  { period: 'Next planned basket', budget: '800 SEK', value: `${budget.estimatedBasketTotal} SEK`, variance: `${budget.weeklyRemainingAfterEstimate} SEK left`, status: 'needs review' },
+  { period: 'Month-end projection', budget: '3 200 SEK', value: '3 084 SEK', variance: '116 SEK left', status: 'on track' }
+];
 
 const scannerReviews = [
   {
@@ -121,6 +141,12 @@ const scannerReviews = [
     owner: 'Sam',
     action: 'Route to product matching queue'
   }
+];
+
+const receiptReviewRows = [
+  { line: 'Arla Milk 1L', match: 'ARLA-MILK-1L', confidence: 98, budgetAction: 'Post to weekly actuals', catalogAction: 'Update verified price' },
+  { line: 'Coop loyalty discount', match: 'receipt discount', confidence: 84, budgetAction: 'Apply receipt total only', catalogAction: 'No shelf price update' },
+  { line: 'Loose tomatoes', match: 'unknown produce', confidence: 54, budgetAction: 'Hold from forecast', catalogAction: 'Route to human review' }
 ];
 
 const humanReviewAssignments = [
@@ -246,7 +272,7 @@ app.innerHTML = `
     <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Scanner review desk</h2>
-        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices.</p>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices. <a href="/receipts/review/">Open receipt review</a>.</p>
         <table class="table">
           <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
           <tbody>
@@ -259,6 +285,19 @@ app.innerHTML = `
           </tbody>
         </table>
       </div>
+      <div class="card">
+        <h2>Receipt line writeback</h2>
+        <p class="lede">Receipt lines require a product match and sufficient confidence before they can update budgets, catalog prices, or Deal Score inputs.</p>
+        <table class="table">
+          <thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptReviewRows.map((row) => `<tr><td>${row.line}</td><td>${row.match}</td><td>${row.confidence}%</td><td>${row.budgetAction}</td><td>${row.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Review routing</h2>
         <p class="lede">Low-confidence captures are separated from verified shelf and retailer-page prices so estimated data cannot masquerade as official price evidence.</p>
@@ -344,7 +383,7 @@ app.innerHTML = `
     <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Weekly basket strategy</h2>
-        <p class="lede">Cheapest by product across selected favorite stores. Distance is informational only and never reduces savings.</p>
+        <p class="lede">Cheapest by product across selected favorite stores. Distance is informational only and never reduces savings. <a href="/budget/forecast/">Open budget forecast</a>.</p>
         <table class="table">
           <thead><tr><th>Product</th><th>Store</th><th>Total</th></tr></thead>
           <tbody>
@@ -352,10 +391,21 @@ app.innerHTML = `
           </tbody>
         </table>
         <h2 style="margin-top:24px">Smart swaps</h2>
+        <p class="lede"><a href="/savings/smart-swaps/">Open smart swaps</a> for equivalence, household fit, and confidence guardrails.</p>
         <table class="table">
           <thead><tr><th>Swap</th><th>Saves</th><th>Rule</th></tr></thead>
           <tbody>
             ${smartSwaps.map((swap) => `<tr><td>${swap.from} → ${swap.to}</td><td>${swap.savings} SEK</td><td>${swap.rule}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget forecast</h2>
+        <p class="lede">Forecast rows compare actual receipts, planned baskets, and month-end projection before corrective swaps are applied.</p>
+        <table class="table">
+          <thead><tr><th>Period</th><th>Budget</th><th>Value</th><th>Variance</th><th>Status</th></tr></thead>
+          <tbody>
+            ${budgetForecastRows.map((row) => `<tr><td>${row.period}</td><td>${row.budget}</td><td>${row.value}</td><td>${row.variance}</td><td><span class="status">${row.status}</span></td></tr>`).join('')}
           </tbody>
         </table>
       </div>
@@ -365,6 +415,7 @@ app.innerHTML = `
     <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Watchlist alerts</h2>
+        <p class="lede"><a href="/watchlist/">Open the watchlist workbench</a> for target prices, alert state, and confidence guardrails.</p>
         <table class="table">
           <thead><tr><th>Type</th><th>Message</th></tr></thead>
           <tbody>
@@ -376,6 +427,29 @@ app.innerHTML = `
           <thead><tr><th>Rule</th><th>Channel</th><th>Quiet hours</th><th>Scope</th></tr></thead>
           <tbody>
             ${alertPreferences.map((preference) => `<tr><td>${preference.rule}</td><td><span class="status">${preference.channel}</span></td><td>${preference.quietHours}</td><td>${preference.scope}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Watchlist workbench</h2>
+        <p class="lede">Target-price rows show whether an alert is ready, still watching, or held because price evidence is estimated.</p>
+        <table class="table">
+          <thead><tr><th>Product</th><th>Target</th><th>Current</th><th>Status</th></tr></thead>
+          <tbody>
+            ${watchlistRows.map((row) => `<tr><td><strong>${row.product}</strong><br><span class="footer-note">${row.trigger}</span></td><td>${row.target}</td><td>${row.current}</td><td><span class="status">${row.status}</span></td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Notification inbox</h2>
+        <p class="lede"><a href="/notifications/inbox/">Open alert inbox</a> to audit delivered, held, and suppressed household notifications.</p>
+        <table class="table">
+          <thead><tr><th>Alert</th><th>Channel</th><th>Status</th><th>Reason</th></tr></thead>
+          <tbody>
+            ${notificationInboxRows.map((row) => `<tr><td>${row.alert}</td><td>${row.channel}</td><td><span class="status">${row.status}</span></td><td>${row.reason}</td></tr>`).join('')}
           </tbody>
         </table>
       </div>
