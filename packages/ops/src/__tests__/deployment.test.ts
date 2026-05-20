@@ -4,6 +4,7 @@ import {
   buildDeploymentReadinessReport,
   buildHostedSmokeCommandPlan,
   buildRollbackPlan,
+  buildSecretRotationReadinessReport,
   summarizeDeploymentReadinessReport,
   summarizeGateBlockers,
   summarizeGateWarnings
@@ -244,6 +245,45 @@ describe('deployment ops foundation', () => {
       ],
       requiredSecrets: ['PROD_METRICS_TOKEN'],
       evidence: ['hosted_api_health', 'hosted_web', 'hosted_postgres_readiness']
+    });
+  });
+
+  it('blocks deployment when required secrets are missing, stale, or lack rotation ownership', () => {
+    const report = buildSecretRotationReadinessReport({
+      checkedAt: '2026-05-20T08:00:00.000Z',
+      maxAgeDays: 90,
+      requiredSecrets: ['DATABASE_URL', 'SESSION_SECRET', 'METRICS_TOKEN', 'BILLING_WEBHOOK_SECRET'],
+      secrets: [
+        {
+          name: 'DATABASE_URL',
+          present: true,
+          rotatedAt: '2026-01-01T00:00:00.000Z',
+          owner: 'platform'
+        },
+        {
+          name: 'SESSION_SECRET',
+          present: true,
+          rotatedAt: '2026-05-01T00:00:00.000Z'
+        },
+        {
+          name: 'METRICS_TOKEN',
+          present: false,
+          rotatedAt: '2026-05-01T00:00:00.000Z',
+          owner: 'platform'
+        }
+      ]
+    });
+
+    assert.deepEqual(report, {
+      status: 'blocked',
+      blockers: [
+        'secret_rotation_stale:DATABASE_URL',
+        'secret_rotation_owner_missing:SESSION_SECRET',
+        'secret_missing:METRICS_TOKEN',
+        'secret_missing:BILLING_WEBHOOK_SECRET'
+      ],
+      readySecrets: [],
+      summary: 'Secret rotation readiness is blocked until required deployment secrets are present, fresh, and owned.'
     });
   });
 });

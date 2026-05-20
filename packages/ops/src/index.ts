@@ -343,6 +343,64 @@ export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput):
   return { commands, requiredSecrets, evidence };
 }
 
+export type SecretRotationRecord = {
+  name: string;
+  present: boolean;
+  rotatedAt?: string;
+  owner?: string;
+};
+
+export type SecretRotationReadinessInput = {
+  checkedAt: string;
+  maxAgeDays: number;
+  requiredSecrets: string[];
+  secrets: SecretRotationRecord[];
+};
+
+export type SecretRotationReadinessReport = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  readySecrets: string[];
+  summary: string;
+};
+
+export function buildSecretRotationReadinessReport(input: SecretRotationReadinessInput): SecretRotationReadinessReport {
+  const checkedAt = Date.parse(input.checkedAt);
+  const maxAgeMs = input.maxAgeDays * 24 * 60 * 60 * 1000;
+  const secretsByName = new Map(input.secrets.map((secret) => [secret.name, secret]));
+  const blockers: string[] = [];
+  const readySecrets: string[] = [];
+
+  for (const name of input.requiredSecrets) {
+    const secret = secretsByName.get(name);
+    if (!secret || !secret.present) {
+      blockers.push(`secret_missing:${name}`);
+      continue;
+    }
+
+    const rotatedAt = secret.rotatedAt ? Date.parse(secret.rotatedAt) : Number.NaN;
+    if (!Number.isFinite(rotatedAt) || !Number.isFinite(checkedAt) || checkedAt - rotatedAt > maxAgeMs) {
+      blockers.push(`secret_rotation_stale:${name}`);
+    }
+
+    if (!secret.owner) {
+      blockers.push(`secret_rotation_owner_missing:${name}`);
+    } else if (Number.isFinite(rotatedAt) && Number.isFinite(checkedAt) && checkedAt - rotatedAt <= maxAgeMs) {
+      readySecrets.push(name);
+    }
+  }
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    readySecrets,
+    summary:
+      blockers.length === 0
+        ? 'Secret rotation readiness passed.'
+        : 'Secret rotation readiness is blocked until required deployment secrets are present, fresh, and owned.'
+  };
+}
+
 export function buildRollbackPlan(input: RollbackPlanInput): RollbackPlan {
   const steps = [`Disable new traffic to release ${input.currentRelease}.`, `Restore application artifact ${input.previousRelease}.`];
   let requiresManualDatabaseRecovery = false;
