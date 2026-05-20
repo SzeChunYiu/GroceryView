@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { createSessionToken } from '@groceryview/auth';
 import {
   buildHealthReport,
+  createRuntimeHttpService,
   createRuntimeHttpHandler,
   isDirectServerEntrypoint,
   loadRuntimeConfig,
@@ -14,6 +15,39 @@ import {
 
 function signBillingWebhookBody(body: string, secret: string): string {
   return `sha256=${createHmac('sha256', secret).update(body).digest('hex')}`;
+}
+
+class RecordingPgPool {
+  calls: Array<{ text: string; values: unknown[] }> = [];
+  closed = false;
+  private entitlementRow: unknown | null = null;
+
+  async query(text: string, values: unknown[] = []) {
+    this.calls.push({ text, values });
+    if (text.includes('insert into subscription_entitlements')) {
+      this.entitlementRow = {
+        user_id: values[0],
+        tier: values[1],
+        plan: values[2],
+        status: values[3],
+        current_period_ends_at: values[4],
+        provider: values[5],
+        provider_customer_id: values[6],
+        provider_subscription_id: values[7],
+        updated_at: values[8]
+      };
+      return { rows: [] };
+    }
+    if (text.includes('from subscription_entitlements')) {
+      const row = this.entitlementRow as { user_id?: string } | null;
+      return { rows: row?.user_id === values[0] ? [row] : [] };
+    }
+    return { rows: [] };
+  }
+
+  async end() {
+    this.closed = true;
+  }
 }
 
 describe('runtime config', () => {
@@ -195,6 +229,69 @@ describe('runtime config', () => {
     assert.equal(policy.checkoutRequired, false);
     assert.equal(JSON.stringify(policy).includes('cus_internal_only'), false);
     assert.equal(JSON.stringify(policy).includes('sub_internal_only'), false);
+  });
+
+  it('bootstraps a PostgreSQL-backed runtime repository from DATABASE_URL', async () => {
+    const pool = new RecordingPgPool();
+    const authSecret = 'auth-secret';
+    const billingSecret = 'billing-secret';
+    let connectionString: string | undefined;
+    const service = createRuntimeHttpService(
+      {
+        NODE_ENV: 'development',
+        PORT: '3000',
+        AUTH_SECRET: authSecret,
+        DATABASE_URL: 'postgres://runtime-db.example/groceryview',
+        PUBLIC_WEB_URL: 'https://groceryview.example',
+        NOTIFICATION_WEBHOOK_SECRET: 'notification-secret',
+        BILLING_WEBHOOK_SECRET: billingSecret,
+        METRICS_TOKEN: 'metrics-secret'
+      },
+      {
+        pgPoolFactory: (databaseUrl) => {
+          connectionString = databaseUrl;
+          return pool;
+        }
+      }
+    );
+    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, authSecret);
+
+    try {
+      const body = JSON.stringify({
+        provider: 'stripe_compatible',
+        providerEventId: 'evt_subscription_active_pg_runtime',
+        type: 'subscription.active',
+        userId: 'user-1',
+        plan: 'premium_monthly',
+        currentPeriodEndsAt: '2099-01-01T00:00:00.000Z',
+        providerCustomerId: 'cus_internal_only',
+        providerSubscriptionId: 'sub_internal_only',
+        occurredAt: '2026-05-20T00:00:00.000Z'
+      });
+
+      const accepted = await service.handler(new Request('http://localhost/api/billing/subscription-events', {
+        method: 'POST',
+        headers: { 'x-groceryview-billing-signature': signBillingWebhookBody(body, billingSecret) },
+        body
+      }));
+      assert.equal(accepted.status, 202);
+
+      const account = await service.handler(new Request('http://localhost/api/account/subscription-access?userId=user-1', {
+        headers: { authorization: `Bearer ${token}` }
+      }));
+      assert.equal(account.status, 200);
+      assert.deepEqual((await account.json() as { enforcementReasons: string[] }).enforcementReasons, [
+        'active_subscription_entitlement:premium_monthly'
+      ]);
+    } finally {
+      await service.close();
+    }
+
+    assert.equal(connectionString, 'postgres://runtime-db.example/groceryview');
+    assert.equal(pool.closed, true);
+    const writeCall = pool.calls.find((call) => call.text.includes('insert into subscription_entitlements'));
+    assert.deepEqual(writeCall?.values.slice(0, 4), ['user-1', 'premium', 'premium_monthly', 'active']);
+    assert.equal(writeCall?.text.includes('$1'), true);
   });
 
   it('detects when the server module is executed directly as the deployment entrypoint', () => {

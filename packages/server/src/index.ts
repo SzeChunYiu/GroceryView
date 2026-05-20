@@ -1,9 +1,11 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createGroceryViewApi } from '@groceryview/api';
 import { parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
+import { createPgQueryExecutor, createPostgresRepository, type PgLikeClient } from '@groceryview/db';
 import {
   buildSubscriptionAccessPolicy,
   processBillingSubscriptionEvent,
@@ -71,14 +73,22 @@ export type RuntimePersistenceRepository = {
   upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
 };
 
+export type RuntimePgPool = PgLikeClient & {
+  end(): Promise<void> | void;
+};
+
+export type RuntimePgPoolFactory = (databaseUrl: string) => RuntimePgPool;
+
 export type RuntimeHandlerOptions = {
   now?: Date;
   repository?: RuntimePersistenceRepository;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
+  pgPoolFactory?: RuntimePgPoolFactory;
 };
 
 type JsonRecord = Record<string, unknown>;
 
+const require = createRequire(import.meta.url);
 const jsonHeaders = { 'content-type': 'application/json; charset=utf-8' };
 
 function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
@@ -715,6 +725,16 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
   };
 }
 
+function createDefaultPgPool(databaseUrl: string): RuntimePgPool {
+  const pg = require('pg') as { Pool?: new (config: { connectionString: string }) => RuntimePgPool };
+  if (!pg.Pool) throw new Error('pg Pool export is not available.');
+  return new pg.Pool({ connectionString: databaseUrl });
+}
+
+function noopClose(): Promise<void> {
+  return Promise.resolve();
+}
+
 export function buildRepositoryBackedAuthOptions(
   config: RuntimeConfig,
   repository: RuntimePersistenceRepository,
@@ -743,20 +763,65 @@ export function buildRuntimeRequestAuthOptions(config: RuntimeConfig, options: R
   return options.repository ? buildRepositoryBackedAuthOptions(config, options.repository, options) : buildRuntimeAuthOptions(config, options);
 }
 
+function createRuntimeRepositoryResource(config: RuntimeConfig, options: RuntimeHandlerOptions): {
+  repository?: RuntimePersistenceRepository;
+  close(): Promise<void>;
+} {
+  if (options.repository || !config.databaseUrl) return { close: noopClose };
+
+  const pool = (options.pgPoolFactory ?? createDefaultPgPool)(config.databaseUrl);
+  return {
+    repository: createPostgresRepository(createPgQueryExecutor(pool)),
+    async close() {
+      await pool.end();
+    }
+  };
+}
+
+function createRuntimeHttpServiceFromConfig(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): RuntimeHttpService {
+  const resource = createRuntimeRepositoryResource(config, options);
+  const authOptions = buildRuntimeRequestAuthOptions(config, resource.repository ? { ...options, repository: resource.repository } : options);
+  return {
+    handler: createHttpHandler(undefined, authOptions),
+    close: resource.close
+  };
+}
+
+export type RuntimeHttpService = {
+  handler: HttpHandler;
+  close(): Promise<void>;
+};
+
+export function createRuntimeHttpService(
+  env: Record<string, string | undefined> = process.env,
+  options: RuntimeHandlerOptions = {}
+): RuntimeHttpService {
+  return createRuntimeHttpServiceFromConfig(loadRuntimeConfig(env), options);
+}
+
 export function createRuntimeHttpHandler(
   env: Record<string, string | undefined> = process.env,
   options: RuntimeHandlerOptions = {}
 ): HttpHandler {
-  return createHttpHandler(undefined, buildRuntimeRequestAuthOptions(loadRuntimeConfig(env), options));
+  return createRuntimeHttpService(env, options).handler;
 }
 
 export function createRuntimeNodeServer(env: Record<string, string | undefined> = process.env, options: RuntimeHandlerOptions = {}) {
-  return createNodeServer(createRuntimeHttpHandler(env, options));
+  const service = createRuntimeHttpService(env, options);
+  const server = createNodeServer(service.handler);
+  server.on('close', () => {
+    void service.close();
+  });
+  return server;
 }
 
 export function startNodeServerFromEnv(env: Record<string, string | undefined> = process.env, options: RuntimeHandlerOptions = {}) {
   const config = loadRuntimeConfig(env);
-  const server = createNodeServer(createHttpHandler(undefined, buildRuntimeRequestAuthOptions(config, options)));
+  const service = createRuntimeHttpServiceFromConfig(config, options);
+  const server = createNodeServer(service.handler);
+  server.on('close', () => {
+    void service.close();
+  });
   server.listen(config.port);
   return server;
 }
