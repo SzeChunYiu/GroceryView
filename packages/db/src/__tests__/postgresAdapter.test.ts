@@ -99,6 +99,7 @@ class RecordingQueryExecutor implements QueryExecutor {
 
   async query<T>(sql: string, params: unknown[] = []) {
     this.calls.push({ sql, params });
+    if (sql.includes('update source_runs')) return this.sourceRunId === undefined ? ([] as T[]) : ([{ id: this.sourceRunId }] as T[]);
     if (sql.includes('insert into source_runs')) return this.sourceRunId === undefined ? ([] as T[]) : ([{ id: this.sourceRunId }] as T[]);
     if (sql.includes('insert into raw_records')) return this.rawRecordId === undefined ? ([] as T[]) : ([{ id: this.rawRecordId }] as T[]);
     if (sql.includes('insert into observations')) return this.observationId === undefined ? ([] as T[]) : ([{ id: this.observationId }] as T[]);
@@ -448,6 +449,26 @@ describe('createPostgresSourceRecordWriter', () => {
     ]);
   });
 
+  it('finishes source runs with terminal status and error metadata', async () => {
+    const executor = new RecordingQueryExecutor();
+    const writer = createPostgresSourceRecordWriter(executor);
+
+    assert.deepEqual(
+      await writer.finishSourceRun({
+        sourceRunId: 'source-run-1',
+        finishedAt: '2026-05-20T08:02:00.000Z',
+        status: 'partial',
+        errorMessage: '2 records skipped'
+      }),
+      { sourceRunId: 'source-run-1' }
+    );
+
+    assert.match(executor.calls[0]!.sql, /update source_runs/);
+    assert.match(executor.calls[0]!.sql, /finished_at = coalesce\(\$2, now\(\)\)/);
+    assert.match(executor.calls[0]!.sql, /returning id/);
+    assert.deepEqual(executor.calls[0]!.params, ['source-run-1', '2026-05-20T08:02:00.000Z', 'partial', '2 records skipped']);
+  });
+
   it('fails closed when source run or raw record writes do not return ids', async () => {
     const executor = new RecordingQueryExecutor();
     const writer = createPostgresSourceRecordWriter(executor);
@@ -462,6 +483,16 @@ describe('createPostgresSourceRecordWriter', () => {
         errorMessage: 'timeout'
       }),
       /Source run insert did not return an id/
+    );
+
+    executor.sourceRunId = undefined;
+    await assert.rejects(
+      writer.finishSourceRun({
+        sourceRunId: 'source-run-missing',
+        status: 'failed',
+        errorMessage: 'missing run'
+      }),
+      /Source run update did not return an id: source-run-missing/
     );
 
     executor.sourceRunId = 'source-run-1';

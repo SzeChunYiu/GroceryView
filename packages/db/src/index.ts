@@ -274,6 +274,13 @@ export type RawRecordRecord = {
   provenance: Record<string, unknown>;
 };
 
+export type FinishSourceRunRecord = {
+  sourceRunId: string;
+  finishedAt?: string;
+  status: 'succeeded' | 'failed' | 'partial';
+  errorMessage?: string;
+};
+
 export type SourceRunWriteResult = {
   sourceRunId: string;
 };
@@ -284,6 +291,7 @@ export type RawRecordWriteResult = {
 
 export type PostgresSourceRecordWriter = {
   createSourceRun(sourceRun: SourceRunRecord): Promise<SourceRunWriteResult>;
+  finishSourceRun(sourceRun: FinishSourceRunRecord): Promise<SourceRunWriteResult>;
   upsertRawRecord(rawRecord: RawRecordRecord): Promise<RawRecordWriteResult>;
 };
 
@@ -1250,6 +1258,21 @@ export function createPostgresSourceRecordWriter(executor: QueryExecutor): Postg
       );
       const sourceRunId = rows[0]?.id;
       if (!sourceRunId) throw new Error('Source run insert did not return an id');
+      return { sourceRunId };
+    },
+
+    async finishSourceRun(sourceRun) {
+      const rows = await executor.query<SourceRunIdRow>(
+        `update source_runs
+         set finished_at = coalesce($2, now()),
+             status = $3,
+             error_message = $4
+         where id = $1
+         returning id`,
+        [sourceRun.sourceRunId, sourceRun.finishedAt ?? null, sourceRun.status, sourceRun.errorMessage ?? null]
+      );
+      const sourceRunId = rows[0]?.id;
+      if (!sourceRunId) throw new Error(`Source run update did not return an id: ${sourceRun.sourceRunId}`);
       return { sourceRunId };
     },
 
