@@ -19,7 +19,6 @@ describe('buildStaticPages', () => {
         'budget/forecast/index.html',
         'catalog/coverage/index.html',
         'categories/coffee/index.html',
-        'community/reports/index.html',
         'deals/today/index.html',
         'household/index.html',
         'login/index.html',
