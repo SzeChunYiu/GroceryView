@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { validateDeploymentManifest, type DeploymentManifest } from '../index.js';
+import { summarizeDeploymentManifestValidationReport, validateDeploymentManifest, type DeploymentManifest } from '../index.js';
 
 const validManifest: DeploymentManifest = {
   version: 1,
@@ -71,6 +71,52 @@ describe('validateDeploymentManifest', () => {
       ],
       warnings: [],
       serviceNames: ['groceryview-server', 'groceryview-server']
+    });
+  });
+
+  it('summarizes manifest validation blockers for release dashboards', () => {
+    const report = validateDeploymentManifest({
+      version: 2,
+      services: [
+        {
+          type: '',
+          workspace: 'server',
+          healthCheck: { path: 'health', expectedStatus: 500 },
+          requiredEnv: ['bad-env-name']
+        },
+        {
+          name: 'groceryview-web',
+          type: 'static-site',
+          workspace: '@groceryview/web',
+          buildCommand: '',
+          outputDirectory: '',
+          healthCheck: { path: '/', expectedStatus: 200 },
+          requiredEnv: []
+        },
+        {
+          name: 'groceryview-web',
+          type: 'node-http',
+          workspace: '@groceryview/server',
+          healthCheck: { path: '/api/health', expectedStatus: 200 },
+          requiredEnv: ['DATABASE_URL']
+        }
+      ]
+    });
+
+    assert.deepEqual(summarizeDeploymentManifestValidationReport(report), {
+      status: 'blocked',
+      serviceCount: 3,
+      totalBlockers: 11,
+      totalWarnings: 1,
+      unsupportedVersion: 1,
+      missingServices: 0,
+      duplicateServices: 1,
+      serviceMetadata: 2,
+      invalidWorkspaces: 1,
+      commandOrOutput: 3,
+      healthChecks: 2,
+      requiredEnv: 1,
+      servicesWithoutRequiredEnv: 1
     });
   });
 

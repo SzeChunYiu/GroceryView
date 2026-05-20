@@ -598,6 +598,39 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
 
       if (method === 'GET' && path === '/api/market/overview') return jsonResponse(api.getMarketOverview());
       if (method === 'GET' && path === '/api/nutrition/value') return jsonResponse(api.getNutritionValueReport(optionalNutritionMetric(url.searchParams.get('metric'))));
+      if (path === '/api/pantry/replenishment') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(api.getPantryReplenishment(user, url.searchParams.get('asOf') ?? undefined));
+      }
+      if (path === '/api/loyalty/offers') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(api.getLoyaltyOfferReport(user));
+      }
+      if (path === '/api/ads/disclosure') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') {
+          const entitlement = authOptions.subscriptionEntitlementRepository
+            ? await authOptions.subscriptionEntitlementRepository.getSubscriptionEntitlement(user)
+            : undefined;
+          return jsonResponse(api.getAdDisclosureReport(user, entitlement));
+        }
+      }
+      if (path === '/api/receipts/review') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(api.getReceiptReviewReport(user));
+      }
       const categoryMarketMatch = path.match(/^\/api\/categories\/([^/]+)\/market$/);
       if (method === 'GET' && categoryMarketMatch) {
         const report = api.getCategoryMarket(decodeURIComponent(categoryMarketMatch[1]));
@@ -1194,6 +1227,10 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/auth/session': { post: publicOperation('Exchange a verified auth provider assertion for a short-lived bearer session.') },
       '/api/market/overview': { get: publicOperation('Get Stockholm grocery market overview.') },
       '/api/nutrition/value': { get: publicOperation('Get nutrition per krona rankings with sugar and salt warning guardrails.') },
+      '/api/pantry/replenishment': { get: protectedOperation('Get pantry replenishment status with expiry, basket duplicate, and best-deal context.') },
+      '/api/loyalty/offers': { get: protectedOperation('Get account-scoped loyalty offers with savings, coupon actions, and membership guardrails.') },
+      '/api/ads/disclosure': { get: protectedOperation('Get ad disclosure status with placement labels, premium removal, and ranking separation guardrails.') },
+      '/api/receipts/review': { get: protectedOperation('Get receipt review budget impact, match confidence, and writeback guardrails.') },
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },

@@ -346,15 +346,36 @@ function trimTrailingSlash(url: string): string {
   return url.replace(/\/+$/, '');
 }
 
+function normalizeHostedSmokeUrl(url: string, field: string): string {
+  const normalizedUrl = trimTrailingSlash(url.trim());
+  if (normalizedUrl.length === 0) {
+    throw new Error(`${field} is required for hosted smoke command plans.`);
+  }
+
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(normalizedUrl);
+  } catch (error) {
+    throw new Error(`${field} must be a valid absolute URL.`);
+  }
+
+  if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+    throw new Error(`${field} must use http or https.`);
+  }
+
+  return normalizedUrl;
+}
+
 export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput): HostedSmokeCommandPlan {
   const timeout = input.timeoutSeconds ?? 15;
   if (!Number.isInteger(timeout) || timeout <= 0) throw new Error('timeoutSeconds must be a positive integer.');
-  const serverUrl = trimTrailingSlash(input.serverUrl);
+  const serverUrl = normalizeHostedSmokeUrl(input.serverUrl, 'serverUrl');
+  const webUrl = input.webUrl ? normalizeHostedSmokeUrl(input.webUrl, 'webUrl') : undefined;
   const terminalProductId = input.terminalProductId ?? 'coffee';
   const commands = [
     [
       `GROCERYVIEW_SERVER_URL=${serverUrl}`,
-      input.webUrl ? `GROCERYVIEW_WEB_URL=${trimTrailingSlash(input.webUrl)}` : undefined,
+      webUrl ? `GROCERYVIEW_WEB_URL=${webUrl}` : undefined,
       `GROCERYVIEW_TERMINAL_PRODUCT_ID=${terminalProductId}`,
       `HTTP_SMOKE_TIMEOUT_SECONDS=${timeout}`,
       'infra/scripts/smoke-hosted-http.sh'
@@ -365,7 +386,7 @@ export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput):
   const evidence = ['hosted_api_health', 'hosted_product_terminal'];
   const requiredSecrets: string[] = [];
 
-  if (input.webUrl) evidence.push('hosted_web');
+  if (webUrl) evidence.push('hosted_web');
 
   if (input.includePostgresReadiness) {
     const metricsTokenEnvVar = input.metricsTokenEnvVar ?? 'METRICS_TOKEN';
@@ -568,10 +589,62 @@ export type DeploymentManifestValidationReport = {
   serviceNames: string[];
 };
 
+export type DeploymentManifestValidationSummary = {
+  status: DeploymentManifestValidationReport['status'];
+  serviceCount: number;
+  totalBlockers: number;
+  totalWarnings: number;
+  unsupportedVersion: number;
+  missingServices: number;
+  duplicateServices: number;
+  serviceMetadata: number;
+  invalidWorkspaces: number;
+  commandOrOutput: number;
+  healthChecks: number;
+  requiredEnv: number;
+  servicesWithoutRequiredEnv: number;
+};
+
 type HealthCheckShape = {
   path?: unknown;
   expectedStatus?: unknown;
 };
+
+export function summarizeDeploymentManifestValidationReport(
+  report: DeploymentManifestValidationReport
+): DeploymentManifestValidationSummary {
+  return report.blockers.reduce<DeploymentManifestValidationSummary>(
+    (summary, blocker) => {
+      summary.totalBlockers += 1;
+      if (blocker === 'manifest_version_not_supported') summary.unsupportedVersion += 1;
+      if (blocker === 'services_missing') summary.missingServices += 1;
+      if (blocker.startsWith('duplicate_service:')) summary.duplicateServices += 1;
+      if (blocker.startsWith('service_name_missing:') || blocker.startsWith('service_type_missing:')) summary.serviceMetadata += 1;
+      if (blocker.startsWith('workspace_invalid:')) summary.invalidWorkspaces += 1;
+      if (blocker.startsWith('start_command_missing:') || blocker.startsWith('build_command_missing:') || blocker.startsWith('output_directory_missing:')) {
+        summary.commandOrOutput += 1;
+      }
+      if (blocker.startsWith('health_check_')) summary.healthChecks += 1;
+      if (blocker.startsWith('required_env_invalid:')) summary.requiredEnv += 1;
+      return summary;
+    },
+    {
+      status: report.status,
+      serviceCount: report.serviceNames.length,
+      totalBlockers: 0,
+      totalWarnings: report.warnings.length,
+      unsupportedVersion: 0,
+      missingServices: 0,
+      duplicateServices: 0,
+      serviceMetadata: 0,
+      invalidWorkspaces: 0,
+      commandOrOutput: 0,
+      healthChecks: 0,
+      requiredEnv: 0,
+      servicesWithoutRequiredEnv: report.warnings.filter((warning) => warning.startsWith('no_required_env:')).length
+    }
+  );
+}
 
 export function validateDeploymentManifest(manifest: DeploymentManifest): DeploymentManifestValidationReport {
   const blockers: string[] = [];

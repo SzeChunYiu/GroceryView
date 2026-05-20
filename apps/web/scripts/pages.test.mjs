@@ -364,6 +364,15 @@ describe('buildStaticPages', () => {
       assert.match(adDisclosure, /Sponsored banner/);
       assert.match(adDisclosure, /Sponsored placements cannot change Deal Score/);
       assert.match(adDisclosure, /Advertiser payloads stay aggregated and never include raw receipts/);
+      assert.match(adDisclosure, /Connected ad disclosure API/);
+      assert.match(adDisclosure, /Load live ad disclosure/);
+      assert.match(adDisclosure, /data-groceryview-flow="ad-disclosure"/);
+      assert.match(adDisclosure, /data-flow-action="load-ad-disclosure"/);
+      assert.match(adDisclosure, /data-ad-disclosure-slots/);
+      assert.match(adDisclosure, /data-ad-disclosure-blocked/);
+      assert.match(adDisclosure, /data-ad-disclosure-premium/);
+      assert.match(adDisclosure, /fetch\(apiUrl\('\/api\/ads\/disclosure'/);
+      assert.match(adDisclosure, /Connected ad disclosure loaded/);
 
       const billingStatus = await readFile(join(root, 'billing/status/index.html'), 'utf8');
       assert.match(billingStatus, /Billing status/);
@@ -371,6 +380,15 @@ describe('buildStaticPages', () => {
       assert.match(billingStatus, /premium_monthly/);
       assert.match(billingStatus, /Missing or past-due entitlements keep checkout required/);
       assert.match(billingStatus, /Provider updates must be newer than stored entitlement state/);
+      assert.match(billingStatus, /Connected billing API/);
+      assert.match(billingStatus, /Load live billing status/);
+      assert.match(billingStatus, /data-groceryview-flow="billing-status"/);
+      assert.match(billingStatus, /data-flow-action="load-billing-status"/);
+      assert.match(billingStatus, /data-billing-status-entitlement/);
+      assert.match(billingStatus, /data-billing-status-ads/);
+      assert.match(billingStatus, /data-billing-status-actions/);
+      assert.match(billingStatus, /fetch\(apiUrl\('\/api\/account\/subscription-access'/);
+      assert.match(billingStatus, /Connected billing status loaded/);
 
       const loyaltyOffers = await readFile(join(root, 'loyalty/offers/index.html'), 'utf8');
       assert.match(loyaltyOffers, /Loyalty offer tracker/);
@@ -378,6 +396,15 @@ describe('buildStaticPages', () => {
       assert.match(loyaltyOffers, /ICA Stammis linked/);
       assert.match(loyaltyOffers, /Clip coupon before checkout/);
       assert.match(loyaltyOffers, /Member-only savings never overwrite verified public shelf evidence/);
+      assert.match(loyaltyOffers, /Connected loyalty API/);
+      assert.match(loyaltyOffers, /Load live loyalty offers/);
+      assert.match(loyaltyOffers, /data-groceryview-flow="loyalty-offers"/);
+      assert.match(loyaltyOffers, /data-flow-action="load-loyalty-offers"/);
+      assert.match(loyaltyOffers, /data-loyalty-offers-savings/);
+      assert.match(loyaltyOffers, /data-loyalty-offers-actions/);
+      assert.match(loyaltyOffers, /data-loyalty-offers-guardrails/);
+      assert.match(loyaltyOffers, /fetch\(apiUrl\('\/api\/loyalty\/offers'/);
+      assert.match(loyaltyOffers, /Connected loyalty offers loaded/);
 
       const mealPlans = await readFile(join(root, 'meal-plans/index.html'), 'utf8');
       assert.match(mealPlans, /Meal plan builder/);
@@ -403,6 +430,15 @@ describe('buildStaticPages', () => {
       assert.match(pantry, /Rice 1kg/);
       assert.match(pantry, /Use before expiry/);
       assert.match(pantry, /Meal plans consume expiring pantry items before adding duplicate basket lines/);
+      assert.match(pantry, /Connected pantry API/);
+      assert.match(pantry, /Load live pantry replenishment/);
+      assert.match(pantry, /data-groceryview-flow="pantry"/);
+      assert.match(pantry, /data-flow-action="load-pantry"/);
+      assert.match(pantry, /data-pantry-summary/);
+      assert.match(pantry, /data-pantry-restock/);
+      assert.match(pantry, /data-pantry-expiry/);
+      assert.match(pantry, /fetch\(apiUrl\('\/api\/pantry\/replenishment/);
+      assert.match(pantry, /Connected pantry replenishment loaded/);
 
       const watchlist = await readFile(join(root, 'watchlist/index.html'), 'utf8');
       assert.match(watchlist, /Price watchlist workbench/);
@@ -511,6 +547,15 @@ describe('buildStaticPages', () => {
       assert.match(receiptReview, /Post to weekly actuals/);
       assert.match(receiptReview, /Route to human review/);
       assert.match(receiptReview, /Cannot update catalog or Deal Score/);
+      assert.match(receiptReview, /Connected receipt review API/);
+      assert.match(receiptReview, /Load live receipt review/);
+      assert.match(receiptReview, /data-groceryview-flow="receipt-review"/);
+      assert.match(receiptReview, /data-flow-action="load-receipt-review"/);
+      assert.match(receiptReview, /data-receipt-review-budget/);
+      assert.match(receiptReview, /data-receipt-review-lines/);
+      assert.match(receiptReview, /data-receipt-review-guardrails/);
+      assert.match(receiptReview, /fetch\(apiUrl\('\/api\/receipts\/review'/);
+      assert.match(receiptReview, /Connected receipt review loaded/);
 
       const humanReview = await readFile(join(root, 'admin/human-review/index.html'), 'utf8');
       assert.match(humanReview, /Human review operations/);

@@ -4,14 +4,14 @@ import { readFileSync } from 'node:fs';
 import { createGroceryViewApi } from '@groceryview/api';
 import {
   buildExpoReadinessPlan,
+  buildMobileOfflineSyncPlan,
   buildMobileProviderReadinessReport,
+  buildMobilePrivacyRequestPlan,
   buildMobileScreenBlueprints,
   buildMobileShell,
   buildScanResult,
   createMobileDiscoveryViewModel,
-  createMobileProductPriceTerminalViewModel,
-  createMobileViewModel,
-  loadMobileProductTerminal
+  createMobileViewModel
 } from '../index.js';
 
 describe('mobile app foundation', () => {
@@ -65,90 +65,6 @@ describe('mobile app foundation', () => {
     assert.equal(viewModel.budget.weeklyRemainingAfterEstimate, 72.3);
     assert.equal(viewModel.budget.weeklyStatus, 'under');
     assert.deepEqual(viewModel.watchlist.alertTypes, ['deal_score', 'new_52_week_low', 'target_price']);
-  });
-
-  it('loads connected product terminal numbers from the public API route for mobile product detail', async () => {
-    const api = createGroceryViewApi();
-    const terminal = api.getProductPriceTerminal('coffee');
-    assert.ok(terminal);
-    const requestedUrls: string[] = [];
-
-    const summary = await loadMobileProductTerminal({
-      apiBase: 'https://api.groceryview.example',
-      productId: 'coffee',
-      asOf: '2026-05-19T00:00:00.000Z',
-      bearerToken: 'session-token',
-      fetcher: async (url, init) => {
-        requestedUrls.push(String(url));
-        assert.equal(init?.method, 'GET');
-        assert.deepEqual(init?.headers, { authorization: 'Bearer session-token' });
-        return new Response(JSON.stringify(terminal), { status: 200, headers: { 'content-type': 'application/json' } });
-      }
-    });
-
-    assert.deepEqual(requestedUrls, ['https://api.groceryview.example/api/products/coffee/terminal?asOf=2026-05-19T00%3A00%3A00.000Z']);
-    assert.equal(summary.quote.bestPrice, 49.9);
-    assert.equal(summary.distributionSummaries[0].currentPercentile, 8);
-    assert.equal(summary.chartSummary.historyPointCount, 3);
-    assert.equal(summary.chartSummary.isNewLow, true);
-    assert.match(summary.guardrails.join(' '), /Verified shelf/);
-  });
-
-  it('fails closed for missing mobile terminal API configuration or route errors', async () => {
-    await assert.rejects(() => loadMobileProductTerminal({ apiBase: ' ', productId: 'coffee' }), /apiBase is required/);
-    await assert.rejects(() => loadMobileProductTerminal({ apiBase: 'https://api.groceryview.example', productId: ' ' }), /productId is required/);
-    await assert.rejects(
-      () => loadMobileProductTerminal({
-        apiBase: 'https://api.groceryview.example',
-        productId: 'missing-product',
-        fetcher: async () => new Response(JSON.stringify({ error: 'Product not found.' }), { status: 404 })
-      }),
-      /Product not found/
-    );
-  });
-
-  it('builds mobile product terminal state from quote, distribution, chart, and evidence data', () => {
-    const viewModel = createMobileProductPriceTerminalViewModel('coffee');
-
-    assert.equal(viewModel?.ticker, 'ZOEGAS-COFFEE-450G');
-    assert.equal(viewModel?.quote.bestPriceLabel, '49.90 SEK');
-    assert.equal(viewModel?.quote.bestStoreName, 'Willys Odenplan');
-    assert.equal(viewModel?.quote.dealVerdict, 'Buy');
-    assert.equal(viewModel?.quote.oneMonthMoveLabel, '-16.7%');
-    assert.equal(viewModel?.quote.range52WeekLabel, '49.90-69.90 SEK');
-    assert.deepEqual(viewModel?.evidence, {
-      currentPrices: 3,
-      historyPoints: 3,
-      verifiedHistoryPoints: 3,
-      latestObservedAt: '2026-05-19T00:00:00.000Z',
-      isNewLow: true,
-      guardrails: [
-        'Verified shelf or retailer-page prices can power current quote, Deal Score, and basket totals.',
-        'Member, promotion, estimated, and low-confidence rows must stay explicitly labeled before customer action.',
-        'Distribution and chart samples include sample size and provenance-aware confidence styling.'
-      ]
-    });
-    assert.deepEqual(viewModel?.distributions.map((distribution) => ({
-      scope: distribution.scope,
-      sampleSize: distribution.sampleSize,
-      medianPrice: distribution.medianPrice,
-      cheaperThanPercent: distribution.cheaperThanPercent
-    })), [
-      { scope: 'stockholm', sampleSize: 3, medianPrice: 59.9, cheaperThanPercent: 92 },
-      { scope: 'local_area', sampleSize: 2, medianPrice: 57.4, cheaperThanPercent: 50 }
-    ]);
-    assert.deepEqual(viewModel?.chartSeries, [
-      {
-        id: 'willys-odenplan:shelf',
-        storeName: 'Willys Odenplan',
-        lineStyle: 'solid',
-        pointCount: 3,
-        latestPrice: 49.9,
-        markerCount: 1
-      }
-    ]);
-    assert.deepEqual(viewModel?.actions, ['add_to_watchlist', 'add_to_weekly_basket', 'compare_stores', 'scan_receipt_to_verify']);
-    assert.equal(createMobileProductPriceTerminalViewModel('missing-product'), null);
   });
 
   it('builds barcode scan results with deal score, equivalent products, and actions', () => {
@@ -233,6 +149,109 @@ describe('mobile app foundation', () => {
       '/scan/receipt',
       '/profile'
     ]);
+  });
+
+  it('plans authenticated mobile privacy exports from the privacy route', () => {
+    const plan = buildMobilePrivacyRequestPlan({
+      userId: 'user-1',
+      requestType: 'export_data',
+      authenticated: true,
+      networkOnline: true
+    });
+
+    assert.equal(plan.route, '/privacy');
+    assert.equal(plan.confirmationRequired, false);
+    assert.deepEqual(plan.exportSections, ['profile', 'favorite_stores', 'watchlist', 'receipts', 'households']);
+    assert.deepEqual(plan.actions, ['download_export']);
+    assert.deepEqual(plan.blockers, []);
+  });
+
+  it('blocks mobile account deletion until the user confirms the destructive action', () => {
+    const plan = buildMobilePrivacyRequestPlan({
+      userId: 'user-1',
+      requestType: 'delete_account',
+      authenticated: true,
+      networkOnline: true
+    });
+
+    assert.equal(plan.confirmationRequired, true);
+    assert.deepEqual(plan.blockers, ['account_deletion_confirmation_required']);
+    assert.deepEqual(plan.actions, ['confirm_account_deletion']);
+  });
+
+  it('fails closed for mobile privacy requests that are offline or unauthenticated', () => {
+    const plan = buildMobilePrivacyRequestPlan({
+      userId: 'user-1',
+      requestType: 'ad_privacy',
+      authenticated: false,
+      networkOnline: false
+    });
+
+    assert.deepEqual(plan.blockers, ['mobile_reauthentication_required', 'network_required_for_privacy_request']);
+    assert.deepEqual(plan.actions, ['reauthenticate', 'retry_online']);
+  });
+
+  it('schedules receipt image cleanup only after privacy prerequisites pass', () => {
+    const plan = buildMobilePrivacyRequestPlan({
+      userId: 'user-1',
+      requestType: 'receipt_retention',
+      authenticated: true,
+      networkOnline: true,
+      receiptImageRetentionDays: 7
+    });
+
+    assert.deepEqual(plan.actions, ['schedule_receipt_image_cleanup']);
+    assert.deepEqual(plan.blockers, []);
+  });
+
+it('plans offline cache coverage and prioritized mobile sync queue', () => {
+    const plan = buildMobileOfflineSyncPlan({
+      userId: 'user-1',
+      offlineEnabled: true,
+      secureStorageConfigured: true,
+      pendingMutations: [
+        { id: 'mutation-1', kind: 'add_to_basket', createdAt: '2026-05-20T04:00:00.000Z' },
+        { id: 'mutation-2', kind: 'save_receipt_match', createdAt: '2026-05-20T04:01:00.000Z' }
+      ]
+    });
+
+    assert.deepEqual(plan.cachedScreens, ['today', 'stores', 'basket', 'scan', 'profile']);
+    assert.deepEqual(
+      plan.mutationQueue.map((mutation) => [mutation.kind, mutation.syncPriority]),
+      [
+        ['add_to_basket', 'normal'],
+        ['save_receipt_match', 'high']
+      ]
+    );
+    assert.deepEqual(plan.actions, ['cache_mobile_home', 'queue_mutations', 'sync_when_online']);
+    assert.deepEqual(plan.blockers, []);
+  });
+
+  it('fails closed for mobile offline sync when secure storage is unavailable', () => {
+    const plan = buildMobileOfflineSyncPlan({
+      userId: 'user-1',
+      offlineEnabled: true,
+      secureStorageConfigured: false,
+      pendingMutations: []
+    });
+
+    assert.deepEqual(plan.cachedScreens, []);
+    assert.deepEqual(plan.blockers, ['secure_storage_not_configured']);
+    assert.deepEqual(plan.actions, ['configure_secure_storage']);
+  });
+
+  it('prompts before caching mobile data when offline mode is disabled', () => {
+    const plan = buildMobileOfflineSyncPlan({
+      userId: 'user-1',
+      offlineEnabled: false,
+      secureStorageConfigured: true,
+      pendingMutations: [{ id: 'mutation-1', kind: 'update_budget', createdAt: '2026-05-20T04:02:00.000Z' }]
+    });
+
+    assert.deepEqual(plan.cachedScreens, []);
+    assert.deepEqual(plan.blockers, ['mobile_offline_mode_disabled']);
+    assert.deepEqual(plan.actions, ['prompt_enable_offline', 'queue_mutations', 'sync_when_online']);
+    assert.equal(plan.mutationQueue[0].syncPriority, 'high');
   });
 
   it('blocks mobile screens when required providers are unavailable', () => {

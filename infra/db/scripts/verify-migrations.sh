@@ -67,6 +67,8 @@ REQUIRED_TABLES=(
   notification_suppressions
   alert_rules
   pantry_items
+  receipt_uploads
+  receipt_items
 )
 
 REQUIRED_EXTENSIONS=(
