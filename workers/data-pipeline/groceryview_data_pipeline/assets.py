@@ -635,6 +635,7 @@ def summarize_open_prices_launch_readiness(
     summary: OpenPricesLaunchReadinessSummary,
 ) -> OpenPricesLaunchReadinessDigest:
     hosted_smoke_blockers = summary.blockers_by_plan.get("open_prices_hosted_smoke_plan", [])
+    schedule_health_blockers = summary.blockers_by_plan.get("open_prices_schedule_health_plan", [])
     persistence_plan_names = {
         "open_prices_ingestion_run_plan",
         "open_prices_artifact_import_plan",
@@ -654,6 +655,7 @@ def summarize_open_prices_launch_readiness(
         evidence_field_count=len(summary.evidence_fields),
         hosted_smoke_blocker_count=len(hosted_smoke_blockers),
         persistence_blocker_count=persistence_blocker_count,
+        schedule_health_blocker_count=len(schedule_health_blockers),
     )
 
 

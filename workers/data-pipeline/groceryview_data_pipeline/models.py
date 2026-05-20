@@ -340,6 +340,7 @@ class OpenPricesLaunchReadinessDigest:
     evidence_field_count: int
     hosted_smoke_blocker_count: int
     persistence_blocker_count: int
+    schedule_health_blocker_count: int
     demo: bool = False
 
     def to_dict(self) -> dict[str, object]:
