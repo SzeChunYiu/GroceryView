@@ -552,7 +552,8 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
             notificationWebhookSecret:
               authOptions.notificationWebhookSecret ?? runtimeConfig?.notificationWebhookSecret ?? process.env.NOTIFICATION_WEBHOOK_SECRET,
             billingWebhookSecret: authOptions.billingWebhookSecret ?? runtimeConfig?.billingWebhookSecret ?? process.env.BILLING_WEBHOOK_SECRET,
-            metricsToken: authOptions.notificationMetricsToken ?? runtimeConfig?.metricsToken ?? process.env.METRICS_TOKEN
+            metricsToken: authOptions.notificationMetricsToken ?? runtimeConfig?.metricsToken ?? process.env.METRICS_TOKEN,
+            scanUploadStorageConfigured: Boolean(authOptions.scanUploadStorage)
           })
         );
       }
@@ -1384,9 +1385,14 @@ export type HealthReport = {
   hasNotificationWebhookSecret: boolean;
   hasBillingWebhookSecret: boolean;
   hasMetricsToken: boolean;
+  hasScanUploadStorage: boolean;
 };
 
-export function buildHealthReport(config: RuntimeConfig): HealthReport {
+export type HealthReportInput = RuntimeConfig & {
+  scanUploadStorageConfigured?: boolean;
+};
+
+export function buildHealthReport(config: HealthReportInput): HealthReport {
   return {
     status: 'ok',
     service: 'groceryview-server',
@@ -1396,7 +1402,8 @@ export function buildHealthReport(config: RuntimeConfig): HealthReport {
     hasAuthSecret: Boolean(config.authSecret),
     hasNotificationWebhookSecret: Boolean(config.notificationWebhookSecret),
     hasBillingWebhookSecret: Boolean(config.billingWebhookSecret),
-    hasMetricsToken: Boolean(config.metricsToken)
+    hasMetricsToken: Boolean(config.metricsToken),
+    hasScanUploadStorage: Boolean(config.scanUploadStorageConfigured)
   };
 }
 
