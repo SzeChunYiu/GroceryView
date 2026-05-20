@@ -48,6 +48,9 @@ th { color:#88a49c; font-size: 12px; text-transform: uppercase; letter-spacing: 
 .histogram i { position: absolute; bottom: 4px; transform: translateX(-50%); padding: 4px 7px; border-radius: 999px; color: #04110d; background: #ccfff0; font-size: 12px; font-style: normal; font-weight: 900; }
 .footer-note { color: #88a49c; margin-top: 28px; }
 .price-terminal { margin-top: 16px; }
+.terminal-live-panel { border-color: rgba(255,202,102,.34); background: linear-gradient(135deg, rgba(18, 38, 48, .92), rgba(8, 24, 34, .82)); }
+.terminal-live-panel .metric { border: 1px solid rgba(255,202,102,.14); background: rgba(255,202,102,.07); }
+.terminal-live-panel code { color: #ffdc94; }
 .price-summary { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; margin-bottom: 16px; }
 .price-table td { vertical-align: top; }
 .status { display: inline-block; border: 1px solid rgba(255,255,255,.14); border-radius: 999px; padding: 5px 9px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
