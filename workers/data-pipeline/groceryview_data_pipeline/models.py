@@ -244,6 +244,21 @@ class OpenPricesIngestionRunPlanSummary:
 
 
 @dataclass(frozen=True)
+class OpenPricesLaunchReadinessSummary:
+    status: Literal["ready", "blocked"]
+    ready_plan_count: int
+    blocked_plan_count: int
+    checked_plans: list[str]
+    blockers_by_plan: dict[str, list[str]]
+    next_actions: list[str]
+    evidence_fields: list[str]
+    demo: bool = False
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class ObservationCoverageSummary:
     status: Literal["ready", "partial"]
     observation_count: int

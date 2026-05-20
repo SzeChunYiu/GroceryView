@@ -6,6 +6,7 @@ from groceryview_data_pipeline.assets import (
     build_observation_freshness_summary,
     build_open_prices_artifact_import_plan,
     build_open_prices_ingestion_run_plan,
+    build_open_prices_launch_readiness_summary,
     build_open_prices_pull_plan,
     build_price_observation_mix_summary,
     build_price_observations,
@@ -199,6 +200,61 @@ def test_open_prices_ingestion_run_plan_summary_counts_operator_requirements() -
         schedule_enabled=True,
     )
     assert summarize_open_prices_ingestion_run_plan(ready).required_action_count == 0
+
+
+def test_open_prices_launch_readiness_rolls_up_all_open_prices_plans() -> None:
+    pull = build_open_prices_pull_plan(open_prices_user_agent_present=True)
+    ingestion = build_open_prices_ingestion_run_plan(open_prices_user_agent_present=True)
+    artifact_import = build_open_prices_artifact_import_plan(input_artifact_present=True)
+
+    summary = build_open_prices_launch_readiness_summary(pull, ingestion, artifact_import)
+
+    assert summary.status == "blocked"
+    assert summary.ready_plan_count == 1
+    assert summary.blocked_plan_count == 2
+    assert summary.checked_plans == [
+        "open_prices_real_pull_plan",
+        "open_prices_ingestion_run_plan",
+        "open_prices_artifact_import_plan",
+    ]
+    assert summary.blockers_by_plan == {
+        "open_prices_ingestion_run_plan": [
+            "set_database_url",
+            "configure_raw_snapshot_storage",
+            "enable_open_prices_schedule",
+        ],
+        "open_prices_artifact_import_plan": [
+            "set_database_url",
+            "build_groceryview_db_package",
+        ],
+    }
+    assert summary.next_actions == [
+        "build_groceryview_db_package",
+        "configure_raw_snapshot_storage",
+        "enable_open_prices_schedule",
+        "set_database_url",
+    ]
+    assert "persistedObservationCount" in summary.evidence_fields
+    assert "sourceRunId" in summary.evidence_fields
+    assert summary.to_dict()["demo"] is False
+
+    ready = build_open_prices_launch_readiness_summary(
+        build_open_prices_pull_plan(open_prices_user_agent_present=True),
+        build_open_prices_ingestion_run_plan(
+            open_prices_user_agent_present=True,
+            database_url_present=True,
+            raw_snapshot_storage_present=True,
+            schedule_enabled=True,
+        ),
+        build_open_prices_artifact_import_plan(
+            database_url_present=True,
+            input_artifact_present=True,
+            db_package_built=True,
+        ),
+    )
+    assert ready.status == "ready"
+    assert ready.blocked_plan_count == 0
+    assert ready.next_actions == []
 
 
 def test_latest_price_rollup_picks_latest_observation() -> None:

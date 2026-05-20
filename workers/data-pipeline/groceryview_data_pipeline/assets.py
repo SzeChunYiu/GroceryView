@@ -23,6 +23,7 @@ from .models import (
     OpenPricesArtifactImportPlan,
     OpenPricesIngestionRunPlan,
     OpenPricesIngestionRunPlanSummary,
+    OpenPricesLaunchReadinessSummary,
     OpenPricesPullPlan,
     PriceObservationRow,
     PriceObservationMixSummary,
@@ -435,6 +436,41 @@ def summarize_open_prices_ingestion_run_plan(plan: OpenPricesIngestionRunPlan) -
     )
 
 
+def build_open_prices_launch_readiness_summary(
+    pull_plan: OpenPricesPullPlan,
+    ingestion_plan: OpenPricesIngestionRunPlan,
+    artifact_import_plan: OpenPricesArtifactImportPlan,
+) -> OpenPricesLaunchReadinessSummary:
+    plans = {
+        "open_prices_real_pull_plan": pull_plan,
+        "open_prices_ingestion_run_plan": ingestion_plan,
+        "open_prices_artifact_import_plan": artifact_import_plan,
+    }
+    blockers_by_plan = {
+        plan_name: list(plan.required_actions)
+        for plan_name, plan in plans.items()
+        if plan.status != "ready"
+    }
+    next_actions = sorted({action for actions in blockers_by_plan.values() for action in actions})
+    evidence_fields = sorted(
+        {
+            field
+            for plan in plans.values()
+            for field in plan.evidence_fields
+        }
+    )
+
+    return OpenPricesLaunchReadinessSummary(
+        status="ready" if not blockers_by_plan else "blocked",
+        ready_plan_count=sum(1 for plan in plans.values() if plan.status == "ready"),
+        blocked_plan_count=len(blockers_by_plan),
+        checked_plans=list(plans.keys()),
+        blockers_by_plan=blockers_by_plan,
+        next_actions=next_actions,
+        evidence_fields=evidence_fields,
+    )
+
+
 def build_observation_coverage_summary(
     observations: Iterable[PriceObservationRow],
     stores: Iterable[StoreSeed],
@@ -666,6 +702,20 @@ def open_prices_artifact_import_plan(open_prices_real_pull_plan: dict[str, objec
         input_artifact_present=open_prices_real_pull_plan.get("status") == "ready",
         db_package_built=False,
     ).to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
+def open_prices_launch_readiness(
+    open_prices_real_pull_plan: dict[str, object],
+    open_prices_ingestion_run_plan: dict[str, object],
+    open_prices_artifact_import_plan: dict[str, object],
+) -> dict[str, object]:
+    summary = build_open_prices_launch_readiness_summary(
+        OpenPricesPullPlan(**open_prices_real_pull_plan),
+        OpenPricesIngestionRunPlan(**open_prices_ingestion_run_plan),
+        OpenPricesArtifactImportPlan(**open_prices_artifact_import_plan),
+    )
+    return summary.to_dict()
 
 
 @asset(group_name=ASSET_GROUP)
