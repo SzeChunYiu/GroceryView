@@ -634,82 +634,116 @@ export function calculateFixedBasketIndex(input: FixedBasketIndexInput): FixedBa
   };
 }
 
-export type StoreBasketObservation = {
-  storeId: string;
-  storeName: string;
-  chainId: string;
-  category: string;
-  basketUnitPrice: number;
-  stockholmMedianUnitPrice: number;
-  isDeal?: boolean;
-  watchlistMatch?: boolean;
+export type PriceHistoryPoint = {
+  observedAt: string;
+  price: number;
+  storeId?: string;
 };
 
-export type StorePriceLevelProfile = {
-  storeId: string;
-  storeName: string;
-  overallVsStockholmPercent: number;
-  sameChainPercentile: number;
-  bestCategories: string[];
-  worstCategories: string[];
-  dealDensity: 'low' | 'medium' | 'high';
-  watchlistMatchCount: number;
-  favoriteStorePercentile: number;
+export type PriceHistorySummary = {
+  latestPrice: number;
+  previousPrice?: number;
+  changeFromPrevious: number;
+  lowestPrice: number;
+  highestPrice: number;
+  isNewLow: boolean;
+  observedCount: number;
+  latestObservedAt: string;
 };
 
-function percentileRank(sortedValues: number[], value: number): number {
-  if (sortedValues.length === 0) return 0;
-  const cheaperOrEqual = sortedValues.filter((candidate) => candidate <= value).length;
-  return Math.round((cheaperOrEqual / sortedValues.length) * 100);
+export type PriceChartSourceType = 'shelf' | 'online' | 'flyer' | 'member' | 'receipt' | 'shelf_photo' | 'manual' | 'estimated';
+
+export type PriceChartLineStyle = 'solid' | 'dashed' | 'dotted';
+
+export type PriceChartMarkerType = 'promotion' | 'member' | 'new_low' | 'receipt_confirmed' | 'source_warning';
+
+export type PriceChartObservation = PriceHistoryPoint & {
+  storeId: string;
+  storeName: string;
+  sourceType: PriceChartSourceType;
+  confidence: number;
+  provenanceLabel?: string;
+  markerType?: PriceChartMarkerType;
+  markerLabel?: string;
+};
+
+export type PriceChartSeriesPoint = {
+  time: string;
+  value: number;
+  confidence: number;
+  provenanceLabel?: string;
+};
+
+export type PriceChartMarker = {
+  time: string;
+  type: PriceChartMarkerType;
+  text: string;
+  color: string;
+  shape: 'circle' | 'arrowUp' | 'arrowDown';
+  position: 'aboveBar' | 'belowBar' | 'inBar';
+  sourceType: PriceChartSourceType;
+  provenanceLabel?: string;
+};
+
+export type PriceChartSeries = {
+  id: string;
+  storeId: string;
+  storeName: string;
+  sourceType: PriceChartSourceType;
+  lineStyle: PriceChartLineStyle;
+  points: PriceChartSeriesPoint[];
+  markers: PriceChartMarker[];
+};
+
+export type PriceChartAdapterInput = {
+  observations: PriceChartObservation[];
+  asOf?: string;
+  rangeDays?: 7 | 30 | 90 | 365;
+  markerLimitPerSeries?: number;
+};
+
+export type PriceChartAdapterResult = {
+  series: PriceChartSeries[];
+  windowStart?: string;
+  windowEnd?: string;
+};
+
+const chartLineStyleWeight: Record<PriceChartLineStyle, number> = {
+  solid: 0,
+  dashed: 1,
+  dotted: 2
+};
+
+export function priceChartLineStyle(input: {
+  sourceType: PriceChartSourceType;
+  confidence: number;
+}): PriceChartLineStyle {
+  const confidence = clamp(input.confidence, 0, 1);
+  if (input.sourceType === 'estimated' || input.sourceType === 'manual' || confidence < 0.5) return 'dotted';
+  if (input.sourceType === 'shelf_photo' || confidence < 0.8) return 'dashed';
+  return 'solid';
 }
 
-export function buildStorePriceLevelProfile(input: {
-  storeId: string;
-  favoriteStoreIds: string[];
-  observations: StoreBasketObservation[];
-}): StorePriceLevelProfile {
-  const storeRows = input.observations.filter((row) => row.storeId === input.storeId);
-  if (storeRows.length === 0) throw new Error('At least one observation is required for the target store.');
-
-  const storeName = storeRows[0].storeName;
-  const chainId = storeRows[0].chainId;
-  const storeAverage = storeRows.reduce((sum, row) => sum + row.basketUnitPrice, 0) / storeRows.length;
-  const medianAverage = storeRows.reduce((sum, row) => sum + row.stockholmMedianUnitPrice, 0) / storeRows.length;
-  if (medianAverage <= 0) throw new Error('Stockholm median price must be positive.');
-
-  const categoryDiffs = storeRows.map((row) => ({
-    category: row.category,
-    diffPercent: ((row.basketUnitPrice - row.stockholmMedianUnitPrice) / row.stockholmMedianUnitPrice) * 100
-  }));
-
-  const storeAverages = new Map<string, { storeId: string; chainId: string; total: number; count: number }>();
-  for (const row of input.observations) {
-    const current = storeAverages.get(row.storeId) ?? { storeId: row.storeId, chainId: row.chainId, total: 0, count: 0 };
-    current.total += row.basketUnitPrice;
-    current.count += 1;
-    storeAverages.set(row.storeId, current);
+export function summarizePriceHistory(points: PriceHistoryPoint[]): PriceHistorySummary {
+  if (points.length === 0) {
+    throw new Error('At least one price history point is required.');
   }
 
-  const sameChainValues = [...storeAverages.values()]
-    .filter((store) => store.chainId === chainId)
-    .map((store) => store.total / store.count)
-    .sort((a, b) => a - b);
-  const favoriteValues = [...storeAverages.values()]
-    .filter((store) => input.favoriteStoreIds.includes(store.storeId))
-    .map((store) => store.total / store.count)
-    .sort((a, b) => a - b);
-  const dealRatio = storeRows.filter((row) => row.isDeal).length / storeRows.length;
+  const ordered = [...points].sort((a, b) => new Date(a.observedAt).getTime() - new Date(b.observedAt).getTime());
+  const latest = ordered.at(-1)!;
+  const previous = ordered.at(-2);
+  const previousPrices = ordered.slice(0, -1).map((point) => point.price);
+  const historicalLow = previousPrices.length > 0 ? Math.min(...previousPrices) : latest.price;
 
   return {
-    storeId: input.storeId,
-    storeName,
-    overallVsStockholmPercent: roundMoney(((storeAverage - medianAverage) / medianAverage) * 100),
-    sameChainPercentile: percentileRank(sameChainValues, storeAverage),
-    bestCategories: [...categoryDiffs].sort((a, b) => a.diffPercent - b.diffPercent).slice(0, 3).map((row) => row.category),
-    worstCategories: [...categoryDiffs].sort((a, b) => b.diffPercent - a.diffPercent).slice(0, 3).map((row) => row.category),
-    dealDensity: dealRatio >= 0.5 ? 'high' : dealRatio >= 0.25 ? 'medium' : 'low',
-    watchlistMatchCount: storeRows.filter((row) => row.watchlistMatch).length,
-    favoriteStorePercentile: percentileRank(favoriteValues, storeAverage)
+    latestPrice: latest.price,
+    previousPrice: previous?.price,
+    changeFromPrevious: previous ? roundMoney(latest.price - previous.price) : 0,
+    lowestPrice: Math.min(...ordered.map((point) => point.price)),
+    highestPrice: Math.max(...ordered.map((point) => point.price)),
+    isNewLow: latest.price < historicalLow,
+    observedCount: ordered.length,
+    latestObservedAt: latest.observedAt
   };
 }
 
