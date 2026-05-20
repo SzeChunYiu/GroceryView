@@ -6,6 +6,7 @@ import {
   buildPostgresIntegrationReadinessReport,
   buildPostgresRepositorySmokeProbes,
   checkPostgresIntegrationReadiness,
+  checkPostgresRepositoryIntegrationReadiness,
   collectPostgresIntegrationProbe,
   type QueryExecutor
 } from '../index.js';
@@ -52,6 +53,12 @@ class RepositorySmokeQueryExecutor implements QueryExecutor {
   async query<T>(sql: string, params: unknown[] = []) {
     this.calls.push({ sql, params });
     if (!this.readable) return [] as T[];
+    if (sql.includes('information_schema.tables')) {
+      return POSTGRES_INTEGRATION_REQUIRED_TABLES.map((table_name) => ({ table_name })) as T[];
+    }
+    if (sql.includes('schema_migrations')) {
+      return POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS.map((version) => ({ version })) as T[];
+    }
     if (sql.includes('insert into chains')) {
       return [{ id: 'chain-1' }] as T[];
     }
@@ -288,6 +295,25 @@ describe('checkPostgresIntegrationReadiness', () => {
     ]);
     assert.match(report.blockers.join('\n'), /missing_table:notification_suppressions/);
     assert.match(report.blockers.join('\n'), /repository_check_fail:suppression_read_probe/);
+  });
+});
+
+describe('checkPostgresRepositoryIntegrationReadiness', () => {
+  it('runs schema, migration, and repository smoke probes through one readiness check', async () => {
+    const executor = new RepositorySmokeQueryExecutor();
+    const report = await checkPostgresRepositoryIntegrationReadiness({
+      executor,
+      runId: 'run/42',
+      now: '2026-05-20T00:00:00.000Z'
+    });
+
+    assert.equal(report.status, 'ready');
+    assert.deepEqual(report.blockers, []);
+    assert.equal(report.evidence.includes('repository_check:user_budget_round_trip'), true);
+    assert.equal(report.evidence.includes('repository_check:price_observation_pipeline_round_trip'), true);
+    assert.equal(executor.calls.some((call) => call.sql.includes('information_schema.tables')), true);
+    assert.equal(executor.calls.some((call) => call.sql.includes('schema_migrations')), true);
+    assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-product-run-42')), true);
   });
 });
 
