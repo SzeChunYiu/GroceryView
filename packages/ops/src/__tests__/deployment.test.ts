@@ -251,11 +251,39 @@ describe('deployment ops foundation', () => {
       requiredSecrets: ['PROD_METRICS_TOKEN'],
       evidence: ['hosted_api_health', 'hosted_product_terminal', 'hosted_web', 'hosted_postgres_readiness']
     });
+
     assert.throws(() => buildHostedSmokeCommandPlan({
       serverUrl: 'https://api.groceryview.example',
       includePostgresReadiness: false,
       timeoutSeconds: 0
     }), /timeoutSeconds must be a positive integer/);
+
+    assert.throws(
+      () =>
+        buildHostedSmokeCommandPlan({
+          serverUrl: ' ',
+          includePostgresReadiness: false
+        }),
+      /serverUrl is required/
+    );
+
+    assert.throws(
+      () =>
+        buildHostedSmokeCommandPlan({
+          serverUrl: 'api.groceryview.example',
+          includePostgresReadiness: false
+        }),
+      /serverUrl must be a valid absolute URL/
+    );
+
+    assert.throws(
+      () =>
+        buildHostedSmokeCommandPlan({
+          serverUrl: 'ftp://api.groceryview.example',
+          includePostgresReadiness: false
+        }),
+      /serverUrl must use http or https/
+    );
   });
 
   it('summarizes hosted smoke evidence blockers for deployment dashboards', () => {
