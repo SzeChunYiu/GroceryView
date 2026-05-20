@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildDefaultFlyerSourcePlans, buildRetailerSourceRegistry, confidenceForSource, findRetailerSourceRegistryEntry, ingestRetailerProduct, normalizeUnitPrice, planFlyerSourceFetch, planIngestionBatch, planRetailerSourceAccess } from '../index.js';
+import { assertOfficialPriceIndexSource, buildDefaultFlyerSourcePlans, buildOfficialBaselineSourceRegistry, buildRetailerSourceRegistry, confidenceForSource, findRetailerSourceRegistryEntry, ingestRetailerProduct, normalizeUnitPrice, officialPriceIndexSources, planFlyerSourceFetch, planIngestionBatch, planRetailerSourceAccess } from '../index.js';
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
@@ -203,5 +203,44 @@ describe('planFlyerSourceFetch', () => {
     assert.equal(lidlMember.rawSnapshotRef, 'raw/lidl-plus.html');
     assert.equal(lidlMember.contentHash, 'sha256:lidl');
     assert.equal(lidlMember.emitsProductFacts, false);
+  });
+});
+
+describe('buildOfficialBaselineSourceRegistry', () => {
+  it('captures official price-index and taxonomy sources with license metadata', () => {
+    const sources = buildOfficialBaselineSourceRegistry();
+
+    assert.deepEqual(sources.map((source) => source.id), [
+      'scb-cpi-food-nonalcoholic-2020',
+      'scb-pxweb-api',
+      'sjv-kpi-j-ppi-j-food',
+      'eurostat-hicp-food',
+      'slv-food-composition'
+    ]);
+
+    const scb = sources.find((source) => source.id === 'scb-cpi-food-nonalcoholic-2020');
+    const livsmedelsverket = sources.find((source) => source.id === 'slv-food-composition');
+
+    assert.equal(scb?.license, 'CC0');
+    assert.equal(scb?.requiresAttribution, false);
+    assert.equal(livsmedelsverket?.license, 'CC_BY_4_0');
+    assert.equal(livsmedelsverket?.requiresAttribution, true);
+    assert.equal(livsmedelsverket?.kind, 'taxonomy');
+  });
+
+  it('marks official baseline sources as unable to generate store or SKU prices', () => {
+    for (const source of buildOfficialBaselineSourceRegistry()) {
+      assert.equal(source.canGenerateStorePrices, false);
+      assert.equal(source.canGenerateSkuPrices, false);
+      assert.match(source.datasetUrl, /^https:\/\//);
+    }
+  });
+
+  it('filters price-index sources and rejects taxonomy-only sources as price indices', () => {
+    const priceIndices = officialPriceIndexSources();
+    const taxonomy = buildOfficialBaselineSourceRegistry().find((source) => source.kind === 'taxonomy');
+
+    assert.deepEqual(priceIndices.map((source) => source.id), ['scb-cpi-food-nonalcoholic-2020', 'scb-pxweb-api', 'sjv-kpi-j-ppi-j-food', 'eurostat-hicp-food']);
+    assert.throws(() => assertOfficialPriceIndexSource(taxonomy!), /not a price index/);
   });
 });

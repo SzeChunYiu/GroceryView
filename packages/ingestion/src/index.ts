@@ -78,6 +78,22 @@ export type FlyerSourcePlan = {
   legalReviewStatus: LegalReviewStatus;
   emitsProductFacts: false;
 };
+export type OfficialSourceKind = 'price_index' | 'taxonomy';
+export type OfficialSourceLicense = 'CC0' | 'CC_BY_4_0' | 'OFFICIAL_STATISTICS_TERMS_PENDING';
+export type OfficialBaselineSource = {
+  id: string;
+  authority: 'SCB' | 'Jordbruksverket' | 'Eurostat' | 'Livsmedelsverket';
+  name: string;
+  kind: OfficialSourceKind;
+  datasetUrl: string;
+  apiUrl?: string;
+  license: OfficialSourceLicense;
+  requiresAttribution: boolean;
+  attribution?: string;
+  categoryScope: string;
+  canGenerateStorePrices: false;
+  canGenerateSkuPrices: false;
+};
 
 export type RetailerSourceAccessInput = {
   chainId: string;
@@ -359,6 +375,88 @@ export function buildDefaultFlyerSourcePlans(retrievedAt = DEFAULT_ROBOTS_CHECKE
       requiresStoreSelection: true
     })
   ];
+}
+
+const OFFICIAL_BASELINE_SOURCES: OfficialBaselineSource[] = [
+  {
+    id: 'scb-cpi-food-nonalcoholic-2020',
+    authority: 'SCB',
+    name: 'Consumer Price Index (CPI), food and non-alcoholic beverages, 2020=100',
+    kind: 'price_index',
+    datasetUrl: 'https://www.statistikdatabasen.scb.se/pxweb/en/ssd/START__PR__PR0101__PR0101A/KPI2020EPG01M/',
+    apiUrl: 'https://www.scb.se/en/services/open-data-api/pxwebapi/pxwebapi-2.0',
+    license: 'CC0',
+    requiresAttribution: false,
+    categoryScope: 'national_food_and_non_alcoholic_beverages',
+    canGenerateStorePrices: false,
+    canGenerateSkuPrices: false
+  },
+  {
+    id: 'scb-pxweb-api',
+    authority: 'SCB',
+    name: 'Statistics Sweden PxWeb API',
+    kind: 'price_index',
+    datasetUrl: 'https://www.scb.se/en/services/open-data-api/',
+    apiUrl: 'https://www.scb.se/en/services/open-data-api/pxwebapi/pxwebapi-2.0',
+    license: 'CC0',
+    requiresAttribution: false,
+    categoryScope: 'official_statistics_query_transport',
+    canGenerateStorePrices: false,
+    canGenerateSkuPrices: false
+  },
+  {
+    id: 'sjv-kpi-j-ppi-j-food',
+    authority: 'Jordbruksverket',
+    name: 'Prisindex och priser på livsmedelsområdet KPI-J/PPI-J',
+    kind: 'price_index',
+    datasetUrl: 'https://jordbruksverket.se/om-jordbruksverket/jordbruksverkets-officiella-statistik/jordbruksverkets-statistikrapporter/statistik/2025-12-15-prisindex-och-priser-pa-livsmedelsomradet--ars--och-manadsstatistik---202510',
+    license: 'OFFICIAL_STATISTICS_TERMS_PENDING',
+    requiresAttribution: true,
+    attribution: 'Jordbruksverket',
+    categoryScope: 'agriculture_regulated_food_indices',
+    canGenerateStorePrices: false,
+    canGenerateSkuPrices: false
+  },
+  {
+    id: 'eurostat-hicp-food',
+    authority: 'Eurostat',
+    name: 'Harmonised Indices of Consumer Prices food categories',
+    kind: 'price_index',
+    datasetUrl: 'https://ec.europa.eu/eurostat/web/hicp',
+    license: 'OFFICIAL_STATISTICS_TERMS_PENDING',
+    requiresAttribution: true,
+    attribution: 'Eurostat',
+    categoryScope: 'international_hicp_food_comparison',
+    canGenerateStorePrices: false,
+    canGenerateSkuPrices: false
+  },
+  {
+    id: 'slv-food-composition',
+    authority: 'Livsmedelsverket',
+    name: 'Swedish Food Composition Database',
+    kind: 'taxonomy',
+    datasetUrl: 'https://www.livsmedelsverket.se/en/about-us/open-data/food-composition-data/',
+    apiUrl: 'https://dataportal.livsmedelsverket.se/livsmedel/swagger/index.html',
+    license: 'CC_BY_4_0',
+    requiresAttribution: true,
+    attribution: 'Livsmedelsverket',
+    categoryScope: 'food_taxonomy_and_composition',
+    canGenerateStorePrices: false,
+    canGenerateSkuPrices: false
+  }
+];
+
+export function buildOfficialBaselineSourceRegistry(): OfficialBaselineSource[] {
+  return OFFICIAL_BASELINE_SOURCES.map((source) => ({ ...source }));
+}
+
+export function officialPriceIndexSources(): OfficialBaselineSource[] {
+  return buildOfficialBaselineSourceRegistry().filter((source) => source.kind === 'price_index');
+}
+
+export function assertOfficialPriceIndexSource(source: OfficialBaselineSource): OfficialBaselineSource {
+  if (source.kind !== 'price_index') throw new Error(`Official source is not a price index: ${source.id}`);
+  return source;
 }
 
 export type UnitInput = {
