@@ -1,6 +1,7 @@
 import { createHash } from 'node:crypto';
 
 export * from './connectors/openfoodfacts.js';
+export * from './connectors/overpass.js';
 
 export type SourceType =
   | 'official_api'

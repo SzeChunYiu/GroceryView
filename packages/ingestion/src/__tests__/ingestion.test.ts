@@ -9,7 +9,7 @@ import {
   confidenceForSource,
   fetchOpenFoodFactsExportProducts,
   fetchOpenFoodFactsProducts,
-  OPENFOODFACTS_EXPORT_URL,
+  fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -26,6 +26,9 @@ import {
   planRetailerSourceAccess,
   planRetailerSurfacePolicy,
   offerVisibilityBoundaryPlans,
+  OPENFOODFACTS_EXPORT_URL,
+  OVERPASS_INTERPRETER_URL,
+  parseOverpassGroceryStores,
   retailerRobotsPolicyMatrix,
   runRetailerConnector,
   stockholmStoreLocatorFixtures,
@@ -118,6 +121,71 @@ describe('fetchOpenFoodFactsExportProducts', () => {
     assert.equal(rows[0].name, 'Havredryck choklad');
     assert.deepEqual(rows[0].categories, ['en:beverages', 'en:dairy-substitutes']);
     assert.equal(rows[0].sourceUrl, `${OPENFOODFACTS_EXPORT_URL}#code=7340083494406`);
+  });
+});
+
+describe('fetchOverpassGroceryStores', () => {
+  it('posts a public Overpass query and preserves OSM store provenance', async () => {
+    const requestedBodies: string[] = [];
+    const fetchImpl: typeof fetch = async (url, init) => {
+      assert.equal(String(url), OVERPASS_INTERPRETER_URL);
+      assert.equal(init?.method, 'POST');
+      requestedBodies.push(String(init?.body));
+      return new Response(JSON.stringify({
+        elements: [{
+          type: 'node',
+          id: 29898149,
+          lat: 59.337217,
+          lon: 18.0911217,
+          tags: {
+            shop: 'supermarket',
+            name: 'ICA nära Karlaplan',
+            brand: 'ICA Nära',
+            'contact:website': 'https://www.ica.se/butiker/nara/stockholm/ica-karlaplan-1003714/',
+            'contact:phone': '+4686624035',
+            opening_hours: 'Mo-Fr 07:00-23:00; Sa-Su 08:00-23:00'
+          }
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchOverpassGroceryStores({
+      fetchImpl,
+      retrievedAt: '2026-05-20T23:45:00.000Z'
+    });
+
+    assert.match(requestedBodies[0], /shop/);
+    assert.deepEqual(rows, [{
+      osmType: 'node',
+      osmId: 29898149,
+      name: 'ICA nära Karlaplan',
+      brand: 'ICA Nära',
+      shop: 'supermarket',
+      latitude: 59.337217,
+      longitude: 18.0911217,
+      street: '',
+      houseNumber: '',
+      postcode: '',
+      city: '',
+      openingHours: 'Mo-Fr 07:00-23:00; Sa-Su 08:00-23:00',
+      website: 'https://www.ica.se/butiker/nara/stockholm/ica-karlaplan-1003714/',
+      phone: '+4686624035',
+      sourceUrl: OVERPASS_INTERPRETER_URL,
+      retrievedAt: '2026-05-20T23:45:00.000Z'
+    }]);
+  });
+
+  it('drops Overpass elements that do not have coordinates or a shop name', () => {
+    const rows = parseOverpassGroceryStores({
+      elements: [
+        { type: 'node', id: 1, lat: 59, lon: 18, tags: { shop: 'supermarket', name: 'Valid' } },
+        { type: 'node', id: 2, tags: { shop: 'supermarket', name: 'Missing coordinates' } },
+        { type: 'node', id: 3, lat: 59, lon: 18, tags: { shop: 'supermarket' } }
+      ]
+    }, '2026-05-20T23:45:00.000Z');
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].name, 'Valid');
   });
 });
 

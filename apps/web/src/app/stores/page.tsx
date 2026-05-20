@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { osmStores } from '@/lib/osm-stores';
 import { stores as curatedStores } from '@/lib/demo-data';
+import { overpassSource } from '@/lib/ingested/overpass';
 
 export const dynamic = 'force-static';
 
@@ -40,6 +41,9 @@ export default function StoresIndexPage() {
         <p className="mt-3 max-w-3xl text-base leading-7 text-market-ink/65">
           Coverage backed by © OpenStreetMap contributors (retrieved {osmStores[0]?.retrievedDate}).
           Grouped by chain. Click a store to see its profile and the price observations our connectors collect there.
+        </p>
+        <p className="mt-2 text-sm font-semibold text-market-ink/55">
+          Overpass connector sample: {overpassSource.rowCount} live OSM rows retrieved {overpassSource.retrievedAt.slice(0, 10)}.
         </p>
       </header>
 

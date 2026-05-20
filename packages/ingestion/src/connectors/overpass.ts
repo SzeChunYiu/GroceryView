@@ -1,0 +1,122 @@
+export type OverpassGroceryStore = {
+  osmType: 'node' | 'way' | 'relation';
+  osmId: number;
+  name: string;
+  brand: string;
+  shop: string;
+  latitude: number;
+  longitude: number;
+  street: string;
+  houseNumber: string;
+  postcode: string;
+  city: string;
+  openingHours: string;
+  website: string;
+  phone: string;
+  sourceUrl: string;
+  retrievedAt: string;
+};
+
+type OverpassElement = {
+  type?: unknown;
+  id?: unknown;
+  lat?: unknown;
+  lon?: unknown;
+  center?: { lat?: unknown; lon?: unknown };
+  tags?: Record<string, unknown>;
+};
+
+type OverpassResponse = {
+  elements?: OverpassElement[];
+};
+
+export const OVERPASS_INTERPRETER_URL = 'https://overpass-api.de/api/interpreter';
+
+export const STOCKHOLM_GROCERY_OVERPASS_QUERY = `[out:json][timeout:25];
+area["ISO3166-2"="SE-AB"][admin_level=4]->.searchArea;
+(
+  node["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
+  way["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
+  relation["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
+);
+out center tags 60;`;
+
+export type FetchOverpassGroceryStoresOptions = {
+  fetchImpl?: typeof fetch;
+  query?: string;
+  retrievedAt?: string;
+};
+
+export async function fetchOverpassGroceryStores(options: FetchOverpassGroceryStoresOptions = {}): Promise<OverpassGroceryStore[]> {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const query = options.query ?? STOCKHOLM_GROCERY_OVERPASS_QUERY;
+  const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const body = new URLSearchParams({ data: query });
+  const response = await fetchImpl(OVERPASS_INTERPRETER_URL, {
+    method: 'POST',
+    body,
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
+      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`Overpass request failed: ${response.status}`);
+  }
+
+  const payload = await response.json() as OverpassResponse;
+  return parseOverpassGroceryStores(payload, retrievedAt);
+}
+
+export function parseOverpassGroceryStores(payload: OverpassResponse, retrievedAt: string): OverpassGroceryStore[] {
+  return (payload.elements ?? [])
+    .map((element) => normalizeOverpassElement(element, retrievedAt))
+    .filter((store): store is OverpassGroceryStore => store !== null);
+}
+
+export function normalizeOverpassElement(element: OverpassElement, retrievedAt: string): OverpassGroceryStore | null {
+  const osmType = asOsmType(element.type);
+  const osmId = typeof element.id === 'number' ? element.id : null;
+  const tags = element.tags ?? {};
+  const latitude = numberOrNull(element.lat) ?? numberOrNull(element.center?.lat);
+  const longitude = numberOrNull(element.lon) ?? numberOrNull(element.center?.lon);
+  const name = text(tags.name) || text(tags.brand) || text(tags.operator);
+  const shop = text(tags.shop);
+
+  if (!osmType || osmId === null || latitude === null || longitude === null || !name || !shop) {
+    return null;
+  }
+
+  return {
+    osmType,
+    osmId,
+    name,
+    brand: text(tags.brand) || text(tags.operator) || name,
+    shop,
+    latitude,
+    longitude,
+    street: text(tags['addr:street']),
+    houseNumber: text(tags['addr:housenumber']),
+    postcode: text(tags['addr:postcode']),
+    city: text(tags['addr:city']),
+    openingHours: text(tags.opening_hours),
+    website: text(tags.website) || text(tags['contact:website']),
+    phone: text(tags.phone) || text(tags['contact:phone']),
+    sourceUrl: OVERPASS_INTERPRETER_URL,
+    retrievedAt
+  };
+}
+
+function asOsmType(value: unknown): OverpassGroceryStore['osmType'] | null {
+  return value === 'node' || value === 'way' || value === 'relation' ? value : null;
+}
+
+function numberOrNull(value: unknown): number | null {
+  return typeof value === 'number' && Number.isFinite(value) ? value : null;
+}
+
+function text(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : '';
+}
