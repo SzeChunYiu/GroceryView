@@ -416,6 +416,142 @@ export function createMobileProductPriceTerminalViewModel(
   };
 }
 
+export type MobileScreenComponent =
+  | {
+      type: 'screen';
+      key: string;
+      title: string;
+      state: 'ready' | 'empty';
+      children: MobileScreenComponent[];
+    }
+  | {
+      type: 'section';
+      key: string;
+      title: string;
+      children: MobileScreenComponent[];
+    }
+  | {
+      type: 'metric';
+      key: string;
+      label: string;
+      value: string;
+      tone: 'neutral' | 'positive' | 'warning';
+    }
+  | {
+      type: 'row';
+      key: string;
+      label: string;
+      value: string;
+    }
+  | {
+      type: 'action';
+      key: string;
+      action: MobileProductPriceTerminalViewModel['actions'][number];
+      label: string;
+      primary: boolean;
+    }
+  | {
+      type: 'empty';
+      key: string;
+      message: string;
+      action: 'search_product' | 'scan_barcode';
+    };
+
+function actionLabel(action: MobileProductPriceTerminalViewModel['actions'][number]): string {
+  if (action === 'add_to_watchlist') return 'Watch price';
+  if (action === 'add_to_weekly_basket') return 'Add to basket';
+  if (action === 'compare_stores') return 'Compare stores';
+  return 'Verify with receipt';
+}
+
+export function composeMobileProductTerminalScreen(
+  productId: string,
+  api: MobileApi = createGroceryViewApi()
+): MobileScreenComponent {
+  const terminal = createMobileProductPriceTerminalViewModel(productId, api);
+  if (!terminal) {
+    return {
+      type: 'screen',
+      key: `product-terminal:${productId}`,
+      title: 'Product terminal',
+      state: 'empty',
+      children: [
+        {
+          type: 'empty',
+          key: 'missing-product',
+          message: 'Product terminal data is unavailable for this product.',
+          action: 'search_product'
+        }
+      ]
+    };
+  }
+
+  return {
+    type: 'screen',
+    key: `product-terminal:${terminal.productId}`,
+    title: terminal.title,
+    state: 'ready',
+    children: [
+      {
+        type: 'section',
+        key: 'quote',
+        title: 'Quote',
+        children: [
+          { type: 'metric', key: 'best-price', label: 'Best price', value: terminal.quote.bestPriceLabel, tone: 'positive' },
+          { type: 'metric', key: 'deal-score', label: 'Deal Score', value: `${terminal.quote.dealScore} / ${terminal.quote.dealVerdict}`, tone: 'positive' },
+          { type: 'metric', key: 'one-month-move', label: '1M move', value: terminal.quote.oneMonthMoveLabel, tone: terminal.quote.oneMonthMoveLabel.startsWith('+') ? 'warning' : 'positive' },
+          { type: 'metric', key: 'range-52w', label: '52W range', value: terminal.quote.range52WeekLabel, tone: 'neutral' }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'evidence',
+        title: 'Evidence',
+        children: [
+          { type: 'row', key: 'best-store', label: 'Best store', value: terminal.quote.bestStoreName ?? 'Unknown store' },
+          { type: 'row', key: 'verified-history', label: 'Verified history', value: `${terminal.evidence.verifiedHistoryPoints} of ${terminal.evidence.historyPoints}` },
+          { type: 'row', key: 'latest-observed', label: 'Latest observed', value: terminal.evidence.latestObservedAt ?? 'Not observed' },
+          { type: 'row', key: 'guardrails', label: 'Guardrails', value: `${terminal.evidence.guardrails.length} active` }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'distribution',
+        title: 'Distribution',
+        children: terminal.distributions.map((distribution) => ({
+          type: 'row',
+          key: `distribution:${distribution.scope}`,
+          label: distribution.label,
+          value: `${distribution.medianPrice.toFixed(2)} SEK median, cheaper than ${distribution.cheaperThanPercent}%`
+        }))
+      },
+      {
+        type: 'section',
+        key: 'chart',
+        title: 'Chart',
+        children: terminal.chartSeries.map((series) => ({
+          type: 'row',
+          key: `chart:${series.id}`,
+          label: series.storeName,
+          value: `${series.pointCount} points, latest ${series.latestPrice?.toFixed(2) ?? 'n/a'} SEK, ${series.markerCount} markers`
+        }))
+      },
+      {
+        type: 'section',
+        key: 'actions',
+        title: 'Actions',
+        children: terminal.actions.map((action, index) => ({
+          type: 'action',
+          key: action,
+          action,
+          label: actionLabel(action),
+          primary: index === 0
+        }))
+      }
+    ]
+  };
+}
+
 export type ScanRequest = {
   mode: 'barcode' | 'receipt';
   code: string;
