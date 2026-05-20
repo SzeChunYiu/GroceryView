@@ -5,8 +5,10 @@ import {
   buildAdPlacementPlan,
   buildMobilePremiumEntitlementPlan,
   buildMonetizationProviderReadinessReport,
-  buildReferralOfferPlan,
-  buildSubscriptionCheckoutPlan
+  buildSubscriptionAccessPolicy,
+  buildSubscriptionCheckoutPlan,
+  parseStripeCompatibleSubscriptionEvent,
+  processBillingSubscriptionEvent
 } from '../index.js';
 
 describe('monetization foundation', () => {
@@ -385,57 +387,52 @@ describe('monetization foundation', () => {
     });
   });
 
-  it('plans privacy-safe referral offers with visible sponsored disclosure', () => {
-    const plan = buildReferralOfferPlan({
-      partnerId: 'mathem',
-      partnerType: 'online_grocery',
-      destinationUrl: 'https://partner.example/deal/coffee',
-      label: 'Order online',
-      commissionDisclosure: 'GroceryView may earn a referral commission.',
-      sponsoredLabelVisible: true,
-      organicRankingSeparated: true,
-      allowedSurfaces: ['store_detail', 'basket_checkout'],
-      requestedEventFields: ['partnerId', 'partnerType', 'surface', 'clickedAt', 'campaignId']
+  it('hides mobile ads for active premium entitlements and schedules status refresh', () => {
+    const plan = buildMobilePremiumEntitlementPlan({
+      userId: 'user-1',
+      userTier: 'premium',
+      platform: 'ios',
+      billingProviderConfigured: true,
+      activeSubscriptionPlan: 'premium_monthly',
+      expiresAt: '2026-06-20T00:00:00.000Z',
+      now: '2026-05-20T00:00:00.000Z'
     });
 
-    assert.deepEqual(plan, {
-      status: 'ready',
-      partnerId: 'mathem',
-      partnerType: 'online_grocery',
-      label: 'Order online',
-      destinationUrl: 'https://partner.example/deal/coffee',
-      allowedSurfaces: ['store_detail', 'basket_checkout'],
-      outboundEventFields: ['partnerId', 'partnerType', 'surface', 'clickedAt', 'campaignId'],
-      blockers: [],
-      summary: 'Referral offer can be shown with privacy-safe attribution.'
-    });
+    assert.equal(plan.premiumActive, true);
+    assert.deepEqual(plan.adPlan.slots, []);
+    assert.deepEqual(plan.blockers, []);
+    assert.deepEqual(plan.actions, ['hide_mobile_ads', 'refresh_subscription_status']);
   });
 
-  it('blocks referral offers that hide disclosures or request private shopping data', () => {
-    const plan = buildReferralOfferPlan({
-      partnerId: '',
-      partnerType: 'cashback',
-      destinationUrl: 'http://cashback.example/deal',
-      label: 'Cashback',
-      commissionDisclosure: '',
-      sponsoredLabelVisible: false,
-      organicRankingSeparated: false,
-      allowedSurfaces: [],
-      requestedEventFields: ['partnerId', 'userId', 'receiptId', 'budgetAmount']
+  it('keeps labeled mobile ads and checkout actions for free users', () => {
+    const plan = buildMobilePremiumEntitlementPlan({
+      userId: 'user-2',
+      userTier: 'free',
+      platform: 'android',
+      billingProviderConfigured: true,
+      now: '2026-05-20T00:00:00.000Z'
     });
 
-    assert.deepEqual(plan.status, 'blocked');
-    assert.deepEqual(plan.outboundEventFields, ['partnerId']);
-    assert.deepEqual(plan.blockers, [
-      'partner_id_required',
-      'https_destination_required',
-      'commission_disclosure_required',
-      'sponsored_label_not_visible',
-      'organic_ranking_not_separated',
-      'no_referral_surfaces_enabled',
-      'private_event_field_requested:userId',
-      'private_event_field_requested:receiptId',
-      'private_event_field_requested:budgetAmount'
-    ]);
+    assert.equal(plan.premiumActive, false);
+    assert.deepEqual(plan.adPlan.slots.map((slot) => `${slot.surface}:${slot.provider}:${slot.label}`), ['mobile_deals_feed:admob:Sponsored']);
+    assert.equal(plan.adPlan.affectsDealScore, false);
+    assert.deepEqual(plan.blockers, []);
+    assert.deepEqual(plan.actions, ['show_mobile_deals_ads', 'start_premium_checkout', 'restore_purchase']);
+  });
+
+  it('blocks expired mobile premium recovery when billing is not configured', () => {
+    const plan = buildMobilePremiumEntitlementPlan({
+      userId: 'user-3',
+      userTier: 'premium',
+      platform: 'ios',
+      billingProviderConfigured: false,
+      activeSubscriptionPlan: 'premium_yearly',
+      expiresAt: '2026-05-19T00:00:00.000Z',
+      now: '2026-05-20T00:00:00.000Z'
+    });
+
+    assert.equal(plan.premiumActive, false);
+    assert.deepEqual(plan.blockers, ['mobile_billing_provider_not_configured']);
+    assert.deepEqual(plan.actions, ['show_mobile_deals_ads']);
   });
 });
