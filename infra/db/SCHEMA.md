@@ -2,7 +2,7 @@
 
 Target runtime: PostgreSQL 18 with `postgis`, `pg_trgm`, and `pgcrypto`.
 
-The migration in `migrations/001_groceryview_schema.sql` stores grocery prices as immutable observations. `latest_prices` is a derived lookup table and must not be treated as the source of truth.
+The migrations in `migrations/*.sql` store grocery prices as immutable observations and add repository support tables for app workflows. `latest_prices` is a derived lookup table and must not be treated as the source of truth.
 
 ## Extensions
 
@@ -148,3 +148,81 @@ User alert rules for target prices, Deal Score thresholds, stock, or price drops
 Key columns: `user_id`, `watchlist_id`, `product_id`, `store_id`, `alert_type`, `target_price`, `deal_score_threshold`, `active`, `last_triggered_at`.
 
 Indexes: `alerts_active_user_idx`.
+
+### `app_users`
+
+Legacy app repository user records used by existing package contracts while API-facing work moves to canonical `users`.
+
+Key columns: `email`, `created_at`, `updated_at`.
+
+### `favorite_stores`
+
+Legacy app repository favorite-store links.
+
+Key columns: `user_id`, `store_id`, `created_at`.
+
+Primary key: `(user_id, store_id)`.
+
+### `user_preferences`
+
+Legacy app repository budget preferences.
+
+Key columns: `user_id`, `weekly_budget`, `monthly_budget`, `updated_at`.
+
+### `watchlist_items`
+
+Legacy app repository watchlist rows used by existing package APIs.
+
+Key columns: `user_id`, `product_id`, `target_price`, `alert_deal_score_at`, `favorite_stores_only`.
+
+### `weekly_baskets`
+
+Legacy app repository basket headers.
+
+Key columns: `user_id`, `week_start`, `created_at`, `updated_at`.
+
+Unique key: `(user_id, week_start)`.
+
+### `basket_items`
+
+Legacy app repository basket lines.
+
+Key columns: `basket_id`, `product_id`, `quantity`, `created_at`.
+
+### `human_review_assignments`
+
+Operational queue entries for product-match and community-report review.
+
+Key columns: `review_id`, `subject_type`, `subject_id`, `priority`, `reason`, `assignee_id`, `assigned_at`, `due_at`, `status`.
+
+### `human_reviewers`
+
+Reviewer identity and role state for the human review queue.
+
+Key columns: `role`, `active`, `created_at`, `updated_at`.
+
+### `community_reporter_trust`
+
+Rate-limit and trust counters for community price reporters.
+
+Key columns: `reports_last_24_hours`, `pending_reports`, `accepted_reports_last_30_days`, `rejected_reports_last_30_days`, `updated_at`.
+
+### `notification_tasks`
+
+Scheduled push/email notification work items.
+
+Key columns: `channel`, `type`, `title`, `body`, `priority`, `send_at`, `recipient`, `attempt_count`, `max_attempts`, `status`.
+
+### `notification_suppressions`
+
+Recipient suppression records for unsubscribe, bounce, and complaint handling.
+
+Key columns: `recipient`, `channel`, `reason`, `active`, `updated_at`.
+
+### `subscription_entitlements`
+
+Provider-neutral premium subscription entitlement state.
+
+Key columns: `user_id`, `tier`, `plan`, `status`, `current_period_ends_at`, `provider`, `provider_customer_id`, `provider_subscription_id`, `updated_at`.
+
+Stored billing provider identifiers are not payment credentials. Card data, CVCs, payment method secrets, and checkout client secrets stay outside GroceryView storage.

@@ -672,6 +672,28 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
+      const watchlistItemMatch = path.match(/^\/api\/watchlist\/items\/([^/]+)$/);
+      if (watchlistItemMatch) {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        const productId = decodeURIComponent(watchlistItemMatch[1]);
+        if (method === 'PATCH') {
+          const body = await readJson(request);
+          api.updateWatchlistItem(user, productId, {
+            targetPrice: optionalNumber(body.targetPrice, 'targetPrice'),
+            alertDealScoreAt: optionalNumber(body.alertDealScoreAt, 'alertDealScoreAt'),
+            favoriteStoresOnly: typeof body.favoriteStoresOnly === 'boolean' ? body.favoriteStoresOnly : undefined
+          });
+          return jsonResponse(api.getWatchlist(user));
+        }
+        if (method === 'DELETE') {
+          api.removeWatchlistItem(user, productId);
+          return jsonResponse(api.getWatchlist(user));
+        }
+      }
+
       if (path === '/api/basket/current') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -692,6 +714,24 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
             quantity: requiredNumber(body.quantity, 'quantity')
           });
           return jsonResponse(api.getBasket(user), { status: 201 });
+        }
+      }
+
+      const basketItemMatch = path.match(/^\/api\/basket\/items\/([^/]+)$/);
+      if (basketItemMatch) {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        const productId = decodeURIComponent(basketItemMatch[1]);
+        if (method === 'PATCH') {
+          const body = await readJson(request);
+          api.updateBasketItem(user, productId, requiredNumber(body.quantity, 'quantity'));
+          return jsonResponse(api.getBasket(user));
+        }
+        if (method === 'DELETE') {
+          api.removeBasketItem(user, productId);
+          return jsonResponse(api.getBasket(user));
         }
       }
 
@@ -901,8 +941,16 @@ export function buildOpenApiDocument(): OpenApiDocument {
         get: protectedOperation('Get watchlist and alerts.'),
         post: protectedOperation('Add watchlist item.')
       },
+      '/api/watchlist/items/{productId}': {
+        patch: protectedOperation('Update watchlist item.'),
+        delete: protectedOperation('Remove watchlist item.')
+      },
       '/api/basket/current': { get: protectedOperation('Get current weekly basket.') },
       '/api/basket/items': { post: protectedOperation('Add basket item.') },
+      '/api/basket/items/{productId}': {
+        patch: protectedOperation('Update basket item quantity.'),
+        delete: protectedOperation('Remove basket item.')
+      },
       '/api/basket/compare': { post: protectedOperation('Compare basket strategies.') },
       '/api/budget': { patch: protectedOperation('Update budget.') },
       '/api/budget/summary': { get: protectedOperation('Get budget summary.') },
