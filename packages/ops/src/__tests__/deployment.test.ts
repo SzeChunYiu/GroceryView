@@ -5,6 +5,7 @@ import {
   buildHostedSmokeCommandPlan,
   buildRollbackPlan,
   buildSecretRotationReadinessReport,
+  summarizeSecretRotationReadinessReport,
   summarizeDeploymentReadinessReport,
   summarizeGateBlockers,
   summarizeGateWarnings
@@ -284,6 +285,28 @@ describe('deployment ops foundation', () => {
       ],
       readySecrets: [],
       summary: 'Secret rotation readiness is blocked until required deployment secrets are present, fresh, and owned.'
+    });
+  });
+
+  it('summarizes secret rotation readiness for deployment dashboards', () => {
+    const report = buildSecretRotationReadinessReport({
+      checkedAt: '2026-05-20T08:00:00.000Z',
+      maxAgeDays: 90,
+      requiredSecrets: ['DATABASE_URL', 'SESSION_SECRET', 'METRICS_TOKEN', 'PUBLIC_APP_URL'],
+      secrets: [
+        { name: 'DATABASE_URL', present: true, rotatedAt: '2026-01-01T00:00:00.000Z', owner: 'platform' },
+        { name: 'SESSION_SECRET', present: true, rotatedAt: '2026-05-01T00:00:00.000Z' },
+        { name: 'PUBLIC_APP_URL', present: true, rotatedAt: '2026-05-01T00:00:00.000Z', owner: 'platform' }
+      ]
+    });
+
+    assert.deepEqual(summarizeSecretRotationReadinessReport(report), {
+      status: 'blocked',
+      totalBlockers: 3,
+      missingSecrets: 1,
+      staleSecrets: 1,
+      ownerlessSecrets: 1,
+      readySecrets: 1
     });
   });
 });

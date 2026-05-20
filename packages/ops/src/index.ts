@@ -364,6 +364,15 @@ export type SecretRotationReadinessReport = {
   summary: string;
 };
 
+export type SecretRotationReadinessSummary = {
+  status: SecretRotationReadinessReport['status'];
+  totalBlockers: number;
+  missingSecrets: number;
+  staleSecrets: number;
+  ownerlessSecrets: number;
+  readySecrets: number;
+};
+
 export function buildSecretRotationReadinessReport(input: SecretRotationReadinessInput): SecretRotationReadinessReport {
   const checkedAt = Date.parse(input.checkedAt);
   const maxAgeMs = input.maxAgeDays * 24 * 60 * 60 * 1000;
@@ -398,6 +407,19 @@ export function buildSecretRotationReadinessReport(input: SecretRotationReadines
       blockers.length === 0
         ? 'Secret rotation readiness passed.'
         : 'Secret rotation readiness is blocked until required deployment secrets are present, fresh, and owned.'
+  };
+}
+
+export function summarizeSecretRotationReadinessReport(
+  report: SecretRotationReadinessReport
+): SecretRotationReadinessSummary {
+  return {
+    status: report.status,
+    totalBlockers: report.blockers.length,
+    missingSecrets: report.blockers.filter((blocker) => blocker.startsWith('secret_missing:')).length,
+    staleSecrets: report.blockers.filter((blocker) => blocker.startsWith('secret_rotation_stale:')).length,
+    ownerlessSecrets: report.blockers.filter((blocker) => blocker.startsWith('secret_rotation_owner_missing:')).length,
+    readySecrets: report.readySecrets.length
   };
 }
 
