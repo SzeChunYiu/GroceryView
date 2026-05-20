@@ -224,6 +224,16 @@ describe('buildStaticPages', () => {
       assert.match(savingsLedger, /Willys coffee promo/);
       assert.match(savingsLedger, /Only verified receipts can move forecast savings into realized savings/);
       assert.match(savingsLedger, /Low-confidence prices cannot increase savings totals/);
+      assert.match(savingsLedger, /Connected savings ledger API/);
+      assert.match(savingsLedger, /Load live savings ledger/);
+      assert.match(savingsLedger, /data-groceryview-flow="savings-ledger"/);
+      assert.match(savingsLedger, /data-flow-action="load-savings-ledger"/);
+      assert.match(savingsLedger, /data-savings-ledger-confirmed/);
+      assert.match(savingsLedger, /data-savings-ledger-forecast/);
+      assert.match(savingsLedger, /data-savings-ledger-blockers/);
+      assert.match(savingsLedger, /fetch\(apiUrl\('\/api\/budget\/summary'/);
+      assert.match(savingsLedger, /fetch\(apiUrl\('\/api\/basket\/compare'/);
+      assert.match(savingsLedger, /Connected savings ledger loaded/);
 
       const smartSwapsPage = await readFile(join(root, 'savings/smart-swaps/index.html'), 'utf8');
       assert.match(smartSwapsPage, /Smart grocery swaps/);
