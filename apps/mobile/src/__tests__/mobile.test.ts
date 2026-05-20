@@ -5,6 +5,7 @@ import { createGroceryViewApi } from '@groceryview/api';
 import {
   buildExpoReadinessPlan,
   buildMobileProviderReadinessReport,
+  buildMobilePrivacyRequestPlan,
   buildMobileScreenBlueprints,
   buildMobileShell,
   buildScanResult,
@@ -289,6 +290,8 @@ describe('mobile app foundation', () => {
       '/scan/receipt',
       '/profile'
     ]);
+  });
+
   it('plans authenticated mobile privacy exports from the privacy route', () => {
     const plan = buildMobilePrivacyRequestPlan({
       userId: 'user-1',
