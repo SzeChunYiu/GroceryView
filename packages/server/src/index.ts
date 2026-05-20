@@ -299,6 +299,11 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return store ? jsonResponse(store) : errorResponse(404, 'Store not found.');
       }
 
+      const storeDealsMatch = path.match(/^\/api\/stores\/([^/]+)\/deals$/);
+      if (method === 'GET' && storeDealsMatch) {
+        return jsonResponse(api.getStoreDeals(decodeURIComponent(storeDealsMatch[1])));
+      }
+
       if (method === 'GET' && path === '/api/products/search') {
         return jsonResponse(api.searchProducts(url.searchParams.get('q') ?? ''));
       }
@@ -479,6 +484,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
       '/api/stores/{id}': { get: publicOperation('Get store profile.') },
+      '/api/stores/{id}/deals': { get: publicOperation('Get ranked in-store deals for one store.') },
       '/api/products/search': { get: publicOperation('Search products.') },
       '/api/products/{id}': { get: publicOperation('Get product detail.') },
       '/api/products/{id}/prices': { get: publicOperation('Get product prices by store.') },

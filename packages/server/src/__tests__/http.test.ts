@@ -57,6 +57,14 @@ describe('createHttpHandler', () => {
     assert.equal(stores.status, 200);
     assert.equal((await json(stores) as Array<{ id: string }>)[0].id, 'willys-odenplan');
 
+    const storeDeals = await handle(new Request('http://localhost/api/stores/willys-odenplan/deals'));
+    assert.equal(storeDeals.status, 200);
+    assert.deepEqual((await json(storeDeals) as Array<{ productId: string; storeId: string }>).map((deal) => [deal.productId, deal.storeId]), [
+      ['coffee', 'willys-odenplan'],
+      ['milk', 'willys-odenplan'],
+      ['butter', 'willys-odenplan']
+    ]);
+
     const product = await handle(new Request('http://localhost/api/products/coffee'));
     assert.equal(product.status, 200);
     assert.equal((await json(product) as { ticker: string }).ticker, 'ZOEGAS-COFFEE-450G');
