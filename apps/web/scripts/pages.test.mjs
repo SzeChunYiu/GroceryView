@@ -371,6 +371,15 @@ describe('buildStaticPages', () => {
       assert.match(billingStatus, /premium_monthly/);
       assert.match(billingStatus, /Missing or past-due entitlements keep checkout required/);
       assert.match(billingStatus, /Provider updates must be newer than stored entitlement state/);
+      assert.match(billingStatus, /Connected billing API/);
+      assert.match(billingStatus, /Load live billing status/);
+      assert.match(billingStatus, /data-groceryview-flow="billing-status"/);
+      assert.match(billingStatus, /data-flow-action="load-billing-status"/);
+      assert.match(billingStatus, /data-billing-status-entitlement/);
+      assert.match(billingStatus, /data-billing-status-ads/);
+      assert.match(billingStatus, /data-billing-status-actions/);
+      assert.match(billingStatus, /fetch\(apiUrl\('\/api\/account\/subscription-access'/);
+      assert.match(billingStatus, /Connected billing status loaded/);
 
       const loyaltyOffers = await readFile(join(root, 'loyalty/offers/index.html'), 'utf8');
       assert.match(loyaltyOffers, /Loyalty offer tracker/);

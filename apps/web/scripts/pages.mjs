@@ -57,6 +57,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-budget-summary-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setBillingStatusMetric = (metric, message) => {
+    const target = document.querySelector('[data-billing-status-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setMealPlansMetric = (metric, message) => {
     const target = document.querySelector('[data-meal-plans-' + metric + ']');
     if (target) target.textContent = message;
@@ -224,6 +228,29 @@ window.GroceryViewFlowActions = (() => {
       setResult('account', 'Connected API: ' + (payload.summary || 'subscription access loaded') + ' Actions: ' + ((payload.accountActions || []).join(', ') || 'none') + '.');
     } catch (error) {
       setResult('account', 'Subscription access check failed: ' + error.message + '.');
+    }
+  };
+  const loadBillingStatusFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('billing-status', 'Local preview mode: connect the API session bridge before loading live billing status.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/account/subscription-access', config), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const actions = Array.isArray(payload.accountActions) ? payload.accountActions : [];
+      const adState = payload.hideAds ? 'Ads hidden for premium' : 'Ads eligible until premium is active';
+      const checkoutState = payload.requiresCheckout ? 'Checkout required' : 'Checkout not required';
+      setBillingStatusMetric('entitlement', (payload.summary || 'subscription access loaded') + ' · ' + checkoutState);
+      setBillingStatusMetric('ads', adState + ' · tier ' + (payload.tier || 'unknown') + ' · status ' + (payload.status || 'unknown'));
+      setBillingStatusMetric('actions', actions.length ? actions.join(', ') : 'No account actions returned');
+      setResult('billing-status', 'Connected billing status loaded: ' + (payload.summary || 'subscription access loaded') + '; ' + actions.length + ' account actions.');
+    } catch (error) {
+      setResult('billing-status', 'Billing status API load failed: ' + error.message + '. Static billing status remains visible.');
     }
   };
   const loadPrivacyExportFromApi = async () => {
@@ -1126,6 +1153,10 @@ window.GroceryViewFlowActions = (() => {
         await loadBudgetSummaryFromApi();
         return;
       }
+      if (flow === 'billing-status' && action === 'load-billing-status') {
+        await loadBillingStatusFromApi();
+        return;
+      }
       if (flow === 'meal-plans' && action === 'load-meal-plans') {
         await loadMealPlansFromApi();
         return;
@@ -1301,6 +1332,9 @@ const dailyDealsLivePanel = `
 const budgetSummaryLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="budget-summary" style="margin-top:16px"><div class="eyebrow">Connected budget API</div><h2>Pull live household budget summary</h2><p class="lede">Fetch <code>/api/budget/summary</code> through the protected API session bridge to refresh weekly budget, month-to-date spend, next-basket estimate, remaining buffers, and over/under status from account data.</p><div class="grid" aria-label="Live budget summary API metrics"><div class="metric"><strong data-budget-summary-weekly>Waiting for API pull</strong><span>weekly budget status</span></div><div class="metric"><strong data-budget-summary-monthly>Static monthly preview</strong><span>monthly budget status</span></div><div class="metric"><strong data-budget-summary-estimate>Static basket estimate preview</strong><span>next basket buffer</span></div></div><div class="flow-panel" aria-label="Connected budget summary actions"><button type="button" data-flow-action="load-budget-summary">Load live budget summary</button></div><p class="flow-result" data-flow-result="budget-summary" aria-live="polite">Local preview mode: connect the API session bridge before loading live budget summary.</p></section>`;
 
+const billingStatusLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="billing-status" style="margin-top:16px"><div class="eyebrow">Connected billing API</div><h2>Pull live billing status</h2><p class="lede">Fetch <code>/api/account/subscription-access</code> through the protected API session bridge to refresh entitlement status, checkout requirement, ad-removal state, and account actions before premium UI or billing prompts are shown.</p><div class="grid" aria-label="Live billing status API metrics"><div class="metric"><strong data-billing-status-entitlement>Waiting for API pull</strong><span>entitlement and checkout state</span></div><div class="metric"><strong data-billing-status-ads>Static ad-removal preview</strong><span>ad removal and plan status</span></div><div class="metric"><strong data-billing-status-actions>Static account action preview</strong><span>billing actions</span></div></div><div class="flow-panel" aria-label="Connected billing status actions"><button type="button" data-flow-action="load-billing-status">Load live billing status</button></div><p class="flow-result" data-flow-result="billing-status" aria-live="polite">Local preview mode: connect the API session bridge before loading live billing status.</p></section>`;
+
 const mealPlansLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="meal-plans" style="margin-top:16px"><div class="eyebrow">Connected meal plan API</div><h2>Pull live meal plan budget</h2><p class="lede">Fetch protected <code>/api/budget/summary</code> and <code>/api/basket/compare</code> plus public <code>/api/market/overview</code> to refresh weekly meal budget buffer, verified ingredient coverage, split-store savings, missing-product blockers, and meal-relevant deal signals from live API data.</p><div class="grid" aria-label="Live meal plan API metrics"><div class="metric"><strong data-meal-plans-budget>Waiting for API pull</strong><span>weekly budget buffer and next basket</span></div><div class="metric"><strong data-meal-plans-basket>Static ingredient coverage preview</strong><span>verified ingredient lines and blockers</span></div><div class="metric"><strong data-meal-plans-deals>Static meal deal preview</strong><span>meal-relevant deal signals</span></div></div><div class="flow-panel" aria-label="Connected meal plan actions"><button type="button" data-flow-action="load-meal-plans">Load live meal plan budget</button></div><p class="flow-result" data-flow-result="meal-plans" aria-live="polite">Local preview mode: connect the API session bridge and save a basket before loading live meal plan budget.</p></section>`;
 
@@ -1351,7 +1385,7 @@ const pages = [
     path: 'billing/status/index.html',
     title: 'Billing status — GroceryView',
     description: 'Review GroceryView subscription entitlement, checkout requirement, ad removal state, billing issue actions, and provider webhook status.',
-    body: `<section class="card"><div class="eyebrow">Billing</div><h1>Billing status</h1><p class="lede">Audit subscription entitlement, checkout enforcement, ad removal, and provider webhook state before premium features are shown.</p><div class="grid"><div class="metric"><strong>Premium</strong><span>active entitlement</span></div><div class="metric"><strong>Ads off</strong><span>non-critical slots removed</span></div><div class="metric"><strong>0</strong><span>billing blockers</span></div></div></section><section class="card" style="margin-top:16px"><h2>Entitlement state</h2><table class="table"><thead><tr><th>Account</th><th>Plan</th><th>Status</th><th>Checkout</th><th>Action</th></tr></thead><tbody><tr><td>Household workspace</td><td>premium_monthly</td><td>Active</td><td>Not required</td><td>Show manage subscription</td></tr><tr><td>Solo price watch</td><td>free</td><td>No entitlement</td><td>Required</td><td>Show upgrade</td></tr><tr><td>Reviewer desk</td><td>premium_yearly</td><td>Past due</td><td>Required</td><td>Show billing issue</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Billing guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Fail closed</td><td>Missing or past-due entitlements keep checkout required.</td></tr><tr><td>Ads removed only for premium</td><td>Free and past-due accounts keep non-critical ad slots eligible.</td></tr><tr><td>Webhook freshness</td><td>Provider updates must be newer than stored entitlement state.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Billing</div><h1>Billing status</h1><p class="lede">Audit subscription entitlement, checkout enforcement, ad removal, and provider webhook state before premium features are shown.</p><div class="grid"><div class="metric"><strong>Premium</strong><span>active entitlement</span></div><div class="metric"><strong>Ads off</strong><span>non-critical slots removed</span></div><div class="metric"><strong>0</strong><span>billing blockers</span></div></div></section><section class="card" style="margin-top:16px"><h2>Entitlement state</h2><table class="table"><thead><tr><th>Account</th><th>Plan</th><th>Status</th><th>Checkout</th><th>Action</th></tr></thead><tbody><tr><td>Household workspace</td><td>premium_monthly</td><td>Active</td><td>Not required</td><td>Show manage subscription</td></tr><tr><td>Solo price watch</td><td>free</td><td>No entitlement</td><td>Required</td><td>Show upgrade</td></tr><tr><td>Reviewer desk</td><td>premium_yearly</td><td>Past due</td><td>Required</td><td>Show billing issue</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Billing guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Fail closed</td><td>Missing or past-due entitlements keep checkout required.</td></tr><tr><td>Ads removed only for premium</td><td>Free and past-due accounts keep non-critical ad slots eligible.</td></tr><tr><td>Webhook freshness</td><td>Provider updates must be newer than stored entitlement state.</td></tr></tbody></table></section>${billingStatusLivePanel}`
   },
   {
     path: 'loyalty/offers/index.html',
