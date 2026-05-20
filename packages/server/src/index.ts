@@ -243,6 +243,57 @@ function hasValidMetricsToken(request: Request, token: string): boolean {
   return providedBuffer.length === expectedBuffer.length && timingSafeEqual(providedBuffer, expectedBuffer);
 }
 
+export type PostgresReadinessDiagnostics = {
+  blockers: {
+    total: number;
+    missingTables: number;
+    missingMigrations: number;
+    repositoryChecks: number;
+  };
+  evidence: {
+    total: number;
+    tables: number;
+    migrations: number;
+    repositoryChecks: number;
+  };
+};
+
+export type HttpPostgresReadinessReport = PostgresIntegrationReadinessReport & {
+  diagnostics: PostgresReadinessDiagnostics;
+};
+
+export function summarizePostgresReadinessForHttp(report: PostgresIntegrationReadinessReport): PostgresReadinessDiagnostics {
+  return {
+    blockers: report.blockers.reduce<PostgresReadinessDiagnostics['blockers']>(
+      (summary, blocker) => {
+        summary.total += 1;
+        if (blocker.startsWith('missing_table:')) summary.missingTables += 1;
+        if (blocker.startsWith('missing_migration:')) summary.missingMigrations += 1;
+        if (blocker.startsWith('repository_check_')) summary.repositoryChecks += 1;
+        return summary;
+      },
+      { total: 0, missingTables: 0, missingMigrations: 0, repositoryChecks: 0 }
+    ),
+    evidence: report.evidence.reduce<PostgresReadinessDiagnostics['evidence']>(
+      (summary, entry) => {
+        summary.total += 1;
+        if (entry.startsWith('table:')) summary.tables += 1;
+        if (entry.startsWith('migration:')) summary.migrations += 1;
+        if (entry.startsWith('repository_check:')) summary.repositoryChecks += 1;
+        return summary;
+      },
+      { total: 0, tables: 0, migrations: 0, repositoryChecks: 0 }
+    )
+  };
+}
+
+function postgresReadinessResponse(report: PostgresIntegrationReadinessReport): HttpPostgresReadinessReport {
+  return {
+    ...report,
+    diagnostics: summarizePostgresReadinessForHttp(report)
+  };
+}
+
 const sensitiveBillingEventFields = new Set([
   'cardnumber',
   'card',
@@ -404,15 +455,15 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
 
         try {
           const report = await authOptions.postgresReadinessProvider();
-          return jsonResponse(report, { status: report.status === 'ready' ? 200 : 503 });
+          return jsonResponse(postgresReadinessResponse(report), { status: report.status === 'ready' ? 200 : 503 });
         } catch {
           return jsonResponse(
-            {
+            postgresReadinessResponse({
               status: 'blocked',
               blockers: ['postgres_readiness_probe_failed'],
               evidence: [],
               summary: 'PostgreSQL integration contract is blocked.'
-            },
+            }),
             { status: 503 }
           );
         }
