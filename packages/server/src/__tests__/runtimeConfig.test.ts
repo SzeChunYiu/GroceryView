@@ -45,14 +45,13 @@ class RecordingPgPool {
           'subscription_entitlements',
           'notification_tasks',
           'notification_suppressions',
-          'alert_rules',
-          'pantry_items'
+          'alert_rules'
         ].map((table_name) => ({ table_name }))
       };
     }
     if (text.includes('select version from schema_migrations')) {
       return {
-        rows: ['001_groceryview_schema', '002_repository_support_schema', '003_subscription_entitlements', '004_alert_rules', '005_pantry_inventory'].map((version) => ({ version }))
+        rows: ['001_groceryview_schema', '002_repository_support_schema', '003_subscription_entitlements', '004_alert_rules'].map((version) => ({ version }))
       };
     }
     if (text.includes('insert into subscription_entitlements')) {
@@ -372,10 +371,8 @@ describe('runtime config', () => {
       assert.deepEqual(body.blockers, []);
       assert.equal(body.evidence.includes('table:app_users'), true);
       assert.equal(body.evidence.includes('table:alert_rules'), true);
-      assert.equal(body.evidence.includes('table:pantry_items'), true);
       assert.equal(body.evidence.includes('migration:003_subscription_entitlements'), true);
       assert.equal(body.evidence.includes('migration:004_alert_rules'), true);
-      assert.equal(body.evidence.includes('migration:005_pantry_inventory'), true);
       assert.equal(JSON.stringify(body).includes('runtime-password'), false);
     } finally {
       await service.close();

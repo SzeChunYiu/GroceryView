@@ -73,21 +73,6 @@ class RecordingQueryExecutor implements QueryExecutor {
       created_at: '2026-05-20T07:29:00.000Z'
     }
   ];
-  pantryItemRows: unknown[] = [
-    {
-      id: 'pantry-coffee',
-      user_id: 'user-1',
-      product_id: 'coffee',
-      name: 'Coffee',
-      category: 'pantry',
-      quantity: '1.000',
-      unit: 'bag',
-      minimum_quantity: '1.000',
-      target_quantity: '3.000',
-      expires_on: '2026-07-01',
-      updated_at: '2026-05-20T08:00:00.000Z'
-    }
-  ];
   sourceRunRows: unknown[] = [
     {
       id: 'source-run-1',
@@ -312,7 +297,6 @@ class RecordingQueryExecutor implements QueryExecutor {
       ] as T[];
     }
     if (sql.includes('from alert_rules')) return this.alertRuleRows as T[];
-    if (sql.includes('from pantry_items')) return this.pantryItemRows as T[];
     if (sql.includes('from human_review_assignments')) {
       return [
         {
@@ -643,55 +627,6 @@ describe('createPostgresRepository', () => {
       null,
       true,
       '2026-05-20T08:00:00.000Z',
-      '2026-05-20T08:00:00.000Z'
-    ]);
-    assert.deepEqual(executor.calls[1].params, ['user-1']);
-  });
-
-  it('persists and lists pantry inventory items', async () => {
-    const executor = new RecordingQueryExecutor();
-    const repo = createPostgresRepository(executor);
-
-    await repo.upsertPantryItem({
-      id: 'pantry-coffee',
-      userId: 'user-1',
-      productId: 'coffee',
-      name: 'Coffee',
-      category: 'pantry',
-      quantity: 1,
-      unit: 'bag',
-      minimumQuantity: 1,
-      targetQuantity: 3,
-      expiresOn: '2026-07-01',
-      updatedAt: '2026-05-20T08:00:00.000Z'
-    });
-
-    assert.deepEqual(await repo.listPantryItems('user-1'), [
-      {
-        id: 'pantry-coffee',
-        userId: 'user-1',
-        productId: 'coffee',
-        name: 'Coffee',
-        category: 'pantry',
-        quantity: 1,
-        unit: 'bag',
-        minimumQuantity: 1,
-        targetQuantity: 3,
-        expiresOn: '2026-07-01',
-        updatedAt: '2026-05-20T08:00:00.000Z'
-      }
-    ]);
-    assert.deepEqual(executor.calls[0].params, [
-      'pantry-coffee',
-      'user-1',
-      'coffee',
-      'Coffee',
-      'pantry',
-      1,
-      'bag',
-      1,
-      3,
-      '2026-07-01',
       '2026-05-20T08:00:00.000Z'
     ]);
     assert.deepEqual(executor.calls[1].params, ['user-1']);

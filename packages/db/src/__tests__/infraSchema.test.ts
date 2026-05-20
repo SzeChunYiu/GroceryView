@@ -9,8 +9,7 @@ const migration = readFileSync(join(repoRoot, 'infra/db/migrations/001_groceryvi
 const repositoryMigration = readFileSync(join(repoRoot, 'infra/db/migrations/002_repository_support_schema.sql'), 'utf8').toLowerCase();
 const entitlementMigration = readFileSync(join(repoRoot, 'infra/db/migrations/003_subscription_entitlements.sql'), 'utf8').toLowerCase();
 const alertRulesMigration = readFileSync(join(repoRoot, 'infra/db/migrations/004_alert_rules.sql'), 'utf8').toLowerCase();
-const pantryInventoryMigration = readFileSync(join(repoRoot, 'infra/db/migrations/005_pantry_inventory.sql'), 'utf8').toLowerCase();
-const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}`;
+const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}`;
 const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
 
@@ -44,8 +43,7 @@ const repositoryTables = [
   'subscription_entitlements',
   'notification_tasks',
   'notification_suppressions',
-  'alert_rules',
-  'pantry_items'
+  'alert_rules'
 ];
 
 function tableDefinition(table: string): string {
@@ -119,10 +117,6 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('alert_rules'), /user_id text not null references app_users\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('alert_rules'), /alert_type text not null check/);
     assert.match(repositoryTableDefinition('alert_rules'), /deal_score_threshold integer check/);
-    assert.match(repositoryTableDefinition('pantry_items'), /user_id text not null references app_users\(id\) on delete cascade/);
-    assert.match(repositoryTableDefinition('pantry_items'), /category text not null check/);
-    assert.match(repositoryTableDefinition('pantry_items'), /quantity numeric\(12, 3\) not null check \(quantity >= 0\)/);
-    assert.match(repositoryTableDefinition('pantry_items'), /target_quantity numeric\(12, 3\) check \(target_quantity is null or target_quantity >= 0\)/);
   });
 
   it('indexes repository workflow lookups used by adapters and workers', () => {
@@ -133,8 +127,6 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryMigration, /notification_tasks_due_idx on notification_tasks \(status, send_at, id\)/);
     assert.match(repositoryMigration, /notification_suppressions_active_idx on notification_suppressions \(active, recipient, channel, id\)/);
     assert.match(alertRulesMigration, /alert_rules_active_user_idx on alert_rules \(user_id, active, product_id, alert_type, id\)/);
-    assert.match(pantryInventoryMigration, /pantry_items_user_idx on pantry_items \(user_id, product_id\)/);
-    assert.match(pantryInventoryMigration, /pantry_items_expiry_idx on pantry_items \(expires_on\) where expires_on is not null/);
   });
 
   it('keeps the migration verifier aligned with catalog and repository tables', () => {

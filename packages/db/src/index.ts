@@ -236,20 +236,6 @@ export type BasketRecord = {
   quantity: number;
 };
 
-export type PantryItemRecord = {
-  id: string;
-  userId: string;
-  productId: string;
-  name: string;
-  category: 'protein' | 'pantry' | 'vegetables' | 'dairy' | 'fruit' | 'other';
-  quantity: number;
-  unit: string;
-  minimumQuantity: number;
-  targetQuantity?: number;
-  expiresOn?: string;
-  updatedAt: string;
-};
-
 export type PriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'estimated';
 
 export type ProductCatalogRecord = {
@@ -604,8 +590,6 @@ export type GroceryViewRepository = {
   getWatchlist(userId: string): Promise<WatchlistRecord[]>;
   addBasketItem(userId: string, item: BasketRecord): Promise<void>;
   getBasket(userId: string): Promise<BasketRecord[]>;
-  upsertPantryItem(item: PantryItemRecord): Promise<void>;
-  listPantryItems(userId: string): Promise<PantryItemRecord[]>;
   upsertHumanReviewer(reviewer: HumanReviewerRecord): Promise<void>;
   getHumanReviewer(reviewerId: string): Promise<HumanReviewerRecord | null>;
   upsertCommunityReporterTrust(trust: CommunityReporterTrustRecord): Promise<void>;
@@ -741,7 +725,6 @@ export function createMemoryRepository(): GroceryViewRepository {
   const subscriptionEntitlements = new Map<string, SubscriptionEntitlementRecord>();
   const watchlists = new Map<string, WatchlistRecord[]>();
   const baskets = new Map<string, BasketRecord[]>();
-  const pantryItems = new Map<string, PantryItemRecord>();
   const humanReviewers = new Map<string, HumanReviewerRecord>();
   const communityReporterTrust = new Map<string, CommunityReporterTrustRecord>();
   const notificationTasks = new Map<string, NotificationTaskRecord>();
@@ -806,19 +789,6 @@ export function createMemoryRepository(): GroceryViewRepository {
     async getBasket(userId) {
       requireUser(users, userId);
       return (baskets.get(userId) ?? []).map((item) => ({ ...item }));
-    },
-
-    async upsertPantryItem(item) {
-      requireUser(users, item.userId);
-      pantryItems.set(item.id, { ...item });
-    },
-
-    async listPantryItems(userId) {
-      requireUser(users, userId);
-      return [...pantryItems.values()]
-        .filter((item) => item.userId === userId)
-        .sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name) || a.productId.localeCompare(b.productId) || a.id.localeCompare(b.id))
-        .map((item) => ({ ...item }));
     },
 
     async saveHumanReviewAssignment(assignment) {
@@ -906,19 +876,6 @@ type SubscriptionEntitlementRow = {
 };
 type WatchlistRow = { product_id: string; target_price: string | number | null; alert_deal_score_at: number | null; favorite_stores_only: boolean };
 type BasketRow = { product_id: string; quantity: string | number };
-type PantryItemRow = {
-  id: string;
-  user_id: string;
-  product_id: string;
-  name: string;
-  category: PantryItemRecord['category'];
-  quantity: string | number;
-  unit: string;
-  minimum_quantity: string | number;
-  target_quantity: string | number | null;
-  expires_on: string | Date | null;
-  updated_at: string | Date;
-};
 type HumanReviewerRow = { id: string; role: HumanReviewerRecord['role']; active: boolean };
 type NotificationTaskRow = {
   id: string;
@@ -1303,22 +1260,6 @@ function mapNotificationSuppression(row: NotificationSuppressionRow): Notificati
   };
 }
 
-function mapPantryItem(row: PantryItemRow): PantryItemRecord {
-  return {
-    id: row.id,
-    userId: row.user_id,
-    productId: row.product_id,
-    name: row.name,
-    category: row.category,
-    quantity: Number(row.quantity),
-    unit: row.unit,
-    minimumQuantity: Number(row.minimum_quantity),
-    ...(row.target_quantity === null ? {} : { targetQuantity: Number(row.target_quantity) }),
-    ...(row.expires_on ? { expiresOn: asIso(row.expires_on).slice(0, 10) } : {}),
-    updatedAt: asIso(row.updated_at)
-  };
-}
-
 function mapAlertRule(row: AlertRuleRow): AlertRuleRecord {
   return {
     id: row.id,
@@ -1469,49 +1410,6 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
         [userId]
       );
       return rows.map((row) => ({ productId: row.product_id, quantity: Number(row.quantity) }));
-    },
-
-    async upsertPantryItem(item) {
-      await executor.query(
-        `insert into pantry_items(
-           id, user_id, product_id, name, category, quantity, unit, minimum_quantity, target_quantity, expires_on, updated_at
-         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-         on conflict (id) do update set
-           user_id = excluded.user_id,
-           product_id = excluded.product_id,
-           name = excluded.name,
-           category = excluded.category,
-           quantity = excluded.quantity,
-           unit = excluded.unit,
-           minimum_quantity = excluded.minimum_quantity,
-           target_quantity = excluded.target_quantity,
-           expires_on = excluded.expires_on,
-           updated_at = excluded.updated_at`,
-        [
-          item.id,
-          item.userId,
-          item.productId,
-          item.name,
-          item.category,
-          item.quantity,
-          item.unit,
-          item.minimumQuantity,
-          item.targetQuantity ?? null,
-          item.expiresOn ?? null,
-          item.updatedAt
-        ]
-      );
-    },
-
-    async listPantryItems(userId) {
-      const rows = await executor.query<PantryItemRow>(
-        `select id, user_id, product_id, name, category, quantity, unit, minimum_quantity, target_quantity, expires_on, updated_at
-         from pantry_items
-         where user_id = $1
-         order by category, name, product_id, id`,
-        [userId]
-      );
-      return rows.map(mapPantryItem);
     },
 
     async saveHumanReviewAssignment(assignment) {
@@ -2045,16 +1943,14 @@ export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'subscription_entitlements',
   'notification_tasks',
   'notification_suppressions',
-  'alert_rules',
-  'pantry_items'
+  'alert_rules'
 ] as const;
 
 export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '001_groceryview_schema',
   '002_repository_support_schema',
   '003_subscription_entitlements',
-  '004_alert_rules',
-  '005_pantry_inventory'
+  '004_alert_rules'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
@@ -2067,7 +1963,6 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
   const assignmentId = `postgres-probe-assignment-${safeId}`;
   const suppressionId = `postgres-probe-suppression-${safeId}`;
   const alertRuleId = `postgres-probe-alert-${safeId}`;
-  const pantryItemId = `postgres-probe-pantry-${safeId}`;
   const providerSubscriptionId = `postgres-probe-subscription-${safeId}`;
   const chainSlug = `postgres-probe-chain-${safeId}`;
   const productSlug = `postgres-probe-product-${safeId}`;
@@ -2160,28 +2055,6 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
         });
         const alertRules = await repository.listActiveAlertRules(userId);
         assertProbe(alertRules.some((rule) => rule.id === alertRuleId), 'alert rule probe row was not readable');
-      }
-    },
-    {
-      name: 'pantry_item_round_trip',
-      async run(executor) {
-        const repository = createPostgresRepository(executor);
-        await repository.upsertUser({ id: userId, email: `${userId}@example.invalid` });
-        await repository.upsertPantryItem({
-          id: pantryItemId,
-          userId,
-          productId: `postgres-probe-product-${safeId}`,
-          name: 'Postgres Probe Pantry Item',
-          category: 'pantry',
-          quantity: 1,
-          unit: 'pcs',
-          minimumQuantity: 2,
-          targetQuantity: 4,
-          expiresOn: '2026-06-20',
-          updatedAt: input.now
-        });
-        const pantryItems = await repository.listPantryItems(userId);
-        assertProbe(pantryItems.some((item) => item.id === pantryItemId), 'pantry item probe row was not readable');
       }
     },
     {

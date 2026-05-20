@@ -141,23 +141,6 @@ class RepositorySmokeQueryExecutor implements QueryExecutor {
         }
       ] as T[];
     }
-    if (sql.includes('from pantry_items')) {
-      return [
-        {
-          id: 'postgres-probe-pantry-run-42',
-          user_id: 'postgres-probe-user-run-42',
-          product_id: 'postgres-probe-product-run-42',
-          name: 'Postgres Probe Pantry Item',
-          category: 'pantry',
-          quantity: '1.000',
-          unit: 'pcs',
-          minimum_quantity: '2.000',
-          target_quantity: '4.000',
-          expires_on: '2026-06-20',
-          updated_at: '2026-05-20T00:00:00.000Z'
-        }
-      ] as T[];
-    }
     return [] as T[];
   }
 }
@@ -187,7 +170,6 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_table:latest_prices',
       'missing_table:notification_suppressions',
       'missing_table:observations',
-      'missing_table:pantry_items',
       'missing_table:products',
       'missing_table:raw_records',
       'missing_table:source_runs',
@@ -198,7 +180,6 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_migration:002_repository_support_schema',
       'missing_migration:003_subscription_entitlements',
       'missing_migration:004_alert_rules',
-      'missing_migration:005_pantry_inventory',
       'repository_check_fail:human_review_assignment_round_trip',
       'repository_check_not_run:notification_suppression_round_trip'
     ]);
@@ -241,7 +222,6 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'table:notification_suppressions',
         'table:notification_tasks',
         'table:observations',
-        'table:pantry_items',
         'table:products',
         'table:raw_records',
         'table:source_runs',
@@ -253,7 +233,6 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'migration:002_repository_support_schema',
         'migration:003_subscription_entitlements',
         'migration:004_alert_rules',
-        'migration:005_pantry_inventory',
         'repository_check:favorite_store_round_trip',
         'repository_check:human_review_assignment_round_trip',
         'repository_check:notification_suppression_round_trip',
@@ -453,7 +432,6 @@ describe('buildPostgresRepositorySmokeProbes', () => {
       'human_review_assignment_round_trip',
       'notification_suppression_round_trip',
       'alert_rule_round_trip',
-      'pantry_item_round_trip',
       'price_observation_pipeline_round_trip'
     ]);
 
@@ -466,7 +444,6 @@ describe('buildPostgresRepositorySmokeProbes', () => {
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-assignment-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-suppression-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-alert-run-42')), true);
-    assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-pantry-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-chain-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-product-run-42')), true);
   });

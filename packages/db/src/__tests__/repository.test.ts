@@ -299,63 +299,6 @@ describe('createMemoryRepository', () => {
       }
     ]);
   });
-
-  it('persists pantry inventory for replenishment planning', async () => {
-    const repo = createMemoryRepository();
-
-    await repo.upsertUser({ id: 'user-1', email: 'pantry@example.com' });
-    await repo.upsertPantryItem({
-      id: 'pantry-coffee',
-      userId: 'user-1',
-      productId: 'coffee',
-      name: 'Coffee',
-      category: 'pantry',
-      quantity: 1,
-      unit: 'bag',
-      minimumQuantity: 1,
-      targetQuantity: 3,
-      expiresOn: '2026-07-01',
-      updatedAt: '2026-05-20T08:00:00.000Z'
-    });
-    await repo.upsertPantryItem({
-      id: 'pantry-yogurt',
-      userId: 'user-1',
-      productId: 'yogurt',
-      name: 'Yogurt',
-      category: 'dairy',
-      quantity: 2,
-      unit: 'kg',
-      minimumQuantity: 1,
-      updatedAt: '2026-05-20T08:01:00.000Z'
-    });
-
-    assert.deepEqual(await repo.listPantryItems('user-1'), [
-      {
-        id: 'pantry-yogurt',
-        userId: 'user-1',
-        productId: 'yogurt',
-        name: 'Yogurt',
-        category: 'dairy',
-        quantity: 2,
-        unit: 'kg',
-        minimumQuantity: 1,
-        updatedAt: '2026-05-20T08:01:00.000Z'
-      },
-      {
-        id: 'pantry-coffee',
-        userId: 'user-1',
-        productId: 'coffee',
-        name: 'Coffee',
-        category: 'pantry',
-        quantity: 1,
-        unit: 'bag',
-        minimumQuantity: 1,
-        targetQuantity: 3,
-        expiresOn: '2026-07-01',
-        updatedAt: '2026-05-20T08:00:00.000Z'
-      }
-    ]);
-  });
 });
 
 describe('applyNotificationTaskAcknowledgements', () => {
