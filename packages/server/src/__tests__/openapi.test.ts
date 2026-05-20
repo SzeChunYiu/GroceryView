@@ -27,6 +27,7 @@ describe('buildOpenApiDocument', () => {
       '/api/notifications/suppression-events',
       '/api/privacy/deletion-plan',
       '/api/privacy/export',
+      '/api/prices/freshness',
       '/api/products/search',
       '/api/products/{id}',
       '/api/products/{id}/history',

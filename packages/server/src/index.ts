@@ -421,6 +421,9 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
 
       if (method === 'GET' && path === '/api/market/overview') return jsonResponse(api.getMarketOverview());
       if (method === 'GET' && path === '/api/stores') return jsonResponse(api.getStores());
+      if (method === 'GET' && path === '/api/prices/freshness') {
+        return jsonResponse(api.getPriceFreshnessReport(url.searchParams.get('asOf') ?? undefined));
+      }
 
       if (method === 'GET' && path === '/api/account/subscription-access') {
         const user = userIdFrom(url);
@@ -889,6 +892,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
       '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
       '/api/scans/process': { post: protectedOperation('Process barcode or receipt scan payloads through configured providers and return review routing work.') },
+      '/api/prices/freshness': { get: publicOperation('Get price freshness and stale-price backfill queue.') },
       '/api/users/{userId}/favorite-stores': {
         get: protectedOperation('List favorite stores.'),
         post: protectedOperation('Add favorite store.')

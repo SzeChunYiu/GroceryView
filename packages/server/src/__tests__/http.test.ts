@@ -86,6 +86,44 @@ describe('createHttpHandler', () => {
     assert.equal(product.status, 200);
     assert.equal((await json(product) as { ticker: string }).ticker, 'ZOEGAS-COFFEE-450G');
 
+    const freshness = await handle(new Request('http://localhost/api/prices/freshness?asOf=2026-06-03T00:00:00.000Z'));
+    assert.equal(freshness.status, 200);
+    assert.deepEqual((await json(freshness) as { summary: Record<string, number>; backfillProductIds: string[] }), {
+      asOf: '2026-06-03T00:00:00.000Z',
+      thresholds: { agingAfterDays: 7, staleAfterDays: 14 },
+      summary: { fresh: 0, aging: 0, stale: 3 },
+      products: [
+        {
+          productId: 'coffee',
+          productName: 'Zoégas Coffee 450g',
+          category: 'coffee',
+          latestVerifiedPriceDate: '2026-05-19',
+          ageDays: 15,
+          status: 'stale',
+          action: 'prioritize_manual_or_feed_refresh'
+        },
+        {
+          productId: 'milk',
+          productName: 'Arla Milk 1L',
+          category: 'dairy',
+          latestVerifiedPriceDate: '2026-05-19',
+          ageDays: 15,
+          status: 'stale',
+          action: 'prioritize_manual_or_feed_refresh'
+        },
+        {
+          productId: 'butter',
+          productName: 'Butter 600g',
+          category: 'dairy',
+          latestVerifiedPriceDate: '2026-05-19',
+          ageDays: 15,
+          status: 'stale',
+          action: 'prioritize_manual_or_feed_refresh'
+        }
+      ],
+      backfillProductIds: ['butter', 'coffee', 'milk']
+    });
+
     const index = await handle(new Request('http://localhost/api/indices/stockholm-grocery-index'));
     assert.equal(index.status, 200);
     assert.equal((await json(index) as { label: string }).label, 'Stockholm Grocery Index');
