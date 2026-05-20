@@ -4,16 +4,16 @@ import { readFileSync } from 'node:fs';
 import { createGroceryViewApi } from '@groceryview/api';
 import {
   buildExpoReadinessPlan,
+  buildMobileOfflineSyncPlan,
   buildMobileProviderReadinessReport,
+  buildMobilePrivacyRequestPlan,
   buildMobileScreenBlueprints,
   buildMobileShell,
   buildScanResult,
   composeMobileTodayScreen,
   composeMobileProductTerminalScreen,
   createMobileDiscoveryViewModel,
-  createMobileProductPriceTerminalViewModel,
-  createMobileViewModel,
-  loadMobileProductTerminal
+  createMobileViewModel
 } from '../index.js';
 
 describe('mobile app foundation', () => {
@@ -342,6 +342,109 @@ describe('mobile app foundation', () => {
       '/scan/receipt',
       '/profile'
     ]);
+  });
+
+  it('plans authenticated mobile privacy exports from the privacy route', () => {
+    const plan = buildMobilePrivacyRequestPlan({
+      userId: 'user-1',
+      requestType: 'export_data',
+      authenticated: true,
+      networkOnline: true
+    });
+
+    assert.equal(plan.route, '/privacy');
+    assert.equal(plan.confirmationRequired, false);
+    assert.deepEqual(plan.exportSections, ['profile', 'favorite_stores', 'watchlist', 'receipts', 'households']);
+    assert.deepEqual(plan.actions, ['download_export']);
+    assert.deepEqual(plan.blockers, []);
+  });
+
+  it('blocks mobile account deletion until the user confirms the destructive action', () => {
+    const plan = buildMobilePrivacyRequestPlan({
+      userId: 'user-1',
+      requestType: 'delete_account',
+      authenticated: true,
+      networkOnline: true
+    });
+
+    assert.equal(plan.confirmationRequired, true);
+    assert.deepEqual(plan.blockers, ['account_deletion_confirmation_required']);
+    assert.deepEqual(plan.actions, ['confirm_account_deletion']);
+  });
+
+  it('fails closed for mobile privacy requests that are offline or unauthenticated', () => {
+    const plan = buildMobilePrivacyRequestPlan({
+      userId: 'user-1',
+      requestType: 'ad_privacy',
+      authenticated: false,
+      networkOnline: false
+    });
+
+    assert.deepEqual(plan.blockers, ['mobile_reauthentication_required', 'network_required_for_privacy_request']);
+    assert.deepEqual(plan.actions, ['reauthenticate', 'retry_online']);
+  });
+
+  it('schedules receipt image cleanup only after privacy prerequisites pass', () => {
+    const plan = buildMobilePrivacyRequestPlan({
+      userId: 'user-1',
+      requestType: 'receipt_retention',
+      authenticated: true,
+      networkOnline: true,
+      receiptImageRetentionDays: 7
+    });
+
+    assert.deepEqual(plan.actions, ['schedule_receipt_image_cleanup']);
+    assert.deepEqual(plan.blockers, []);
+  });
+
+it('plans offline cache coverage and prioritized mobile sync queue', () => {
+    const plan = buildMobileOfflineSyncPlan({
+      userId: 'user-1',
+      offlineEnabled: true,
+      secureStorageConfigured: true,
+      pendingMutations: [
+        { id: 'mutation-1', kind: 'add_to_basket', createdAt: '2026-05-20T04:00:00.000Z' },
+        { id: 'mutation-2', kind: 'save_receipt_match', createdAt: '2026-05-20T04:01:00.000Z' }
+      ]
+    });
+
+    assert.deepEqual(plan.cachedScreens, ['today', 'stores', 'basket', 'scan', 'profile']);
+    assert.deepEqual(
+      plan.mutationQueue.map((mutation) => [mutation.kind, mutation.syncPriority]),
+      [
+        ['add_to_basket', 'normal'],
+        ['save_receipt_match', 'high']
+      ]
+    );
+    assert.deepEqual(plan.actions, ['cache_mobile_home', 'queue_mutations', 'sync_when_online']);
+    assert.deepEqual(plan.blockers, []);
+  });
+
+  it('fails closed for mobile offline sync when secure storage is unavailable', () => {
+    const plan = buildMobileOfflineSyncPlan({
+      userId: 'user-1',
+      offlineEnabled: true,
+      secureStorageConfigured: false,
+      pendingMutations: []
+    });
+
+    assert.deepEqual(plan.cachedScreens, []);
+    assert.deepEqual(plan.blockers, ['secure_storage_not_configured']);
+    assert.deepEqual(plan.actions, ['configure_secure_storage']);
+  });
+
+  it('prompts before caching mobile data when offline mode is disabled', () => {
+    const plan = buildMobileOfflineSyncPlan({
+      userId: 'user-1',
+      offlineEnabled: false,
+      secureStorageConfigured: true,
+      pendingMutations: [{ id: 'mutation-1', kind: 'update_budget', createdAt: '2026-05-20T04:02:00.000Z' }]
+    });
+
+    assert.deepEqual(plan.cachedScreens, []);
+    assert.deepEqual(plan.blockers, ['mobile_offline_mode_disabled']);
+    assert.deepEqual(plan.actions, ['prompt_enable_offline', 'queue_mutations', 'sync_when_online']);
+    assert.equal(plan.mutationQueue[0].syncPriority, 'high');
   });
 
   it('blocks mobile screens when required providers are unavailable', () => {

@@ -21,7 +21,9 @@ from .models import (
     ObservationCoverageSummary,
     ObservationFreshnessSummary,
     OpenPricesArtifactImportPlan,
+    OpenPricesArtifactImportPlanSummary,
     OpenPricesHostedSmokePlan,
+    OpenPricesHostedSmokePlanSummary,
     OpenPricesIngestionRunPlan,
     OpenPricesIngestionRunPlanSummary,
     OpenPricesLaunchReadinessSummary,
@@ -483,6 +485,27 @@ def summarize_open_prices_ingestion_run_plan(plan: OpenPricesIngestionRunPlan) -
     )
 
 
+def summarize_open_prices_artifact_import_plan(plan: OpenPricesArtifactImportPlan) -> OpenPricesArtifactImportPlanSummary:
+    return OpenPricesArtifactImportPlanSummary(
+        status=plan.status,
+        required_action_count=len(plan.required_actions),
+        required_env_count=len(plan.required_env),
+        required_package_count=len(plan.required_packages),
+        database_target_count=len(plan.database_targets),
+        evidence_field_count=len(plan.evidence_fields),
+    )
+
+
+def summarize_open_prices_hosted_smoke_plan(plan: OpenPricesHostedSmokePlan) -> OpenPricesHostedSmokePlanSummary:
+    return OpenPricesHostedSmokePlanSummary(
+        status=plan.status,
+        required_action_count=len(plan.required_actions),
+        required_env_count=len(plan.required_env),
+        endpoint_count=len(plan.endpoints),
+        evidence_field_count=len(plan.evidence_fields),
+    )
+
+
 def build_open_prices_launch_readiness_summary(
     pull_plan: OpenPricesPullPlan,
     ingestion_plan: OpenPricesIngestionRunPlan,
@@ -571,6 +594,7 @@ def build_data_pipeline_quality_gate(
     coverage: ObservationCoverageSummary,
     open_prices_ingestion: OpenPricesIngestionRunPlan | None = None,
     open_prices_import: OpenPricesArtifactImportPlan | None = None,
+    open_prices_hosted_smoke: OpenPricesHostedSmokePlan | None = None,
     min_observations: int = 1,
 ) -> DataPipelineQualityGateSummary:
     blockers: list[str] = []
@@ -593,6 +617,8 @@ def build_data_pipeline_quality_gate(
         blockers.append("open_prices_ingestion_plan_blocked")
     if open_prices_import is not None and open_prices_import.status != "ready":
         blockers.append("open_prices_artifact_import_plan_blocked")
+    if open_prices_hosted_smoke is not None and open_prices_hosted_smoke.status != "ready":
+        blockers.append("open_prices_hosted_smoke_plan_blocked")
 
     return DataPipelineQualityGateSummary(
         status="ready" if not blockers else "blocked",
@@ -605,6 +631,7 @@ def build_data_pipeline_quality_gate(
             "price_observation_coverage",
             *([] if open_prices_ingestion is None else ["open_prices_ingestion_run_plan"]),
             *([] if open_prices_import is None else ["open_prices_artifact_import_plan"]),
+            *([] if open_prices_hosted_smoke is None else ["open_prices_hosted_smoke_plan"]),
         ],
     )
 
@@ -818,11 +845,20 @@ def data_pipeline_quality_gate(
     price_observation_coverage: dict[str, object],
     open_prices_ingestion_run_plan: dict[str, object],
     open_prices_artifact_import_plan: dict[str, object],
+    open_prices_hosted_smoke_plan: dict[str, object],
 ) -> dict[str, object]:
     quality = QualityCheckSummary(**quality_checks)
     freshness = ObservationFreshnessSummary(**price_observation_freshness)
     coverage = ObservationCoverageSummary(**price_observation_coverage)
     open_prices_ingestion = OpenPricesIngestionRunPlan(**open_prices_ingestion_run_plan)
     open_prices_import = OpenPricesArtifactImportPlan(**open_prices_artifact_import_plan)
-    summary = build_data_pipeline_quality_gate(quality, freshness, coverage, open_prices_ingestion, open_prices_import)
+    open_prices_hosted_smoke = OpenPricesHostedSmokePlan(**open_prices_hosted_smoke_plan)
+    summary = build_data_pipeline_quality_gate(
+        quality,
+        freshness,
+        coverage,
+        open_prices_ingestion,
+        open_prices_import,
+        open_prices_hosted_smoke,
+    )
     return summary.to_dict()

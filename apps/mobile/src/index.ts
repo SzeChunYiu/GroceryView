@@ -16,6 +16,8 @@ export type {
 } from './offlineMutations.js';
 export { buildMobileDeepLink, buildMobileRouteManifest, findMobileRoute } from './routeManifest.js';
 export type { MobileMvpRoute, MobileMvpRouteId, MobileMvpRoutePath, MobileRouteManifest, MobileRouteParam } from './routeManifest.js';
+export { buildMobilePermissionPlan, nextMobilePermissionPrompt, summarizeMobilePermissionPlan } from './permissions.js';
+export type { MobilePermissionKind, MobilePermissionPlan, MobilePermissionPrompt, MobilePermissionSnapshot, MobilePermissionState, MobilePermissionSurface } from './permissions.js';
 export { buildMobilePersistedCachePlan, buildMobileQueryKey, buildMobileQueryRegistry } from './queryCache.js';
 export type { MobilePersistedCachePlan, MobileQueryDefinition, MobileQueryId, MobileQueryKeyInput, MobileScreenRoute } from './queryCache.js';
 
@@ -890,6 +892,133 @@ export function buildMobileScreenBlueprints(): MobileScreenBlueprintPlan {
   };
 }
 
+export type MobilePrivacyRequestType = 'export_data' | 'delete_account' | 'ad_privacy' | 'receipt_retention';
+
+export type MobilePrivacyRequestInput = {
+  userId: string;
+  requestType: MobilePrivacyRequestType;
+  authenticated: boolean;
+  networkOnline: boolean;
+  confirmedDestructiveAction?: boolean;
+  receiptImageRetentionDays?: number;
+};
+
+export type MobilePrivacyRequestPlan = {
+  userId: string;
+  route: '/privacy';
+  requestType: MobilePrivacyRequestType;
+  confirmationRequired: boolean;
+  exportSections: Array<'profile' | 'favorite_stores' | 'watchlist' | 'receipts' | 'households'>;
+  blockers: string[];
+  actions: Array<'reauthenticate' | 'retry_online' | 'download_export' | 'confirm_account_deletion' | 'open_ad_privacy_controls' | 'schedule_receipt_image_cleanup'>;
+};
+
+export function buildMobilePrivacyRequestPlan(input: MobilePrivacyRequestInput): MobilePrivacyRequestPlan {
+  if (!input.userId) throw new Error('userId is required.');
+  if (input.receiptImageRetentionDays !== undefined && input.receiptImageRetentionDays < 0) {
+    throw new Error('receiptImageRetentionDays must be zero or greater.');
+  }
+
+  const blockers: string[] = [];
+  const actions: MobilePrivacyRequestPlan['actions'] = [];
+
+  if (!input.authenticated) {
+    blockers.push('mobile_reauthentication_required');
+    actions.push('reauthenticate');
+  }
+
+  if (!input.networkOnline) {
+    blockers.push('network_required_for_privacy_request');
+    actions.push('retry_online');
+  }
+
+  const confirmationRequired = input.requestType === 'delete_account';
+  if (confirmationRequired && !input.confirmedDestructiveAction) {
+    blockers.push('account_deletion_confirmation_required');
+    actions.push('confirm_account_deletion');
+  }
+
+  const exportSections: MobilePrivacyRequestPlan['exportSections'] =
+    input.requestType === 'export_data' ? ['profile', 'favorite_stores', 'watchlist', 'receipts', 'households'] : [];
+
+  if (blockers.length === 0) {
+    if (input.requestType === 'export_data') actions.push('download_export');
+    if (input.requestType === 'ad_privacy') actions.push('open_ad_privacy_controls');
+    if (input.requestType === 'receipt_retention') actions.push('schedule_receipt_image_cleanup');
+  }
+
+  return {
+    userId: input.userId,
+    route: '/privacy',
+    requestType: input.requestType,
+    confirmationRequired,
+    exportSections,
+    blockers,
+    actions
+  };
+}
+
+
+export type MobileOfflineSyncMutation = {
+  id: string;
+  kind: 'add_to_basket' | 'remove_from_basket' | 'add_to_watchlist' | 'update_budget' | 'save_receipt_match';
+  createdAt: string;
+};
+
+export type MobileOfflineSyncInput = {
+  userId: string;
+  offlineEnabled: boolean;
+  secureStorageConfigured: boolean;
+  pendingMutations: MobileOfflineSyncMutation[];
+};
+
+export type MobileOfflineSyncPlan = {
+  userId: string;
+  cachedScreens: Array<'today' | 'stores' | 'basket' | 'scan' | 'profile'>;
+  mutationQueue: Array<MobileOfflineSyncMutation & { syncPriority: 'high' | 'normal' }>;
+  blockers: string[];
+  actions: Array<'cache_mobile_home' | 'queue_mutations' | 'sync_when_online' | 'prompt_enable_offline' | 'configure_secure_storage'>;
+};
+
+export function buildMobileOfflineSyncPlan(input: MobileOfflineSyncInput): MobileOfflineSyncPlan {
+  if (!input.userId) throw new Error('userId is required.');
+
+  const blockers: string[] = [];
+  const actions: MobileOfflineSyncPlan['actions'] = [];
+  const cachedScreens: MobileOfflineSyncPlan['cachedScreens'] = [];
+
+  if (!input.offlineEnabled) {
+    blockers.push('mobile_offline_mode_disabled');
+    actions.push('prompt_enable_offline');
+  }
+
+  if (!input.secureStorageConfigured) {
+    blockers.push('secure_storage_not_configured');
+    actions.push('configure_secure_storage');
+  }
+
+  if (blockers.length === 0) {
+    cachedScreens.push('today', 'stores', 'basket', 'scan', 'profile');
+    actions.push('cache_mobile_home');
+  }
+
+  const mutationQueue: MobileOfflineSyncPlan['mutationQueue'] = input.pendingMutations.map((mutation) => ({
+    ...mutation,
+    syncPriority: mutation.kind === 'save_receipt_match' || mutation.kind === 'update_budget' ? 'high' : 'normal'
+  }));
+
+  if (mutationQueue.length > 0) {
+    actions.push('queue_mutations', 'sync_when_online');
+  }
+
+  return {
+    userId: input.userId,
+    cachedScreens,
+    mutationQueue,
+    blockers,
+    actions
+  };
+}
 export function buildMobileProviderReadinessReport(input: MobileProviderReadinessInput): MobileProviderReadinessReport {
   const plan = buildMobileScreenBlueprints();
   const screenStates = plan.screens.map((screen) => {

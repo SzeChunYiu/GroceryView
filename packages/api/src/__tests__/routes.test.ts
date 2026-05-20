@@ -138,6 +138,103 @@ describe('createGroceryViewApi', () => {
     assert.match(report.guardrails[0], /nutrition labels cannot override allergen locks/i);
   });
 
+  it('serves pantry replenishment plans with live deal and basket duplicate context', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+
+    const plan = api.getPantryReplenishment('user-1', '2026-05-20T08:00:00.000Z');
+
+    assert.equal(plan.householdId, 'user-1');
+    assert.deepEqual(
+      plan.statuses.map((item) => ({ productId: item.productId, status: item.status, remainingQuantity: item.remainingQuantity })),
+      [
+        { productId: 'coffee', status: 'low_stock', remainingQuantity: 0.5 },
+        { productId: 'milk', status: 'expiring_soon', remainingQuantity: 1 },
+        { productId: 'butter', status: 'in_stock', remainingQuantity: 1 }
+      ]
+    );
+    assert.deepEqual(plan.expiringSoonProductIds, ['milk']);
+    assert.deepEqual(plan.replenishment.map((item) => ({
+      productId: item.productId,
+      alreadyInBasket: item.alreadyInBasket,
+      bestDeal: item.bestDeal && { storeId: item.bestDeal.storeId, price: item.bestDeal.price }
+    })), [
+      { productId: 'coffee', alreadyInBasket: true, bestDeal: { storeId: 'willys-odenplan', price: 49.9 } }
+    ]);
+  });
+
+  it('serves account-scoped loyalty offers with savings and action requirements', () => {
+    const api = createGroceryViewApi();
+
+    const report = api.getLoyaltyOfferReport('user-1');
+
+    assert.equal(report.userId, 'user-1');
+    assert.equal(report.totalEligibleSavings, 26);
+    assert.equal(report.requiresActionCount, 1);
+    assert.equal(report.membershipRequiredCount, 1);
+    assert.deepEqual(report.offers.map((offer) => ({
+      productId: offer.productId,
+      chain: offer.chain,
+      savings: offer.savings,
+      status: offer.status,
+      actionRequired: offer.actionRequired
+    })), [
+      { productId: 'coffee', chain: 'ica', savings: 7, status: 'eligible', actionRequired: false },
+      { productId: 'milk', chain: 'coop', savings: 12, status: 'needs_coupon', actionRequired: true },
+      { productId: 'private-label-milk', chain: 'willys', savings: 7, status: 'eligible', actionRequired: false }
+    ]);
+    assert.match(report.guardrails[0], /member-only savings never overwrite verified public shelf evidence/i);
+  });
+
+  it('serves ad disclosure reports with premium removal and ranking separation guardrails', () => {
+    const api = createGroceryViewApi();
+
+    const freeReport = api.getAdDisclosureReport('user-1');
+
+    assert.equal(freeReport.userId, 'user-1');
+    assert.equal(freeReport.userTier, 'free');
+    assert.equal(freeReport.placementPlan.slots.length, 2);
+    assert.equal(freeReport.premiumAdsRemoved, false);
+    assert.equal(freeReport.affectsDealScore, false);
+    assert.equal(freeReport.allowedCount, 2);
+    assert.equal(freeReport.blockedCount, 2);
+    assert.deepEqual(freeReport.excludedSurfaces, ['deal_score', 'checkout_decision', 'basket_optimizer']);
+    assert.match(freeReport.guardrails[0], /Sponsored placements cannot change Deal Score/i);
+
+    api.upsertSubscriptionEntitlement('premium-user', {
+      tier: 'premium',
+      plan: 'premium_monthly',
+      status: 'active',
+      currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
+      updatedAt: '2026-05-20T00:00:00.000Z'
+    });
+
+    const premiumReport = api.getAdDisclosureReport('premium-user');
+    assert.equal(premiumReport.userTier, 'premium');
+    assert.equal(premiumReport.placementPlan.slots.length, 0);
+    assert.equal(premiumReport.premiumAdsRemoved, true);
+    assert.equal(premiumReport.allowedCount, 0);
+    assert.equal(premiumReport.blockedCount, 4);
+  });
+
+  it('serves receipt review reports with budget actuals, match confidence, and writeback guardrails', () => {
+    const api = createGroceryViewApi();
+
+    const report = api.getReceiptReviewReport('user-1');
+
+    assert.equal(report.userId, 'user-1');
+    assert.equal(report.lineCount, 3);
+    assert.equal(report.matchedCount, 2);
+    assert.equal(report.needsReviewCount, 2);
+    assert.equal(report.review.budget.afterReceiptSpend, 762);
+    assert.equal(report.review.budget.remaining, 38);
+    assert.equal(report.review.comparedWithLocalMedianDelta, 3);
+    assert.deepEqual(report.review.goodBuys.map((item) => item.productId), ['coffee']);
+    assert.deepEqual(report.review.overspend.map((item) => [item.productId, item.deltaVsMedian]), [['cheese', 18]]);
+    assert.match(report.guardrails[0], /Low confidence.*cannot update catalog or Deal Score/i);
+  });
+
   it('serves category market reports with terminal-style mover evidence', () => {
     const api = createGroceryViewApi();
 

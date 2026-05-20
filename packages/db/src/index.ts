@@ -252,6 +252,31 @@ export type PantryItemRecord = {
   updatedAt: string;
 };
 
+export type ReceiptItemRecord = {
+  id: string;
+  receiptId: string;
+  rawName: string;
+  productId?: string;
+  canonicalName?: string;
+  quantity: number;
+  itemTotal: number;
+  matchConfidence?: number;
+};
+
+export type ReceiptUploadRecord = {
+  id: string;
+  userId: string;
+  storeId?: string;
+  imageUri: string;
+  purchasedAt: string;
+  totalAmount: number;
+  ocrConfidence: number;
+  status: 'uploaded' | 'parsed' | 'needs_review' | 'processed' | 'failed';
+  createdAt: string;
+  updatedAt: string;
+  items: ReceiptItemRecord[];
+};
+
 export type PriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'estimated';
 
 export type ProductCatalogRecord = {
@@ -698,6 +723,8 @@ export type GroceryViewRepository = {
   getBasket(userId: string): Promise<BasketRecord[]>;
   upsertPantryItem(item: PantryItemRecord): Promise<void>;
   listPantryItems(userId: string): Promise<PantryItemRecord[]>;
+  upsertReceiptUpload(upload: ReceiptUploadRecord): Promise<void>;
+  listReceiptUploads(userId: string): Promise<ReceiptUploadRecord[]>;
   upsertHumanReviewer(reviewer: HumanReviewerRecord): Promise<void>;
   getHumanReviewer(reviewerId: string): Promise<HumanReviewerRecord | null>;
   upsertCommunityReporterTrust(trust: CommunityReporterTrustRecord): Promise<void>;
@@ -874,6 +901,7 @@ export function createMemoryRepository(): GroceryViewRepository {
   const watchlists = new Map<string, WatchlistRecord[]>();
   const baskets = new Map<string, BasketRecord[]>();
   const pantryItems = new Map<string, PantryItemRecord>();
+  const receiptUploads = new Map<string, ReceiptUploadRecord>();
   const humanReviewers = new Map<string, HumanReviewerRecord>();
   const communityReporterTrust = new Map<string, CommunityReporterTrustRecord>();
   const notificationTasks = new Map<string, NotificationTaskRecord>();
@@ -951,6 +979,22 @@ export function createMemoryRepository(): GroceryViewRepository {
         .filter((item) => item.userId === userId)
         .sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name) || a.productId.localeCompare(b.productId) || a.id.localeCompare(b.id))
         .map((item) => ({ ...item }));
+    },
+
+    async upsertReceiptUpload(upload) {
+      requireUser(users, upload.userId);
+      receiptUploads.set(upload.id, {
+        ...upload,
+        items: upload.items.map((item) => ({ ...item }))
+      });
+    },
+
+    async listReceiptUploads(userId) {
+      requireUser(users, userId);
+      return [...receiptUploads.values()]
+        .filter((upload) => upload.userId === userId)
+        .sort((a, b) => b.purchasedAt.localeCompare(a.purchasedAt) || a.id.localeCompare(b.id))
+        .map((upload) => ({ ...upload, items: upload.items.map((item) => ({ ...item })) }));
     },
 
     async saveHumanReviewAssignment(assignment) {
@@ -1050,6 +1094,28 @@ type PantryItemRow = {
   target_quantity: string | number | null;
   expires_on: string | Date | null;
   updated_at: string | Date;
+};
+type ReceiptUploadRow = {
+  id: string;
+  user_id: string;
+  store_id: string | null;
+  image_uri: string;
+  purchased_at: string | Date;
+  total_amount: string | number;
+  ocr_confidence: string | number;
+  status: ReceiptUploadRecord['status'];
+  created_at: string | Date;
+  updated_at: string | Date;
+};
+type ReceiptItemRow = {
+  id: string;
+  receipt_id: string;
+  raw_name: string;
+  product_id: string | null;
+  canonical_name: string | null;
+  quantity: string | number;
+  item_total: string | number;
+  match_confidence: string | number | null;
 };
 type HumanReviewerRow = { id: string; role: HumanReviewerRecord['role']; active: boolean };
 type NotificationTaskRow = {
@@ -1451,6 +1517,35 @@ function mapPantryItem(row: PantryItemRow): PantryItemRecord {
   };
 }
 
+function mapReceiptItem(row: ReceiptItemRow): ReceiptItemRecord {
+  return {
+    id: row.id,
+    receiptId: row.receipt_id,
+    rawName: row.raw_name,
+    ...(row.product_id ? { productId: row.product_id } : {}),
+    ...(row.canonical_name ? { canonicalName: row.canonical_name } : {}),
+    quantity: Number(row.quantity),
+    itemTotal: Number(row.item_total),
+    ...(row.match_confidence === null ? {} : { matchConfidence: Number(row.match_confidence) })
+  };
+}
+
+function mapReceiptUpload(row: ReceiptUploadRow, items: ReceiptItemRecord[]): ReceiptUploadRecord {
+  return {
+    id: row.id,
+    userId: row.user_id,
+    ...(row.store_id ? { storeId: row.store_id } : {}),
+    imageUri: row.image_uri,
+    purchasedAt: asIso(row.purchased_at),
+    totalAmount: Number(row.total_amount),
+    ocrConfidence: Number(row.ocr_confidence),
+    status: row.status,
+    createdAt: asIso(row.created_at),
+    updatedAt: asIso(row.updated_at),
+    items
+  };
+}
+
 function mapAlertRule(row: AlertRuleRow): AlertRuleRecord {
   return {
     id: row.id,
@@ -1644,6 +1739,79 @@ export function createPostgresRepository(executor: QueryExecutor): GroceryViewRe
         [userId]
       );
       return rows.map(mapPantryItem);
+    },
+
+    async upsertReceiptUpload(upload) {
+      await executor.query(
+        `insert into receipt_uploads(
+           id, user_id, store_id, image_uri, purchased_at, total_amount, ocr_confidence, status, created_at, updated_at
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+         on conflict (id) do update set
+           user_id = excluded.user_id,
+           store_id = excluded.store_id,
+           image_uri = excluded.image_uri,
+           purchased_at = excluded.purchased_at,
+           total_amount = excluded.total_amount,
+           ocr_confidence = excluded.ocr_confidence,
+           status = excluded.status,
+           updated_at = excluded.updated_at`,
+        [
+          upload.id,
+          upload.userId,
+          upload.storeId ?? null,
+          upload.imageUri,
+          upload.purchasedAt,
+          upload.totalAmount,
+          upload.ocrConfidence,
+          upload.status,
+          upload.createdAt,
+          upload.updatedAt
+        ]
+      );
+      await executor.query('delete from receipt_items where receipt_id = $1', [upload.id]);
+      for (const item of upload.items) {
+        await executor.query(
+          `insert into receipt_items(
+             id, receipt_id, raw_name, product_id, canonical_name, quantity, item_total, match_confidence
+           ) values ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          [
+            item.id,
+            upload.id,
+            item.rawName,
+            item.productId ?? null,
+            item.canonicalName ?? null,
+            item.quantity,
+            item.itemTotal,
+            item.matchConfidence ?? null
+          ]
+        );
+      }
+    },
+
+    async listReceiptUploads(userId) {
+      const receiptRows = await executor.query<ReceiptUploadRow>(
+        `select id, user_id, store_id, image_uri, purchased_at, total_amount, ocr_confidence, status, created_at, updated_at
+         from receipt_uploads
+         where user_id = $1
+         order by purchased_at desc, id`,
+        [userId]
+      );
+      if (receiptRows.length === 0) return [];
+      const receiptIds = receiptRows.map((row) => row.id);
+      const itemRows = await executor.query<ReceiptItemRow>(
+        `select id, receipt_id, raw_name, product_id, canonical_name, quantity, item_total, match_confidence
+         from receipt_items
+         where receipt_id = any($1::text[])
+         order by receipt_id, id`,
+        [receiptIds]
+      );
+      const itemsByReceiptId = new Map<string, ReceiptItemRecord[]>();
+      for (const item of itemRows.map(mapReceiptItem)) {
+        const items = itemsByReceiptId.get(item.receiptId) ?? [];
+        items.push(item);
+        itemsByReceiptId.set(item.receiptId, items);
+      }
+      return receiptRows.map((row) => mapReceiptUpload(row, itemsByReceiptId.get(row.id) ?? []));
     },
 
     async saveHumanReviewAssignment(assignment) {
@@ -2408,7 +2576,9 @@ export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'notification_tasks',
   'notification_suppressions',
   'alert_rules',
-  'pantry_items'
+  'pantry_items',
+  'receipt_uploads',
+  'receipt_items'
 ] as const;
 
 export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
@@ -2416,7 +2586,8 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '002_repository_support_schema',
   '003_subscription_entitlements',
   '004_alert_rules',
-  '005_pantry_inventory'
+  '005_pantry_inventory',
+  '007_receipt_uploads'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {
@@ -2430,6 +2601,8 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
   const suppressionId = `postgres-probe-suppression-${safeId}`;
   const alertRuleId = `postgres-probe-alert-${safeId}`;
   const pantryItemId = `postgres-probe-pantry-${safeId}`;
+  const receiptId = `postgres-probe-receipt-${safeId}`;
+  const receiptItemId = `postgres-probe-receipt-item-${safeId}`;
   const providerSubscriptionId = `postgres-probe-subscription-${safeId}`;
   const chainSlug = `postgres-probe-chain-${safeId}`;
   const productSlug = `postgres-probe-product-${safeId}`;
@@ -2544,6 +2717,41 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
         });
         const pantryItems = await repository.listPantryItems(userId);
         assertProbe(pantryItems.some((item) => item.id === pantryItemId), 'pantry item probe row was not readable');
+      }
+    },
+    {
+      name: 'receipt_upload_round_trip',
+      async run(executor) {
+        const repository = createPostgresRepository(executor);
+        await repository.upsertUser({ id: userId, email: `${userId}@example.invalid` });
+        await repository.upsertReceiptUpload({
+          id: receiptId,
+          userId,
+          imageUri: `scan://postgres-probe/${safeId}`,
+          purchasedAt: input.now,
+          totalAmount: 12.34,
+          ocrConfidence: 0.97,
+          status: 'parsed',
+          createdAt: input.now,
+          updatedAt: input.now,
+          items: [
+            {
+              id: receiptItemId,
+              receiptId,
+              rawName: 'Postgres Probe Receipt Item',
+              productId: `postgres-probe-product-${safeId}`,
+              canonicalName: 'Postgres Probe Product',
+              quantity: 1,
+              itemTotal: 12.34,
+              matchConfidence: 0.91
+            }
+          ]
+        });
+        const receipts = await repository.listReceiptUploads(userId);
+        assertProbe(
+          receipts.some((receipt) => receipt.id === receiptId && receipt.items.some((item) => item.id === receiptItemId)),
+          'receipt upload probe row was not readable'
+        );
       }
     },
     {

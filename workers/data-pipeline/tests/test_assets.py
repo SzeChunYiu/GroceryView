@@ -15,7 +15,9 @@ from groceryview_data_pipeline.assets import (
     build_retailer_fetch_stubs,
     build_seed_products,
     build_seed_stores,
+    summarize_open_prices_artifact_import_plan,
     summarize_data_pipeline_quality_gate,
+    summarize_open_prices_hosted_smoke_plan,
     summarize_open_prices_ingestion_run_plan,
 )
 from groceryview_data_pipeline.models import LatestPriceRow, ObservationFreshnessSummary, PriceObservationRow, PriceProvenance
@@ -241,6 +243,45 @@ def test_open_prices_ingestion_run_plan_summary_counts_operator_requirements() -
         schedule_enabled=True,
     )
     assert summarize_open_prices_ingestion_run_plan(ready).required_action_count == 0
+
+
+def test_open_prices_artifact_import_plan_summary_counts_database_import_requirements() -> None:
+    blocked = build_open_prices_artifact_import_plan(input_artifact_present=True)
+    assert summarize_open_prices_artifact_import_plan(blocked).to_dict() == {
+        "status": "blocked",
+        "required_action_count": 2,
+        "required_env_count": 2,
+        "required_package_count": 2,
+        "database_target_count": 6,
+        "evidence_field_count": 7,
+        "demo": False,
+    }
+
+    ready = build_open_prices_artifact_import_plan(
+        database_url_present=True,
+        input_artifact_present=True,
+        db_package_built=True,
+    )
+    assert summarize_open_prices_artifact_import_plan(ready).required_action_count == 0
+
+
+def test_open_prices_hosted_smoke_plan_summary_counts_hosted_evidence_requirements() -> None:
+    blocked = build_open_prices_hosted_smoke_plan(imported_terminal_product_id_present=True)
+    assert summarize_open_prices_hosted_smoke_plan(blocked).to_dict() == {
+        "status": "blocked",
+        "required_action_count": 2,
+        "required_env_count": 3,
+        "endpoint_count": 3,
+        "evidence_field_count": 6,
+        "demo": False,
+    }
+
+    ready = build_open_prices_hosted_smoke_plan(
+        deployment_url_present=True,
+        metrics_token_present=True,
+        imported_terminal_product_id_present=True,
+    )
+    assert summarize_open_prices_hosted_smoke_plan(ready).required_action_count == 0
 
 
 def test_open_prices_launch_readiness_rolls_up_all_open_prices_plans() -> None:
@@ -519,7 +560,19 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
         input_artifact_present=True,
         db_package_built=True,
     )
-    ready_gate = build_data_pipeline_quality_gate(quality, freshness, coverage, ready_ingestion, ready_import)
+    ready_hosted_smoke = build_open_prices_hosted_smoke_plan(
+        deployment_url_present=True,
+        metrics_token_present=True,
+        imported_terminal_product_id_present=True,
+    )
+    ready_gate = build_data_pipeline_quality_gate(
+        quality,
+        freshness,
+        coverage,
+        ready_ingestion,
+        ready_import,
+        ready_hosted_smoke,
+    )
     assert ready_gate.to_dict() == {
         "status": "ready",
         "blockers": [],
@@ -531,6 +584,7 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
             "price_observation_coverage",
             "open_prices_ingestion_run_plan",
             "open_prices_artifact_import_plan",
+            "open_prices_hosted_smoke_plan",
         ],
         "demo": True,
     }
@@ -560,6 +614,19 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
     assert blocked_import_gate.status == "blocked"
     assert blocked_import_gate.blockers == ["open_prices_artifact_import_plan_blocked"]
     assert blocked_import_gate.checked_assets[-1] == "open_prices_artifact_import_plan"
+
+    blocked_hosted_smoke = build_open_prices_hosted_smoke_plan(imported_terminal_product_id_present=True)
+    blocked_hosted_gate = build_data_pipeline_quality_gate(
+        quality,
+        freshness,
+        coverage,
+        ready_ingestion,
+        ready_import,
+        blocked_hosted_smoke,
+    )
+    assert blocked_hosted_gate.status == "blocked"
+    assert blocked_hosted_gate.blockers == ["open_prices_hosted_smoke_plan_blocked"]
+    assert blocked_hosted_gate.checked_assets[-1] == "open_prices_hosted_smoke_plan"
 
 
 def test_data_pipeline_quality_gate_digest_counts_blocker_classes() -> None:

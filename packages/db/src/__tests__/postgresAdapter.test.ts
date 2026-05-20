@@ -92,6 +92,32 @@ class RecordingQueryExecutor implements QueryExecutor {
       updated_at: '2026-05-20T08:00:00.000Z'
     }
   ];
+  receiptUploadRows: unknown[] = [
+    {
+      id: 'receipt-1',
+      user_id: 'user-1',
+      store_id: 'willys-odenplan',
+      image_uri: 'scan://receipts/receipt-1.jpg',
+      purchased_at: new Date('2026-05-20T08:00:00.000Z'),
+      total_amount: '64.90',
+      ocr_confidence: '0.9400',
+      status: 'parsed',
+      created_at: '2026-05-20T08:01:00.000Z',
+      updated_at: '2026-05-20T08:02:00.000Z'
+    }
+  ];
+  receiptItemRows: unknown[] = [
+    {
+      id: 'receipt-item-1',
+      receipt_id: 'receipt-1',
+      raw_name: 'BRYGGKAFFE 450G',
+      product_id: 'coffee',
+      canonical_name: 'Bryggkaffe 450 g',
+      quantity: '1.000',
+      item_total: '64.90',
+      match_confidence: '0.9100'
+    }
+  ];
   sourceRunRows: unknown[] = [
     {
       id: 'source-run-1',
@@ -319,6 +345,8 @@ class RecordingQueryExecutor implements QueryExecutor {
     }
     if (sql.includes('from alert_rules')) return this.alertRuleRows as T[];
     if (sql.includes('from pantry_items')) return this.pantryItemRows as T[];
+    if (sql.includes('from receipt_uploads')) return this.receiptUploadRows as T[];
+    if (sql.includes('from receipt_items')) return this.receiptItemRows as T[];
     if (sql.includes('from human_review_assignments')) {
       return [
         {
@@ -701,6 +729,88 @@ describe('createPostgresRepository', () => {
       '2026-05-20T08:00:00.000Z'
     ]);
     assert.deepEqual(executor.calls[1].params, ['user-1']);
+  });
+
+  it('persists and lists receipt uploads with parsed items', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertReceiptUpload({
+      id: 'receipt-1',
+      userId: 'user-1',
+      storeId: 'willys-odenplan',
+      imageUri: 'scan://receipts/receipt-1.jpg',
+      purchasedAt: '2026-05-20T08:00:00.000Z',
+      totalAmount: 64.9,
+      ocrConfidence: 0.94,
+      status: 'parsed',
+      createdAt: '2026-05-20T08:01:00.000Z',
+      updatedAt: '2026-05-20T08:02:00.000Z',
+      items: [
+        {
+          id: 'receipt-item-1',
+          receiptId: 'receipt-1',
+          rawName: 'BRYGGKAFFE 450G',
+          productId: 'coffee',
+          canonicalName: 'Bryggkaffe 450 g',
+          quantity: 1,
+          itemTotal: 64.9,
+          matchConfidence: 0.91
+        }
+      ]
+    });
+
+    assert.deepEqual(await repo.listReceiptUploads('user-1'), [
+      {
+        id: 'receipt-1',
+        userId: 'user-1',
+        storeId: 'willys-odenplan',
+        imageUri: 'scan://receipts/receipt-1.jpg',
+        purchasedAt: '2026-05-20T08:00:00.000Z',
+        totalAmount: 64.9,
+        ocrConfidence: 0.94,
+        status: 'parsed',
+        createdAt: '2026-05-20T08:01:00.000Z',
+        updatedAt: '2026-05-20T08:02:00.000Z',
+        items: [
+          {
+            id: 'receipt-item-1',
+            receiptId: 'receipt-1',
+            rawName: 'BRYGGKAFFE 450G',
+            productId: 'coffee',
+            canonicalName: 'Bryggkaffe 450 g',
+            quantity: 1,
+            itemTotal: 64.9,
+            matchConfidence: 0.91
+          }
+        ]
+      }
+    ]);
+    assert.deepEqual(executor.calls[0].params, [
+      'receipt-1',
+      'user-1',
+      'willys-odenplan',
+      'scan://receipts/receipt-1.jpg',
+      '2026-05-20T08:00:00.000Z',
+      64.9,
+      0.94,
+      'parsed',
+      '2026-05-20T08:01:00.000Z',
+      '2026-05-20T08:02:00.000Z'
+    ]);
+    assert.deepEqual(executor.calls[1].params, ['receipt-1']);
+    assert.deepEqual(executor.calls[2].params, [
+      'receipt-item-1',
+      'receipt-1',
+      'BRYGGKAFFE 450G',
+      'coffee',
+      'Bryggkaffe 450 g',
+      1,
+      64.9,
+      0.91
+    ]);
+    assert.deepEqual(executor.calls[3].params, ['user-1']);
+    assert.deepEqual(executor.calls[4].params, [['receipt-1']]);
   });
 });
 
