@@ -1,6 +1,83 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { planScanReviewWorkItems, processScanUpload } from '../index.js';
+import { buildScanProviderReadinessReport, planScanReviewWorkItems, processScanUpload } from '../index.js';
+
+describe('buildScanProviderReadinessReport', () => {
+  it('fails closed when barcode or receipt OCR providers are missing credentials or health checks', () => {
+    const report = buildScanProviderReadinessReport({
+      requiredProviders: ['barcode', 'receiptOcr'],
+      providers: [
+        {
+          kind: 'barcode',
+          providerName: 'gs1-compatible-lookup',
+          configured: true,
+          credentialsPresent: true,
+          healthStatus: 'pass'
+        },
+        {
+          kind: 'receiptOcr',
+          providerName: 'cloud-ocr',
+          configured: false,
+          credentialsPresent: false,
+          healthStatus: 'not_run'
+        }
+      ]
+    });
+
+    assert.deepEqual(report, {
+      status: 'blocked',
+      blockers: [
+        'scan_provider_not_configured:receiptOcr',
+        'scan_provider_credentials_missing:receiptOcr',
+        'scan_provider_health_not_run:receiptOcr'
+      ],
+      evidence: [
+        'scan_provider_configured:barcode:gs1-compatible-lookup',
+        'scan_provider_credentials_present:barcode',
+        'scan_provider_health_pass:barcode'
+      ],
+      warnings: [],
+      summary: 'Scan provider readiness is blocked.'
+    });
+  });
+
+  it('passes only when all required scan providers are configured, credentialed, and healthy', () => {
+    const report = buildScanProviderReadinessReport({
+      requiredProviders: ['barcode', 'receiptOcr'],
+      providers: [
+        {
+          kind: 'barcode',
+          providerName: 'gs1-compatible-lookup',
+          configured: true,
+          credentialsPresent: true,
+          healthStatus: 'pass'
+        },
+        {
+          kind: 'receiptOcr',
+          providerName: 'cloud-ocr',
+          configured: true,
+          credentialsPresent: true,
+          healthStatus: 'pass'
+        }
+      ]
+    });
+
+    assert.deepEqual(report, {
+      status: 'ready',
+      blockers: [],
+      evidence: [
+        'scan_provider_configured:barcode:gs1-compatible-lookup',
+        'scan_provider_credentials_present:barcode',
+        'scan_provider_health_pass:barcode',
+        'scan_provider_configured:receiptOcr:cloud-ocr',
+        'scan_provider_credentials_present:receiptOcr',
+        'scan_provider_health_pass:receiptOcr'
+      ],
+      warnings: [],
+      summary: 'Scan providers are ready.'
+    });
+  });
+});
 
 describe('processScanUpload', () => {
   it('routes barcode scans through barcode provider and returns lookup confidence', async () => {

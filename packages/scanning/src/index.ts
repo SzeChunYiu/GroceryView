@@ -32,6 +32,28 @@ export type ScanProviders = {
   };
 };
 
+export type ScanProviderKind = keyof ScanProviders;
+export type ScanProviderHealthStatus = 'pass' | 'fail' | 'not_run';
+
+export type ScanProviderReadinessInput = {
+  requiredProviders: ScanProviderKind[];
+  providers: Array<{
+    kind: ScanProviderKind;
+    providerName: string;
+    configured: boolean;
+    credentialsPresent: boolean;
+    healthStatus: ScanProviderHealthStatus;
+  }>;
+};
+
+export type ScanProviderReadinessReport = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  evidence: string[];
+  warnings: string[];
+  summary: string;
+};
+
 export type ScanPipelineResult =
   | {
       status: 'matched';
@@ -53,6 +75,43 @@ export type ScanPipelineResult =
       kind: ScanUpload['kind'];
       reason: string;
     };
+
+export function buildScanProviderReadinessReport(input: ScanProviderReadinessInput): ScanProviderReadinessReport {
+  const blockers: string[] = [];
+  const evidence: string[] = [];
+  const providersByKind = new Map(input.providers.map((provider) => [provider.kind, provider]));
+
+  for (const kind of input.requiredProviders) {
+    const provider = providersByKind.get(kind);
+    if (!provider?.configured) {
+      blockers.push(`scan_provider_not_configured:${kind}`);
+    } else {
+      evidence.push(`scan_provider_configured:${kind}:${provider.providerName}`);
+    }
+
+    if (!provider?.credentialsPresent) {
+      blockers.push(`scan_provider_credentials_missing:${kind}`);
+    } else {
+      evidence.push(`scan_provider_credentials_present:${kind}`);
+    }
+
+    if (provider?.healthStatus === 'pass') {
+      evidence.push(`scan_provider_health_pass:${kind}`);
+    } else if (provider?.healthStatus === 'fail') {
+      blockers.push(`scan_provider_health_failed:${kind}`);
+    } else {
+      blockers.push(`scan_provider_health_not_run:${kind}`);
+    }
+  }
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    evidence,
+    warnings: [],
+    summary: blockers.length === 0 ? 'Scan providers are ready.' : 'Scan provider readiness is blocked.'
+  };
+}
 
 export type ScanReviewPriority = 'high' | 'medium' | 'low';
 
