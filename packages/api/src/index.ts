@@ -497,6 +497,35 @@ export type AdDisclosureReport = {
   guardrails: string[];
 };
 
+export type NotificationInboxQueueItem = {
+  id: string;
+  title: string;
+  channel: 'push' | 'email';
+  status: 'delivered' | 'held' | 'suppressed';
+  reason: string;
+  action: string;
+  priority: 'normal' | 'high';
+  productId?: string;
+};
+
+export type NotificationInboxReport = {
+  userId: string;
+  trackedItemCount: number;
+  activeAlertCount: number;
+  deliveredCount: number;
+  heldCount: number;
+  suppressedCount: number;
+  summary: {
+    delivered: number;
+    held: number;
+    suppressed: number;
+    total: number;
+  };
+  queue: NotificationInboxQueueItem[];
+  quietHoursWindow: string;
+  guardrails: string[];
+};
+
 const stores: Store[] = [
   { id: 'willys-odenplan', name: 'Willys Odenplan', chain: 'willys', district: 'Odenplan', address: 'Odenplan, Stockholm', confidence: 'high' },
   { id: 'lidl-sveavagen', name: 'Lidl Sveavägen', chain: 'lidl', district: 'Norrmalm', address: 'Sveavägen, Stockholm', confidence: 'medium' },
@@ -1448,6 +1477,67 @@ export function createGroceryViewApi() {
           'Sponsored placements cannot change Deal Score, basket totals, or store ordering.',
           'Premium entitlements remove non-critical ads before delivery.',
           'Advertiser payloads stay aggregated and never include raw receipts.'
+        ]
+      };
+    },
+
+    getNotificationInboxReport(userId: string): NotificationInboxReport {
+      requireNonEmptyId(userId, 'userId');
+      const watchlist = this.getWatchlist(userId);
+      const deliveredRows: NotificationInboxQueueItem[] = watchlist.alerts.map((alert, index) => ({
+        id: `alert-${alert.productId}-${alert.type}-${index}`,
+        title: alert.productName,
+        channel: alert.severity === 'urgent' ? 'push' : 'email',
+        status: 'delivered',
+        reason: alert.trigger.metric === 'price_history' ? 'Verified 52-week low signal' : 'Verified shelf price or Deal Score trigger',
+        action: alert.trigger.metric === 'deal_score' ? 'Open deal' : 'Open price history',
+        priority: alert.severity === 'urgent' ? 'high' : 'normal',
+        productId: alert.productId
+      }));
+      const queue: NotificationInboxQueueItem[] = [
+        ...deliveredRows,
+        {
+          id: 'receipt-review-quiet-hours',
+          title: 'Receipt review reminder',
+          channel: 'push',
+          status: 'held',
+          reason: 'Quiet hours 21:00-07:00',
+          action: 'Send in morning digest',
+          priority: 'normal'
+        },
+        {
+          id: 'butter-provider-suppression',
+          title: 'Butter target price',
+          channel: 'push',
+          status: 'suppressed',
+          reason: 'Provider token invalid',
+          action: 'Request device refresh',
+          priority: 'normal',
+          productId: 'butter'
+        }
+      ];
+      const deliveredCount = queue.filter((item) => item.status === 'delivered').length;
+      const heldCount = queue.filter((item) => item.status === 'held').length;
+      const suppressedCount = queue.filter((item) => item.status === 'suppressed').length;
+      return {
+        userId,
+        trackedItemCount: watchlist.items.length,
+        activeAlertCount: watchlist.alerts.length,
+        deliveredCount,
+        heldCount,
+        suppressedCount,
+        summary: {
+          delivered: deliveredCount,
+          held: heldCount,
+          suppressed: suppressedCount,
+          total: queue.length
+        },
+        queue,
+        quietHoursWindow: '21:00-07:00',
+        guardrails: [
+          'Estimated prices never generate household alerts.',
+          'Quiet-hours holds wait for the morning digest unless the alert is critical.',
+          'Provider suppressions stop future sends until the device or email recipient refreshes.'
         ]
       };
     },

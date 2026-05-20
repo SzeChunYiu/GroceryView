@@ -218,6 +218,36 @@ describe('createGroceryViewApi', () => {
     assert.equal(premiumReport.blockedCount, 4);
   });
 
+  it('serves notification inbox reports from watchlist alerts plus delivery guardrails', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addWatchlistItem('user-1', {
+      productId: 'coffee',
+      targetPrice: 50,
+      alertDealScoreAt: 80,
+      favoriteStoresOnly: true
+    });
+
+    const report = api.getNotificationInboxReport('user-1');
+
+    assert.equal(report.userId, 'user-1');
+    assert.equal(report.trackedItemCount, 1);
+    assert.equal(report.activeAlertCount, 3);
+    assert.equal(report.deliveredCount, 3);
+    assert.equal(report.heldCount, 1);
+    assert.equal(report.suppressedCount, 1);
+    assert.deepEqual(report.summary, {
+      delivered: 3,
+      held: 1,
+      suppressed: 1,
+      total: 5
+    });
+    assert.match(report.queue[0]?.title ?? '', /Zoégas Coffee 450g/);
+    assert.match(report.queue.find((item) => item.status === 'held')?.reason ?? '', /Quiet hours/i);
+    assert.match(report.queue.find((item) => item.status === 'suppressed')?.reason ?? '', /Provider token invalid/i);
+    assert.match(report.guardrails[0], /Estimated prices never generate household alerts/i);
+  });
+
   it('serves receipt review reports with budget actuals, match confidence, and writeback guardrails', () => {
     const api = createGroceryViewApi();
 

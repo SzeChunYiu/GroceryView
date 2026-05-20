@@ -178,6 +178,27 @@ describe('createHttpHandler', () => {
     assert.equal(adDisclosureBody.affectsDealScore, false);
     assert.match(adDisclosureBody.guardrails[0] ?? '', /Sponsored placements cannot change Deal Score/i);
 
+    const notificationInbox = await handle(new Request('http://localhost/api/notifications/inbox?userId=user-1'));
+    assert.equal(notificationInbox.status, 200);
+    const notificationInboxBody = await json(notificationInbox) as {
+      userId: string;
+      activeAlertCount: number;
+      deliveredCount: number;
+      heldCount: number;
+      suppressedCount: number;
+      summary: { total: number };
+      queue: Array<{ status: string; reason: string }>;
+      guardrails: string[];
+    };
+    assert.equal(notificationInboxBody.userId, 'user-1');
+    assert.equal(notificationInboxBody.activeAlertCount, 0);
+    assert.equal(notificationInboxBody.deliveredCount, 0);
+    assert.equal(notificationInboxBody.heldCount, 1);
+    assert.equal(notificationInboxBody.suppressedCount, 1);
+    assert.equal(notificationInboxBody.summary.total, 2);
+    assert.match(notificationInboxBody.queue.find((item) => item.status === 'held')?.reason ?? '', /Quiet hours/i);
+    assert.match(notificationInboxBody.guardrails[0] ?? '', /Estimated prices never generate household alerts/i);
+
     const receiptReview = await handle(new Request('http://localhost/api/receipts/review?userId=user-1'));
     assert.equal(receiptReview.status, 200);
     const receiptReviewBody = await json(receiptReview) as {
