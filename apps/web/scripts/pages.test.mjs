@@ -434,6 +434,15 @@ describe('buildStaticPages', () => {
       assert.match(nutritionAllergens, /Peanut granola/);
       assert.match(nutritionAllergens, /Blocked allergens outrank price savings and Deal Score/);
       assert.match(nutritionAllergens, /Diet conflicts stop meal-plan and basket updates until reviewed/);
+      assert.match(nutritionAllergens, /Connected nutrition value API/);
+      assert.match(nutritionAllergens, /Load live nutrition value/);
+      assert.match(nutritionAllergens, /data-groceryview-flow="nutrition-value"/);
+      assert.match(nutritionAllergens, /data-flow-action="load-nutrition-value"/);
+      assert.match(nutritionAllergens, /data-nutrition-value-leader/);
+      assert.match(nutritionAllergens, /data-nutrition-value-ranking/);
+      assert.match(nutritionAllergens, /data-nutrition-value-warnings/);
+      assert.match(nutritionAllergens, /fetch\(apiUrl\('\/api\/nutrition\/value\?metric=protein'/);
+      assert.match(nutritionAllergens, /Connected nutrition value loaded/);
 
       const household = await readFile(join(root, 'household/index.html'), 'utf8');
       assert.match(household, /Shared household basket/);

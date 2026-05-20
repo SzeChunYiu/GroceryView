@@ -28,6 +28,7 @@ describe('buildOpenApiDocument', () => {
       '/api/metrics/notifications',
       '/api/notifications/provider-suppression-events',
       '/api/notifications/suppression-events',
+      '/api/nutrition/value',
       '/api/prices/freshness',
       '/api/privacy/deletion-plan',
       '/api/privacy/export',
@@ -79,6 +80,8 @@ describe('buildOpenApiDocument', () => {
     assert.equal(doc.paths['/api/products/{id}/terminal'].get?.security, undefined);
     assert.match(doc.paths['/api/products/{id}/terminal'].get?.summary ?? '', /price terminal/i);
     assert.equal(doc.paths['/api/market/overview'].get?.security, undefined);
+    assert.equal(doc.paths['/api/nutrition/value'].get?.security, undefined);
+    assert.match(doc.paths['/api/nutrition/value'].get?.summary ?? '', /nutrition.*krona/i);
     assert.equal(doc.paths['/api/categories/{category}/market'].get?.security, undefined);
     assert.match(doc.paths['/api/categories/{category}/market'].get?.summary ?? '', /category market/i);
   });

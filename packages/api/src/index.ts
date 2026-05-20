@@ -5,6 +5,7 @@ import {
   calculateFixedBasketIndex,
   compareBasketStrategies,
   createHouseholdState,
+  rankNutritionPerKrona,
   scoreBand,
   searchProducts,
   summarizeBudget,
@@ -20,6 +21,9 @@ import {
   type HouseholdSnapshot,
   type HouseholdSummary,
   type HouseholdWatchlistItem,
+  type NutritionMetric,
+  type NutritionProduct,
+  type NutritionRank,
   type SearchableProduct,
   type StorePrice,
   type WatchlistAlert,
@@ -400,6 +404,19 @@ export type HouseholdPlan = {
   approvalPolicy: HouseholdApprovalPolicy;
 };
 
+export type NutritionValueReport = {
+  metric: NutritionMetric;
+  currency: 'SEK';
+  rows: NutritionRank[];
+  leader: {
+    productId: string;
+    name: string;
+    valuePer10Sek: number;
+    saltWarning: boolean;
+  } | null;
+  guardrails: string[];
+};
+
 const stores: Store[] = [
   { id: 'willys-odenplan', name: 'Willys Odenplan', chain: 'willys', district: 'Odenplan', address: 'Odenplan, Stockholm', confidence: 'high' },
   { id: 'lidl-sveavagen', name: 'Lidl Sveavägen', chain: 'lidl', district: 'Norrmalm', address: 'Sveavägen, Stockholm', confidence: 'medium' },
@@ -489,6 +506,12 @@ const products: ProductDetail[] = [
       { date: '2026-05-19', price: 54.9, verified: true }
     ]
   }
+];
+
+const nutritionProducts: NutritionProduct[] = [
+  { productId: 'chicken', name: 'Chicken thighs', price: 69.9, nutritionPerPackage: { proteinGrams: 160, calories: 900, fiberGrams: 0, sugarGrams: 0, saltGrams: 2.4 } },
+  { productId: 'eggs', name: 'Eggs 12-pack', price: 34.9, nutritionPerPackage: { proteinGrams: 75, calories: 840, fiberGrams: 0, sugarGrams: 1, saltGrams: 1.8 } },
+  { productId: 'yogurt', name: 'Greek yogurt', price: 34.9, nutritionPerPackage: { proteinGrams: 55, calories: 380, fiberGrams: 0, sugarGrams: 16, saltGrams: 0.5 } }
 ];
 
 const index = calculateFixedBasketIndex({
@@ -1181,6 +1204,29 @@ export function createGroceryViewApi() {
           };
         });
       return { city: 'Stockholm', indices: [index], movers, topDeals };
+    },
+
+    getNutritionValueReport(metric: NutritionMetric = 'protein'): NutritionValueReport {
+      const rows = rankNutritionPerKrona(nutritionProducts, metric);
+      const leader = rows[0]
+        ? {
+            productId: rows[0].productId,
+            name: rows[0].name,
+            valuePer10Sek: rows[0].valuePer10Sek,
+            saltWarning: rows[0].saltWarning
+          }
+        : null;
+      return {
+        metric,
+        currency: 'SEK',
+        rows,
+        leader,
+        guardrails: [
+          'Verified nutrition labels cannot override allergen locks or household diet rules.',
+          'Salt and sugar warnings remain visible even when a product has strong value per krona.',
+          'Nutrition value is advisory and cannot rewrite basket or meal-plan decisions without user confirmation.'
+        ]
+      };
     },
 
     getCategoryMarket(category: string): CategoryMarketReport | null {

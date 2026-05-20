@@ -188,6 +188,12 @@ function optionalDeliveryChannel(value: unknown): DeliveryChannel | undefined {
   throw new Error('channel must be push or email.');
 }
 
+function optionalNutritionMetric(value: string | null): 'protein' | 'calories' | 'fiber' {
+  if (value === null || value === '') return 'protein';
+  if (value === 'protein' || value === 'calories' || value === 'fiber') return value;
+  throw new Error('metric must be protein, calories, or fiber.');
+}
+
 function requiredSuppressionEventType(value: unknown): NotificationSuppressionEventType {
   if (value === 'unsubscribe' || value === 'bounce' || value === 'complaint' || value === 'resubscribe') return value;
   throw new Error('eventType must be unsubscribe, bounce, complaint, or resubscribe.');
@@ -584,6 +590,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       }
 
       if (method === 'GET' && path === '/api/market/overview') return jsonResponse(api.getMarketOverview());
+      if (method === 'GET' && path === '/api/nutrition/value') return jsonResponse(api.getNutritionValueReport(optionalNutritionMetric(url.searchParams.get('metric'))));
       const categoryMarketMatch = path.match(/^\/api\/categories\/([^/]+)\/market$/);
       if (method === 'GET' && categoryMarketMatch) {
         const report = api.getCategoryMarket(decodeURIComponent(categoryMarketMatch[1]));
@@ -1158,6 +1165,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/health': { get: publicOperation('Get API runtime health without exposing secrets.') },
       '/api/auth/session': { post: publicOperation('Exchange a verified auth provider assertion for a short-lived bearer session.') },
       '/api/market/overview': { get: publicOperation('Get Stockholm grocery market overview.') },
+      '/api/nutrition/value': { get: publicOperation('Get nutrition per krona rankings with sugar and salt warning guardrails.') },
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },

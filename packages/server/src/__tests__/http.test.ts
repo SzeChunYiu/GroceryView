@@ -124,6 +124,17 @@ describe('createHttpHandler', () => {
     assert.equal(marketBody.movers[0]?.stockholmMedianGap, -10);
     assert.equal(marketBody.movers[0]?.verifiedHistoryPoints, 3);
 
+    const nutrition = await handle(new Request('http://localhost/api/nutrition/value?metric=protein'));
+    assert.equal(nutrition.status, 200);
+    const nutritionBody = await json(nutrition) as { metric: string; rows: Array<{ productId: string; valuePer10Sek: number }>; leader: { productId: string } };
+    assert.equal(nutritionBody.metric, 'protein');
+    assert.deepEqual(nutritionBody.rows.map((row) => [row.productId, row.valuePer10Sek]), [
+      ['chicken', 22.89],
+      ['eggs', 21.49],
+      ['yogurt', 15.76]
+    ]);
+    assert.equal(nutritionBody.leader.productId, 'chicken');
+
     const categoryMarket = await handle(new Request('http://localhost/api/categories/coffee/market'));
     assert.equal(categoryMarket.status, 200);
     const categoryMarketBody = await json(categoryMarket) as {
