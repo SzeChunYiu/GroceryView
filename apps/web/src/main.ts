@@ -98,6 +98,12 @@ const alertPreferences = [
   { rule: 'Receipt review reminder', channel: 'Push', quietHours: 'Immediate', scope: 'Household queue' }
 ];
 
+const billingStatusRows = [
+  { account: 'Household workspace', plan: 'premium_monthly', status: 'Active', checkout: 'Not required', action: 'Show manage subscription' },
+  { account: 'Solo price watch', plan: 'free', status: 'No entitlement', checkout: 'Required', action: 'Show upgrade' },
+  { account: 'Reviewer desk', plan: 'premium_yearly', status: 'Past due', checkout: 'Required', action: 'Show billing issue' }
+];
+
 const watchlistRows = [
   { product: 'Zoégas Coffee 450g', target: '50 SEK', current: '49.90 SEK', trigger: 'Deal Score >= 80', status: 'Ready for push' },
   { product: 'Butter 600g', target: '45 SEK', current: '54.90 SEK', trigger: '52-week low', status: 'Watching' },
@@ -470,6 +476,16 @@ app.innerHTML = `
           <thead><tr><th>Rule</th><th>Channel</th><th>Quiet hours</th><th>Scope</th></tr></thead>
           <tbody>
             ${alertPreferences.map((preference) => `<tr><td>${preference.rule}</td><td><span class="status">${preference.channel}</span></td><td>${preference.quietHours}</td><td>${preference.scope}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Billing status</h2>
+        <p class="lede"><a href="/billing/status/">Open billing status</a> to verify entitlement, checkout, and ad-removal behavior.</p>
+        <table class="table">
+          <thead><tr><th>Account</th><th>Plan</th><th>Status</th><th>Checkout</th><th>Action</th></tr></thead>
+          <tbody>
+            ${billingStatusRows.map((row) => `<tr><td>${row.account}</td><td>${row.plan}</td><td><span class="status">${row.status}</span></td><td>${row.checkout}</td><td>${row.action}</td></tr>`).join('')}
           </tbody>
         </table>
       </div>
