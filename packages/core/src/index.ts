@@ -1069,6 +1069,136 @@ export function summarizeHousehold(snapshot: HouseholdSnapshot, priceByProductId
   };
 }
 
+export type PantryInventoryItem = {
+  productId: string;
+  name: string;
+  category: string;
+  quantity: number;
+  unit: 'each' | 'kg' | 'g' | 'l' | 'ml' | 'pack';
+  minimumQuantity: number;
+  targetQuantity?: number;
+  expiresAt?: string;
+  lastPurchasedAt?: string;
+};
+
+export type PantryUsageEvent = {
+  productId: string;
+  quantityUsed: number;
+  usedAt: string;
+};
+
+export type PantryDeal = {
+  productId: string;
+  storeId: string;
+  storeName: string;
+  price: number;
+  dealScore?: number;
+};
+
+export type PantryStatus = 'in_stock' | 'low_stock' | 'expiring_soon' | 'expired';
+
+export type PantryInventoryStatus = PantryInventoryItem & {
+  remainingQuantity: number;
+  status: PantryStatus;
+  daysUntilExpiry?: number;
+};
+
+export type PantryReplenishment = {
+  productId: string;
+  name: string;
+  quantityToBuy: number;
+  unit: PantryInventoryItem['unit'];
+  priority: 'high' | 'medium' | 'low';
+  reason: string;
+  alreadyInBasket: boolean;
+  bestDeal?: PantryDeal;
+};
+
+export type PantryPlan = {
+  householdId?: string;
+  statuses: PantryInventoryStatus[];
+  replenishment: PantryReplenishment[];
+  expiringSoonProductIds: string[];
+};
+
+export function planPantryReplenishment(input: {
+  pantry: PantryInventoryItem[];
+  usage?: PantryUsageEvent[];
+  deals?: PantryDeal[];
+  now: string;
+  household?: HouseholdSnapshot;
+  expiringSoonDays?: number;
+}): PantryPlan {
+  const nowMs = Date.parse(input.now);
+  if (Number.isNaN(nowMs)) throw new Error('now must be an ISO date.');
+  const expiringSoonDays = input.expiringSoonDays ?? 3;
+  const usageByProduct = new Map<string, number>();
+  for (const event of input.usage ?? []) {
+    if (event.quantityUsed < 0) throw new Error('quantityUsed must be non-negative.');
+    if (Number.isNaN(Date.parse(event.usedAt))) throw new Error('usedAt must be an ISO date.');
+    usageByProduct.set(event.productId, roundMoney((usageByProduct.get(event.productId) ?? 0) + event.quantityUsed));
+  }
+
+  const basketProductIds = new Set((input.household?.basketItems ?? []).map((item) => item.productId));
+  const dealByProduct = new Map<string, PantryDeal>();
+  for (const deal of input.deals ?? []) {
+    const current = dealByProduct.get(deal.productId);
+    if (!current || (deal.dealScore ?? 0) > (current.dealScore ?? 0) || ((deal.dealScore ?? 0) === (current.dealScore ?? 0) && deal.price < current.price)) {
+      dealByProduct.set(deal.productId, { ...deal });
+    }
+  }
+
+  const statuses = input.pantry.map((item): PantryInventoryStatus => {
+    if (item.quantity < 0 || item.minimumQuantity < 0) throw new Error('pantry quantities must be non-negative.');
+    const remainingQuantity = Math.max(0, roundMoney(item.quantity - (usageByProduct.get(item.productId) ?? 0)));
+    const daysUntilExpiry = item.expiresAt === undefined ? undefined : Math.ceil((Date.parse(item.expiresAt) - nowMs) / 86_400_000);
+    if (daysUntilExpiry !== undefined && Number.isNaN(daysUntilExpiry)) throw new Error(`expiresAt must be an ISO date for ${item.productId}.`);
+    const status: PantryStatus =
+      daysUntilExpiry !== undefined && daysUntilExpiry < 0
+        ? 'expired'
+        : daysUntilExpiry !== undefined && daysUntilExpiry <= expiringSoonDays
+          ? 'expiring_soon'
+          : remainingQuantity <= item.minimumQuantity
+            ? 'low_stock'
+            : 'in_stock';
+    return {
+      ...item,
+      remainingQuantity,
+      status,
+      ...(daysUntilExpiry !== undefined ? { daysUntilExpiry } : {})
+    };
+  });
+
+  const replenishment = statuses
+    .filter((item) => item.status === 'low_stock' || item.status === 'expired')
+    .map((item): PantryReplenishment => {
+      const targetQuantity = item.targetQuantity ?? item.minimumQuantity * 2;
+      const quantityToBuy = Math.max(1, roundMoney(targetQuantity - item.remainingQuantity));
+      const alreadyInBasket = basketProductIds.has(item.productId);
+      return {
+        productId: item.productId,
+        name: item.name,
+        quantityToBuy,
+        unit: item.unit,
+        priority: item.status === 'expired' ? 'high' : item.remainingQuantity === 0 ? 'high' : 'medium',
+        reason: item.status === 'expired' ? 'Expired pantry item should be replaced.' : 'Pantry item is at or below its minimum quantity.',
+        alreadyInBasket,
+        ...(dealByProduct.has(item.productId) ? { bestDeal: dealByProduct.get(item.productId) } : {})
+      };
+    })
+    .sort((a, b) => {
+      const priorityRank = { high: 0, medium: 1, low: 2 };
+      return priorityRank[a.priority] - priorityRank[b.priority] || a.name.localeCompare(b.name);
+    });
+
+  return {
+    householdId: input.household?.id,
+    statuses,
+    replenishment,
+    expiringSoonProductIds: statuses.filter((item) => item.status === 'expiring_soon').map((item) => item.productId)
+  };
+}
+
 export type AdSurface =
   | 'market_feed'
   | 'product_page_bottom'
