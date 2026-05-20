@@ -35,6 +35,11 @@ describe('authenticated HTTP routes', () => {
       body: JSON.stringify({ scanId: 'scan-1', kind: 'receipt', contentType: 'image/jpeg', byteLength: 1 })
     }));
     assert.equal(unauthenticatedScanUpload.status, 401);
+    const unauthenticatedPantry = await handle(new Request('http://localhost/api/pantry/replenishment?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ pantry: [] })
+    }));
+    assert.equal(unauthenticatedPantry.status, 401);
 
     const wrongUserToken = await createSessionToken({ userId: 'user-2', expiresAt: '2099-01-01T00:00:00.000Z' }, 'secret');
     const forbidden = await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
@@ -74,6 +79,12 @@ describe('authenticated HTTP routes', () => {
       body: JSON.stringify({ scanId: 'scan-1', kind: 'receipt', contentType: 'image/jpeg', byteLength: 1 })
     }));
     assert.equal(forbiddenScanUpload.status, 403);
+    const forbiddenPantry = await handle(new Request('http://localhost/api/pantry/replenishment?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${wrongUserToken}` },
+      body: JSON.stringify({ pantry: [] })
+    }));
+    assert.equal(forbiddenPantry.status, 403);
 
     const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'secret');
     const authorized = await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
@@ -112,5 +123,11 @@ describe('authenticated HTTP routes', () => {
       body: JSON.stringify({ scanId: 'scan-1', kind: 'receipt', contentType: 'image/jpeg', byteLength: 1 })
     }));
     assert.equal(authorizedScanUpload.status, 200);
+    const authorizedPantry = await handle(new Request('http://localhost/api/pantry/replenishment?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}` },
+      body: JSON.stringify({ pantry: [] })
+    }));
+    assert.equal(authorizedPantry.status, 200);
   });
 });
