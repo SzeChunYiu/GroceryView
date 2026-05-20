@@ -220,7 +220,9 @@ export function createGroceryViewApi() {
     },
 
     getProduct(id: string) {
-      return products.find((product) => product.id === id) ?? null;
+      const product = products.find((candidate) => candidate.id === id);
+      if (!product) return null;
+      return { ...product, currentPrices: sortPricesByValue(product.currentPrices) };
     },
 
     getProductPrices(id: string) {
