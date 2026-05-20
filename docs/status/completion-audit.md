@@ -32,6 +32,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Connected price freshness UI | This PR, `apps/web/scripts/pages.mjs`, and web page-generation tests wire the retailer freshness page to `/api/prices/freshness` and render fresh/aging/stale counts, backfill IDs, thresholds, and stale-product names from the API response | Completed by this PR merge |
 | Watchlist, alerts, budget summaries | PR #2, PR #11 | Foundation shipped |
 | Connected watchlist UI | This PR, `apps/web/scripts/pages.mjs`, and web page-generation tests wire the watchlist workbench to `/api/watchlist`, rendering tracked-item counts, target-price rules, active trigger values, favorite-store scope, and 52-week-low alert counts from the protected API response | Completed by this PR merge |
+| Connected budget forecast UI | This PR, `apps/web/scripts/pages.mjs`, and web page-generation tests wire the budget forecast page to `/api/budget/summary`, rendering weekly and monthly budget status, actual remaining buffers, next-basket estimate, after-estimate buffer, and over/under statuses from the protected API response | Completed by this PR merge |
 | API foundation | PR #3, `packages/api` | Foundation shipped |
 | API mutable route input validation | PR #132, `packages/api` route validation tests | Shipped after merge |
 | SQL data schema | PR #4, `db/schema.sql` | Foundation shipped |
