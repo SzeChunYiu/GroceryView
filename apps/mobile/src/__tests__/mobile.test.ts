@@ -12,8 +12,10 @@ import {
   buildScanResult,
   composeMobileTodayScreen,
   composeMobileProductTerminalScreen,
+  createMobileProductPriceTerminalViewModel,
   createMobileDiscoveryViewModel,
-  createMobileViewModel
+  createMobileViewModel,
+  loadMobileProductTerminal
 } from '../index.js';
 
 describe('mobile app foundation', () => {
