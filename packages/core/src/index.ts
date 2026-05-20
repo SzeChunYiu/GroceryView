@@ -1200,22 +1200,6 @@ export type BudgetSummary = {
   monthlyStatus: 'under' | 'over';
 };
 
-export type BudgetMode = 'strict' | 'balanced' | 'convenience_first' | 'student' | 'family' | 'healthy';
-
-export type MobileBudgetTrackerInput = BudgetInput & {
-  mode: BudgetMode;
-  runningCartTotal: number;
-};
-
-export type MobileBudgetTrackerPlan = BudgetSummary & {
-  mode: BudgetMode;
-  runningCartTotal: number;
-  runningRemaining: number;
-  runningStatus: 'under' | 'over';
-  guidance: string;
-  actions: Array<'continue_shopping' | 'review_substitutions' | 'scan_receipt' | 'reduce_cart' | 'compare_favorite_stores'>;
-};
-
 export function summarizeBudget(input: BudgetInput): BudgetSummary {
   const weeklyActualSpend = roundMoney(input.receiptTotalsThisWeek.reduce((sum, value) => sum + value, 0));
   const monthlyActualSpend = roundMoney(input.receiptTotalsThisMonth.reduce((sum, value) => sum + value, 0));
@@ -1234,49 +1218,6 @@ export function summarizeBudget(input: BudgetInput): BudgetSummary {
     monthlyRemainingActual,
     weeklyStatus: weeklyRemainingActual >= 0 ? 'under' : 'over',
     monthlyStatus: monthlyRemainingActual >= 0 ? 'under' : 'over'
-  };
-}
-
-function modeGuidance(mode: BudgetMode): string {
-  switch (mode) {
-    case 'strict':
-      return 'Stay under the weekly limit before checkout.';
-    case 'convenience_first':
-      return 'Prefer fewer store switches unless savings are material.';
-    case 'student':
-      return 'Prioritize private-label swaps and lowest unit prices.';
-    case 'family':
-      return 'Protect household staples and bulk value before treats.';
-    case 'healthy':
-      return 'Keep nutritious staples in budget before optional items.';
-    case 'balanced':
-    default:
-      return 'Balance savings, convenience, and planned basket needs.';
-  }
-}
-
-export function planMobileBudgetTracker(input: MobileBudgetTrackerInput): MobileBudgetTrackerPlan {
-  const summary = summarizeBudget(input);
-  const runningRemaining = roundMoney(input.weeklyBudget - input.runningCartTotal);
-  const actions: MobileBudgetTrackerPlan['actions'] = [];
-
-  if (runningRemaining < 0 || summary.weeklyRemainingAfterEstimate < 0) {
-    actions.push('reduce_cart', 'review_substitutions');
-  } else {
-    actions.push('continue_shopping');
-  }
-
-  if (input.mode !== 'convenience_first') actions.push('compare_favorite_stores');
-  actions.push('scan_receipt');
-
-  return {
-    ...summary,
-    mode: input.mode,
-    runningCartTotal: roundMoney(input.runningCartTotal),
-    runningRemaining,
-    runningStatus: runningRemaining >= 0 ? 'under' : 'over',
-    guidance: modeGuidance(input.mode),
-    actions
   };
 }
 
