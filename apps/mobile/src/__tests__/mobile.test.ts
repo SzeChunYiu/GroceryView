@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { buildExpoReadinessPlan, buildMobileShell, buildScanResult, createMobileViewModel } from '../index.js';
+import { buildExpoReadinessPlan, buildMobileScreenBlueprints, buildMobileShell, buildScanResult, createMobileViewModel } from '../index.js';
 
 describe('mobile app foundation', () => {
   it('defines the proposal bottom navigation and Today dashboard modules', () => {
@@ -47,7 +47,8 @@ describe('mobile app foundation', () => {
       '/scan/receipt',
       '/profile',
       '/household',
-      '/privacy'
+      '/privacy',
+      '/review-queue'
     ]);
     assert.deepEqual(plan.requiredDeviceCapabilities, ['camera', 'secure-storage', 'push-notifications']);
     assert.equal(plan.buildProfiles.production.distribution, 'store');
@@ -63,5 +64,35 @@ describe('mobile app foundation', () => {
     assert.deepEqual(appConfig.expo.android.permissions, ['CAMERA', 'POST_NOTIFICATIONS']);
     assert.equal(appConfig.expo.extra.failClosedWithoutProviders, true);
     assert.equal(easConfig.build.production.distribution, 'store');
+  });
+
+  it('defines screen blueprints with states, actions, provider gates, and offline behavior', () => {
+    const plan = buildMobileScreenBlueprints();
+
+    assert.equal(plan.authRequiredByDefault, true);
+    assert.deepEqual(plan.screens.map((screen) => screen.route), [
+      '/today',
+      '/basket',
+      '/scan/barcode',
+      '/scan/receipt',
+      '/review-queue',
+      '/profile'
+    ]);
+
+    const receipt = plan.screens.find((screen) => screen.route === '/scan/receipt');
+    assert.equal(receipt?.primaryState, 'needs_provider');
+    assert.deepEqual(receipt?.providerRequirements, ['camera', 'ocr', 'secure-session']);
+    assert.match(receipt?.offlineBehavior ?? '', /block budget writeback/i);
+
+    const reviewQueue = plan.screens.find((screen) => screen.route === '/review-queue');
+    assert.equal(reviewQueue?.screen, 'HumanReviewQueueScreen');
+    assert.deepEqual(reviewQueue?.actions, ['review_assignment', 'submit_review_decision']);
+    assert.match(reviewQueue?.dataDependencies.join(','), /reviewer_permissions/);
+
+    assert.deepEqual(plan.blockedWithoutProviders.map((screen) => screen.route), [
+      '/scan/barcode',
+      '/scan/receipt',
+      '/profile'
+    ]);
   });
 });
