@@ -79,6 +79,45 @@ describe('createGroceryViewApi', () => {
     assert.throws(() => api.getStoreDeals('missing-store'), /Unknown storeId/);
   });
 
+
+  it('returns product price terminal reports with distribution and chart data', () => {
+    const api = createGroceryViewApi();
+
+    const terminal = api.getProductPriceTerminal('coffee');
+    assert.equal(terminal?.productId, 'coffee');
+    assert.equal(terminal?.ticker, 'ZOEGAS-COFFEE-450G');
+    assert.deepEqual(terminal?.quote, {
+      bestPrice: 49.9,
+      bestStoreId: 'willys-odenplan',
+      bestStoreName: 'Willys Odenplan',
+      unitPrice: '110.89 SEK/kg',
+      dealScore: 82,
+      band: { label: 'Good deal', verdict: 'Buy' },
+      oneMonthMovePercent: -16.7,
+      range52Week: { low: 49.9, high: 69.9 },
+      evidenceVolume: { currentPrices: 3, historyPoints: 3, verifiedHistoryPoints: 3 }
+    });
+    assert.deepEqual(terminal?.distributions.map((distribution) => distribution.label), [
+      'Whole Stockholm',
+      'Odenplan local area'
+    ]);
+    assert.equal(terminal?.distributions[0].sampleSize, 3);
+    assert.equal(terminal?.distributions[0].median, 59.9);
+    assert.equal(terminal?.distributions[0].currentPercentile, 8);
+    assert.match(terminal?.distributions[0].customerRead ?? '', /cheaper than 92% of verified Stockholm observations/);
+    assert.equal(terminal?.distributions[1].sampleSize, 2);
+    assert.equal(terminal?.chart.series[0].id, 'willys-odenplan:shelf');
+    assert.equal(terminal?.chart.series[0].lineStyle, 'solid');
+    assert.deepEqual(terminal?.chart.series[0].points.map((point) => point.value), [69.9, 59.9, 49.9]);
+    assert.equal(terminal?.historySummary?.isNewLow, true);
+    assert.deepEqual(terminal?.evidenceGuardrails, [
+      'Verified shelf or retailer-page prices can power current quote, Deal Score, and basket totals.',
+      'Member, promotion, estimated, and low-confidence rows must stay explicitly labeled before customer action.',
+      'Distribution and chart samples include sample size and provenance-aware confidence styling.'
+    ]);
+    assert.equal(api.getProductPriceTerminal('missing-product'), null);
+  });
+
   it('returns Deal Score v1 reports without using distance in the default score', () => {
     const api = createGroceryViewApi();
 

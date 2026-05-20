@@ -35,6 +35,7 @@ describe('buildOpenApiDocument', () => {
       '/api/products/{id}/equivalents',
       '/api/products/{id}/history',
       '/api/products/{id}/prices',
+      '/api/products/{id}/terminal',
       '/api/readiness/postgres',
       '/api/scans/process',
       '/api/scans/upload-url',
@@ -66,6 +67,8 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/notifications/suppression-events'].post?.security, [{ webhookSignature: [] }]);
     assert.deepEqual(doc.paths['/api/notifications/provider-suppression-events'].post?.security, [{ webhookSignature: [] }]);
     assert.match(doc.paths['/api/health'].get?.summary ?? '', /without exposing secrets/i);
+    assert.equal(doc.paths['/api/products/{id}/terminal'].get?.security, undefined);
+    assert.match(doc.paths['/api/products/{id}/terminal'].get?.summary ?? '', /price terminal/i);
     assert.equal(doc.paths['/api/market/overview'].get?.security, undefined);
   });
 });
