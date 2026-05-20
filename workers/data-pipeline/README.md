@@ -21,7 +21,7 @@ Dagster scaffold for the GroceryView data-worker lane.
 - Open Prices ingestion run plan asset with schedule, persistence targets, idempotency keys, and fail-closed deployment requirements.
 - Open Prices hosted smoke plan asset with the hosted API, imported product-terminal, and PostgreSQL readiness smoke commands.
 - Open Prices launch readiness summary that rolls the pull, scheduled ingestion, artifact import, hosted smoke, and schedule health plans into one blocker list for operators.
-- Open Prices launch readiness digest with dashboard-friendly counts for checked plans, remaining actions, evidence fields, hosted-smoke blockers, and persistence blockers.
+- Open Prices launch readiness digest with dashboard-friendly counts for checked plans, remaining actions, evidence fields, hosted-smoke blockers, persistence blockers, and schedule-health blockers.
 - Open Prices schedule health plan asset with the Dagster deployment URL, schedule enablement flags, and last-run evidence needed before hosted scheduled-worker proof can pass.
 - An `open_prices_ingestion_schedule` Dagster schedule contract that targets the Open Prices pull, ingestion plan, observations, latest-price rollup, freshness, and coverage assets every six hours.
 - An `open_prices_import_readiness_schedule` Dagster schedule contract that targets the Open Prices import plan, launch readiness summary, and data-pipeline quality gate every six hours after the ingestion plan window.

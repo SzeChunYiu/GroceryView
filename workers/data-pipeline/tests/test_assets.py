@@ -474,6 +474,7 @@ def test_open_prices_launch_readiness_digest_counts_operator_signals() -> None:
         "evidence_field_count": 28,
         "hosted_smoke_blocker_count": 3,
         "persistence_blocker_count": 5,
+        "schedule_health_blocker_count": 4,
         "demo": False,
     }
 
@@ -507,6 +508,7 @@ def test_open_prices_launch_readiness_digest_counts_operator_signals() -> None:
     assert ready_digest.next_action_count == 0
     assert ready_digest.hosted_smoke_blocker_count == 0
     assert ready_digest.persistence_blocker_count == 0
+    assert ready_digest.schedule_health_blocker_count == 0
 
 
 def test_latest_price_rollup_picks_latest_observation() -> None:
