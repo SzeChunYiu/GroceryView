@@ -71,6 +71,30 @@ const budget = summarizeBudget({
   receiptTotalsThisMonth: [321, 180, 760, 690]
 });
 
+const scannerReviews = [
+  {
+    source: 'Coop Farsta receipt',
+    status: 'Needs human review',
+    confidence: 71,
+    owner: 'Mina',
+    action: 'Confirm milk line item and loyalty discount'
+  },
+  {
+    source: 'Arla Milk barcode',
+    status: 'Matched',
+    confidence: 98,
+    owner: 'Alex',
+    action: 'Ready for basket price update'
+  },
+  {
+    source: 'Loose tomatoes label',
+    status: 'Low confidence',
+    confidence: 54,
+    owner: 'Sam',
+    action: 'Route to product matching queue'
+  }
+];
+
 const index = calculateFixedBasketIndex({
   id: 'stockholm-grocery-index',
   label: 'Stockholm Grocery Index',
@@ -113,6 +137,33 @@ app.innerHTML = `
         </div>
         <p class="footer-note">Fixed basket methodology, equal weights, confidence: ${index.confidence}.</p>
       </aside>
+    </section>
+
+    <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Scanner review desk</h2>
+        <p class="lede">Receipt and barcode captures stay visible with confidence, owner, and next action before they update budgets or catalog prices.</p>
+        <table class="table">
+          <thead><tr><th>Capture</th><th>Status</th><th>Confidence</th><th>Owner</th></tr></thead>
+          <tbody>
+            ${scannerReviews.map((review) => `<tr>
+              <td><strong>${review.source}</strong><br><span class="footer-note">${review.action}</span></td>
+              <td><span class="status">${review.status}</span></td>
+              <td>${review.confidence}%</td>
+              <td>${review.owner}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Review routing</h2>
+        <p class="lede">Low-confidence captures are separated from verified shelf and retailer-page prices so estimated data cannot masquerade as official price evidence.</p>
+        <div class="grid">
+          <div class="metric"><strong>${scannerReviews.filter((review) => review.status === 'Matched').length}</strong><span>matched capture</span></div>
+          <div class="metric"><strong>${scannerReviews.filter((review) => review.status !== 'Matched').length}</strong><span>review queue</span></div>
+          <div class="metric"><strong>${Math.round(scannerReviews.reduce((sum, review) => sum + review.confidence, 0) / scannerReviews.length)}%</strong><span>average confidence</span></div>
+        </div>
+      </div>
     </section>
 
     <section class="market" style="margin-top:16px">

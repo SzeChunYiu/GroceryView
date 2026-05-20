@@ -42,6 +42,8 @@ describe('buildStaticPages', () => {
       const scanner = await readFile(join(root, 'scanner/index.html'), 'utf8');
       assert.match(scanner, /Barcode and receipt scanner/);
       assert.match(scanner, /manual review queue/);
+      assert.match(scanner, /Coop Farsta receipt/);
+      assert.match(scanner, /Route to product matching queue/);
 
       const privacy = await readFile(join(root, 'privacy/index.html'), 'utf8');
       assert.match(privacy, /Export or delete your data/);
