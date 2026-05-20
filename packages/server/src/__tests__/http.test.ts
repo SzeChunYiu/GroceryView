@@ -273,6 +273,13 @@ describe('createHttpHandler', () => {
       method: 'POST',
       body: JSON.stringify({ storeId: 'willys-odenplan' })
     }))).status, 201);
+    assert.equal((await handle(new Request('http://localhost/api/users/user-1/favorite-stores', {
+      method: 'POST',
+      body: JSON.stringify({ storeId: 'lidl-sveavagen' })
+    }))).status, 201);
+    assert.equal((await handle(new Request('http://localhost/api/users/user-1/favorite-stores/lidl-sveavagen', {
+      method: 'DELETE'
+    }))).status, 200);
 
     assert.equal((await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
       method: 'POST',
