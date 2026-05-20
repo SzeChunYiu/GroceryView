@@ -7,6 +7,7 @@ const envExample = readFileSync(new URL('../../../../.env.example', import.meta.
 const infraReadme = readFileSync(new URL('../../../../infra/README.md', import.meta.url), 'utf8');
 const smokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-local-services.sh', import.meta.url), 'utf8');
 const hostedReadinessSmokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-hosted-readiness.sh', import.meta.url), 'utf8');
+const hostedHttpSmokeScript = readFileSync(new URL('../../../../infra/scripts/smoke-hosted-http.sh', import.meta.url), 'utf8');
 const smokeWorkflow = readFileSync(new URL('../../../../.github/workflows/local-infra-smoke.yml', import.meta.url), 'utf8');
 
 describe('local infrastructure compose', () => {
@@ -73,5 +74,15 @@ describe('local infrastructure compose', () => {
     assert.match(hostedReadinessSmokeScript, /x-groceryview-metrics-token: \$METRICS_TOKEN/);
     assert.match(hostedReadinessSmokeScript, /curl -fsS/);
     assert.match(hostedReadinessSmokeScript, /"status"\[\[:space:\]\]\*:\[\[:space:\]\]\*"ready"/);
+  });
+
+  it('ships a hosted HTTP smoke script for API health and optional web checks', () => {
+    assert.match(hostedHttpSmokeScript, /GROCERYVIEW_SERVER_URL/);
+    assert.match(hostedHttpSmokeScript, /GROCERYVIEW_WEB_URL/);
+    assert.match(hostedHttpSmokeScript, /HTTP_SMOKE_TIMEOUT_SECONDS/);
+    assert.match(hostedHttpSmokeScript, /\/api\/health/);
+    assert.match(hostedHttpSmokeScript, /curl -fsS/);
+    assert.match(hostedHttpSmokeScript, /"status"\[\[:space:\]\]\*:\[\[:space:\]\]\*"ok"/);
+    assert.match(hostedHttpSmokeScript, /"service"\[\[:space:\]\]\*:\[\[:space:\]\]\*"groceryview-server"/);
   });
 });
