@@ -8,6 +8,7 @@ import {
   buildRollbackPlan,
   buildSecretRotationReadinessReport,
   summarizeSecretRotationReadinessReport,
+  summarizeDeploymentSmokeEvidenceReport,
   summarizeDeploymentReadinessReport,
   summarizeGateBlockers,
   summarizeGateWarnings
@@ -249,6 +250,31 @@ describe('deployment ops foundation', () => {
       ],
       requiredSecrets: ['PROD_METRICS_TOKEN'],
       evidence: ['hosted_api_health', 'hosted_product_terminal', 'hosted_web', 'hosted_postgres_readiness']
+    });
+  });
+
+  it('summarizes hosted smoke evidence blockers for deployment dashboards', () => {
+    const report = buildDeploymentSmokeEvidenceReport({
+      checkedAt: '2026-05-20T08:00:00.000Z',
+      maxAgeMinutes: 30,
+      requiredSmokeTests: ['hosted_api_health', 'hosted_product_terminal', 'hosted_web', 'hosted_postgres_readiness', 'hosted_worker'],
+      evidence: [
+        { name: 'hosted_api_health', status: 'pass', checkedAt: '2026-05-20T07:45:00.000Z', url: 'https://api.example.com/api/health' },
+        { name: 'hosted_product_terminal', status: 'fail', checkedAt: '2026-05-20T07:55:00.000Z', url: 'https://api.example.com/api/products/coffee/terminal' },
+        { name: 'hosted_web', status: 'pass', checkedAt: '2026-05-20T07:00:00.000Z', url: 'https://groceryview.example' },
+        { name: 'hosted_postgres_readiness', status: 'not_run', checkedAt: '2026-05-20T07:50:00.000Z', url: '' }
+      ]
+    });
+
+    assert.deepEqual(summarizeDeploymentSmokeEvidenceReport(report), {
+      status: 'blocked',
+      totalBlockers: 5,
+      missingEvidence: 1,
+      staleEvidence: 1,
+      failedEvidence: 1,
+      notRunEvidence: 1,
+      missingUrls: 1,
+      passedEvidence: 2
     });
   });
 
