@@ -348,6 +348,7 @@ function trimTrailingSlash(url: string): string {
 
 export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput): HostedSmokeCommandPlan {
   const timeout = input.timeoutSeconds ?? 15;
+  if (!Number.isInteger(timeout) || timeout <= 0) throw new Error('timeoutSeconds must be a positive integer.');
   const serverUrl = trimTrailingSlash(input.serverUrl);
   const terminalProductId = input.terminalProductId ?? 'coffee';
   const commands = [
