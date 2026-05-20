@@ -15,6 +15,7 @@ import {
 } from '@groceryview/db';
 import {
   buildSubscriptionAccessPolicy,
+  parseStripeCompatibleSubscriptionEvent,
   processBillingSubscriptionEvent,
   type BillingSubscriptionEntitlementMutation,
   type BillingSubscriptionEvent,
@@ -60,6 +61,7 @@ export type AuthOptions = {
     upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
   };
   billingWebhookSecret?: string;
+  billingPriceIdPlanMap?: Partial<Record<string, SubscriptionPlan>>;
   billingSubscriptionSink?: {
     upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
   };
@@ -296,6 +298,20 @@ function parseBillingSubscriptionEvent(body: JsonRecord): BillingSubscriptionEve
   };
 }
 
+function parseBillingSubscriptionWebhookBody(body: JsonRecord, authOptions: AuthOptions): BillingSubscriptionEvent {
+  rejectSensitiveBillingEventFields(body);
+  if (body.provider !== undefined) return parseBillingSubscriptionEvent(body);
+
+  const receivedAt = (authOptions.now ?? new Date()).toISOString();
+  const event = parseStripeCompatibleSubscriptionEvent({
+    payload: body,
+    receivedAt,
+    priceIdPlanMap: authOptions.billingPriceIdPlanMap
+  });
+  if (!event) throw new Error('Unsupported billing subscription webhook event.');
+  return event;
+}
+
 export function createHttpHandler(api = createGroceryViewApi(), authOptions: AuthOptions = {}): HttpHandler {
   const requireSession = async (request: Request): Promise<SessionPayload | Response> => {
     if (!authOptions.authSecret) return errorResponse(503, 'Auth secret is not configured.');
@@ -521,7 +537,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         const sink = authOptions.billingSubscriptionSink;
         if (!sink) return errorResponse(503, 'Billing subscription sink is not configured.');
 
-        const entitlement = processBillingSubscriptionEvent(parseBillingSubscriptionEvent(parseJsonObject(rawBody)));
+        const entitlement = processBillingSubscriptionEvent(parseBillingSubscriptionWebhookBody(parseJsonObject(rawBody), authOptions));
         await sink.upsertSubscriptionEntitlement(entitlement);
         return jsonResponse(
           { accepted: true, persisted: true, userId: entitlement.userId, status: entitlement.status },

@@ -98,6 +98,13 @@ const watchlistRows = [
   { product: 'Loose tomatoes', target: '29 SEK/kg', current: 'Estimated', trigger: 'Confidence >= 80%', status: 'Held for review' }
 ];
 
+const notificationInboxRows = [
+  { alert: 'Coffee below 50 SEK', channel: 'Push', status: 'Delivered', reason: 'Verified shelf price' },
+  { alert: 'Eggs favorite-store drop', channel: 'Email', status: 'Delivered', reason: 'Retailer page confidence' },
+  { alert: 'Receipt review reminder', channel: 'Push', status: 'Held', reason: 'Quiet hours 21:00-07:00' },
+  { alert: 'Butter target price', channel: 'Push', status: 'Suppressed', reason: 'Provider token invalid' }
+];
+
 const budget = summarizeBudget({
   weeklyBudget: 800,
   monthlyBudget: 3200,
@@ -384,6 +391,7 @@ app.innerHTML = `
           </tbody>
         </table>
         <h2 style="margin-top:24px">Smart swaps</h2>
+        <p class="lede"><a href="/savings/smart-swaps/">Open smart swaps</a> for equivalence, household fit, and confidence guardrails.</p>
         <table class="table">
           <thead><tr><th>Swap</th><th>Saves</th><th>Rule</th></tr></thead>
           <tbody>
@@ -435,6 +443,16 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Notification inbox</h2>
+        <p class="lede"><a href="/notifications/inbox/">Open alert inbox</a> to audit delivered, held, and suppressed household notifications.</p>
+        <table class="table">
+          <thead><tr><th>Alert</th><th>Channel</th><th>Status</th><th>Reason</th></tr></thead>
+          <tbody>
+            ${notificationInboxRows.map((row) => `<tr><td>${row.alert}</td><td>${row.channel}</td><td><span class="status">${row.status}</span></td><td>${row.reason}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Privacy controls</h2>
         <p class="lede">Sensitive receipt, location, and contribution settings stay visible before data is shared with household or catalog workflows.</p>
