@@ -624,6 +624,13 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           return jsonResponse(api.getAdDisclosureReport(user, entitlement));
         }
       }
+      if (path === '/api/notifications/inbox') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(api.getNotificationInboxReport(user));
+      }
       if (path === '/api/receipts/review') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -1222,6 +1229,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/pantry/replenishment': { get: protectedOperation('Get pantry replenishment status with expiry, basket duplicate, and best-deal context.') },
       '/api/loyalty/offers': { get: protectedOperation('Get account-scoped loyalty offers with savings, coupon actions, and membership guardrails.') },
       '/api/ads/disclosure': { get: protectedOperation('Get ad disclosure status with placement labels, premium removal, and ranking separation guardrails.') },
+      '/api/notifications/inbox': { get: protectedOperation('Get notification inbox delivery status, holds, suppressions, and alert guardrails.') },
       '/api/receipts/review': { get: protectedOperation('Get receipt review budget impact, match confidence, and writeback guardrails.') },
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
       '/api/stores': { get: publicOperation('List stores.') },

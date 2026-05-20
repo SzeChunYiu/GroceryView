@@ -273,6 +273,19 @@ class OpenPricesArtifactImportPlanSummary:
 
 
 @dataclass(frozen=True)
+class OpenPricesHostedSmokePlanSummary:
+    status: Literal["ready", "blocked"]
+    required_action_count: int
+    required_env_count: int
+    endpoint_count: int
+    evidence_field_count: int
+    demo: bool = False
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class OpenPricesLaunchReadinessSummary:
     status: Literal["ready", "blocked"]
     ready_plan_count: int

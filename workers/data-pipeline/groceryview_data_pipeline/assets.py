@@ -23,6 +23,7 @@ from .models import (
     OpenPricesArtifactImportPlan,
     OpenPricesArtifactImportPlanSummary,
     OpenPricesHostedSmokePlan,
+    OpenPricesHostedSmokePlanSummary,
     OpenPricesIngestionRunPlan,
     OpenPricesIngestionRunPlanSummary,
     OpenPricesLaunchReadinessDigest,
@@ -492,6 +493,16 @@ def summarize_open_prices_artifact_import_plan(plan: OpenPricesArtifactImportPla
         required_env_count=len(plan.required_env),
         required_package_count=len(plan.required_packages),
         database_target_count=len(plan.database_targets),
+        evidence_field_count=len(plan.evidence_fields),
+    )
+
+
+def summarize_open_prices_hosted_smoke_plan(plan: OpenPricesHostedSmokePlan) -> OpenPricesHostedSmokePlanSummary:
+    return OpenPricesHostedSmokePlanSummary(
+        status=plan.status,
+        required_action_count=len(plan.required_actions),
+        required_env_count=len(plan.required_env),
+        endpoint_count=len(plan.endpoints),
         evidence_field_count=len(plan.evidence_fields),
     )
 
