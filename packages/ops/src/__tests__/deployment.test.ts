@@ -1,6 +1,15 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildDeploymentReadinessReport, buildRollbackPlan, buildTrafficRampPlan } from '../index.js';
+import {
+  buildDeploymentReadinessReport,
+  buildHostedSmokeCommandPlan,
+  buildRollbackPlan,
+  buildSecretRotationReadinessReport,
+  summarizeSecretRotationReadinessReport,
+  summarizeDeploymentReadinessReport,
+  summarizeGateBlockers,
+  summarizeGateWarnings
+} from '../index.js';
 
 describe('deployment ops foundation', () => {
   it('passes readiness only when provider, secrets, DNS, health checks, and smoke tests are ready', () => {
@@ -222,121 +231,62 @@ describe('deployment ops foundation', () => {
     });
   });
 
-  it('builds a staged traffic ramp with per-stage rollback triggers', () => {
-    const readiness = buildDeploymentReadinessReport({
-      providerSelected: true,
-      requiredSecretsPresent: ['DATABASE_URL', 'SESSION_SECRET', 'PUBLIC_APP_URL'],
-      requiredSecrets: ['DATABASE_URL', 'SESSION_SECRET', 'PUBLIC_APP_URL'],
-      dnsConfigured: true,
-      healthChecks: [{ name: 'api', status: 'pass' }],
-      smokeTests: [{ name: 'health-endpoint', status: 'pass' }],
-      observabilityConfigured: true
-    });
-
-    const plan = buildTrafficRampPlan({
-      release: '2026-05-20.1',
-      previousRelease: '2026-05-19.3',
-      readiness,
-      stages: [
-        { trafficPercent: 10, holdMinutes: 15, requiredChecks: ['api-health', 'error-rate'] },
-        { trafficPercent: 50, holdMinutes: 20, requiredChecks: ['checkout-smoke', 'latency-p95'] },
-        { trafficPercent: 100, holdMinutes: 30, requiredChecks: ['synthetic-market-page', 'worker-heartbeat'] }
-      ],
-      reversibleMigration: true
-    });
-
-    assert.deepEqual(plan.status, 'ready');
-    assert.deepEqual(plan.blockers, []);
-    assert.deepEqual(plan.stages[0], {
-      trafficPercent: 10,
-      holdMinutes: 15,
-      actions: ['Shift 10% traffic to release 2026-05-20.1.', 'Hold for 15 minutes.', 'Verify api-health, error-rate.'],
-      rollbackTrigger: 'Rollback to 2026-05-19.3 if api-health, error-rate fails during the 10% ramp.'
-    });
-    assert.deepEqual(plan.stages[2].actions, [
-      'Shift 100% traffic to release 2026-05-20.1.',
-      'Hold for 30 minutes.',
-      'Verify synthetic-market-page, worker-heartbeat.'
-    ]);
-    assert.deepEqual(plan.rollback.targetRelease, '2026-05-19.3');
-    assert.deepEqual(plan.summary, 'Traffic ramp for 2026-05-20.1 is ready across 3 stages.');
-  });
-
-  it('blocks traffic ramp planning when readiness gates are blocked', () => {
-    const readiness = buildDeploymentReadinessReport({
-      providerSelected: true,
-      requiredSecretsPresent: ['DATABASE_URL'],
-      requiredSecrets: ['DATABASE_URL', 'SESSION_SECRET'],
-      dnsConfigured: true,
-      healthChecks: [{ name: 'api', status: 'pass' }],
-      smokeTests: [{ name: 'health-endpoint', status: 'pass' }],
-      observabilityConfigured: true
-    });
-
-    const plan = buildTrafficRampPlan({
-      release: '2026-05-20.1',
-      previousRelease: '2026-05-19.3',
-      readiness,
-      stages: [{ trafficPercent: 100, holdMinutes: 15, requiredChecks: ['api-health'] }],
-      reversibleMigration: true
+  it('builds hosted smoke command plans without embedding secret token values', () => {
+    const plan = buildHostedSmokeCommandPlan({
+      serverUrl: 'https://api.groceryview.example/',
+      webUrl: 'https://groceryview.example',
+      includePostgresReadiness: true,
+      metricsTokenEnvVar: 'PROD_METRICS_TOKEN',
+      timeoutSeconds: 20
     });
 
     assert.deepEqual(plan, {
-      status: 'blocked',
-      release: '2026-05-20.1',
-      blockers: ['missing_secret:SESSION_SECRET'],
-      stages: [],
-      rollback: {
-        currentRelease: '2026-05-20.1',
-        targetRelease: '2026-05-19.3',
-        steps: [
-          'Disable new traffic to release 2026-05-20.1.',
-          'Restore application artifact 2026-05-19.3.',
-          'Run smoke tests before re-enabling traffic.'
-        ],
-        requiresManualDatabaseRecovery: false
-      },
-      summary: 'Traffic ramp is blocked until deployment readiness gates pass.'
+      commands: [
+        'GROCERYVIEW_SERVER_URL=https://api.groceryview.example GROCERYVIEW_WEB_URL=https://groceryview.example GROCERYVIEW_TERMINAL_PRODUCT_ID=coffee HTTP_SMOKE_TIMEOUT_SECONDS=20 infra/scripts/smoke-hosted-http.sh',
+        'GROCERYVIEW_SERVER_URL=https://api.groceryview.example METRICS_TOKEN=$PROD_METRICS_TOKEN READINESS_TIMEOUT_SECONDS=20 infra/scripts/smoke-hosted-readiness.sh'
+      ],
+      requiredSecrets: ['PROD_METRICS_TOKEN'],
+      evidence: ['hosted_api_health', 'hosted_product_terminal', 'hosted_web', 'hosted_postgres_readiness']
     });
   });
 
-  it('rejects unsafe traffic ramp stage definitions', () => {
-    const readiness = buildDeploymentReadinessReport({
-      providerSelected: true,
-      requiredSecretsPresent: ['DATABASE_URL'],
-      requiredSecrets: ['DATABASE_URL'],
-      dnsConfigured: true,
-      healthChecks: [{ name: 'api', status: 'pass' }],
-      smokeTests: [{ name: 'health-endpoint', status: 'pass' }],
-      observabilityConfigured: true
+  it('blocks deployment when required secrets are missing, stale, or lack rotation ownership', () => {
+    const report = buildSecretRotationReadinessReport({
+      checkedAt: '2026-05-20T08:00:00.000Z',
+      maxAgeDays: 90,
+      requiredSecrets: ['DATABASE_URL', 'SESSION_SECRET', 'METRICS_TOKEN', 'BILLING_WEBHOOK_SECRET'],
+      secrets: [
+        {
+          name: 'DATABASE_URL',
+          present: true,
+          rotatedAt: '2026-01-01T00:00:00.000Z',
+          owner: 'platform'
+        },
+        {
+          name: 'SESSION_SECRET',
+          present: true,
+          rotatedAt: '2026-05-01T00:00:00.000Z'
+        },
+        {
+          name: 'METRICS_TOKEN',
+          present: false,
+          rotatedAt: '2026-05-01T00:00:00.000Z',
+          owner: 'platform'
+        }
+      ]
     });
 
-    assert.throws(
-      () =>
-        buildTrafficRampPlan({
-          release: '2026-05-20.1',
-          previousRelease: '2026-05-19.3',
-          readiness,
-          stages: [
-            { trafficPercent: 50, holdMinutes: 15, requiredChecks: ['api-health'] },
-            { trafficPercent: 50, holdMinutes: 15, requiredChecks: ['api-health'] }
-          ],
-          reversibleMigration: true
-        }),
-      /trafficPercent values must strictly increase/
-    );
-
-    assert.throws(
-      () =>
-        buildTrafficRampPlan({
-          release: '2026-05-20.1',
-          previousRelease: '2026-05-19.3',
-          readiness,
-          stages: [{ trafficPercent: 90, holdMinutes: 15, requiredChecks: ['api-health'] }],
-          reversibleMigration: true
-        }),
-      /Final traffic ramp stage must reach 100 percent/
-    );
+    assert.deepEqual(report, {
+      status: 'blocked',
+      blockers: [
+        'secret_rotation_stale:DATABASE_URL',
+        'secret_rotation_owner_missing:SESSION_SECRET',
+        'secret_missing:METRICS_TOKEN',
+        'secret_missing:BILLING_WEBHOOK_SECRET'
+      ],
+      readySecrets: [],
+      summary: 'Secret rotation readiness is blocked until required deployment secrets are present, fresh, and owned.'
+    });
   });
 
   it('summarizes secret rotation readiness for deployment dashboards', () => {
