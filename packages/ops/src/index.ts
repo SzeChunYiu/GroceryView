@@ -366,11 +366,13 @@ export type SecretRotationReadinessReport = {
   status: 'ready' | 'blocked';
   blockers: string[];
   readySecrets: string[];
+  requiredSecretCount: number;
   summary: string;
 };
 
 export type SecretRotationReadinessSummary = {
   status: SecretRotationReadinessReport['status'];
+  requiredSecrets: number;
   totalBlockers: number;
   missingSecrets: number;
   staleSecrets: number;
@@ -408,6 +410,7 @@ export function buildSecretRotationReadinessReport(input: SecretRotationReadines
     status: blockers.length === 0 ? 'ready' : 'blocked',
     blockers,
     readySecrets,
+    requiredSecretCount: input.requiredSecrets.length,
     summary:
       blockers.length === 0
         ? 'Secret rotation readiness passed.'
@@ -420,6 +423,7 @@ export function summarizeSecretRotationReadinessReport(
 ): SecretRotationReadinessSummary {
   return {
     status: report.status,
+    requiredSecrets: report.requiredSecretCount,
     totalBlockers: report.blockers.length,
     missingSecrets: report.blockers.filter((blocker) => blocker.startsWith('secret_missing:')).length,
     staleSecrets: report.blockers.filter((blocker) => blocker.startsWith('secret_rotation_stale:')).length,
