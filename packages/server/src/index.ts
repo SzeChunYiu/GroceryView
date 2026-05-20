@@ -584,6 +584,12 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       }
 
       if (method === 'GET' && path === '/api/market/overview') return jsonResponse(api.getMarketOverview());
+      const categoryMarketMatch = path.match(/^\/api\/categories\/([^/]+)\/market$/);
+      if (method === 'GET' && categoryMarketMatch) {
+        const report = api.getCategoryMarket(decodeURIComponent(categoryMarketMatch[1]));
+        if (!report) return errorResponse(404, 'Category market not found.');
+        return jsonResponse(report);
+      }
       if (method === 'GET' && path === '/api/stores') return jsonResponse(api.getStores());
 
       if (method === 'GET' && path === '/api/account/subscription-access') {
@@ -1143,6 +1149,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/health': { get: publicOperation('Get API runtime health without exposing secrets.') },
       '/api/auth/session': { post: publicOperation('Exchange a verified auth provider assertion for a short-lived bearer session.') },
       '/api/market/overview': { get: publicOperation('Get Stockholm grocery market overview.') },
+      '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
       '/api/billing/subscription-events': { post: billingWebhookOperation('Accept signed billing subscription events and persist entitlement updates.') },
