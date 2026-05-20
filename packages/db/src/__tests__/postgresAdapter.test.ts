@@ -4,6 +4,7 @@ import {
   createPostgresPriceObservationWriter,
   createPostgresPriceReader,
   createPostgresRepository,
+  createPostgresSourceRecordReader,
   createPostgresSourceRecordWriter,
   type QueryExecutor
 } from '../index.js';
@@ -14,6 +15,19 @@ class RecordingQueryExecutor implements QueryExecutor {
   observationId: string | undefined = 'observation-1';
   sourceRunId: string | undefined = 'source-run-1';
   rawRecordId: string | undefined = 'raw-record-1';
+  rawRecordRows: unknown[] = [
+    {
+      id: 'raw-record-1',
+      source_run_id: 'source-run-1',
+      record_type: 'price',
+      external_ref: 'retailer-price-1',
+      observed_at: new Date('2026-05-20T08:00:00.000Z'),
+      payload: '{"product":"coffee","price":49.9}',
+      payload_hash: 'sha256:payload-1',
+      provenance: { fetchUrl: 'https://example.invalid/coffee', parserVersion: 'retailer-v1' },
+      created_at: '2026-05-20T08:00:01.000Z'
+    }
+  ];
   observationHistoryRows: unknown[] = [
     {
       id: 'observation-3',
@@ -102,6 +116,7 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('update source_runs')) return this.sourceRunId === undefined ? ([] as T[]) : ([{ id: this.sourceRunId }] as T[]);
     if (sql.includes('insert into source_runs')) return this.sourceRunId === undefined ? ([] as T[]) : ([{ id: this.sourceRunId }] as T[]);
     if (sql.includes('insert into raw_records')) return this.rawRecordId === undefined ? ([] as T[]) : ([{ id: this.rawRecordId }] as T[]);
+    if (sql.includes('from raw_records')) return this.rawRecordRows as T[];
     if (sql.includes('insert into observations')) return this.observationId === undefined ? ([] as T[]) : ([{ id: this.observationId }] as T[]);
     if (sql.includes('from latest_prices')) return this.latestPriceRows as T[];
     if (sql.includes('from observations')) return this.observationHistoryRows as T[];
@@ -507,6 +522,37 @@ describe('createPostgresSourceRecordWriter', () => {
       }),
       /Raw record upsert did not return an id/
     );
+  });
+});
+
+describe('createPostgresSourceRecordReader', () => {
+  it('reads raw records by source run and payload hash with payload provenance mapping', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresSourceRecordReader(executor);
+
+    assert.deepEqual(await reader.getRawRecordByHash('source-run-1', 'sha256:payload-1'), {
+      rawRecordId: 'raw-record-1',
+      sourceRunId: 'source-run-1',
+      recordType: 'price',
+      externalRef: 'retailer-price-1',
+      observedAt: '2026-05-20T08:00:00.000Z',
+      payload: { product: 'coffee', price: 49.9 },
+      payloadHash: 'sha256:payload-1',
+      provenance: { fetchUrl: 'https://example.invalid/coffee', parserVersion: 'retailer-v1' },
+      createdAt: '2026-05-20T08:00:01.000Z'
+    });
+
+    assert.match(executor.calls[0]!.sql, /from raw_records/);
+    assert.match(executor.calls[0]!.sql, /where source_run_id = \$1 and payload_hash = \$2/);
+    assert.deepEqual(executor.calls[0]!.params, ['source-run-1', 'sha256:payload-1']);
+  });
+
+  it('returns null when no raw record matches the payload hash', async () => {
+    const executor = new RecordingQueryExecutor();
+    executor.rawRecordRows = [];
+    const reader = createPostgresSourceRecordReader(executor);
+
+    assert.equal(await reader.getRawRecordByHash('source-run-1', 'sha256:missing'), null);
   });
 });
 

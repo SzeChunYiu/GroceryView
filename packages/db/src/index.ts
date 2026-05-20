@@ -274,6 +274,11 @@ export type RawRecordRecord = {
   provenance: Record<string, unknown>;
 };
 
+export type RawRecordReadRecord = RawRecordRecord & {
+  rawRecordId: string;
+  createdAt: string;
+};
+
 export type FinishSourceRunRecord = {
   sourceRunId: string;
   finishedAt?: string;
@@ -293,6 +298,10 @@ export type PostgresSourceRecordWriter = {
   createSourceRun(sourceRun: SourceRunRecord): Promise<SourceRunWriteResult>;
   finishSourceRun(sourceRun: FinishSourceRunRecord): Promise<SourceRunWriteResult>;
   upsertRawRecord(rawRecord: RawRecordRecord): Promise<RawRecordWriteResult>;
+};
+
+export type PostgresSourceRecordReader = {
+  getRawRecordByHash(sourceRunId: string, payloadHash: string): Promise<RawRecordReadRecord | null>;
 };
 
 export type HumanReviewerRecord = {
@@ -642,6 +651,17 @@ type PriceObservationHistoryRow = {
   confidence: string | number;
   provenance: Record<string, unknown> | string | null;
 };
+type RawRecordRow = {
+  id: string;
+  source_run_id: string;
+  record_type: RawRecordRecord['recordType'];
+  external_ref: string | null;
+  observed_at: string | Date | null;
+  payload: Record<string, unknown> | string;
+  payload_hash: string;
+  provenance: Record<string, unknown> | string | null;
+  created_at: string | Date;
+};
 
 function asIso(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : value;
@@ -699,6 +719,20 @@ function mapPriceObservationHistory(row: PriceObservationHistoryRow): PriceObser
     ...(optionalIso(row.valid_until) ? { validUntil: optionalIso(row.valid_until) } : {}),
     confidence: Number(row.confidence),
     provenance: asRecord(row.provenance)
+  };
+}
+
+function mapRawRecord(row: RawRecordRow): RawRecordReadRecord {
+  return {
+    rawRecordId: row.id,
+    sourceRunId: row.source_run_id,
+    recordType: row.record_type,
+    ...(row.external_ref ? { externalRef: row.external_ref } : {}),
+    ...(row.observed_at ? { observedAt: asIso(row.observed_at) } : {}),
+    payload: asRecord(row.payload),
+    payloadHash: row.payload_hash,
+    provenance: asRecord(row.provenance),
+    createdAt: asIso(row.created_at)
   };
 }
 
@@ -1307,6 +1341,29 @@ export function createPostgresSourceRecordWriter(executor: QueryExecutor): Postg
       const rawRecordId = rows[0]?.id;
       if (!rawRecordId) throw new Error('Raw record upsert did not return an id');
       return { rawRecordId };
+    }
+  };
+}
+
+export function createPostgresSourceRecordReader(executor: QueryExecutor): PostgresSourceRecordReader {
+  return {
+    async getRawRecordByHash(sourceRunId, payloadHash) {
+      const rows = await executor.query<RawRecordRow>(
+        `select id,
+                source_run_id,
+                record_type,
+                external_ref,
+                observed_at,
+                payload,
+                payload_hash,
+                provenance,
+                created_at
+         from raw_records
+         where source_run_id = $1 and payload_hash = $2`,
+        [sourceRunId, payloadHash]
+      );
+      const row = rows[0];
+      return row ? mapRawRecord(row) : null;
     }
   };
 }
