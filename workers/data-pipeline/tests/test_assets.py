@@ -215,11 +215,12 @@ def test_open_prices_hosted_smoke_plan_blocks_until_hosted_proof_is_configured()
     ]
     assert plan.evidence_artifacts == [
         "/tmp/groceryview-hosted-http-smoke.json",
-        "hosted-readiness-console-output",
+        "/tmp/groceryview-hosted-readiness-smoke.json",
     ]
     assert "smoke-hosted-http.sh" in plan.smoke_command
     assert "smoke-hosted-readiness.sh" in plan.smoke_command
     assert "HOSTED_HTTP_SMOKE_OUTPUT_PATH=/tmp/groceryview-hosted-http-smoke.json" in plan.smoke_command
+    assert "HOSTED_READINESS_SMOKE_OUTPUT_PATH=/tmp/groceryview-hosted-readiness-smoke.json" in plan.smoke_command
     assert plan.to_dict()["demo"] is False
 
     ready = build_open_prices_hosted_smoke_plan(
