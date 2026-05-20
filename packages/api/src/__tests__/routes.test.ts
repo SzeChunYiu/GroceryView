@@ -120,6 +120,24 @@ describe('createGroceryViewApi', () => {
     assert.equal(detail?.dealScore, 73);
   });
 
+  it('serves nutrition-per-krona value rows for customer value comparisons', () => {
+    const api = createGroceryViewApi();
+
+    const report = api.getNutritionValueReport('protein');
+
+    assert.equal(report.metric, 'protein');
+    assert.equal(report.currency, 'SEK');
+    assert.equal(report.rows.length, 3);
+    assert.deepEqual(report.rows.map((row) => row.productId), ['chicken', 'eggs', 'yogurt']);
+    assert.deepEqual(report.leader, {
+      productId: 'chicken',
+      name: 'Chicken thighs',
+      valuePer10Sek: 22.89,
+      saltWarning: true
+    });
+    assert.match(report.guardrails[0], /nutrition labels cannot override allergen locks/i);
+  });
+
   it('serves category market reports with terminal-style mover evidence', () => {
     const api = createGroceryViewApi();
 

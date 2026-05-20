@@ -61,6 +61,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-meal-plans-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setNutritionValueMetric = (metric, message) => {
+    const target = document.querySelector('[data-nutrition-value-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setSavingsLedgerMetric = (metric, message) => {
     const target = document.querySelector('[data-savings-ledger-' + metric + ']');
     if (target) target.textContent = message;
@@ -801,6 +805,30 @@ window.GroceryViewFlowActions = (() => {
       setResult('meal-plans', 'Meal plan API load failed: ' + error.message + '. Static meal plan remains visible.');
     }
   };
+  const loadNutritionValueFromApi = async () => {
+    const config = getApiConfig();
+    if (!config.apiBase) {
+      setResult('nutrition-value', 'Local preview mode: add an API base URL before loading live nutrition value rankings.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/nutrition/value?metric=protein', config, false), {
+        method: 'GET',
+        headers: config.bearerToken ? apiHeaders(config) : { 'content-type': 'application/json' }
+      });
+      const payload = await requireApiSuccess(response);
+      const rows = Array.isArray(payload.rows) ? payload.rows : [];
+      const leader = payload.leader || rows[0] || {};
+      const warningRows = rows.filter((row) => row.saltWarning || Number(row.sugarPerPackage || 0) > 12);
+      const ranking = rows.slice(0, 3).map((row) => row.name + ' ' + Number(row.valuePer10Sek || 0).toFixed(2) + 'g/10 SEK').join(' · ');
+      setNutritionValueMetric('leader', leader.name ? leader.name + ' · ' + Number(leader.valuePer10Sek || 0).toFixed(2) + 'g protein/10 SEK' : 'No nutrition value leader returned');
+      setNutritionValueMetric('ranking', ranking || 'No protein value rows returned');
+      setNutritionValueMetric('warnings', warningRows.length + ' salt/sugar warnings · ' + (Array.isArray(payload.guardrails) ? payload.guardrails.length : 0) + ' guardrails');
+      setResult('nutrition-value', 'Connected nutrition value loaded: ' + rows.length + ' protein-value rows; leader ' + (leader.name || 'n/a') + '.');
+    } catch (error) {
+      setResult('nutrition-value', 'Nutrition value API load failed: ' + error.message + '. Static nutrition review remains visible.');
+    }
+  };
   const loadSavingsLedgerFromApi = async () => {
     const config = getApiConfig();
     if (!hasApiSession(config)) {
@@ -1070,6 +1098,10 @@ window.GroceryViewFlowActions = (() => {
         await loadMealPlansFromApi();
         return;
       }
+      if (flow === 'nutrition-value' && action === 'load-nutrition-value') {
+        await loadNutritionValueFromApi();
+        return;
+      }
       if (flow === 'savings-ledger' && action === 'load-savings-ledger') {
         await loadSavingsLedgerFromApi();
         return;
@@ -1236,6 +1268,9 @@ const budgetSummaryLivePanel = `
 const mealPlansLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="meal-plans" style="margin-top:16px"><div class="eyebrow">Connected meal plan API</div><h2>Pull live meal plan budget</h2><p class="lede">Fetch protected <code>/api/budget/summary</code> and <code>/api/basket/compare</code> plus public <code>/api/market/overview</code> to refresh weekly meal budget buffer, verified ingredient coverage, split-store savings, missing-product blockers, and meal-relevant deal signals from live API data.</p><div class="grid" aria-label="Live meal plan API metrics"><div class="metric"><strong data-meal-plans-budget>Waiting for API pull</strong><span>weekly budget buffer and next basket</span></div><div class="metric"><strong data-meal-plans-basket>Static ingredient coverage preview</strong><span>verified ingredient lines and blockers</span></div><div class="metric"><strong data-meal-plans-deals>Static meal deal preview</strong><span>meal-relevant deal signals</span></div></div><div class="flow-panel" aria-label="Connected meal plan actions"><button type="button" data-flow-action="load-meal-plans">Load live meal plan budget</button></div><p class="flow-result" data-flow-result="meal-plans" aria-live="polite">Local preview mode: connect the API session bridge and save a basket before loading live meal plan budget.</p></section>`;
 
+const nutritionValueLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="nutrition-value" style="margin-top:16px"><div class="eyebrow">Connected nutrition value API</div><h2>Pull live nutrition value</h2><p class="lede">Fetch <code>/api/nutrition/value?metric=protein</code> to compare protein per 10 SEK, sugar exposure, salt warnings, and guardrails before a cheap item is treated as a healthy grocery swap or meal-plan ingredient.</p><div class="grid" aria-label="Live nutrition value API metrics"><div class="metric"><strong data-nutrition-value-leader>Waiting for API pull</strong><span>best protein value per 10 SEK</span></div><div class="metric"><strong data-nutrition-value-ranking>Static nutrition ranking preview</strong><span>top value rows</span></div><div class="metric"><strong data-nutrition-value-warnings>Static warning preview</strong><span>sugar, salt, and allergen guardrails</span></div></div><div class="flow-panel" aria-label="Connected nutrition value actions"><button type="button" data-flow-action="load-nutrition-value">Load live nutrition value</button></div><p class="flow-result" data-flow-result="nutrition-value" aria-live="polite">Local preview mode: add an API base URL before loading live nutrition value rankings.</p></section>`;
+
 const savingsLedgerLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="savings-ledger" style="margin-top:16px"><div class="eyebrow">Connected savings ledger API</div><h2>Pull live savings ledger</h2><p class="lede">Fetch protected <code>/api/budget/summary</code> and <code>/api/basket/compare</code> to reconcile budget remaining, next-basket estimate, split-basket forecast savings, verified assignment lines, and missing-product blockers before savings are treated as realized.</p><div class="grid" aria-label="Live savings ledger API metrics"><div class="metric"><strong data-savings-ledger-confirmed>Waiting for API pull</strong><span>budget actuals</span></div><div class="metric"><strong data-savings-ledger-forecast>Static forecast preview</strong><span>forecast savings and next basket</span></div><div class="metric"><strong data-savings-ledger-blockers>Static blocker preview</strong><span>assignment evidence and blockers</span></div></div><div class="flow-panel" aria-label="Connected savings ledger actions"><button type="button" data-flow-action="load-savings-ledger">Load live savings ledger</button></div><p class="flow-result" data-flow-result="savings-ledger" aria-live="polite">Local preview mode: connect the API session bridge and save a basket before loading live savings ledger.</p></section>`;
 
@@ -1313,7 +1348,7 @@ const pages = [
     path: 'nutrition/allergens/index.html',
     title: 'Nutrition and allergen review — GroceryView',
     description: 'Review GroceryView nutrition labels, allergen conflicts, household diet rules, and safe substitution decisions before items enter baskets.',
-    body: `<section class="card"><div class="eyebrow">Nutrition</div><h1>Nutrition and allergen review</h1><p class="lede">Check grocery items against household allergen locks, dietary goals, and substitution rules before recommendations reach a basket or meal plan.</p><div class="grid"><div class="metric"><strong>3</strong><span>diet rules active</span></div><div class="metric"><strong>1</strong><span>blocked allergen</span></div><div class="metric"><strong>2</strong><span>safe swaps ready</span></div></div></section><section class="card" style="margin-top:16px"><h2>Diet review queue</h2><table class="table"><thead><tr><th>Item</th><th>Signal</th><th>Household rule</th><th>Decision</th><th>Action</th></tr></thead><tbody><tr><td>Peanut granola</td><td>Contains peanuts</td><td>Nut alert</td><td>Blocked</td><td>Suggest oat granola</td></tr><tr><td>ICA Milk 1L</td><td>Lactose</td><td>Lactose ok</td><td>Allowed</td><td>Keep dairy swap</td></tr><tr><td>Private-label cheese</td><td>Vegetarian label</td><td>Vegetarian household meal</td><td>Needs label check</td><td>Hold meal-plan writeback</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Diet guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Allergen lock</td><td>Blocked allergens outrank price savings and Deal Score.</td></tr><tr><td>Label confidence</td><td>Unverified nutrition labels cannot approve household-safe swaps.</td></tr><tr><td>Meal-plan writeback</td><td>Diet conflicts stop meal-plan and basket updates until reviewed.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Nutrition</div><h1>Nutrition and allergen review</h1><p class="lede">Check grocery items against household allergen locks, dietary goals, and substitution rules before recommendations reach a basket or meal plan.</p><div class="grid"><div class="metric"><strong>3</strong><span>diet rules active</span></div><div class="metric"><strong>1</strong><span>blocked allergen</span></div><div class="metric"><strong>2</strong><span>safe swaps ready</span></div></div></section><section class="card" style="margin-top:16px"><h2>Diet review queue</h2><table class="table"><thead><tr><th>Item</th><th>Signal</th><th>Household rule</th><th>Decision</th><th>Action</th></tr></thead><tbody><tr><td>Peanut granola</td><td>Contains peanuts</td><td>Nut alert</td><td>Blocked</td><td>Suggest oat granola</td></tr><tr><td>ICA Milk 1L</td><td>Lactose</td><td>Lactose ok</td><td>Allowed</td><td>Keep dairy swap</td></tr><tr><td>Private-label cheese</td><td>Vegetarian label</td><td>Vegetarian household meal</td><td>Needs label check</td><td>Hold meal-plan writeback</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Diet guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Allergen lock</td><td>Blocked allergens outrank price savings and Deal Score.</td></tr><tr><td>Label confidence</td><td>Unverified nutrition labels cannot approve household-safe swaps.</td></tr><tr><td>Meal-plan writeback</td><td>Diet conflicts stop meal-plan and basket updates until reviewed.</td></tr></tbody></table></section>${nutritionValueLivePanel}`
   },
   {
     path: 'household/index.html',
