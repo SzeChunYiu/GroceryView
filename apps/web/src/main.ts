@@ -367,6 +367,12 @@ const businessSignals = [
   { segment: 'Promotion frequency', metric: 'Dairy promos 3.1x per month', buyer: 'Retail media analyst', guardrail: 'Organic ranking separated from ads' }
 ];
 
+const communityReports = [
+  { product: 'Zoégas Coffee 450g', report: 'Wrong price', evidence: 'Shelf photo', status: 'Needs review', trust: 'trusted reporter' },
+  { product: 'Arla Milk 1L', report: 'Out of stock', evidence: 'Receipt mismatch', status: 'Queued', trust: 'new reporter' },
+  { product: 'Butter 600g', report: 'Promo expired', evidence: 'Retailer page', status: 'Accepted', trust: 'verified history' }
+];
+
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Missing #app root');
 
@@ -884,6 +890,16 @@ app.innerHTML = `
           <div class="metric"><strong>0</strong><span>household exports</span></div>
           <div class="metric"><strong>API</strong><span>delivery method</span></div>
         </div>
+      </div>
+      <div class="card">
+        <h2>Community price reports</h2>
+        <p class="lede">User-submitted price reports flow through a trust-ranked queue. Trusted reporters accelerate verification; new reporters require manual review before any price update.</p>
+        <table class="table">
+          <thead><tr><th>Product</th><th>Report type</th><th>Evidence</th><th>Status</th><th>Trust</th></tr></thead>
+          <tbody>
+            ${communityReports.map((r) => `<tr><td>${r.product}</td><td>${r.report}</td><td>${r.evidence}</td><td><span class="status">${r.status}</span></td><td>${r.trust}</td></tr>`).join('')}
+          </tbody>
+        </table>
       </div>
     </section>
   </main>

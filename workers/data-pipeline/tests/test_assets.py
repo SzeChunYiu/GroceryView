@@ -15,6 +15,7 @@ from groceryview_data_pipeline.assets import (
     build_retailer_fetch_stubs,
     build_seed_products,
     build_seed_stores,
+    summarize_open_prices_artifact_import_plan,
     summarize_data_pipeline_quality_gate,
     summarize_open_prices_ingestion_run_plan,
 )
@@ -241,6 +242,26 @@ def test_open_prices_ingestion_run_plan_summary_counts_operator_requirements() -
         schedule_enabled=True,
     )
     assert summarize_open_prices_ingestion_run_plan(ready).required_action_count == 0
+
+
+def test_open_prices_artifact_import_plan_summary_counts_database_import_requirements() -> None:
+    blocked = build_open_prices_artifact_import_plan(input_artifact_present=True)
+    assert summarize_open_prices_artifact_import_plan(blocked).to_dict() == {
+        "status": "blocked",
+        "required_action_count": 2,
+        "required_env_count": 2,
+        "required_package_count": 2,
+        "database_target_count": 6,
+        "evidence_field_count": 7,
+        "demo": False,
+    }
+
+    ready = build_open_prices_artifact_import_plan(
+        database_url_present=True,
+        input_artifact_present=True,
+        db_package_built=True,
+    )
+    assert summarize_open_prices_artifact_import_plan(ready).required_action_count == 0
 
 
 def test_open_prices_launch_readiness_rolls_up_all_open_prices_plans() -> None:

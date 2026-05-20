@@ -346,15 +346,36 @@ function trimTrailingSlash(url: string): string {
   return url.replace(/\/+$/, '');
 }
 
+function normalizeHostedSmokeUrl(url: string, field: string): string {
+  const normalizedUrl = trimTrailingSlash(url.trim());
+  if (normalizedUrl.length === 0) {
+    throw new Error(`${field} is required for hosted smoke command plans.`);
+  }
+
+  let parsedUrl: URL;
+  try {
+    parsedUrl = new URL(normalizedUrl);
+  } catch (error) {
+    throw new Error(`${field} must be a valid absolute URL.`);
+  }
+
+  if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
+    throw new Error(`${field} must use http or https.`);
+  }
+
+  return normalizedUrl;
+}
+
 export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput): HostedSmokeCommandPlan {
   const timeout = input.timeoutSeconds ?? 15;
   if (!Number.isInteger(timeout) || timeout <= 0) throw new Error('timeoutSeconds must be a positive integer.');
-  const serverUrl = trimTrailingSlash(input.serverUrl);
+  const serverUrl = normalizeHostedSmokeUrl(input.serverUrl, 'serverUrl');
+  const webUrl = input.webUrl ? normalizeHostedSmokeUrl(input.webUrl, 'webUrl') : undefined;
   const terminalProductId = input.terminalProductId ?? 'coffee';
   const commands = [
     [
       `GROCERYVIEW_SERVER_URL=${serverUrl}`,
-      input.webUrl ? `GROCERYVIEW_WEB_URL=${trimTrailingSlash(input.webUrl)}` : undefined,
+      webUrl ? `GROCERYVIEW_WEB_URL=${webUrl}` : undefined,
       `GROCERYVIEW_TERMINAL_PRODUCT_ID=${terminalProductId}`,
       `HTTP_SMOKE_TIMEOUT_SECONDS=${timeout}`,
       'infra/scripts/smoke-hosted-http.sh'
@@ -365,7 +386,7 @@ export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput):
   const evidence = ['hosted_api_health', 'hosted_product_terminal'];
   const requiredSecrets: string[] = [];
 
-  if (input.webUrl) evidence.push('hosted_web');
+  if (webUrl) evidence.push('hosted_web');
 
   if (input.includePostgresReadiness) {
     const metricsTokenEnvVar = input.metricsTokenEnvVar ?? 'METRICS_TOKEN';

@@ -364,6 +364,15 @@ describe('buildStaticPages', () => {
       assert.match(adDisclosure, /Sponsored banner/);
       assert.match(adDisclosure, /Sponsored placements cannot change Deal Score/);
       assert.match(adDisclosure, /Advertiser payloads stay aggregated and never include raw receipts/);
+      assert.match(adDisclosure, /Connected ad disclosure API/);
+      assert.match(adDisclosure, /Load live ad disclosure/);
+      assert.match(adDisclosure, /data-groceryview-flow="ad-disclosure"/);
+      assert.match(adDisclosure, /data-flow-action="load-ad-disclosure"/);
+      assert.match(adDisclosure, /data-ad-disclosure-slots/);
+      assert.match(adDisclosure, /data-ad-disclosure-blocked/);
+      assert.match(adDisclosure, /data-ad-disclosure-premium/);
+      assert.match(adDisclosure, /fetch\(apiUrl\('\/api\/ads\/disclosure'/);
+      assert.match(adDisclosure, /Connected ad disclosure loaded/);
 
       const billingStatus = await readFile(join(root, 'billing/status/index.html'), 'utf8');
       assert.match(billingStatus, /Billing status/);

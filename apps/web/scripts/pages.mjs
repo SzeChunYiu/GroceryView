@@ -77,6 +77,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-loyalty-offers-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setAdDisclosureMetric = (metric, message) => {
+    const target = document.querySelector('[data-ad-disclosure-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setReceiptReviewMetric = (metric, message) => {
     const target = document.querySelector('[data-receipt-review-' + metric + ']');
     if (target) target.textContent = message;
@@ -920,6 +924,32 @@ window.GroceryViewFlowActions = (() => {
       setResult('loyalty-offers', 'Loyalty offers API load failed: ' + error.message + '. Static loyalty offer queue remains visible.');
     }
   };
+  const loadAdDisclosureFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('ad-disclosure', 'Local preview mode: connect the API session bridge before loading live ad disclosure.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/ads/disclosure', config), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const slots = Array.isArray(payload.placementPlan?.slots) ? payload.placementPlan.slots : [];
+      const blocked = Array.isArray(payload.compliance?.blocked) ? payload.compliance.blocked : [];
+      const excluded = Array.isArray(payload.excludedSurfaces) ? payload.excludedSurfaces : [];
+      const slotLabels = slots.map((slot) => slot.surface + ' ' + slot.label).join(' · ');
+      const firstBlocked = blocked[0];
+      const firstReason = Array.isArray(firstBlocked?.reasons) ? firstBlocked.reasons[0] : null;
+      setAdDisclosureMetric('slots', slots.length + ' labeled slots · ' + (slotLabels || 'ads removed or no providers configured'));
+      setAdDisclosureMetric('blocked', Number(payload.blockedCount || blocked.length) + ' blocked attempts · ' + (firstReason || 'no policy violations'));
+      setAdDisclosureMetric('premium', (payload.premiumAdsRemoved ? 'Premium ads removed' : 'Free tier ads eligible') + ' · tier ' + (payload.userTier || 'unknown') + ' · excluded ' + excluded.length);
+      setResult('ad-disclosure', 'Connected ad disclosure loaded: ' + slots.length + ' labeled slots, ' + Number(payload.blockedCount || blocked.length) + ' blocked unsafe placements, Deal Score influence ' + (payload.affectsDealScore ? 'detected' : 'zero') + '.');
+    } catch (error) {
+      setResult('ad-disclosure', 'Ad disclosure API load failed: ' + error.message + '. Static ad disclosure remains visible.');
+    }
+  };
   const loadReceiptReviewFromApi = async () => {
     const config = getApiConfig();
     if (!hasApiSession(config)) {
@@ -1234,6 +1264,10 @@ window.GroceryViewFlowActions = (() => {
         await loadLoyaltyOffersFromApi();
         return;
       }
+      if (flow === 'ad-disclosure' && action === 'load-ad-disclosure') {
+        await loadAdDisclosureFromApi();
+        return;
+      }
       if (flow === 'receipt-review' && action === 'load-receipt-review') {
         await loadReceiptReviewFromApi();
         return;
@@ -1416,6 +1450,9 @@ const pantryLivePanel = `
 const loyaltyOffersLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="loyalty-offers" style="margin-top:16px"><div class="eyebrow">Connected loyalty API</div><h2>Pull live loyalty offers</h2><p class="lede">Fetch <code>/api/loyalty/offers</code> through the protected API session bridge to refresh eligible member savings, coupon action counts, membership confirmations, and shelf-price separation guardrails before loyalty offers affect household savings.</p><div class="grid" aria-label="Live loyalty offer API metrics"><div class="metric"><strong data-loyalty-offers-savings>Waiting for API pull</strong><span>eligible savings and ready offers</span></div><div class="metric"><strong data-loyalty-offers-actions>Static action preview</strong><span>coupon and top-offer actions</span></div><div class="metric"><strong data-loyalty-offers-guardrails>Static guardrail preview</strong><span>membership and shelf-price guardrails</span></div></div><div class="flow-panel" aria-label="Connected loyalty offer actions"><button type="button" data-flow-action="load-loyalty-offers">Load live loyalty offers</button></div><p class="flow-result" data-flow-result="loyalty-offers" aria-live="polite">Local preview mode: connect the API session bridge before loading live loyalty offers.</p></section>`;
 
+const adDisclosureLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="ad-disclosure" style="margin-top:16px"><div class="eyebrow">Connected ad disclosure API</div><h2>Pull live ad disclosure</h2><p class="lede">Fetch <code>/api/ads/disclosure</code> through the protected API session bridge to refresh labeled ad slots, blocked unsafe placements, premium ad-removal state, and Deal Score separation evidence before sponsored content appears beside grocery recommendations.</p><div class="grid" aria-label="Live ad disclosure API metrics"><div class="metric"><strong data-ad-disclosure-slots>Waiting for API pull</strong><span>labeled ad slots</span></div><div class="metric"><strong data-ad-disclosure-blocked>Static policy-block preview</strong><span>blocked unsafe placements</span></div><div class="metric"><strong data-ad-disclosure-premium>Static premium-state preview</strong><span>premium removal and excluded surfaces</span></div></div><div class="flow-panel" aria-label="Connected ad disclosure actions"><button type="button" data-flow-action="load-ad-disclosure">Load live ad disclosure</button></div><p class="flow-result" data-flow-result="ad-disclosure" aria-live="polite">Local preview mode: connect the API session bridge before loading live ad disclosure.</p></section>`;
+
 const receiptReviewLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="receipt-review" style="margin-top:16px"><div class="eyebrow">Connected receipt review API</div><h2>Pull live receipt review</h2><p class="lede">Fetch <code>/api/receipts/review</code> through the protected API session bridge to refresh actual receipt spend, local median delta, confidence routing, and writeback guardrails before receipt rows update household actuals or price history.</p><div class="grid" aria-label="Live receipt review API metrics"><div class="metric"><strong data-receipt-review-budget>Waiting for API pull</strong><span>actual spend and budget buffer</span></div><div class="metric"><strong data-receipt-review-lines>Static line-review preview</strong><span>matched lines and review queue</span></div><div class="metric"><strong data-receipt-review-guardrails>Static writeback preview</strong><span>good buys, overspend, and guardrails</span></div></div><div class="flow-panel" aria-label="Connected receipt review actions"><button type="button" data-flow-action="load-receipt-review">Load live receipt review</button></div><p class="flow-result" data-flow-result="receipt-review" aria-live="polite">Local preview mode: connect the API session bridge before loading live receipt review.</p></section>`;
 
@@ -1454,7 +1491,7 @@ const pages = [
     path: 'ads/disclosure/index.html',
     title: 'Ad disclosure center — GroceryView',
     description: 'Review GroceryView sponsored placement labels, ad eligibility, premium ad removal, and ranking separation guardrails.',
-    body: `<section class="card"><div class="eyebrow">Ads</div><h1>Ad disclosure center</h1><p class="lede">Audit sponsored placements, premium ad removal, and ranking separation so ads never look like organic grocery deal recommendations.</p><div class="grid"><div class="metric"><strong>3</strong><span>labeled placements</span></div><div class="metric"><strong>0</strong><span>ranking influence</span></div><div class="metric"><strong>Premium</strong><span>non-critical ads removed</span></div></div></section><section class="card" style="margin-top:16px"><h2>Disclosure states</h2><table class="table"><thead><tr><th>Surface</th><th>Placement</th><th>Label</th><th>Premium state</th><th>Rule</th></tr></thead><tbody><tr><td>Daily deals</td><td>Sponsored banner</td><td>Sponsored</td><td>Hidden for premium</td><td>Never affects Deal Score</td></tr><tr><td>Product page</td><td>Brand offer card</td><td>Ad</td><td>Hidden for premium</td><td>Separated from price rows</td></tr><tr><td>Store map</td><td>Promoted pickup note</td><td>Sponsored</td><td>Visible only when useful</td><td>No route ranking boost</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Ad guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Ranking separation</td><td>Sponsored placements cannot change Deal Score, basket totals, or store ordering.</td></tr><tr><td>Premium removal</td><td>Premium entitlements hide non-critical ad slots while preserving disclosure history.</td></tr><tr><td>Privacy boundary</td><td>Advertiser payloads stay aggregated and never include raw receipts.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Ads</div><h1>Ad disclosure center</h1><p class="lede">Audit sponsored placements, premium ad removal, and ranking separation so ads never look like organic grocery deal recommendations.</p><div class="grid"><div class="metric"><strong>3</strong><span>labeled placements</span></div><div class="metric"><strong>0</strong><span>ranking influence</span></div><div class="metric"><strong>Premium</strong><span>non-critical ads removed</span></div></div></section><section class="card" style="margin-top:16px"><h2>Disclosure states</h2><table class="table"><thead><tr><th>Surface</th><th>Placement</th><th>Label</th><th>Premium state</th><th>Rule</th></tr></thead><tbody><tr><td>Daily deals</td><td>Sponsored banner</td><td>Sponsored</td><td>Hidden for premium</td><td>Never affects Deal Score</td></tr><tr><td>Product page</td><td>Brand offer card</td><td>Ad</td><td>Hidden for premium</td><td>Separated from price rows</td></tr><tr><td>Store map</td><td>Promoted pickup note</td><td>Sponsored</td><td>Visible only when useful</td><td>No route ranking boost</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Ad guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Ranking separation</td><td>Sponsored placements cannot change Deal Score, basket totals, or store ordering.</td></tr><tr><td>Premium removal</td><td>Premium entitlements hide non-critical ad slots while preserving disclosure history.</td></tr><tr><td>Privacy boundary</td><td>Advertiser payloads stay aggregated and never include raw receipts.</td></tr></tbody></table></section>${adDisclosureLivePanel}`
   },
   {
     path: 'billing/status/index.html',
