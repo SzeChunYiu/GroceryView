@@ -15,8 +15,10 @@ function signBillingWebhookBody(body: string, secret: string): string {
 describe('createHttpHandler', () => {
   it('serves runtime health without leaking configured secret values', async () => {
     const previousDatabaseUrl = process.env.DATABASE_URL;
+    const previousPublicWebUrl = process.env.PUBLIC_WEB_URL;
     const previousNodeEnv = process.env.NODE_ENV;
     process.env.DATABASE_URL = 'postgres://user:secret@localhost:5432/groceryview';
+    process.env.PUBLIC_WEB_URL = 'https://groceryview.example';
     process.env.NODE_ENV = 'test';
 
     try {
@@ -29,21 +31,29 @@ describe('createHttpHandler', () => {
 
       const response = await handle(new Request('http://localhost/api/health'));
       assert.equal(response.status, 200);
-      assert.deepEqual(await json(response), {
+      const body = await json(response);
+      assert.deepEqual(body, {
         status: 'ok',
         service: 'groceryview-server',
         environment: 'test',
         hasDatabase: true,
+        hasPublicWebUrl: true,
         hasAuthSecret: true,
         hasNotificationWebhookSecret: true,
         hasBillingWebhookSecret: true,
         hasMetricsToken: true
       });
+      assert.equal(JSON.stringify(body).includes('groceryview.example'), false);
     } finally {
       if (previousDatabaseUrl === undefined) {
         delete process.env.DATABASE_URL;
       } else {
         process.env.DATABASE_URL = previousDatabaseUrl;
+      }
+      if (previousPublicWebUrl === undefined) {
+        delete process.env.PUBLIC_WEB_URL;
+      } else {
+        process.env.PUBLIC_WEB_URL = previousPublicWebUrl;
       }
       if (previousNodeEnv === undefined) {
         delete process.env.NODE_ENV;
