@@ -32,51 +32,15 @@ export type ScanProviders = {
   };
 };
 
-export type ScanUploadTicketRequest = {
-  scanId: string;
-  kind: ScanUpload['kind'];
-  contentType: string;
-  byteLength: number;
-  requestedAt: string;
+export type ScanBatchPlanItem = ScanUpload & {
+  fingerprint: string;
+  status: 'accepted' | 'rejected';
+  reason?: 'duplicate_payload' | 'invalid_uploaded_at' | 'empty_payload';
 };
 
-export type ScanUploadTicket = {
-  scanId: string;
-  uploadUrl: string;
-  payloadUri: string;
-  expiresAt: string;
-  maxBytes: number;
-  headers: Record<string, string>;
-};
-
-export type ScanUploadStorage = {
-  createUploadTicket(request: ScanUploadTicketRequest): Promise<ScanUploadTicket>;
-};
-
-export type ScanUploadTicketResult =
-  | { status: 'ready'; ticket: ScanUploadTicket }
-  | { status: 'failed_no_storage'; kind: ScanUpload['kind']; reason: string };
-
-export type ScanProviderKind = keyof ScanProviders;
-export type ScanProviderHealthStatus = 'pass' | 'fail' | 'not_run';
-
-export type ScanProviderReadinessInput = {
-  requiredProviders: ScanProviderKind[];
-  providers: Array<{
-    kind: ScanProviderKind;
-    providerName: string;
-    configured: boolean;
-    credentialsPresent: boolean;
-    healthStatus: ScanProviderHealthStatus;
-  }>;
-};
-
-export type ScanProviderReadinessReport = {
-  status: 'ready' | 'blocked';
-  blockers: string[];
-  evidence: string[];
-  warnings: string[];
-  summary: string;
+export type ScanBatchPlan = {
+  accepted: ScanBatchPlanItem[];
+  rejected: ScanBatchPlanItem[];
 };
 
 export type ScanPipelineResult =
@@ -100,43 +64,6 @@ export type ScanPipelineResult =
       kind: ScanUpload['kind'];
       reason: string;
     };
-
-export function buildScanProviderReadinessReport(input: ScanProviderReadinessInput): ScanProviderReadinessReport {
-  const blockers: string[] = [];
-  const evidence: string[] = [];
-  const providersByKind = new Map(input.providers.map((provider) => [provider.kind, provider]));
-
-  for (const kind of input.requiredProviders) {
-    const provider = providersByKind.get(kind);
-    if (!provider?.configured) {
-      blockers.push(`scan_provider_not_configured:${kind}`);
-    } else {
-      evidence.push(`scan_provider_configured:${kind}:${provider.providerName}`);
-    }
-
-    if (!provider?.credentialsPresent) {
-      blockers.push(`scan_provider_credentials_missing:${kind}`);
-    } else {
-      evidence.push(`scan_provider_credentials_present:${kind}`);
-    }
-
-    if (provider?.healthStatus === 'pass') {
-      evidence.push(`scan_provider_health_pass:${kind}`);
-    } else if (provider?.healthStatus === 'fail') {
-      blockers.push(`scan_provider_health_failed:${kind}`);
-    } else {
-      blockers.push(`scan_provider_health_not_run:${kind}`);
-    }
-  }
-
-  return {
-    status: blockers.length === 0 ? 'ready' : 'blocked',
-    blockers,
-    evidence,
-    warnings: [],
-    summary: blockers.length === 0 ? 'Scan providers are ready.' : 'Scan provider readiness is blocked.'
-  };
-}
 
 export type ScanReviewPriority = 'high' | 'medium' | 'low';
 
@@ -251,6 +178,37 @@ export function planScanReviewWorkItems(scans: ScanReviewWorkItemInput[]): ScanR
   }
 
   return items.sort((left, right) => scanReviewPriorityRank[left.priority] - scanReviewPriorityRank[right.priority] || left.id.localeCompare(right.id));
+function scanFingerprint(upload: ScanUpload): string {
+  return `${upload.kind}:${upload.payload.trim().toLowerCase()}`;
+}
+
+export function planScanUploadBatch(input: { uploads: ScanUpload[]; knownFingerprints?: string[] }): ScanBatchPlan {
+  const seen = new Set(input.knownFingerprints ?? []);
+  const accepted: ScanBatchPlanItem[] = [];
+  const rejected: ScanBatchPlanItem[] = [];
+
+  for (const upload of input.uploads) {
+    const fingerprint = scanFingerprint(upload);
+    if (!upload.payload.trim()) {
+      rejected.push({ ...upload, fingerprint, status: 'rejected', reason: 'empty_payload' });
+      continue;
+    }
+
+    if (Number.isNaN(Date.parse(upload.uploadedAt))) {
+      rejected.push({ ...upload, fingerprint, status: 'rejected', reason: 'invalid_uploaded_at' });
+      continue;
+    }
+
+    if (seen.has(fingerprint)) {
+      rejected.push({ ...upload, fingerprint, status: 'rejected', reason: 'duplicate_payload' });
+      continue;
+    }
+
+    seen.add(fingerprint);
+    accepted.push({ ...upload, fingerprint, status: 'accepted' });
+  }
+
+  return { accepted, rejected };
 }
 
 export async function processScanUpload(input: { upload: ScanUpload; providers: ScanProviders }): Promise<ScanPipelineResult> {
