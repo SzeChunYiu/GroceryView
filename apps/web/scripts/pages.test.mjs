@@ -38,13 +38,14 @@ describe('buildStaticPages', () => {
       const product = await readFile(join(root, 'products/coffee/index.html'), 'utf8');
       assert.match(product, /ZOEGAS-COFFEE-450G/);
       assert.match(product, /Deal Score/);
-      assert.match(product, /Current store prices/);
-      assert.match(product, /110\.89 SEK\/kg/);
-      assert.match(product, /shelf · high confidence/);
-      assert.match(product, /member promo · medium confidence/);
-      assert.match(product, /promo estimate · low confidence/);
-      assert.match(product, /observed 2026-05-19 09:00/);
-      assert.match(product, /unverified, not official shelf price/);
+      assert.match(product, /Current best verified shelf price: 54\.90 SEK/);
+      assert.match(product, /ICA Kvantum Liljeholmen - 54\.90 SEK/);
+      assert.match(product, /Official shelf price/);
+      assert.match(product, /Promo campaign/);
+      assert.match(product, /Member-only/);
+      assert.match(product, /Unverified \/ estimated/);
+      assert.match(product, /Estimated fallback\. Never styled as an official shelf price/);
+      assert.match(product, /2026-05-16 08:45 UTC/);
 
       const market = await readFile(join(root, 'market/index.html'), 'utf8');
       assert.match(market, /Stockholm Grocery Market/);

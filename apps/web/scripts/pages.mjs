@@ -368,6 +368,82 @@ const layout = ({ title, description, body }) => `<!doctype html>
   </body>
 </html>`;
 
+const productPriceRows = [
+  {
+    store: 'Willys Odenplan',
+    price: '49.90 SEK',
+    unitPrice: '110.89 SEK/kg',
+    priceType: 'Promo',
+    confidence: 'High confidence',
+    sourceTime: '2026-05-16 09:30 UTC',
+    sourceType: 'retailer_page',
+    label: 'Promo campaign',
+    note: 'Temporary promotion. Not presented as an official shelf price.',
+    tone: 'promo'
+  },
+  {
+    store: 'ICA Kvantum Liljeholmen',
+    price: '54.90 SEK',
+    unitPrice: '122.00 SEK/kg',
+    priceType: 'Shelf',
+    confidence: 'High confidence',
+    sourceTime: '2026-05-16 08:45 UTC',
+    sourceType: 'retailer_page',
+    label: 'Official shelf price',
+    note: 'Verified retailer source with current shelf treatment.',
+    tone: 'verified'
+  },
+  {
+    store: 'Coop Farsta',
+    price: '57.90 SEK',
+    unitPrice: '128.67 SEK/kg',
+    priceType: 'Estimated',
+    confidence: 'Low confidence',
+    sourceTime: '2026-05-15 17:20 UTC',
+    sourceType: 'estimated',
+    label: 'Unverified / estimated',
+    note: 'Estimated fallback. Never styled as an official shelf price.',
+    tone: 'estimated'
+  },
+  {
+    store: 'Hemkop T-Centralen',
+    price: '46.90 SEK',
+    unitPrice: '104.11 SEK/kg',
+    priceType: 'Member',
+    confidence: 'Medium confidence',
+    sourceTime: '2026-05-14 12:18 UTC',
+    sourceType: 'manual_admin',
+    label: 'Member-only',
+    note: 'Requires loyalty context and cannot be treated as a public shelf price.',
+    tone: 'member'
+  }
+];
+
+const productPriceTable = `
+  <div class="price-terminal">
+    <div class="price-summary">
+      <div>
+        <div class="eyebrow">Current best comparable price</div>
+        <h2>ICA Kvantum Liljeholmen - 54.90 SEK</h2>
+        <p class="lede">Best verified shelf source. Promo, member-only, estimated, and low-confidence observations are separated before comparison.</p>
+      </div>
+      <span class="status verified">Official shelf price</span>
+    </div>
+    <table class="table price-table">
+      <thead><tr><th>Store</th><th>Price</th><th>Unit</th><th>Type</th><th>Confidence</th><th>Source timestamp</th></tr></thead>
+      <tbody>
+        ${productPriceRows.map((row) => `<tr class="${row.tone}">
+          <td><strong>${row.store}</strong><br><span class="footer-note">${row.note}</span></td>
+          <td>${row.price}</td>
+          <td>${row.unitPrice}</td>
+          <td><span class="status ${row.tone}">${row.priceType}</span><br><span class="footer-note">${row.label}</span></td>
+          <td>${row.confidence}</td>
+          <td>${row.sourceTime}<br><span class="footer-note">${row.sourceType}</span></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
 const pages = [
   {
     path: 'login/index.html',
@@ -475,7 +551,7 @@ const pages = [
     path: 'products/coffee/index.html',
     title: 'ZOEGAS-COFFEE-450G price history — GroceryView',
     description: 'Zoégas Coffee 450g price ticker with current prices, price history, and Deal Score.',
-    body: `<section class="card"><div class="eyebrow">Product ticker</div><h1>ZOEGAS-COFFEE-450G</h1><p class="lede">Current best verified shelf price: 49.90 SEK at Willys Odenplan.</p><div class="grid"><div class="metric"><strong>82</strong><span>Deal Score</span></div><div class="metric"><strong>8th</strong><span>Stockholm percentile</span></div><div class="metric"><strong>6th</strong><span>Historical percentile</span></div></div><h2>Current store prices</h2><div class="grid"><div class="metric"><strong>49.90 SEK</strong><span>Willys Odenplan · 110.89 SEK/kg · shelf · high confidence · observed 2026-05-19 09:00 · public shelf</span></div><div class="metric"><strong>54.90 SEK</strong><span>ICA Vanadis · 122.00 SEK/kg · member promo · medium confidence · observed 2026-05-19 08:45 · member label</span></div><div class="metric"><strong>47.90 SEK</strong><span>Coop Odenplan · 106.44 SEK/kg · promo estimate · low confidence · observed 2026-05-18 18:20 · unverified, not official shelf price</span></div></div><p class="lede">Unverified and promo-only prices are marked separately; GroceryView does not present them as official shelf prices.</p></section>`
+    body: `<section class="card"><div class="eyebrow">Product ticker</div><h1>ZOEGAS-COFFEE-450G</h1><p class="lede">Current best verified shelf price: 54.90 SEK at ICA Kvantum Liljeholmen. Lower promo or member-only observations stay visible but are never implied to be official shelf prices.</p><div class="grid"><div class="metric"><strong>82</strong><span>Deal Score</span></div><div class="metric"><strong>8th</strong><span>Stockholm percentile</span></div><div class="metric"><strong>6th</strong><span>Historical percentile</span></div></div></section>${productPriceTable}`
   },
   {
     path: 'stores/willys-odenplan/index.html',
