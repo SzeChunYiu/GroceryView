@@ -8,11 +8,24 @@ POSTGIS_IMAGE="${POSTGIS_IMAGE:-postgis/postgis:18-3.6}"
 POSTGRES_DB="${POSTGRES_DB:-groceryview}"
 POSTGRES_USER="${POSTGRES_USER:-groceryview}"
 POSTGRES_PASSWORD="${POSTGRES_PASSWORD:-groceryview}"
+POSTGRES_READY_TIMEOUT_SECONDS="${POSTGRES_READY_TIMEOUT_SECONDS:-60}"
 CONTAINER_NAME="groceryview-migration-verify-$RANDOM-$$"
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "docker is required to verify database migrations" >&2
   exit 127
+fi
+
+case "$POSTGRES_READY_TIMEOUT_SECONDS" in
+  ''|*[!0-9]*)
+    echo "POSTGRES_READY_TIMEOUT_SECONDS must be a positive integer" >&2
+    exit 1
+    ;;
+esac
+
+if [ "$POSTGRES_READY_TIMEOUT_SECONDS" -lt 1 ]; then
+  echo "POSTGRES_READY_TIMEOUT_SECONDS must be a positive integer" >&2
+  exit 1
 fi
 
 if [ ! -d "$MIGRATIONS_DIR" ]; then
@@ -66,7 +79,7 @@ docker run -d \
   -e "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" \
   "$POSTGIS_IMAGE" >/dev/null
 
-for _ in $(seq 1 60); do
+for _ in $(seq 1 "$POSTGRES_READY_TIMEOUT_SECONDS"); do
   if docker exec "$CONTAINER_NAME" pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" >/dev/null 2>&1; then
     break
   fi
