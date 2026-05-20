@@ -50,6 +50,10 @@ describe('buildStaticPages', () => {
       assert.match(account, /Alert preferences/);
       assert.match(account, /Coffee below 50 SEK/);
       assert.match(account, /Daily digest/);
+      assert.match(account, /Subscription access/);
+      assert.match(account, /Premium access is active/);
+      assert.match(account, /\/api\/account\/subscription-access/);
+      assert.match(account, /Manage subscription/);
 
       const household = await readFile(join(root, 'household/index.html'), 'utf8');
       assert.match(household, /Shared household basket/);

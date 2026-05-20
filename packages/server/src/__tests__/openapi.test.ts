@@ -8,6 +8,7 @@ describe('buildOpenApiDocument', () => {
     const paths = Object.keys(doc.paths).sort();
 
     assert.deepEqual(paths, [
+      '/api/account/subscription-access',
       '/api/basket/compare',
       '/api/basket/current',
       '/api/basket/items',
@@ -34,6 +35,7 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.components.securitySchemes.bearerAuth, { type: 'http', scheme: 'bearer' });
     assert.deepEqual(doc.components.securitySchemes.metricsToken, { type: 'apiKey', in: 'header', name: 'x-groceryview-metrics-token' });
     assert.deepEqual(doc.components.securitySchemes.webhookSignature, { type: 'apiKey', in: 'header', name: 'x-groceryview-signature' });
+    assert.deepEqual(doc.paths['/api/account/subscription-access'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/watchlist'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/human-review/assignments'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/human-review/assignments/{id}/decisions'].post?.security, [{ bearerAuth: [] }]);

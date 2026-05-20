@@ -10,16 +10,27 @@ describe('authenticated HTTP routes', () => {
     const unauthenticated = await handle(new Request('http://localhost/api/watchlist?userId=user-1'));
     assert.equal(unauthenticated.status, 401);
 
+    const unauthenticatedAccountAccess = await handle(new Request('http://localhost/api/account/subscription-access?userId=user-1'));
+    assert.equal(unauthenticatedAccountAccess.status, 401);
+
     const wrongUserToken = await createSessionToken({ userId: 'user-2', expiresAt: '2099-01-01T00:00:00.000Z' }, 'secret');
     const forbidden = await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
       headers: { authorization: `Bearer ${wrongUserToken}` }
     }));
     assert.equal(forbidden.status, 403);
+    const forbiddenAccountAccess = await handle(new Request('http://localhost/api/account/subscription-access?userId=user-1', {
+      headers: { authorization: `Bearer ${wrongUserToken}` }
+    }));
+    assert.equal(forbiddenAccountAccess.status, 403);
 
     const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'secret');
     const authorized = await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
       headers: { authorization: `Bearer ${token}` }
     }));
     assert.equal(authorized.status, 200);
+    const authorizedAccountAccess = await handle(new Request('http://localhost/api/account/subscription-access?userId=user-1', {
+      headers: { authorization: `Bearer ${token}` }
+    }));
+    assert.equal(authorizedAccountAccess.status, 200);
   });
 });

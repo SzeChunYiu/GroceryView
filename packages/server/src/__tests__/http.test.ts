@@ -1,5 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { createGroceryViewApi } from '@groceryview/api';
 import { createHttpHandler } from '../index.js';
 
 async function json(response: Response) {
@@ -96,6 +97,84 @@ describe('createHttpHandler', () => {
 
     const budget = await json(await handle(new Request('http://localhost/api/budget/summary?userId=user-1'))) as { weeklyRemainingAfterEstimate: number };
     assert.equal(budget.weeklyRemainingAfterEstimate, 750.1);
+  });
+
+  it('serves account subscription access from user-scoped entitlements', async () => {
+    const api = createGroceryViewApi();
+    api.upsertSubscriptionEntitlement('user-1', {
+      tier: 'premium',
+      plan: 'premium_monthly',
+      status: 'active',
+      currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
+      provider: 'stripe_compatible',
+      updatedAt: '2026-05-20T00:00:00.000Z'
+    });
+    const handle = createHttpHandler(api, { now: new Date('2026-05-20T00:00:00.000Z') });
+
+    const premium = await handle(new Request('http://localhost/api/account/subscription-access?userId=user-1'));
+    assert.equal(premium.status, 200);
+    assert.deepEqual(await json(premium), {
+      userTier: 'premium',
+      premiumFeaturesEnabled: true,
+      adsRemoved: true,
+      checkoutRequired: false,
+      enforcementReasons: ['active_subscription_entitlement:premium_monthly'],
+      accountActions: ['show_manage_subscription'],
+      summary: 'Premium access is active.'
+    });
+
+    const missing = await handle(new Request('http://localhost/api/account/subscription-access?userId=user-2'));
+    assert.equal(missing.status, 200);
+    assert.deepEqual((await json(missing) as { enforcementReasons: string[] }).enforcementReasons, ['missing_subscription_entitlement']);
+  });
+
+  it('prefers repository-backed subscription entitlements for account access when configured', async () => {
+    const api = createGroceryViewApi();
+    api.upsertSubscriptionEntitlement('user-1', {
+      tier: 'premium',
+      plan: 'premium_monthly',
+      status: 'past_due',
+      currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
+      provider: 'stripe_compatible',
+      updatedAt: '2026-05-20T00:00:00.000Z'
+    });
+    const requestedUserIds: string[] = [];
+    const handle = createHttpHandler(api, {
+      now: new Date('2026-05-20T00:00:00.000Z'),
+      subscriptionEntitlementRepository: {
+        async getSubscriptionEntitlement(userId) {
+          requestedUserIds.push(userId);
+          if (userId !== 'user-1') return null;
+          return {
+            userId,
+            tier: 'premium',
+            plan: 'premium_yearly',
+            status: 'active',
+            currentPeriodEndsAt: '2027-05-20T00:00:00.000Z',
+            provider: 'stripe_compatible',
+            providerCustomerId: 'cus_internal_only',
+            providerSubscriptionId: 'sub_internal_only',
+            updatedAt: '2026-05-20T00:00:00.000Z'
+          };
+        }
+      }
+    });
+
+    const premium = await json(await handle(new Request('http://localhost/api/account/subscription-access?userId=user-1'))) as {
+      enforcementReasons: string[];
+      accountActions: string[];
+      checkoutRequired: boolean;
+    };
+    assert.deepEqual(requestedUserIds, ['user-1']);
+    assert.deepEqual(premium.enforcementReasons, ['active_subscription_entitlement:premium_yearly']);
+    assert.deepEqual(premium.accountActions, ['show_manage_subscription']);
+    assert.equal(premium.checkoutRequired, false);
+    assert.equal(JSON.stringify(premium).includes('cus_internal_only'), false);
+
+    const missing = await json(await handle(new Request('http://localhost/api/account/subscription-access?userId=user-2'))) as {
+      enforcementReasons: string[];
+    };
+    assert.deepEqual(missing.enforcementReasons, ['missing_subscription_entitlement']);
   });
 
   it('returns explicit errors for invalid JSON, missing user id, and unknown routes', async () => {
