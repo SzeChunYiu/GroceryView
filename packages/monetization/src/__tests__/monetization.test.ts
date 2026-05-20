@@ -5,6 +5,7 @@ import {
   buildMonetizationProviderReadinessReport,
   buildSubscriptionAccessPolicy,
   buildSubscriptionCheckoutPlan,
+  parseStripeCompatibleSubscriptionEvent,
   processBillingSubscriptionEvent
 } from '../index.js';
 
@@ -152,6 +153,117 @@ describe('monetization foundation', () => {
       providerSubscriptionId: 'sub_123',
       updatedAt: '2026-05-20T00:00:00.000Z'
     });
+  });
+
+  it('normalizes Stripe-compatible active subscription webhooks into billing events', () => {
+    const event = parseStripeCompatibleSubscriptionEvent({
+      receivedAt: '2026-05-20T12:00:00.000Z',
+      priceIdPlanMap: { price_yearly_123: 'premium_yearly' },
+      payload: {
+        id: 'evt_123',
+        type: 'customer.subscription.updated',
+        created: 1779278400,
+        data: {
+          object: {
+            id: 'sub_123',
+            customer: 'cus_123',
+            status: 'active',
+            current_period_end: 1810771200,
+            metadata: { userId: 'user-1' },
+            items: { data: [{ price: { id: 'price_yearly_123' } }] }
+          }
+        }
+      }
+    });
+
+    assert.deepEqual(event, {
+      provider: 'stripe_compatible',
+      providerEventId: 'evt_123',
+      type: 'subscription.active',
+      userId: 'user-1',
+      plan: 'premium_yearly',
+      currentPeriodEndsAt: '2027-05-20T00:00:00.000Z',
+      providerCustomerId: 'cus_123',
+      providerSubscriptionId: 'sub_123',
+      occurredAt: '2026-05-20T12:00:00.000Z'
+    });
+    assert.deepEqual(processBillingSubscriptionEvent(event!), {
+      userId: 'user-1',
+      tier: 'premium',
+      plan: 'premium_yearly',
+      status: 'active',
+      currentPeriodEndsAt: '2027-05-20T00:00:00.000Z',
+      provider: 'stripe_compatible',
+      providerCustomerId: 'cus_123',
+      providerSubscriptionId: 'sub_123',
+      updatedAt: '2026-05-20T12:00:00.000Z'
+    });
+  });
+
+  it('normalizes Stripe-compatible past-due and canceled webhooks fail-closed', () => {
+    const pastDue = parseStripeCompatibleSubscriptionEvent({
+      receivedAt: '2026-05-20T12:00:00.000Z',
+      payload: {
+        id: 'evt_past_due',
+        type: 'customer.subscription.updated',
+        data: {
+          object: {
+            id: 'sub_123',
+            status: 'past_due',
+            current_period_end: 1779364800,
+            metadata: { userId: 'user-1', plan: 'premium_monthly' }
+          }
+        }
+      }
+    });
+    const canceled = parseStripeCompatibleSubscriptionEvent({
+      receivedAt: '2026-05-20T12:00:00.000Z',
+      payload: {
+        id: 'evt_deleted',
+        type: 'customer.subscription.deleted',
+        data: {
+          object: {
+            id: 'sub_123',
+            customer: 'cus_123',
+            status: 'canceled',
+            metadata: { userId: 'user-1' }
+          }
+        }
+      }
+    });
+
+    assert.equal(pastDue?.type, 'subscription.past_due');
+    assert.equal(pastDue?.plan, 'premium_monthly');
+    assert.equal(canceled?.type, 'subscription.canceled');
+    assert.equal(canceled?.plan, undefined);
+    assert.deepEqual(buildSubscriptionAccessPolicy({
+      now: '2026-05-20T12:00:00.000Z',
+      entitlement: processBillingSubscriptionEvent(pastDue!)
+    }).accountActions, ['show_billing_issue']);
+    assert.deepEqual(buildSubscriptionAccessPolicy({
+      now: '2026-05-20T12:00:00.000Z',
+      entitlement: processBillingSubscriptionEvent(canceled!)
+    }).accountActions, ['show_renew']);
+  });
+
+  it('ignores unsupported Stripe-compatible webhook types and rejects missing user mapping', () => {
+    assert.equal(parseStripeCompatibleSubscriptionEvent({
+      receivedAt: '2026-05-20T12:00:00.000Z',
+      payload: { id: 'evt_invoice', type: 'invoice.paid', data: { object: {} } }
+    }), null);
+
+    assert.throws(
+      () =>
+        parseStripeCompatibleSubscriptionEvent({
+          receivedAt: '2026-05-20T12:00:00.000Z',
+          payload: {
+            id: 'evt_missing_user',
+            type: 'customer.subscription.updated',
+            data: { object: { status: 'active', metadata: { plan: 'premium_monthly' } } }
+          }
+        }),
+      /metadata.userId is required/
+    );
   });
 
   it('normalizes past-due and canceled billing subscription events into fail-closed entitlements', () => {

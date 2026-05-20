@@ -1,0 +1,29 @@
+name: Local infrastructure smoke
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "infra/**"
+      - ".env.example"
+      - ".github/workflows/local-infra-smoke.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: local-infra-smoke-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  smoke:
+    name: Smoke local services
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run local services smoke check
+        run: infra/scripts/smoke-local-services.sh
+
+      - name: Stop local services
+        if: always()
+        run: docker compose -f infra/docker-compose.yml down -v --remove-orphans
