@@ -287,6 +287,7 @@ describe('deployment ops foundation', () => {
         'secret_missing:BILLING_WEBHOOK_SECRET'
       ],
       readySecrets: [],
+      requiredSecretCount: 4,
       summary: 'Secret rotation readiness is blocked until required deployment secrets are present, fresh, and owned.'
     });
   });
@@ -305,6 +306,7 @@ describe('deployment ops foundation', () => {
 
     assert.deepEqual(summarizeSecretRotationReadinessReport(report), {
       status: 'blocked',
+      requiredSecrets: 4,
       totalBlockers: 3,
       missingSecrets: 1,
       staleSecrets: 1,
