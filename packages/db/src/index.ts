@@ -1827,6 +1827,23 @@ export type PostgresIntegrationReadinessReport = {
   summary: string;
 };
 
+export type PostgresIntegrationReadinessSummary = {
+  status: PostgresIntegrationReadinessReport['status'];
+  blockers: {
+    total: number;
+    missingTables: number;
+    missingMigrations: number;
+    repositoryFailures: number;
+    repositoryNotRun: number;
+  };
+  evidence: {
+    total: number;
+    tables: number;
+    migrations: number;
+    repositoryChecks: number;
+  };
+};
+
 type TableNameRow = { table_name: string };
 type MigrationVersionRow = { version: string };
 type ProbeIdRow = { id: string };
@@ -2222,6 +2239,35 @@ export function buildPostgresIntegrationReadinessReport(input: PostgresIntegrati
     blockers,
     evidence,
     summary: blockers.length === 0 ? 'PostgreSQL integration contract is ready.' : 'PostgreSQL integration contract is blocked.'
+  };
+}
+
+export function summarizePostgresIntegrationReadinessReport(
+  report: PostgresIntegrationReadinessReport
+): PostgresIntegrationReadinessSummary {
+  return {
+    status: report.status,
+    blockers: report.blockers.reduce<PostgresIntegrationReadinessSummary['blockers']>(
+      (summary, blocker) => {
+        summary.total += 1;
+        if (blocker.startsWith('missing_table:')) summary.missingTables += 1;
+        if (blocker.startsWith('missing_migration:')) summary.missingMigrations += 1;
+        if (blocker.startsWith('repository_check_fail:')) summary.repositoryFailures += 1;
+        if (blocker.startsWith('repository_check_not_run:')) summary.repositoryNotRun += 1;
+        return summary;
+      },
+      { total: 0, missingTables: 0, missingMigrations: 0, repositoryFailures: 0, repositoryNotRun: 0 }
+    ),
+    evidence: report.evidence.reduce<PostgresIntegrationReadinessSummary['evidence']>(
+      (summary, entry) => {
+        summary.total += 1;
+        if (entry.startsWith('table:')) summary.tables += 1;
+        if (entry.startsWith('migration:')) summary.migrations += 1;
+        if (entry.startsWith('repository_check:')) summary.repositoryChecks += 1;
+        return summary;
+      },
+      { total: 0, tables: 0, migrations: 0, repositoryChecks: 0 }
+    )
   };
 }
 
