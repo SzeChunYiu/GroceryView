@@ -224,6 +224,31 @@ export type ScbPxWebQueryFixtureValidation = {
   issues: string[];
 };
 
+export type GroceryCategoryMappingScope = 'category' | 'hero_product';
+export type GroceryCategoryMappingConfidence = 'high' | 'medium' | 'product_required' | 'unmapped';
+export type GroceryCategoryCoicopMapping = {
+  mappingId: string;
+  scope: GroceryCategoryMappingScope;
+  groceryCategoryId: string;
+  heroProductSlug?: string;
+  scbCoicopCode?: typeof scbCoicopFoodCategoryCodes[number];
+  scbTableId?: ScbPxWebQueryFixture['tableId'];
+  scbContentCode?: string;
+  livsmedelsverketFoodNumber?: number;
+  livsmedelsverketFoodName?: string;
+  mappingConfidence: GroceryCategoryMappingConfidence;
+  mappingReason: string;
+  canUseForCategoryIndexBaseline: boolean;
+  canUseForNutritionFacts: boolean;
+  canUseForStorePrice: false;
+};
+
+export type GroceryCategoryCoicopMappingValidation = {
+  status: 'valid' | 'invalid';
+  mappingIds: string[];
+  issues: string[];
+};
+
 export type OfferSelectorEvidence = {
   evidenceId: string;
   selector: string;
@@ -636,6 +661,101 @@ export const scbPxWebQueryFixtures: ScbPxWebQueryFixture[] = [
   }
 ];
 
+const SCB_COICOPM_CONTENT_CODE = '0000080H';
+const currentHeroProductSlugs = [
+  'standardmjolk-1l',
+  'agg-12-pack',
+  'smor-500g',
+  'bryggkaffe-450g',
+  'kycklingfile-1kg',
+  'notfars-500g',
+  'pasta-500g',
+  'basmatiris-1kg',
+  'formbrod-rost-700g',
+  'hushallsost-1kg',
+  'bananer-1kg',
+  'tomater-500g',
+  'potatis-2kg',
+  'toalettpapper-8-pack',
+  'tvattmedel-color-1l',
+  'blojor-storlek-4',
+  'havredryck-1l',
+  'naturell-yoghurt-1kg',
+  'olivolja-500ml',
+  'fryst-pizza-350g'
+] as const;
+
+const activeGroceryCategoryIds = [
+  'bakery',
+  'bread',
+  'butter',
+  'coffee',
+  'dairy',
+  'eggs',
+  'frozen',
+  'fruit',
+  'meat',
+  'pantry',
+  'rice',
+  'snacks',
+  'vegetables'
+] as const;
+
+function coicopFoodMapping(input: Omit<GroceryCategoryCoicopMapping, 'scbTableId' | 'scbContentCode' | 'canUseForStorePrice'>): GroceryCategoryCoicopMapping {
+  return {
+    ...input,
+    scbTableId: 'KPI2020COICOPM',
+    scbContentCode: SCB_COICOPM_CONTENT_CODE,
+    canUseForStorePrice: false
+  };
+}
+
+function unmappedGroceryMapping(input: Omit<GroceryCategoryCoicopMapping, 'canUseForCategoryIndexBaseline' | 'canUseForNutritionFacts' | 'canUseForStorePrice' | 'mappingConfidence'>): GroceryCategoryCoicopMapping {
+  return {
+    ...input,
+    mappingConfidence: 'unmapped',
+    canUseForCategoryIndexBaseline: false,
+    canUseForNutritionFacts: false,
+    canUseForStorePrice: false
+  };
+}
+
+export const groceryCategoryCoicopMappings: GroceryCategoryCoicopMapping[] = [
+  coicopFoodMapping({ mappingId: 'category:bakery', scope: 'category', groceryCategoryId: 'bakery', scbCoicopCode: '01.1.1', mappingConfidence: 'medium', mappingReason: 'Bakery is represented as bread and cereals for CPI baselines; product-level mapping is required for pastries and non-bread bakery items.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: false }),
+  coicopFoodMapping({ mappingId: 'category:bread', scope: 'category', groceryCategoryId: 'bread', scbCoicopCode: '01.1.1', mappingConfidence: 'high', mappingReason: 'Bread products map directly to SCB bread and cereals for price-index baselines.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: false }),
+  coicopFoodMapping({ mappingId: 'category:butter', scope: 'category', groceryCategoryId: 'butter', scbCoicopCode: '01.1.5', mappingConfidence: 'high', mappingReason: 'Butter is covered by SCB oils and fats.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: false }),
+  coicopFoodMapping({ mappingId: 'category:coffee', scope: 'category', groceryCategoryId: 'coffee', scbCoicopCode: '01.2.1', mappingConfidence: 'high', mappingReason: 'Coffee is represented by SCB coffee, tea and cocoa.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: false }),
+  coicopFoodMapping({ mappingId: 'category:dairy', scope: 'category', groceryCategoryId: 'dairy', scbCoicopCode: '01.1.4', mappingConfidence: 'medium', mappingReason: 'Dairy spans milk, cheese, yoghurt and eggs; product-level mappings are required before nutrition facts.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: false }),
+  coicopFoodMapping({ mappingId: 'category:eggs', scope: 'category', groceryCategoryId: 'eggs', scbCoicopCode: '01.1.4', mappingConfidence: 'high', mappingReason: 'Eggs are included in SCB milk, cheese and eggs.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: false }),
+  coicopFoodMapping({ mappingId: 'category:frozen', scope: 'category', groceryCategoryId: 'frozen', scbCoicopCode: '01.1.9', mappingConfidence: 'product_required', mappingReason: 'Frozen includes prepared meals and single-ingredient foods, so only product mappings can choose a defensible baseline.', canUseForCategoryIndexBaseline: false, canUseForNutritionFacts: false }),
+  coicopFoodMapping({ mappingId: 'category:fruit', scope: 'category', groceryCategoryId: 'fruit', scbCoicopCode: '01.1.6', mappingConfidence: 'high', mappingReason: 'Fruit maps directly to SCB fruit.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: false }),
+  coicopFoodMapping({ mappingId: 'category:meat', scope: 'category', groceryCategoryId: 'meat', scbCoicopCode: '01.1.2', mappingConfidence: 'high', mappingReason: 'Meat products map to SCB meat.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: false }),
+  coicopFoodMapping({ mappingId: 'category:pantry', scope: 'category', groceryCategoryId: 'pantry', scbCoicopCode: '01.1.9', mappingConfidence: 'product_required', mappingReason: 'Pantry spans coffee, rice, pasta, oils and canned foods; category-level baselines are disabled until product mappings choose the specific SCB group.', canUseForCategoryIndexBaseline: false, canUseForNutritionFacts: false }),
+  coicopFoodMapping({ mappingId: 'category:rice', scope: 'category', groceryCategoryId: 'rice', scbCoicopCode: '01.1.1', mappingConfidence: 'high', mappingReason: 'Rice is represented by bread and cereals for CPI baselines.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: false }),
+  coicopFoodMapping({ mappingId: 'category:snacks', scope: 'category', groceryCategoryId: 'snacks', scbCoicopCode: '01.1.8', mappingConfidence: 'product_required', mappingReason: 'Snacks can map to sugar, confectionery or prepared-food groups depending on product; category baselines are disabled.', canUseForCategoryIndexBaseline: false, canUseForNutritionFacts: false }),
+  coicopFoodMapping({ mappingId: 'category:vegetables', scope: 'category', groceryCategoryId: 'vegetables', scbCoicopCode: '01.1.7', mappingConfidence: 'high', mappingReason: 'Vegetables map directly to SCB vegetables.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: false }),
+  coicopFoodMapping({ mappingId: 'hero:standardmjolk-1l', scope: 'hero_product', groceryCategoryId: 'dairy', heroProductSlug: 'standardmjolk-1l', scbCoicopCode: '01.1.4', livsmedelsverketFoodNumber: 123, livsmedelsverketFoodName: 'Mjolk fett 3% berikad', mappingConfidence: 'high', mappingReason: 'Seed product is standard milk and has a direct Livsmedelsverket milk concept.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: true }),
+  coicopFoodMapping({ mappingId: 'hero:agg-12-pack', scope: 'hero_product', groceryCategoryId: 'eggs', heroProductSlug: 'agg-12-pack', scbCoicopCode: '01.1.4', livsmedelsverketFoodNumber: 1225, livsmedelsverketFoodName: 'Agg ratt', mappingConfidence: 'high', mappingReason: 'Eggs are explicitly covered by SCB milk, cheese and eggs and have a direct Livsmedelsverket egg concept.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: true }),
+  coicopFoodMapping({ mappingId: 'hero:smor-500g', scope: 'hero_product', groceryCategoryId: 'butter', heroProductSlug: 'smor-500g', scbCoicopCode: '01.1.5', livsmedelsverketFoodNumber: 29, livsmedelsverketFoodName: 'Smor fett 80%', mappingConfidence: 'high', mappingReason: 'Butter maps to oils and fats and has a direct Livsmedelsverket butter concept.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: true }),
+  coicopFoodMapping({ mappingId: 'hero:bryggkaffe-450g', scope: 'hero_product', groceryCategoryId: 'coffee', heroProductSlug: 'bryggkaffe-450g', scbCoicopCode: '01.2.1', livsmedelsverketFoodNumber: 1955, livsmedelsverketFoodName: 'Snabbkaffe pulver', mappingConfidence: 'medium', mappingReason: 'Coffee belongs to SCB coffee, tea and cocoa; Livsmedelsverket concept is only a reviewed proxy for dry coffee until a brewed/ground distinction is selected.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: false }),
+  coicopFoodMapping({ mappingId: 'hero:kycklingfile-1kg', scope: 'hero_product', groceryCategoryId: 'meat', heroProductSlug: 'kycklingfile-1kg', scbCoicopCode: '01.1.2', livsmedelsverketFoodNumber: 1173, livsmedelsverketFoodName: 'Kyckling brostfile ra u. skinn', mappingConfidence: 'high', mappingReason: 'Chicken fillet maps to meat and has a direct raw chicken breast concept.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: true }),
+  coicopFoodMapping({ mappingId: 'hero:notfars-500g', scope: 'hero_product', groceryCategoryId: 'meat', heroProductSlug: 'notfars-500g', scbCoicopCode: '01.1.2', livsmedelsverketFoodNumber: 951, livsmedelsverketFoodName: 'Not fars ra fett 10%', mappingConfidence: 'high', mappingReason: 'Minced beef maps to meat and has a direct raw minced beef concept.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: true }),
+  coicopFoodMapping({ mappingId: 'hero:pasta-500g', scope: 'hero_product', groceryCategoryId: 'pantry', heroProductSlug: 'pasta-500g', scbCoicopCode: '01.1.1', livsmedelsverketFoodNumber: 845, livsmedelsverketFoodName: 'Pasta okokt', mappingConfidence: 'high', mappingReason: 'Dry pasta is a cereal product and has a direct Livsmedelsverket concept.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: true }),
+  coicopFoodMapping({ mappingId: 'hero:basmatiris-1kg', scope: 'hero_product', groceryCategoryId: 'rice', heroProductSlug: 'basmatiris-1kg', scbCoicopCode: '01.1.1', livsmedelsverketFoodNumber: 2475, livsmedelsverketFoodName: 'Ris basmati okokt', mappingConfidence: 'high', mappingReason: 'Basmati rice is a cereal product and has a direct Livsmedelsverket concept.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: true }),
+  coicopFoodMapping({ mappingId: 'hero:formbrod-rost-700g', scope: 'hero_product', groceryCategoryId: 'bread', heroProductSlug: 'formbrod-rost-700g', scbCoicopCode: '01.1.1', mappingConfidence: 'high', mappingReason: 'Toast bread maps directly to bread and cereals; nutrition facts wait for a reviewed Livsmedelsverket bread concept.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: false }),
+  coicopFoodMapping({ mappingId: 'hero:hushallsost-1kg', scope: 'hero_product', groceryCategoryId: 'dairy', heroProductSlug: 'hushallsost-1kg', scbCoicopCode: '01.1.4', livsmedelsverketFoodNumber: 78, livsmedelsverketFoodName: 'Ost hardost fett 23%', mappingConfidence: 'high', mappingReason: 'Household cheese maps to milk, cheese and eggs and has a direct hard-cheese concept.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: true }),
+  coicopFoodMapping({ mappingId: 'hero:bananer-1kg', scope: 'hero_product', groceryCategoryId: 'fruit', heroProductSlug: 'bananer-1kg', scbCoicopCode: '01.1.6', livsmedelsverketFoodNumber: 553, livsmedelsverketFoodName: 'Banan', mappingConfidence: 'high', mappingReason: 'Bananas map to fruit and have a direct Livsmedelsverket concept.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: true }),
+  coicopFoodMapping({ mappingId: 'hero:tomater-500g', scope: 'hero_product', groceryCategoryId: 'vegetables', heroProductSlug: 'tomater-500g', scbCoicopCode: '01.1.7', livsmedelsverketFoodNumber: 364, livsmedelsverketFoodName: 'Tomat', mappingConfidence: 'high', mappingReason: 'Tomatoes map to vegetables and have a direct Livsmedelsverket concept.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: true }),
+  coicopFoodMapping({ mappingId: 'hero:potatis-2kg', scope: 'hero_product', groceryCategoryId: 'vegetables', heroProductSlug: 'potatis-2kg', scbCoicopCode: '01.1.7', livsmedelsverketFoodNumber: 230, livsmedelsverketFoodName: 'Potatis host ra', mappingConfidence: 'high', mappingReason: 'Potatoes map to vegetables and have a direct Livsmedelsverket concept.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: true }),
+  unmappedGroceryMapping({ mappingId: 'hero:toalettpapper-8-pack', scope: 'hero_product', groceryCategoryId: 'household', heroProductSlug: 'toalettpapper-8-pack', mappingReason: 'Toilet paper is outside SCB food/non-alcoholic beverage categories and outside Livsmedelsverket food concepts.' }),
+  unmappedGroceryMapping({ mappingId: 'hero:tvattmedel-color-1l', scope: 'hero_product', groceryCategoryId: 'household', heroProductSlug: 'tvattmedel-color-1l', mappingReason: 'Laundry detergent is outside SCB food/non-alcoholic beverage categories and outside Livsmedelsverket food concepts.' }),
+  unmappedGroceryMapping({ mappingId: 'hero:blojor-storlek-4', scope: 'hero_product', groceryCategoryId: 'baby', heroProductSlug: 'blojor-storlek-4', mappingReason: 'Diapers are outside SCB food/non-alcoholic beverage categories and outside Livsmedelsverket food concepts.' }),
+  coicopFoodMapping({ mappingId: 'hero:havredryck-1l', scope: 'hero_product', groceryCategoryId: 'dairy_alt', heroProductSlug: 'havredryck-1l', scbCoicopCode: '01.1.4', livsmedelsverketFoodNumber: 700, livsmedelsverketFoodName: 'Havredryck fett 1,5% berikad', mappingConfidence: 'medium', mappingReason: 'Oat drink has a direct Livsmedelsverket concept; SCB category uses the closest milk, cheese and eggs baseline until plant-drink subcategory metadata is reviewed.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: true }),
+  coicopFoodMapping({ mappingId: 'hero:naturell-yoghurt-1kg', scope: 'hero_product', groceryCategoryId: 'dairy', heroProductSlug: 'naturell-yoghurt-1kg', scbCoicopCode: '01.1.4', livsmedelsverketFoodNumber: 124, livsmedelsverketFoodName: 'Yoghurt naturell fett 3% berikad', mappingConfidence: 'high', mappingReason: 'Plain yoghurt maps to milk, cheese and eggs and has a direct Livsmedelsverket concept.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: true }),
+  coicopFoodMapping({ mappingId: 'hero:olivolja-500ml', scope: 'hero_product', groceryCategoryId: 'pantry', heroProductSlug: 'olivolja-500ml', scbCoicopCode: '01.1.5', livsmedelsverketFoodNumber: 35, livsmedelsverketFoodName: 'Olivolja', mappingConfidence: 'high', mappingReason: 'Olive oil maps to oils and fats and has a direct Livsmedelsverket concept.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: true }),
+  coicopFoodMapping({ mappingId: 'hero:fryst-pizza-350g', scope: 'hero_product', groceryCategoryId: 'frozen', heroProductSlug: 'fryst-pizza-350g', scbCoicopCode: '01.1.9', livsmedelsverketFoodNumber: 762, livsmedelsverketFoodName: 'Pizza Capricciosa frysvara', mappingConfidence: 'medium', mappingReason: 'Frozen pizza maps to prepared food products; nutrition facts require recipe and brand review before use.', canUseForCategoryIndexBaseline: true, canUseForNutritionFacts: false })
+];
+
 export function cellCountForScbPxWebQueryFixture(fixture: ScbPxWebQueryFixture): number {
   return fixture.expectedDimensions.reduce((product, dimension) => product * dimension, 1);
 }
@@ -685,6 +805,61 @@ export function validateScbPxWebQueryFixtures(fixtures: ScbPxWebQueryFixture[]):
     fixtureIds,
     issues
   };
+}
+
+export function validateGroceryCategoryCoicopMappings(mappings: GroceryCategoryCoicopMapping[]): GroceryCategoryCoicopMappingValidation {
+  const issues: string[] = [];
+  const mappingIds = mappings.map((mapping) => mapping.mappingId).sort();
+  const mappingIdSet = new Set<string>();
+  const heroSlugSet = new Set<string>();
+  const categoryIdSet = new Set<string>();
+  const validScbCodes = new Set<string>(scbCoicopFoodCategoryCodes);
+
+  for (const mapping of mappings) {
+    if (mappingIdSet.has(mapping.mappingId)) issues.push(`duplicate_mapping_id:${mapping.mappingId}`);
+    mappingIdSet.add(mapping.mappingId);
+    if (!mapping.mappingReason.trim()) issues.push(`missing_reason:${mapping.mappingId}`);
+    if (mapping.canUseForStorePrice) issues.push(`emits_store_price:${mapping.mappingId}`);
+
+    if (mapping.scope === 'hero_product') {
+      if (!mapping.heroProductSlug) issues.push(`missing_hero_slug:${mapping.mappingId}`);
+      else heroSlugSet.add(mapping.heroProductSlug);
+    }
+    if (mapping.scope === 'category') {
+      if (mapping.heroProductSlug) issues.push(`category_has_hero_slug:${mapping.mappingId}`);
+      categoryIdSet.add(mapping.groceryCategoryId);
+    }
+
+    if (mapping.mappingConfidence === 'unmapped') {
+      if (mapping.scbCoicopCode || mapping.livsmedelsverketFoodNumber || mapping.canUseForCategoryIndexBaseline || mapping.canUseForNutritionFacts) {
+        issues.push(`unmapped_has_food_outputs:${mapping.mappingId}`);
+      }
+      continue;
+    }
+
+    if (!mapping.scbCoicopCode) issues.push(`missing_scb_code:${mapping.mappingId}`);
+    if (mapping.scbCoicopCode && !validScbCodes.has(mapping.scbCoicopCode)) issues.push(`unknown_scb_code:${mapping.mappingId}:${mapping.scbCoicopCode}`);
+    if (!mapping.scbTableId || mapping.scbTableId !== 'KPI2020COICOPM') issues.push(`invalid_scb_table:${mapping.mappingId}`);
+    if (mapping.scbContentCode !== SCB_COICOPM_CONTENT_CODE) issues.push(`invalid_scb_content:${mapping.mappingId}`);
+    if (mapping.scope === 'category' && mapping.canUseForNutritionFacts) issues.push(`category_emits_nutrition:${mapping.mappingId}`);
+  }
+
+  for (const heroSlug of currentHeroProductSlugs) {
+    if (!heroSlugSet.has(heroSlug)) issues.push(`missing_hero_mapping:${heroSlug}`);
+  }
+  for (const categoryId of activeGroceryCategoryIds) {
+    if (!categoryIdSet.has(categoryId)) issues.push(`missing_category_mapping:${categoryId}`);
+  }
+
+  return {
+    status: issues.length === 0 ? 'valid' : 'invalid',
+    mappingIds,
+    issues
+  };
+}
+
+export function groceryCategoryCoicopMappingsCanEmitStorePrices(): false {
+  return false;
 }
 
 export type RetailerConnectorHealthStatus = 'pass' | 'fail' | 'not_run';
