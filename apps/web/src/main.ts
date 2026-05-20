@@ -3,6 +3,7 @@ import {
   buildWatchlistAlerts,
   calculateDealScore,
   calculateFixedBasketIndex,
+  calculatePersonalGroceryInflation,
   compareBasketStrategies,
   rankNutritionPerKrona,
   scoreBand,
@@ -354,6 +355,17 @@ const nutritionDeals = rankNutritionPerKrona([
   { productId: 'eggs', name: 'Eggs 12-pack', price: 34.9, nutritionPerPackage: { proteinGrams: 75, calories: 840, fiberGrams: 0, sugarGrams: 1, saltGrams: 1.8 } },
   { productId: 'yogurt', name: 'Greek yogurt', price: 34.9, nutritionPerPackage: { proteinGrams: 55, calories: 380, fiberGrams: 0, sugarGrams: 16, saltGrams: 0.5 } }
 ], 'protein');
+
+const personalInflation = calculatePersonalGroceryInflation({
+  baseDate: '2026-01-01',
+  currentDate: '2026-05-20',
+  missingProductIds: ['rice'],
+  items: [
+    { productId: 'coffee', productName: 'Zoégas Coffee 450g', category: 'coffee', quantity: 2, baseUnitPrice: 59.9, currentUnitPrice: 49.9, confidence: 'high' },
+    { productId: 'milk', productName: 'Arla Milk 1L', category: 'dairy', quantity: 4, baseUnitPrice: 13.9, currentUnitPrice: 15.9, confidence: 'medium' },
+    { productId: 'eggs', productName: 'Eggs 12-pack', category: 'eggs', quantity: 1, baseUnitPrice: 32.9, currentUnitPrice: 34.9, confidence: 'medium' }
+  ]
+});
 
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Missing #app root');
@@ -830,6 +842,38 @@ app.innerHTML = `
             </tr>`).join('')}
           </tbody>
         </table>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Personal grocery inflation</h2>
+        <p class="lede">Recurring basket from ${personalInflation.baseDate} to ${personalInflation.currentDate}, weighted by the household's usual quantities.</p>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.inflationPercent}%</strong><span>personal inflation</span></div>
+          <div class="metric"><strong>${personalInflation.changeAmount} SEK</strong><span>basket movement</span></div>
+          <div class="metric"><strong>${personalInflation.confidence}</strong><span>confidence</span></div>
+        </div>
+        <table class="table" style="margin-top:12px">
+          <thead><tr><th>Product</th><th>Category</th><th>Change %</th><th>Change SEK</th><th>Confidence</th></tr></thead>
+          <tbody>
+            ${personalInflation.itemContributions.map((item) => `<tr>
+              <td>${item.productName}</td>
+              <td>${item.category}</td>
+              <td class="${item.changePercent > 0 ? 'positive' : 'negative'}">${item.changePercent > 0 ? '+' : ''}${item.changePercent}%</td>
+              <td>${item.changeAmount > 0 ? '+' : ''}${item.changeAmount} SEK</td>
+              <td>${item.confidence}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Missing recurring products</h2>
+        <div class="grid">
+          <div class="metric"><strong>${personalInflation.itemContributions.length}</strong><span>priced recurring items</span></div>
+          <div class="metric"><strong>${personalInflation.missingProductIds.length}</strong><span>missing products</span></div>
+          <div class="metric"><strong>${personalInflation.currentSpend.toFixed(2)}</strong><span>current recurring spend</span></div>
+        </div>
       </div>
     </section>
   </main>
