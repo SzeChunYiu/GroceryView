@@ -368,6 +368,15 @@ describe('buildStaticPages', () => {
       assert.match(budgetForecast, /Month-end projection/);
       assert.match(budgetForecast, /Correction plan/);
       assert.match(budgetForecast, /Needs review before forecast credit/);
+      assert.match(budgetForecast, /Connected budget API/);
+      assert.match(budgetForecast, /Load live budget summary/);
+      assert.match(budgetForecast, /data-groceryview-flow="budget-summary"/);
+      assert.match(budgetForecast, /data-flow-action="load-budget-summary"/);
+      assert.match(budgetForecast, /data-budget-summary-weekly/);
+      assert.match(budgetForecast, /data-budget-summary-monthly/);
+      assert.match(budgetForecast, /data-budget-summary-estimate/);
+      assert.match(budgetForecast, /fetch\(apiUrl\('\/api\/budget\/summary'/);
+      assert.match(budgetForecast, /Connected budget summary loaded/);
 
       const scanner = await readFile(join(root, 'scanner/index.html'), 'utf8');
       assert.match(scanner, /Barcode and receipt scanner/);

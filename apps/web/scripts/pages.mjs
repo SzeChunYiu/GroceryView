@@ -41,6 +41,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-daily-deals-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setBudgetSummaryMetric = (metric, message) => {
+    const target = document.querySelector('[data-budget-summary-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setApiSessionResult = (message) => {
     const target = document.querySelector('[data-api-session-result]');
     if (target) target.textContent = message;
@@ -603,6 +607,26 @@ window.GroceryViewFlowActions = (() => {
       setResult('daily-deals', 'Daily deals API load failed: ' + error.message + '. Static deal board remains visible.');
     }
   };
+  const loadBudgetSummaryFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('budget-summary', 'Local preview mode: connect the API session bridge before loading live budget summary.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/budget/summary', config), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      setBudgetSummaryMetric('weekly', 'Weekly ' + formatSek(payload.weeklyBudget) + ' · remaining actual ' + formatSek(payload.weeklyRemainingActual) + ' · ' + (payload.weeklyStatus || 'unknown'));
+      setBudgetSummaryMetric('monthly', 'Monthly ' + formatSek(payload.monthlyBudget) + ' · remaining actual ' + formatSek(payload.monthlyRemainingActual) + ' · ' + (payload.monthlyStatus || 'unknown'));
+      setBudgetSummaryMetric('estimate', 'Next basket ' + formatSek(payload.estimatedBasketTotal) + ' · after-estimate buffer ' + formatSek(payload.weeklyRemainingAfterEstimate));
+      setResult('budget-summary', 'Connected budget summary loaded: weekly ' + (payload.weeklyStatus || 'unknown') + ', monthly ' + (payload.monthlyStatus || 'unknown') + ', next basket ' + formatSek(payload.estimatedBasketTotal) + '.');
+    } catch (error) {
+      setResult('budget-summary', 'Budget summary API load failed: ' + error.message + '. Static budget forecast remains visible.');
+    }
+  };
   const messages = {
     'toggle-alert': 'Alert rule updated locally; production save waits for authenticated account API.',
     'manage-subscription': 'Billing portal handoff prepared without exposing provider customer IDs.',
@@ -678,6 +702,10 @@ window.GroceryViewFlowActions = (() => {
       }
       if (flow === 'daily-deals' && action === 'load-daily-deals') {
         await loadDailyDealsFromApi();
+        return;
+      }
+      if (flow === 'budget-summary' && action === 'load-budget-summary') {
+        await loadBudgetSummaryFromApi();
         return;
       }
       if (flow && action) setResult(flow, messages[action] || 'Action preview recorded.');
@@ -807,6 +835,9 @@ const watchlistLivePanel = `
 const dailyDealsLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="daily-deals" style="margin-top:16px"><div class="eyebrow">Connected daily deals API</div><h2>Pull live ranked deal board</h2><p class="lede">Fetch <code>/api/market/overview</code> to refresh the daily shopper board with top deal ticker, best price, Deal Score, verdict mix, and store evidence from the public market API.</p><div class="grid" aria-label="Live daily deals API metrics"><div class="metric"><strong data-daily-deals-leader>Waiting for API pull</strong><span>top ranked deal</span></div><div class="metric"><strong data-daily-deals-price>Static best-price preview</strong><span>price and store</span></div><div class="metric"><strong data-daily-deals-count>Static deal-count preview</strong><span>ranked deal count</span></div></div><div class="flow-panel" aria-label="Connected daily deals actions"><button type="button" data-flow-action="load-daily-deals">Load live deal board</button></div><p class="flow-result" data-flow-result="daily-deals" aria-live="polite">Local preview mode: connect the API session bridge before loading live daily deals.</p></section>`;
 
+const budgetSummaryLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="budget-summary" style="margin-top:16px"><div class="eyebrow">Connected budget API</div><h2>Pull live household budget summary</h2><p class="lede">Fetch <code>/api/budget/summary</code> through the protected API session bridge to refresh weekly budget, month-to-date spend, next-basket estimate, remaining buffers, and over/under status from account data.</p><div class="grid" aria-label="Live budget summary API metrics"><div class="metric"><strong data-budget-summary-weekly>Waiting for API pull</strong><span>weekly budget status</span></div><div class="metric"><strong data-budget-summary-monthly>Static monthly preview</strong><span>monthly budget status</span></div><div class="metric"><strong data-budget-summary-estimate>Static basket estimate preview</strong><span>next basket buffer</span></div></div><div class="flow-panel" aria-label="Connected budget summary actions"><button type="button" data-flow-action="load-budget-summary">Load live budget summary</button></div><p class="flow-result" data-flow-result="budget-summary" aria-live="polite">Local preview mode: connect the API session bridge before loading live budget summary.</p></section>`;
+
 const pages = [
   {
     path: 'login/index.html',
@@ -890,7 +921,7 @@ const pages = [
     path: 'budget/forecast/index.html',
     title: 'Grocery budget forecast — GroceryView',
     description: 'Forecast GroceryView household grocery spend with weekly basket totals, month-end projection, receipt actuals, and over-budget prevention actions.',
-    body: `<section class="card"><div class="eyebrow">Budget forecast</div><h1>Grocery budget forecast</h1><p class="lede">Compare planned baskets with receipt actuals, project month-end spend, and choose corrective actions before the household goes over budget.</p><div class="grid"><div class="metric"><strong>742 SEK</strong><span>next basket forecast</span></div><div class="metric"><strong>501 SEK</strong><span>spent this week</span></div><div class="metric"><strong>3 084 SEK</strong><span>month-end projection</span></div></div></section><section class="card" style="margin-top:16px"><h2>Forecast ledger</h2><table class="table"><thead><tr><th>Period</th><th>Budget</th><th>Actual / forecast</th><th>Variance</th><th>Status</th></tr></thead><tbody><tr><td>This week actuals</td><td>800 SEK</td><td>501 SEK</td><td>+299 SEK</td><td>On track</td></tr><tr><td>Next planned basket</td><td>800 SEK</td><td>742 SEK</td><td>+58 SEK</td><td>Needs review</td></tr><tr><td>Month-end projection</td><td>3 200 SEK</td><td>3 084 SEK</td><td>+116 SEK</td><td>On track</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Correction plan</h2><table class="table"><thead><tr><th>Action</th><th>Impact</th><th>Guardrail</th></tr></thead><tbody><tr><td>Apply coffee private-label swap</td><td>Saves 12 SEK</td><td>Requires verified shelf price</td></tr><tr><td>Move eggs to Lidl split basket</td><td>Saves 4 SEK</td><td>Favorite-store only route</td></tr><tr><td>Hold estimated tomato price</td><td>Avoids false saving</td><td>Needs review before forecast credit</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Budget forecast</div><h1>Grocery budget forecast</h1><p class="lede">Compare planned baskets with receipt actuals, project month-end spend, and choose corrective actions before the household goes over budget.</p><div class="grid"><div class="metric"><strong>742 SEK</strong><span>next basket forecast</span></div><div class="metric"><strong>501 SEK</strong><span>spent this week</span></div><div class="metric"><strong>3 084 SEK</strong><span>month-end projection</span></div></div></section><section class="card" style="margin-top:16px"><h2>Forecast ledger</h2><table class="table"><thead><tr><th>Period</th><th>Budget</th><th>Actual / forecast</th><th>Variance</th><th>Status</th></tr></thead><tbody><tr><td>This week actuals</td><td>800 SEK</td><td>501 SEK</td><td>+299 SEK</td><td>On track</td></tr><tr><td>Next planned basket</td><td>800 SEK</td><td>742 SEK</td><td>+58 SEK</td><td>Needs review</td></tr><tr><td>Month-end projection</td><td>3 200 SEK</td><td>3 084 SEK</td><td>+116 SEK</td><td>On track</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Correction plan</h2><table class="table"><thead><tr><th>Action</th><th>Impact</th><th>Guardrail</th></tr></thead><tbody><tr><td>Apply coffee private-label swap</td><td>Saves 12 SEK</td><td>Requires verified shelf price</td></tr><tr><td>Move eggs to Lidl split basket</td><td>Saves 4 SEK</td><td>Favorite-store only route</td></tr><tr><td>Hold estimated tomato price</td><td>Avoids false saving</td><td>Needs review before forecast credit</td></tr></tbody></table></section>${budgetSummaryLivePanel}`
   },
   {
     path: 'scanner/index.html',
