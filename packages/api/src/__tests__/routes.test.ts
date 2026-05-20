@@ -25,9 +25,12 @@ describe('createGroceryViewApi', () => {
     const search = api.searchProducts('coffee');
     assert.equal(search[0].ticker, 'ZOEGAS-COFFEE-450G');
 
-    const detail = api.getProduct('coffee');
-    assert.equal(detail?.currentPrices[0].storeName, 'Willys Odenplan');
-    assert.equal(detail?.dealScore, 82);
+    const detail = api.getProduct('milk');
+    assert.deepEqual(
+      detail?.currentPrices.map((price) => price.storeId),
+      ['lidl-sveavagen', 'willys-odenplan']
+    );
+    assert.equal(detail?.dealScore, 73);
   });
 
   it('returns cheapest product prices first and uses the cheapest quote for watchlist alerts', () => {
@@ -47,6 +50,14 @@ describe('createGroceryViewApi', () => {
         productId: 'milk',
         productName: 'Arla Milk 1L',
         type: 'target_price',
+        severity: 'opportunity',
+        trigger: {
+          metric: 'price',
+          storeId: 'lidl-sveavagen',
+          storeName: 'Lidl Sveavagen',
+          threshold: 14,
+          value: 13.9
+        },
         message: 'Arla Milk 1L is 13.90 SEK at Lidl Sveavagen, below your 14.00 SEK target.'
       }
     ]);
@@ -84,18 +95,35 @@ describe('createGroceryViewApi', () => {
     assert.equal(api.getProductDealScore('missing-product'), null);
   });
 
+  it('returns ranked store-specific deals without mixing other stores', () => {
+    const api = createGroceryViewApi();
+
+    const willysDeals = api.getStoreDeals('willys-odenplan');
+    assert.deepEqual(
+      willysDeals.map((deal) => ({ productId: deal.productId, storeId: deal.storeId, dealScore: deal.dealScore })),
+      [
+        { productId: 'coffee', storeId: 'willys-odenplan', dealScore: 82 },
+        { productId: 'milk', storeId: 'willys-odenplan', dealScore: 73 },
+        { productId: 'butter', storeId: 'willys-odenplan', dealScore: 40 }
+      ]
+    );
+    assert.deepEqual(willysDeals[0].band, { label: 'Good deal', verdict: 'Buy' });
+    assert.throws(() => api.getStoreDeals('missing-store'), /Unknown storeId/);
+  });
+
   it('supports favorite stores, watchlist, basket, budget, and index endpoints', () => {
     const api = createGroceryViewApi();
 
     api.addFavoriteStore('user-1', 'willys-odenplan');
     api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, favoriteStoresOnly: true });
     api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 2 });
     api.updateBudget('user-1', { weeklyBudget: 800, monthlyBudget: 3200 });
 
     assert.deepEqual(api.getFavoriteStores('user-1').map((store) => store.id), ['willys-odenplan']);
     assert.equal(api.getWatchlist('user-1').alerts.length, 3);
-    assert.equal(api.getBasket('user-1').items[0].productId, 'coffee');
-    assert.equal(api.compareBasket('user-1').cheapestByProduct.total, 49.9);
+    assert.deepEqual(api.getBasket('user-1').items, [{ productId: 'coffee', quantity: 3 }]);
+    assert.equal(api.compareBasket('user-1').cheapestByProduct.total, 149.7);
     assert.equal(api.getBudgetSummary('user-1').weeklyBudget, 800);
     assert.equal(api.getIndex('stockholm-grocery-index')?.label, 'Stockholm Grocery Index');
   });
@@ -207,11 +235,13 @@ describe('createGroceryViewApi', () => {
       /targetPrice must be positive/
     );
     assert.throws(() => api.addBasketItem('user-1', { productId: 'coffee', quantity: 0 }), /quantity must be an integer/);
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 98 });
+    assert.throws(() => api.addBasketItem('user-1', { productId: 'coffee', quantity: 2 }), /quantity must be an integer/);
     assert.throws(() => api.updateBudget('user-1', { weeklyBudget: -1, monthlyBudget: 3200 }), /weeklyBudget/);
 
     assert.deepEqual(api.getFavoriteStores('user-1'), []);
     assert.deepEqual(api.getWatchlist('user-1').items, []);
-    assert.deepEqual(api.getBasket('user-1').items, []);
+    assert.deepEqual(api.getBasket('user-1').items, [{ productId: 'coffee', quantity: 98 }]);
     assert.equal(api.getBudgetSummary('user-1').weeklyBudget, 0);
   });
 });

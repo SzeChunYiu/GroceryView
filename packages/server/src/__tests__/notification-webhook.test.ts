@@ -163,6 +163,65 @@ describe('notification suppression webhook route', () => {
     ]);
   });
 
+  it('accepts signed Expo push receipt payloads and persists stale device suppressions', async () => {
+    const persisted: Array<Record<string, unknown>> = [];
+    const handle = createHttpHandler(undefined, {
+      now: new Date('2026-05-20T12:00:00.000Z'),
+      notificationWebhookSecret: 'webhook-secret',
+      notificationSuppressionSink: {
+        upsertNotificationSuppression: async (suppression) => {
+          persisted.push(suppression);
+        }
+      }
+    });
+    const body = JSON.stringify({
+      receipts: {
+        receipt1: {
+          status: 'error',
+          to: 'ExponentPushToken[stale-device]',
+          details: { error: 'DeviceNotRegistered' },
+          occurredAt: '2026-05-20T11:57:00.000Z'
+        },
+        receipt2: {
+          status: 'error',
+          to: 'ExponentPushToken[temporary-failure]',
+          details: { error: 'MessageRateExceeded' }
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/notifications/provider-suppression-events?provider=expo', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-groceryview-signature': signBody(body, 'webhook-secret')
+      },
+      body
+    }));
+
+    assert.equal(response.status, 202);
+    assert.deepEqual(await json(response), {
+      accepted: true,
+      persisted: 1,
+      suppressionIds: ['suppression-expo-receipt1:ExponentPushToken[stale-device]:DeviceNotRegistered']
+    });
+    assert.deepEqual(persisted.map((suppression) => ({
+      id: suppression.id,
+      recipient: suppression.recipient,
+      channel: suppression.channel,
+      reason: suppression.reason,
+      active: suppression.active
+    })), [
+      {
+        id: 'suppression-expo-receipt1:ExponentPushToken[stale-device]:DeviceNotRegistered',
+        recipient: 'ExponentPushToken[stale-device]',
+        channel: 'push',
+        reason: 'unsubscribed',
+        active: true
+      }
+    ]);
+  });
+
   it('rejects provider suppression payloads without a supported provider', async () => {
     const persisted: Array<Record<string, unknown>> = [];
     const handle = createHttpHandler(undefined, {
@@ -185,7 +244,7 @@ describe('notification suppression webhook route', () => {
     }));
 
     assert.equal(response.status, 400);
-    assert.match((await json(response) as { error: string }).error, /provider must be sendgrid or ses/i);
+    assert.match((await json(response) as { error: string }).error, /provider must be sendgrid, ses, or expo/i);
     assert.deepEqual(persisted, []);
   });
 

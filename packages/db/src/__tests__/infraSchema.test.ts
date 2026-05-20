@@ -129,5 +129,7 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(migrationVerifier, /information_schema\.tables/);
     assert.match(migrationVerifier, /migration metadata assertion failed/);
     assert.match(migrationVerifier, /migration table assertion failed/);
+    assert.match(migrationVerifier, /postgres_ready_timeout_seconds/);
+    assert.match(migrationVerifier, /seq 1 "\$postgres_ready_timeout_seconds"/);
   });
 });

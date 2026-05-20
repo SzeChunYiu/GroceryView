@@ -43,6 +43,7 @@ import {
   type NotificationSuppressionEventType,
   type NotificationSuppressionMutation
 } from '@groceryview/notifications';
+import { planScanReviewWorkItems, processScanUpload, type ScanProviders, type ScanUpload } from '@groceryview/scanning';
 
 export type HttpHandler = (request: Request) => Promise<Response>;
 
@@ -70,6 +71,7 @@ export type AuthOptions = {
   notificationMetricsToken?: string;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
+  scanProviders?: ScanProviders;
 };
 
 export type SubscriptionEntitlementLookupRecord = SubscriptionEntitlementSnapshot & {
@@ -139,6 +141,11 @@ function requiredString(value: unknown, field: string): string {
   return value;
 }
 
+function requiredScanKind(value: unknown): ScanUpload['kind'] {
+  if (value === 'barcode' || value === 'receipt') return value;
+  throw new Error('kind must be barcode or receipt.');
+}
+
 function optionalDeliveryChannel(value: unknown): DeliveryChannel | undefined {
   if (value === undefined) return undefined;
   if (value === 'push' || value === 'email') return value;
@@ -151,8 +158,8 @@ function requiredSuppressionEventType(value: unknown): NotificationSuppressionEv
 }
 
 function requiredSuppressionWebhookProvider(value: unknown): NotificationSuppressionWebhookProvider {
-  if (value === 'sendgrid' || value === 'ses') return value;
-  throw new Error('provider must be sendgrid or ses.');
+  if (value === 'sendgrid' || value === 'ses' || value === 'expo') return value;
+  throw new Error('provider must be sendgrid, ses, or expo.');
 }
 
 function optionalNumber(value: unknown, field: string): number | undefined {
@@ -553,6 +560,11 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return store ? jsonResponse(store) : errorResponse(404, 'Store not found.');
       }
 
+      const storeDealsMatch = path.match(/^\/api\/stores\/([^/]+)\/deals$/);
+      if (method === 'GET' && storeDealsMatch) {
+        return jsonResponse(api.getStoreDeals(decodeURIComponent(storeDealsMatch[1])));
+      }
+
       if (method === 'GET' && path === '/api/products/search') {
         return jsonResponse(api.searchProducts(url.searchParams.get('q') ?? ''));
       }
@@ -564,10 +576,18 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       }
 
       const productPricesMatch = path.match(/^\/api\/products\/([^/]+)\/prices$/);
-      if (method === 'GET' && productPricesMatch) return jsonResponse(api.getProductPrices(decodeURIComponent(productPricesMatch[1])));
+      if (method === 'GET' && productPricesMatch) {
+        const productId = decodeURIComponent(productPricesMatch[1]);
+        if (!api.getProduct(productId)) return errorResponse(404, 'Product not found.');
+        return jsonResponse(api.getProductPrices(productId));
+      }
 
       const productHistoryMatch = path.match(/^\/api\/products\/([^/]+)\/history$/);
-      if (method === 'GET' && productHistoryMatch) return jsonResponse(api.getProductHistory(decodeURIComponent(productHistoryMatch[1])));
+      if (method === 'GET' && productHistoryMatch) {
+        const productId = decodeURIComponent(productHistoryMatch[1]);
+        if (!api.getProduct(productId)) return errorResponse(404, 'Product not found.');
+        return jsonResponse(api.getProductHistory(productId));
+      }
 
       const productEquivalentsMatch = path.match(/^\/api\/products\/([^/]+)\/equivalents$/);
       if (method === 'GET' && productEquivalentsMatch) return jsonResponse(api.getProductEquivalents(decodeURIComponent(productEquivalentsMatch[1])));
@@ -692,6 +712,31 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'POST') return jsonResponse({ ...planAccountDeletion(user), destructiveAction: false, requiresReauthentication: true });
       }
 
+      if (path === '/api/scans/process') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'POST') {
+          const body = await readJson(request);
+          const scanId = requiredString(body.scanId, 'scanId');
+          const result = await processScanUpload({
+            upload: {
+              kind: requiredScanKind(body.kind),
+              payload: requiredString(body.payload, 'payload'),
+              uploadedAt: optionalIsoTimestamp(body.uploadedAt, 'uploadedAt') ?? (authOptions.now ?? new Date()).toISOString()
+            },
+            providers: authOptions.scanProviders ?? {}
+          });
+          return jsonResponse({
+            userId: user,
+            scanId,
+            result,
+            reviewWorkItems: planScanReviewWorkItems([{ scanId, result }])
+          });
+        }
+      }
+
       if (method === 'GET' && path === '/api/indices') return jsonResponse(api.getIndices());
       const indexMatch = path.match(/^\/api\/indices\/([^/]+)$/);
       if (method === 'GET' && indexMatch) {
@@ -776,6 +821,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
       '/api/billing/subscription-events': { post: billingWebhookOperation('Accept signed billing subscription events and persist entitlement updates.') },
       '/api/stores/{id}': { get: publicOperation('Get store profile.') },
+      '/api/stores/{id}/deals': { get: publicOperation('Get ranked in-store deals for one store.') },
       '/api/products/search': { get: publicOperation('Search products.') },
       '/api/products/{id}': { get: publicOperation('Get product detail.') },
       '/api/products/{id}/prices': { get: publicOperation('Get product prices by store.') },
@@ -784,6 +830,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/products/{id}/deal-score': { get: publicOperation('Get Deal Score detail for one product.') },
       '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
       '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
+      '/api/scans/process': { post: protectedOperation('Process barcode or receipt scan payloads through configured providers and return review routing work.') },
       '/api/users/{userId}/favorite-stores': {
         get: protectedOperation('List favorite stores.'),
         post: protectedOperation('Add favorite store.')
@@ -804,7 +851,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/metrics/notifications': { get: metricsOperation('Export notification operations metrics.') },
       '/api/readiness/postgres': { get: metricsOperation('Check PostgreSQL schema and migration readiness without exposing database secrets.') },
       '/api/notifications/suppression-events': { post: webhookOperation('Accept signed normalized notification suppression events.') },
-      '/api/notifications/provider-suppression-events': { post: webhookOperation('Accept signed SendGrid or SES suppression payloads.') }
+      '/api/notifications/provider-suppression-events': { post: webhookOperation('Accept signed SendGrid, SES, or Expo suppression payloads.') }
     }
   };
 }
@@ -977,6 +1024,7 @@ export type HealthReport = {
   service: 'groceryview-server';
   environment: RuntimeConfig['nodeEnv'];
   hasDatabase: boolean;
+  hasPublicWebUrl: boolean;
   hasAuthSecret: boolean;
   hasNotificationWebhookSecret: boolean;
   hasBillingWebhookSecret: boolean;
@@ -989,6 +1037,7 @@ export function buildHealthReport(config: RuntimeConfig): HealthReport {
     service: 'groceryview-server',
     environment: config.nodeEnv,
     hasDatabase: Boolean(config.databaseUrl),
+    hasPublicWebUrl: Boolean(config.publicWebUrl),
     hasAuthSecret: Boolean(config.authSecret),
     hasNotificationWebhookSecret: Boolean(config.notificationWebhookSecret),
     hasBillingWebhookSecret: Boolean(config.billingWebhookSecret),

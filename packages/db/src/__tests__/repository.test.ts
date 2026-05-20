@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { applyNotificationTaskAcknowledgements, createMemoryRepository } from '../index.js';
+import { applyNotificationTaskAcknowledgements, buildSourceRunHealthReport, createMemoryRepository } from '../index.js';
 
 describe('createMemoryRepository', () => {
   it('persists users, favorite stores, budgets, watchlist items, and baskets', async () => {
@@ -345,5 +345,90 @@ describe('applyNotificationTaskAcknowledgements', () => {
       tasks: [],
       acknowledgements: [{ taskId: 'missing-task', status: 'not_due' }]
     }), /Unknown notification task acknowledgement: missing-task/);
+  });
+});
+
+describe('buildSourceRunHealthReport', () => {
+  it('reports healthy fresh source runs as evidence', () => {
+    const report = buildSourceRunHealthReport({
+      now: '2026-05-20T08:30:00.000Z',
+      maxRunningMinutes: 30,
+      staleAfterMinutes: 90,
+      runs: [
+        {
+          sourceRunId: 'source-run-1',
+          sourceType: 'retailer_api',
+          sourceName: 'Willys API',
+          startedAt: '2026-05-20T08:00:00.000Z',
+          finishedAt: '2026-05-20T08:05:00.000Z',
+          status: 'succeeded',
+          provenance: { schedule: 'hourly' }
+        }
+      ]
+    });
+
+    assert.deepEqual(report, {
+      status: 'healthy',
+      blockers: [],
+      evidence: ['source_run_succeeded:source-run-1'],
+      runningRunIds: [],
+      staleRunIds: []
+    });
+  });
+
+  it('blocks failed, partial, stale, and stuck running source runs', () => {
+    const report = buildSourceRunHealthReport({
+      now: '2026-05-20T08:30:00.000Z',
+      maxRunningMinutes: 30,
+      staleAfterMinutes: 60,
+      runs: [
+        {
+          sourceRunId: 'failed-run',
+          sourceType: 'retailer_page',
+          sourceName: 'Retailer page',
+          startedAt: '2026-05-20T08:00:00.000Z',
+          finishedAt: '2026-05-20T08:01:00.000Z',
+          status: 'failed',
+          provenance: {},
+          errorMessage: 'HTTP 500'
+        },
+        {
+          sourceRunId: 'partial-run',
+          sourceType: 'weekly_leaflet',
+          sourceName: 'Weekly leaflet',
+          startedAt: '2026-05-20T07:45:00.000Z',
+          finishedAt: '2026-05-20T07:50:00.000Z',
+          status: 'partial',
+          provenance: {}
+        },
+        {
+          sourceRunId: 'running-run',
+          sourceType: 'receipt_ocr',
+          sourceName: 'Receipt OCR',
+          startedAt: '2026-05-20T07:40:00.000Z',
+          status: 'running',
+          provenance: {}
+        },
+        {
+          sourceRunId: 'stale-run',
+          sourceType: 'community_report',
+          sourceName: 'Community reports',
+          startedAt: '2026-05-20T06:00:00.000Z',
+          finishedAt: '2026-05-20T06:05:00.000Z',
+          status: 'succeeded',
+          provenance: {}
+        }
+      ]
+    });
+
+    assert.deepEqual(report.status, 'blocked');
+    assert.deepEqual(report.blockers, [
+      'source_run_failed:failed-run',
+      'source_run_partial:partial-run',
+      'source_run_stuck_running:running-run',
+      'source_run_stale:stale-run'
+    ]);
+    assert.deepEqual(report.runningRunIds, ['running-run']);
+    assert.deepEqual(report.staleRunIds, ['stale-run']);
   });
 });

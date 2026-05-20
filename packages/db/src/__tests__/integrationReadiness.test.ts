@@ -8,6 +8,7 @@ import {
   checkPostgresIntegrationReadiness,
   checkPostgresRepositoryIntegrationReadiness,
   collectPostgresIntegrationProbe,
+  summarizePostgresIntegrationReadinessReport,
   type QueryExecutor
 } from '../index.js';
 
@@ -217,6 +218,66 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'repository_check:upsert_user'
       ],
       summary: 'PostgreSQL integration contract is ready.'
+    });
+  });
+});
+
+describe('summarizePostgresIntegrationReadinessReport', () => {
+  it('counts blocker and evidence categories for readiness dashboards', () => {
+    const report = buildPostgresIntegrationReadinessReport({
+      requiredTables: ['app_users', 'latest_prices', 'products'],
+      existingTables: ['app_users'],
+      requiredMigrationVersions: ['001_groceryview_schema', '002_repository_support_schema'],
+      appliedMigrationVersions: ['001_groceryview_schema'],
+      repositoryChecks: [
+        { name: 'user_budget_round_trip', status: 'pass' },
+        { name: 'price_observation_pipeline_round_trip', status: 'fail' },
+        { name: 'notification_suppression_round_trip', status: 'not_run' }
+      ]
+    });
+
+    assert.deepEqual(summarizePostgresIntegrationReadinessReport(report), {
+      status: 'blocked',
+      blockers: {
+        total: 5,
+        missingTables: 2,
+        missingMigrations: 1,
+        repositoryFailures: 1,
+        repositoryNotRun: 1
+      },
+      evidence: {
+        total: 3,
+        tables: 1,
+        migrations: 1,
+        repositoryChecks: 1
+      }
+    });
+  });
+
+  it('reports zero blockers for a ready PostgreSQL integration report', () => {
+    const report = buildPostgresIntegrationReadinessReport({
+      requiredTables: ['app_users'],
+      existingTables: ['app_users'],
+      requiredMigrationVersions: ['001_groceryview_schema'],
+      appliedMigrationVersions: ['001_groceryview_schema'],
+      repositoryChecks: [{ name: 'user_budget_round_trip', status: 'pass' }]
+    });
+
+    assert.deepEqual(summarizePostgresIntegrationReadinessReport(report), {
+      status: 'ready',
+      blockers: {
+        total: 0,
+        missingTables: 0,
+        missingMigrations: 0,
+        repositoryFailures: 0,
+        repositoryNotRun: 0
+      },
+      evidence: {
+        total: 3,
+        tables: 1,
+        migrations: 1,
+        repositoryChecks: 1
+      }
     });
   });
 });

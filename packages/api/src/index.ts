@@ -60,6 +60,19 @@ export type ProductDealScoreDetail = {
   verifiedHistoryPoints: number;
 };
 
+export type StoreDeal = {
+  productId: string;
+  ticker: string;
+  productName: string;
+  category: string;
+  storeId: string;
+  storeName: string;
+  price: number;
+  dealScore: number;
+  band: ReturnType<typeof scoreBand>;
+  unitPrice: string;
+};
+
 export type BasketItemRequest = {
   productId: string;
   quantity: number;
@@ -262,6 +275,28 @@ function productEquivalentFor(product: ProductDetail): ProductEquivalent {
   };
 }
 
+function storeDealsFor(storeId: string): StoreDeal[] {
+  requireKnownStore(storeId);
+  return products
+    .flatMap((product) => {
+      const price = product.currentPrices.find((candidate) => candidate.storeId === storeId);
+      if (!price) return [];
+      return [{
+        productId: product.id,
+        ticker: product.ticker,
+        productName: product.name,
+        category: product.category,
+        storeId: price.storeId,
+        storeName: price.storeName,
+        price: price.price,
+        dealScore: product.dealScore,
+        band: scoreBand(product.dealScore),
+        unitPrice: product.unitPrice
+      }];
+    })
+    .sort((left, right) => right.dealScore - left.dealScore || left.price - right.price || left.productName.localeCompare(right.productName));
+}
+
 export function createGroceryViewApi() {
   const favoriteStores = new Map<string, Set<string>>();
   const watchlists = new Map<string, WatchlistItem[]>();
@@ -308,12 +343,18 @@ export function createGroceryViewApi() {
       return stores.find((store) => store.id === id) ?? null;
     },
 
+    getStoreDeals(storeId: string) {
+      return storeDealsFor(storeId);
+    },
+
     searchProducts(query: string) {
       return searchProducts(products, query);
     },
 
     getProduct(id: string) {
-      return products.find((product) => product.id === id) ?? null;
+      const product = products.find((candidate) => candidate.id === id);
+      if (!product) return null;
+      return { ...product, currentPrices: sortPricesByValue(product.currentPrices) };
     },
 
     getProductPrices(id: string) {
@@ -384,7 +425,19 @@ export function createGroceryViewApi() {
       if (!Number.isInteger(item.quantity) || item.quantity <= 0 || item.quantity > 99) {
         throw new Error('quantity must be an integer between 1 and 99');
       }
-      baskets.set(userId, [...(baskets.get(userId) ?? []), item]);
+      const current = baskets.get(userId) ?? [];
+      const existing = current.find((basketItem) => basketItem.productId === item.productId);
+      if (existing) {
+        const quantity = existing.quantity + item.quantity;
+        if (quantity > 99) {
+          throw new Error('quantity must be an integer between 1 and 99');
+        }
+        baskets.set(userId, current.map((basketItem) =>
+          basketItem.productId === item.productId ? { ...basketItem, quantity } : basketItem
+        ));
+        return;
+      }
+      baskets.set(userId, [...current, item]);
     },
 
     getBasket(userId: string) {

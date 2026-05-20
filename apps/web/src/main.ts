@@ -51,6 +51,13 @@ const scoredProducts = products.map((product) => {
   return { ...product, score, band: scoreBand(score) };
 });
 
+const priceConfidenceRows = [
+  { label: 'Verified shelf', source: 'Shelf photo or audited retailer page', dealScore: 'Eligible', decision: 'Can alert households' },
+  { label: 'Retailer page', source: 'Parsed public retailer page', dealScore: 'Eligible when fresh', decision: 'Show source timestamp' },
+  { label: 'Estimated', source: 'Model or stale observation', dealScore: 'Ineligible', decision: 'Display only' },
+  { label: 'Low confidence', source: 'OCR or match uncertainty', dealScore: 'Ineligible', decision: 'Route to review' }
+];
+
 const dailyDealActions = [
   { product: 'Zoégas Coffee 450g', store: 'Willys Odenplan', score: 82, confidence: 'Verified shelf', action: 'Buy two for this week' },
   { product: 'Eggs 12-pack', store: 'Lidl Sveavägen', score: 76, confidence: 'Retailer page', action: 'Add to split basket' },
@@ -346,7 +353,7 @@ app.innerHTML = `
     <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Top movers and true deals</h2>
-        <p class="lede"><a href="/deals/today/">Open today’s ranked deal board</a> for shopper actions and ranking guardrails.</p>
+        <p class="lede"><a href="/deals/today/">Open today’s ranked deal board</a> for shopper actions and ranking guardrails. <a href="/prices/confidence/">Review price confidence rules</a>.</p>
         <table class="table">
           <thead><tr><th>Ticker</th><th>Best price</th><th>7D</th><th>Deal</th><th>Verdict</th></tr></thead>
           <tbody>
@@ -361,6 +368,19 @@ app.innerHTML = `
         </table>
       </div>
 
+      <div class="card">
+        <h2>Price confidence guide</h2>
+        <p class="lede">Confidence labels determine whether price rows can rank, alert, or only display with review context.</p>
+        <table class="table">
+          <thead><tr><th>Label</th><th>Source</th><th>Deal Score</th><th>Decision</th></tr></thead>
+          <tbody>
+            ${priceConfidenceRows.map((row) => `<tr><td>${row.label}</td><td>${row.source}</td><td>${row.dealScore}</td><td>${row.decision}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Daily deal actions</h2>
         <p class="lede">Deal actions combine Deal Score, confidence, and basket fit so shoppers can act without treating estimates as verified prices.</p>

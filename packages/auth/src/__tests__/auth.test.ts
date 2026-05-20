@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createSessionToken, parseBearerToken, verifySessionToken } from '../index.js';
+import { createSessionToken, parseBearerToken, planMobileSessionPolicy, verifySessionToken } from '../index.js';
 
 describe('auth sessions', () => {
   it('creates and verifies a signed session token', async () => {
@@ -22,5 +22,47 @@ describe('auth sessions', () => {
     assert.equal(parseBearerToken('Bearer abc.def'), 'abc.def');
     assert.equal(parseBearerToken('Basic nope'), null);
     assert.equal(parseBearerToken(null), null);
+  });
+
+  it('plans native mobile session storage, device binding, and refresh actions', () => {
+    const policy = planMobileSessionPolicy({
+      userId: 'user-1',
+      platform: 'ios',
+      deviceId: 'ios-device-1',
+      secureStorageAvailable: true,
+      issuedAt: '2026-05-19T00:00:00.000Z',
+      expiresAt: '2026-05-23T00:00:00.000Z',
+      now: '2026-05-22T06:00:00.000Z'
+    });
+
+    assert.deepEqual(policy, {
+      userId: 'user-1',
+      platform: 'ios',
+      deviceBound: true,
+      secureStorageRequired: true,
+      refreshRecommended: true,
+      expired: false,
+      blockers: [],
+      actions: ['store_in_secure_storage', 'refresh_session']
+    });
+  });
+
+  it('fails closed for native mobile sessions without secure storage or device binding', () => {
+    const policy = planMobileSessionPolicy({
+      userId: 'user-1',
+      platform: 'android',
+      secureStorageAvailable: false,
+      issuedAt: '2026-05-19T00:00:00.000Z',
+      expiresAt: '2026-05-20T00:00:00.000Z',
+      now: '2026-05-20T01:00:00.000Z'
+    });
+
+    assert.equal(policy.expired, true);
+    assert.equal(policy.secureStorageRequired, true);
+    assert.deepEqual(policy.blockers, [
+      'Native mobile sessions require secure storage.',
+      'Native mobile sessions require a bound device id.'
+    ]);
+    assert.deepEqual(policy.actions, ['bind_device', 'reauthenticate']);
   });
 });

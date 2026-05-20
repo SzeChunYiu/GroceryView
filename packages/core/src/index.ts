@@ -14,6 +14,12 @@ export type ScoreBand = {
 
 const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
 const roundMoney = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
+const formatSek = (value: number): string => `${value.toFixed(2)} SEK`;
+const storeNameFromId = (storeId: string): string =>
+  storeId
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
 
 export function calculateDealScore(input: DealScoreInput): number {
   const currentCityStrength = 100 - clamp(input.currentCityPercentile, 0, 100);
@@ -41,6 +47,57 @@ export function scoreBand(score: number): ScoreBand {
   if (normalized >= 60) return { label: 'Fair deal', verdict: 'Compare' };
   if (normalized >= 40) return { label: 'Normal price', verdict: 'Normal' };
   return { label: 'Not a real deal', verdict: 'Wait' };
+}
+
+export type DealOpportunityInput = {
+  productId: string;
+  productName: string;
+  storeId: string;
+  storeName: string;
+  currentPrice: number;
+  regularPrice: number;
+  dealScore: number;
+  sourceConfidence: number;
+  sponsoredPlacement?: boolean;
+};
+
+export type DealOpportunity = DealOpportunityInput & {
+  band: ScoreBand;
+  priceDrop: number;
+  discountPercent: number;
+  reason: string;
+};
+
+export function rankDealOpportunities(input: {
+  deals: DealOpportunityInput[];
+  minimumDealScore?: number;
+  minimumSourceConfidence?: number;
+}): DealOpportunity[] {
+  const minimumDealScore = input.minimumDealScore ?? 60;
+  const minimumSourceConfidence = input.minimumSourceConfidence ?? 0.5;
+
+  return input.deals
+    .filter((deal) => !deal.sponsoredPlacement)
+    .filter((deal) => deal.dealScore >= minimumDealScore)
+    .filter((deal) => deal.sourceConfidence >= minimumSourceConfidence)
+    .map((deal) => {
+      const priceDrop = roundMoney(Math.max(0, deal.regularPrice - deal.currentPrice));
+      const discountPercent = deal.regularPrice > 0 ? roundMoney((priceDrop / deal.regularPrice) * 100) : 0;
+      const band = scoreBand(deal.dealScore);
+
+      return {
+        ...deal,
+        band,
+        priceDrop,
+        discountPercent,
+        reason: `${deal.productName} is ${discountPercent}% below regular price at ${deal.storeName} with Deal Score ${deal.dealScore}.`
+      };
+    })
+    .sort((a, b) => {
+      if (b.dealScore !== a.dealScore) return b.dealScore - a.dealScore;
+      if (b.discountPercent !== a.discountPercent) return b.discountPercent - a.discountPercent;
+      return a.productName.localeCompare(b.productName);
+    });
 }
 
 export type StorePrice = {
@@ -85,7 +142,25 @@ export type SingleStoreOption = {
 export type BasketComparisonResult = {
   cheapestByProduct: BasketStrategy;
   singleStoreOptions: SingleStoreOption[];
+  bestSingleStore?: SingleStoreOption;
+  savingsVsBestSingleStore: number;
+  splitStoreCount: number;
   missingProductIds: string[];
+};
+
+export type StoreBasketCoverage = {
+  storeId: string;
+  storeName: string;
+  knownTotal: number;
+  availableProductIds: string[];
+  missingProductIds: string[];
+  coveragePercent: number;
+};
+
+export type StoreBasketCoverageSummary = {
+  stores: StoreBasketCoverage[];
+  bestCoverage?: StoreBasketCoverage;
+  fullCoverageStoreIds: string[];
 };
 
 export function compareBasketStrategies(input: BasketComparisonInput): BasketComparisonResult {
@@ -126,13 +201,73 @@ export function compareBasketStrategies(input: BasketComparisonInput): BasketCom
     });
   }
 
+  const cheapestByProduct = {
+    total: roundMoney(assignments.reduce((sum, item) => sum + item.lineTotal, 0)),
+    assignments
+  };
+  const singleStoreOptions = [...storeTotals.values()].sort((a, b) => a.total - b.total);
+  const bestSingleStore = singleStoreOptions.find((option) => option.itemCount === assignments.length);
+
   return {
-    cheapestByProduct: {
-      total: roundMoney(assignments.reduce((sum, item) => sum + item.lineTotal, 0)),
-      assignments
-    },
-    singleStoreOptions: [...storeTotals.values()].sort((a, b) => a.total - b.total),
+    cheapestByProduct,
+    singleStoreOptions,
+    bestSingleStore,
+    savingsVsBestSingleStore: bestSingleStore ? roundMoney(bestSingleStore.total - cheapestByProduct.total) : 0,
+    splitStoreCount: new Set(assignments.map((assignment) => assignment.storeId)).size,
     missingProductIds
+  };
+}
+
+export function summarizeStoreBasketCoverage(input: BasketComparisonInput): StoreBasketCoverageSummary {
+  const coverageByStore = new Map<string, StoreBasketCoverage>();
+
+  for (const storeId of input.favoriteStoreIds) {
+    coverageByStore.set(storeId, {
+      storeId,
+      storeName: storeNameFromId(storeId),
+      knownTotal: 0,
+      availableProductIds: [],
+      missingProductIds: [],
+      coveragePercent: input.items.length === 0 ? 100 : 0
+    });
+  }
+
+  for (const item of input.items) {
+    for (const storeId of input.favoriteStoreIds) {
+      const coverage = coverageByStore.get(storeId);
+      if (!coverage) continue;
+
+      const price = item.prices.find((candidate) => candidate.storeId === storeId);
+      if (!price) {
+        coverage.missingProductIds.push(item.productId);
+        continue;
+      }
+
+      coverage.storeName = price.storeName;
+      coverage.knownTotal = roundMoney(coverage.knownTotal + price.price * item.quantity);
+      coverage.availableProductIds.push(item.productId);
+    }
+  }
+
+  const stores = [...coverageByStore.values()]
+    .map((coverage) => ({
+      ...coverage,
+      coveragePercent: input.items.length === 0
+        ? 100
+        : roundMoney((coverage.availableProductIds.length / input.items.length) * 100)
+    }))
+    .sort((a, b) => {
+      if (b.coveragePercent !== a.coveragePercent) return b.coveragePercent - a.coveragePercent;
+      if (a.knownTotal !== b.knownTotal) return a.knownTotal - b.knownTotal;
+      return a.storeName.localeCompare(b.storeName);
+    });
+
+  return {
+    stores,
+    bestCoverage: stores[0],
+    fullCoverageStoreIds: stores
+      .filter((coverage) => coverage.missingProductIds.length === 0)
+      .map((coverage) => coverage.storeId)
   };
 }
 
@@ -183,6 +318,77 @@ export function calculateFixedBasketIndex(input: FixedBasketIndexInput): FixedBa
   };
 }
 
+export type PriceHistorySourceType = 'shelf' | 'online' | 'flyer' | 'member' | 'receipt' | 'shelf_photo' | 'manual' | 'estimated';
+
+export type PriceHistoryPoint = {
+  observedAt: string;
+  price: number;
+  sourceType: PriceHistorySourceType;
+  confidence: number;
+};
+
+export type PriceHistorySummaryInput = {
+  points: PriceHistoryPoint[];
+  rangeDays: 30 | 90 | 365;
+  sourceType: PriceHistorySourceType;
+  asOf: string;
+};
+
+export type PriceHistorySummary = {
+  rangeDays: 30 | 90 | 365;
+  sourceType: PriceHistorySourceType;
+  pointCount: number;
+  low: number;
+  high: number;
+  average: number;
+  currentPrice: number;
+  currentPercentile: number;
+  averageConfidence: number;
+  limitedHistory: boolean;
+  windowStart: string;
+  windowEnd: string;
+};
+
+export function summarizePriceHistory(input: PriceHistorySummaryInput): PriceHistorySummary {
+  const asOf = Date.parse(input.asOf);
+  if (Number.isNaN(asOf)) throw new Error('asOf must be an ISO date.');
+  const windowStartMs = asOf - input.rangeDays * 24 * 60 * 60 * 1000;
+  const filtered = input.points
+    .map((point) => ({ ...point, observedAtMs: Date.parse(point.observedAt) }))
+    .filter((point) => point.sourceType === input.sourceType)
+    .filter((point) => !Number.isNaN(point.observedAtMs))
+    .filter((point) => point.observedAtMs >= windowStartMs && point.observedAtMs <= asOf)
+    .sort((a, b) => a.observedAtMs - b.observedAtMs);
+
+  if (filtered.length === 0) throw new Error('At least one price history point is required for the selected source type and range.');
+
+  const prices = filtered.map((point) => point.price);
+  if (prices.some((price) => price < 0)) throw new Error('Price history points must be non-negative.');
+  const current = filtered[filtered.length - 1];
+  const sortedPrices = [...prices].sort((a, b) => a - b);
+  let currentRank = 0;
+  for (let index = 0; index < sortedPrices.length; index += 1) {
+    if (sortedPrices[index] <= current.price) currentRank = index;
+  }
+  const currentPercentile = sortedPrices.length === 1 ? 0 : Math.round((currentRank / (sortedPrices.length - 1)) * 100);
+  const oldest = filtered[0].observedAtMs;
+
+  return {
+    rangeDays: input.rangeDays,
+    sourceType: input.sourceType,
+    pointCount: filtered.length,
+    low: roundMoney(Math.min(...prices)),
+    high: roundMoney(Math.max(...prices)),
+    average: roundMoney(prices.reduce((sum, price) => sum + price, 0) / prices.length),
+    currentPrice: roundMoney(current.price),
+    currentPercentile,
+    averageConfidence: roundMoney(filtered.reduce((sum, point) => sum + clamp(point.confidence, 0, 1), 0) / filtered.length),
+    limitedHistory: filtered.length < 2 || oldest > windowStartMs,
+    windowStart: new Date(windowStartMs).toISOString(),
+    windowEnd: new Date(asOf).toISOString()
+  };
+}
+
 export type BrandTier = 'national' | 'premium' | 'standard_private_label' | 'budget_private_label' | 'organic_private_label' | 'discount_chain_label';
 
 export type SearchableProduct = {
@@ -193,6 +399,50 @@ export type SearchableProduct = {
   brandTier: BrandTier;
   availableChains: string[];
 };
+
+export type CategoryDealCandidate = {
+  productId: string;
+  productName: string;
+  category: string;
+  storeName: string;
+  price: number;
+  dealScore: number;
+  sourceConfidence: number;
+};
+
+export type CategoryDealLeader = CategoryDealCandidate & {
+  signal: string;
+};
+
+export function summarizeCategoryDealLeaders(input: {
+  candidates: CategoryDealCandidate[];
+  minimumSourceConfidence?: number;
+}): CategoryDealLeader[] {
+  const minimumSourceConfidence = input.minimumSourceConfidence ?? 0.5;
+  const leaderByCategory = new Map<string, CategoryDealCandidate>();
+
+  for (const candidate of input.candidates) {
+    if (candidate.sourceConfidence < minimumSourceConfidence) continue;
+    const current = leaderByCategory.get(candidate.category);
+    if (
+      !current ||
+      candidate.dealScore > current.dealScore ||
+      (candidate.dealScore === current.dealScore && candidate.price < current.price) ||
+      (candidate.dealScore === current.dealScore &&
+        candidate.price === current.price &&
+        candidate.productName.localeCompare(current.productName) < 0)
+    ) {
+      leaderByCategory.set(candidate.category, candidate);
+    }
+  }
+
+  return [...leaderByCategory.values()]
+    .map((candidate) => ({
+      ...candidate,
+      signal: `${scoreBand(candidate.dealScore).label} at ${formatSek(candidate.price)}`
+    }))
+    .sort((a, b) => a.category.localeCompare(b.category));
+}
 
 export function searchProducts(products: SearchableProduct[], query: string): SearchableProduct[] {
   const terms = query
@@ -231,15 +481,16 @@ export type WatchlistAlert = {
   productId: string;
   productName: string;
   type: 'target_price' | 'deal_score' | 'new_52_week_low';
+  severity: 'info' | 'opportunity' | 'urgent';
+  trigger: {
+    metric: 'price' | 'deal_score' | 'price_history';
+    value: number | string;
+    threshold?: number;
+    storeId?: string;
+    storeName?: string;
+  };
   message: string;
 };
-
-const formatSek = (value: number): string => `${value.toFixed(2)} SEK`;
-const storeNameFromId = (storeId: string): string =>
-  storeId
-    .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
 
 export function buildWatchlistAlerts(input: {
   watchlist: WatchlistItem[];
@@ -256,11 +507,20 @@ export function buildWatchlistAlerts(input: {
     if (item.favoriteStoresOnly && !favoriteStoreSet.has(product.bestStoreId)) continue;
 
     if (item.targetPrice !== undefined && product.bestPrice <= item.targetPrice) {
+      const storeName = storeNameFromId(product.bestStoreId);
       alerts.push({
         productId: product.productId,
         productName: product.productName,
         type: 'target_price',
-        message: `${product.productName} is ${formatSek(product.bestPrice)} at ${storeNameFromId(product.bestStoreId)}, below your ${formatSek(item.targetPrice)} target.`
+        severity: product.bestPrice <= item.targetPrice * 0.9 ? 'urgent' : 'opportunity',
+        trigger: {
+          metric: 'price',
+          value: product.bestPrice,
+          threshold: item.targetPrice,
+          storeId: product.bestStoreId,
+          storeName
+        },
+        message: `${product.productName} is ${formatSek(product.bestPrice)} at ${storeName}, below your ${formatSek(item.targetPrice)} target.`
       });
     }
 
@@ -269,6 +529,14 @@ export function buildWatchlistAlerts(input: {
         productId: product.productId,
         productName: product.productName,
         type: 'deal_score',
+        severity: product.dealScore >= 90 ? 'urgent' : 'opportunity',
+        trigger: {
+          metric: 'deal_score',
+          value: product.dealScore,
+          threshold: item.alertDealScoreAt,
+          storeId: product.bestStoreId,
+          storeName: storeNameFromId(product.bestStoreId)
+        },
         message: `${product.productName} has Deal Score ${product.dealScore}, meeting your ${item.alertDealScoreAt}+ alert.`
       });
     }
@@ -278,6 +546,13 @@ export function buildWatchlistAlerts(input: {
         productId: product.productId,
         productName: product.productName,
         type: 'new_52_week_low',
+        severity: 'urgent',
+        trigger: {
+          metric: 'price_history',
+          value: 'new_52_week_low',
+          storeId: product.bestStoreId,
+          storeName: storeNameFromId(product.bestStoreId)
+        },
         message: `${product.productName} is at a new 52-week low.`
       });
     }
@@ -466,6 +741,12 @@ export type SmartSwapInput = {
   candidates: Array<ProductMatchInput & { unitPrice: number }>;
   acceptPrivateLabel: 'yes' | 'no' | 'maybe';
   minimumSavingsPercent: number;
+  privateLabelPreference?: PrivateLabelPreference;
+};
+
+export type PrivateLabelPreference = {
+  acceptedTiers: BrandTier[];
+  blockedCategories: string[];
 };
 
 export type SmartSwapRecommendation = {
@@ -480,12 +761,20 @@ function isPrivateLabel(tier: BrandTier): boolean {
   return tier === 'standard_private_label' || tier === 'budget_private_label' || tier === 'organic_private_label' || tier === 'discount_chain_label';
 }
 
+function privateLabelAllowed(input: SmartSwapInput, candidate: ProductMatchInput): boolean {
+  if (!isPrivateLabel(candidate.brandTier)) return true;
+  if (input.acceptPrivateLabel === 'no') return false;
+  if (input.privateLabelPreference?.blockedCategories.includes(candidate.category)) return false;
+  if (input.privateLabelPreference && !input.privateLabelPreference.acceptedTiers.includes(candidate.brandTier)) return false;
+  if (input.acceptPrivateLabel === 'maybe' && candidate.brandTier === 'budget_private_label') return false;
+  return true;
+}
+
 export function recommendSmartSwaps(input: SmartSwapInput): SmartSwapRecommendation[] {
-  if (input.acceptPrivateLabel === 'no') return [];
   const recommendations: SmartSwapRecommendation[] = [];
 
   for (const candidate of input.candidates) {
-    if (isPrivateLabel(candidate.brandTier) && input.acceptPrivateLabel === 'maybe' && candidate.brandTier === 'budget_private_label') continue;
+    if (!privateLabelAllowed(input, candidate)) continue;
     const match = classifyProductMatch({ source: input.source, candidate });
     if (match.mode === 'not_recommended') continue;
     const savingsPercent = Math.round(((input.source.unitPrice - candidate.unitPrice) / input.source.unitPrice) * 10000) / 100;

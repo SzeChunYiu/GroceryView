@@ -21,6 +21,7 @@ describe('buildStaticPages', () => {
         'login/index.html',
         'market/index.html',
         'notifications/inbox/index.html',
+        'prices/confidence/index.html',
         'privacy/index.html',
         'products/coffee/index.html',
         'receipts/review/index.html',
@@ -35,10 +36,37 @@ describe('buildStaticPages', () => {
       const product = await readFile(join(root, 'products/coffee/index.html'), 'utf8');
       assert.match(product, /ZOEGAS-COFFEE-450G/);
       assert.match(product, /Deal Score/);
+      assert.match(product, /Price chart/);
+      assert.match(product, /7D/);
+      assert.match(product, /30D/);
+      assert.match(product, /90D/);
+      assert.match(product, /1Y/);
+      assert.match(product, /Multi-store coffee price history/);
+      assert.match(product, /promo marker/);
+      assert.match(product, /stroke-dasharray="8 8"/);
+      assert.match(product, /Willys Odenplan/);
+      assert.match(product, /ICA Kvantum Torsplan/);
+      assert.match(product, /Coop Medborgarplatsen/);
+      assert.match(product, /Estimated observations need review/);
+      assert.match(product, /Current store prices/);
+      assert.match(product, /Unit price/);
+      assert.match(product, /promotion/);
+      assert.match(product, /Member label: Stammis price/);
+      assert.match(product, /94% verified retailer page/);
+      assert.match(product, /2026-05-20 06:00/);
+      assert.match(product, /Unverified estimate: do not treat as official shelf price/);
+      assert.match(product, /excluded from official shelf-price claims/);
 
       const market = await readFile(join(root, 'market/index.html'), 'utf8');
       assert.match(market, /Stockholm Grocery Market/);
       assert.match(market, /Coffee Index/);
+
+      const priceConfidence = await readFile(join(root, 'prices/confidence/index.html'), 'utf8');
+      assert.match(priceConfidence, /Price confidence guide/);
+      assert.match(priceConfidence, /Confidence labels/);
+      assert.match(priceConfidence, /Verified shelf/);
+      assert.match(priceConfidence, /Estimated and low-confidence rows are excluded/);
+      assert.match(priceConfidence, /Only verified or fresh retailer-page prices can alert/);
 
       const deals = await readFile(join(root, 'deals/today/index.html'), 'utf8');
       assert.match(deals, /Today’s best grocery deals/);
@@ -159,6 +187,8 @@ describe('buildStaticPages', () => {
       assert.match(scanner, /data-groceryview-flow="scanner"/);
       assert.match(scanner, /accept="image\/\*"/);
       assert.match(scanner, /data-flow-action="route-review"/);
+      assert.match(scanner, /fetch\(apiUrl\('\/api\/scans\/process/);
+      assert.match(scanner, /private-upload:\/\/scanner-preview/);
 
       const receiptReview = await readFile(join(root, 'receipts/review/index.html'), 'utf8');
       assert.match(receiptReview, /Receipt review desk/);

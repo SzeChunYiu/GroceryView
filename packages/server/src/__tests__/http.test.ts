@@ -15,8 +15,10 @@ function signBillingWebhookBody(body: string, secret: string): string {
 describe('createHttpHandler', () => {
   it('serves runtime health without leaking configured secret values', async () => {
     const previousDatabaseUrl = process.env.DATABASE_URL;
+    const previousPublicWebUrl = process.env.PUBLIC_WEB_URL;
     const previousNodeEnv = process.env.NODE_ENV;
     process.env.DATABASE_URL = 'postgres://user:secret@localhost:5432/groceryview';
+    process.env.PUBLIC_WEB_URL = 'https://groceryview.example';
     process.env.NODE_ENV = 'test';
 
     try {
@@ -29,21 +31,29 @@ describe('createHttpHandler', () => {
 
       const response = await handle(new Request('http://localhost/api/health'));
       assert.equal(response.status, 200);
-      assert.deepEqual(await json(response), {
+      const body = await json(response);
+      assert.deepEqual(body, {
         status: 'ok',
         service: 'groceryview-server',
         environment: 'test',
         hasDatabase: true,
+        hasPublicWebUrl: true,
         hasAuthSecret: true,
         hasNotificationWebhookSecret: true,
         hasBillingWebhookSecret: true,
         hasMetricsToken: true
       });
+      assert.equal(JSON.stringify(body).includes('groceryview.example'), false);
     } finally {
       if (previousDatabaseUrl === undefined) {
         delete process.env.DATABASE_URL;
       } else {
         process.env.DATABASE_URL = previousDatabaseUrl;
+      }
+      if (previousPublicWebUrl === undefined) {
+        delete process.env.PUBLIC_WEB_URL;
+      } else {
+        process.env.PUBLIC_WEB_URL = previousPublicWebUrl;
       }
       if (previousNodeEnv === undefined) {
         delete process.env.NODE_ENV;
@@ -63,6 +73,14 @@ describe('createHttpHandler', () => {
     const stores = await handle(new Request('http://localhost/api/stores'));
     assert.equal(stores.status, 200);
     assert.equal((await json(stores) as Array<{ id: string }>)[0].id, 'willys-odenplan');
+
+    const storeDeals = await handle(new Request('http://localhost/api/stores/willys-odenplan/deals'));
+    assert.equal(storeDeals.status, 200);
+    assert.deepEqual((await json(storeDeals) as Array<{ productId: string; storeId: string }>).map((deal) => [deal.productId, deal.storeId]), [
+      ['coffee', 'willys-odenplan'],
+      ['milk', 'willys-odenplan'],
+      ['butter', 'willys-odenplan']
+    ]);
 
     const product = await handle(new Request('http://localhost/api/products/coffee'));
     assert.equal(product.status, 200);
@@ -103,6 +121,22 @@ describe('createHttpHandler', () => {
     assert.equal((await json(index) as { label: string }).label, 'Stockholm Grocery Index');
   });
 
+  it('returns product not found for unknown product child resources', async () => {
+    const handle = createHttpHandler();
+
+    const product = await handle(new Request('http://localhost/api/products/missing-product'));
+    assert.equal(product.status, 404);
+    assert.deepEqual(await json(product), { error: 'Product not found.' });
+
+    const prices = await handle(new Request('http://localhost/api/products/missing-product/prices'));
+    assert.equal(prices.status, 404);
+    assert.deepEqual(await json(prices), { error: 'Product not found.' });
+
+    const history = await handle(new Request('http://localhost/api/products/missing-product/history'));
+    assert.equal(history.status, 404);
+    assert.deepEqual(await json(history), { error: 'Product not found.' });
+  });
+
   it('mutates favorite stores, watchlist, basket, and budget through proposal routes', async () => {
     const handle = createHttpHandler();
 
@@ -121,6 +155,13 @@ describe('createHttpHandler', () => {
       body: JSON.stringify({ productId: 'coffee', quantity: 1 })
     }))).status, 201);
 
+    const mergedBasket = await handle(new Request('http://localhost/api/basket/items?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ productId: 'coffee', quantity: 2 })
+    }));
+    assert.equal(mergedBasket.status, 201);
+    assert.deepEqual((await json(mergedBasket) as { items: unknown[] }).items, [{ productId: 'coffee', quantity: 3 }]);
+
     assert.equal((await handle(new Request('http://localhost/api/budget?userId=user-1', {
       method: 'PATCH',
       body: JSON.stringify({ weeklyBudget: 800, monthlyBudget: 3200 })
@@ -130,10 +171,10 @@ describe('createHttpHandler', () => {
     assert.equal(watchlist.alerts.length, 3);
 
     const comparison = await json(await handle(new Request('http://localhost/api/basket/compare?userId=user-1', { method: 'POST' }))) as { cheapestByProduct: { total: number } };
-    assert.equal(comparison.cheapestByProduct.total, 49.9);
+    assert.equal(comparison.cheapestByProduct.total, 149.7);
 
     const budget = await json(await handle(new Request('http://localhost/api/budget/summary?userId=user-1'))) as { weeklyRemainingAfterEstimate: number };
-    assert.equal(budget.weeklyRemainingAfterEstimate, 750.1);
+    assert.equal(budget.weeklyRemainingAfterEstimate, 650.3);
   });
 
   it('serves user-scoped privacy export and deletion plans from protected account data', async () => {
@@ -157,6 +198,53 @@ describe('createHttpHandler', () => {
     assert.equal(plan.destructiveAction, false);
     assert.ok(plan.deleteFromTables.includes('receipt_uploads'));
     assert.deepEqual(plan.anonymizeTables, ['community_price_reports']);
+  });
+
+  it('processes scan uploads through configured providers and returns review work items', async () => {
+    const handle = createHttpHandler(undefined, {
+      now: new Date('2026-05-20T13:00:00.000Z'),
+      scanProviders: {
+        barcode: {
+          lookup: async (barcode) => ({ barcode, productId: 'coffee', confidence: 0.93, needsHumanReview: false })
+        },
+        receiptOcr: {
+          parse: async () => ({
+            rows: [
+              { rawName: 'ZOEGAS 450G', itemTotal: 49.9, confidence: 0.91 },
+              { rawName: 'SMUDGED ITEM', itemTotal: 12.5, confidence: 0.41 }
+            ],
+            totalAmount: 62.4,
+            confidence: 0.66
+          })
+        }
+      }
+    });
+
+    const barcode = await json(await handle(new Request('http://localhost/api/scans/process?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ scanId: 'barcode-1', kind: 'barcode', payload: '0735000123456' })
+    }))) as { scanId: string; result: { status: string; productId: string }; reviewWorkItems: unknown[] };
+    assert.equal(barcode.scanId, 'barcode-1');
+    assert.deepEqual(barcode.reviewWorkItems, []);
+    assert.equal(barcode.result.status, 'matched');
+    assert.equal(barcode.result.productId, 'coffee');
+
+    const receipt = await json(await handle(new Request('http://localhost/api/scans/process?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ scanId: 'receipt-1', kind: 'receipt', payload: 'private-upload://receipt.jpg' })
+    }))) as { result: { status: string; lowConfidenceRows: string[] }; reviewWorkItems: Array<{ id: string; priority: string; evidence: string[] }> };
+    assert.equal(receipt.result.status, 'parsed');
+    assert.deepEqual(receipt.result.lowConfidenceRows, ['SMUDGED ITEM']);
+    assert.deepEqual(receipt.reviewWorkItems, [
+      {
+        id: 'scan-review-receipt-1',
+        scanId: 'receipt-1',
+        kind: 'receipt',
+        priority: 'high',
+        reason: 'Receipt has 1 low-confidence rows.',
+        evidence: ['confidence:0.66', 'total:62.4', 'low_confidence_row:SMUDGED ITEM']
+      }
+    ]);
   });
 
   it('serves account subscription access from user-scoped entitlements', async () => {

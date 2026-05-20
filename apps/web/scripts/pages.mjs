@@ -147,6 +147,34 @@ window.GroceryViewFlowActions = (() => {
       setResult('privacy', 'Deletion plan failed: ' + error.message + '. Local plan preview preserved.');
     }
   };
+  const processScannerUploadWithApi = async (form) => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('scanner', 'Local preview: connect the API session bridge before routing scans through the server.');
+      return;
+    }
+    const data = new FormData(form);
+    const file = data.get('scanImage');
+    const fileName = file && typeof file === 'object' && 'name' in file ? file.name : 'manual-scan';
+    try {
+      const payload = {
+        scanId: 'scanner-preview-' + Date.now(),
+        kind: 'receipt',
+        payload: 'private-upload://scanner-preview/' + encodeURIComponent(fileName || 'manual-scan'),
+        uploadedAt: new Date().toISOString()
+      };
+      const response = await fetch(apiUrl('/api/scans/process', config), {
+        method: 'POST',
+        headers: apiHeaders(config),
+        body: JSON.stringify(payload)
+      });
+      const result = await requireApiSuccess(response);
+      const reviewCount = Array.isArray(result.reviewWorkItems) ? result.reviewWorkItems.length : 0;
+      setResult('scanner', 'Connected API: scan processed as ' + (result.result?.status || 'unknown') + ' with ' + reviewCount + ' review work items.');
+    } catch (error) {
+      setResult('scanner', 'Scan API processing failed: ' + error.message + '. Local preview remains staged.');
+    }
+  };
   const saveBasketToApi = async (form) => {
     const config = getApiConfig();
     if (!hasApiSession(config)) {
@@ -203,7 +231,7 @@ window.GroceryViewFlowActions = (() => {
       } else if (flow === 'basket') {
         setResult(flow, 'Basket preview recalculated at ' + formatSek(summarizeBasket(form)) + ' before checkout.');
       }
-      if (flow === 'scanner') setResult(flow, 'Upload preview staged; OCR provider stays gated until credentials are configured.');
+      if (flow === 'scanner') await processScannerUploadWithApi(form);
     });
   });
   document.querySelectorAll('[data-flow-action]').forEach((button) => {
@@ -329,6 +357,12 @@ const pages = [
     body: `<section class="card"><div class="eyebrow">Market</div><h1>Stockholm Grocery Market</h1><p class="lede">Top movers, best true deals, and grocery indices for Stockholm.</p><div class="grid"><div class="metric"><strong>101.6</strong><span>Stockholm Grocery Index</span></div><div class="metric"><strong>91.6</strong><span>Coffee Index</span></div><div class="metric"><strong>108.4</strong><span>Dairy Index</span></div></div></section>`
   },
   {
+    path: 'prices/confidence/index.html',
+    title: 'Price confidence guide — GroceryView',
+    description: 'Explain GroceryView price confidence labels, source types, Deal Score eligibility, and user-facing trust decisions.',
+    body: `<section class="card"><div class="eyebrow">Price confidence</div><h1>Price confidence guide</h1><p class="lede">Understand how verified shelf, retailer-page, member, estimated, and low-confidence prices appear across deal boards and basket decisions.</p><div class="grid"><div class="metric"><strong>Verified</strong><span>can affect Deal Score</span></div><div class="metric"><strong>Estimated</strong><span>display only</span></div><div class="metric"><strong>Low</strong><span>review required</span></div></div></section><section class="card" style="margin-top:16px"><h2>Confidence labels</h2><table class="table"><thead><tr><th>Label</th><th>Source</th><th>Deal Score</th><th>User copy</th></tr></thead><tbody><tr><td>Verified shelf</td><td>Shelf photo or audited retailer page</td><td>Eligible</td><td>Official shelf evidence</td></tr><tr><td>Retailer page</td><td>Parsed public retailer page</td><td>Eligible when fresh</td><td>Retailer-page confidence</td></tr><tr><td>Member-only</td><td>Loyalty price or coupon</td><td>Separated</td><td>Requires membership context</td></tr><tr><td>Estimated</td><td>Model or stale observation</td><td>Ineligible</td><td>Estimate, do not rank</td></tr><tr><td>Low confidence</td><td>OCR or match uncertainty</td><td>Ineligible</td><td>Needs review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Trust decisions</h2><table class="table"><thead><tr><th>Decision</th><th>Rule</th></tr></thead><tbody><tr><td>Show in product page</td><td>All labels can appear with source metadata.</td></tr><tr><td>Trigger household alert</td><td>Only verified or fresh retailer-page prices can alert.</td></tr><tr><td>Rank in deal board</td><td>Estimated and low-confidence rows are excluded.</td></tr></tbody></table></section>`
+  },
+  {
     path: 'deals/today/index.html',
     title: 'Today’s best grocery deals — GroceryView',
     description: 'Daily GroceryView deal board with Deal Score, source confidence, savings, and recommended shopper actions.',
@@ -344,7 +378,7 @@ const pages = [
     path: 'products/coffee/index.html',
     title: 'ZOEGAS-COFFEE-450G price history — GroceryView',
     description: 'Zoégas Coffee 450g price ticker with current prices, price history, and Deal Score.',
-    body: `<section class="card"><div class="eyebrow">Product ticker</div><h1>ZOEGAS-COFFEE-450G</h1><p class="lede">Current best price: 49.90 SEK at Willys Odenplan.</p><div class="grid"><div class="metric"><strong>82</strong><span>Deal Score</span></div><div class="metric"><strong>8th</strong><span>Stockholm percentile</span></div><div class="metric"><strong>6th</strong><span>Historical percentile</span></div></div></section>`
+    body: `<section class="card"><div class="eyebrow">Product ticker</div><h1>ZOEGAS-COFFEE-450G</h1><p class="lede">Current best price: 49.90 SEK at Willys Odenplan. Price rows separate verified shelf, member, promotion, and estimated evidence so GroceryView never presents unverified values as official shelf prices.</p><div class="grid"><div class="metric"><strong>82</strong><span>Deal Score</span></div><div class="metric"><strong>8th</strong><span>Stockholm percentile</span></div><div class="metric"><strong>6th</strong><span>Historical percentile</span></div></div></section><section class="card" style="margin-top:16px"><h2>Price chart</h2><div class="toolbar" aria-label="Chart range"><span class="pill">7D</span><span class="pill">30D</span><span class="pill">90D</span><span class="pill">1Y</span></div><svg class="price-chart" viewBox="0 0 720 260" role="img" aria-label="Multi-store coffee price history with promo markers and confidence styling"><line x1="44" y1="42" x2="44" y2="218" stroke="#37524b"/><line x1="44" y1="218" x2="690" y2="218" stroke="#37524b"/><polyline points="56,92 150,96 244,110 338,126 432,130 526,146 620,142" fill="none" stroke="#20d9a6" stroke-width="4"/><polyline points="56,112 150,116 244,121 338,128 432,137 526,151 620,157" fill="none" stroke="#7cf2ce" stroke-width="4"/><polyline points="56,80 150,88 244,102 338,118 432,132 526,138 620,150" fill="none" stroke="#ffca66" stroke-width="4" stroke-dasharray="8 8"/><circle cx="526" cy="146" r="8" fill="#20d9a6"/><circle cx="620" cy="150" r="8" fill="#ffca66"/><text x="536" y="132" fill="#ccfff0" font-size="13">promo marker</text><text x="54" y="236" fill="#88a49c" font-size="12">May 14</text><text x="300" y="236" fill="#88a49c" font-size="12">May 17</text><text x="584" y="236" fill="#88a49c" font-size="12">May 20</text></svg><table class="table"><thead><tr><th>Store line</th><th>Style</th><th>Confidence</th></tr></thead><tbody><tr><td>Willys Odenplan</td><td>Solid green</td><td>Verified shelf and promo observations</td></tr><tr><td>ICA Kvantum Torsplan</td><td>Solid mint</td><td>Retailer page observations</td></tr><tr><td>Coop Medborgarplatsen</td><td>Dotted amber</td><td>Estimated observations need review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Current store prices</h2><table class="table"><thead><tr><th>Store</th><th>Price</th><th>Unit price</th><th>Type</th><th>Confidence</th><th>Observed</th></tr></thead><tbody><tr><td>Willys Odenplan<br><span class="footer-note">Promo label: weekly coffee campaign</span></td><td>49.90 SEK</td><td>110.89 SEK/kg</td><td><span class="status">promotion</span></td><td>94% verified retailer page</td><td>2026-05-20 06:00</td></tr><tr><td>ICA Kvantum Torsplan<br><span class="footer-note">Member label: Stammis price</span></td><td>52.90 SEK</td><td>117.56 SEK/kg</td><td><span class="status">member</span></td><td>91% loyalty offer</td><td>2026-05-20 06:05</td></tr><tr><td>Coop Medborgarplatsen<br><span class="footer-note">Unverified estimate: do not treat as official shelf price</span></td><td>57.90 SEK</td><td>128.67 SEK/kg</td><td><span class="status">estimated</span></td><td>62% needs review</td><td>2026-05-20 05:55</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Price evidence guardrails</h2><table class="table"><thead><tr><th>Signal</th><th>Displayed behavior</th></tr></thead><tbody><tr><td>Verified shelf or retailer page</td><td>Can contribute to current price, Deal Score, and basket totals.</td></tr><tr><td>Member or promotion price</td><td>Shown with explicit loyalty or campaign label before shoppers act.</td></tr><tr><td>Estimated or low-confidence row</td><td>Marked unverified and excluded from official shelf-price claims.</td></tr></tbody></table></section>`
   },
   {
     path: 'stores/willys-odenplan/index.html',

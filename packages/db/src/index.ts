@@ -8,6 +8,15 @@ export type SqlMigrationFile = {
   sql: string;
 };
 
+export type MigrationPlanStatus = {
+  status: 'ready' | 'pending' | 'drift';
+  applied: string[];
+  pending: string[];
+  unknownApplied: string[];
+  duplicateApplied: string[];
+  summary: string;
+};
+
 export type SqlExecutor = {
   getAppliedMigrationVersions(): Promise<string[]>;
   execute(sql: string): Promise<void>;
@@ -41,6 +50,39 @@ export function createMigrationPlan(files: SqlMigrationFile[]): Migration[] {
   }
 
   return migrations;
+}
+
+export function buildMigrationPlanStatus(migrations: Migration[], appliedVersions: string[]): MigrationPlanStatus {
+  const plannedVersions = [...new Set(migrations.map((migration) => migration.version))].sort();
+  const planned = new Set(plannedVersions);
+  const appliedCounts = new Map<string, number>();
+
+  for (const version of appliedVersions) {
+    appliedCounts.set(version, (appliedCounts.get(version) ?? 0) + 1);
+  }
+
+  const applied = [...appliedCounts.keys()].filter((version) => planned.has(version)).sort();
+  const pending = plannedVersions.filter((version) => !appliedCounts.has(version));
+  const unknownApplied = [...appliedCounts.keys()].filter((version) => !planned.has(version)).sort();
+  const duplicateApplied = [...appliedCounts.entries()]
+    .filter(([, count]) => count > 1)
+    .map(([version]) => version)
+    .sort();
+  const driftCount = unknownApplied.length + duplicateApplied.length;
+
+  return {
+    status: driftCount > 0 ? 'drift' : pending.length > 0 ? 'pending' : 'ready',
+    applied,
+    pending,
+    unknownApplied,
+    duplicateApplied,
+    summary:
+      driftCount > 0
+        ? `Migration metadata drift detected: ${driftCount} issue(s).`
+        : pending.length > 0
+          ? `${pending.length} migration(s) pending.`
+          : 'All planned migrations are applied.'
+  };
 }
 
 export function parseSqlStatements(sql: string): string[] {
@@ -399,6 +441,21 @@ export type SourceRunListFilter = {
   limit?: number;
 };
 
+export type SourceRunHealthInput = {
+  now: string;
+  maxRunningMinutes: number;
+  staleAfterMinutes: number;
+  runs: SourceRunReadRecord[];
+};
+
+export type SourceRunHealthReport = {
+  status: 'healthy' | 'blocked';
+  blockers: string[];
+  evidence: string[];
+  runningRunIds: string[];
+  staleRunIds: string[];
+};
+
 export type FinishSourceRunRecord = {
   sourceRunId: string;
   finishedAt?: string;
@@ -566,6 +623,67 @@ export function applyNotificationTaskAcknowledgements(input: {
   }
 
   return updates;
+}
+
+function parseDbIsoDate(value: string, label: string): number {
+  const parsed = Date.parse(value);
+  if (Number.isNaN(parsed)) throw new Error(`${label} must be an ISO date.`);
+  return parsed;
+}
+
+export function buildSourceRunHealthReport(input: SourceRunHealthInput): SourceRunHealthReport {
+  if (!Number.isFinite(input.maxRunningMinutes) || input.maxRunningMinutes <= 0) throw new Error('maxRunningMinutes must be positive.');
+  if (!Number.isFinite(input.staleAfterMinutes) || input.staleAfterMinutes <= 0) throw new Error('staleAfterMinutes must be positive.');
+
+  const nowMs = parseDbIsoDate(input.now, 'now');
+  const blockers: string[] = [];
+  const evidence: string[] = [];
+  const runningRunIds: string[] = [];
+  const staleRunIds: string[] = [];
+
+  for (const run of [...input.runs].sort((a, b) => a.sourceRunId.localeCompare(b.sourceRunId))) {
+    const startedAtMs = parseDbIsoDate(run.startedAt, `startedAt for ${run.sourceRunId}`);
+    if (startedAtMs > nowMs) {
+      blockers.push(`source_run_started_in_future:${run.sourceRunId}`);
+      continue;
+    }
+
+    if (run.status === 'running') {
+      const runningMinutes = (nowMs - startedAtMs) / 60_000;
+      runningRunIds.push(run.sourceRunId);
+      if (runningMinutes > input.maxRunningMinutes) blockers.push(`source_run_stuck_running:${run.sourceRunId}`);
+      continue;
+    }
+
+    if (!run.finishedAt) {
+      blockers.push(`source_run_missing_finished_at:${run.sourceRunId}`);
+      continue;
+    }
+
+    const finishedAtMs = parseDbIsoDate(run.finishedAt, `finishedAt for ${run.sourceRunId}`);
+    if (finishedAtMs > nowMs) {
+      blockers.push(`source_run_finished_in_future:${run.sourceRunId}`);
+      continue;
+    }
+
+    const ageMinutes = (nowMs - finishedAtMs) / 60_000;
+    if (ageMinutes > input.staleAfterMinutes) {
+      staleRunIds.push(run.sourceRunId);
+      blockers.push(`source_run_stale:${run.sourceRunId}`);
+    }
+
+    if (run.status === 'failed') blockers.push(`source_run_failed:${run.sourceRunId}`);
+    if (run.status === 'partial') blockers.push(`source_run_partial:${run.sourceRunId}`);
+    if (run.status === 'succeeded' && ageMinutes <= input.staleAfterMinutes) evidence.push(`source_run_succeeded:${run.sourceRunId}`);
+  }
+
+  return {
+    status: blockers.length === 0 ? 'healthy' : 'blocked',
+    blockers,
+    evidence,
+    runningRunIds,
+    staleRunIds
+  };
 }
 
 function requireUser(users: Map<string, UserRecord>, userId: string): void {
@@ -1827,6 +1945,23 @@ export type PostgresIntegrationReadinessReport = {
   summary: string;
 };
 
+export type PostgresIntegrationReadinessSummary = {
+  status: PostgresIntegrationReadinessReport['status'];
+  blockers: {
+    total: number;
+    missingTables: number;
+    missingMigrations: number;
+    repositoryFailures: number;
+    repositoryNotRun: number;
+  };
+  evidence: {
+    total: number;
+    tables: number;
+    migrations: number;
+    repositoryChecks: number;
+  };
+};
+
 type TableNameRow = { table_name: string };
 type MigrationVersionRow = { version: string };
 type ProbeIdRow = { id: string };
@@ -2222,6 +2357,35 @@ export function buildPostgresIntegrationReadinessReport(input: PostgresIntegrati
     blockers,
     evidence,
     summary: blockers.length === 0 ? 'PostgreSQL integration contract is ready.' : 'PostgreSQL integration contract is blocked.'
+  };
+}
+
+export function summarizePostgresIntegrationReadinessReport(
+  report: PostgresIntegrationReadinessReport
+): PostgresIntegrationReadinessSummary {
+  return {
+    status: report.status,
+    blockers: report.blockers.reduce<PostgresIntegrationReadinessSummary['blockers']>(
+      (summary, blocker) => {
+        summary.total += 1;
+        if (blocker.startsWith('missing_table:')) summary.missingTables += 1;
+        if (blocker.startsWith('missing_migration:')) summary.missingMigrations += 1;
+        if (blocker.startsWith('repository_check_fail:')) summary.repositoryFailures += 1;
+        if (blocker.startsWith('repository_check_not_run:')) summary.repositoryNotRun += 1;
+        return summary;
+      },
+      { total: 0, missingTables: 0, missingMigrations: 0, repositoryFailures: 0, repositoryNotRun: 0 }
+    ),
+    evidence: report.evidence.reduce<PostgresIntegrationReadinessSummary['evidence']>(
+      (summary, entry) => {
+        summary.total += 1;
+        if (entry.startsWith('table:')) summary.tables += 1;
+        if (entry.startsWith('migration:')) summary.migrations += 1;
+        if (entry.startsWith('repository_check:')) summary.repositoryChecks += 1;
+        return summary;
+      },
+      { total: 0, tables: 0, migrations: 0, repositoryChecks: 0 }
+    )
   };
 }
 

@@ -33,8 +33,10 @@ describe('buildOpenApiDocument', () => {
       '/api/products/{id}/history',
       '/api/products/{id}/prices',
       '/api/readiness/postgres',
+      '/api/scans/process',
       '/api/stores',
       '/api/stores/{id}',
+      '/api/stores/{id}/deals',
       '/api/users/{userId}/favorite-stores',
       '/api/watchlist'
     ]);
@@ -50,6 +52,7 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/human-review/assignments/{id}/decisions'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/privacy/export'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/privacy/deletion-plan'].post?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/scans/process'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/metrics/notifications'].get?.security, [{ metricsToken: [] }]);
     assert.deepEqual(doc.paths['/api/readiness/postgres'].get?.security, [{ metricsToken: [] }]);
     assert.deepEqual(doc.paths['/api/notifications/suppression-events'].post?.security, [{ webhookSignature: [] }]);
