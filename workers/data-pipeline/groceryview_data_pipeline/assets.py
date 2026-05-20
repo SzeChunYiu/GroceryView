@@ -31,6 +31,7 @@ from .models import (
     OpenPricesLaunchReadinessSummary,
     OpenPricesPullPlan,
     OpenPricesScheduleHealthPlan,
+    OpenPricesScheduleHealthPlanSummary,
     PriceObservationRow,
     PriceObservationMixSummary,
     PriceProvenance,
@@ -568,6 +569,17 @@ def summarize_open_prices_hosted_smoke_plan(plan: OpenPricesHostedSmokePlan) -> 
         required_action_count=len(plan.required_actions),
         required_env_count=len(plan.required_env),
         endpoint_count=len(plan.endpoints),
+        evidence_field_count=len(plan.evidence_fields),
+    )
+
+
+def summarize_open_prices_schedule_health_plan(plan: OpenPricesScheduleHealthPlan) -> OpenPricesScheduleHealthPlanSummary:
+    return OpenPricesScheduleHealthPlanSummary(
+        status=plan.status,
+        required_action_count=len(plan.required_actions),
+        required_env_count=len(plan.required_env),
+        source_asset_count=len(plan.source_assets),
+        schedule_count=len(plan.schedule_names),
         evidence_field_count=len(plan.evidence_fields),
     )
 

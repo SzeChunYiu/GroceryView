@@ -21,6 +21,7 @@ from groceryview_data_pipeline.assets import (
     summarize_open_prices_launch_readiness,
     summarize_open_prices_hosted_smoke_plan,
     summarize_open_prices_ingestion_run_plan,
+    summarize_open_prices_schedule_health_plan,
 )
 from groceryview_data_pipeline.models import LatestPriceRow, ObservationFreshnessSummary, PriceObservationRow, PriceProvenance
 
@@ -336,6 +337,28 @@ def test_open_prices_schedule_health_plan_blocks_until_worker_schedules_are_obse
     )
     assert ready.status == "ready"
     assert ready.required_actions == []
+
+
+def test_open_prices_schedule_health_plan_summary_counts_schedule_requirements() -> None:
+    blocked = build_open_prices_schedule_health_plan(ingestion_schedule_enabled=True)
+
+    assert summarize_open_prices_schedule_health_plan(blocked).to_dict() == {
+        "status": "blocked",
+        "required_action_count": 3,
+        "required_env_count": 4,
+        "source_asset_count": 2,
+        "schedule_count": 2,
+        "evidence_field_count": 6,
+        "demo": False,
+    }
+
+    ready = build_open_prices_schedule_health_plan(
+        dagster_deployment_url_present=True,
+        ingestion_schedule_enabled=True,
+        import_readiness_schedule_enabled=True,
+        schedule_health_probe_configured=True,
+    )
+    assert summarize_open_prices_schedule_health_plan(ready).required_action_count == 0
 
 
 def test_open_prices_launch_readiness_rolls_up_all_open_prices_plans() -> None:
