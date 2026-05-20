@@ -2,6 +2,7 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { createGroceryViewApi } from '@groceryview/api';
 import { parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
+import { buildSubscriptionAccessPolicy, type SubscriptionEntitlementSnapshot } from '@groceryview/monetization';
 import {
   applyHumanReviewDecision,
   authorizeHumanReviewAction,
@@ -24,6 +25,9 @@ export type HttpHandler = (request: Request) => Promise<Response>;
 export type AuthOptions = {
   authSecret?: string;
   now?: Date;
+  subscriptionEntitlementRepository?: {
+    getSubscriptionEntitlement(userId: string): Promise<SubscriptionEntitlementLookupRecord | null>;
+  };
   humanReviewRepository?: {
     getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
     listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
@@ -35,6 +39,12 @@ export type AuthOptions = {
   };
   notificationMetricsToken?: string;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
+};
+
+export type SubscriptionEntitlementLookupRecord = SubscriptionEntitlementSnapshot & {
+  userId: string;
+  providerCustomerId?: string;
+  providerSubscriptionId?: string;
 };
 
 type JsonRecord = Record<string, unknown>;
@@ -198,6 +208,14 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
+        if (authOptions.subscriptionEntitlementRepository) {
+          return jsonResponse(
+            buildSubscriptionAccessPolicy({
+              entitlement: await authOptions.subscriptionEntitlementRepository.getSubscriptionEntitlement(user),
+              now: (authOptions.now ?? new Date()).toISOString()
+            })
+          );
+        }
         return jsonResponse(api.getSubscriptionAccess(user, (authOptions.now ?? new Date()).toISOString()));
       }
 
