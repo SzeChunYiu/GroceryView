@@ -854,8 +854,8 @@ export function createGroceryViewApi() {
       requireKnownProduct(productId);
       const items = watchlists.get(userId) ?? [];
       const next = items.filter((item) => item.productId !== productId);
-      if (next.length === items.length) throw new Error(`Watchlist item not found: ${productId}`);
       watchlists.set(userId, next);
+      return { removed: next.length !== items.length };
     },
 
     getWatchlist(userId: string): { items: WatchlistItem[]; alerts: WatchlistAlert[] } {

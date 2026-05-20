@@ -261,7 +261,7 @@ describe('createGroceryViewApi', () => {
     );
     assert.throws(() => api.addBasketItem('user-1', { productId: 'coffee', quantity: 0 }), /quantity must be an integer/);
     assert.throws(() => api.updateWatchlistItem('user-1', 'coffee', { targetPrice: 40 }), /Watchlist item not found/);
-    assert.throws(() => api.removeWatchlistItem('user-1', 'coffee'), /Watchlist item not found/);
+    assert.deepEqual(api.removeWatchlistItem('user-1', 'coffee'), { removed: false });
     assert.throws(() => api.updateBasketItem('user-1', 'coffee', 1), /Basket item not found/);
     assert.throws(() => api.removeBasketItem('user-1', 'coffee'), /Basket item not found/);
     api.addBasketItem('user-1', { productId: 'coffee', quantity: 98 });
