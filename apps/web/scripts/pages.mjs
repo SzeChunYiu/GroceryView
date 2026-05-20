@@ -73,6 +73,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-pantry-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setLoyaltyOffersMetric = (metric, message) => {
+    const target = document.querySelector('[data-loyalty-offers-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setSavingsLedgerMetric = (metric, message) => {
     const target = document.querySelector('[data-savings-ledger-' + metric + ']');
     if (target) target.textContent = message;
@@ -888,6 +892,30 @@ window.GroceryViewFlowActions = (() => {
       setResult('pantry', 'Pantry API load failed: ' + error.message + '. Static pantry inventory remains visible.');
     }
   };
+  const loadLoyaltyOffersFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('loyalty-offers', 'Local preview mode: connect the API session bridge before loading live loyalty offers.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/loyalty/offers', config), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const offers = Array.isArray(payload.offers) ? payload.offers : [];
+      const actionOffers = offers.filter((offer) => offer.actionRequired);
+      const eligibleOffers = offers.filter((offer) => offer.status === 'eligible');
+      const topOffer = offers[0] || {};
+      setLoyaltyOffersMetric('savings', formatSek(payload.totalEligibleSavings || 0) + ' eligible savings · ' + eligibleOffers.length + '/' + offers.length + ' offers ready');
+      setLoyaltyOffersMetric('actions', actionOffers.length + ' action-required offers · top ' + (topOffer.productName || topOffer.productId || 'n/a') + ' saves ' + formatSek(topOffer.savings || 0));
+      setLoyaltyOffersMetric('guardrails', Number(payload.membershipRequiredCount || 0) + ' membership confirmations · ' + (Array.isArray(payload.guardrails) ? payload.guardrails.length : 0) + ' loyalty guardrails');
+      setResult('loyalty-offers', 'Connected loyalty offers loaded: ' + offers.length + ' offers, ' + formatSek(payload.totalEligibleSavings || 0) + ' eligible savings, ' + actionOffers.length + ' actions required.');
+    } catch (error) {
+      setResult('loyalty-offers', 'Loyalty offers API load failed: ' + error.message + '. Static loyalty offer queue remains visible.');
+    }
+  };
   const loadSavingsLedgerFromApi = async () => {
     const config = getApiConfig();
     if (!hasApiSession(config)) {
@@ -1169,6 +1197,10 @@ window.GroceryViewFlowActions = (() => {
         await loadPantryFromApi();
         return;
       }
+      if (flow === 'loyalty-offers' && action === 'load-loyalty-offers') {
+        await loadLoyaltyOffersFromApi();
+        return;
+      }
       if (flow === 'savings-ledger' && action === 'load-savings-ledger') {
         await loadSavingsLedgerFromApi();
         return;
@@ -1344,6 +1376,9 @@ const nutritionValueLivePanel = `
 const pantryLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="pantry" style="margin-top:16px"><div class="eyebrow">Connected pantry API</div><h2>Pull live pantry replenishment</h2><p class="lede">Fetch <code>/api/pantry/replenishment</code> through the protected API session bridge to refresh live low-stock status, expiring-soon rows, restock quantities, duplicate basket blockers, and best-deal context before pantry suggestions modify a basket or meal plan.</p><div class="grid" aria-label="Live pantry replenishment API metrics"><div class="metric"><strong data-pantry-summary>Waiting for API pull</strong><span>inventory status mix</span></div><div class="metric"><strong data-pantry-restock>Static restock preview</strong><span>top restock action</span></div><div class="metric"><strong data-pantry-expiry>Static expiry preview</strong><span>expiry, duplicate, and deal context</span></div></div><div class="flow-panel" aria-label="Connected pantry actions"><button type="button" data-flow-action="load-pantry">Load live pantry replenishment</button></div><p class="flow-result" data-flow-result="pantry" aria-live="polite">Local preview mode: connect the API session bridge before loading live pantry replenishment.</p></section>`;
 
+const loyaltyOffersLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="loyalty-offers" style="margin-top:16px"><div class="eyebrow">Connected loyalty API</div><h2>Pull live loyalty offers</h2><p class="lede">Fetch <code>/api/loyalty/offers</code> through the protected API session bridge to refresh eligible member savings, coupon action counts, membership confirmations, and shelf-price separation guardrails before loyalty offers affect household savings.</p><div class="grid" aria-label="Live loyalty offer API metrics"><div class="metric"><strong data-loyalty-offers-savings>Waiting for API pull</strong><span>eligible savings and ready offers</span></div><div class="metric"><strong data-loyalty-offers-actions>Static action preview</strong><span>coupon and top-offer actions</span></div><div class="metric"><strong data-loyalty-offers-guardrails>Static guardrail preview</strong><span>membership and shelf-price guardrails</span></div></div><div class="flow-panel" aria-label="Connected loyalty offer actions"><button type="button" data-flow-action="load-loyalty-offers">Load live loyalty offers</button></div><p class="flow-result" data-flow-result="loyalty-offers" aria-live="polite">Local preview mode: connect the API session bridge before loading live loyalty offers.</p></section>`;
+
 const savingsLedgerLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="savings-ledger" style="margin-top:16px"><div class="eyebrow">Connected savings ledger API</div><h2>Pull live savings ledger</h2><p class="lede">Fetch protected <code>/api/budget/summary</code> and <code>/api/basket/compare</code> to reconcile budget remaining, next-basket estimate, split-basket forecast savings, verified assignment lines, and missing-product blockers before savings are treated as realized.</p><div class="grid" aria-label="Live savings ledger API metrics"><div class="metric"><strong data-savings-ledger-confirmed>Waiting for API pull</strong><span>budget actuals</span></div><div class="metric"><strong data-savings-ledger-forecast>Static forecast preview</strong><span>forecast savings and next basket</span></div><div class="metric"><strong data-savings-ledger-blockers>Static blocker preview</strong><span>assignment evidence and blockers</span></div></div><div class="flow-panel" aria-label="Connected savings ledger actions"><button type="button" data-flow-action="load-savings-ledger">Load live savings ledger</button></div><p class="flow-result" data-flow-result="savings-ledger" aria-live="polite">Local preview mode: connect the API session bridge and save a basket before loading live savings ledger.</p></section>`;
 
@@ -1391,7 +1426,7 @@ const pages = [
     path: 'loyalty/offers/index.html',
     title: 'Loyalty offer tracker — GroceryView',
     description: 'Track GroceryView member-only offers, coupon eligibility, membership requirements, basket impact, and loyalty-price guardrails.',
-    body: `<section class="card"><div class="eyebrow">Loyalty</div><h1>Loyalty offer tracker</h1><p class="lede">Review member-only prices, coupon eligibility, and basket impact before loyalty offers affect household savings decisions.</p><div class="grid"><div class="metric"><strong>3</strong><span>active member offers</span></div><div class="metric"><strong>38 SEK</strong><span>eligible savings</span></div><div class="metric"><strong>1</strong><span>needs membership confirmation</span></div></div></section><section class="card" style="margin-top:16px"><h2>Member offer queue</h2><table class="table"><thead><tr><th>Offer</th><th>Chain</th><th>Requirement</th><th>Savings</th><th>Status</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g Stammis price</td><td>ICA</td><td>ICA Stammis linked</td><td>7 SEK</td><td>Eligible</td></tr><tr><td>Coop Medmera dairy coupon</td><td>Coop</td><td>Clip coupon before checkout</td><td>12 SEK</td><td>Needs action</td></tr><tr><td>Willys Plus pantry bundle</td><td>Willys</td><td>Member account verified</td><td>19 SEK</td><td>Ready for basket</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Loyalty guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Separate public shelf price</td><td>Member-only savings never overwrite verified public shelf evidence.</td></tr><tr><td>Confirm membership</td><td>Unlinked programs stay out of basket savings until the household confirms access.</td></tr><tr><td>Coupon action required</td><td>Clip-required offers show an action before checkout routing.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Loyalty</div><h1>Loyalty offer tracker</h1><p class="lede">Review member-only prices, coupon eligibility, and basket impact before loyalty offers affect household savings decisions.</p><div class="grid"><div class="metric"><strong>3</strong><span>active member offers</span></div><div class="metric"><strong>38 SEK</strong><span>eligible savings</span></div><div class="metric"><strong>1</strong><span>needs membership confirmation</span></div></div></section><section class="card" style="margin-top:16px"><h2>Member offer queue</h2><table class="table"><thead><tr><th>Offer</th><th>Chain</th><th>Requirement</th><th>Savings</th><th>Status</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g Stammis price</td><td>ICA</td><td>ICA Stammis linked</td><td>7 SEK</td><td>Eligible</td></tr><tr><td>Coop Medmera dairy coupon</td><td>Coop</td><td>Clip coupon before checkout</td><td>12 SEK</td><td>Needs action</td></tr><tr><td>Willys Plus pantry bundle</td><td>Willys</td><td>Member account verified</td><td>19 SEK</td><td>Ready for basket</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Loyalty guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Separate public shelf price</td><td>Member-only savings never overwrite verified public shelf evidence.</td></tr><tr><td>Confirm membership</td><td>Unlinked programs stay out of basket savings until the household confirms access.</td></tr><tr><td>Coupon action required</td><td>Clip-required offers show an action before checkout routing.</td></tr></tbody></table></section>${loyaltyOffersLivePanel}`
   },
   {
     path: 'meal-plans/index.html',

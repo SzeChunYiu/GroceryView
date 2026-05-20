@@ -387,6 +387,15 @@ describe('buildStaticPages', () => {
       assert.match(loyaltyOffers, /ICA Stammis linked/);
       assert.match(loyaltyOffers, /Clip coupon before checkout/);
       assert.match(loyaltyOffers, /Member-only savings never overwrite verified public shelf evidence/);
+      assert.match(loyaltyOffers, /Connected loyalty API/);
+      assert.match(loyaltyOffers, /Load live loyalty offers/);
+      assert.match(loyaltyOffers, /data-groceryview-flow="loyalty-offers"/);
+      assert.match(loyaltyOffers, /data-flow-action="load-loyalty-offers"/);
+      assert.match(loyaltyOffers, /data-loyalty-offers-savings/);
+      assert.match(loyaltyOffers, /data-loyalty-offers-actions/);
+      assert.match(loyaltyOffers, /data-loyalty-offers-guardrails/);
+      assert.match(loyaltyOffers, /fetch\(apiUrl\('\/api\/loyalty\/offers'/);
+      assert.match(loyaltyOffers, /Connected loyalty offers loaded/);
 
       const mealPlans = await readFile(join(root, 'meal-plans/index.html'), 'utf8');
       assert.match(mealPlans, /Meal plan builder/);

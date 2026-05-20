@@ -444,6 +444,29 @@ export type NutritionValueReport = {
   guardrails: string[];
 };
 
+export type LoyaltyOfferStatus = 'eligible' | 'needs_coupon' | 'needs_membership';
+
+export type LoyaltyOffer = {
+  productId: string;
+  productName: string;
+  chain: string;
+  publicShelfPrice: number;
+  memberPrice: number;
+  savings: number;
+  requirement: string;
+  status: LoyaltyOfferStatus;
+  actionRequired: boolean;
+};
+
+export type LoyaltyOfferReport = {
+  userId: string;
+  offers: LoyaltyOffer[];
+  totalEligibleSavings: number;
+  requiresActionCount: number;
+  membershipRequiredCount: number;
+  guardrails: string[];
+};
+
 const stores: Store[] = [
   { id: 'willys-odenplan', name: 'Willys Odenplan', chain: 'willys', district: 'Odenplan', address: 'Odenplan, Stockholm', confidence: 'high' },
   { id: 'lidl-sveavagen', name: 'Lidl Sveavägen', chain: 'lidl', district: 'Norrmalm', address: 'Sveavägen, Stockholm', confidence: 'medium' },
@@ -549,6 +572,42 @@ const defaultPantry: PantryInventoryItem[] = [
 
 const defaultPantryUsage = [
   { productId: 'coffee', quantityUsed: 0.5, usedAt: '2026-05-19T07:00:00.000Z' }
+];
+
+const loyaltyOffers: LoyaltyOffer[] = [
+  {
+    productId: 'coffee',
+    productName: 'Zoégas Coffee 450g',
+    chain: 'ica',
+    publicShelfPrice: 56.9,
+    memberPrice: 49.9,
+    savings: 7,
+    requirement: 'ICA Stammis linked',
+    status: 'eligible',
+    actionRequired: false
+  },
+  {
+    productId: 'milk',
+    productName: 'Arla Milk 1L',
+    chain: 'coop',
+    publicShelfPrice: 25.9,
+    memberPrice: 13.9,
+    savings: 12,
+    requirement: 'Clip Coop Medmera coupon before checkout',
+    status: 'needs_coupon',
+    actionRequired: true
+  },
+  {
+    productId: 'private-label-milk',
+    productName: 'Garant Milk 1L',
+    chain: 'willys',
+    publicShelfPrice: 19.9,
+    memberPrice: 12.9,
+    savings: 7,
+    requirement: 'Willys Plus member account verified',
+    status: 'eligible',
+    actionRequired: false
+  }
 ];
 
 const index = calculateFixedBasketIndex({
@@ -1292,6 +1351,24 @@ export function createGroceryViewApi() {
         usage: defaultPantryUsage,
         deals
       });
+    },
+
+    getLoyaltyOfferReport(userId: string): LoyaltyOfferReport {
+      requireNonEmptyId(userId, 'userId');
+      return {
+        userId,
+        offers: loyaltyOffers.map((offer) => ({ ...offer })),
+        totalEligibleSavings: loyaltyOffers
+          .filter((offer) => offer.status !== 'needs_membership')
+          .reduce((sum, offer) => roundPrice(sum + offer.savings), 0),
+        requiresActionCount: loyaltyOffers.filter((offer) => offer.actionRequired).length,
+        membershipRequiredCount: 1,
+        guardrails: [
+          'Member-only savings never overwrite verified public shelf evidence.',
+          'Coupon-required offers need explicit action before checkout routing.',
+          'Unlinked loyalty programs stay out of realized savings until the household confirms access.'
+        ]
+      };
     },
 
     getCategoryMarket(category: string): CategoryMarketReport | null {
