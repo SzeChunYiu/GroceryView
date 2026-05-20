@@ -19,7 +19,7 @@ describe('createHttpHandler', () => {
     const previousNodeEnv = process.env.NODE_ENV;
     process.env.DATABASE_URL = 'postgres://user:secret@localhost:5432/groceryview';
     process.env.PUBLIC_WEB_URL = 'https://groceryview.example';
-    process.env.NODE_ENV = 'test';
+    (process.env as Record<string, string | undefined>).NODE_ENV = 'test';
 
     try {
       const handle = createHttpHandler(undefined, {
@@ -56,9 +56,9 @@ describe('createHttpHandler', () => {
         process.env.PUBLIC_WEB_URL = previousPublicWebUrl;
       }
       if (previousNodeEnv === undefined) {
-        delete process.env.NODE_ENV;
+        delete (process.env as Record<string, string | undefined>).NODE_ENV;
       } else {
-        process.env.NODE_ENV = previousNodeEnv;
+        (process.env as Record<string, string | undefined>).NODE_ENV = previousNodeEnv;
       }
     }
   });
