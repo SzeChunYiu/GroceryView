@@ -44,6 +44,40 @@ export type RetailerSourceRegistryEntry = {
   legalReviewStatus: LegalReviewStatus;
   stubOnly: boolean;
 };
+export type FlyerSourceFormat = 'weekly_offer_html' | 'store_offer_html' | 'digital_flyer' | 'member_offer' | 'app_offer' | 'app_rendered_offer_html';
+export type FlyerSourcePlanInput = {
+  chainId: RetailerChainId;
+  sourceUrl: string;
+  format: FlyerSourceFormat;
+  retrievedAt: string;
+  storeId?: string;
+  retailerStoreKey?: string;
+  requiresStoreSelection?: boolean;
+  requiresAuthentication?: boolean;
+  memberOnly?: boolean;
+  rawSnapshotRef?: string;
+  contentHash?: string;
+  parserVersion?: string;
+};
+
+export type FlyerSourcePlan = {
+  chainId: RetailerChainId;
+  sourceUrl: string;
+  sourceHost: string;
+  format: FlyerSourceFormat;
+  retrievedAt: string;
+  storeId?: string;
+  retailerStoreKey?: string;
+  requiresStoreSelection: boolean;
+  requiresAuthentication: boolean;
+  memberOnly: boolean;
+  rawSnapshotRef: string | null;
+  contentHash: string | null;
+  parserVersion: string;
+  robotsPolicy: RobotsPolicy;
+  legalReviewStatus: LegalReviewStatus;
+  emitsProductFacts: false;
+};
 
 export type RetailerSourceAccessInput = {
   chainId: string;
@@ -236,6 +270,95 @@ export function findRetailerSourceRegistryEntry(chainId: RetailerChainId): Retai
   const entry = RETAILER_SOURCE_REGISTRY.find((candidate) => candidate.chainId === chainId);
   if (!entry) throw new Error(`Retailer source registry entry not found: ${chainId}`);
   return buildRetailerSourceRegistry().find((candidate) => candidate.chainId === chainId)!;
+}
+
+function sourceHost(sourceUrl: string): string {
+  try {
+    return new URL(sourceUrl).host;
+  } catch {
+    throw new Error('sourceUrl must be an absolute URL.');
+  }
+}
+
+export function planFlyerSourceFetch(input: FlyerSourcePlanInput): FlyerSourcePlan {
+  if (Number.isNaN(Date.parse(input.retrievedAt))) throw new Error('retrievedAt must be an ISO date.');
+  const registryEntry = findRetailerSourceRegistryEntry(input.chainId);
+  return {
+    chainId: input.chainId,
+    sourceUrl: input.sourceUrl,
+    sourceHost: sourceHost(input.sourceUrl),
+    format: input.format,
+    retrievedAt: input.retrievedAt,
+    storeId: input.storeId,
+    retailerStoreKey: input.retailerStoreKey,
+    requiresStoreSelection: input.requiresStoreSelection ?? false,
+    requiresAuthentication: input.requiresAuthentication ?? false,
+    memberOnly: input.memberOnly ?? false,
+    rawSnapshotRef: input.rawSnapshotRef ?? null,
+    contentHash: input.contentHash ?? null,
+    parserVersion: input.parserVersion ?? '0.1.0',
+    robotsPolicy: {
+      ...registryEntry.robotsPolicy,
+      disallowedPaths: [...registryEntry.robotsPolicy.disallowedPaths]
+    },
+    legalReviewStatus: registryEntry.legalReviewStatus,
+    emitsProductFacts: false
+  };
+}
+
+export function buildDefaultFlyerSourcePlans(retrievedAt = DEFAULT_ROBOTS_CHECKED_AT): FlyerSourcePlan[] {
+  return [
+    planFlyerSourceFetch({
+      chainId: 'ica',
+      sourceUrl: 'https://www.ica.se/butiker/erbjudanden/',
+      format: 'weekly_offer_html',
+      retrievedAt,
+      requiresStoreSelection: true
+    }),
+    planFlyerSourceFetch({
+      chainId: 'willys',
+      sourceUrl: 'https://www.willys.se/erbjudanden/butik',
+      format: 'store_offer_html',
+      retrievedAt,
+      requiresStoreSelection: true
+    }),
+    planFlyerSourceFetch({
+      chainId: 'hemkop',
+      sourceUrl: 'https://www.hemkop.se/handla',
+      format: 'digital_flyer',
+      retrievedAt
+    }),
+    planFlyerSourceFetch({
+      chainId: 'lidl',
+      sourceUrl: 'https://www.lidl.se/c/lidl-plus/s10017033',
+      format: 'member_offer',
+      retrievedAt,
+      requiresAuthentication: true,
+      memberOnly: true
+    }),
+    planFlyerSourceFetch({
+      chainId: 'willys',
+      sourceUrl: 'https://www.willys.se/artikel/om-willys-appen',
+      format: 'app_offer',
+      retrievedAt,
+      requiresAuthentication: true,
+      memberOnly: true
+    }),
+    planFlyerSourceFetch({
+      chainId: 'city_gross',
+      sourceUrl: 'https://www.citygross.se/reklamblad',
+      format: 'app_rendered_offer_html',
+      retrievedAt
+    }),
+    planFlyerSourceFetch({
+      chainId: 'coop',
+      sourceUrl: 'https://dr.coop.se/Butik/?store=105740',
+      format: 'store_offer_html',
+      retrievedAt,
+      retailerStoreKey: '105740',
+      requiresStoreSelection: true
+    })
+  ];
 }
 
 export type UnitInput = {

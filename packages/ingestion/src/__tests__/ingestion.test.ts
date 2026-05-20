@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildRetailerSourceRegistry, confidenceForSource, findRetailerSourceRegistryEntry, ingestRetailerProduct, normalizeUnitPrice, planIngestionBatch, planRetailerSourceAccess } from '../index.js';
+import { buildDefaultFlyerSourcePlans, buildRetailerSourceRegistry, confidenceForSource, findRetailerSourceRegistryEntry, ingestRetailerProduct, normalizeUnitPrice, planFlyerSourceFetch, planIngestionBatch, planRetailerSourceAccess } from '../index.js';
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
@@ -144,5 +144,64 @@ describe('buildRetailerSourceRegistry', () => {
 
     assert.ok(ica.surfaces.includes('store_locator'));
     assert.equal(ica.robotsPolicy.disallowedPaths.includes('/mutated'), false);
+  });
+});
+
+describe('planFlyerSourceFetch', () => {
+  it('serializes all supported flyer source formats with provenance fields and no product facts', () => {
+    const plans = buildDefaultFlyerSourcePlans('2026-05-20T06:00:00.000Z');
+
+    assert.deepEqual(
+      [...new Set(plans.map((plan) => plan.format))].sort(),
+      ['app_offer', 'app_rendered_offer_html', 'digital_flyer', 'member_offer', 'store_offer_html', 'weekly_offer_html']
+    );
+
+    for (const plan of plans) {
+      assert.match(plan.sourceUrl, /^https:\/\//);
+      assert.ok(plan.sourceHost.length > 0);
+      assert.equal(plan.retrievedAt, '2026-05-20T06:00:00.000Z');
+      assert.equal(plan.rawSnapshotRef, null);
+      assert.equal(plan.contentHash, null);
+      assert.equal(plan.parserVersion, '0.1.0');
+      assert.match(plan.robotsPolicy.robotsUrl, /^https:\/\/www\./);
+      assert.equal(plan.legalReviewStatus, 'pending');
+      assert.equal(plan.emitsProductFacts, false);
+    }
+  });
+
+  it('carries chain-specific flyer constraints from the researched public surfaces', () => {
+    const plans = buildDefaultFlyerSourcePlans('2026-05-20T06:00:00.000Z');
+    const willys = plans.find((plan) => plan.chainId === 'willys' && plan.format === 'store_offer_html');
+    const hemkop = plans.find((plan) => plan.chainId === 'hemkop' && plan.format === 'digital_flyer');
+    const coop = plans.find((plan) => plan.chainId === 'coop');
+    const cityGross = plans.find((plan) => plan.chainId === 'city_gross');
+
+    assert.equal(willys?.requiresStoreSelection, true);
+    assert.equal(willys?.robotsPolicy.crawlDelaySeconds, 10);
+    assert.equal(willys?.robotsPolicy.visitTimeUtc, '0400-0845');
+    assert.equal(hemkop?.robotsPolicy.crawlDelaySeconds, 10);
+    assert.equal(coop?.sourceHost, 'dr.coop.se');
+    assert.equal(coop?.retailerStoreKey, '105740');
+    assert.equal(cityGross?.format, 'app_rendered_offer_html');
+    assert.equal(cityGross?.emitsProductFacts, false);
+  });
+
+  it('marks member and app offer plans as authentication-bound stubs', () => {
+    const lidlMember = planFlyerSourceFetch({
+      chainId: 'lidl',
+      sourceUrl: 'https://www.lidl.se/c/lidl-plus/s10017033',
+      format: 'member_offer',
+      retrievedAt: '2026-05-20T06:00:00.000Z',
+      requiresAuthentication: true,
+      memberOnly: true,
+      rawSnapshotRef: 'raw/lidl-plus.html',
+      contentHash: 'sha256:lidl'
+    });
+
+    assert.equal(lidlMember.requiresAuthentication, true);
+    assert.equal(lidlMember.memberOnly, true);
+    assert.equal(lidlMember.rawSnapshotRef, 'raw/lidl-plus.html');
+    assert.equal(lidlMember.contentHash, 'sha256:lidl');
+    assert.equal(lidlMember.emitsProductFacts, false);
   });
 });
