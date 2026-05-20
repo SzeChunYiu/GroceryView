@@ -21,6 +21,7 @@ describe('buildStaticPages', () => {
         'login/index.html',
         'market/index.html',
         'notifications/inbox/index.html',
+        'prices/confidence/index.html',
         'privacy/index.html',
         'products/coffee/index.html',
         'receipts/review/index.html',
@@ -59,6 +60,13 @@ describe('buildStaticPages', () => {
       const market = await readFile(join(root, 'market/index.html'), 'utf8');
       assert.match(market, /Stockholm Grocery Market/);
       assert.match(market, /Coffee Index/);
+
+      const priceConfidence = await readFile(join(root, 'prices/confidence/index.html'), 'utf8');
+      assert.match(priceConfidence, /Price confidence guide/);
+      assert.match(priceConfidence, /Confidence labels/);
+      assert.match(priceConfidence, /Verified shelf/);
+      assert.match(priceConfidence, /Estimated and low-confidence rows are excluded/);
+      assert.match(priceConfidence, /Only verified or fresh retailer-page prices can alert/);
 
       const deals = await readFile(join(root, 'deals/today/index.html'), 'utf8');
       assert.match(deals, /Today’s best grocery deals/);
