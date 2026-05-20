@@ -12,7 +12,14 @@ import {
   summarizeHousehold,
   type BasketComparisonResult,
   type BudgetSummary,
-  type DealScoreInput,
+  type PriceChartAdapterResult,
+  type PriceChartObservation,
+  type PriceHistorySummary,
+  type HouseholdBasketItem,
+  type HouseholdMember,
+  type HouseholdSnapshot,
+  type HouseholdSummary,
+  type HouseholdWatchlistItem,
   type SearchableProduct,
   type StorePrice,
   type WatchlistAlert,
@@ -37,7 +44,6 @@ export type Store = {
 export type ProductDetail = SearchableProduct & {
   currentPrices: StorePrice[];
   dealScore: number;
-  dealScoreInputs: DealScoreInput;
   verdict: string;
   unitPrice: string;
   history: Array<{ date: string; price: number; verified: boolean }>;
@@ -293,17 +299,6 @@ export type StoreDeal = {
   unitPrice: string;
 };
 
-export type ProductDealScore = {
-  productId: string;
-  score: number;
-  band: ReturnType<typeof scoreBand>['label'];
-  verdict: ReturnType<typeof scoreBand>['verdict'];
-  discountVsMedianPercent: number;
-  historicalPercentile: number;
-  confidence: 'high' | 'medium' | 'low';
-  reasons: string[];
-};
-
 export type BasketItemRequest = {
   productId: string;
   quantity: number;
@@ -357,7 +352,6 @@ const products: ProductDetail[] = [
       { storeId: 'lidl-sveavagen', storeName: 'Lidl Sveavägen', price: 59.9 },
       { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', price: 64.9 }
     ],
-    dealScoreInputs: { currentCityPercentile: 8, knownPromoHistoryPercentile: 12, equivalentUnitPricePercentile: 18, discountDepthPercent: 25, sourceConfidence: 0.9 },
     dealScore: calculateDealScore({ currentCityPercentile: 8, knownPromoHistoryPercentile: 12, equivalentUnitPricePercentile: 18, discountDepthPercent: 25, sourceConfidence: 0.9 }),
     verdict: 'Buy',
     unitPrice: '110.89 SEK/kg',
@@ -379,7 +373,6 @@ const products: ProductDetail[] = [
       { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 14.9 },
       { storeId: 'lidl-sveavagen', storeName: 'Lidl Sveavägen', price: 13.9 }
     ],
-    dealScoreInputs: { currentCityPercentile: 18, knownPromoHistoryPercentile: 12, equivalentUnitPricePercentile: 35, discountDepthPercent: 8, sourceConfidence: 0.86 },
     dealScore: calculateDealScore({ currentCityPercentile: 18, knownPromoHistoryPercentile: 12, equivalentUnitPricePercentile: 35, discountDepthPercent: 8, sourceConfidence: 0.86 }),
     verdict: 'Buy',
     unitPrice: '14.90 SEK/l',
@@ -401,7 +394,6 @@ const products: ProductDetail[] = [
       { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', price: 54.9 },
       { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 56.9 }
     ],
-    dealScoreInputs: { currentCityPercentile: 58, knownPromoHistoryPercentile: 61, equivalentUnitPricePercentile: 52, discountDepthPercent: 2, sourceConfidence: 0.72 },
     dealScore: calculateDealScore({ currentCityPercentile: 58, knownPromoHistoryPercentile: 61, equivalentUnitPricePercentile: 52, discountDepthPercent: 2, sourceConfidence: 0.72 }),
     verdict: 'Wait',
     unitPrice: '91.50 SEK/kg',
@@ -880,34 +872,6 @@ export function createGroceryViewApi() {
 
     getProductPrices(id: string) {
       return sortPricesByValue(this.getProduct(id)?.currentPrices ?? []);
-    },
-
-    getProductDealScore(id: string): ProductDealScore | null {
-      const product = this.getProduct(id);
-      if (!product) return null;
-
-      const band = scoreBand(product.dealScore);
-      const confidence =
-        product.dealScoreInputs.sourceConfidence >= 0.85
-          ? 'high'
-          : product.dealScoreInputs.sourceConfidence >= 0.7
-            ? 'medium'
-            : 'low';
-
-      return {
-        productId: product.id,
-        score: product.dealScore,
-        band: band.label,
-        verdict: band.verdict,
-        discountVsMedianPercent: product.dealScoreInputs.discountDepthPercent,
-        historicalPercentile: product.dealScoreInputs.knownPromoHistoryPercentile,
-        confidence,
-        reasons: [
-          `${product.dealScoreInputs.discountDepthPercent}% below the local median reference.`,
-          `Historical promo percentile ${product.dealScoreInputs.knownPromoHistoryPercentile} means this is rare versus known promotions.`,
-          `Source confidence ${(product.dealScoreInputs.sourceConfidence * 100).toFixed(0)}% keeps the verdict ${confidence} confidence.`
-        ]
-      };
     },
 
     getProductHistory(id: string) {

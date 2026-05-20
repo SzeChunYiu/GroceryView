@@ -134,32 +134,97 @@ describe('createHttpHandler', () => {
     assert.equal(product.status, 200);
     assert.equal((await json(product) as { ticker: string }).ticker, 'ZOEGAS-COFFEE-450G');
 
-    const nearDealScore = await handle(new Request('http://localhost/api/products/coffee/deal-score?distanceKm=1'));
-    const farDealScore = await handle(new Request('http://localhost/api/products/coffee/deal-score?distanceKm=35'));
-    assert.equal(nearDealScore.status, 200);
-    assert.equal(farDealScore.status, 200);
-    assert.deepEqual(await json(nearDealScore), await json(farDealScore));
-    assert.deepEqual(await json(await handle(new Request('http://localhost/api/products/coffee/deal-score'))) as {
-      score: number;
-      band: string;
-      verdict: string;
-      discountVsMedianPercent: number;
-      historicalPercentile: number;
-      confidence: string;
-      reasons: string[];
-    }, {
+    const dealScore = await handle(new Request('http://localhost/api/products/coffee/deal-score?distanceKm=12.5'));
+    assert.equal(dealScore.status, 200);
+    assert.deepEqual(await json(dealScore), {
       productId: 'coffee',
       score: 82,
-      band: 'Good deal',
+      band: { label: 'Good deal', verdict: 'Buy' },
       verdict: 'Buy',
-      discountVsMedianPercent: 25,
+      discountVsMedianPercent: 16.7,
       historicalPercentile: 12,
-      confidence: 'high',
+      confidence: 0.9,
       reasons: [
-        '25% below the local median reference.',
-        'Historical promo percentile 12 means this is rare versus known promotions.',
-        'Source confidence 90% keeps the verdict high confidence.'
+        'Best current quote is 49.90 SEK at Willys Odenplan.',
+        'Zoégas Coffee 450g is in the 8th city price percentile.',
+        'Historical promo percentile is 12.',
+        'Equivalent unit-price percentile is 18.',
+        'Source confidence is 90%.',
+        'Default verdict is Buy.'
       ]
+    });
+
+
+
+    const terminal = await handle(new Request('http://localhost/api/products/coffee/terminal?asOf=2026-05-19T00:00:00.000Z'));
+    assert.equal(terminal.status, 200);
+    const terminalBody = await json(terminal) as {
+      quote: { bestPrice: number; range52Week: { low: number; high: number }; evidenceVolume: { currentPrices: number } };
+      distributions: Array<{ label: string; median: number; currentPercentile: number; customerRead: string }>;
+      chart: { series: Array<{ id: string; points: Array<{ value: number }> }> };
+      historySummary: { isNewLow: boolean };
+    };
+    assert.equal(terminalBody.quote.bestPrice, 49.9);
+    assert.deepEqual(terminalBody.quote.range52Week, { low: 49.9, high: 69.9 });
+    assert.equal(terminalBody.quote.evidenceVolume.currentPrices, 3);
+    assert.deepEqual(terminalBody.distributions.map((distribution) => distribution.label), ['Whole Stockholm', 'Odenplan local area']);
+    assert.equal(terminalBody.distributions[0].median, 59.9);
+    assert.equal(terminalBody.distributions[0].currentPercentile, 8);
+    assert.match(terminalBody.distributions[0].customerRead, /cheaper than 92%/);
+    assert.equal(terminalBody.chart.series[0].id, 'willys-odenplan:shelf');
+    assert.deepEqual(terminalBody.chart.series[0].points.map((point) => point.value), [69.9, 59.9, 49.9]);
+    assert.equal(terminalBody.historySummary.isNewLow, true);
+
+    const equivalents = await handle(new Request('http://localhost/api/products/milk/equivalents'));
+    assert.equal(equivalents.status, 200);
+    assert.deepEqual(await json(equivalents), [
+      {
+        productId: 'butter',
+        productName: 'Butter 600g',
+        category: 'dairy',
+        bestPrice: 54.9,
+        bestStoreId: 'coop-odenplan',
+        dealScore: 40,
+        reason: 'Same dairy category with comparable current price evidence.'
+      }
+    ]);
+
+    const freshness = await handle(new Request('http://localhost/api/prices/freshness?asOf=2026-06-03T00:00:00.000Z'));
+    assert.equal(freshness.status, 200);
+    assert.deepEqual(await json(freshness), {
+      asOf: '2026-06-03T00:00:00.000Z',
+      thresholds: { agingAfterDays: 7, staleAfterDays: 14 },
+      summary: { fresh: 0, aging: 0, stale: 3 },
+      products: [
+        {
+          productId: 'coffee',
+          productName: 'Zoégas Coffee 450g',
+          category: 'coffee',
+          latestVerifiedPriceDate: '2026-05-19',
+          ageDays: 15,
+          status: 'stale',
+          action: 'prioritize_manual_or_feed_refresh'
+        },
+        {
+          productId: 'milk',
+          productName: 'Arla Milk 1L',
+          category: 'dairy',
+          latestVerifiedPriceDate: '2026-05-19',
+          ageDays: 15,
+          status: 'stale',
+          action: 'prioritize_manual_or_feed_refresh'
+        },
+        {
+          productId: 'butter',
+          productName: 'Butter 600g',
+          category: 'dairy',
+          latestVerifiedPriceDate: '2026-05-19',
+          ageDays: 15,
+          status: 'stale',
+          action: 'prioritize_manual_or_feed_refresh'
+        }
+      ],
+      backfillProductIds: ['butter', 'coffee', 'milk']
     });
 
     const index = await handle(new Request('http://localhost/api/indices/stockholm-grocery-index'));
