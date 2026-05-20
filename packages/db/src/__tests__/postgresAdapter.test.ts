@@ -15,6 +15,30 @@ class RecordingQueryExecutor implements QueryExecutor {
   observationId: string | undefined = 'observation-1';
   sourceRunId: string | undefined = 'source-run-1';
   rawRecordId: string | undefined = 'raw-record-1';
+  sourceRunRows: unknown[] = [
+    {
+      id: 'source-run-1',
+      source_type: 'retailer_api',
+      source_name: 'Willys',
+      source_url: 'https://example.invalid/willys/offers',
+      started_at: new Date('2026-05-20T08:00:00.000Z'),
+      finished_at: '2026-05-20T08:01:00.000Z',
+      status: 'succeeded',
+      provenance: '{"collectorVersion":"2026.05.20"}',
+      error_message: null
+    },
+    {
+      id: 'source-run-2',
+      source_type: 'retailer_page',
+      source_name: 'Retailer',
+      source_url: null,
+      started_at: '2026-05-20T07:00:00.000Z',
+      finished_at: null,
+      status: 'running',
+      provenance: { schedule: 'hourly' },
+      error_message: 'last fetch pending'
+    }
+  ];
   rawRecordRows: unknown[] = [
     {
       id: 'raw-record-1',
@@ -115,6 +139,7 @@ class RecordingQueryExecutor implements QueryExecutor {
     this.calls.push({ sql, params });
     if (sql.includes('update source_runs')) return this.sourceRunId === undefined ? ([] as T[]) : ([{ id: this.sourceRunId }] as T[]);
     if (sql.includes('insert into source_runs')) return this.sourceRunId === undefined ? ([] as T[]) : ([{ id: this.sourceRunId }] as T[]);
+    if (sql.includes('from source_runs')) return this.sourceRunRows as T[];
     if (sql.includes('insert into raw_records')) return this.rawRecordId === undefined ? ([] as T[]) : ([{ id: this.rawRecordId }] as T[]);
     if (sql.includes('from raw_records')) return this.rawRecordRows as T[];
     if (sql.includes('insert into observations')) return this.observationId === undefined ? ([] as T[]) : ([{ id: this.observationId }] as T[]);
@@ -526,6 +551,50 @@ describe('createPostgresSourceRecordWriter', () => {
 });
 
 describe('createPostgresSourceRecordReader', () => {
+  it('lists source runs with status and source-type filters', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresSourceRecordReader(executor);
+
+    assert.deepEqual(await reader.listSourceRuns({ status: 'succeeded', sourceType: 'retailer_api', limit: 25 }), [
+      {
+        sourceRunId: 'source-run-1',
+        sourceType: 'retailer_api',
+        sourceName: 'Willys',
+        sourceUrl: 'https://example.invalid/willys/offers',
+        startedAt: '2026-05-20T08:00:00.000Z',
+        finishedAt: '2026-05-20T08:01:00.000Z',
+        status: 'succeeded',
+        provenance: { collectorVersion: '2026.05.20' }
+      },
+      {
+        sourceRunId: 'source-run-2',
+        sourceType: 'retailer_page',
+        sourceName: 'Retailer',
+        startedAt: '2026-05-20T07:00:00.000Z',
+        status: 'running',
+        provenance: { schedule: 'hourly' },
+        errorMessage: 'last fetch pending'
+      }
+    ]);
+
+    assert.match(executor.calls[0]!.sql, /from source_runs/);
+    assert.match(executor.calls[0]!.sql, /\$1::text is null or status = \$1/);
+    assert.match(executor.calls[0]!.sql, /\$2::text is null or source_type = \$2/);
+    assert.match(executor.calls[0]!.sql, /order by started_at desc, id/);
+    assert.deepEqual(executor.calls[0]!.params, ['succeeded', 'retailer_api', 25]);
+  });
+
+  it('clamps source run list limits to a safe range', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresSourceRecordReader(executor);
+
+    await reader.listSourceRuns({ limit: 5000 });
+    await reader.listSourceRuns({ limit: 0 });
+
+    assert.deepEqual(executor.calls[0]!.params, [null, null, 500]);
+    assert.deepEqual(executor.calls[1]!.params, [null, null, 1]);
+  });
+
   it('reads raw records by source run and payload hash with payload provenance mapping', async () => {
     const executor = new RecordingQueryExecutor();
     const reader = createPostgresSourceRecordReader(executor);
