@@ -15,6 +15,7 @@ describe('buildStaticPages', () => {
         'admin/human-review/index.html',
         'basket/index.html',
         'categories/coffee/index.html',
+        'deals/today/index.html',
         'household/index.html',
         'login/index.html',
         'market/index.html',
@@ -32,6 +33,13 @@ describe('buildStaticPages', () => {
       const market = await readFile(join(root, 'market/index.html'), 'utf8');
       assert.match(market, /Stockholm Grocery Market/);
       assert.match(market, /Coffee Index/);
+
+      const deals = await readFile(join(root, 'deals/today/index.html'), 'utf8');
+      assert.match(deals, /Today’s best grocery deals/);
+      assert.match(deals, /Ranked deal actions/);
+      assert.match(deals, /Deal Score/);
+      assert.match(deals, /Ads excluded from ranking/);
+      assert.match(deals, /Estimated rows held back/);
 
       const store = await readFile(join(root, 'stores/willys-odenplan/index.html'), 'utf8');
       assert.match(store, /Store highlights/);
