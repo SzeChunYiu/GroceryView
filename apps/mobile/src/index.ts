@@ -805,6 +805,9 @@ export function buildMobileScreenBlueprints(): MobileScreenBlueprintPlan {
     blockedWithoutProviders: screens
       .filter((screen) => screen.providerRequirements.some((provider) => provider !== 'secure-session'))
       .map((screen) => ({ route: screen.route, providers: screen.providerRequirements }))
+  };
+}
+
 export type MobilePrivacyRequestType = 'export_data' | 'delete_account' | 'ad_privacy' | 'receipt_retention';
 
 export type MobilePrivacyRequestInput = {
