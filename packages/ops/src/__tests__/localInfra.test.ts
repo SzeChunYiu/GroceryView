@@ -50,6 +50,7 @@ describe('local infrastructure compose', () => {
     assert.match(smokeScript, /docker inspect[\s\S]*health=/);
     assert.match(smokeScript, /compose logs --no-color --tail=120 "\$service"/);
     assert.match(smokeScript, /"\$POSTGRES_SERVICE" "\$REDIS_SERVICE" "\$OBJECT_STORAGE_SERVICE" "\$OBJECT_STORAGE_INIT_SERVICE"/);
+    assert.match(smokeScript, /WAIT_SECONDS must be a positive integer/);
   });
 
   it('publishes every supported smoke environment override for operators', () => {
