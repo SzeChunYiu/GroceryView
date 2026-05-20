@@ -61,6 +61,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-store-comparison-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setRoutePlanMetric = (metric, message) => {
+    const target = document.querySelector('[data-route-plan-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setApiSessionResult = (message) => {
     const target = document.querySelector('[data-api-session-result]');
     if (target) target.textContent = message;
@@ -743,6 +747,34 @@ window.GroceryViewFlowActions = (() => {
       setResult('store-comparison', 'Store comparison API load failed: ' + error.message + '. Static comparison remains visible.');
     }
   };
+  const loadRoutePlanFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('route-planner', 'Local preview mode: connect the API session bridge and save a basket before loading live route plan.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/basket/compare', config), {
+        method: 'POST',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const cheapest = payload.cheapestByProduct || {};
+      const assignments = Array.isArray(cheapest.assignments) ? cheapest.assignments : [];
+      const missing = Array.isArray(payload.missingProductIds) ? payload.missingProductIds : [];
+      const splitCount = Number(payload.splitStoreCount || 0);
+      const splitTotal = Number(cheapest.total || 0);
+      const savings = Number(payload.savingsVsBestSingleStore || 0);
+      const storeNames = [...new Set(assignments.map((assignment) => assignment.storeName).filter(Boolean))];
+      const productNames = assignments.map((assignment) => assignment.productId + ' → ' + assignment.storeName).slice(0, 3);
+      setRoutePlanMetric('stops', splitCount + ' live stops · ' + (storeNames.length ? storeNames.join(' → ') : 'no assigned stores'));
+      setRoutePlanMetric('total', 'Split basket ' + formatSek(splitTotal) + ' · saves ' + formatSek(savings) + ' vs best single store');
+      setRoutePlanMetric('assignments', assignments.length + ' assigned items · ' + (productNames.length ? productNames.join(' · ') : 'save basket first') + ' · missing ' + missing.length);
+      setResult('route-planner', 'Connected route plan loaded: ' + assignments.length + ' assigned basket lines across ' + splitCount + ' stops; ' + missing.length + ' missing products.');
+    } catch (error) {
+      setResult('route-planner', 'Route planner API load failed: ' + error.message + '. Static route plan remains visible.');
+    }
+  };
   const messages = {
     'toggle-alert': 'Alert rule updated locally; production save waits for authenticated account API.',
     'manage-subscription': 'Billing portal handoff prepared without exposing provider customer IDs.',
@@ -838,6 +870,10 @@ window.GroceryViewFlowActions = (() => {
       }
       if (flow === 'store-comparison' && action === 'load-store-comparison') {
         await loadStoreComparisonFromApi();
+        return;
+      }
+      if (flow === 'route-planner' && action === 'load-route-plan') {
+        await loadRoutePlanFromApi();
         return;
       }
       if (flow && action) setResult(flow, messages[action] || 'Action preview recorded.');
@@ -982,6 +1018,9 @@ const storeMapLivePanel = `
 const storeComparisonLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="store-comparison" style="margin-top:16px"><div class="eyebrow">Connected store comparison API</div><h2>Pull live favorite-store basket totals</h2><p class="lede">Fetch <code>/api/basket/compare</code> through the protected API session bridge to refresh favorite-store totals, best single-store option, split-basket total, split-store count, missing products, and savings against the best single-store basket.</p><div class="grid" aria-label="Live store comparison API metrics"><div class="metric"><strong data-store-comparison-best>Waiting for API pull</strong><span>best single-store option</span></div><div class="metric"><strong data-store-comparison-split>Static split-basket preview</strong><span>split-store basket and savings</span></div><div class="metric"><strong data-store-comparison-coverage>Static coverage preview</strong><span>favorite-store coverage and missing products</span></div></div><div class="flow-panel" aria-label="Connected store comparison actions"><button type="button" data-flow-action="load-store-comparison">Load live store comparison</button></div><p class="flow-result" data-flow-result="store-comparison" aria-live="polite">Local preview mode: connect the API session bridge and save a basket before loading live store comparison.</p></section>`;
 
+const routePlanLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="route-planner" style="margin-top:16px"><div class="eyebrow">Connected route planner API</div><h2>Pull live split-basket route plan</h2><p class="lede">Fetch <code>/api/basket/compare</code> through the protected API session bridge to translate the saved basket into route stops, assigned products, split-basket total, split-store count, savings, and missing-product blockers without letting route convenience change Deal Score.</p><div class="grid" aria-label="Live route planner API metrics"><div class="metric"><strong data-route-plan-stops>Waiting for API pull</strong><span>live stop count and order</span></div><div class="metric"><strong data-route-plan-total>Static split-basket preview</strong><span>split basket total and savings</span></div><div class="metric"><strong data-route-plan-assignments>Static assignment preview</strong><span>assigned products and blockers</span></div></div><div class="flow-panel" aria-label="Connected route planner actions"><button type="button" data-flow-action="load-route-plan">Load live route plan</button></div><p class="flow-result" data-flow-result="route-planner" aria-live="polite">Local preview mode: connect the API session bridge and save a basket before loading live route plan.</p></section>`;
+
 const pages = [
   {
     path: 'login/index.html',
@@ -1107,7 +1146,7 @@ const pages = [
     path: 'routes/shopping/index.html',
     title: 'Shopping route planner — GroceryView',
     description: 'Plan GroceryView shopping stops from favorite-store baskets, pickup windows, split-basket savings, and travel guardrails.',
-    body: `<section class="card"><div class="eyebrow">Shopping route</div><h1>Shopping route planner</h1><p class="lede">Turn verified basket decisions into ordered store stops while keeping travel convenience separate from Deal Score and shelf-price evidence.</p><div class="grid"><div class="metric"><strong>3</strong><span>planned stops</span></div><div class="metric"><strong>44 SEK</strong><span>split-basket savings</span></div><div class="metric"><strong>28 min</strong><span>estimated route time</span></div></div></section><section class="card" style="margin-top:16px"><h2>Ordered stops</h2><table class="table"><thead><tr><th>Stop</th><th>Store</th><th>Basket role</th><th>Pickup note</th><th>Action</th></tr></thead><tbody><tr><td>1</td><td>Willys Odenplan</td><td>Coffee and pantry</td><td>Primary weekly basket</td><td>Buy verified coffee promo</td></tr><tr><td>2</td><td>Lidl Sveavägen</td><td>Eggs and dairy</td><td>Split basket stop</td><td>Pick up eggs and milk</td></tr><tr><td>3</td><td>Hemköp T-Centralen</td><td>Convenience top-up</td><td>Small-basket only</td><td>Skip unless pantry rice is out</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Route guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>No travel penalty in Deal Score</td><td>Route time can reorder stops but cannot change product deal ranking.</td></tr><tr><td>Pickup windows</td><td>Closed or pickup-limited stores stay out of active checkout plans.</td></tr><tr><td>Low-confidence rows</td><td>Unverified prices cannot justify an extra route stop.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Shopping route</div><h1>Shopping route planner</h1><p class="lede">Turn verified basket decisions into ordered store stops while keeping travel convenience separate from Deal Score and shelf-price evidence.</p><div class="grid"><div class="metric"><strong>3</strong><span>planned stops</span></div><div class="metric"><strong>44 SEK</strong><span>split-basket savings</span></div><div class="metric"><strong>28 min</strong><span>estimated route time</span></div></div></section><section class="card" style="margin-top:16px"><h2>Ordered stops</h2><table class="table"><thead><tr><th>Stop</th><th>Store</th><th>Basket role</th><th>Pickup note</th><th>Action</th></tr></thead><tbody><tr><td>1</td><td>Willys Odenplan</td><td>Coffee and pantry</td><td>Primary weekly basket</td><td>Buy verified coffee promo</td></tr><tr><td>2</td><td>Lidl Sveavägen</td><td>Eggs and dairy</td><td>Split basket stop</td><td>Pick up eggs and milk</td></tr><tr><td>3</td><td>Hemköp T-Centralen</td><td>Convenience top-up</td><td>Small-basket only</td><td>Skip unless pantry rice is out</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Route guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>No travel penalty in Deal Score</td><td>Route time can reorder stops but cannot change product deal ranking.</td></tr><tr><td>Pickup windows</td><td>Closed or pickup-limited stores stay out of active checkout plans.</td></tr><tr><td>Low-confidence rows</td><td>Unverified prices cannot justify an extra route stop.</td></tr></tbody></table></section>${routePlanLivePanel}`
   },
   {
     path: 'prices/confidence/index.html',
