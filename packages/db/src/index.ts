@@ -856,18 +856,28 @@ export async function collectPostgresIntegrationProbe(input: CollectPostgresInte
   const requiredTables = [...(input.requiredTables ?? POSTGRES_INTEGRATION_REQUIRED_TABLES)];
   const requiredMigrationVersions = [...(input.requiredMigrationVersions ?? POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS)];
 
-  const [tableRows, migrationRows] = await Promise.all([
-    input.executor.query<TableNameRow>(
+  const repositoryChecks: PostgresIntegrationProbe['repositoryChecks'] = [];
+  let tableRows: TableNameRow[] = [];
+  let migrationRows: MigrationVersionRow[] = [];
+
+  try {
+    tableRows = await input.executor.query<TableNameRow>(
       `select table_name
        from information_schema.tables
        where table_schema = 'public' and table_name = any($1::text[])
        order by table_name`,
       [requiredTables]
-    ),
-    input.executor.query<MigrationVersionRow>('select version from schema_migrations order by version')
-  ]);
+    );
+  } catch {
+    repositoryChecks.push({ name: 'required_table_probe', status: 'fail' });
+  }
 
-  const repositoryChecks: PostgresIntegrationProbe['repositoryChecks'] = [];
+  try {
+    migrationRows = await input.executor.query<MigrationVersionRow>('select version from schema_migrations order by version');
+  } catch {
+    repositoryChecks.push({ name: 'schema_migrations_probe', status: 'fail' });
+  }
+
   for (const probe of input.repositoryProbes) {
     try {
       await probe.run(input.executor);

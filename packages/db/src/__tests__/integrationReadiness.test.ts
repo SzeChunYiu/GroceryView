@@ -27,6 +27,22 @@ class ProbeQueryExecutor implements QueryExecutor {
   }
 }
 
+class MissingSchemaMigrationsExecutor extends ProbeQueryExecutor {
+  override async query<T>(sql: string, params: unknown[] = []) {
+    this.calls.push({ sql, params });
+    if (sql.includes('schema_migrations')) {
+      throw new Error('relation "schema_migrations" does not exist');
+    }
+    if (sql.includes('information_schema.tables')) {
+      return [{ table_name: 'app_users' }] as T[];
+    }
+    if (sql.includes('select 1 as ok')) {
+      return [{ ok: 1 }] as T[];
+    }
+    throw new Error('probe failed');
+  }
+}
+
 describe('buildPostgresIntegrationReadinessReport', () => {
   it('fails closed with concrete blockers for missing schema, migrations, and repository probes', () => {
     const report = buildPostgresIntegrationReadinessReport({
@@ -141,6 +157,32 @@ describe('collectPostgresIntegrationProbe', () => {
     assert.deepEqual(executor.calls[0].params[0], [...POSTGRES_INTEGRATION_REQUIRED_TABLES]);
     assert.match(executor.calls[0].sql, /information_schema\.tables/);
     assert.match(executor.calls[1].sql, /schema_migrations/);
+  });
+
+  it('fails closed when migration metadata cannot be read', async () => {
+    const probe = await collectPostgresIntegrationProbe({
+      executor: new MissingSchemaMigrationsExecutor(),
+      repositoryProbes: [
+        {
+          name: 'user_read_probe',
+          async run(queryExecutor) {
+            await queryExecutor.query('select 1 as ok');
+          }
+        }
+      ]
+    });
+
+    assert.deepEqual(probe.appliedMigrationVersions, []);
+    assert.deepEqual(probe.repositoryChecks, [
+      { name: 'schema_migrations_probe', status: 'fail' },
+      { name: 'user_read_probe', status: 'pass' }
+    ]);
+
+    const report = buildPostgresIntegrationReadinessReport(probe);
+    assert.equal(report.status, 'blocked');
+    assert.match(report.blockers.join('\n'), /missing_migration:001_initial_schema/);
+    assert.match(report.blockers.join('\n'), /repository_check_fail:schema_migrations_probe/);
+    assert.deepEqual(report.evidence, ['table:app_users', 'repository_check:user_read_probe']);
   });
 });
 
