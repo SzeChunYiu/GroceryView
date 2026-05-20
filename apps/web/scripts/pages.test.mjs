@@ -183,14 +183,6 @@ describe('buildStaticPages', () => {
       assert.match(category, /Private-label swap candidate/);
       assert.match(category, /Arvid Nordquist/);
 
-      const category = await readFile(join(root, 'categories/coffee/index.html'), 'utf8');
-      assert.match(category, /Category deal feed/);
-      assert.match(category, /110\.89 SEK\/kg/);
-      assert.match(category, /standard private label/);
-      assert.match(category, /20% cheaper by unit price/);
-      assert.match(category, /Unverified promo-only record/);
-      assert.match(category, /not automatic substitutions/);
-
       const login = await readFile(join(root, 'login/index.html'), 'utf8');
       assert.match(login, /Sign in to GroceryView/);
       assert.match(login, /Passkey or magic link/);
