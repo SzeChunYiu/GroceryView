@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   SCHEMA_MIGRATIONS_TABLE_SQL,
   applyMigrations,
+  buildMigrationPlanStatus,
   createMigrationPlan,
   createPostgresMigrationExecutor,
   migrationVersionFromPath,
@@ -124,6 +125,55 @@ describe('createMigrationPlan', () => {
           { path: 'db/migrations/001_init.sql', sql: 'create table stores(id uuid primary key);' }
         ]),
       /Duplicate migration version: 001_init/
+    );
+  });
+});
+
+describe('buildMigrationPlanStatus', () => {
+  const plan = [
+    { version: '001_groceryview_schema', sql: 'create table products(id uuid primary key);' },
+    { version: '002_repository_support_schema', sql: 'create table app_users(id text primary key);' },
+    { version: '003_subscription_entitlements', sql: 'create table subscription_entitlements(user_id text primary key);' }
+  ];
+
+  it('reports ready when every planned migration is applied exactly once', () => {
+    assert.deepEqual(buildMigrationPlanStatus(plan, ['003_subscription_entitlements', '001_groceryview_schema', '002_repository_support_schema']), {
+      status: 'ready',
+      applied: ['001_groceryview_schema', '002_repository_support_schema', '003_subscription_entitlements'],
+      pending: [],
+      unknownApplied: [],
+      duplicateApplied: [],
+      summary: 'All planned migrations are applied.'
+    });
+  });
+
+  it('reports pending migrations without treating unapplied planned versions as drift', () => {
+    assert.deepEqual(buildMigrationPlanStatus(plan, ['001_groceryview_schema']), {
+      status: 'pending',
+      applied: ['001_groceryview_schema'],
+      pending: ['002_repository_support_schema', '003_subscription_entitlements'],
+      unknownApplied: [],
+      duplicateApplied: [],
+      summary: '2 migration(s) pending.'
+    });
+  });
+
+  it('reports metadata drift for unknown or duplicate applied migrations', () => {
+    assert.deepEqual(
+      buildMigrationPlanStatus(plan, [
+        '001_groceryview_schema',
+        '001_groceryview_schema',
+        '002_repository_support_schema',
+        '999_manual_hotfix'
+      ]),
+      {
+        status: 'drift',
+        applied: ['001_groceryview_schema', '002_repository_support_schema'],
+        pending: ['003_subscription_entitlements'],
+        unknownApplied: ['999_manual_hotfix'],
+        duplicateApplied: ['001_groceryview_schema'],
+        summary: 'Migration metadata drift detected: 2 issue(s).'
+      }
     );
   });
 });

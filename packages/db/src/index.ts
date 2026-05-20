@@ -8,6 +8,15 @@ export type SqlMigrationFile = {
   sql: string;
 };
 
+export type MigrationPlanStatus = {
+  status: 'ready' | 'pending' | 'drift';
+  applied: string[];
+  pending: string[];
+  unknownApplied: string[];
+  duplicateApplied: string[];
+  summary: string;
+};
+
 export type SqlExecutor = {
   getAppliedMigrationVersions(): Promise<string[]>;
   execute(sql: string): Promise<void>;
@@ -41,6 +50,39 @@ export function createMigrationPlan(files: SqlMigrationFile[]): Migration[] {
   }
 
   return migrations;
+}
+
+export function buildMigrationPlanStatus(migrations: Migration[], appliedVersions: string[]): MigrationPlanStatus {
+  const plannedVersions = [...new Set(migrations.map((migration) => migration.version))].sort();
+  const planned = new Set(plannedVersions);
+  const appliedCounts = new Map<string, number>();
+
+  for (const version of appliedVersions) {
+    appliedCounts.set(version, (appliedCounts.get(version) ?? 0) + 1);
+  }
+
+  const applied = [...appliedCounts.keys()].filter((version) => planned.has(version)).sort();
+  const pending = plannedVersions.filter((version) => !appliedCounts.has(version));
+  const unknownApplied = [...appliedCounts.keys()].filter((version) => !planned.has(version)).sort();
+  const duplicateApplied = [...appliedCounts.entries()]
+    .filter(([, count]) => count > 1)
+    .map(([version]) => version)
+    .sort();
+  const driftCount = unknownApplied.length + duplicateApplied.length;
+
+  return {
+    status: driftCount > 0 ? 'drift' : pending.length > 0 ? 'pending' : 'ready',
+    applied,
+    pending,
+    unknownApplied,
+    duplicateApplied,
+    summary:
+      driftCount > 0
+        ? `Migration metadata drift detected: ${driftCount} issue(s).`
+        : pending.length > 0
+          ? `${pending.length} migration(s) pending.`
+          : 'All planned migrations are applied.'
+  };
 }
 
 export function parseSqlStatements(sql: string): string[] {
