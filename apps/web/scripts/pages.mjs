@@ -49,6 +49,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-store-deals-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setStoreMapMetric = (metric, message) => {
+    const target = document.querySelector('[data-store-map-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setApiSessionResult = (message) => {
     const target = document.querySelector('[data-api-session-result]');
     if (target) target.textContent = message;
@@ -658,6 +662,30 @@ window.GroceryViewFlowActions = (() => {
       setResult('store-deals', 'Store deals API load failed: ' + error.message + '. Static store highlights remain visible.');
     }
   };
+  const loadStoreMapFromApi = async () => {
+    const config = getApiConfig();
+    if (!config.apiBase) {
+      setResult('store-map', 'Local preview mode: connect the API session bridge before loading live store map.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/stores', config, false), {
+        method: 'GET',
+        headers: config.bearerToken ? apiHeaders(config) : { 'content-type': 'application/json' }
+      });
+      const stores = await requireApiSuccess(response);
+      const rows = Array.isArray(stores) ? stores : [];
+      const districts = [...new Set(rows.map((store) => store.district).filter(Boolean))];
+      const chains = [...new Set(rows.map((store) => store.chain).filter(Boolean))];
+      const highConfidence = rows.filter((store) => store.confidence === 'high');
+      setStoreMapMetric('count', rows.length + ' mapped stores · ' + (chains.length ? chains.join(', ') : 'no chains'));
+      setStoreMapMetric('districts', districts.length + ' districts · ' + (districts.length ? districts.join(', ') : 'none reported'));
+      setStoreMapMetric('confidence', highConfidence.length + '/' + rows.length + ' high-confidence store profiles');
+      setResult('store-map', 'Connected store map loaded: ' + rows.length + ' stores across ' + districts.length + ' districts from /api/stores.');
+    } catch (error) {
+      setResult('store-map', 'Store map API load failed: ' + error.message + '. Static store map remains visible.');
+    }
+  };
   const messages = {
     'toggle-alert': 'Alert rule updated locally; production save waits for authenticated account API.',
     'manage-subscription': 'Billing portal handoff prepared without exposing provider customer IDs.',
@@ -741,6 +769,10 @@ window.GroceryViewFlowActions = (() => {
       }
       if (flow === 'store-deals' && action === 'load-store-deals') {
         await loadStoreDealsFromApi(button);
+        return;
+      }
+      if (flow === 'store-map' && action === 'load-store-map') {
+        await loadStoreMapFromApi();
         return;
       }
       if (flow && action) setResult(flow, messages[action] || 'Action preview recorded.');
@@ -875,6 +907,9 @@ const budgetSummaryLivePanel = `
 
 const storeDealsLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="store-deals" data-store-id="willys-odenplan" style="margin-top:16px"><div class="eyebrow">Connected store deals API</div><h2>Pull live in-store deal board</h2><p class="lede">Fetch <code>/api/stores/willys-odenplan/deals</code> to refresh this favorite-store profile with ranked products, current store price, Deal Score, category coverage, and Buy/Compare verdict mix from the public API.</p><div class="grid" aria-label="Live store deals API metrics"><div class="metric"><strong data-store-deals-leader>Waiting for API pull</strong><span>top in-store deal</span></div><div class="metric"><strong data-store-deals-count>Static deal-count preview</strong><span>ranked store products and categories</span></div><div class="metric"><strong data-store-deals-verdict>Static verdict preview</strong><span>Buy and Compare mix</span></div></div><div class="flow-panel" aria-label="Connected store deal actions"><button type="button" data-flow-action="load-store-deals">Load live store deals</button></div><p class="flow-result" data-flow-result="store-deals" aria-live="polite">Local preview mode: connect the API session bridge before loading live store deals.</p></section>`;
+
+const storeMapLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="store-map" style="margin-top:16px"><div class="eyebrow">Connected store map API</div><h2>Pull live Stockholm store coverage</h2><p class="lede">Fetch <code>/api/stores</code> to refresh mapped store count, districts, chains, and confidence coverage from the public API before a shopper uses map or route guidance.</p><div class="grid" aria-label="Live store map API metrics"><div class="metric"><strong data-store-map-count>Waiting for API pull</strong><span>mapped stores and chains</span></div><div class="metric"><strong data-store-map-districts>Static district preview</strong><span>covered districts</span></div><div class="metric"><strong data-store-map-confidence>Static confidence preview</strong><span>high-confidence profiles</span></div></div><div class="flow-panel" aria-label="Connected store map actions"><button type="button" data-flow-action="load-store-map">Load live store map</button></div><p class="flow-result" data-flow-result="store-map" aria-live="polite">Local preview mode: connect the API session bridge before loading live store map.</p></section>`;
 
 const pages = [
   {
@@ -1049,7 +1084,7 @@ const pages = [
     path: 'stores/map/index.html',
     title: 'Stockholm store map — GroceryView',
     description: 'Browse nearby Stockholm grocery stores by district, basket fit, verified coverage, confidence risk, and pickup notes.',
-    body: `<section class="card"><div class="eyebrow">Store map</div><h1>Stockholm store map</h1><p class="lede">Choose nearby stores by district, verified price coverage, basket fit, and confidence risk before planning a shopping route.</p><div class="grid"><div class="metric"><strong>5</strong><span>mapped stores</span></div><div class="metric"><strong>82%</strong><span>best verified coverage</span></div><div class="metric"><strong>2</strong><span>pickup-ready baskets</span></div></div></section><section class="card" style="margin-top:16px"><h2>District store list</h2><table class="table"><thead><tr><th>Store</th><th>District</th><th>Basket fit</th><th>Coverage</th><th>Pickup note</th></tr></thead><tbody><tr><td>Willys Odenplan</td><td>Vasastan</td><td>Coffee and pantry</td><td>82%</td><td>Primary weekly basket</td></tr><tr><td>Lidl Sveavägen</td><td>Norrmalm</td><td>Eggs and dairy</td><td>76%</td><td>Split basket stop</td></tr><tr><td>ICA Kvantum Liljeholmen</td><td>Liljeholmen</td><td>Milk and produce</td><td>74%</td><td>Transit-friendly backup</td></tr><tr><td>Coop Farsta</td><td>Farsta</td><td>Member promos</td><td>68%</td><td>Review loyalty rows first</td></tr><tr><td>Hemköp T-Centralen</td><td>Norrmalm</td><td>Convenience top-up</td><td>71%</td><td>Small-basket only</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Map guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>No travel-time penalty in Deal Score</td><td>Map distance informs route planning but never changes product deal ranking.</td></tr><tr><td>Coverage shown beside fit</td><td>Low-coverage stores need review before becoming default basket routes.</td></tr><tr><td>Pickup notes separate from prices</td><td>Operational notes cannot overwrite verified shelf or retailer-page evidence.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Store map</div><h1>Stockholm store map</h1><p class="lede">Choose nearby stores by district, verified price coverage, basket fit, and confidence risk before planning a shopping route.</p><div class="grid"><div class="metric"><strong>5</strong><span>mapped stores</span></div><div class="metric"><strong>82%</strong><span>best verified coverage</span></div><div class="metric"><strong>2</strong><span>pickup-ready baskets</span></div></div></section><section class="card" style="margin-top:16px"><h2>District store list</h2><table class="table"><thead><tr><th>Store</th><th>District</th><th>Basket fit</th><th>Coverage</th><th>Pickup note</th></tr></thead><tbody><tr><td>Willys Odenplan</td><td>Vasastan</td><td>Coffee and pantry</td><td>82%</td><td>Primary weekly basket</td></tr><tr><td>Lidl Sveavägen</td><td>Norrmalm</td><td>Eggs and dairy</td><td>76%</td><td>Split basket stop</td></tr><tr><td>ICA Kvantum Liljeholmen</td><td>Liljeholmen</td><td>Milk and produce</td><td>74%</td><td>Transit-friendly backup</td></tr><tr><td>Coop Farsta</td><td>Farsta</td><td>Member promos</td><td>68%</td><td>Review loyalty rows first</td></tr><tr><td>Hemköp T-Centralen</td><td>Norrmalm</td><td>Convenience top-up</td><td>71%</td><td>Small-basket only</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Map guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>No travel-time penalty in Deal Score</td><td>Map distance informs route planning but never changes product deal ranking.</td></tr><tr><td>Coverage shown beside fit</td><td>Low-coverage stores need review before becoming default basket routes.</td></tr><tr><td>Pickup notes separate from prices</td><td>Operational notes cannot overwrite verified shelf or retailer-page evidence.</td></tr></tbody></table></section>${storeMapLivePanel}`
   },
   {
     path: 'categories/coffee/index.html',

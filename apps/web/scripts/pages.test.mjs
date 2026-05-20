@@ -231,6 +231,15 @@ describe('buildStaticPages', () => {
       assert.match(storeMap, /Willys Odenplan/);
       assert.match(storeMap, /No travel-time penalty in Deal Score/);
       assert.match(storeMap, /Pickup notes separate from prices/);
+      assert.match(storeMap, /Connected store map API/);
+      assert.match(storeMap, /Load live store map/);
+      assert.match(storeMap, /data-groceryview-flow="store-map"/);
+      assert.match(storeMap, /data-flow-action="load-store-map"/);
+      assert.match(storeMap, /data-store-map-count/);
+      assert.match(storeMap, /data-store-map-districts/);
+      assert.match(storeMap, /data-store-map-confidence/);
+      assert.match(storeMap, /fetch\(apiUrl\('\/api\/stores', config, false\)/);
+      assert.match(storeMap, /Connected store map loaded/);
 
       const category = await readFile(join(root, 'categories/coffee/index.html'), 'utf8');
       assert.match(category, /Category signals/);
