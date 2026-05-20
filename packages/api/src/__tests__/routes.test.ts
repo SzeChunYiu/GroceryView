@@ -164,6 +164,29 @@ describe('createGroceryViewApi', () => {
     ]);
   });
 
+  it('serves account-scoped loyalty offers with savings and action requirements', () => {
+    const api = createGroceryViewApi();
+
+    const report = api.getLoyaltyOfferReport('user-1');
+
+    assert.equal(report.userId, 'user-1');
+    assert.equal(report.totalEligibleSavings, 26);
+    assert.equal(report.requiresActionCount, 1);
+    assert.equal(report.membershipRequiredCount, 1);
+    assert.deepEqual(report.offers.map((offer) => ({
+      productId: offer.productId,
+      chain: offer.chain,
+      savings: offer.savings,
+      status: offer.status,
+      actionRequired: offer.actionRequired
+    })), [
+      { productId: 'coffee', chain: 'ica', savings: 7, status: 'eligible', actionRequired: false },
+      { productId: 'milk', chain: 'coop', savings: 12, status: 'needs_coupon', actionRequired: true },
+      { productId: 'private-label-milk', chain: 'willys', savings: 7, status: 'eligible', actionRequired: false }
+    ]);
+    assert.match(report.guardrails[0], /member-only savings never overwrite verified public shelf evidence/i);
+  });
+
   it('serves category market reports with terminal-style mover evidence', () => {
     const api = createGroceryViewApi();
 

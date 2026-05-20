@@ -25,6 +25,7 @@ describe('buildOpenApiDocument', () => {
       '/api/human-review/assignments/{id}/decisions',
       '/api/indices',
       '/api/indices/{id}',
+      '/api/loyalty/offers',
       '/api/market/overview',
       '/api/metrics/notifications',
       '/api/notifications/provider-suppression-events',
@@ -88,6 +89,8 @@ describe('buildOpenApiDocument', () => {
     assert.match(doc.paths['/api/nutrition/value'].get?.summary ?? '', /nutrition.*krona/i);
     assert.deepEqual(doc.paths['/api/pantry/replenishment'].get?.security, [{ bearerAuth: [] }]);
     assert.match(doc.paths['/api/pantry/replenishment'].get?.summary ?? '', /pantry replenishment/i);
+    assert.deepEqual(doc.paths['/api/loyalty/offers'].get?.security, [{ bearerAuth: [] }]);
+    assert.match(doc.paths['/api/loyalty/offers'].get?.summary ?? '', /loyalty offers/i);
     assert.equal(doc.paths['/api/categories/{category}/market'].get?.security, undefined);
     assert.match(doc.paths['/api/categories/{category}/market'].get?.summary ?? '', /category market/i);
   });

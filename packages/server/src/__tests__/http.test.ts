@@ -146,6 +146,17 @@ describe('createHttpHandler', () => {
     assert.deepEqual(pantryBody.replenishment.map((row) => [row.productId, row.alreadyInBasket]), [['coffee', false]]);
     assert.deepEqual(pantryBody.expiringSoonProductIds, ['milk']);
 
+    const loyalty = await handle(new Request('http://localhost/api/loyalty/offers?userId=user-1'));
+    assert.equal(loyalty.status, 200);
+    const loyaltyBody = await json(loyalty) as { totalEligibleSavings: number; requiresActionCount: number; offers: Array<{ productId: string; status: string; savings: number }> };
+    assert.equal(loyaltyBody.totalEligibleSavings, 26);
+    assert.equal(loyaltyBody.requiresActionCount, 1);
+    assert.deepEqual(loyaltyBody.offers.map((offer) => [offer.productId, offer.status, offer.savings]), [
+      ['coffee', 'eligible', 7],
+      ['milk', 'needs_coupon', 12],
+      ['private-label-milk', 'eligible', 7]
+    ]);
+
     const categoryMarket = await handle(new Request('http://localhost/api/categories/coffee/market'));
     assert.equal(categoryMarket.status, 200);
     const categoryMarketBody = await json(categoryMarket) as {
