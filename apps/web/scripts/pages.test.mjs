@@ -30,6 +30,7 @@ describe('buildStaticPages', () => {
         'privacy/index.html',
         'products/coffee/index.html',
         'receipts/review/index.html',
+        'retailers/freshness/index.html',
         'savings/smart-swaps/index.html',
         'scanner/index.html',
         'stores/compare/index.html',
@@ -96,6 +97,13 @@ describe('buildStaticPages', () => {
       assert.match(catalogCoverage, /Backfill member prices/);
       assert.match(catalogCoverage, /Receipt photos need human review before catalog writeback/);
       assert.match(catalogCoverage, /Products without unit prices cannot rank category savings/);
+
+      const retailerFreshness = await readFile(join(root, 'retailers/freshness/index.html'), 'utf8');
+      assert.match(retailerFreshness, /Retailer freshness monitor/);
+      assert.match(retailerFreshness, /Freshness by retailer/);
+      assert.match(retailerFreshness, /Coop/);
+      assert.match(retailerFreshness, /Pause new alerts/);
+      assert.match(retailerFreshness, /Stale retailer-page rows cannot trigger household notifications/);
 
       const priceConfidence = await readFile(join(root, 'prices/confidence/index.html'), 'utf8');
       assert.match(priceConfidence, /Price confidence guide/);

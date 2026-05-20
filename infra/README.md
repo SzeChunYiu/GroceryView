@@ -58,6 +58,22 @@ METRICS_TOKEN=replace-with-deployment-token \
 
 The readiness smoke calls `/api/readiness/postgres` with `METRICS_TOKEN` and requires a `ready` response before the deployment can count as database-backed smoke evidence.
 
+## Smoke environment overrides
+
+Use these variables when running the smoke script against a non-default compose file, renamed services, or slower local Docker runtime.
+
+| Variable | Default | Purpose |
+|---|---:|---|
+| `COMPOSE_FILE` | `infra/docker-compose.yml` | Docker Compose file used for the local dependency stack. |
+| `POSTGRES_SERVICE` | `postgres` | Compose service name for PostgreSQL/PostGIS readiness checks. |
+| `REDIS_SERVICE` | `redis` | Compose service name for Redis readiness checks. |
+| `OBJECT_STORAGE_SERVICE` | `object-storage` | Compose service name for MinIO health checks. |
+| `OBJECT_STORAGE_INIT_SERVICE` | `object-storage-init` | Compose service name that creates and verifies the configured bucket. |
+| `POSTGRES_DB` | `groceryview` | Database name used by the `pg_isready` probe. |
+| `POSTGRES_USER` | `groceryview` | Database user used by the `pg_isready` probe. |
+| `S3_BUCKET` | `groceryview-raw` | MinIO bucket that must exist before API or worker development. |
+| `WAIT_SECONDS` | `90` | Maximum seconds to wait for health checks before printing diagnostics. |
+
 ## Smoke troubleshooting
 
 The smoke script prints Docker inspect state and the last compose logs for Postgres, Redis, MinIO, and the bucket initialization service before it exits nonzero.

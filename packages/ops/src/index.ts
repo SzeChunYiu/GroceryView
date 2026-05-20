@@ -1,5 +1,63 @@
 export type GateStatus = 'pass' | 'fail' | 'not_run';
 
+export type LocalSmokeEnvOverride = {
+  name: string;
+  defaultValue: string;
+  purpose: string;
+};
+
+export const localSmokeEnvOverrides: LocalSmokeEnvOverride[] = [
+  {
+    name: 'COMPOSE_FILE',
+    defaultValue: 'infra/docker-compose.yml',
+    purpose: 'Docker Compose file used for the local dependency stack.'
+  },
+  {
+    name: 'POSTGRES_SERVICE',
+    defaultValue: 'postgres',
+    purpose: 'Compose service name for PostgreSQL/PostGIS readiness checks.'
+  },
+  {
+    name: 'REDIS_SERVICE',
+    defaultValue: 'redis',
+    purpose: 'Compose service name for Redis readiness checks.'
+  },
+  {
+    name: 'OBJECT_STORAGE_SERVICE',
+    defaultValue: 'object-storage',
+    purpose: 'Compose service name for MinIO health checks.'
+  },
+  {
+    name: 'OBJECT_STORAGE_INIT_SERVICE',
+    defaultValue: 'object-storage-init',
+    purpose: 'Compose service name that creates and verifies the configured bucket.'
+  },
+  {
+    name: 'POSTGRES_DB',
+    defaultValue: 'groceryview',
+    purpose: 'Database name used by the pg_isready probe.'
+  },
+  {
+    name: 'POSTGRES_USER',
+    defaultValue: 'groceryview',
+    purpose: 'Database user used by the pg_isready probe.'
+  },
+  {
+    name: 'S3_BUCKET',
+    defaultValue: 'groceryview-raw',
+    purpose: 'MinIO bucket that must exist before API or worker development.'
+  },
+  {
+    name: 'WAIT_SECONDS',
+    defaultValue: '90',
+    purpose: 'Maximum seconds to wait for health checks before printing diagnostics.'
+  }
+];
+
+export function listLocalSmokeEnvOverrideNames(): string[] {
+  return localSmokeEnvOverrides.map((override) => override.name);
+}
+
 export type DeploymentReadinessInput = {
   providerSelected: boolean;
   requiredSecretsPresent: string[];
@@ -230,6 +288,59 @@ export function buildDeploymentSmokeEvidenceReport(input: DeploymentSmokeEvidenc
         ? 'Deployment smoke evidence is fresh and passing.'
         : 'Deployment smoke evidence is blocked until every required probe has fresh passing proof.'
   };
+}
+
+export type HostedSmokeCommandPlanInput = {
+  serverUrl: string;
+  webUrl?: string;
+  includePostgresReadiness: boolean;
+  metricsTokenEnvVar?: string;
+  timeoutSeconds?: number;
+};
+
+export type HostedSmokeCommandPlan = {
+  commands: string[];
+  requiredSecrets: string[];
+  evidence: string[];
+};
+
+function trimTrailingSlash(url: string): string {
+  return url.replace(/\/+$/, '');
+}
+
+export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput): HostedSmokeCommandPlan {
+  const timeout = input.timeoutSeconds ?? 15;
+  const serverUrl = trimTrailingSlash(input.serverUrl);
+  const commands = [
+    [
+      `GROCERYVIEW_SERVER_URL=${serverUrl}`,
+      input.webUrl ? `GROCERYVIEW_WEB_URL=${trimTrailingSlash(input.webUrl)}` : undefined,
+      `HTTP_SMOKE_TIMEOUT_SECONDS=${timeout}`,
+      'infra/scripts/smoke-hosted-http.sh'
+    ]
+      .filter(Boolean)
+      .join(' ')
+  ];
+  const evidence = ['hosted_api_health'];
+  const requiredSecrets: string[] = [];
+
+  if (input.webUrl) evidence.push('hosted_web');
+
+  if (input.includePostgresReadiness) {
+    const metricsTokenEnvVar = input.metricsTokenEnvVar ?? 'METRICS_TOKEN';
+    requiredSecrets.push(metricsTokenEnvVar);
+    commands.push(
+      [
+        `GROCERYVIEW_SERVER_URL=${serverUrl}`,
+        `METRICS_TOKEN=$${metricsTokenEnvVar}`,
+        `READINESS_TIMEOUT_SECONDS=${timeout}`,
+        'infra/scripts/smoke-hosted-readiness.sh'
+      ].join(' ')
+    );
+    evidence.push('hosted_postgres_readiness');
+  }
+
+  return { commands, requiredSecrets, evidence };
 }
 
 export function buildRollbackPlan(input: RollbackPlanInput): RollbackPlan {

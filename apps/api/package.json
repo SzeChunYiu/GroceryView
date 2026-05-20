@@ -1,0 +1,27 @@
+{
+  "name": "@groceryview/api-app",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "npm run build -w @groceryview/core && npm run build -w @groceryview/api && tsc -p tsconfig.build.json",
+    "test": "npm run build && tsc -p tsconfig.test.json && node --test dist-test/test/*.js"
+  },
+  "dependencies": {
+    "@groceryview/api": "0.1.0",
+    "@nestjs/common": "^11.1.9",
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/core": "^11.1.9",
+    "@nestjs/platform-express": "^11.1.9",
+    "@nestjs/swagger": "^11.2.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.3",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^11.1.9",
+    "@types/supertest": "^6.0.3",
+    "supertest": "^7.1.4"
+  }
+}

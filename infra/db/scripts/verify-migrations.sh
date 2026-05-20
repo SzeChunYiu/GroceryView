@@ -68,6 +68,12 @@ REQUIRED_TABLES=(
   alert_rules
 )
 
+REQUIRED_EXTENSIONS=(
+  pgcrypto
+  postgis
+  pg_trgm
+)
+
 REQUIRED_SEED_CHAIN_SLUGS=(
   ica
   willys
@@ -204,6 +210,25 @@ if [ -n "$missing_tables" ]; then
 fi
 
 echo "required migration tables ok"
+
+required_extension_values="$(sql_values "${REQUIRED_EXTENSIONS[@]}")"
+missing_extensions="$(
+  docker exec "$CONTAINER_NAME" \
+    psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc \
+    "with required(extension_name) as (values ${required_extension_values})
+     select coalesce(string_agg(required.extension_name, ',' order by required.extension_name), '')
+     from required
+     left join pg_extension installed
+       on installed.extname = required.extension_name
+     where installed.extname is null"
+)"
+
+if [ -n "$missing_extensions" ]; then
+  echo "migration extension assertion failed: missing ${missing_extensions}" >&2
+  exit 1
+fi
+
+echo "required migration extensions ok"
 
 if [ -d "$SEEDS_DIR" ]; then
   mapfile -t SEEDS < <(find "$SEEDS_DIR" -maxdepth 1 -type f -name '*.sql' | sort)
