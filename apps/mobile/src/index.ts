@@ -418,6 +418,12 @@ export function createMobileProductPriceTerminalViewModel(
   };
 }
 
+export type MobileScreenComponentAction =
+  | MobileProductPriceTerminalViewModel['actions'][number]
+  | 'open_product'
+  | 'compare_basket'
+  | 'scan_barcode';
+
 export type MobileScreenComponent =
   | {
       type: 'screen';
@@ -448,7 +454,7 @@ export type MobileScreenComponent =
   | {
       type: 'action';
       key: string;
-      action: MobileProductPriceTerminalViewModel['actions'][number];
+      action: MobileScreenComponentAction;
       label: string;
       primary: boolean;
     }
@@ -464,6 +470,82 @@ function actionLabel(action: MobileProductPriceTerminalViewModel['actions'][numb
   if (action === 'add_to_weekly_basket') return 'Add to basket';
   if (action === 'compare_stores') return 'Compare stores';
   return 'Verify with receipt';
+}
+
+function todayActionLabel(action: Extract<MobileScreenComponentAction, 'open_product' | 'compare_basket' | 'scan_barcode'>): string {
+  if (action === 'open_product') return 'Open deal';
+  if (action === 'compare_basket') return 'Compare basket';
+  return 'Scan barcode';
+}
+
+export function composeMobileTodayScreen(
+  userId: string,
+  api: MobileApi = createGroceryViewApi()
+): MobileScreenComponent {
+  const viewModel = createMobileViewModel(userId, api);
+  const budget = api.getBudgetSummary(userId);
+  const watchlist = api.getWatchlist(userId);
+  const favoriteStores = viewModel.stores.favoriteStores;
+  const actions: Array<Extract<MobileScreenComponentAction, 'open_product' | 'compare_basket' | 'scan_barcode'>> = ['open_product', 'compare_basket', 'scan_barcode'];
+
+  return {
+    type: 'screen',
+    key: `today:${userId}`,
+    title: `${viewModel.today.marketCity} Today`,
+    state: 'ready',
+    children: [
+      {
+        type: 'section',
+        key: 'budget',
+        title: 'Budget',
+        children: [
+          { type: 'metric', key: 'weekly-budget', label: 'Weekly budget', value: `${budget.weeklyBudget} SEK`, tone: 'neutral' },
+          { type: 'metric', key: 'planned-basket', label: 'Planned basket', value: `${budget.estimatedBasketTotal} SEK`, tone: budget.weeklyStatus === 'under' ? 'positive' : 'warning' },
+          { type: 'metric', key: 'remaining-after-plan', label: 'After plan', value: `${budget.weeklyRemainingAfterEstimate} SEK`, tone: budget.weeklyRemainingAfterEstimate >= 0 ? 'positive' : 'warning' }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'top-deals',
+        title: 'Top deals',
+        children: viewModel.today.topDeals.slice(0, 3).map((deal) => ({
+          type: 'row',
+          key: `deal:${deal.ticker}`,
+          label: deal.ticker,
+          value: `${deal.bestPrice?.toFixed(2) ?? 'n/a'} SEK, score ${deal.dealScore}`
+        }))
+      },
+      {
+        type: 'section',
+        key: 'favorite-stores',
+        title: 'Favorite stores',
+        children: favoriteStores.length > 0
+          ? favoriteStores.map((store) => ({ type: 'row', key: `store:${store.id}`, label: store.name, value: 'Saved for local deal filters' }))
+          : [{ type: 'empty', key: 'no-favorite-stores', message: 'Add favorite stores to personalize Today.', action: 'search_product' }]
+      },
+      {
+        type: 'section',
+        key: 'watchlist',
+        title: 'Watchlist',
+        children: [
+          { type: 'metric', key: 'watchlist-items', label: 'Watched products', value: String(watchlist.items.length), tone: 'neutral' },
+          { type: 'metric', key: 'watchlist-alerts', label: 'Active alerts', value: String(watchlist.alerts.length), tone: watchlist.alerts.length > 0 ? 'positive' : 'neutral' }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'actions',
+        title: 'Actions',
+        children: actions.map((action, index) => ({
+          type: 'action',
+          key: action,
+          action,
+          label: todayActionLabel(action),
+          primary: index === 0
+        }))
+      }
+    ]
+  };
 }
 
 export function composeMobileProductTerminalScreen(

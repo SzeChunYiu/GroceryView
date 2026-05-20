@@ -8,6 +8,7 @@ import {
   buildMobileScreenBlueprints,
   buildMobileShell,
   buildScanResult,
+  composeMobileTodayScreen,
   composeMobileProductTerminalScreen,
   createMobileDiscoveryViewModel,
   createMobileProductPriceTerminalViewModel,
@@ -150,6 +151,58 @@ describe('mobile app foundation', () => {
     ]);
     assert.deepEqual(viewModel?.actions, ['add_to_watchlist', 'add_to_weekly_basket', 'compare_stores', 'scan_receipt_to_verify']);
     assert.equal(createMobileProductPriceTerminalViewModel('missing-product'), null);
+  });
+
+  it('composes a renderable mobile Today screen from budget, deal, store, and watchlist data', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 55, alertDealScoreAt: 80, favoriteStoresOnly: true });
+    api.updateBudget('user-1', { weeklyBudget: 150, monthlyBudget: 600 });
+
+    const screen = composeMobileTodayScreen('user-1', api);
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.title, 'Stockholm Today');
+    assert.equal(screen.state, 'ready');
+    assert.deepEqual(screen.children.map((section) => section.key), ['budget', 'top-deals', 'favorite-stores', 'watchlist', 'actions']);
+
+    const budget = screen.children.find((section) => section.key === 'budget');
+    assert.equal(budget?.type, 'section');
+    assert.deepEqual(budget?.children.map((metric) => 'value' in metric ? metric.value : null), ['150 SEK', '49.9 SEK', '100.1 SEK']);
+
+    const topDeals = screen.children.find((section) => section.key === 'top-deals');
+    assert.equal(topDeals?.type, 'section');
+    assert.equal(topDeals?.children[0]?.key, 'deal:ZOEGAS-COFFEE-450G');
+    assert.equal('value' in topDeals!.children[0]! ? topDeals!.children[0]!.value : null, '49.90 SEK, score 82');
+
+    const stores = screen.children.find((section) => section.key === 'favorite-stores');
+    assert.equal(stores?.type, 'section');
+    assert.deepEqual(stores?.children.map((row) => row.key), ['store:willys-odenplan', 'store:lidl-sveavagen']);
+
+    const watchlist = screen.children.find((section) => section.key === 'watchlist');
+    assert.equal(watchlist?.type, 'section');
+    assert.deepEqual(watchlist?.children.map((metric) => 'value' in metric ? metric.value : null), ['1', '3']);
+
+    const actions = screen.children.find((section) => section.key === 'actions');
+    assert.equal(actions?.type, 'section');
+    assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Open deal', 'Compare basket', 'Scan barcode']);
+  });
+
+  it('composes a Today empty state when no favorite stores are saved', () => {
+    const screen = composeMobileTodayScreen('new-user');
+    assert.equal(screen.type, 'screen');
+    const stores = screen.children.find((section) => section.key === 'favorite-stores');
+
+    if (!stores || stores.type !== 'section') throw new Error('favorite stores section missing');
+    assert.deepEqual(stores.children, [
+      {
+        type: 'empty',
+        key: 'no-favorite-stores',
+        message: 'Add favorite stores to personalize Today.',
+        action: 'search_product'
+      }
+    ]);
   });
 
   it('composes a renderable mobile product terminal screen with quote, evidence, chart, and actions', () => {
