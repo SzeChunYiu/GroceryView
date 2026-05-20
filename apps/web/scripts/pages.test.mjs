@@ -14,6 +14,7 @@ describe('buildStaticPages', () => {
       assert.deepEqual(pages.sort(), [
         'account/index.html',
         'admin/human-review/index.html',
+        'ads/disclosure/index.html',
         'basket/index.html',
         'billing/status/index.html',
         'budget/forecast/index.html',
@@ -213,6 +214,13 @@ describe('buildStaticPages', () => {
       assert.match(account, /fetch\(apiUrl\('\/api\/watchlist/);
       assert.match(account, /fetch\(apiUrl\('\/api\/account\/subscription-access/);
       assert.match(account, /authorization: 'Bearer '/);
+
+      const adDisclosure = await readFile(join(root, 'ads/disclosure/index.html'), 'utf8');
+      assert.match(adDisclosure, /Ad disclosure center/);
+      assert.match(adDisclosure, /Disclosure states/);
+      assert.match(adDisclosure, /Sponsored banner/);
+      assert.match(adDisclosure, /Sponsored placements cannot change Deal Score/);
+      assert.match(adDisclosure, /Advertiser payloads stay aggregated and never include raw receipts/);
 
       const billingStatus = await readFile(join(root, 'billing/status/index.html'), 'utf8');
       assert.match(billingStatus, /Billing status/);
