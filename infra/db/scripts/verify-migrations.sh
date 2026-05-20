@@ -65,6 +65,7 @@ REQUIRED_TABLES=(
   subscription_entitlements
   notification_tasks
   notification_suppressions
+  alert_rules
 )
 
 REQUIRED_SEED_CHAIN_SLUGS=(

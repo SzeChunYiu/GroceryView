@@ -8,7 +8,8 @@ const repoRoot = join(fileURLToPath(new URL('.', import.meta.url)), '../../../..
 const migration = readFileSync(join(repoRoot, 'infra/db/migrations/001_groceryview_schema.sql'), 'utf8').toLowerCase();
 const repositoryMigration = readFileSync(join(repoRoot, 'infra/db/migrations/002_repository_support_schema.sql'), 'utf8').toLowerCase();
 const entitlementMigration = readFileSync(join(repoRoot, 'infra/db/migrations/003_subscription_entitlements.sql'), 'utf8').toLowerCase();
-const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}`;
+const alertRulesMigration = readFileSync(join(repoRoot, 'infra/db/migrations/004_alert_rules.sql'), 'utf8').toLowerCase();
+const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}`;
 const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
 
@@ -41,7 +42,8 @@ const repositoryTables = [
   'community_reporter_trust',
   'subscription_entitlements',
   'notification_tasks',
-  'notification_suppressions'
+  'notification_suppressions',
+  'alert_rules'
 ];
 
 function tableDefinition(table: string): string {
@@ -109,6 +111,9 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('subscription_entitlements'), /provider_subscription_id text/);
     assert.match(repositoryTableDefinition('notification_tasks'), /status text not null check/);
     assert.match(repositoryTableDefinition('notification_suppressions'), /channel text check \(channel in \('push', 'email'\)\)/);
+    assert.match(repositoryTableDefinition('alert_rules'), /user_id text not null references app_users\(id\) on delete cascade/);
+    assert.match(repositoryTableDefinition('alert_rules'), /alert_type text not null check/);
+    assert.match(repositoryTableDefinition('alert_rules'), /deal_score_threshold integer check/);
   });
 
   it('indexes repository workflow lookups used by adapters and workers', () => {
@@ -118,6 +123,7 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(entitlementMigration, /subscription_entitlements_status_idx on subscription_entitlements \(status, updated_at desc\)/);
     assert.match(repositoryMigration, /notification_tasks_due_idx on notification_tasks \(status, send_at, id\)/);
     assert.match(repositoryMigration, /notification_suppressions_active_idx on notification_suppressions \(active, recipient, channel, id\)/);
+    assert.match(alertRulesMigration, /alert_rules_active_user_idx on alert_rules \(user_id, active, product_id, alert_type, id\)/);
   });
 
   it('keeps the migration verifier aligned with catalog and repository tables', () => {

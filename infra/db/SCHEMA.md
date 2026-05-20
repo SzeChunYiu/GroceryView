@@ -148,3 +148,11 @@ User alert rules for target prices, Deal Score thresholds, stock, or price drops
 Key columns: `user_id`, `watchlist_id`, `product_id`, `store_id`, `alert_type`, `target_price`, `deal_score_threshold`, `active`, `last_triggered_at`.
 
 Indexes: `alerts_active_user_idx`.
+
+### `alert_rules`
+
+Application repository alert rules keyed by the text `app_users` identity used by current API and worker packages.
+
+Key columns: `user_id`, `product_id`, `store_id`, `channel`, `alert_type`, `target_price`, `deal_score_threshold`, `active`.
+
+Indexes: `alert_rules_active_user_idx` for account alert-center reads and `alert_rules_store_idx` for store-scoped alert fanout.
