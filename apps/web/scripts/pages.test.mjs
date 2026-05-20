@@ -25,6 +25,7 @@ describe('buildStaticPages', () => {
         'market/index.html',
         'meal-plans/index.html',
         'notifications/inbox/index.html',
+        'nutrition/allergens/index.html',
         'pantry/index.html',
         'prices/confidence/index.html',
         'privacy/index.html',
@@ -223,6 +224,13 @@ describe('buildStaticPages', () => {
       assert.match(notificationInbox, /Quiet hours 21:00-07:00/);
       assert.match(notificationInbox, /Provider token invalid/);
       assert.match(notificationInbox, /Invalid tokens stop future sends/);
+
+      const nutritionAllergens = await readFile(join(root, 'nutrition/allergens/index.html'), 'utf8');
+      assert.match(nutritionAllergens, /Nutrition and allergen review/);
+      assert.match(nutritionAllergens, /Diet review queue/);
+      assert.match(nutritionAllergens, /Peanut granola/);
+      assert.match(nutritionAllergens, /Blocked allergens outrank price savings and Deal Score/);
+      assert.match(nutritionAllergens, /Diet conflicts stop meal-plan and basket updates until reviewed/);
 
       const household = await readFile(join(root, 'household/index.html'), 'utf8');
       assert.match(household, /Shared household basket/);
