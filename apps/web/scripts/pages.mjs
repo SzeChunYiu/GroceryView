@@ -75,6 +75,33 @@ window.GroceryViewFlowActions = (() => {
     const eggs = Number(data.get('eggsQuantity') || 0);
     return coffee * 49.9 + milk * 13.9 + eggs * 34.9;
   };
+  const requestLoginSessionFromApi = async (form) => {
+    const config = getApiConfig();
+    const data = new FormData(form);
+    const email = String(data.get('email') || '').trim();
+    if (!config.apiBase) {
+      setResult('login', 'Demo mode: sign-in link queued for ' + (email || 'your email') + '. Add an API base URL to exchange a provider session.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/auth/session', config, false), {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          provider: 'magic_link',
+          assertion: 'demo-magic-link:' + (email || 'unknown'),
+          email
+        })
+      });
+      const payload = await requireApiSuccess(response);
+      if (payload.accessToken) sessionStorage.setItem('groceryview.bearerToken', payload.accessToken);
+      if (payload.userId) localStorage.setItem('groceryview.userId', payload.userId);
+      setResult('login', 'Connected API: session exchanged for ' + (payload.email || email || payload.userId || 'signed-in user') + '; bearer token stored in sessionStorage.');
+      setApiSessionResult('Connected mode ready for authenticated API calls.');
+    } catch (error) {
+      setResult('login', 'Session exchange failed: ' + error.message + '. Provider credentials may still be unconfigured.');
+    }
+  };
   const saveCoffeeAlertToApi = async () => {
     const config = getApiConfig();
     if (!hasApiSession(config)) {
@@ -265,7 +292,7 @@ window.GroceryViewFlowActions = (() => {
       event.preventDefault();
       const flow = form.closest('[data-groceryview-flow]')?.dataset.groceryviewFlow;
       const data = new FormData(form);
-      if (flow === 'login') setResult(flow, 'Sign-in link queued for ' + (data.get('email') || 'your email') + '. Demo mode does not send email.');
+      if (flow === 'login') await requestLoginSessionFromApi(form);
       if (flow === 'household') await saveHouseholdToApi(form);
       if (flow === 'basket' && event.submitter?.dataset.flowAction === 'save-basket-api') {
         await saveBasketToApi(form);
