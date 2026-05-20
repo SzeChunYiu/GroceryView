@@ -244,6 +244,12 @@ const humanReviewDecisionPreview = applyHumanReviewDecision({
   notes: 'Shelf photo confirms equivalent produce unit.'
 });
 
+const receiptHistory = [
+  { receipt: 'Coop Farsta', status: 'Needs human review', budgetImpact: 'Hold 321 SEK', catalogAction: 'No price contribution yet' },
+  { receipt: 'Willys Odenplan', status: 'Reviewed', budgetImpact: 'Apply 180 SEK', catalogAction: 'Verified shelf observations' },
+  { receipt: 'Lidl Sveavägen', status: 'Redacted', budgetImpact: 'Apply total only', catalogAction: 'Image deleted after review' }
+];
+
 const privacyControls = [
   { setting: 'Receipt images', state: 'Auto-delete after review', detail: '7 day retention window' },
   { setting: 'Location precision', state: 'District only', detail: 'Street address hidden from exports' },
@@ -408,6 +414,27 @@ app.innerHTML = `
           <div class="metric"><strong>${humanReviewSla.overdueAssignments}</strong><span>overdue assignment</span></div>
           <div class="metric"><strong>${humanReviewDecisionPreview.writeback.action.replaceAll('_', ' ')}</strong><span>next writeback</span></div>
         </div>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Receipt history</h2>
+        <p class="lede">Receipt totals reconcile budgets only after review, and catalog price contribution stays blocked until line-item confidence is high enough.</p>
+        <div class="grid">
+          <div class="metric"><strong>501 SEK</strong><span>reviewed weekly spend</span></div>
+          <div class="metric"><strong>2</strong><span>pending review receipts</span></div>
+          <div class="metric"><strong>7 days</strong><span>image retention</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Reconciliation queue</h2>
+        <table class="table">
+          <thead><tr><th>Receipt</th><th>Status</th><th>Budget</th><th>Catalog</th></tr></thead>
+          <tbody>
+            ${receiptHistory.map((receipt) => `<tr><td>${receipt.receipt}</td><td><span class="status">${receipt.status}</span></td><td>${receipt.budgetImpact}</td><td>${receipt.catalogAction}</td></tr>`).join('')}
+          </tbody>
+        </table>
       </div>
     </section>
 

@@ -36,6 +36,7 @@ describe('buildStaticPages', () => {
         'routes/shopping/index.html',
         'savings/ledger/index.html',
         'savings/smart-swaps/index.html',
+        'receipts/index.html',
         'scanner/index.html',
         'stores/compare/index.html',
         'stores/map/index.html',
@@ -323,6 +324,13 @@ describe('buildStaticPages', () => {
       assert.match(humanReview, /SLA breached/);
       assert.match(humanReview, /Approve product match/);
       assert.match(humanReview, /approve_product_match/);
+
+      const receipts = await readFile(join(root, 'receipts/index.html'), 'utf8');
+      assert.match(receipts, /Receipt history/);
+      assert.match(receipts, /Budget reconciliation/);
+      assert.match(receipts, /Needs human review/);
+      assert.match(receipts, /No price contribution yet/);
+      assert.match(receipts, /Receipt image deleted after review/);
 
       const privacy = await readFile(join(root, 'privacy/index.html'), 'utf8');
       assert.match(privacy, /Export or delete your data/);
