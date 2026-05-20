@@ -22,6 +22,7 @@ Environment overrides:
 - `POSTGRES_DB`: database name, default `groceryview`.
 - `POSTGRES_USER`: user name, default `groceryview`.
 - `POSTGRES_PASSWORD`: password, default `groceryview`.
+- `POSTGRES_READY_TIMEOUT_SECONDS`: PostgreSQL readiness wait in seconds, default `60`.
 - `MIGRATIONS_DIR`: migration directory, default `infra/db/migrations`.
 - `SEEDS_DIR`: seed directory, default `infra/db/seeds`.
 
