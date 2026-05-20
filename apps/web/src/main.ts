@@ -110,6 +110,12 @@ const loyaltyOfferRows = [
   { offer: 'Willys Plus pantry bundle', chain: 'Willys', requirement: 'Member account verified', savings: '19 SEK', status: 'Ready for basket' }
 ];
 
+const mealPlanRows = [
+  { meal: 'Tuesday pasta bake', items: 'Tomatoes, milk, private-label cheese', cost: '142 SEK', fit: 'Vegetarian', status: 'Ready' },
+  { meal: 'Thursday egg bowls', items: 'Eggs, rice, frozen vegetables', cost: '118 SEK', fit: 'School lunch staples', status: 'Ready' },
+  { meal: 'Saturday coffee brunch', items: 'Zoégas Coffee 450g, eggs, bread', cost: '176 SEK', fit: 'Favorite-store pickup', status: 'Needs coffee promo confirmation' }
+];
+
 const watchlistRows = [
   { product: 'Zoégas Coffee 450g', target: '50 SEK', current: '49.90 SEK', trigger: 'Deal Score >= 80', status: 'Ready for push' },
   { product: 'Butter 600g', target: '45 SEK', current: '54.90 SEK', trigger: '52-week low', status: 'Watching' },
@@ -502,6 +508,16 @@ app.innerHTML = `
           <thead><tr><th>Offer</th><th>Chain</th><th>Requirement</th><th>Savings</th><th>Status</th></tr></thead>
           <tbody>
             ${loyaltyOfferRows.map((row) => `<tr><td>${row.offer}</td><td>${row.chain}</td><td>${row.requirement}</td><td>${row.savings}</td><td><span class="status">${row.status}</span></td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Meal plans</h2>
+        <p class="lede"><a href="/meal-plans/">Open meal plans</a> to turn verified basket prices into budget-aware household dinners.</p>
+        <table class="table">
+          <thead><tr><th>Meal</th><th>Key items</th><th>Cost</th><th>Fit</th><th>Status</th></tr></thead>
+          <tbody>
+            ${mealPlanRows.map((row) => `<tr><td>${row.meal}</td><td>${row.items}</td><td>${row.cost}</td><td>${row.fit}</td><td><span class="status">${row.status}</span></td></tr>`).join('')}
           </tbody>
         </table>
       </div>

@@ -23,6 +23,7 @@ describe('buildStaticPages', () => {
         'login/index.html',
         'loyalty/offers/index.html',
         'market/index.html',
+        'meal-plans/index.html',
         'notifications/inbox/index.html',
         'prices/confidence/index.html',
         'privacy/index.html',
@@ -185,6 +186,13 @@ describe('buildStaticPages', () => {
       assert.match(loyaltyOffers, /ICA Stammis linked/);
       assert.match(loyaltyOffers, /Clip coupon before checkout/);
       assert.match(loyaltyOffers, /Member-only savings never overwrite verified public shelf evidence/);
+
+      const mealPlans = await readFile(join(root, 'meal-plans/index.html'), 'utf8');
+      assert.match(mealPlans, /Meal plan builder/);
+      assert.match(mealPlans, /Weekly meal plan/);
+      assert.match(mealPlans, /Tuesday pasta bake/);
+      assert.match(mealPlans, /Needs coffee promo confirmation/);
+      assert.match(mealPlans, /Estimated produce prices cannot reduce the weekly meal budget/);
 
       const watchlist = await readFile(join(root, 'watchlist/index.html'), 'utf8');
       assert.match(watchlist, /Price watchlist workbench/);
