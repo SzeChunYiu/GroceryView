@@ -17,7 +17,7 @@ Continue shipping GroceryView toward production readiness, prioritize the next i
 | Keep sensitive payment data out of this endpoint | The route rejects card/client-secret/payment-method style top-level fields before persistence, and the success response excludes provider customer/subscription IDs | Implemented |
 | Document route contract | OpenAPI includes `/api/billing/subscription-events` and `billingWebhookSignature`; runtime health/config/deploy manifest track `BILLING_WEBHOOK_SECRET` without exposing the value | Implemented |
 | Refresh completion audit | `docs/status/completion-audit.md` adds the billing webhook contract row and narrows the monetization gap wording | Updated |
-| PR and merge to `main` after the round | PR #264 | Pending until merge step |
+| PR and merge to `main` after the round | PR #264 merged to `main` with merge commit `aad6457` | Completed |
 
 ## Implementation scope
 

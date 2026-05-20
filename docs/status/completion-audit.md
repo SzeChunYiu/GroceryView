@@ -80,7 +80,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Subscription access policy | PR #234, `buildSubscriptionAccessPolicy` maps entitlements to premium/free enforcement decisions | Shipped after merge |
 | Subscription access account API | PR #244, `createGroceryViewApi().getSubscriptionAccess()` and `/api/account/subscription-access` expose entitlement policy to account clients | Shipped after merge |
 | Repository-backed subscription access | PR #251, `/api/account/subscription-access` can load persisted entitlement rows via a configured repository before falling back to in-memory API state | Shipped after merge |
-| Billing subscription webhook contract | PR #264, `/api/billing/subscription-events` verifies `x-groceryview-billing-signature`, rejects sensitive payment fields, normalizes subscription events, and persists entitlement mutations through a configured sink | Pending merge |
+| Billing subscription webhook contract | PR #264, `/api/billing/subscription-events` verifies `x-groceryview-billing-signature`, rejects sensitive payment fields, normalizes subscription events, and persists entitlement mutations through a configured sink | Shipped after merge |
 | Retailer compliance gate | PR #34, `planRetailerSourceAccess` | Source-access gate shipped |
 | Deployment ops foundation | PR #35, `packages/ops` | Readiness/rollback gates shipped |
 | Scheduled background worker deployment gates | PR #134, `buildDeploymentReadinessReport` scheduled job checks | Shipped after merge |
