@@ -109,6 +109,14 @@ Application user profile data.
 
 Key columns: `email`, `display_name`, `home_store_id`, `preferred_currency`, `dietary_preferences`.
 
+### `subscription_entitlements`
+
+Provider-neutral account entitlement state for premium subscription enforcement.
+
+Key columns: `user_id`, `tier`, `plan`, `status`, `current_period_ends_at`, `provider`, `provider_customer_id`, `provider_subscription_id`, `updated_at`.
+
+The table stores billing-provider identifiers only. Payment card numbers, CVCs, payment method secrets, and checkout client secrets must remain outside GroceryView storage.
+
 ### `watchlists`
 
 User watchlists for product or category target prices.

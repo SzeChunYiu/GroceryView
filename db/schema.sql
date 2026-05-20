@@ -106,6 +106,18 @@ create table if not exists app_users (
   created_at timestamptz not null default now()
 );
 
+create table if not exists subscription_entitlements (
+  user_id text primary key references app_users(id) on delete cascade,
+  tier text not null check (tier in ('free', 'premium')),
+  plan text check (plan in ('premium_monthly', 'premium_yearly')),
+  status text not null check (status in ('active', 'past_due', 'canceled')),
+  current_period_ends_at timestamptz,
+  provider text check (provider in ('stripe_compatible')),
+  provider_customer_id text,
+  provider_subscription_id text,
+  updated_at timestamptz not null
+);
+
 create table if not exists user_preferences (
   user_id text primary key references app_users(id) on delete cascade,
   weekly_budget numeric(12, 2),
@@ -293,6 +305,8 @@ create index if not exists price_observations_product_time_idx on price_observat
 create index if not exists price_observations_store_time_idx on price_observations(store_id, observed_at desc);
 create index if not exists promotion_observations_product_dates_idx on promotion_observations(product_id, promo_start, promo_end);
 create index if not exists products_category_idx on products(category_id);
+create index if not exists subscription_entitlements_status_idx on subscription_entitlements (status, updated_at desc);
+create unique index if not exists subscription_entitlements_provider_subscription_idx on subscription_entitlements (provider, provider_subscription_id) where provider_subscription_id is not null;
 create index if not exists community_reporter_trust_pending_idx on community_reporter_trust(pending_reports desc);
 create index if not exists notification_tasks_status_send_idx on notification_tasks(status, send_at);
 create index if not exists notification_suppressions_active_recipient_idx on notification_suppressions(active, recipient);
