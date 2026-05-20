@@ -273,6 +273,46 @@ export type BasketComparisonInput = {
   items: BasketInputItem[];
 };
 
+export type BasketComparisonLineStatus =
+  | 'matched'
+  | 'missing_product_match'
+  | 'unavailable'
+  | 'substitution_offered'
+  | 'substitution_accepted'
+  | 'member_only'
+  | 'weight_adjusted';
+
+export type BasketComparisonLinePriceSource = 'online' | 'shelf' | 'flyer' | 'member' | 'receipt' | 'estimated';
+export type BasketComparisonLineAvailabilitySource = 'retailer' | 'community' | 'manual' | 'unknown';
+
+export type BasketComparisonLineFixture = {
+  basketLineId: string;
+  requestedProductId: string;
+  requestedQuantity: number;
+  requestedUnit: string;
+  retailerChainId: string;
+  storeId: string;
+  status: BasketComparisonLineStatus;
+  matchedProductId?: string;
+  replacementProductId?: string;
+  replacementAccepted?: boolean;
+  availabilitySource: BasketComparisonLineAvailabilitySource;
+  priceSourceType?: BasketComparisonLinePriceSource;
+  unitPrice?: number;
+  lineTotal?: number;
+  memberOnly: boolean;
+  weightAdjusted: boolean;
+  confidence: number;
+  exclusionReason?: string;
+  disclosureCopy: string;
+};
+
+export type BasketComparisonLineFixtureValidation = {
+  status: 'valid' | 'invalid';
+  basketLineIds: string[];
+  issues: string[];
+};
+
 export type BasketAssignment = {
   productId: string;
   storeId: string;
@@ -485,6 +525,73 @@ export function summarizeStoreBasketCoverage(input: BasketComparisonInput): Stor
     fullCoverageStoreIds: stores
       .filter((coverage) => coverage.missingProductIds.length === 0)
       .map((coverage) => coverage.storeId)
+  };
+}
+
+function hasPricedBasketLineTotal(line: BasketComparisonLineFixture): boolean {
+  return line.unitPrice !== undefined && line.lineTotal !== undefined && line.priceSourceType !== undefined;
+}
+
+export function validateBasketComparisonLineFixtures(lines: BasketComparisonLineFixture[]): BasketComparisonLineFixtureValidation {
+  const issues: string[] = [];
+  const basketLineIds = lines.map((line) => line.basketLineId).sort();
+  const seen = new Set<string>();
+
+  for (const line of lines) {
+    if (seen.has(line.basketLineId)) issues.push(`duplicate_line:${line.basketLineId}`);
+    seen.add(line.basketLineId);
+    if (!line.basketLineId.trim()) issues.push('missing_line_id');
+    if (!line.requestedProductId.trim()) issues.push(`missing_requested_product:${line.basketLineId}`);
+    if (line.requestedQuantity <= 0) issues.push(`invalid_quantity:${line.basketLineId}`);
+    if (!line.requestedUnit.trim()) issues.push(`missing_requested_unit:${line.basketLineId}`);
+    if (!line.retailerChainId.trim()) issues.push(`missing_retailer:${line.basketLineId}`);
+    if (!line.storeId.trim()) issues.push(`missing_store:${line.basketLineId}`);
+    if (line.confidence < 0 || line.confidence > 1) issues.push(`invalid_confidence:${line.basketLineId}`);
+    if (!line.disclosureCopy.trim()) issues.push(`missing_disclosure:${line.basketLineId}`);
+    if (line.unitPrice !== undefined && line.unitPrice < 0) issues.push(`invalid_unit_price:${line.basketLineId}`);
+    if (line.lineTotal !== undefined && line.lineTotal < 0) issues.push(`invalid_line_total:${line.basketLineId}`);
+
+    if (line.status === 'matched') {
+      if (!line.matchedProductId) issues.push(`matched_product_required:${line.basketLineId}`);
+      if (!hasPricedBasketLineTotal(line)) issues.push(`matched_price_required:${line.basketLineId}`);
+      if (line.exclusionReason) issues.push(`matched_has_exclusion:${line.basketLineId}`);
+    }
+    if (line.status === 'missing_product_match') {
+      if (!line.exclusionReason) issues.push(`missing_match_reason_required:${line.basketLineId}`);
+      if (line.matchedProductId || line.replacementProductId || line.lineTotal !== undefined) issues.push(`missing_match_has_included_data:${line.basketLineId}`);
+    }
+    if (line.status === 'unavailable') {
+      if (!line.matchedProductId) issues.push(`unavailable_product_required:${line.basketLineId}`);
+      if (!line.exclusionReason) issues.push(`unavailable_reason_required:${line.basketLineId}`);
+      if (line.lineTotal !== undefined) issues.push(`unavailable_has_line_total:${line.basketLineId}`);
+    }
+    if (line.status === 'substitution_offered') {
+      if (!line.replacementProductId) issues.push(`substitution_replacement_required:${line.basketLineId}`);
+      if (line.replacementAccepted !== false) issues.push(`substitution_offered_acceptance_required:${line.basketLineId}`);
+      if (!line.exclusionReason) issues.push(`substitution_offered_reason_required:${line.basketLineId}`);
+      if (line.lineTotal !== undefined) issues.push(`substitution_offered_has_line_total:${line.basketLineId}`);
+    }
+    if (line.status === 'substitution_accepted') {
+      if (!line.replacementProductId) issues.push(`accepted_substitution_replacement_required:${line.basketLineId}`);
+      if (line.replacementAccepted !== true) issues.push(`accepted_substitution_flag_required:${line.basketLineId}`);
+      if (!hasPricedBasketLineTotal(line)) issues.push(`accepted_substitution_price_required:${line.basketLineId}`);
+    }
+    if (line.status === 'member_only') {
+      if (!line.memberOnly) issues.push(`member_only_flag_required:${line.basketLineId}`);
+      if (!line.exclusionReason) issues.push(`member_only_reason_required:${line.basketLineId}`);
+      if (line.lineTotal !== undefined) issues.push(`member_only_has_public_total:${line.basketLineId}`);
+    }
+    if (line.status === 'weight_adjusted') {
+      if (!line.weightAdjusted) issues.push(`weight_adjusted_flag_required:${line.basketLineId}`);
+      if (!hasPricedBasketLineTotal(line)) issues.push(`weight_adjusted_price_required:${line.basketLineId}`);
+      if (line.exclusionReason) issues.push(`weight_adjusted_has_exclusion:${line.basketLineId}`);
+    }
+  }
+
+  return {
+    status: issues.length === 0 ? 'valid' : 'invalid',
+    basketLineIds,
+    issues
   };
 }
 
