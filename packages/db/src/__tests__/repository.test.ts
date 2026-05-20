@@ -416,7 +416,9 @@ describe('buildSourceRunHealthReport', () => {
       blockers: [],
       evidence: ['source_run_succeeded:source-run-1'],
       runningRunIds: [],
-      staleRunIds: []
+      staleRunIds: [],
+      latestSuccessfulRunId: 'source-run-1',
+      latestSuccessfulFinishedAt: '2026-05-20T08:05:00.000Z'
     });
   });
 
@@ -474,5 +476,7 @@ describe('buildSourceRunHealthReport', () => {
     ]);
     assert.deepEqual(report.runningRunIds, ['running-run']);
     assert.deepEqual(report.staleRunIds, ['stale-run']);
+    assert.equal(report.latestSuccessfulRunId, 'stale-run');
+    assert.equal(report.latestSuccessfulFinishedAt, '2026-05-20T06:05:00.000Z');
   });
 });

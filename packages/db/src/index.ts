@@ -454,6 +454,8 @@ export type SourceRunHealthReport = {
   evidence: string[];
   runningRunIds: string[];
   staleRunIds: string[];
+  latestSuccessfulRunId?: string;
+  latestSuccessfulFinishedAt?: string;
 };
 
 export type FinishSourceRunRecord = {
@@ -656,6 +658,9 @@ export function buildSourceRunHealthReport(input: SourceRunHealthInput): SourceR
   const evidence: string[] = [];
   const runningRunIds: string[] = [];
   const staleRunIds: string[] = [];
+  let latestSuccessfulRunId: string | undefined;
+  let latestSuccessfulFinishedAt: string | undefined;
+  let latestSuccessfulFinishedAtMs = Number.NEGATIVE_INFINITY;
 
   for (const run of [...input.runs].sort((a, b) => a.sourceRunId.localeCompare(b.sourceRunId))) {
     const startedAtMs = parseDbIsoDate(run.startedAt, `startedAt for ${run.sourceRunId}`);
@@ -683,6 +688,12 @@ export function buildSourceRunHealthReport(input: SourceRunHealthInput): SourceR
     }
 
     const ageMinutes = (nowMs - finishedAtMs) / 60_000;
+    if (run.status === 'succeeded' && finishedAtMs > latestSuccessfulFinishedAtMs) {
+      latestSuccessfulRunId = run.sourceRunId;
+      latestSuccessfulFinishedAt = run.finishedAt;
+      latestSuccessfulFinishedAtMs = finishedAtMs;
+    }
+
     if (ageMinutes > input.staleAfterMinutes) {
       staleRunIds.push(run.sourceRunId);
       blockers.push(`source_run_stale:${run.sourceRunId}`);
@@ -698,7 +709,8 @@ export function buildSourceRunHealthReport(input: SourceRunHealthInput): SourceR
     blockers,
     evidence,
     runningRunIds,
-    staleRunIds
+    staleRunIds,
+    ...(latestSuccessfulRunId && latestSuccessfulFinishedAt ? { latestSuccessfulRunId, latestSuccessfulFinishedAt } : {})
   };
 }
 
