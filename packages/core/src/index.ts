@@ -1110,22 +1110,6 @@ export type WatchlistAlert = {
   message: string;
 };
 
-export type WatchlistAlertDigest = {
-  totalAlerts: number;
-  targetPriceCount: number;
-  dealScoreCount: number;
-  newLowCount: number;
-  urgentProductNames: string[];
-  summary: string;
-};
-
-const formatSek = (value: number): string => `${value.toFixed(2)} SEK`;
-const storeNameFromId = (storeId: string): string =>
-  storeId
-    .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
-
 export function buildWatchlistAlerts(input: {
   watchlist: WatchlistItem[];
   products: WatchlistProductSnapshot[];
@@ -1193,25 +1177,6 @@ export function buildWatchlistAlerts(input: {
   }
 
   return alerts;
-}
-
-export function summarizeWatchlistAlerts(alerts: WatchlistAlert[]): WatchlistAlertDigest {
-  const targetPriceCount = alerts.filter((alert) => alert.type === 'target_price').length;
-  const dealScoreCount = alerts.filter((alert) => alert.type === 'deal_score').length;
-  const newLowAlerts = alerts.filter((alert) => alert.type === 'new_52_week_low');
-  const urgentProductNames = [...new Set(newLowAlerts.map((alert) => alert.productName))].sort();
-
-  return {
-    totalAlerts: alerts.length,
-    targetPriceCount,
-    dealScoreCount,
-    newLowCount: newLowAlerts.length,
-    urgentProductNames,
-    summary:
-      alerts.length === 0
-        ? 'No watchlist alerts right now.'
-        : `${alerts.length} watchlist alerts: ${targetPriceCount} target price, ${dealScoreCount} deal score, ${newLowAlerts.length} new low.`
-  };
 }
 
 export type BudgetInput = {

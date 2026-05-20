@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildWatchlistAlerts, searchProducts, summarizeBudget, summarizeWatchlistAlerts } from '../index.js';
+import { buildWatchlistAlerts, searchProducts, summarizeBudget, summarizeCategoryDealLeaders } from '../index.js';
 
 describe('searchProducts', () => {
   it('finds products by ticker, name, category, or chain availability', () => {
@@ -138,37 +138,6 @@ describe('buildWatchlistAlerts', () => {
         message: 'Zoégas Coffee 450g is at a new 52-week low.'
       }
     ]);
-  });
-});
-
-describe('summarizeWatchlistAlerts', () => {
-  it('summarizes alert types and urgent new-low products for notification digests', () => {
-    const digest = summarizeWatchlistAlerts([
-      { productId: 'coffee', productName: 'Zoégas Coffee 450g', type: 'target_price', message: 'Coffee hit target.' },
-      { productId: 'coffee', productName: 'Zoégas Coffee 450g', type: 'deal_score', message: 'Coffee score is high.' },
-      { productId: 'coffee', productName: 'Zoégas Coffee 450g', type: 'new_52_week_low', message: 'Coffee is a new low.' },
-      { productId: 'butter', productName: 'Butter 600g', type: 'new_52_week_low', message: 'Butter is a new low.' }
-    ]);
-
-    assert.deepEqual(digest, {
-      totalAlerts: 4,
-      targetPriceCount: 1,
-      dealScoreCount: 1,
-      newLowCount: 2,
-      urgentProductNames: ['Butter 600g', 'Zoégas Coffee 450g'],
-      summary: '4 watchlist alerts: 1 target price, 1 deal score, 2 new low.'
-    });
-  });
-
-  it('summarizes an empty watchlist digest without urgent products', () => {
-    assert.deepEqual(summarizeWatchlistAlerts([]), {
-      totalAlerts: 0,
-      targetPriceCount: 0,
-      dealScoreCount: 0,
-      newLowCount: 0,
-      urgentProductNames: [],
-      summary: 'No watchlist alerts right now.'
-    });
   });
 });
 
