@@ -206,100 +206,30 @@ function requiredNumber(value: unknown, field: string): number {
   return parsed;
 }
 
-function optionalHumanReviewDecision(value: unknown): HumanReviewDecision | undefined {
-  if (value === undefined) return undefined;
-  if (value === 'approve' || value === 'reject' || value === 'needs_more_info') return value;
-  throw new Error('decision must be approve, reject, or needs_more_info.');
-}
-
-function requiredHumanReviewDecision(value: unknown): HumanReviewDecision {
-  const parsed = optionalHumanReviewDecision(value);
-  if (parsed === undefined) throw new Error('decision is required.');
+function optionalPositiveNumber(value: unknown, field: string): number | undefined {
+  const parsed = optionalNumber(value, field);
+  if (parsed === undefined) return undefined;
+  if (parsed <= 0) throw new Error(`${field} must be greater than zero.`);
   return parsed;
 }
 
-function optionalString(value: unknown, field: string): string | undefined {
-  if (value === undefined) return undefined;
-  if (typeof value !== 'string') throw new Error(`${field} must be a string.`);
-  const trimmed = value.trim();
-  return trimmed ? trimmed : undefined;
+function requiredPositiveInteger(value: unknown, field: string): number {
+  const parsed = requiredNumber(value, field);
+  if (!Number.isInteger(parsed) || parsed <= 0) throw new Error(`${field} must be a positive integer.`);
+  return parsed;
 }
 
-const isoTimestampPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
-
-function requiredIsoTimestamp(value: unknown, field: string): string {
-  const text = requiredString(value, field);
-  if (text.trim() !== text || !isoTimestampPattern.test(text) || !Number.isFinite(Date.parse(text))) {
-    throw new Error(`${field} must be an ISO timestamp.`);
-  }
-  return text;
+function requiredNonNegativeNumber(value: unknown, field: string): number {
+  const parsed = requiredNumber(value, field);
+  if (parsed < 0) throw new Error(`${field} must be greater than or equal to zero.`);
+  return parsed;
 }
 
-function optionalIsoTimestamp(value: unknown, field: string): string | undefined {
-  if (value === undefined) return undefined;
-  return requiredIsoTimestamp(value, field);
-}
-
-function authProviderAssertionFromBody(body: JsonRecord): AuthProviderAssertion {
-  const email = optionalString(body.email, 'email');
-  return {
-    provider: requiredAuthProvider(body.provider),
-    assertion: requiredString(body.assertion, 'assertion'),
-    ...(email ? { email } : {})
-  };
-}
-
-function defaultSessionExpiresAt(now: Date): string {
-  return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
-}
-
-function requiredRecordArray(value: unknown, field: string): JsonRecord[] {
-  if (!Array.isArray(value)) throw new Error(`${field} must be an array.`);
-  return value.map((item, index) => {
-    if (item === null || typeof item !== 'object' || Array.isArray(item)) {
-      throw new Error(`${field}[${index}] must be an object.`);
-    }
-    return item as JsonRecord;
-  });
-}
-
-function optionalRecordArray(value: unknown, field: string): JsonRecord[] | undefined {
-  if (value === undefined) return undefined;
-  return requiredRecordArray(value, field);
-}
-
-function optionalStringArray(value: unknown, field: string): string[] | undefined {
-  if (value === undefined) return undefined;
-  if (!Array.isArray(value)) throw new Error(`${field} must be an array.`);
-  return value.map((item, index) => requiredString(item, `${field}[${index}]`));
-}
-
-function householdPlanRequestFromBody(body: JsonRecord): HouseholdPlanRequest {
-  return {
-    householdId: requiredString(body.householdId, 'householdId'),
-    name: requiredString(body.name, 'name'),
-    weeklyBudget: requiredNumber(body.weeklyBudget, 'weeklyBudget'),
-    approvalLimit: requiredNumber(body.approvalLimit, 'approvalLimit'),
-    reviewer: requiredString(body.reviewer, 'reviewer'),
-    members: requiredRecordArray(body.members, 'members').map((member) => ({
-      userId: requiredString(member.userId, 'members.userId'),
-      displayName: requiredString(member.displayName, 'members.displayName')
-    })),
-    basketItems: (optionalRecordArray(body.basketItems, 'basketItems') ?? []).map((item) => ({
-      productId: requiredString(item.productId, 'basketItems.productId'),
-      quantity: requiredNumber(item.quantity, 'basketItems.quantity'),
-      addedBy: requiredString(item.addedBy, 'basketItems.addedBy')
-    })),
-    watchlistItems: (optionalRecordArray(body.watchlistItems, 'watchlistItems') ?? []).map((item) => {
-      const targetPrice = optionalNumber(item.targetPrice, 'watchlistItems.targetPrice');
-      return {
-        productId: requiredString(item.productId, 'watchlistItems.productId'),
-        addedBy: requiredString(item.addedBy, 'watchlistItems.addedBy'),
-        ...(targetPrice === undefined ? {} : { targetPrice })
-      };
-    }),
-    sharedFavoriteStoreIds: optionalStringArray(body.sharedFavoriteStoreIds, 'sharedFavoriteStoreIds') ?? []
-  };
+function optionalDealScoreThreshold(value: unknown, field: string): number | undefined {
+  const parsed = optionalNumber(value, field);
+  if (parsed === undefined) return undefined;
+  if (parsed < 0 || parsed > 100) throw new Error(`${field} must be between 0 and 100.`);
+  return parsed;
 }
 
 function userIdFrom(url: URL): string | Response {
@@ -808,8 +738,8 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           const body = await readJson(request);
           api.addWatchlistItem(user, {
             productId: requiredString(body.productId, 'productId'),
-            targetPrice: optionalNumber(body.targetPrice, 'targetPrice'),
-            alertDealScoreAt: optionalNumber(body.alertDealScoreAt, 'alertDealScoreAt'),
+            targetPrice: optionalPositiveNumber(body.targetPrice, 'targetPrice'),
+            alertDealScoreAt: optionalDealScoreThreshold(body.alertDealScoreAt, 'alertDealScoreAt'),
             favoriteStoresOnly: typeof body.favoriteStoresOnly === 'boolean' ? body.favoriteStoresOnly : true
           });
           return jsonResponse(api.getWatchlist(user), { status: 201 });
@@ -855,7 +785,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           const body = await readJson(request);
           api.addBasketItem(user, {
             productId: requiredString(body.productId, 'productId'),
-            quantity: requiredNumber(body.quantity, 'quantity')
+            quantity: requiredPositiveInteger(body.quantity, 'quantity')
           });
           return jsonResponse(api.getBasket(user), { status: 201 });
         }
@@ -895,8 +825,8 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'PATCH') {
           const body = await readJson(request);
           api.updateBudget(user, {
-            weeklyBudget: requiredNumber(body.weeklyBudget, 'weeklyBudget'),
-            monthlyBudget: requiredNumber(body.monthlyBudget, 'monthlyBudget')
+            weeklyBudget: requiredNonNegativeNumber(body.weeklyBudget, 'weeklyBudget'),
+            monthlyBudget: requiredNonNegativeNumber(body.monthlyBudget, 'monthlyBudget')
           });
           return jsonResponse(api.getBudgetSummary(user));
         }

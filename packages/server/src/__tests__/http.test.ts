@@ -756,4 +756,42 @@ describe('createHttpHandler', () => {
     const missing = await handle(new Request('http://localhost/api/nope'));
     assert.equal(missing.status, 404);
   });
+
+  it('rejects invalid numeric mutation values before updating user state', async () => {
+    const handle = createHttpHandler();
+
+    const invalidWatchlistPrice = await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ productId: 'coffee', targetPrice: -1 })
+    }));
+    assert.equal(invalidWatchlistPrice.status, 400);
+    assert.match((await json(invalidWatchlistPrice) as { error: string }).error, /targetPrice must be greater than zero/i);
+
+    const invalidDealScoreThreshold = await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ productId: 'coffee', alertDealScoreAt: 101 })
+    }));
+    assert.equal(invalidDealScoreThreshold.status, 400);
+    assert.match((await json(invalidDealScoreThreshold) as { error: string }).error, /alertDealScoreAt must be between 0 and 100/i);
+
+    const invalidBasketQuantity = await handle(new Request('http://localhost/api/basket/items?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ productId: 'coffee', quantity: 0 })
+    }));
+    assert.equal(invalidBasketQuantity.status, 400);
+    assert.match((await json(invalidBasketQuantity) as { error: string }).error, /quantity must be a positive integer/i);
+
+    const invalidBudget = await handle(new Request('http://localhost/api/budget?userId=user-1', {
+      method: 'PATCH',
+      body: JSON.stringify({ weeklyBudget: -1, monthlyBudget: 3200 })
+    }));
+    assert.equal(invalidBudget.status, 400);
+    assert.match((await json(invalidBudget) as { error: string }).error, /weeklyBudget must be greater than or equal to zero/i);
+
+    const watchlist = await json(await handle(new Request('http://localhost/api/watchlist?userId=user-1'))) as { items: unknown[] };
+    assert.equal(watchlist.items.length, 0);
+
+    const basket = await json(await handle(new Request('http://localhost/api/basket/current?userId=user-1'))) as { items: unknown[] };
+    assert.equal(basket.items.length, 0);
+  });
 });
