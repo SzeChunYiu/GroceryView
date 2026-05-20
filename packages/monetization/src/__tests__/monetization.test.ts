@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildAdPlacementPlan,
+  buildMobilePremiumEntitlementPlan,
   buildMonetizationProviderReadinessReport,
   buildSubscriptionAccessPolicy,
   buildSubscriptionCheckoutPlan,
@@ -333,92 +334,52 @@ describe('monetization foundation', () => {
     });
   });
 
-  it('enforces premium access only for active unexpired subscription entitlements', () => {
-    const policy = buildSubscriptionAccessPolicy({
-      now: '2026-05-20T00:00:00.000Z',
-      entitlement: {
-        tier: 'premium',
-        plan: 'premium_yearly',
-        status: 'active',
-        currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
-        provider: 'stripe_compatible',
-        updatedAt: '2026-05-20T00:00:00.000Z'
-      }
+  it('hides mobile ads for active premium entitlements and schedules status refresh', () => {
+    const plan = buildMobilePremiumEntitlementPlan({
+      userId: 'user-1',
+      userTier: 'premium',
+      platform: 'ios',
+      billingProviderConfigured: true,
+      activeSubscriptionPlan: 'premium_monthly',
+      expiresAt: '2026-06-20T00:00:00.000Z',
+      now: '2026-05-20T00:00:00.000Z'
     });
 
-    assert.deepEqual(policy, {
-      userTier: 'premium',
-      premiumFeaturesEnabled: true,
-      adsRemoved: true,
-      checkoutRequired: false,
-      enforcementReasons: ['active_subscription_entitlement:premium_yearly'],
-      accountActions: ['show_manage_subscription'],
-      summary: 'Premium access is active.'
-    });
+    assert.equal(plan.premiumActive, true);
+    assert.deepEqual(plan.adPlan.slots, []);
+    assert.deepEqual(plan.blockers, []);
+    assert.deepEqual(plan.actions, ['hide_mobile_ads', 'refresh_subscription_status']);
   });
 
-  it('fails closed to the free tier when entitlement data is missing, expired, or past due', () => {
-    const missing = buildSubscriptionAccessPolicy({
-      now: '2026-05-20T00:00:00.000Z',
-      entitlement: null
-    });
-    const expired = buildSubscriptionAccessPolicy({
-      now: '2026-05-20T00:00:00.000Z',
-      entitlement: {
-        tier: 'premium',
-        plan: 'premium_monthly',
-        status: 'active',
-        currentPeriodEndsAt: '2026-05-19T23:59:59.000Z',
-        updatedAt: '2026-05-19T00:00:00.000Z'
-      }
-    });
-    const pastDue = buildSubscriptionAccessPolicy({
-      now: '2026-05-20T00:00:00.000Z',
-      entitlement: {
-        tier: 'premium',
-        plan: 'premium_monthly',
-        status: 'past_due',
-        currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
-        provider: 'stripe_compatible',
-        updatedAt: '2026-05-20T00:00:00.000Z'
-      }
+  it('keeps labeled mobile ads and checkout actions for free users', () => {
+    const plan = buildMobilePremiumEntitlementPlan({
+      userId: 'user-2',
+      userTier: 'free',
+      platform: 'android',
+      billingProviderConfigured: true,
+      now: '2026-05-20T00:00:00.000Z'
     });
 
-    assert.deepEqual(
-      [missing, expired, pastDue].map((policy) => ({
-        userTier: policy.userTier,
-        premiumFeaturesEnabled: policy.premiumFeaturesEnabled,
-        adsRemoved: policy.adsRemoved,
-        checkoutRequired: policy.checkoutRequired,
-        enforcementReasons: policy.enforcementReasons,
-        accountActions: policy.accountActions
-      })),
-      [
-        {
-          userTier: 'free',
-          premiumFeaturesEnabled: false,
-          adsRemoved: false,
-          checkoutRequired: true,
-          enforcementReasons: ['missing_subscription_entitlement'],
-          accountActions: ['show_upgrade']
-        },
-        {
-          userTier: 'free',
-          premiumFeaturesEnabled: false,
-          adsRemoved: false,
-          checkoutRequired: true,
-          enforcementReasons: ['subscription_period_expired:premium_monthly'],
-          accountActions: ['show_renew']
-        },
-        {
-          userTier: 'free',
-          premiumFeaturesEnabled: false,
-          adsRemoved: false,
-          checkoutRequired: true,
-          enforcementReasons: ['subscription_status_not_active:past_due'],
-          accountActions: ['show_billing_issue']
-        }
-      ]
-    );
+    assert.equal(plan.premiumActive, false);
+    assert.deepEqual(plan.adPlan.slots.map((slot) => `${slot.surface}:${slot.provider}:${slot.label}`), ['mobile_deals_feed:admob:Sponsored']);
+    assert.equal(plan.adPlan.affectsDealScore, false);
+    assert.deepEqual(plan.blockers, []);
+    assert.deepEqual(plan.actions, ['show_mobile_deals_ads', 'start_premium_checkout', 'restore_purchase']);
+  });
+
+  it('blocks expired mobile premium recovery when billing is not configured', () => {
+    const plan = buildMobilePremiumEntitlementPlan({
+      userId: 'user-3',
+      userTier: 'premium',
+      platform: 'ios',
+      billingProviderConfigured: false,
+      activeSubscriptionPlan: 'premium_yearly',
+      expiresAt: '2026-05-19T00:00:00.000Z',
+      now: '2026-05-20T00:00:00.000Z'
+    });
+
+    assert.equal(plan.premiumActive, false);
+    assert.deepEqual(plan.blockers, ['mobile_billing_provider_not_configured']);
+    assert.deepEqual(plan.actions, ['show_mobile_deals_ads']);
   });
 });
