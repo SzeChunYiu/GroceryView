@@ -117,6 +117,15 @@ METRICS_TOKEN=replace-with-deployment-token \
 
 The readiness smoke calls `/api/readiness/postgres` with `METRICS_TOKEN` and requires a `ready` response before the deployment can count as database-backed smoke evidence.
 
+Set `HOSTED_READINESS_SMOKE_OUTPUT_PATH` to save passed PostgreSQL readiness evidence as JSON for release records:
+
+```bash
+GROCERYVIEW_SERVER_URL=https://api.groceryview.example \
+METRICS_TOKEN=replace-with-deployment-token \
+HOSTED_READINESS_SMOKE_OUTPUT_PATH=/tmp/groceryview-hosted-readiness-smoke.json \
+  infra/scripts/smoke-hosted-readiness.sh
+```
+
 ## Smoke environment overrides
 
 Use these variables when running the smoke script against a non-default compose file, renamed services, or slower local Docker runtime.
