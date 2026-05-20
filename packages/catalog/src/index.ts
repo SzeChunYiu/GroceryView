@@ -44,31 +44,6 @@ export type MyStoresCoverageReport = {
   missingCategoryIds: string[];
   coveragePercent: number;
   mobileActions: Array<'show_my_stores_deals' | 'ask_for_more_favorite_stores' | 'backfill_favorite_store_prices' | 'broaden_to_nearby_stores'>;
-export type CatalogFreshnessProduct = {
-  id: string;
-  categoryId: string;
-  lastObservedAt?: string;
-};
-
-export type CatalogFreshnessInput = {
-  now: string;
-  maxAgeDays: number;
-  products: CatalogFreshnessProduct[];
-};
-
-export type CatalogFreshnessProductStatus = CatalogFreshnessProduct & {
-  ageDays: number | null;
-  status: 'fresh' | 'stale' | 'never_observed';
-};
-
-export type CatalogFreshnessReport = {
-  status: 'fresh' | 'stale';
-  productCount: number;
-  freshCount: number;
-  staleCount: number;
-  neverObservedCount: number;
-  products: CatalogFreshnessProductStatus[];
-  requiredActions: string[];
 };
 
 function roundPercent(value: number): number {
@@ -141,50 +116,5 @@ export function buildMyStoresCoverageReport(input: MyStoresCoverageInput): MySto
     missingCategoryIds,
     coveragePercent,
     mobileActions
-function parseIsoDate(value: string, label: string): number {
-  const parsed = Date.parse(value);
-  if (Number.isNaN(parsed)) throw new Error(`${label} must be an ISO date.`);
-  return parsed;
-}
-
-function roundDays(value: number): number {
-  return Math.round((value + Number.EPSILON) * 100) / 100;
-}
-
-export function buildCatalogFreshnessReport(input: CatalogFreshnessInput): CatalogFreshnessReport {
-  if (input.maxAgeDays < 0) throw new Error('maxAgeDays must be non-negative.');
-  const nowMs = parseIsoDate(input.now, 'now');
-  const staleProductIds: string[] = [];
-  const products = input.products
-    .map((product): CatalogFreshnessProductStatus => {
-      if (!product.lastObservedAt) {
-        staleProductIds.push(product.id);
-        return { ...product, ageDays: null, status: 'never_observed' };
-      }
-
-      const observedMs = parseIsoDate(product.lastObservedAt, `lastObservedAt for ${product.id}`);
-      if (observedMs > nowMs) throw new Error(`lastObservedAt for ${product.id} cannot be in the future.`);
-      const ageDays = roundDays((nowMs - observedMs) / (24 * 60 * 60 * 1000));
-      if (ageDays > input.maxAgeDays) {
-        staleProductIds.push(product.id);
-        return { ...product, ageDays, status: 'stale' };
-      }
-
-      return { ...product, ageDays, status: 'fresh' };
-    })
-    .sort((a, b) => a.categoryId.localeCompare(b.categoryId) || a.id.localeCompare(b.id));
-
-  const staleCount = products.filter((product) => product.status === 'stale').length;
-  const neverObservedCount = products.filter((product) => product.status === 'never_observed').length;
-  const requiredActions = staleProductIds.length === 0 ? [] : [`backfill_stale_catalog:${[...staleProductIds].sort().join(',')}`];
-
-  return {
-    status: requiredActions.length === 0 ? 'fresh' : 'stale',
-    productCount: products.length,
-    freshCount: products.length - staleCount - neverObservedCount,
-    staleCount,
-    neverObservedCount,
-    products,
-    requiredActions
   };
 }
