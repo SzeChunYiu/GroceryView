@@ -114,6 +114,13 @@ describe('buildStaticPages', () => {
       const market = await readFile(join(root, 'market/index.html'), 'utf8');
       assert.match(market, /Stockholm Grocery Market/);
       assert.match(market, /Coffee Index/);
+      assert.match(market, /Grocery mover board/);
+      assert.match(market, /Biggest verified movers/);
+      assert.match(market, /1M move/);
+      assert.match(market, /52W position/);
+      assert.match(market, /vs Stockholm median/);
+      assert.match(market, /verified observations/);
+      assert.match(market, /Estimated rows cannot top the mover board/);
       assert.match(market, /Brand-tier indices/);
       assert.match(market, /Private Label Index/);
       assert.match(market, /Premium Brand Index/);
