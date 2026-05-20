@@ -7,6 +7,7 @@ Dagster scaffold for the GroceryView data-worker lane.
 - Stockholm store and product seed assets.
 - Stubbed retailer fetch assets with explicit provenance.
 - Normalization, price-observation, latest-price rollup, and quality-check assets.
+- Price observation freshness summaries for stale or future-dated worker outputs.
 - A `dagster dev` entrypoint that boots the local webserver.
 - Deterministic seed/order behavior so local materializations are reproducible.
 
@@ -28,6 +29,7 @@ Example Dagster assets in this lane:
 - `price_observations`
 - `latest_price_rollup`
 - `quality_checks`
+- `price_observation_freshness`
 
 ## Tests
 

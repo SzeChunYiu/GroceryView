@@ -5,6 +5,7 @@ import sys
 EXPECTED_ASSETS = {
     "latest_price_rollup",
     "normalized_products",
+    "price_observation_freshness",
     "price_observations",
     "quality_checks",
     "retailer_fetch_stubs",
