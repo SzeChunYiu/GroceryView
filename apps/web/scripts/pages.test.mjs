@@ -34,6 +34,7 @@ describe('buildStaticPages', () => {
         'privacy/index.html',
         'products/coffee/index.html',
         'receipts/review/index.html',
+        'receipts/upload/index.html',
         'retailers/freshness/index.html',
         'routes/shopping/index.html',
         'savings/ledger/index.html',
@@ -326,6 +327,13 @@ describe('buildStaticPages', () => {
       assert.match(receiptReview, /Post to weekly actuals/);
       assert.match(receiptReview, /Route to human review/);
       assert.match(receiptReview, /Cannot update catalog or Deal Score/);
+
+      const receiptUpload = await readFile(join(root, 'receipts/upload/index.html'), 'utf8');
+      assert.match(receiptUpload, /Receipt upload intake/);
+      assert.match(receiptUpload, /Upload intake queue/);
+      assert.match(receiptUpload, /Willys Odenplan receipt/);
+      assert.match(receiptUpload, /Receipt images are stored privately before OCR or human review starts/);
+      assert.match(receiptUpload, /Uploaded captures cannot update budgets, catalog prices, or Deal Score/);
 
       const humanReview = await readFile(join(root, 'admin/human-review/index.html'), 'utf8');
       assert.match(humanReview, /Human review operations/);
