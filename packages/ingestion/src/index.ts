@@ -457,6 +457,82 @@ export async function runRetailerConnector(input: RetailerConnectorRunInput): Pr
   }
 }
 
+
+function recordFrom(value: unknown, path: string): Record<string, unknown> {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) throw new Error(`${path} must be an object.`);
+  return value as Record<string, unknown>;
+}
+
+function requiredString(record: Record<string, unknown>, key: string, path: string): string {
+  const value = record[key];
+  if (typeof value !== 'string' || !value.trim()) throw new Error(`${path}.${key} must be a non-empty string.`);
+  return value.trim();
+}
+
+function optionalString(record: Record<string, unknown>, key: string, path: string): string | undefined {
+  const value = record[key];
+  if (value === undefined || value === null || value === '') return undefined;
+  if (typeof value !== 'string') throw new Error(`${path}.${key} must be a string.`);
+  return value.trim();
+}
+
+function requiredNumber(record: Record<string, unknown>, key: string, path: string): number {
+  const value = record[key];
+  const parsed = typeof value === 'number' ? value : typeof value === 'string' && value.trim() ? Number(value) : Number.NaN;
+  if (!Number.isFinite(parsed)) throw new Error(`${path}.${key} must be a finite number.`);
+  return parsed;
+}
+
+function optionalNumber(record: Record<string, unknown>, key: string, path: string): number | undefined {
+  const value = record[key];
+  if (value === undefined || value === null || value === '') return undefined;
+  const parsed = typeof value === 'number' ? value : typeof value === 'string' && value.trim() ? Number(value) : Number.NaN;
+  if (!Number.isFinite(parsed)) throw new Error(`${path}.${key} must be a finite number.`);
+  return parsed;
+}
+
+function optionalBoolean(record: Record<string, unknown>, key: string, path: string): boolean | undefined {
+  const value = record[key];
+  if (value === undefined || value === null || value === '') return undefined;
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'string' && ['true', 'false'].includes(value.toLowerCase())) return value.toLowerCase() === 'true';
+  throw new Error(`${path}.${key} must be a boolean.`);
+}
+
+export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnapshot): RetailerConnectorParsedProduct[] {
+  let payload: unknown;
+  try {
+    payload = JSON.parse(snapshot.body) as unknown;
+  } catch (error) {
+    throw new Error(`connector snapshot body must be valid JSON: ${error instanceof Error ? error.message : 'unknown parse error'}`);
+  }
+
+  const items = Array.isArray(payload) ? payload : recordFrom(payload, 'payload').items;
+  if (!Array.isArray(items)) throw new Error('payload.items must be an array, or the snapshot body must be an array.');
+
+  return items.map((item, index) => {
+    const path = `items[${index}]`;
+    const record = recordFrom(item, path);
+    return {
+      storeId: optionalString(record, 'storeId', path),
+      retailerProductId: optionalString(record, 'retailerProductId', path),
+      rawName: requiredString(record, 'rawName', path),
+      canonicalName: requiredString(record, 'canonicalName', path),
+      productId: requiredString(record, 'productId', path),
+      categoryId: requiredString(record, 'categoryId', path),
+      brand: optionalString(record, 'brand', path),
+      packageSize: requiredNumber(record, 'packageSize', path),
+      packageUnit: requiredString(record, 'packageUnit', path),
+      price: requiredNumber(record, 'price', path),
+      regularPrice: optionalNumber(record, 'regularPrice', path),
+      promoText: optionalString(record, 'promoText', path),
+      memberOnly: optionalBoolean(record, 'memberOnly', path),
+      observedAt: optionalString(record, 'observedAt', path),
+      sourceUrl: optionalString(record, 'sourceUrl', path)
+    };
+  });
+}
+
 export type UnitInput = {
   price: number;
   packageSize: number;
