@@ -92,3 +92,86 @@ export function buildRollbackPlan(input: RollbackPlanInput): RollbackPlan {
     requiresManualDatabaseRecovery
   };
 }
+
+export type DeploymentManifestService = {
+  name?: unknown;
+  type?: unknown;
+  workspace?: unknown;
+  startCommand?: unknown;
+  buildCommand?: unknown;
+  outputDirectory?: unknown;
+  healthCheck?: unknown;
+  requiredEnv?: unknown;
+};
+
+export type DeploymentManifest = {
+  version?: unknown;
+  services?: unknown;
+};
+
+export type DeploymentManifestValidationReport = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  warnings: string[];
+  serviceNames: string[];
+};
+
+type HealthCheckShape = {
+  path?: unknown;
+  expectedStatus?: unknown;
+};
+
+export function validateDeploymentManifest(manifest: DeploymentManifest): DeploymentManifestValidationReport {
+  const blockers: string[] = [];
+  const warnings: string[] = [];
+  const serviceNames: string[] = [];
+
+  if (manifest.version !== 1) blockers.push('manifest_version_not_supported');
+  if (!Array.isArray(manifest.services) || manifest.services.length === 0) {
+    blockers.push('services_missing');
+    return { status: 'blocked', blockers, warnings, serviceNames };
+  }
+
+  const seenNames = new Set<string>();
+  for (const [index, rawService] of manifest.services.entries()) {
+    const service = rawService as DeploymentManifestService;
+    const name = typeof service.name === 'string' && service.name.trim().length > 0 ? service.name : `service_${index}`;
+    if (name === `service_${index}`) blockers.push(`service_name_missing:${index}`);
+    if (seenNames.has(name)) blockers.push(`duplicate_service:${name}`);
+    seenNames.add(name);
+    serviceNames.push(name);
+
+    if (typeof service.workspace !== 'string' || !service.workspace.startsWith('@groceryview/')) {
+      blockers.push(`workspace_invalid:${name}`);
+    }
+    if (typeof service.type !== 'string' || service.type.trim().length === 0) blockers.push(`service_type_missing:${name}`);
+
+    const healthCheck = service.healthCheck as HealthCheckShape | undefined;
+    if (!healthCheck || typeof healthCheck.path !== 'string' || !healthCheck.path.startsWith('/')) {
+      blockers.push(`health_check_path_invalid:${name}`);
+    }
+    if (!healthCheck || typeof healthCheck.expectedStatus !== 'number' || healthCheck.expectedStatus < 200 || healthCheck.expectedStatus > 399) {
+      blockers.push(`health_check_status_invalid:${name}`);
+    }
+
+    if (!Array.isArray(service.requiredEnv) || !service.requiredEnv.every((envVar) => typeof envVar === 'string' && /^[A-Z][A-Z0-9_]*$/.test(envVar))) {
+      blockers.push(`required_env_invalid:${name}`);
+    }
+
+    if (service.type === 'node-http' && (typeof service.startCommand !== 'string' || service.startCommand.trim().length === 0)) {
+      blockers.push(`start_command_missing:${name}`);
+    }
+    if (service.type === 'static-site') {
+      if (typeof service.buildCommand !== 'string' || service.buildCommand.trim().length === 0) blockers.push(`build_command_missing:${name}`);
+      if (typeof service.outputDirectory !== 'string' || service.outputDirectory.trim().length === 0) blockers.push(`output_directory_missing:${name}`);
+    }
+    if (Array.isArray(service.requiredEnv) && service.requiredEnv.length === 0) warnings.push(`no_required_env:${name}`);
+  }
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    warnings,
+    serviceNames
+  };
+}
