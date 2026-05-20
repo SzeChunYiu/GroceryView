@@ -66,6 +66,7 @@ REQUIRED_TABLES=(
   notification_tasks
   notification_suppressions
   alert_rules
+  pantry_items
 )
 
 REQUIRED_EXTENSIONS=(

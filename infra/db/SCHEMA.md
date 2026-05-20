@@ -234,3 +234,11 @@ Provider-neutral premium subscription entitlement state.
 Key columns: `user_id`, `tier`, `plan`, `status`, `current_period_ends_at`, `provider`, `provider_customer_id`, `provider_subscription_id`, `updated_at`.
 
 Stored billing provider identifiers are not payment credentials. Card data, CVCs, payment method secrets, and checkout client secrets stay outside GroceryView storage.
+
+### `pantry_items`
+
+Application repository pantry inventory keyed by the text `app_users` identity used by current API and replenishment planning packages.
+
+Key columns: `user_id`, `product_id`, `name`, `category`, `quantity`, `unit`, `minimum_quantity`, `target_quantity`, `expires_on`, `updated_at`.
+
+Indexes: `pantry_items_user_idx` for account inventory reads and `pantry_items_expiry_idx` for expiry-aware replenishment jobs.
