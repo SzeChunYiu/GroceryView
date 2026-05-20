@@ -162,6 +162,14 @@ function requireScoreThreshold(value: number | undefined) {
   }
 }
 
+function sortPricesByValue(prices: StorePrice[]) {
+  return [...prices].sort((left, right) => left.price - right.price || left.storeName.localeCompare(right.storeName));
+}
+
+function bestPriceFor(product: ProductDetail) {
+  return sortPricesByValue(product.currentPrices)[0] ?? null;
+}
+
 export function createGroceryViewApi() {
   const favoriteStores = new Map<string, Set<string>>();
   const watchlists = new Map<string, WatchlistItem[]>();
@@ -169,26 +177,33 @@ export function createGroceryViewApi() {
   const budgets = new Map<string, UserBudgetPatch>();
 
   const productSnapshots = () =>
-    products.map((product) => ({
-      productId: product.id,
-      productName: product.name,
-      bestPrice: product.currentPrices[0]?.price ?? 0,
-      bestStoreId: product.currentPrices[0]?.storeId ?? '',
-      dealScore: product.dealScore,
-      isNew52WeekLow: product.id === 'coffee'
-    }));
+    products.map((product) => {
+      const bestPrice = bestPriceFor(product);
+      return {
+        productId: product.id,
+        productName: product.name,
+        bestPrice: bestPrice?.price ?? 0,
+        bestStoreId: bestPrice?.storeId ?? '',
+        dealScore: product.dealScore,
+        isNew52WeekLow: product.id === 'coffee'
+      };
+    });
 
   return {
     getMarketOverview() {
       const topDeals = [...products]
         .sort((a, b) => b.dealScore - a.dealScore)
-        .map((product) => ({
-          productId: product.id,
-          ticker: product.ticker,
-          bestPrice: product.currentPrices[0]?.price ?? null,
-          dealScore: product.dealScore,
-          band: scoreBand(product.dealScore)
-        }));
+        .map((product) => {
+          const bestPrice = bestPriceFor(product);
+          return {
+            productId: product.id,
+            ticker: product.ticker,
+            bestPrice: bestPrice?.price ?? null,
+            bestStoreId: bestPrice?.storeId ?? null,
+            dealScore: product.dealScore,
+            band: scoreBand(product.dealScore)
+          };
+        });
       return { city: 'Stockholm', indices: [index], topDeals };
     },
 
@@ -209,7 +224,7 @@ export function createGroceryViewApi() {
     },
 
     getProductPrices(id: string) {
-      return this.getProduct(id)?.currentPrices ?? [];
+      return sortPricesByValue(this.getProduct(id)?.currentPrices ?? []);
     },
 
     getProductHistory(id: string) {

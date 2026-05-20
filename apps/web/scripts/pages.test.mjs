@@ -39,6 +39,11 @@ describe('buildStaticPages', () => {
       assert.match(household, /Shared household basket/);
       assert.match(household, /member attribution/);
 
+      const basket = await readFile(join(root, 'basket/index.html'), 'utf8');
+      assert.match(basket, /Basket lines/);
+      assert.match(basket, /Lidl Sveavägen/);
+      assert.match(basket, /Smart swaps/);
+
       const scanner = await readFile(join(root, 'scanner/index.html'), 'utf8');
       assert.match(scanner, /Barcode and receipt scanner/);
       assert.match(scanner, /manual review queue/);

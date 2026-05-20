@@ -751,6 +751,8 @@ export type CollectPostgresIntegrationProbeInput = {
   repositoryProbes: PostgresRepositoryProbe[];
 };
 
+export type CheckPostgresIntegrationReadinessInput = CollectPostgresIntegrationProbeInput;
+
 export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'app_users',
   'favorite_stores',
@@ -851,4 +853,10 @@ export function buildPostgresIntegrationReadinessReport(input: PostgresIntegrati
     evidence,
     summary: blockers.length === 0 ? 'PostgreSQL integration contract is ready.' : 'PostgreSQL integration contract is blocked.'
   };
+}
+
+export async function checkPostgresIntegrationReadiness(
+  input: CheckPostgresIntegrationReadinessInput
+): Promise<PostgresIntegrationReadinessReport> {
+  return buildPostgresIntegrationReadinessReport(await collectPostgresIntegrationProbe(input));
 }
