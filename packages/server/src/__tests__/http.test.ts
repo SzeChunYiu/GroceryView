@@ -41,7 +41,8 @@ describe('createHttpHandler', () => {
         hasAuthSecret: true,
         hasNotificationWebhookSecret: true,
         hasBillingWebhookSecret: true,
-        hasMetricsToken: true
+        hasMetricsToken: true,
+        hasScanUploadStorage: false
       });
       assert.equal(JSON.stringify(body).includes('groceryview.example'), false);
     } finally {
@@ -402,6 +403,9 @@ describe('createHttpHandler', () => {
         })
       }
     });
+
+    const health = await json(await handle(new Request('http://localhost/api/health'))) as { hasScanUploadStorage: boolean };
+    assert.equal(health.hasScanUploadStorage, true);
 
     const response = await handle(new Request('http://localhost/api/scans/upload-url?userId=user-1', {
       method: 'POST',

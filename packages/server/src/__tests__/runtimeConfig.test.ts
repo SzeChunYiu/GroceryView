@@ -163,7 +163,8 @@ describe('runtime config', () => {
       hasAuthSecret: false,
       hasNotificationWebhookSecret: false,
       hasBillingWebhookSecret: false,
-      hasMetricsToken: false
+      hasMetricsToken: false,
+      hasScanUploadStorage: false
     });
   });
 
@@ -190,7 +191,8 @@ describe('runtime config', () => {
       hasAuthSecret: true,
       hasNotificationWebhookSecret: true,
       hasBillingWebhookSecret: true,
-      hasMetricsToken: true
+      hasMetricsToken: true,
+      hasScanUploadStorage: false
     });
 
     const protectedAccountRoute = await handle(new Request('http://localhost/api/account/subscription-access?userId=user-1'));
