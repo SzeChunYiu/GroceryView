@@ -962,14 +962,6 @@ export function createGroceryViewApi() {
       favoriteStores.set(userId, set);
     },
 
-    removeFavoriteStore(userId: string, storeId: string) {
-      requireNonEmptyId(userId, 'userId');
-      requireKnownStore(storeId);
-      const set = favoriteStores.get(userId) ?? new Set<string>();
-      set.delete(storeId);
-      favoriteStores.set(userId, set);
-    },
-
     getFavoriteStores(userId: string) {
       const ids = favoriteStores.get(userId) ?? new Set<string>();
       return stores.filter((store) => ids.has(store.id));
@@ -983,32 +975,32 @@ export function createGroceryViewApi() {
       watchlists.set(userId, [...(watchlists.get(userId) ?? []), item]);
     },
 
-    updateWatchlistItem(userId: string, productId: string, patch: Partial<WatchlistItem>) {
+    updateWatchlistItem(userId: string, productId: string, patch: Partial<Omit<WatchlistItem, 'productId'>>) {
       requireNonEmptyId(userId, 'userId');
       requireKnownProduct(productId);
       requireOptionalPositiveFinite(patch.targetPrice, 'targetPrice');
       requireScoreThreshold(patch.alertDealScoreAt);
-      const current = watchlists.get(userId) ?? [];
-      if (!current.some((item) => item.productId === productId)) throw new Error(`Watchlist item not found: ${productId}`);
-      watchlists.set(userId, current.map((item) => (
-        item.productId === productId
-          ? {
-              ...item,
-              ...patch,
-              productId,
-              favoriteStoresOnly: patch.favoriteStoresOnly ?? item.favoriteStoresOnly
-            }
-          : item
-      )));
+      const items = watchlists.get(userId) ?? [];
+      const index = items.findIndex((item) => item.productId === productId);
+      if (index === -1) throw new Error(`Watchlist item not found: ${productId}`);
+      const next = [...items];
+      next[index] = {
+        ...next[index],
+        ...(patch.targetPrice === undefined ? {} : { targetPrice: patch.targetPrice }),
+        ...(patch.alertDealScoreAt === undefined ? {} : { alertDealScoreAt: patch.alertDealScoreAt }),
+        ...(patch.favoriteStoresOnly === undefined ? {} : { favoriteStoresOnly: patch.favoriteStoresOnly }),
+        productId
+      };
+      watchlists.set(userId, next);
     },
 
     removeWatchlistItem(userId: string, productId: string) {
       requireNonEmptyId(userId, 'userId');
       requireKnownProduct(productId);
-      const current = watchlists.get(userId) ?? [];
-      const removed = current.some((item) => item.productId === productId);
-      watchlists.set(userId, current.filter((item) => item.productId !== productId));
-      return { removed };
+      const items = watchlists.get(userId) ?? [];
+      const next = items.filter((item) => item.productId !== productId);
+      watchlists.set(userId, next);
+      return { removed: next.length !== items.length };
     },
 
     getWatchlist(userId: string): { items: WatchlistItem[]; alerts: WatchlistAlert[] } {
@@ -1044,17 +1036,21 @@ export function createGroceryViewApi() {
       if (!Number.isInteger(quantity) || quantity <= 0 || quantity > 99) {
         throw new Error('quantity must be an integer between 1 and 99');
       }
-      const current = baskets.get(userId) ?? [];
-      if (!current.some((item) => item.productId === productId)) throw new Error(`Basket item not found: ${productId}`);
-      baskets.set(userId, current.map((item) => (item.productId === productId ? { ...item, quantity } : item)));
+      const items = baskets.get(userId) ?? [];
+      const index = items.findIndex((item) => item.productId === productId);
+      if (index === -1) throw new Error(`Basket item not found: ${productId}`);
+      const next = [...items];
+      next[index] = { productId, quantity };
+      baskets.set(userId, next);
     },
 
     removeBasketItem(userId: string, productId: string) {
       requireNonEmptyId(userId, 'userId');
       requireKnownProduct(productId);
-      const current = baskets.get(userId) ?? [];
-      if (!current.some((item) => item.productId === productId)) throw new Error(`Basket item not found: ${productId}`);
-      baskets.set(userId, current.filter((item) => item.productId !== productId));
+      const items = baskets.get(userId) ?? [];
+      const next = items.filter((item) => item.productId !== productId);
+      if (next.length === items.length) throw new Error(`Basket item not found: ${productId}`);
+      baskets.set(userId, next);
     },
 
     getBasket(userId: string) {

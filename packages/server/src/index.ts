@@ -798,17 +798,6 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
-      const favoriteStoreDeleteMatch = path.match(/^\/api\/users\/([^/]+)\/favorite-stores\/([^/]+)$/);
-      if (favoriteStoreDeleteMatch) {
-        const routeUserId = decodeURIComponent(favoriteStoreDeleteMatch[1]);
-        const authError = await authorizeUser(request, routeUserId);
-        if (authError) return authError;
-        if (method === 'DELETE') {
-          api.removeFavoriteStore(routeUserId, decodeURIComponent(favoriteStoreDeleteMatch[2]));
-          return jsonResponse(api.getFavoriteStores(routeUserId));
-        }
-      }
-
       if (path === '/api/watchlist') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -827,7 +816,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }
       }
 
-      const watchlistItemMatch = path.match(/^\/api\/watchlist\/([^/]+)$/);
+      const watchlistItemMatch = path.match(/^\/api\/watchlist\/items\/([^/]+)$/);
       if (watchlistItemMatch) {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -836,15 +825,11 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         const productId = decodeURIComponent(watchlistItemMatch[1]);
         if (method === 'PATCH') {
           const body = await readJson(request);
-          if (body.favoriteStoresOnly !== undefined && typeof body.favoriteStoresOnly !== 'boolean') {
-            throw new Error('favoriteStoresOnly must be a boolean.');
-          }
-          const patch = {
-            ...(body.targetPrice !== undefined ? { targetPrice: optionalNumber(body.targetPrice, 'targetPrice') } : {}),
-            ...(body.alertDealScoreAt !== undefined ? { alertDealScoreAt: optionalNumber(body.alertDealScoreAt, 'alertDealScoreAt') } : {}),
-            ...(body.favoriteStoresOnly !== undefined ? { favoriteStoresOnly: body.favoriteStoresOnly } : {})
-          };
-          api.updateWatchlistItem(user, productId, patch);
+          api.updateWatchlistItem(user, productId, {
+            targetPrice: optionalNumber(body.targetPrice, 'targetPrice'),
+            alertDealScoreAt: optionalNumber(body.alertDealScoreAt, 'alertDealScoreAt'),
+            favoriteStoresOnly: typeof body.favoriteStoresOnly === 'boolean' ? body.favoriteStoresOnly : undefined
+          });
           return jsonResponse(api.getWatchlist(user));
         }
         if (method === 'DELETE') {
@@ -1122,22 +1107,19 @@ export function buildOpenApiDocument(): OpenApiDocument {
         get: protectedOperation('List favorite stores.'),
         post: protectedOperation('Add favorite store.')
       },
-      '/api/users/{userId}/favorite-stores/{storeId}': {
-        delete: protectedOperation('Remove favorite store.')
-      },
       '/api/watchlist': {
         get: protectedOperation('Get watchlist and alerts.'),
         post: protectedOperation('Add watchlist item.')
       },
-      '/api/watchlist/{id}': {
+      '/api/watchlist/items/{productId}': {
         patch: protectedOperation('Update watchlist item.'),
-        delete: protectedOperation('Delete watchlist item.')
+        delete: protectedOperation('Remove watchlist item.')
       },
       '/api/basket/current': { get: protectedOperation('Get current weekly basket.') },
       '/api/basket/items': { post: protectedOperation('Add basket item.') },
-      '/api/basket/items/{id}': {
+      '/api/basket/items/{productId}': {
         patch: protectedOperation('Update basket item quantity.'),
-        delete: protectedOperation('Delete basket item.')
+        delete: protectedOperation('Remove basket item.')
       },
       '/api/basket/compare': { post: protectedOperation('Compare basket strategies.') },
       '/api/budget': { patch: protectedOperation('Update budget.') },
