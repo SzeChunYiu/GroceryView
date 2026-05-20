@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { confidenceForSource, ingestRetailerProduct, normalizeUnitPrice, planIngestionBatch, planRetailerSourceAccess } from '../index.js';
+import { assertOfficialPriceIndexSource, buildDefaultFlyerSourcePlans, buildOfficialBaselineSourceRegistry, buildRetailerSourceRegistry, confidenceForSource, findRetailerSourceRegistryEntry, ingestRetailerProduct, normalizeUnitPrice, officialPriceIndexSources, planFlyerSourceFetch, planIngestionBatch, planRetailerSourceAccess } from '../index.js';
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
@@ -104,5 +104,143 @@ describe('planRetailerSourceAccess', () => {
       reason: 'Retailer page ingestion requires robots.txt allow and approved legal review.',
       requiredActions: ['robots_txt_allow_required', 'legal_review_approval_required']
     });
+  });
+});
+
+describe('buildRetailerSourceRegistry', () => {
+  it('defines stub-only source policy for each researched Stockholm grocery chain', () => {
+    const registry = buildRetailerSourceRegistry();
+
+    assert.deepEqual(registry.map((entry) => entry.chainId), ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']);
+    for (const entry of registry) {
+      assert.equal(entry.stubOnly, true);
+      assert.equal(entry.legalReviewStatus, 'pending');
+      assert.ok(entry.surfaces.includes('store_locator'), `${entry.chainId} should define a store locator surface`);
+      assert.ok(entry.sourceUrls.length > 0, `${entry.chainId} should include source URLs`);
+      assert.match(entry.robotsPolicy.robotsUrl, /^https:\/\/www\./);
+      assert.equal(entry.robotsPolicy.checkedAt, '2026-05-20T00:00:00.000Z');
+    }
+  });
+
+  it('captures robots constraints for Axfood retailer pages without enabling live fetches', () => {
+    const willys = findRetailerSourceRegistryEntry('willys');
+    const hemkop = findRetailerSourceRegistryEntry('hemkop');
+    const cityGross = findRetailerSourceRegistryEntry('city_gross');
+
+    assert.equal(willys.robotsPolicy.crawlDelaySeconds, 10);
+    assert.equal(willys.robotsPolicy.visitTimeUtc, '0400-0845');
+    assert.ok(willys.robotsPolicy.disallowedPaths.includes('/varukorg'));
+    assert.ok(hemkop.robotsPolicy.disallowedPaths.includes('/mina-sidor/'));
+    assert.ok(cityGross.robotsPolicy.disallowedPaths.includes('/loop54/'));
+    assert.equal(willys.stubOnly && hemkop.stubOnly && cityGross.stubOnly, true);
+  });
+
+  it('returns defensive copies so callers cannot mutate the source registry singleton', () => {
+    const registry = buildRetailerSourceRegistry();
+    registry[0].surfaces.length = 0;
+    registry[0].robotsPolicy.disallowedPaths.push('/mutated');
+
+    const ica = findRetailerSourceRegistryEntry('ica');
+
+    assert.ok(ica.surfaces.includes('store_locator'));
+    assert.equal(ica.robotsPolicy.disallowedPaths.includes('/mutated'), false);
+  });
+});
+
+describe('planFlyerSourceFetch', () => {
+  it('serializes all supported flyer source formats with provenance fields and no product facts', () => {
+    const plans = buildDefaultFlyerSourcePlans('2026-05-20T06:00:00.000Z');
+
+    assert.deepEqual(
+      [...new Set(plans.map((plan) => plan.format))].sort(),
+      ['app_offer', 'app_rendered_offer_html', 'digital_flyer', 'member_offer', 'store_offer_html', 'weekly_offer_html']
+    );
+
+    for (const plan of plans) {
+      assert.match(plan.sourceUrl, /^https:\/\//);
+      assert.ok(plan.sourceHost.length > 0);
+      assert.equal(plan.retrievedAt, '2026-05-20T06:00:00.000Z');
+      assert.equal(plan.rawSnapshotRef, null);
+      assert.equal(plan.contentHash, null);
+      assert.equal(plan.parserVersion, '0.1.0');
+      assert.match(plan.robotsPolicy.robotsUrl, /^https:\/\/www\./);
+      assert.equal(plan.legalReviewStatus, 'pending');
+      assert.equal(plan.emitsProductFacts, false);
+    }
+  });
+
+  it('carries chain-specific flyer constraints from the researched public surfaces', () => {
+    const plans = buildDefaultFlyerSourcePlans('2026-05-20T06:00:00.000Z');
+    const willys = plans.find((plan) => plan.chainId === 'willys' && plan.format === 'store_offer_html');
+    const hemkop = plans.find((plan) => plan.chainId === 'hemkop' && plan.format === 'digital_flyer');
+    const coop = plans.find((plan) => plan.chainId === 'coop');
+    const cityGross = plans.find((plan) => plan.chainId === 'city_gross');
+
+    assert.equal(willys?.requiresStoreSelection, true);
+    assert.equal(willys?.robotsPolicy.crawlDelaySeconds, 10);
+    assert.equal(willys?.robotsPolicy.visitTimeUtc, '0400-0845');
+    assert.equal(hemkop?.robotsPolicy.crawlDelaySeconds, 10);
+    assert.equal(coop?.sourceHost, 'dr.coop.se');
+    assert.equal(coop?.retailerStoreKey, '105740');
+    assert.equal(cityGross?.format, 'app_rendered_offer_html');
+    assert.equal(cityGross?.emitsProductFacts, false);
+  });
+
+  it('marks member and app offer plans as authentication-bound stubs', () => {
+    const lidlMember = planFlyerSourceFetch({
+      chainId: 'lidl',
+      sourceUrl: 'https://www.lidl.se/c/lidl-plus/s10017033',
+      format: 'member_offer',
+      retrievedAt: '2026-05-20T06:00:00.000Z',
+      requiresAuthentication: true,
+      memberOnly: true,
+      rawSnapshotRef: 'raw/lidl-plus.html',
+      contentHash: 'sha256:lidl'
+    });
+
+    assert.equal(lidlMember.requiresAuthentication, true);
+    assert.equal(lidlMember.memberOnly, true);
+    assert.equal(lidlMember.rawSnapshotRef, 'raw/lidl-plus.html');
+    assert.equal(lidlMember.contentHash, 'sha256:lidl');
+    assert.equal(lidlMember.emitsProductFacts, false);
+  });
+});
+
+describe('buildOfficialBaselineSourceRegistry', () => {
+  it('captures official price-index and taxonomy sources with license metadata', () => {
+    const sources = buildOfficialBaselineSourceRegistry();
+
+    assert.deepEqual(sources.map((source) => source.id), [
+      'scb-cpi-food-nonalcoholic-2020',
+      'scb-pxweb-api',
+      'sjv-kpi-j-ppi-j-food',
+      'eurostat-hicp-food',
+      'slv-food-composition'
+    ]);
+
+    const scb = sources.find((source) => source.id === 'scb-cpi-food-nonalcoholic-2020');
+    const livsmedelsverket = sources.find((source) => source.id === 'slv-food-composition');
+
+    assert.equal(scb?.license, 'CC0');
+    assert.equal(scb?.requiresAttribution, false);
+    assert.equal(livsmedelsverket?.license, 'CC_BY_4_0');
+    assert.equal(livsmedelsverket?.requiresAttribution, true);
+    assert.equal(livsmedelsverket?.kind, 'taxonomy');
+  });
+
+  it('marks official baseline sources as unable to generate store or SKU prices', () => {
+    for (const source of buildOfficialBaselineSourceRegistry()) {
+      assert.equal(source.canGenerateStorePrices, false);
+      assert.equal(source.canGenerateSkuPrices, false);
+      assert.match(source.datasetUrl, /^https:\/\//);
+    }
+  });
+
+  it('filters price-index sources and rejects taxonomy-only sources as price indices', () => {
+    const priceIndices = officialPriceIndexSources();
+    const taxonomy = buildOfficialBaselineSourceRegistry().find((source) => source.kind === 'taxonomy');
+
+    assert.deepEqual(priceIndices.map((source) => source.id), ['scb-cpi-food-nonalcoholic-2020', 'scb-pxweb-api', 'sjv-kpi-j-ppi-j-food', 'eurostat-hicp-food']);
+    assert.throws(() => assertOfficialPriceIndexSource(taxonomy!), /not a price index/);
   });
 });
