@@ -469,6 +469,7 @@ def build_open_prices_hosted_smoke_plan(
         smoke_command=(
             f"GROCERYVIEW_SERVER_URL={normalized_deployment_url} "
             "GROCERYVIEW_TERMINAL_PRODUCT_ID=<imported-product-id> "
+            "HOSTED_HTTP_SMOKE_OUTPUT_PATH=/tmp/groceryview-hosted-http-smoke.json "
             "infra/scripts/smoke-hosted-http.sh && "
             f"GROCERYVIEW_SERVER_URL={normalized_deployment_url} "
             "METRICS_TOKEN=<token> infra/scripts/smoke-hosted-readiness.sh"
@@ -491,6 +492,10 @@ def build_open_prices_hosted_smoke_plan(
             "terminalDistribution",
             "terminalChart",
             "postgresReadinessStatus",
+        ],
+        evidence_artifacts=[
+            "/tmp/groceryview-hosted-http-smoke.json",
+            "hosted-readiness-console-output",
         ],
     )
 
@@ -570,6 +575,7 @@ def summarize_open_prices_hosted_smoke_plan(plan: OpenPricesHostedSmokePlan) -> 
         required_env_count=len(plan.required_env),
         endpoint_count=len(plan.endpoints),
         evidence_field_count=len(plan.evidence_fields),
+        evidence_artifact_count=len(plan.evidence_artifacts),
     )
 
 

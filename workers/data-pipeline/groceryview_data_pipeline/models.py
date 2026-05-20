@@ -237,6 +237,7 @@ class OpenPricesHostedSmokePlan:
     required_actions: list[str]
     endpoints: list[str]
     evidence_fields: list[str]
+    evidence_artifacts: list[str]
     demo: bool = False
 
     def to_dict(self) -> dict[str, object]:
@@ -293,6 +294,7 @@ class OpenPricesHostedSmokePlanSummary:
     required_env_count: int
     endpoint_count: int
     evidence_field_count: int
+    evidence_artifact_count: int
     demo: bool = False
 
     def to_dict(self) -> dict[str, object]:
