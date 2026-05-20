@@ -285,19 +285,36 @@ describe('createHttpHandler', () => {
     assert.equal(mergedBasket.status, 201);
     assert.deepEqual((await json(mergedBasket) as { items: unknown[] }).items, [{ productId: 'coffee', quantity: 3 }]);
 
+    assert.equal((await handle(new Request('http://localhost/api/watchlist/items/coffee?userId=user-1', {
+      method: 'PATCH',
+      body: JSON.stringify({ targetPrice: 48, favoriteStoresOnly: false })
+    }))).status, 200);
+
+    assert.equal((await handle(new Request('http://localhost/api/basket/items/coffee?userId=user-1', {
+      method: 'PATCH',
+      body: JSON.stringify({ quantity: 2 })
+    }))).status, 200);
+
     assert.equal((await handle(new Request('http://localhost/api/budget?userId=user-1', {
       method: 'PATCH',
       body: JSON.stringify({ weeklyBudget: 800, monthlyBudget: 3200 })
     }))).status, 200);
 
     const watchlist = await json(await handle(new Request('http://localhost/api/watchlist?userId=user-1'))) as { alerts: unknown[] };
-    assert.equal(watchlist.alerts.length, 3);
+    assert.equal(watchlist.alerts.length, 2);
 
     const comparison = await json(await handle(new Request('http://localhost/api/basket/compare?userId=user-1', { method: 'POST' }))) as { cheapestByProduct: { total: number } };
-    assert.equal(comparison.cheapestByProduct.total, 149.7);
+    assert.equal(comparison.cheapestByProduct.total, 99.8);
 
     const budget = await json(await handle(new Request('http://localhost/api/budget/summary?userId=user-1'))) as { weeklyRemainingAfterEstimate: number };
-    assert.equal(budget.weeklyRemainingAfterEstimate, 650.3);
+    assert.equal(budget.weeklyRemainingAfterEstimate, 700.2);
+
+    assert.equal((await handle(new Request('http://localhost/api/watchlist/items/coffee?userId=user-1', { method: 'DELETE' }))).status, 200);
+    assert.equal((await handle(new Request('http://localhost/api/basket/items/coffee?userId=user-1', { method: 'DELETE' }))).status, 200);
+    const emptyWatchlist = await json(await handle(new Request('http://localhost/api/watchlist?userId=user-1'))) as { items: unknown[] };
+    assert.equal(emptyWatchlist.items.length, 0);
+    const emptyBasket = await json(await handle(new Request('http://localhost/api/basket/current?userId=user-1'))) as { items: unknown[] };
+    assert.equal(emptyBasket.items.length, 0);
   });
 
   it('serves user-scoped privacy export and deletion plans from protected account data', async () => {
