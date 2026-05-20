@@ -29,6 +29,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-category-market-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setNotificationMetric = (metric, message) => {
+    const target = document.querySelector('[data-notification-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setApiSessionResult = (message) => {
     const target = document.querySelector('[data-api-session-result]');
     if (target) target.textContent = message;
@@ -485,6 +489,42 @@ window.GroceryViewFlowActions = (() => {
       setResult('category-market', 'Category market API load failed: ' + error.message + '. Static category board remains visible.');
     }
   };
+  const notificationMetricValue = (metricsText, status) => {
+    const match = metricsText.match(new RegExp('groceryview_notification_worker_events_total\\\\{[^}]*status="' + status + '"[^}]*\\\\}\\\\s+([0-9.]+)'));
+    return match ? Number(match[1]) : 0;
+  };
+  const loadNotificationMetricsFromApi = async (form) => {
+    const config = getApiConfig();
+    const data = new FormData(form);
+    const metricsToken = String(data.get('metricsToken') || '').trim();
+    if (!config.apiBase) {
+      setResult('notifications', 'Local preview mode: add an API base before loading notification operations metrics.');
+      return;
+    }
+    if (!metricsToken) {
+      setResult('notifications', 'Metrics token required before loading notification operations metrics.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/metrics/notifications', config, false), {
+        method: 'GET',
+        headers: { 'x-groceryview-metrics-token': metricsToken }
+      });
+      const metricsText = await response.text();
+      if (!response.ok) throw new Error(metricsText || 'HTTP ' + response.status);
+      const delivered = notificationMetricValue(metricsText, 'delivered');
+      const failed = notificationMetricValue(metricsText, 'failed');
+      const deadLetter = notificationMetricValue(metricsText, 'dead_letter');
+      const suppressed = notificationMetricValue(metricsText, 'suppressed');
+      setNotificationMetric('delivered', String(delivered));
+      setNotificationMetric('failed', String(failed));
+      setNotificationMetric('dead-letter', String(deadLetter));
+      setNotificationMetric('suppressed', String(suppressed));
+      setResult('notifications', 'Connected notification metrics loaded: ' + delivered + ' delivered, ' + failed + ' failed, ' + deadLetter + ' dead-lettered, ' + suppressed + ' suppressed.');
+    } catch (error) {
+      setResult('notifications', 'Notification metrics load failed: ' + error.message + '. Static delivery queue remains visible.');
+    }
+  };
   const messages = {
     'toggle-alert': 'Alert rule updated locally; production save waits for authenticated account API.',
     'manage-subscription': 'Billing portal handoff prepared without exposing provider customer IDs.',
@@ -507,6 +547,7 @@ window.GroceryViewFlowActions = (() => {
         setResult(flow, 'Basket preview recalculated at ' + formatSek(summarizeBasket(form)) + ' before checkout.');
       }
       if (flow === 'scanner') await processScannerUploadWithApi(form);
+      if (flow === 'notifications') await loadNotificationMetricsFromApi(form);
     });
   });
   document.querySelectorAll('[data-flow-action]').forEach((button) => {
@@ -717,7 +758,7 @@ const pages = [
     path: 'notifications/inbox/index.html',
     title: 'Grocery alert inbox — GroceryView',
     description: 'Review GroceryView alert delivery status, quiet-hours holds, suppressions, dead-letter candidates, and household notification actions.',
-    body: `<section class="card"><div class="eyebrow">Notification inbox</div><h1>Grocery alert inbox</h1><p class="lede">Audit delivered, held, and suppressed grocery alerts before households miss price drops or receive noisy notifications.</p><div class="grid"><div class="metric"><strong>2</strong><span>delivered alerts</span></div><div class="metric"><strong>1</strong><span>quiet-hours hold</span></div><div class="metric"><strong>1</strong><span>suppressed provider token</span></div></div></section><section class="card" style="margin-top:16px"><h2>Alert delivery queue</h2><table class="table"><thead><tr><th>Alert</th><th>Channel</th><th>Status</th><th>Reason</th><th>Action</th></tr></thead><tbody><tr><td>Coffee below 50 SEK</td><td>Push</td><td>Delivered</td><td>Verified shelf price</td><td>Open deal</td></tr><tr><td>Eggs favorite-store drop</td><td>Email</td><td>Delivered</td><td>Retailer page confidence</td><td>Open basket</td></tr><tr><td>Receipt review reminder</td><td>Push</td><td>Held</td><td>Quiet hours 21:00-07:00</td><td>Send in digest</td></tr><tr><td>Butter target price</td><td>Push</td><td>Suppressed</td><td>Provider token invalid</td><td>Request device refresh</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Delivery guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Quiet-hours respect</td><td>Non-critical push alerts wait for the morning digest.</td></tr><tr><td>Provider suppression</td><td>Invalid tokens stop future sends until the device refreshes.</td></tr><tr><td>Confidence floor</td><td>Estimated prices never generate household alerts.</td></tr></tbody></table></section>`
+    body: `<section class="card" data-groceryview-flow="notifications"><div class="eyebrow">Notification inbox</div><h1>Grocery alert inbox</h1><p class="lede">Audit delivered, held, suppressed, and failed grocery alerts before households miss price drops or receive noisy notifications.</p><div class="grid"><div class="metric"><strong data-notification-delivered>2</strong><span>delivered alerts</span></div><div class="metric"><strong data-notification-failed>0</strong><span>failed sends</span></div><div class="metric"><strong data-notification-dead-letter>0</strong><span>dead-lettered tasks</span></div><div class="metric"><strong data-notification-suppressed>1</strong><span>suppressed provider token</span></div></div><form class="flow-panel" aria-label="Notification metrics loader"><label>Metrics token<input name="metricsToken" type="password" autocomplete="off" /></label><button type="submit">Load notification metrics</button></form><p class="flow-result" data-flow-result="notifications" aria-live="polite">Local preview mode: add an API base and metrics token before loading notification operations metrics.</p></section><section class="card" style="margin-top:16px"><h2>Alert delivery queue</h2><table class="table"><thead><tr><th>Alert</th><th>Channel</th><th>Status</th><th>Reason</th><th>Action</th></tr></thead><tbody><tr><td>Coffee below 50 SEK</td><td>Push</td><td>Delivered</td><td>Verified shelf price</td><td>Open deal</td></tr><tr><td>Eggs favorite-store drop</td><td>Email</td><td>Delivered</td><td>Retailer page confidence</td><td>Open basket</td></tr><tr><td>Receipt review reminder</td><td>Push</td><td>Held</td><td>Quiet hours 21:00-07:00</td><td>Send in digest</td></tr><tr><td>Butter target price</td><td>Push</td><td>Suppressed</td><td>Provider token invalid</td><td>Request device refresh</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Delivery guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Quiet-hours respect</td><td>Non-critical push alerts wait for the morning digest.</td></tr><tr><td>Provider suppression</td><td>Invalid tokens stop future sends until the device refreshes.</td></tr><tr><td>Confidence floor</td><td>Estimated prices never generate household alerts.</td></tr></tbody></table></section>`
   },
   {
     path: 'nutrition/allergens/index.html',

@@ -302,6 +302,15 @@ describe('buildStaticPages', () => {
       assert.match(notificationInbox, /Quiet hours 21:00-07:00/);
       assert.match(notificationInbox, /Provider token invalid/);
       assert.match(notificationInbox, /Invalid tokens stop future sends/);
+      assert.match(notificationInbox, /data-groceryview-flow="notifications"/);
+      assert.match(notificationInbox, /name="metricsToken"/);
+      assert.match(notificationInbox, /data-notification-delivered/);
+      assert.match(notificationInbox, /data-notification-dead-letter/);
+      assert.match(notificationInbox, /data-flow-result="notifications"/);
+      assert.match(notificationInbox, /fetch\(apiUrl\('\/api\/metrics\/notifications/);
+      assert.match(notificationInbox, /x-groceryview-metrics-token/);
+      assert.match(notificationInbox, /groceryview_notification_worker_events_total/);
+      assert.match(notificationInbox, /Connected notification metrics loaded/);
 
       const nutritionAllergens = await readFile(join(root, 'nutrition/allergens/index.html'), 'utf8');
       assert.match(nutritionAllergens, /Nutrition and allergen review/);
