@@ -54,6 +54,56 @@ REQUIRED_TABLES=(
   notification_suppressions
 )
 
+REQUIRED_SEED_CHAIN_SLUGS=(
+  ica
+  willys
+  coop
+  hemkop
+  lidl
+  city-gross
+)
+
+REQUIRED_SEED_STORE_SLUGS=(
+  ica-nara-baronen-odenplan
+  willys-hemma-stockholm-torsplan
+  coop-odenplan
+  hemkop-stockholm-torsplan
+  lidl-stockholm-sveavagen
+  city-gross-bromma
+)
+
+REQUIRED_SEED_PRODUCT_SLUGS=(
+  standardmjolk-1l
+  agg-12-pack
+  smor-500g
+  bryggkaffe-450g
+  kycklingfile-1kg
+  notfars-500g
+  pasta-500g
+  basmatiris-1kg
+  formbrod-rost-700g
+  hushallsost-1kg
+  bananer-1kg
+  tomater-500g
+  potatis-2kg
+  toalettpapper-8-pack
+  tvattmedel-color-1l
+  blojor-storlek-4
+  havredryck-1l
+  naturell-yoghurt-1kg
+  olivolja-500ml
+  fryst-pizza-350g
+)
+
+sql_values() {
+  local values=""
+  local value
+  for value in "$@"; do
+    values="${values}('${value}'),"
+  done
+  printf '%s' "${values%,}"
+}
+
 cleanup() {
   docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
 }
@@ -164,7 +214,57 @@ if [ "${#SEEDS[@]}" -gt 0 ]; then
     exit 1
   fi
 
-  echo "applied ${#SEEDS[@]} seed file(s); seed counts ok"
+  required_chain_values="$(sql_values "${REQUIRED_SEED_CHAIN_SLUGS[@]}")"
+  missing_chain_slugs="$(
+    docker exec "$CONTAINER_NAME" \
+      psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc \
+      "with required(slug) as (values ${required_chain_values})
+       select coalesce(string_agg(required.slug, ',' order by required.slug), '')
+       from required
+       left join chains seeded on seeded.slug = required.slug
+       where seeded.slug is null"
+  )"
+
+  required_store_values="$(sql_values "${REQUIRED_SEED_STORE_SLUGS[@]}")"
+  missing_store_slugs="$(
+    docker exec "$CONTAINER_NAME" \
+      psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc \
+      "with required(slug) as (values ${required_store_values})
+       select coalesce(string_agg(required.slug, ',' order by required.slug), '')
+       from required
+       left join stores seeded
+         on seeded.slug = required.slug
+        and seeded.position is not null
+       where seeded.slug is null"
+  )"
+
+  required_product_values="$(sql_values "${REQUIRED_SEED_PRODUCT_SLUGS[@]}")"
+  missing_product_slugs="$(
+    docker exec "$CONTAINER_NAME" \
+      psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc \
+      "with required(slug) as (values ${required_product_values})
+       select coalesce(string_agg(required.slug, ',' order by required.slug), '')
+       from required
+       left join products seeded on seeded.slug = required.slug
+       where seeded.slug is null"
+  )"
+
+  if [ -n "$missing_chain_slugs" ]; then
+    echo "seed chain assertion failed: missing ${missing_chain_slugs}" >&2
+    exit 1
+  fi
+
+  if [ -n "$missing_store_slugs" ]; then
+    echo "seed store assertion failed: missing positioned stores ${missing_store_slugs}" >&2
+    exit 1
+  fi
+
+  if [ -n "$missing_product_slugs" ]; then
+    echo "seed product assertion failed: missing ${missing_product_slugs}" >&2
+    exit 1
+  fi
+
+  echo "applied ${#SEEDS[@]} seed file(s); seed counts and required slugs ok"
 else
   echo "no seed files found in $SEEDS_DIR; skipped seed verification"
 fi
