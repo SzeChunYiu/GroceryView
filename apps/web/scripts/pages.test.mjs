@@ -15,6 +15,7 @@ describe('buildStaticPages', () => {
         'admin/human-review/index.html',
         'basket/index.html',
         'budget/forecast/index.html',
+        'catalog/coverage/index.html',
         'categories/coffee/index.html',
         'deals/today/index.html',
         'household/index.html',
@@ -60,6 +61,13 @@ describe('buildStaticPages', () => {
       const market = await readFile(join(root, 'market/index.html'), 'utf8');
       assert.match(market, /Stockholm Grocery Market/);
       assert.match(market, /Coffee Index/);
+
+      const catalogCoverage = await readFile(join(root, 'catalog/coverage/index.html'), 'utf8');
+      assert.match(catalogCoverage, /Catalog coverage dashboard/);
+      assert.match(catalogCoverage, /Coverage by category/);
+      assert.match(catalogCoverage, /Backfill member prices/);
+      assert.match(catalogCoverage, /Receipt photos need human review before catalog writeback/);
+      assert.match(catalogCoverage, /Products without unit prices cannot rank category savings/);
 
       const priceConfidence = await readFile(join(root, 'prices/confidence/index.html'), 'utf8');
       assert.match(priceConfidence, /Price confidence guide/);
