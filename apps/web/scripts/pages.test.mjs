@@ -38,8 +38,10 @@ describe('buildStaticPages', () => {
         'savings/ledger/index.html',
         'savings/smart-swaps/index.html',
         'scanner/index.html',
-        'screener/index.html',
-        'stores/willys-odenplan/index.html'
+        'stores/compare/index.html',
+        'stores/map/index.html',
+        'stores/willys-odenplan/index.html',
+        'watchlist/index.html'
       ]);
 
       const product = await readFile(join(root, 'products/coffee/index.html'), 'utf8');
@@ -180,16 +182,6 @@ describe('buildStaticPages', () => {
       assert.match(category, /Category signals/);
       assert.match(category, /Private-label swap candidate/);
       assert.match(category, /Arvid Nordquist/);
-
-      const screener = await readFile(join(root, 'screener/index.html'), 'utf8');
-      assert.match(screener, /Grocery screener/);
-      assert.match(screener, /Category: Coffee/);
-      assert.match(screener, /Chain: Willys \+ ICA/);
-      assert.match(screener, /Favorite stores only/);
-      assert.match(screener, /Area: Stockholm inner city/);
-      assert.match(screener, /Deal Score ≥ 80/);
-      assert.match(screener, /Confidence ≥ 75%/);
-      assert.match(screener, /ZOEGAS-COFFEE-450G/);
 
       const login = await readFile(join(root, 'login/index.html'), 'utf8');
       assert.match(login, /Sign in to GroceryView/);
