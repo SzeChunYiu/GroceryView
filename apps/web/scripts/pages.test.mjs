@@ -15,9 +15,7 @@ describe('buildStaticPages', () => {
         'account/index.html',
         'admin/human-review/index.html',
         'basket/index.html',
-        'billing/status/index.html',
-        'budget/forecast/index.html',
-        'catalog/coverage/index.html',
+        'budget/index.html',
         'categories/coffee/index.html',
         'deals/today/index.html',
         'household/index.html',
@@ -323,6 +321,15 @@ describe('buildStaticPages', () => {
       assert.match(humanReview, /SLA breached/);
       assert.match(humanReview, /Approve product match/);
       assert.match(humanReview, /approve_product_match/);
+
+      const budget = await readFile(join(root, 'budget/index.html'), 'utf8');
+      assert.match(budget, /Budget tracker/);
+      assert.match(budget, /weekly budget/);
+      assert.match(budget, /monthly budget/);
+      assert.match(budget, /basket forecast/);
+      assert.match(budget, /Category budgets/);
+      assert.match(budget, /In-store running total/);
+      assert.match(budget, /receipt reviews pending/);
 
       const privacy = await readFile(join(root, 'privacy/index.html'), 'utf8');
       assert.match(privacy, /Export or delete your data/);
