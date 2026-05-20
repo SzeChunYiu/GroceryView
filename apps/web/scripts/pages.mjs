@@ -53,6 +53,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-store-map-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setStoreComparisonMetric = (metric, message) => {
+    const target = document.querySelector('[data-store-comparison-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setApiSessionResult = (message) => {
     const target = document.querySelector('[data-api-session-result]');
     if (target) target.textContent = message;
@@ -686,6 +690,33 @@ window.GroceryViewFlowActions = (() => {
       setResult('store-map', 'Store map API load failed: ' + error.message + '. Static store map remains visible.');
     }
   };
+  const loadStoreComparisonFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('store-comparison', 'Local preview mode: connect the API session bridge and save a basket before loading live store comparison.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/basket/compare', config), {
+        method: 'POST',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const cheapest = payload.cheapestByProduct || {};
+      const options = Array.isArray(payload.singleStoreOptions) ? payload.singleStoreOptions : [];
+      const best = payload.bestSingleStore || options[0] || {};
+      const missing = Array.isArray(payload.missingProductIds) ? payload.missingProductIds : [];
+      const splitCount = Number(payload.splitStoreCount || 0);
+      const splitTotal = Number(cheapest.total || 0);
+      const savings = Number(payload.savingsVsBestSingleStore || 0);
+      setStoreComparisonMetric('best', best.storeName ? best.storeName + ' · ' + formatSek(Number(best.total || 0)) + ' · ' + Number(best.itemCount || 0) + ' items' : 'No full-coverage single store yet');
+      setStoreComparisonMetric('split', 'Split basket ' + formatSek(splitTotal) + ' across ' + splitCount + ' stores · saves ' + formatSek(savings));
+      setStoreComparisonMetric('coverage', options.length + ' favorite stores compared · ' + missing.length + ' missing products');
+      setResult('store-comparison', 'Connected store comparison loaded: ' + options.length + ' favorite-store totals, split basket ' + formatSek(splitTotal) + ', ' + missing.length + ' missing products.');
+    } catch (error) {
+      setResult('store-comparison', 'Store comparison API load failed: ' + error.message + '. Static comparison remains visible.');
+    }
+  };
   const messages = {
     'toggle-alert': 'Alert rule updated locally; production save waits for authenticated account API.',
     'manage-subscription': 'Billing portal handoff prepared without exposing provider customer IDs.',
@@ -773,6 +804,10 @@ window.GroceryViewFlowActions = (() => {
       }
       if (flow === 'store-map' && action === 'load-store-map') {
         await loadStoreMapFromApi();
+        return;
+      }
+      if (flow === 'store-comparison' && action === 'load-store-comparison') {
+        await loadStoreComparisonFromApi();
         return;
       }
       if (flow && action) setResult(flow, messages[action] || 'Action preview recorded.');
@@ -910,6 +945,9 @@ const storeDealsLivePanel = `
 
 const storeMapLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="store-map" style="margin-top:16px"><div class="eyebrow">Connected store map API</div><h2>Pull live Stockholm store coverage</h2><p class="lede">Fetch <code>/api/stores</code> to refresh mapped store count, districts, chains, and confidence coverage from the public API before a shopper uses map or route guidance.</p><div class="grid" aria-label="Live store map API metrics"><div class="metric"><strong data-store-map-count>Waiting for API pull</strong><span>mapped stores and chains</span></div><div class="metric"><strong data-store-map-districts>Static district preview</strong><span>covered districts</span></div><div class="metric"><strong data-store-map-confidence>Static confidence preview</strong><span>high-confidence profiles</span></div></div><div class="flow-panel" aria-label="Connected store map actions"><button type="button" data-flow-action="load-store-map">Load live store map</button></div><p class="flow-result" data-flow-result="store-map" aria-live="polite">Local preview mode: connect the API session bridge before loading live store map.</p></section>`;
+
+const storeComparisonLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="store-comparison" style="margin-top:16px"><div class="eyebrow">Connected store comparison API</div><h2>Pull live favorite-store basket totals</h2><p class="lede">Fetch <code>/api/basket/compare</code> through the protected API session bridge to refresh favorite-store totals, best single-store option, split-basket total, split-store count, missing products, and savings against the best single-store basket.</p><div class="grid" aria-label="Live store comparison API metrics"><div class="metric"><strong data-store-comparison-best>Waiting for API pull</strong><span>best single-store option</span></div><div class="metric"><strong data-store-comparison-split>Static split-basket preview</strong><span>split-store basket and savings</span></div><div class="metric"><strong data-store-comparison-coverage>Static coverage preview</strong><span>favorite-store coverage and missing products</span></div></div><div class="flow-panel" aria-label="Connected store comparison actions"><button type="button" data-flow-action="load-store-comparison">Load live store comparison</button></div><p class="flow-result" data-flow-result="store-comparison" aria-live="polite">Local preview mode: connect the API session bridge and save a basket before loading live store comparison.</p></section>`;
 
 const pages = [
   {
@@ -1078,7 +1116,7 @@ const pages = [
     path: 'stores/compare/index.html',
     title: 'Compare Stockholm grocery stores — GroceryView',
     description: 'Compare Stockholm grocery stores by basket total, verified price coverage, confidence risk, best category, and weekly shopper fit.',
-    body: `<section class="card"><div class="eyebrow">Store comparison</div><h1>Compare Stockholm stores</h1><p class="lede">Rank favorite stores by verified basket total, coverage, low-confidence risk, and category strengths before choosing a weekly shop.</p><div class="grid"><div class="metric"><strong>Willys</strong><span>best coffee coverage</span></div><div class="metric"><strong>Lidl</strong><span>lowest basket total</span></div><div class="metric"><strong>Coop</strong><span>review before checkout</span></div></div></section><section class="card" style="margin-top:16px"><h2>Favorite-store comparison</h2><table class="table"><thead><tr><th>Store</th><th>Basket total</th><th>Verified coverage</th><th>Low-confidence rows</th><th>Best category</th></tr></thead><tbody><tr><td>Willys Odenplan</td><td>742 SEK</td><td>82%</td><td>2</td><td>Coffee</td></tr><tr><td>Lidl Sveavägen</td><td>729 SEK</td><td>76%</td><td>3</td><td>Eggs and dairy</td></tr><tr><td>Coop Farsta</td><td>781 SEK</td><td>68%</td><td>5</td><td>Member promos</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Decision notes</h2><table class="table"><thead><tr><th>Store</th><th>Recommended use</th><th>Trust guardrail</th></tr></thead><tbody><tr><td>Willys Odenplan</td><td>Primary weekly basket when coffee is in stock</td><td>Verified shelf and retailer-page rows agree</td></tr><tr><td>Lidl Sveavägen</td><td>Cheapest split basket for dairy and eggs</td><td>Confirm flyer-only promotions before routing</td></tr><tr><td>Coop Farsta</td><td>Use for member promos after review</td><td>Low-confidence receipt rows stay out of Deal Score</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Store comparison</div><h1>Compare Stockholm stores</h1><p class="lede">Rank favorite stores by verified basket total, coverage, low-confidence risk, and category strengths before choosing a weekly shop.</p><div class="grid"><div class="metric"><strong>Willys</strong><span>best coffee coverage</span></div><div class="metric"><strong>Lidl</strong><span>lowest basket total</span></div><div class="metric"><strong>Coop</strong><span>review before checkout</span></div></div></section><section class="card" style="margin-top:16px"><h2>Favorite-store comparison</h2><table class="table"><thead><tr><th>Store</th><th>Basket total</th><th>Verified coverage</th><th>Low-confidence rows</th><th>Best category</th></tr></thead><tbody><tr><td>Willys Odenplan</td><td>742 SEK</td><td>82%</td><td>2</td><td>Coffee</td></tr><tr><td>Lidl Sveavägen</td><td>729 SEK</td><td>76%</td><td>3</td><td>Eggs and dairy</td></tr><tr><td>Coop Farsta</td><td>781 SEK</td><td>68%</td><td>5</td><td>Member promos</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Decision notes</h2><table class="table"><thead><tr><th>Store</th><th>Recommended use</th><th>Trust guardrail</th></tr></thead><tbody><tr><td>Willys Odenplan</td><td>Primary weekly basket when coffee is in stock</td><td>Verified shelf and retailer-page rows agree</td></tr><tr><td>Lidl Sveavägen</td><td>Cheapest split basket for dairy and eggs</td><td>Confirm flyer-only promotions before routing</td></tr><tr><td>Coop Farsta</td><td>Use for member promos after review</td><td>Low-confidence receipt rows stay out of Deal Score</td></tr></tbody></table></section>${storeComparisonLivePanel}`
   },
   {
     path: 'stores/map/index.html',
