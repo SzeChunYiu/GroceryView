@@ -14,6 +14,12 @@ export type ScoreBand = {
 
 const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
 const roundMoney = (value: number): number => Math.round((value + Number.EPSILON) * 100) / 100;
+const formatSek = (value: number): string => `${value.toFixed(2)} SEK`;
+const storeNameFromId = (storeId: string): string =>
+  storeId
+    .split('-')
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
 
 export function calculateDealScore(input: DealScoreInput): number {
   const currentCityStrength = 100 - clamp(input.currentCityPercentile, 0, 100);
@@ -88,6 +94,21 @@ export type BasketComparisonResult = {
   missingProductIds: string[];
 };
 
+export type StoreBasketCoverage = {
+  storeId: string;
+  storeName: string;
+  knownTotal: number;
+  availableProductIds: string[];
+  missingProductIds: string[];
+  coveragePercent: number;
+};
+
+export type StoreBasketCoverageSummary = {
+  stores: StoreBasketCoverage[];
+  bestCoverage?: StoreBasketCoverage;
+  fullCoverageStoreIds: string[];
+};
+
 export function compareBasketStrategies(input: BasketComparisonInput): BasketComparisonResult {
   const favoriteSet = new Set(input.favoriteStoreIds);
   const missingProductIds: string[] = [];
@@ -133,6 +154,59 @@ export function compareBasketStrategies(input: BasketComparisonInput): BasketCom
     },
     singleStoreOptions: [...storeTotals.values()].sort((a, b) => a.total - b.total),
     missingProductIds
+  };
+}
+
+export function summarizeStoreBasketCoverage(input: BasketComparisonInput): StoreBasketCoverageSummary {
+  const coverageByStore = new Map<string, StoreBasketCoverage>();
+
+  for (const storeId of input.favoriteStoreIds) {
+    coverageByStore.set(storeId, {
+      storeId,
+      storeName: storeNameFromId(storeId),
+      knownTotal: 0,
+      availableProductIds: [],
+      missingProductIds: [],
+      coveragePercent: input.items.length === 0 ? 100 : 0
+    });
+  }
+
+  for (const item of input.items) {
+    for (const storeId of input.favoriteStoreIds) {
+      const coverage = coverageByStore.get(storeId);
+      if (!coverage) continue;
+
+      const price = item.prices.find((candidate) => candidate.storeId === storeId);
+      if (!price) {
+        coverage.missingProductIds.push(item.productId);
+        continue;
+      }
+
+      coverage.storeName = price.storeName;
+      coverage.knownTotal = roundMoney(coverage.knownTotal + price.price * item.quantity);
+      coverage.availableProductIds.push(item.productId);
+    }
+  }
+
+  const stores = [...coverageByStore.values()]
+    .map((coverage) => ({
+      ...coverage,
+      coveragePercent: input.items.length === 0
+        ? 100
+        : roundMoney((coverage.availableProductIds.length / input.items.length) * 100)
+    }))
+    .sort((a, b) => {
+      if (b.coveragePercent !== a.coveragePercent) return b.coveragePercent - a.coveragePercent;
+      if (a.knownTotal !== b.knownTotal) return a.knownTotal - b.knownTotal;
+      return a.storeName.localeCompare(b.storeName);
+    });
+
+  return {
+    stores,
+    bestCoverage: stores[0],
+    fullCoverageStoreIds: stores
+      .filter((coverage) => coverage.missingProductIds.length === 0)
+      .map((coverage) => coverage.storeId)
   };
 }
 
@@ -233,13 +307,6 @@ export type WatchlistAlert = {
   type: 'target_price' | 'deal_score' | 'new_52_week_low';
   message: string;
 };
-
-const formatSek = (value: number): string => `${value.toFixed(2)} SEK`;
-const storeNameFromId = (storeId: string): string =>
-  storeId
-    .split('-')
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(' ');
 
 export function buildWatchlistAlerts(input: {
   watchlist: WatchlistItem[];
