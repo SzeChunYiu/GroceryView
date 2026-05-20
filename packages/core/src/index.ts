@@ -745,53 +745,6 @@ export function summarizePriceHistory(points: PriceHistoryPoint[]): PriceHistory
     observedCount: ordered.length,
     latestObservedAt: latest.observedAt
   };
-export type DistrictIndexCandidate = {
-  district: string;
-  label: string;
-  components: Array<IndexComponent & { category: string }>;
-  basketTotal: number;
-  oneWeekMovementPercent: number;
-  oneMonthMovementPercent: number;
-};
-
-export type DistrictIndex = FixedBasketIndex & {
-  district: string;
-  basketTotal: number;
-  oneWeekMovementPercent: number;
-  oneMonthMovementPercent: number;
-  biggestDriver: string;
-  cheapestDistrict: boolean;
-};
-
-export function calculateDistrictIndices(input: {
-  baseDate: string;
-  currentDate: string;
-  districts: DistrictIndexCandidate[];
-}): DistrictIndex[] {
-  if (input.districts.length === 0) throw new Error('At least one district is required.');
-  const cheapestTotal = Math.min(...input.districts.map((district) => district.basketTotal));
-
-  return input.districts.map((district) => {
-    const index = calculateFixedBasketIndex({
-      id: `${district.district.toLowerCase().replace(/\s+/g, '-')}-district-index`,
-      label: district.label,
-      baseDate: input.baseDate,
-      currentDate: input.currentDate,
-      components: district.components
-    });
-    const biggestDriver = [...district.components]
-      .sort((a, b) => Math.abs((b.currentUnitPrice - b.baseUnitPrice) / b.baseUnitPrice) - Math.abs((a.currentUnitPrice - a.baseUnitPrice) / a.baseUnitPrice))[0];
-
-    return {
-      ...index,
-      district: district.district,
-      basketTotal: roundMoney(district.basketTotal),
-      oneWeekMovementPercent: roundMoney(district.oneWeekMovementPercent),
-      oneMonthMovementPercent: roundMoney(district.oneMonthMovementPercent),
-      biggestDriver: `${biggestDriver.category} ${roundMoney(((biggestDriver.currentUnitPrice - biggestDriver.baseUnitPrice) / biggestDriver.baseUnitPrice) * 100)}%`,
-      cheapestDistrict: district.basketTotal === cheapestTotal
-    };
-  });
 }
 
 function chartMarkersForObservation(observation: PriceChartObservation, isNewLow: boolean): PriceChartMarker[] {
