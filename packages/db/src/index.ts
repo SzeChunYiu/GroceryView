@@ -363,6 +363,21 @@ export type SourceRunListFilter = {
   limit?: number;
 };
 
+export type SourceRunHealthInput = {
+  now: string;
+  maxRunningMinutes: number;
+  staleAfterMinutes: number;
+  runs: SourceRunReadRecord[];
+};
+
+export type SourceRunHealthReport = {
+  status: 'healthy' | 'blocked';
+  blockers: string[];
+  evidence: string[];
+  runningRunIds: string[];
+  staleRunIds: string[];
+};
+
 export type FinishSourceRunRecord = {
   sourceRunId: string;
   finishedAt?: string;
@@ -530,6 +545,67 @@ export function applyNotificationTaskAcknowledgements(input: {
   }
 
   return updates;
+}
+
+function parseDbIsoDate(value: string, label: string): number {
+  const parsed = Date.parse(value);
+  if (Number.isNaN(parsed)) throw new Error(`${label} must be an ISO date.`);
+  return parsed;
+}
+
+export function buildSourceRunHealthReport(input: SourceRunHealthInput): SourceRunHealthReport {
+  if (!Number.isFinite(input.maxRunningMinutes) || input.maxRunningMinutes <= 0) throw new Error('maxRunningMinutes must be positive.');
+  if (!Number.isFinite(input.staleAfterMinutes) || input.staleAfterMinutes <= 0) throw new Error('staleAfterMinutes must be positive.');
+
+  const nowMs = parseDbIsoDate(input.now, 'now');
+  const blockers: string[] = [];
+  const evidence: string[] = [];
+  const runningRunIds: string[] = [];
+  const staleRunIds: string[] = [];
+
+  for (const run of [...input.runs].sort((a, b) => a.sourceRunId.localeCompare(b.sourceRunId))) {
+    const startedAtMs = parseDbIsoDate(run.startedAt, `startedAt for ${run.sourceRunId}`);
+    if (startedAtMs > nowMs) {
+      blockers.push(`source_run_started_in_future:${run.sourceRunId}`);
+      continue;
+    }
+
+    if (run.status === 'running') {
+      const runningMinutes = (nowMs - startedAtMs) / 60_000;
+      runningRunIds.push(run.sourceRunId);
+      if (runningMinutes > input.maxRunningMinutes) blockers.push(`source_run_stuck_running:${run.sourceRunId}`);
+      continue;
+    }
+
+    if (!run.finishedAt) {
+      blockers.push(`source_run_missing_finished_at:${run.sourceRunId}`);
+      continue;
+    }
+
+    const finishedAtMs = parseDbIsoDate(run.finishedAt, `finishedAt for ${run.sourceRunId}`);
+    if (finishedAtMs > nowMs) {
+      blockers.push(`source_run_finished_in_future:${run.sourceRunId}`);
+      continue;
+    }
+
+    const ageMinutes = (nowMs - finishedAtMs) / 60_000;
+    if (ageMinutes > input.staleAfterMinutes) {
+      staleRunIds.push(run.sourceRunId);
+      blockers.push(`source_run_stale:${run.sourceRunId}`);
+    }
+
+    if (run.status === 'failed') blockers.push(`source_run_failed:${run.sourceRunId}`);
+    if (run.status === 'partial') blockers.push(`source_run_partial:${run.sourceRunId}`);
+    if (run.status === 'succeeded' && ageMinutes <= input.staleAfterMinutes) evidence.push(`source_run_succeeded:${run.sourceRunId}`);
+  }
+
+  return {
+    status: blockers.length === 0 ? 'healthy' : 'blocked',
+    blockers,
+    evidence,
+    runningRunIds,
+    staleRunIds
+  };
 }
 
 function requireUser(users: Map<string, UserRecord>, userId: string): void {
