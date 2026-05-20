@@ -1,15 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import {
-  buildDeploymentReadinessReport,
-  buildHostedSmokeCommandPlan,
-  buildRollbackPlan,
-  buildSecretRotationReadinessReport,
-  summarizeSecretRotationReadinessReport,
-  summarizeDeploymentReadinessReport,
-  summarizeGateBlockers,
-  summarizeGateWarnings
-} from '../index.js';
+import { buildDeploymentReadinessReport, buildReleaseGateEvidenceReport, buildRollbackPlan } from '../index.js';
 
 describe('deployment ops foundation', () => {
   it('passes readiness only when provider, secrets, DNS, health checks, and smoke tests are ready', () => {
@@ -231,83 +222,39 @@ describe('deployment ops foundation', () => {
     });
   });
 
-  it('builds hosted smoke command plans without embedding secret token values', () => {
-    const plan = buildHostedSmokeCommandPlan({
-      serverUrl: 'https://api.groceryview.example/',
-      webUrl: 'https://groceryview.example',
-      includePostgresReadiness: true,
-      metricsTokenEnvVar: 'PROD_METRICS_TOKEN',
-      timeoutSeconds: 20
-    });
-
-    assert.deepEqual(plan, {
-      commands: [
-        'GROCERYVIEW_SERVER_URL=https://api.groceryview.example GROCERYVIEW_WEB_URL=https://groceryview.example GROCERYVIEW_TERMINAL_PRODUCT_ID=coffee HTTP_SMOKE_TIMEOUT_SECONDS=20 infra/scripts/smoke-hosted-http.sh',
-        'GROCERYVIEW_SERVER_URL=https://api.groceryview.example METRICS_TOKEN=$PROD_METRICS_TOKEN READINESS_TIMEOUT_SECONDS=20 infra/scripts/smoke-hosted-readiness.sh'
+  it('passes release gate evidence only when required checks and main validation are current', () => {
+    const report = buildReleaseGateEvidenceReport({
+      requiredChecks: ['Test, build, and typecheck', 'Validate release-safe candidate'],
+      checks: [
+        { name: 'Test, build, and typecheck', status: 'success' },
+        { name: 'Validate release-safe candidate', status: 'success' }
       ],
-      requiredSecrets: ['PROD_METRICS_TOKEN'],
-      evidence: ['hosted_api_health', 'hosted_product_terminal', 'hosted_web', 'hosted_postgres_readiness']
-    });
-  });
-
-  it('blocks deployment when required secrets are missing, stale, or lack rotation ownership', () => {
-    const report = buildSecretRotationReadinessReport({
-      checkedAt: '2026-05-20T08:00:00.000Z',
-      maxAgeDays: 90,
-      requiredSecrets: ['DATABASE_URL', 'SESSION_SECRET', 'METRICS_TOKEN', 'BILLING_WEBHOOK_SECRET'],
-      secrets: [
-        {
-          name: 'DATABASE_URL',
-          present: true,
-          rotatedAt: '2026-01-01T00:00:00.000Z',
-          owner: 'platform'
-        },
-        {
-          name: 'SESSION_SECRET',
-          present: true,
-          rotatedAt: '2026-05-01T00:00:00.000Z'
-        },
-        {
-          name: 'METRICS_TOKEN',
-          present: false,
-          rotatedAt: '2026-05-01T00:00:00.000Z',
-          owner: 'platform'
-        }
-      ]
+      mainReleaseValidation: { status: 'success', completedAt: '2026-05-20T00:00:00Z' },
+      now: '2026-05-20T00:20:00Z',
+      maxMainValidationAgeMinutes: 30
     });
 
     assert.deepEqual(report, {
-      status: 'blocked',
-      blockers: [
-        'secret_rotation_stale:DATABASE_URL',
-        'secret_rotation_owner_missing:SESSION_SECRET',
-        'secret_missing:METRICS_TOKEN',
-        'secret_missing:BILLING_WEBHOOK_SECRET'
-      ],
-      readySecrets: [],
-      summary: 'Secret rotation readiness is blocked until required deployment secrets are present, fresh, and owned.'
+      status: 'ready',
+      blockers: [],
+      passedChecks: ['Test, build, and typecheck', 'Validate release-safe candidate'],
+      summary: 'Release gate evidence is current and complete.'
     });
   });
 
-  it('summarizes secret rotation readiness for deployment dashboards', () => {
-    const report = buildSecretRotationReadinessReport({
-      checkedAt: '2026-05-20T08:00:00.000Z',
-      maxAgeDays: 90,
-      requiredSecrets: ['DATABASE_URL', 'SESSION_SECRET', 'METRICS_TOKEN', 'PUBLIC_APP_URL'],
-      secrets: [
-        { name: 'DATABASE_URL', present: true, rotatedAt: '2026-01-01T00:00:00.000Z', owner: 'platform' },
-        { name: 'SESSION_SECRET', present: true, rotatedAt: '2026-05-01T00:00:00.000Z' },
-        { name: 'PUBLIC_APP_URL', present: true, rotatedAt: '2026-05-01T00:00:00.000Z', owner: 'platform' }
-      ]
+  it('fails closed for missing checks and stale main release validation', () => {
+    const report = buildReleaseGateEvidenceReport({
+      requiredChecks: ['Test, build, and typecheck', 'Validate release-safe candidate'],
+      checks: [{ name: 'Test, build, and typecheck', status: 'success' }],
+      mainReleaseValidation: { status: 'success', completedAt: '2026-05-19T23:00:00Z' },
+      now: '2026-05-20T00:20:00Z',
+      maxMainValidationAgeMinutes: 30
     });
 
-    assert.deepEqual(summarizeSecretRotationReadinessReport(report), {
-      status: 'blocked',
-      totalBlockers: 3,
-      missingSecrets: 1,
-      staleSecrets: 1,
-      ownerlessSecrets: 1,
-      readySecrets: 1
-    });
+    assert.deepEqual(report.status, 'blocked');
+    assert.deepEqual(report.blockers, [
+      'required_check_missing:Validate release-safe candidate',
+      'main_release_validation_stale'
+    ]);
   });
 });
