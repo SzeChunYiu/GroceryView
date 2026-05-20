@@ -1,6 +1,29 @@
 import Link from 'next/link';
-import { BarChart3, MapPin, ScanSearch, ShoppingBasket } from 'lucide-react';
-import { categories, householdSavings, products, stockholmAreas, stores, weeklyBasket } from '@/lib/demo-data';
+import { BarChart3, Database, MapPin, ScanSearch, ShoppingBasket, Store } from 'lucide-react';
+import {
+  categories,
+  householdSavings,
+  products,
+  sourceCoverage,
+  stockholmAreas,
+  stores,
+  weeklyBasket
+} from '@/lib/demo-data';
+import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
+import { osmStores } from '@/lib/osm-stores';
+
+const totalObservedPrices = pricedProducts.reduce((sum, product) => sum + product.observationCount, 0);
+const latestPriceDate = pricedProducts.reduce(
+  (latest, product) => (product.lastObservedAt > latest ? product.lastObservedAt : latest),
+  pricedProducts[0]?.lastObservedAt ?? 'n/a'
+);
+const activeOpenPriceCategories = new Set(pricedProducts.map((product) => product.category || 'pantry')).size;
+const activeStoreBrands = new Set(osmStores.map((store) => store.brand || 'Other')).size;
+const openPriceLeaders = pricedProducts.slice(0, 6);
+
+function formatSek(value: number) {
+  return `SEK ${value.toFixed(2)}`;
+}
 
 export function MarketShell() {
   return (
@@ -57,6 +80,61 @@ export function MarketShell() {
       </section>
 
       <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto_auto_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">OpenPrices fixture radar</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Live driver data is now visible on the homepage before shoppers drill into the full product screener.
+            </p>
+          </div>
+          <LightMetric label="Products" value={pricedProducts.length.toLocaleString()} />
+          <LightMetric label="Observations" value={totalObservedPrices.toLocaleString()} />
+          <LightMetric label="Latest" value={latestPriceDate} />
+        </div>
+        <div className="grid gap-0 lg:grid-cols-[0.95fr_1.05fr]">
+          <div className="grid gap-3 border-b border-market-ink/10 p-4 lg:border-b-0 lg:border-r">
+            <FixtureMetric
+              icon={<Database size={18} />}
+              label="Observed categories"
+              value={String(activeOpenPriceCategories)}
+              detail="OpenFoodFacts tags mapped into GroceryView category routes"
+              href="/categories"
+            />
+            <FixtureMetric
+              icon={<Store size={18} />}
+              label="Mapped store brands"
+              value={String(activeStoreBrands)}
+              detail={`${osmStores.length.toLocaleString()} Stockholm county stores from the OSM fixture`}
+              href="/stores"
+            />
+          </div>
+          <div className="min-w-0">
+            <div className="grid grid-cols-[1.6fr_0.8fr_0.7fr_0.7fr] gap-3 border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
+              <span>High-signal product</span>
+              <span>Category</span>
+              <span>Median</span>
+              <span className="text-right">Obs</span>
+            </div>
+            {openPriceLeaders.map((product) => (
+              <Link
+                key={product.code}
+                href={`/categories/${product.category || 'pantry'}`}
+                className="grid grid-cols-[1.6fr_0.8fr_0.7fr_0.7fr] gap-3 px-4 py-3 text-sm hover:bg-market-oat/45"
+              >
+                <span className="min-w-0">
+                  <span className="block truncate font-bold">{product.name}</span>
+                  <span className="mt-1 block truncate text-xs text-market-ink/50">{product.brands || product.code}</span>
+                </span>
+                <span className="truncate text-market-ink/65">{categoryLabels[product.category] || product.category}</span>
+                <span className="font-bold tabular-nums">{formatSek(product.priceMedian)}</span>
+                <span className="text-right tabular-nums text-market-ink/55">{product.observationCount}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
         <div className="border-b border-market-ink/10 px-4 py-3">
           <h2 className="text-lg font-black">Category market tape</h2>
           <p className="mt-1 text-sm text-market-ink/60">
@@ -99,6 +177,35 @@ export function MarketShell() {
                 {store.district} · {store.bestCategory}
               </span>
             </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="border-b border-market-ink/10 px-4 py-3">
+          <h2 className="text-lg font-black">Source coverage tape</h2>
+          <p className="mt-1 text-sm text-market-ink/60">
+            Driver rows expose which retailer surfaces are ready, in review, or still stubbed before live ingestion.
+          </p>
+        </div>
+        <div className="grid gap-0 md:grid-cols-2 lg:grid-cols-3">
+          {sourceCoverage.map((source) => (
+            <div key={`${source.chain}-${source.fixture}`} className="border-b border-market-ink/10 px-4 py-4 text-sm md:border-r">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <span className="block text-xs font-bold uppercase text-market-ink/50">{source.chain}</span>
+                  <span className="mt-1 block font-black">{source.fixture}</span>
+                </div>
+                <span className="rounded-full bg-market-oat px-2 py-1 text-xs font-bold uppercase text-market-ink/60">
+                  {source.status}
+                </span>
+              </div>
+              <p className="mt-3 text-market-ink/65">{source.newestSignal}</p>
+              <div className="mt-3 flex items-center justify-between gap-3 text-xs font-bold uppercase text-market-ink/50">
+                <span>{source.surface}</span>
+                <span>{source.visibleRows} rows</span>
+              </div>
+            </div>
           ))}
         </div>
       </section>
@@ -209,6 +316,25 @@ function LightMetric({ label, value }: Readonly<{ label: string; value: string }
       <strong className="block text-2xl">{value}</strong>
       <span className="text-xs font-semibold text-market-ink/55">{label}</span>
     </div>
+  );
+}
+
+function FixtureMetric({
+  icon,
+  label,
+  value,
+  detail,
+  href
+}: Readonly<{ icon: React.ReactNode; label: string; value: string; detail: string; href: string }>) {
+  return (
+    <Link href={href} className="rounded-lg border border-market-ink/10 p-4 hover:border-market-mint/70">
+      <div className="flex items-center justify-between gap-4">
+        <span className="text-market-mint">{icon}</span>
+        <strong className="text-3xl tabular-nums">{value}</strong>
+      </div>
+      <p className="mt-4 font-black">{label}</p>
+      <p className="mt-1 text-sm leading-6 text-market-ink/60">{detail}</p>
+    </Link>
   );
 }
 

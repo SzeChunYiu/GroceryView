@@ -66,14 +66,38 @@ describe('Next.js web scaffold', () => {
     const basketSection = demoData.split('export const weeklyBasket = ')[1] ?? '';
     const basketRows = basketSection.match(/slug: '[^']+'/g) ?? [];
 
-    assert.ok(basketRows.length >= 11, 'homepage driver data should expose at least 11 weekly basket rows');
+    assert.ok(basketRows.length >= 12, 'homepage driver data should expose at least 12 weekly basket rows');
     assert.match(demoData, /eldorado-basmati-rice-1kg/);
     assert.match(demoData, /barilla-spaghetti-1kg/);
     assert.match(demoData, /bregott-normalsaltat-600g/);
-    assert.match(demoData, /weeklyTotal: '416\.60 SEK'/);
+    assert.match(demoData, /garant-havregryn-1kg/);
+    assert.match(demoData, /weeklyTotal: '438\.50 SEK'/);
     assert.match(marketShell, /weeklyBasket\.map/);
     assert.match(marketShell, /householdSavings\.weeklyTotal/);
     assert.match(marketShell, /Weekly basket tape/);
+  });
+
+  it('surfaces source coverage rows on the homepage', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+
+    const sourceSection = demoData.split('export const sourceCoverage = ')[1] ?? '';
+    const coverageRows = sourceSection.match(/chain: '[^']+'/g) ?? [];
+
+    assert.ok(coverageRows.length >= 6, 'homepage driver data should expose at least 6 source coverage rows');
+    assert.match(demoData, /fixture: 'Store locator'/);
+    assert.match(demoData, /fixture: 'Weekly offers'/);
+    assert.match(marketShell, /sourceCoverage\.map/);
+    assert.match(marketShell, /Source coverage tape/);
+  });
+
+  it('surfaces generated OpenPrices and OSM fixture counts on the homepage', async () => {
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+
+    assert.match(marketShell, /pricedProducts\.length\.toLocaleString/);
+    assert.match(marketShell, /totalObservedPrices\.toLocaleString/);
+    assert.match(marketShell, /osmStores\.length\.toLocaleString/);
+    assert.match(marketShell, /OpenPrices fixture radar/);
   });
 
   it('surfaces Stockholm area coverage on the homepage', async () => {
