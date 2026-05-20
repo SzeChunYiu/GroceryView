@@ -2,6 +2,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   buildOpenPricesConnectorUrl,
+  cacheKeyForScbPxWebQueryFixture,
+  cellCountForScbPxWebQueryFixture,
   confidenceForSource,
   fetchRetailerConnectorSnapshot,
   ingestRetailerProduct,
@@ -21,6 +23,9 @@ import {
   runRetailerConnector,
   stockholmStoreLocatorFixtures,
   validateOfferSelectorFixtures,
+  scbCoicopFoodCategoryCodes,
+  scbPxWebQueryFixtures,
+  validateScbPxWebQueryFixtures,
   validateStoreLocatorFixtures
 } from '../index.js';
 
@@ -344,6 +349,63 @@ describe('offer selector fixtures', () => {
     assert.ok(byChain.get('lidl')?.reviewFlags.includes('member_only_or_personalized'));
     assert.equal(byChain.get('city_gross')?.artifactFormat, 'react_shell');
     assert.ok(byChain.get('city_gross')?.reviewFlags.includes('skeleton_or_error_state'));
+  });
+});
+
+describe('SCB PxWeb query fixtures', () => {
+  it('defines valid CPI index baseline fixtures with SCB open-data posture', () => {
+    const validation = validateScbPxWebQueryFixtures(scbPxWebQueryFixtures);
+
+    assert.deepEqual(validation, {
+      status: 'valid',
+      fixtureIds: [
+        'scb-kpi2020-coicop2m-food-division-index-top12',
+        'scb-kpi2020-coicopm-food-category-index-top12',
+        'scb-kpi2020-epg01m-fine-food-index-all'
+      ],
+      issues: []
+    });
+    for (const fixture of scbPxWebQueryFixtures) {
+      assert.equal(fixture.source, 'SCB');
+      assert.equal(fixture.license, 'CC0');
+      assert.equal(fixture.contentLabel, 'Index');
+      assert.equal(fixture.emitsStorePrices, false);
+      assert.equal(fixture.emitsSkuPrices, false);
+      assert.match(fixture.endpoint, /^https:\/\/api\.scb\.se\/OV0104\/v1\/doris\/sv\/ssd\/PR\/PR0101\/PR0101A\//);
+    }
+  });
+
+  it('keeps the grocery category payload aligned to current SCB metadata', () => {
+    const categoryFixture = scbPxWebQueryFixtures.find((fixture) => fixture.tableId === 'KPI2020COICOPM');
+
+    assert.ok(categoryFixture);
+    assert.deepEqual(categoryFixture.expectedDimensions, [18, 1, 12]);
+    assert.equal(categoryFixture.expectedCellCount, 216);
+    const categoryCodes = new Set<string>(scbCoicopFoodCategoryCodes);
+    assert.equal(categoryCodes.has('01.2.4'), false);
+    assert.equal(categoryCodes.has('01.2.5'), true);
+  });
+
+  it('marks EPG01 as fine-grained and 2026-only', () => {
+    const epgFixture = scbPxWebQueryFixtures.find((fixture) => fixture.tableId === 'KPI2020EPG01M');
+
+    assert.ok(epgFixture);
+    assert.deepEqual(epgFixture.expectedDimensions, [97, 1, 4]);
+    assert.equal(epgFixture.observedMetadata.timeRange, '2026M01..2026M04');
+    assert.equal(epgFixture.payload.query[0].selection.filter, 'all');
+  });
+
+  it('computes stable cache keys and guards v1 cell counts', () => {
+    for (const fixture of scbPxWebQueryFixtures) {
+      assert.equal(cellCountForScbPxWebQueryFixture(fixture), fixture.expectedCellCount);
+      assert.ok(fixture.expectedCellCount <= 100000);
+      assert.match(cacheKeyForScbPxWebQueryFixture(fixture), /^scb:pxweb:v1:sv:PR\/PR0101\/PR0101A:/);
+    }
+
+    assert.equal(
+      cacheKeyForScbPxWebQueryFixture(scbPxWebQueryFixtures[0]),
+      'scb:pxweb:v1:sv:PR/PR0101/PR0101A:KPI2020COICOP2M:json-stat2:VaruTjanstegrupp=item(01):ContentsCode=item(0000080C):Tid=top(12)'
+    );
   });
 });
 

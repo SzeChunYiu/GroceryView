@@ -179,6 +179,51 @@ export type OfferVisibilityBoundaryPlan = {
   requiredActions: string[];
 };
 
+export type ScbPxWebSelectionFilter = 'item' | 'top' | 'all';
+export type ScbPxWebResponseFormat = 'JSON-stat2';
+export type ScbPxWebQueryVariable = {
+  code: 'VaruTjanstegrupp' | 'ContentsCode' | 'Tid';
+  selection: {
+    filter: ScbPxWebSelectionFilter;
+    values: string[];
+  };
+};
+
+export type ScbPxWebQueryPayload = {
+  query: ScbPxWebQueryVariable[];
+  response: { format: ScbPxWebResponseFormat };
+};
+
+export type ScbPxWebQueryFixture = {
+  fixtureId: string;
+  tableId: 'KPI2020COICOP2M' | 'KPI2020COICOPM' | 'KPI2020EPG01M';
+  apiVersion: 'v1';
+  language: 'sv';
+  subjectPath: 'PR/PR0101/PR0101A';
+  endpoint: string;
+  payload: ScbPxWebQueryPayload;
+  expectedDimensions: number[];
+  expectedCellCount: number;
+  contentCode: string;
+  contentLabel: 'Index';
+  source: 'SCB';
+  license: 'CC0';
+  observedMetadata: {
+    directoryUpdated: string;
+    responseUpdated: string;
+    timeRange: string;
+    categoryCount: number;
+  };
+  emitsStorePrices: false;
+  emitsSkuPrices: false;
+};
+
+export type ScbPxWebQueryFixtureValidation = {
+  status: 'valid' | 'invalid';
+  fixtureIds: string[];
+  issues: string[];
+};
+
 export type OfferSelectorEvidence = {
   evidenceId: string;
   selector: string;
@@ -467,6 +512,178 @@ export function planOfferVisibilityBoundary(visibility: OfferVisibilityBoundary)
   return {
     ...plan,
     requiredActions: [...plan.requiredActions]
+  };
+}
+
+const SCB_PXWEB_V1_BASE = 'https://api.scb.se/OV0104/v1/doris/sv/ssd/PR/PR0101/PR0101A';
+const SCB_DIRECTORY_UPDATED = '2026-05-13T08:00:00';
+const SCB_RESPONSE_UPDATED = '2026-05-13T06:00:00Z';
+export const scbCoicopFoodCategoryCodes = [
+  '01',
+  '01.1',
+  '01.2',
+  '01.1.1',
+  '01.1.2',
+  '01.1.3',
+  '01.1.4',
+  '01.1.5',
+  '01.1.6',
+  '01.1.7',
+  '01.1.8',
+  '01.1.9',
+  '01.2.1',
+  '01.2.2',
+  '01.2.3',
+  '01.2.5',
+  '01.2.6',
+  '01.2.9'
+] as const;
+
+function scbEndpoint(tableId: ScbPxWebQueryFixture['tableId']): string {
+  return `${SCB_PXWEB_V1_BASE}/${tableId}`;
+}
+
+export const scbPxWebQueryFixtures: ScbPxWebQueryFixture[] = [
+  {
+    fixtureId: 'scb-kpi2020-coicop2m-food-division-index-top12',
+    tableId: 'KPI2020COICOP2M',
+    apiVersion: 'v1',
+    language: 'sv',
+    subjectPath: 'PR/PR0101/PR0101A',
+    endpoint: scbEndpoint('KPI2020COICOP2M'),
+    payload: {
+      query: [
+        { code: 'VaruTjanstegrupp', selection: { filter: 'item', values: ['01'] } },
+        { code: 'ContentsCode', selection: { filter: 'item', values: ['0000080C'] } },
+        { code: 'Tid', selection: { filter: 'top', values: ['12'] } }
+      ],
+      response: { format: 'JSON-stat2' }
+    },
+    expectedDimensions: [1, 1, 12],
+    expectedCellCount: 12,
+    contentCode: '0000080C',
+    contentLabel: 'Index',
+    source: 'SCB',
+    license: 'CC0',
+    observedMetadata: {
+      directoryUpdated: SCB_DIRECTORY_UPDATED,
+      responseUpdated: SCB_RESPONSE_UPDATED,
+      timeRange: '1980M01..2026M04',
+      categoryCount: 14
+    },
+    emitsStorePrices: false,
+    emitsSkuPrices: false
+  },
+  {
+    fixtureId: 'scb-kpi2020-coicopm-food-category-index-top12',
+    tableId: 'KPI2020COICOPM',
+    apiVersion: 'v1',
+    language: 'sv',
+    subjectPath: 'PR/PR0101/PR0101A',
+    endpoint: scbEndpoint('KPI2020COICOPM'),
+    payload: {
+      query: [
+        { code: 'VaruTjanstegrupp', selection: { filter: 'item', values: [...scbCoicopFoodCategoryCodes] } },
+        { code: 'ContentsCode', selection: { filter: 'item', values: ['0000080H'] } },
+        { code: 'Tid', selection: { filter: 'top', values: ['12'] } }
+      ],
+      response: { format: 'JSON-stat2' }
+    },
+    expectedDimensions: [18, 1, 12],
+    expectedCellCount: 216,
+    contentCode: '0000080H',
+    contentLabel: 'Index',
+    source: 'SCB',
+    license: 'CC0',
+    observedMetadata: {
+      directoryUpdated: SCB_DIRECTORY_UPDATED,
+      responseUpdated: SCB_RESPONSE_UPDATED,
+      timeRange: '1980M01..2026M04',
+      categoryCount: 398
+    },
+    emitsStorePrices: false,
+    emitsSkuPrices: false
+  },
+  {
+    fixtureId: 'scb-kpi2020-epg01m-fine-food-index-all',
+    tableId: 'KPI2020EPG01M',
+    apiVersion: 'v1',
+    language: 'sv',
+    subjectPath: 'PR/PR0101/PR0101A',
+    endpoint: scbEndpoint('KPI2020EPG01M'),
+    payload: {
+      query: [
+        { code: 'VaruTjanstegrupp', selection: { filter: 'all', values: ['*'] } },
+        { code: 'ContentsCode', selection: { filter: 'item', values: ['0000080N'] } },
+        { code: 'Tid', selection: { filter: 'all', values: ['*'] } }
+      ],
+      response: { format: 'JSON-stat2' }
+    },
+    expectedDimensions: [97, 1, 4],
+    expectedCellCount: 388,
+    contentCode: '0000080N',
+    contentLabel: 'Index',
+    source: 'SCB',
+    license: 'CC0',
+    observedMetadata: {
+      directoryUpdated: SCB_DIRECTORY_UPDATED,
+      responseUpdated: SCB_RESPONSE_UPDATED,
+      timeRange: '2026M01..2026M04',
+      categoryCount: 97
+    },
+    emitsStorePrices: false,
+    emitsSkuPrices: false
+  }
+];
+
+export function cellCountForScbPxWebQueryFixture(fixture: ScbPxWebQueryFixture): number {
+  return fixture.expectedDimensions.reduce((product, dimension) => product * dimension, 1);
+}
+
+export function cacheKeyForScbPxWebQueryFixture(fixture: ScbPxWebQueryFixture): string {
+  const queryKey = fixture.payload.query
+    .map((variable) => `${variable.code}=${variable.selection.filter}(${variable.selection.values.join(',')})`)
+    .join(':');
+  return [
+    'scb',
+    'pxweb',
+    fixture.apiVersion,
+    fixture.language,
+    fixture.subjectPath,
+    fixture.tableId,
+    fixture.payload.response.format.toLowerCase(),
+    queryKey
+  ].join(':');
+}
+
+export function validateScbPxWebQueryFixtures(fixtures: ScbPxWebQueryFixture[]): ScbPxWebQueryFixtureValidation {
+  const issues: string[] = [];
+  const fixtureIds = fixtures.map((fixture) => fixture.fixtureId).sort();
+
+  for (const fixture of fixtures) {
+    if (!fixture.endpoint.startsWith(`${SCB_PXWEB_V1_BASE}/`)) issues.push(`invalid_endpoint:${fixture.fixtureId}`);
+    if (fixture.source !== 'SCB') issues.push(`invalid_source:${fixture.fixtureId}`);
+    if (fixture.license !== 'CC0') issues.push(`invalid_license:${fixture.fixtureId}`);
+    if (fixture.contentLabel !== 'Index') issues.push(`non_index_content:${fixture.fixtureId}`);
+    if (fixture.emitsStorePrices || fixture.emitsSkuPrices) issues.push(`emits_store_or_sku_prices:${fixture.fixtureId}`);
+    if (cellCountForScbPxWebQueryFixture(fixture) !== fixture.expectedCellCount) issues.push(`cell_count_mismatch:${fixture.fixtureId}`);
+    if (fixture.expectedCellCount > 100000) issues.push(`v1_cell_limit_exceeded:${fixture.fixtureId}`);
+    if (fixture.payload.response.format !== 'JSON-stat2') issues.push(`invalid_response_format:${fixture.fixtureId}`);
+    const contentSelection = fixture.payload.query.find((variable) => variable.code === 'ContentsCode');
+    if (!contentSelection?.selection.values.includes(fixture.contentCode)) issues.push(`content_code_not_selected:${fixture.fixtureId}`);
+  }
+
+  const categoryFixture = fixtures.find((fixture) => fixture.tableId === 'KPI2020COICOPM');
+  const categoryValues = categoryFixture?.payload.query.find((variable) => variable.code === 'VaruTjanstegrupp')?.selection.values ?? [];
+  if (categoryValues.includes('01.2.4')) issues.push('missing_metadata_code_selected:01.2.4');
+
+  const epgFixture = fixtures.find((fixture) => fixture.tableId === 'KPI2020EPG01M');
+  if (epgFixture && !epgFixture.observedMetadata.timeRange.startsWith('2026M01')) issues.push('epg01_not_marked_2026_only');
+
+  return {
+    status: issues.length === 0 ? 'valid' : 'invalid',
+    fixtureIds,
+    issues
   };
 }
 
