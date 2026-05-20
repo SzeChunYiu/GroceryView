@@ -252,6 +252,7 @@ class OpenPricesScheduleHealthPlan:
     required_env: list[str]
     required_actions: list[str]
     evidence_fields: list[str]
+    evidence_artifacts: list[str]
     demo: bool = False
 
     def to_dict(self) -> dict[str, object]:
@@ -309,6 +310,7 @@ class OpenPricesScheduleHealthPlanSummary:
     source_asset_count: int
     schedule_count: int
     evidence_field_count: int
+    evidence_artifact_count: int
     demo: bool = False
 
     def to_dict(self) -> dict[str, object]:

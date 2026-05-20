@@ -542,6 +542,9 @@ def build_open_prices_schedule_health_plan(
             "lastRunAgeHours",
             "nextTickAt",
         ],
+        evidence_artifacts=[
+            "/tmp/groceryview-open-prices-schedule-health.json",
+        ],
     )
 
 
@@ -587,6 +590,7 @@ def summarize_open_prices_schedule_health_plan(plan: OpenPricesScheduleHealthPla
         source_asset_count=len(plan.source_assets),
         schedule_count=len(plan.schedule_names),
         evidence_field_count=len(plan.evidence_fields),
+        evidence_artifact_count=len(plan.evidence_artifacts),
     )
 
 
