@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const repoRoot = join(fileURLToPath(new URL('.', import.meta.url)), '../../../..');
 const migration = readFileSync(join(repoRoot, 'infra/db/migrations/001_groceryview_schema.sql'), 'utf8').toLowerCase();
+const repositoryMigration = readFileSync(join(repoRoot, 'infra/db/migrations/002_repository_support_schema.sql'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
 
 const requiredTables = [
@@ -25,10 +26,29 @@ const requiredTables = [
 ];
 
 const provenanceTables = ['source_runs', 'raw_records', 'observations', 'latest_prices'];
+const repositoryTables = [
+  'app_users',
+  'favorite_stores',
+  'user_preferences',
+  'watchlist_items',
+  'weekly_baskets',
+  'basket_items',
+  'human_review_assignments',
+  'human_reviewers',
+  'community_reporter_trust',
+  'notification_tasks',
+  'notification_suppressions'
+];
 
 function tableDefinition(table: string): string {
   const match = migration.match(new RegExp(`create table if not exists ${table} \\(([\\s\\S]*?)\\n\\);`));
   assert.ok(match, `${table} table missing`);
+  return match[1];
+}
+
+function repositoryTableDefinition(table: string): string {
+  const match = repositoryMigration.match(new RegExp(`create table if not exists ${table} \\(([\\s\\S]*?)\\n\\);`));
+  assert.ok(match, `${table} repository table missing`);
   return match[1];
 }
 
@@ -73,5 +93,23 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(migration, /stores_position_gix on stores using gist \(position\)/);
     assert.match(migration, /products_name_trgm_idx on products using gin \(canonical_name gin_trgm_ops\)/);
     assert.match(migration, /aliases_normalized_trgm_idx on aliases using gin \(normalized_alias gin_trgm_ops\)/);
+  });
+
+  it('migrates every table used by the PostgreSQL repository adapter', () => {
+    for (const table of repositoryTables) {
+      assert.match(repositoryMigration, new RegExp(`create table if not exists ${table}\\b`), `${table} repository table missing`);
+    }
+    assert.match(repositoryTableDefinition('favorite_stores'), /primary key \(user_id, store_id\)/);
+    assert.match(repositoryTableDefinition('weekly_baskets'), /unique \(user_id, week_start\)/);
+    assert.match(repositoryTableDefinition('notification_tasks'), /status text not null check/);
+    assert.match(repositoryTableDefinition('notification_suppressions'), /channel text check \(channel in \('push', 'email'\)\)/);
+  });
+
+  it('indexes repository workflow lookups used by adapters and workers', () => {
+    assert.match(repositoryMigration, /watchlist_items_user_idx on watchlist_items \(user_id, id\)/);
+    assert.match(repositoryMigration, /weekly_baskets_user_week_idx on weekly_baskets \(user_id, week_start desc\)/);
+    assert.match(repositoryMigration, /human_review_assignments_open_idx on human_review_assignments \(status, due_at, id\)/);
+    assert.match(repositoryMigration, /notification_tasks_due_idx on notification_tasks \(status, send_at, id\)/);
+    assert.match(repositoryMigration, /notification_suppressions_active_idx on notification_suppressions \(active, recipient, channel, id\)/);
   });
 });
