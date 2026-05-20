@@ -13,6 +13,7 @@ describe('buildOpenApiDocument', () => {
       '/api/basket/items',
       '/api/budget',
       '/api/budget/summary',
+      '/api/health',
       '/api/indices',
       '/api/indices/{id}',
       '/api/market/overview',
@@ -34,6 +35,7 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/watchlist'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/metrics/notifications'].get?.security, [{ metricsToken: [] }]);
     assert.deepEqual(doc.paths['/api/notifications/suppression-events'].post?.security, [{ webhookSignature: [] }]);
+    assert.match(doc.paths['/api/health'].get?.summary ?? '', /without exposing secrets/i);
     assert.equal(doc.paths['/api/market/overview'].get?.security, undefined);
   });
 });
