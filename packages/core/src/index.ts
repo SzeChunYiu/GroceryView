@@ -497,6 +497,79 @@ export type PriceHistorySummary = {
   latestObservedAt: string;
 };
 
+export type PriceChartSourceType = 'shelf' | 'online' | 'flyer' | 'member' | 'receipt' | 'shelf_photo' | 'manual' | 'estimated';
+
+export type PriceChartLineStyle = 'solid' | 'dashed' | 'dotted';
+
+export type PriceChartMarkerType = 'promotion' | 'member' | 'new_low' | 'receipt_confirmed' | 'source_warning';
+
+export type PriceChartObservation = PriceHistoryPoint & {
+  storeId: string;
+  storeName: string;
+  sourceType: PriceChartSourceType;
+  confidence: number;
+  provenanceLabel?: string;
+  markerType?: PriceChartMarkerType;
+  markerLabel?: string;
+};
+
+export type PriceChartSeriesPoint = {
+  time: string;
+  value: number;
+  confidence: number;
+  provenanceLabel?: string;
+};
+
+export type PriceChartMarker = {
+  time: string;
+  type: PriceChartMarkerType;
+  text: string;
+  color: string;
+  shape: 'circle' | 'arrowUp' | 'arrowDown';
+  position: 'aboveBar' | 'belowBar' | 'inBar';
+  sourceType: PriceChartSourceType;
+  provenanceLabel?: string;
+};
+
+export type PriceChartSeries = {
+  id: string;
+  storeId: string;
+  storeName: string;
+  sourceType: PriceChartSourceType;
+  lineStyle: PriceChartLineStyle;
+  points: PriceChartSeriesPoint[];
+  markers: PriceChartMarker[];
+};
+
+export type PriceChartAdapterInput = {
+  observations: PriceChartObservation[];
+  asOf?: string;
+  rangeDays?: 7 | 30 | 90 | 365;
+  markerLimitPerSeries?: number;
+};
+
+export type PriceChartAdapterResult = {
+  series: PriceChartSeries[];
+  windowStart?: string;
+  windowEnd?: string;
+};
+
+const chartLineStyleWeight: Record<PriceChartLineStyle, number> = {
+  solid: 0,
+  dashed: 1,
+  dotted: 2
+};
+
+export function priceChartLineStyle(input: {
+  sourceType: PriceChartSourceType;
+  confidence: number;
+}): PriceChartLineStyle {
+  const confidence = clamp(input.confidence, 0, 1);
+  if (input.sourceType === 'estimated' || input.sourceType === 'manual' || confidence < 0.5) return 'dotted';
+  if (input.sourceType === 'shelf_photo' || confidence < 0.8) return 'dashed';
+  return 'solid';
+}
+
 export function summarizePriceHistory(points: PriceHistoryPoint[]): PriceHistorySummary {
   if (points.length === 0) {
     throw new Error('At least one price history point is required.');
@@ -517,6 +590,183 @@ export function summarizePriceHistory(points: PriceHistoryPoint[]): PriceHistory
     isNewLow: latest.price < historicalLow,
     observedCount: ordered.length,
     latestObservedAt: latest.observedAt
+  };
+}
+
+function chartMarkersForObservation(observation: PriceChartObservation, isNewLow: boolean): PriceChartMarker[] {
+  const markers: PriceChartMarker[] = [];
+  const sourceMarker = sourceTypeMarker(observation);
+  if (sourceMarker) markers.push(sourceMarker);
+  if (isNewLow) {
+    markers.push({
+      time: observation.observedAt,
+      type: 'new_low',
+      text: 'New low',
+      color: '#0f766e',
+      shape: 'arrowUp',
+      position: 'belowBar',
+      sourceType: observation.sourceType,
+      provenanceLabel: observation.provenanceLabel
+    });
+  }
+  if (clamp(observation.confidence, 0, 1) < 0.5) {
+    markers.push({
+      time: observation.observedAt,
+      type: 'source_warning',
+      text: observation.markerLabel ?? 'Low confidence',
+      color: '#b45309',
+      shape: 'circle',
+      position: 'inBar',
+      sourceType: observation.sourceType,
+      provenanceLabel: observation.provenanceLabel
+    });
+  }
+  if (observation.markerType && !markers.some((marker) => marker.type === observation.markerType)) {
+    markers.push({
+      time: observation.observedAt,
+      type: observation.markerType,
+      text: observation.markerLabel ?? markerText(observation.markerType),
+      color: markerColor(observation.markerType),
+      shape: observation.markerType === 'new_low' ? 'arrowUp' : 'circle',
+      position: observation.markerType === 'new_low' ? 'belowBar' : 'aboveBar',
+      sourceType: observation.sourceType,
+      provenanceLabel: observation.provenanceLabel
+    });
+  }
+  return markers;
+}
+
+function sourceTypeMarker(observation: PriceChartObservation): PriceChartMarker | undefined {
+  if (observation.sourceType === 'flyer') {
+    return {
+      time: observation.observedAt,
+      type: 'promotion',
+      text: observation.markerLabel ?? 'Flyer',
+      color: '#2563eb',
+      shape: 'circle',
+      position: 'aboveBar',
+      sourceType: observation.sourceType,
+      provenanceLabel: observation.provenanceLabel
+    };
+  }
+  if (observation.sourceType === 'member') {
+    return {
+      time: observation.observedAt,
+      type: 'member',
+      text: observation.markerLabel ?? 'Member',
+      color: '#7c3aed',
+      shape: 'circle',
+      position: 'aboveBar',
+      sourceType: observation.sourceType,
+      provenanceLabel: observation.provenanceLabel
+    };
+  }
+  if (observation.sourceType === 'receipt') {
+    return {
+      time: observation.observedAt,
+      type: 'receipt_confirmed',
+      text: observation.markerLabel ?? 'Receipt',
+      color: '#16a34a',
+      shape: 'circle',
+      position: 'inBar',
+      sourceType: observation.sourceType,
+      provenanceLabel: observation.provenanceLabel
+    };
+  }
+  return undefined;
+}
+
+function markerText(type: PriceChartMarkerType): string {
+  if (type === 'promotion') return 'Promo';
+  if (type === 'member') return 'Member';
+  if (type === 'new_low') return 'New low';
+  if (type === 'receipt_confirmed') return 'Receipt';
+  return 'Source';
+}
+
+function markerColor(type: PriceChartMarkerType): string {
+  if (type === 'promotion') return '#2563eb';
+  if (type === 'member') return '#7c3aed';
+  if (type === 'new_low') return '#0f766e';
+  if (type === 'receipt_confirmed') return '#16a34a';
+  return '#b45309';
+}
+
+function markerPriority(type: PriceChartMarkerType): number {
+  if (type === 'source_warning') return 0;
+  if (type === 'new_low') return 1;
+  if (type === 'promotion' || type === 'member') return 2;
+  return 3;
+}
+
+function limitChartMarkers(markers: PriceChartMarker[], limit: number): PriceChartMarker[] {
+  if (markers.length <= limit) return markers;
+  return [...markers]
+    .sort((a, b) => {
+      const priority = markerPriority(a.type) - markerPriority(b.type);
+      if (priority !== 0) return priority;
+      return Date.parse(b.time) - Date.parse(a.time);
+    })
+    .slice(0, limit)
+    .sort((a, b) => Date.parse(a.time) - Date.parse(b.time));
+}
+
+export function buildPriceChartSeries(input: PriceChartAdapterInput): PriceChartAdapterResult {
+  const asOfMs = input.asOf ? Date.parse(input.asOf) : undefined;
+  if (input.asOf && Number.isNaN(asOfMs)) throw new Error('asOf must be an ISO date.');
+  const windowStartMs = asOfMs !== undefined && input.rangeDays !== undefined
+    ? asOfMs - input.rangeDays * 24 * 60 * 60 * 1000
+    : undefined;
+  const markerLimitPerSeries = input.markerLimitPerSeries ?? 12;
+  if (markerLimitPerSeries < 0) throw new Error('markerLimitPerSeries must be non-negative.');
+
+  const grouped = new Map<string, PriceChartObservation[]>();
+  for (const observation of input.observations) {
+    const observedAtMs = Date.parse(observation.observedAt);
+    if (Number.isNaN(observedAtMs)) throw new Error('Price chart observations must use ISO observedAt dates.');
+    if (observation.price < 0) throw new Error('Price chart observations must use non-negative prices.');
+    if (windowStartMs !== undefined && observedAtMs < windowStartMs) continue;
+    if (asOfMs !== undefined && observedAtMs > asOfMs) continue;
+
+    const key = `${observation.storeId}\u0000${observation.sourceType}`;
+    grouped.set(key, [...(grouped.get(key) ?? []), observation]);
+  }
+
+  const series = [...grouped.entries()].map(([key, observations]) => {
+    const [storeId, sourceType] = key.split('\u0000') as [string, PriceChartSourceType];
+    const sorted = [...observations].sort((a, b) => Date.parse(a.observedAt) - Date.parse(b.observedAt));
+    const lowPrice = Math.min(...sorted.map((observation) => observation.price));
+    const lineStyle = sorted
+      .map((observation) => priceChartLineStyle(observation))
+      .reduce((worst, candidate) =>
+        chartLineStyleWeight[candidate] > chartLineStyleWeight[worst] ? candidate : worst
+      );
+    const rawMarkers = sorted.flatMap((observation) => chartMarkersForObservation(observation, observation.price === lowPrice));
+
+    return {
+      id: `${storeId}:${sourceType}`,
+      storeId,
+      storeName: sorted[0].storeName,
+      sourceType,
+      lineStyle,
+      points: sorted.map((observation) => ({
+        time: observation.observedAt,
+        value: roundMoney(observation.price),
+        confidence: clamp(observation.confidence, 0, 1),
+        provenanceLabel: observation.provenanceLabel
+      })),
+      markers: limitChartMarkers(rawMarkers, markerLimitPerSeries)
+    } satisfies PriceChartSeries;
+  }).sort((a, b) => {
+    const storeCompare = a.storeName.localeCompare(b.storeName);
+    if (storeCompare !== 0) return storeCompare;
+    return a.sourceType.localeCompare(b.sourceType);
+  });
+
+  return {
+    series,
+    windowStart: windowStartMs === undefined ? undefined : new Date(windowStartMs).toISOString(),
+    windowEnd: asOfMs === undefined ? undefined : new Date(asOfMs).toISOString()
   };
 }
 
