@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateBrandTierIndices, calculateFixedBasketIndex } from '../index.js';
+import { buildStorePriceLevelProfile, calculateFixedBasketIndex } from '../index.js';
 
 describe('calculateFixedBasketIndex', () => {
   it('normalizes a fixed grocery basket against a base date', () => {
@@ -20,32 +20,36 @@ describe('calculateFixedBasketIndex', () => {
     assert.equal(index.confidence, 'medium');
   });
 
-  it('separates brand-tier indices and summarizes private-label savings', () => {
-    const summary = calculateBrandTierIndices([
-      { brandTier: 'national', category: 'Coffee', baseUnitPrice: 100, currentUnitPrice: 110 },
-      { brandTier: 'national', category: 'Pasta', baseUnitPrice: 100, currentUnitPrice: 105 },
-      { brandTier: 'national', category: 'Cleaning', baseUnitPrice: 100, currentUnitPrice: 120 },
-      { brandTier: 'premium', category: 'Coffee', baseUnitPrice: 100, currentUnitPrice: 135 },
-      { brandTier: 'premium', category: 'Pasta', baseUnitPrice: 100, currentUnitPrice: 130 },
-      { brandTier: 'premium', category: 'Cleaning', baseUnitPrice: 100, currentUnitPrice: 140 },
-      { brandTier: 'budget_private_label', category: 'Coffee', baseUnitPrice: 100, currentUnitPrice: 78 },
-      { brandTier: 'budget_private_label', category: 'Pasta', baseUnitPrice: 100, currentUnitPrice: 80 },
-      { brandTier: 'budget_private_label', category: 'Cleaning', baseUnitPrice: 100, currentUnitPrice: 82 },
-      { brandTier: 'standard_private_label', category: 'Coffee', baseUnitPrice: 100, currentUnitPrice: 90 },
-      { brandTier: 'standard_private_label', category: 'Pasta', baseUnitPrice: 100, currentUnitPrice: 88 },
-      { brandTier: 'standard_private_label', category: 'Cleaning', baseUnitPrice: 100, currentUnitPrice: 92 }
-    ]);
+  it('summarizes a store price-level profile against Stockholm, chain, and favorite stores', () => {
+    const profile = buildStorePriceLevelProfile({
+      storeId: 'willys-odenplan',
+      favoriteStoreIds: ['willys-odenplan', 'lidl-sveavagen', 'coop-odenplan'],
+      observations: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', chainId: 'willys', category: 'Coffee', basketUnitPrice: 88, stockholmMedianUnitPrice: 100, isDeal: true, watchlistMatch: true },
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', chainId: 'willys', category: 'Frozen', basketUnitPrice: 92, stockholmMedianUnitPrice: 100, isDeal: true },
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', chainId: 'willys', category: 'Fresh vegetables', basketUnitPrice: 104, stockholmMedianUnitPrice: 100, watchlistMatch: true },
+        { storeId: 'willys-city', storeName: 'Willys City', chainId: 'willys', category: 'Coffee', basketUnitPrice: 94, stockholmMedianUnitPrice: 100 },
+        { storeId: 'willys-city', storeName: 'Willys City', chainId: 'willys', category: 'Frozen', basketUnitPrice: 95, stockholmMedianUnitPrice: 100 },
+        { storeId: 'willys-city', storeName: 'Willys City', chainId: 'willys', category: 'Fresh vegetables', basketUnitPrice: 110, stockholmMedianUnitPrice: 100 },
+        { storeId: 'willys-sickla', storeName: 'Willys Sickla', chainId: 'willys', category: 'Coffee', basketUnitPrice: 82, stockholmMedianUnitPrice: 100 },
+        { storeId: 'willys-sickla', storeName: 'Willys Sickla', chainId: 'willys', category: 'Frozen', basketUnitPrice: 89, stockholmMedianUnitPrice: 100 },
+        { storeId: 'willys-sickla', storeName: 'Willys Sickla', chainId: 'willys', category: 'Fresh vegetables', basketUnitPrice: 98, stockholmMedianUnitPrice: 100 },
+        { storeId: 'lidl-sveavagen', storeName: 'Lidl Sveavägen', chainId: 'lidl', category: 'Coffee', basketUnitPrice: 86, stockholmMedianUnitPrice: 100 },
+        { storeId: 'lidl-sveavagen', storeName: 'Lidl Sveavägen', chainId: 'lidl', category: 'Frozen', basketUnitPrice: 91, stockholmMedianUnitPrice: 100 },
+        { storeId: 'lidl-sveavagen', storeName: 'Lidl Sveavägen', chainId: 'lidl', category: 'Fresh vegetables', basketUnitPrice: 96, stockholmMedianUnitPrice: 100 },
+        { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', chainId: 'coop', category: 'Coffee', basketUnitPrice: 101, stockholmMedianUnitPrice: 100 },
+        { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', chainId: 'coop', category: 'Frozen', basketUnitPrice: 104, stockholmMedianUnitPrice: 100 },
+        { storeId: 'coop-odenplan', storeName: 'Coop Odenplan', chainId: 'coop', category: 'Fresh vegetables', basketUnitPrice: 108, stockholmMedianUnitPrice: 100 }
+      ]
+    });
 
-    assert.deepEqual(summary.indices.map((index) => index.label), [
-      'Budget Private Label Index',
-      'Standard Private Label Index',
-      'National Brand Index',
-      'Premium Brand Index'
-    ]);
-    assert.equal(summary.indices[0].value, 80);
-    assert.equal(summary.indices[0].categoryCount, 3);
-    assert.equal(summary.privateLabelSavingsPercent, 23.71);
-    assert.deepEqual(summary.highestSavingsCategories, ['Cleaning', 'Coffee', 'Pasta']);
-    assert.equal(summary.premiumGapPercent, 58.82);
+    assert.equal(profile.storeName, 'Willys Odenplan');
+    assert.equal(profile.overallVsStockholmPercent, -5.33);
+    assert.equal(profile.sameChainPercentile, 67);
+    assert.equal(profile.favoriteStorePercentile, 67);
+    assert.deepEqual(profile.bestCategories, ['Coffee', 'Frozen', 'Fresh vegetables']);
+    assert.deepEqual(profile.worstCategories, ['Fresh vegetables', 'Frozen', 'Coffee']);
+    assert.equal(profile.dealDensity, 'high');
+    assert.equal(profile.watchlistMatchCount, 2);
   });
 });
