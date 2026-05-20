@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateDealScore, calculateHistoricalDealScore, rankDealOpportunities, scoreBand } from '../index.js';
+import { calculateDealScore, explainDealScore, scoreBand } from '../index.js';
 
 describe('calculateDealScore', () => {
   it('uses the MVP weighted formula and never accepts sponsored boosts', () => {
@@ -28,6 +28,42 @@ describe('calculateDealScore', () => {
 
     assert.equal(score, 22);
     assert.deepEqual(scoreBand(score), { label: 'Not a real deal', verdict: 'Wait' });
+  });
+
+  it('explains the weighted factors behind a buy or wait verdict', () => {
+    const explanation = explainDealScore({
+      currentCityPercentile: 8,
+      knownPromoHistoryPercentile: 12,
+      equivalentUnitPricePercentile: 18,
+      discountDepthPercent: 25,
+      sourceConfidence: 0.9,
+      sponsoredPlacement: true
+    });
+
+    assert.equal(
+      explanation.score,
+      calculateDealScore({
+        currentCityPercentile: 8,
+        knownPromoHistoryPercentile: 12,
+        equivalentUnitPricePercentile: 18,
+        discountDepthPercent: 25,
+        sourceConfidence: 0.9,
+        sponsoredPlacement: true
+      })
+    );
+    assert.deepEqual(explanation.band, { label: 'Good deal', verdict: 'Buy' });
+    assert.equal(explanation.sponsoredPlacementIgnored, true);
+    assert.match(explanation.summary, /city price percentile contributes most/i);
+    assert.deepEqual(
+      explanation.factors.map((factor) => [factor.key, factor.weight, factor.contribution]),
+      [
+        ['city_price', 0.4, 37],
+        ['promo_history', 0.25, 22],
+        ['equivalent_unit_price', 0.2, 16],
+        ['discount_depth', 0.1, 3],
+        ['source_confidence', 0.05, 5]
+      ]
+    );
   });
 });
 

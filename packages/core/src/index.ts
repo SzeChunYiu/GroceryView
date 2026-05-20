@@ -12,51 +12,21 @@ export type ScoreBand = {
   verdict: 'Buy now' | 'Buy' | 'Compare' | 'Normal' | 'Wait';
 };
 
-export type DealScoreSourceType = 'shelf' | 'online' | 'flyer' | 'member' | 'receipt' | 'shelf_photo' | 'manual' | 'estimated';
-
-export type HistoricalDealScorePoint = {
-  observedAt: string;
-  unitPrice: number;
-  sourceType: DealScoreSourceType;
-  confidence: number;
+export type DealScoreFactor = {
+  key: 'city_price' | 'promo_history' | 'equivalent_unit_price' | 'discount_depth' | 'source_confidence';
+  label: string;
+  rawValue: number;
+  normalizedStrength: number;
+  weight: number;
+  contribution: number;
 };
 
-export type DealScoreReasonCode =
-  | 'low_percentile'
-  | 'below_median'
-  | 'below_30_day_low'
-  | 'near_30_day_low'
-  | 'limited_history'
-  | 'low_confidence'
-  | 'mixed_source_types'
-  | 'claimed_regular_price_unverified'
-  | 'distance_excluded'
-  | 'perishable_short_history'
-  | 'source_type_cap';
-
-export type HistoricalDealScoreInput = {
-  currentUnitPrice: number;
-  asOf: string;
-  history: HistoricalDealScorePoint[];
-  sourceType: DealScoreSourceType;
-  sourceConfidence: number;
-  claimedRegularUnitPrice?: number;
-  distanceKm?: number;
-  perishableShortLife?: boolean;
-};
-
-export type HistoricalDealScore = {
+export type DealScoreExplanation = {
   score: number;
   band: ScoreBand;
-  currentPercentile: number;
-  medianUnitPrice: number;
-  medianDiscountPercent: number;
-  observedThirtyDayLow?: number;
-  thirtyDayLowDiscountPercent?: number;
-  observationCount: number;
-  cappedAt?: number;
-  reasons: DealScoreReasonCode[];
-  warnings: DealScoreReasonCode[];
+  factors: DealScoreFactor[];
+  sponsoredPlacementIgnored: boolean;
+  summary: string;
 };
 
 const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
@@ -85,6 +55,61 @@ export function calculateDealScore(input: DealScoreInput): number {
       discountStrength * 0.1 +
       confidenceStrength * 0.05
   );
+}
+
+export function explainDealScore(input: DealScoreInput): DealScoreExplanation {
+  const factorInputs: Array<Omit<DealScoreFactor, 'contribution'>> = [
+    {
+      key: 'city_price',
+      label: 'City price percentile',
+      rawValue: input.currentCityPercentile,
+      normalizedStrength: 100 - clamp(input.currentCityPercentile, 0, 100),
+      weight: 0.4
+    },
+    {
+      key: 'promo_history',
+      label: 'Known promotion history',
+      rawValue: input.knownPromoHistoryPercentile,
+      normalizedStrength: 100 - clamp(input.knownPromoHistoryPercentile, 0, 100),
+      weight: 0.25
+    },
+    {
+      key: 'equivalent_unit_price',
+      label: 'Equivalent unit price',
+      rawValue: input.equivalentUnitPricePercentile,
+      normalizedStrength: 100 - clamp(input.equivalentUnitPricePercentile, 0, 100),
+      weight: 0.2
+    },
+    {
+      key: 'discount_depth',
+      label: 'Discount depth',
+      rawValue: input.discountDepthPercent,
+      normalizedStrength: clamp(input.discountDepthPercent, 0, 100),
+      weight: 0.1
+    },
+    {
+      key: 'source_confidence',
+      label: 'Source confidence',
+      rawValue: input.sourceConfidence,
+      normalizedStrength: clamp(input.sourceConfidence, 0, 1) * 100,
+      weight: 0.05
+    }
+  ];
+  const factors = factorInputs.map((factor) => ({
+    ...factor,
+    contribution: Math.round(factor.normalizedStrength * factor.weight)
+  }));
+  const score = Math.round(factors.reduce((sum, factor) => sum + factor.normalizedStrength * factor.weight, 0));
+  const band = scoreBand(score);
+  const strongestFactor = [...factors].sort((a, b) => b.contribution - a.contribution)[0]!;
+
+  return {
+    score,
+    band,
+    factors,
+    sponsoredPlacementIgnored: input.sponsoredPlacement === true,
+    summary: `${band.verdict}: ${strongestFactor.label.toLowerCase()} contributes most to this ${score}/100 deal score.`
+  };
 }
 
 export function scoreBand(score: number): ScoreBand {
