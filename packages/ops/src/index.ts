@@ -232,6 +232,59 @@ export function buildDeploymentSmokeEvidenceReport(input: DeploymentSmokeEvidenc
   };
 }
 
+export type HostedSmokeCommandPlanInput = {
+  serverUrl: string;
+  webUrl?: string;
+  includePostgresReadiness: boolean;
+  metricsTokenEnvVar?: string;
+  timeoutSeconds?: number;
+};
+
+export type HostedSmokeCommandPlan = {
+  commands: string[];
+  requiredSecrets: string[];
+  evidence: string[];
+};
+
+function trimTrailingSlash(url: string): string {
+  return url.replace(/\/+$/, '');
+}
+
+export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput): HostedSmokeCommandPlan {
+  const timeout = input.timeoutSeconds ?? 15;
+  const serverUrl = trimTrailingSlash(input.serverUrl);
+  const commands = [
+    [
+      `GROCERYVIEW_SERVER_URL=${serverUrl}`,
+      input.webUrl ? `GROCERYVIEW_WEB_URL=${trimTrailingSlash(input.webUrl)}` : undefined,
+      `HTTP_SMOKE_TIMEOUT_SECONDS=${timeout}`,
+      'infra/scripts/smoke-hosted-http.sh'
+    ]
+      .filter(Boolean)
+      .join(' ')
+  ];
+  const evidence = ['hosted_api_health'];
+  const requiredSecrets: string[] = [];
+
+  if (input.webUrl) evidence.push('hosted_web');
+
+  if (input.includePostgresReadiness) {
+    const metricsTokenEnvVar = input.metricsTokenEnvVar ?? 'METRICS_TOKEN';
+    requiredSecrets.push(metricsTokenEnvVar);
+    commands.push(
+      [
+        `GROCERYVIEW_SERVER_URL=${serverUrl}`,
+        `METRICS_TOKEN=$${metricsTokenEnvVar}`,
+        `READINESS_TIMEOUT_SECONDS=${timeout}`,
+        'infra/scripts/smoke-hosted-readiness.sh'
+      ].join(' ')
+    );
+    evidence.push('hosted_postgres_readiness');
+  }
+
+  return { commands, requiredSecrets, evidence };
+}
+
 export function buildRollbackPlan(input: RollbackPlanInput): RollbackPlan {
   const steps = [`Disable new traffic to release ${input.currentRelease}.`, `Restore application artifact ${input.previousRelease}.`];
   let requiresManualDatabaseRecovery = false;
