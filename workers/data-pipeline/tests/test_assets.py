@@ -333,6 +333,7 @@ def test_open_prices_schedule_health_plan_blocks_until_worker_schedules_are_obse
         "lastRunAgeHours",
         "nextTickAt",
     ]
+    assert plan.evidence_artifacts == ["/tmp/groceryview-open-prices-schedule-health.json"]
     assert plan.to_dict()["demo"] is False
 
     ready = build_open_prices_schedule_health_plan(
@@ -355,6 +356,7 @@ def test_open_prices_schedule_health_plan_summary_counts_schedule_requirements()
         "source_asset_count": 2,
         "schedule_count": 2,
         "evidence_field_count": 6,
+        "evidence_artifact_count": 1,
         "demo": False,
     }
 
