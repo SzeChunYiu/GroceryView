@@ -28,6 +28,7 @@ describe('buildStaticPages', () => {
         'market/index.html',
         'meal-plans/index.html',
         'notifications/inbox/index.html',
+        'notifications/preferences/index.html',
         'nutrition/allergens/index.html',
         'nutrition/labels/index.html',
         'pantry/index.html',
@@ -303,6 +304,13 @@ describe('buildStaticPages', () => {
       assert.match(notificationInbox, /groceryview_notification_worker_events_total/);
       assert.match(notificationInbox, /Connected notification inbox loaded/);
       assert.match(notificationInbox, /Connected notification metrics loaded/);
+
+      const notificationPreferences = await readFile(join(root, 'notifications/preferences/index.html'), 'utf8');
+      assert.match(notificationPreferences, /Notification preferences/);
+      assert.match(notificationPreferences, /Preference rules/);
+      assert.match(notificationPreferences, /Target-price alert/);
+      assert.match(notificationPreferences, /New channels remain off until the household explicitly enables them/);
+      assert.match(notificationPreferences, /Invalid push tokens stay disabled until a fresh device registration arrives/);
 
       const nutritionAllergens = await readFile(join(root, 'nutrition/allergens/index.html'), 'utf8');
       assert.match(nutritionAllergens, /Nutrition and allergen review/);
