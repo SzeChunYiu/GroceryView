@@ -45,7 +45,9 @@ export type MobileViewModel = {
   };
 };
 
-export function createMobileViewModel(userId: string, api = createGroceryViewApi()): MobileViewModel {
+type MobileApi = ReturnType<typeof createGroceryViewApi>;
+
+export function createMobileViewModel(userId: string, api: MobileApi = createGroceryViewApi()): MobileViewModel {
   const market = api.getMarketOverview();
   return {
     userId,
@@ -61,6 +63,116 @@ export function createMobileViewModel(userId: string, api = createGroceryViewApi
     },
     scan: {
       supportedModes: ['barcode', 'receipt']
+    }
+  };
+}
+
+export type MobileDiscoveryViewModel = {
+  userId: string;
+  query: string;
+  favoriteStores: Array<{ id: string; name: string }>;
+  searchResults: Array<{
+    id: string;
+    ticker: string;
+    name: string;
+    category: string;
+    dealScore: number;
+    bestPrice: number | null;
+    primaryAction: 'open_product' | 'scan_to_match';
+  }>;
+  selectedProduct: {
+    id: string;
+    ticker: string;
+    name: string;
+    category: string;
+    verdict: string;
+    dealScore: number;
+    currentPrices: Array<{ storeId: string; storeName: string; price: number }>;
+    priceHistory: Array<{ date: string; price: number; lineStyle: 'solid' | 'dotted' }>;
+    actions: Array<'add_to_weekly_basket' | 'add_to_watchlist' | 'compare_stores' | 'scan_receipt_to_verify'>;
+  } | null;
+  weeklyBasket: {
+    itemCount: number;
+    cheapestTotal: number;
+    bestSingleStore: { storeId: string; storeName: string; total: number } | null;
+    savingsVsBestSingleStore: number;
+    missingProductIds: string[];
+  };
+  budget: {
+    weeklyBudget: number;
+    estimatedBasketTotal: number;
+    weeklyRemainingAfterEstimate: number;
+    weeklyStatus: 'under' | 'over';
+  };
+  watchlist: {
+    itemCount: number;
+    alertCount: number;
+    alertTypes: string[];
+  };
+};
+
+export function createMobileDiscoveryViewModel(
+  input: { userId: string; query: string; selectedProductId?: string },
+  api: MobileApi = createGroceryViewApi()
+): MobileDiscoveryViewModel {
+  const favoriteStores = api.getFavoriteStores(input.userId).map((store) => ({ id: store.id, name: store.name }));
+  const basket = api.getBasket(input.userId);
+  const basketComparison = api.compareBasket(input.userId);
+  const budget = api.getBudgetSummary(input.userId);
+  const watchlist = api.getWatchlist(input.userId);
+  const bestSingleStore = basketComparison.singleStoreOptions[0] ?? null;
+  const selectedProduct = input.selectedProductId ? api.getProduct(input.selectedProductId) : null;
+
+  return {
+    userId: input.userId,
+    query: input.query,
+    favoriteStores,
+    searchResults: api.searchProducts(input.query).map((result) => {
+      const product = api.getProduct(result.id);
+      return {
+        id: result.id,
+        ticker: result.ticker,
+        name: result.name,
+        category: result.category,
+        dealScore: product?.dealScore ?? 0,
+        bestPrice: product?.currentPrices[0]?.price ?? null,
+        primaryAction: product ? 'open_product' : 'scan_to_match'
+      };
+    }),
+    selectedProduct: selectedProduct
+      ? {
+          id: selectedProduct.id,
+          ticker: selectedProduct.ticker,
+          name: selectedProduct.name,
+          category: selectedProduct.category,
+          verdict: selectedProduct.verdict,
+          dealScore: selectedProduct.dealScore,
+          currentPrices: api.getProductPrices(selectedProduct.id),
+          priceHistory: api.getProductHistory(selectedProduct.id).map((point) => ({
+            date: point.date,
+            price: point.price,
+            lineStyle: point.verified ? 'solid' : 'dotted'
+          })),
+          actions: ['add_to_weekly_basket', 'add_to_watchlist', 'compare_stores', 'scan_receipt_to_verify']
+        }
+      : null,
+    weeklyBasket: {
+      itemCount: basket.items.reduce((total, item) => total + item.quantity, 0),
+      cheapestTotal: basketComparison.cheapestByProduct.total,
+      bestSingleStore,
+      savingsVsBestSingleStore: bestSingleStore ? Math.round((bestSingleStore.total - basketComparison.cheapestByProduct.total) * 100) / 100 : 0,
+      missingProductIds: basketComparison.missingProductIds
+    },
+    budget: {
+      weeklyBudget: budget.weeklyBudget,
+      estimatedBasketTotal: budget.estimatedBasketTotal,
+      weeklyRemainingAfterEstimate: budget.weeklyRemainingAfterEstimate,
+      weeklyStatus: budget.weeklyStatus
+    },
+    watchlist: {
+      itemCount: watchlist.items.length,
+      alertCount: watchlist.alerts.length,
+      alertTypes: [...new Set(watchlist.alerts.map((alert) => alert.type))].sort()
     }
   };
 }
@@ -81,7 +193,7 @@ export type ScanResult = {
   actions: string[];
 };
 
-export function buildScanResult(request: ScanRequest, api = createGroceryViewApi()): ScanResult {
+export function buildScanResult(request: ScanRequest, api: MobileApi = createGroceryViewApi()): ScanResult {
   if (request.mode === 'receipt') {
     return {
       mode: request.mode,

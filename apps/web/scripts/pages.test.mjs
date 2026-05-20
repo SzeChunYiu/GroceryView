@@ -20,9 +20,11 @@ describe('buildStaticPages', () => {
         'household/index.html',
         'login/index.html',
         'market/index.html',
+        'notifications/inbox/index.html',
         'privacy/index.html',
         'products/coffee/index.html',
         'receipts/review/index.html',
+        'savings/smart-swaps/index.html',
         'scanner/index.html',
         'stores/compare/index.html',
         'stores/willys-odenplan/index.html',
@@ -43,6 +45,13 @@ describe('buildStaticPages', () => {
       assert.match(deals, /Deal Score/);
       assert.match(deals, /Ads excluded from ranking/);
       assert.match(deals, /Estimated rows held back/);
+
+      const smartSwapsPage = await readFile(join(root, 'savings/smart-swaps/index.html'), 'utf8');
+      assert.match(smartSwapsPage, /Smart grocery swaps/);
+      assert.match(smartSwapsPage, /Swap candidates/);
+      assert.match(smartSwapsPage, /Same roast category/);
+      assert.match(smartSwapsPage, /Estimated swap prices cannot reduce forecast spend/);
+      assert.match(smartSwapsPage, /Dietary restrictions outrank savings/);
 
       const store = await readFile(join(root, 'stores/willys-odenplan/index.html'), 'utf8');
       assert.match(store, /Store highlights/);
@@ -86,6 +95,13 @@ describe('buildStaticPages', () => {
       assert.match(watchlist, /Ready for push/);
       assert.match(watchlist, /Held for review/);
       assert.match(watchlist, /Estimated prices cannot trigger household notifications/);
+
+      const notificationInbox = await readFile(join(root, 'notifications/inbox/index.html'), 'utf8');
+      assert.match(notificationInbox, /Grocery alert inbox/);
+      assert.match(notificationInbox, /Alert delivery queue/);
+      assert.match(notificationInbox, /Quiet hours 21:00-07:00/);
+      assert.match(notificationInbox, /Provider token invalid/);
+      assert.match(notificationInbox, /Invalid tokens stop future sends/);
 
       const household = await readFile(join(root, 'household/index.html'), 'utf8');
       assert.match(household, /Shared household basket/);
