@@ -5,6 +5,18 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 INGESTION_DIST="$ROOT_DIR/packages/ingestion/dist/index.js"
 OPEN_PRICES_TIMEOUT_SECONDS="${OPEN_PRICES_TIMEOUT_SECONDS:-15}"
 
+case "$OPEN_PRICES_TIMEOUT_SECONDS" in
+  ''|*[!0-9]*)
+    echo "OPEN_PRICES_TIMEOUT_SECONDS must be a positive integer" >&2
+    exit 2
+    ;;
+esac
+
+if [ "$OPEN_PRICES_TIMEOUT_SECONDS" -lt 1 ]; then
+  echo "OPEN_PRICES_TIMEOUT_SECONDS must be a positive integer" >&2
+  exit 2
+fi
+
 if [ -z "${OPEN_PRICES_USER_AGENT:-}" ]; then
   echo "Open Prices smoke requires OPEN_PRICES_USER_AGENT in the form requested by Open Food Facts docs." >&2
   exit 2
