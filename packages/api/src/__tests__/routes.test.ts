@@ -1,8 +1,74 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createGroceryViewApi } from '../index.js';
+import { assertPriceObservationDto, createGroceryViewApi, validatePriceObservationDto } from '../index.js';
 
 describe('createGroceryViewApi', () => {
+  it('validates canonical price observation provenance DTOs', () => {
+    const baseObservation = {
+      observationId: 'obs-coffee-willys-2026-05-20',
+      productId: 'coffee',
+      retailerId: 'willys',
+      storeId: 'willys-odenplan',
+      priceType: 'online' as const,
+      packagePrice: 49.9,
+      unitPrice: 110.89,
+      currency: 'SEK' as const,
+      quantityBasis: 'kg',
+      observedAt: '2026-05-20T08:00:00.000Z',
+      validFrom: '2026-05-20T00:00:00.000Z',
+      validThrough: '2026-05-26T23:59:59.000Z',
+      availability: 'in_stock' as const,
+      confidence: 0.92,
+      confidenceReasons: ['official_source' as const],
+      sourceSurface: 'store_page' as const,
+      sourceUrl: 'https://example.test/willys/coffee',
+      rawSnapshotRef: {
+        uri: 's3://groceryview-raw/willys/coffee/2026-05-20.html',
+        contentType: 'text/html',
+        retrievedAt: '2026-05-20T08:00:03.000Z',
+        contentDigest: {
+          algorithm: 'sha-256' as const,
+          value: 'sha256-test-digest'
+        }
+      },
+      captureActivityId: 'capture-run-2026-05-20',
+      capturedBy: 'worker:data-pipeline',
+      legalReviewStatus: 'approved' as const,
+      reviewStatus: 'approved' as const
+    };
+
+    assert.deepEqual(validatePriceObservationDto(baseObservation), []);
+    assert.equal(assertPriceObservationDto(baseObservation).priceType, 'online');
+
+    assert.deepEqual(validatePriceObservationDto({
+      ...baseObservation,
+      priceType: undefined,
+      confidence: 1.2,
+      sourceSurface: undefined,
+      rawSnapshotRef: undefined
+    }), [
+      'missing_price_type',
+      'invalid_confidence',
+      'missing_source_surface',
+      'missing_raw_snapshot_ref',
+      'missing_content_digest'
+    ]);
+
+    assert.deepEqual(validatePriceObservationDto({
+      ...baseObservation,
+      priceType: 'member',
+      confidenceReasons: ['member_only']
+    }), ['missing_membership_requirement']);
+
+    assert.throws(() => assertPriceObservationDto({
+      ...baseObservation,
+      rawSnapshotRef: {
+        ...baseObservation.rawSnapshotRef,
+        contentDigest: { algorithm: 'sha-256', value: '' }
+      }
+    }), /missing_content_digest/);
+  });
+
   it('serves market overview, product search, and product details', () => {
     const api = createGroceryViewApi();
 

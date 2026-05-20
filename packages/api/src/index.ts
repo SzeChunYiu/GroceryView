@@ -56,6 +56,151 @@ export type ProductDetail = SearchableProduct & {
   };
 };
 
+export type CanonicalPriceType =
+  | 'online'
+  | 'flyer'
+  | 'member'
+  | 'in_store'
+  | 'receipt'
+  | 'shelf_photo'
+  | 'manual'
+  | 'estimated';
+
+export type PriceAvailability = 'in_stock' | 'out_of_stock' | 'limited' | 'unknown';
+
+export type PriceSourceSurface =
+  | 'store_page'
+  | 'offer_page'
+  | 'flyer'
+  | 'receipt'
+  | 'shelf_photo'
+  | 'manual_form'
+  | 'official_index'
+  | 'fixture'
+  | 'estimate';
+
+export type LegalReviewStatus = 'approved' | 'pending' | 'rejected' | 'stub_only';
+
+export type PriceReviewStatus = 'pending' | 'approved' | 'rejected' | 'needs_human_review';
+
+export type PriceConfidenceReason =
+  | 'official_source'
+  | 'receipt_confirmed'
+  | 'ocr_low_confidence'
+  | 'member_only'
+  | 'stale_snapshot'
+  | 'missing_validity_window'
+  | 'estimated_price'
+  | 'requires_human_review'
+  | 'fixture_backed'
+  | 'manual_entry';
+
+export type ContentDigest = {
+  algorithm: 'sha-256' | 'sha-384' | 'sha-512';
+  value: string;
+};
+
+export type RawSnapshotRef = {
+  uri: string;
+  contentType?: string;
+  retrievedAt: string;
+  contentDigest: ContentDigest;
+};
+
+export type PriceObservationDto = {
+  observationId: string;
+  productId: string;
+  retailerId: string;
+  storeId?: string;
+  priceType: CanonicalPriceType;
+  packagePrice: number;
+  unitPrice: number;
+  currency: 'SEK';
+  quantityBasis: string;
+  observedAt: string;
+  validFrom?: string;
+  validThrough?: string;
+  availability: PriceAvailability;
+  membershipRequirement?: string;
+  confidence: number;
+  confidenceReasons: PriceConfidenceReason[];
+  sourceSurface: PriceSourceSurface;
+  sourceUrl?: string;
+  rawSnapshotRef: RawSnapshotRef;
+  captureActivityId: string;
+  capturedBy: string;
+  legalReviewStatus: LegalReviewStatus;
+  reviewStatus: PriceReviewStatus;
+};
+
+export type PriceObservationContractIssue =
+  | 'missing_observation_id'
+  | 'missing_product_id'
+  | 'missing_retailer_id'
+  | 'missing_price_type'
+  | 'missing_unit_or_package_price'
+  | 'missing_observed_at'
+  | 'invalid_confidence'
+  | 'missing_confidence_reasons'
+  | 'missing_source_surface'
+  | 'missing_raw_snapshot_ref'
+  | 'missing_content_digest'
+  | 'missing_capture_activity'
+  | 'missing_legal_review_status'
+  | 'missing_membership_requirement'
+  | 'estimated_marked_observed';
+
+const canonicalPriceTypes: CanonicalPriceType[] = [
+  'online',
+  'flyer',
+  'member',
+  'in_store',
+  'receipt',
+  'shelf_photo',
+  'manual',
+  'estimated'
+];
+
+const sourceSurfaces: PriceSourceSurface[] = [
+  'store_page',
+  'offer_page',
+  'flyer',
+  'receipt',
+  'shelf_photo',
+  'manual_form',
+  'official_index',
+  'fixture',
+  'estimate'
+];
+
+const legalReviewStatuses: LegalReviewStatus[] = ['approved', 'pending', 'rejected', 'stub_only'];
+
+export function validatePriceObservationDto(input: Partial<PriceObservationDto>): PriceObservationContractIssue[] {
+  const issues: PriceObservationContractIssue[] = [];
+  if (!input.observationId) issues.push('missing_observation_id');
+  if (!input.productId) issues.push('missing_product_id');
+  if (!input.retailerId) issues.push('missing_retailer_id');
+  if (!input.priceType || !canonicalPriceTypes.includes(input.priceType)) issues.push('missing_price_type');
+  if (typeof input.unitPrice !== 'number' || typeof input.packagePrice !== 'number') issues.push('missing_unit_or_package_price');
+  if (!input.observedAt || Number.isNaN(Date.parse(input.observedAt))) issues.push('missing_observed_at');
+  if (typeof input.confidence !== 'number' || input.confidence < 0 || input.confidence > 1) issues.push('invalid_confidence');
+  if (!input.confidenceReasons || input.confidenceReasons.length === 0) issues.push('missing_confidence_reasons');
+  if (!input.sourceSurface || !sourceSurfaces.includes(input.sourceSurface)) issues.push('missing_source_surface');
+  if (!input.rawSnapshotRef?.uri || !input.rawSnapshotRef.retrievedAt) issues.push('missing_raw_snapshot_ref');
+  if (!input.rawSnapshotRef?.contentDigest?.algorithm || !input.rawSnapshotRef.contentDigest.value) issues.push('missing_content_digest');
+  if (!input.captureActivityId || !input.capturedBy) issues.push('missing_capture_activity');
+  if (!input.legalReviewStatus || !legalReviewStatuses.includes(input.legalReviewStatus)) issues.push('missing_legal_review_status');
+  if (input.priceType === 'member' && !input.membershipRequirement) issues.push('missing_membership_requirement');
+  if (input.priceType === 'estimated' && input.reviewStatus === 'approved') issues.push('estimated_marked_observed');
+  return issues;
+}
+
+export function assertPriceObservationDto(input: Partial<PriceObservationDto>): PriceObservationDto {
+  const issues = validatePriceObservationDto(input);
+  if (issues.length > 0) throw new Error(`Invalid price observation DTO: ${issues.join(', ')}`);
+  return input as PriceObservationDto;
+}
+
 export type DealScoreReport = {
   productId: string;
   score: number;
