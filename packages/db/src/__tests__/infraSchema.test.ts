@@ -97,7 +97,10 @@ describe('infra/db PostgreSQL schema contract', () => {
 
   it('indexes geospatial store lookup and fuzzy product matching', () => {
     assert.match(migration, /stores_position_gix on stores using gist \(position\)/);
+    assert.match(migration, /stores_name_trgm_idx on stores using gin \(name gin_trgm_ops\)/);
+    assert.match(migration, /stores_slug_trgm_idx on stores using gin \(slug gin_trgm_ops\)/);
     assert.match(migration, /products_name_trgm_idx on products using gin \(canonical_name gin_trgm_ops\)/);
+    assert.match(migration, /products_slug_trgm_idx on products using gin \(slug gin_trgm_ops\)/);
     assert.match(migration, /aliases_normalized_trgm_idx on aliases using gin \(normalized_alias gin_trgm_ops\)/);
   });
 

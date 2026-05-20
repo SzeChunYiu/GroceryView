@@ -692,9 +692,13 @@ describe('createPostgresCatalogReader', () => {
     ]);
 
     assert.match(executor.calls[0]!.sql, /from products/);
-    assert.match(executor.calls[0]!.sql, /canonical_name ilike '%' \|\| \$1 \|\| '%'/);
+    assert.match(executor.calls[0]!.sql, /cross join \(select nullif\(trim\(\$1::text\), ''\) as term\) as query/);
+    assert.match(executor.calls[0]!.sql, /products\.barcode = query\.term/);
+    assert.match(executor.calls[0]!.sql, /products\.canonical_name % query\.term/);
+    assert.match(executor.calls[0]!.sql, /aliases\.normalized_alias % lower\(query\.term\)/);
     assert.match(executor.calls[0]!.sql, /category_path @> \$2::text\[\]/);
-    assert.match(executor.calls[0]!.sql, /order by canonical_name, slug/);
+    assert.match(executor.calls[0]!.sql, /when products\.barcode = query\.term then 0/);
+    assert.match(executor.calls[0]!.sql, /similarity\(products\.canonical_name, coalesce\(query\.term, ''\)\)/);
     assert.deepEqual(executor.calls[0]!.params, ['kaffe', ['Pantry', 'Coffee'], 25]);
   });
 
@@ -756,10 +760,13 @@ describe('createPostgresCatalogReader', () => {
 
     assert.equal((await reader.listStores({ search: 'torsplan', chainSlug: 'willys', city: 'Stockholm', limit: 25 })).length, 1);
 
-    assert.match(executor.calls[0]!.sql, /stores\.name ilike '%' \|\| \$1 \|\| '%'/);
+    assert.match(executor.calls[0]!.sql, /cross join \(select nullif\(trim\(\$1::text\), ''\) as query\) as search/);
+    assert.match(executor.calls[0]!.sql, /stores\.name % search\.query/);
+    assert.match(executor.calls[0]!.sql, /chains\.name % search\.query/);
     assert.match(executor.calls[0]!.sql, /chains\.slug = \$2/);
     assert.match(executor.calls[0]!.sql, /stores\.city = \$3/);
-    assert.match(executor.calls[0]!.sql, /order by stores\.city, chains\.name, stores\.name, stores\.slug/);
+    assert.match(executor.calls[0]!.sql, /when lower\(stores\.name\) = lower\(search\.query\) then 0/);
+    assert.match(executor.calls[0]!.sql, /similarity\(stores\.name, coalesce\(search\.query, ''\)\)/);
     assert.deepEqual(executor.calls[0]!.params, ['torsplan', 'willys', 'Stockholm', 25]);
   });
 

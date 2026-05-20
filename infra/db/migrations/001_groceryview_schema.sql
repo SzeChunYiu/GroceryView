@@ -202,8 +202,11 @@ create table if not exists alerts (
 );
 
 create index if not exists stores_position_gix on stores using gist (position);
+create index if not exists stores_name_trgm_idx on stores using gin (name gin_trgm_ops);
+create index if not exists stores_slug_trgm_idx on stores using gin (slug gin_trgm_ops);
 create unique index if not exists products_barcode_unique_idx on products (barcode) where barcode is not null;
 create index if not exists products_name_trgm_idx on products using gin (canonical_name gin_trgm_ops);
+create index if not exists products_slug_trgm_idx on products using gin (slug gin_trgm_ops);
 create index if not exists aliases_normalized_trgm_idx on aliases using gin (normalized_alias gin_trgm_ops);
 create index if not exists observations_product_observed_idx on observations (product_id, observed_at desc);
 create index if not exists observations_store_observed_idx on observations (store_id, observed_at desc);
