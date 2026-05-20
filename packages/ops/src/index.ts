@@ -8,6 +8,15 @@ export type DeploymentReadinessInput = {
   healthChecks: Array<{ name: string; status: GateStatus }>;
   smokeTests: Array<{ name: string; status: GateStatus }>;
   scheduledJobs?: Array<{ name: string; scheduleConfigured: boolean; status: GateStatus }>;
+  changeFreeze?: {
+    active: boolean;
+    reason: string;
+  };
+  activeIncidents?: Array<{
+    id: string;
+    severity: 'sev1' | 'sev2' | 'sev3';
+    status: 'investigating' | 'mitigating' | 'resolved';
+  }>;
   observabilityConfigured: boolean;
 };
 
@@ -43,6 +52,14 @@ export function buildDeploymentReadinessReport(input: DeploymentReadinessInput):
     if (!job.scheduleConfigured) blockers.push(`scheduled_job_schedule_not_configured:${job.name}`);
     if (job.status === 'fail') blockers.push(`scheduled_job_failed:${job.name}`);
     if (job.status === 'not_run') blockers.push(`scheduled_job_not_run:${job.name}`);
+  }
+
+  if (input.changeFreeze?.active) blockers.push(`change_freeze_active:${input.changeFreeze.reason}`);
+
+  for (const incident of input.activeIncidents ?? []) {
+    if ((incident.severity === 'sev1' || incident.severity === 'sev2') && incident.status !== 'resolved') {
+      blockers.push(`active_incident:${incident.severity}:${incident.id}`);
+    }
   }
 
   if (!input.observabilityConfigured) blockers.push('observability_not_configured');

@@ -94,6 +94,32 @@ describe('deployment ops foundation', () => {
     });
   });
 
+  it('blocks production deployment during active change freezes and unresolved major incidents', () => {
+    const report = buildDeploymentReadinessReport({
+      providerSelected: true,
+      requiredSecretsPresent: ['DATABASE_URL', 'SESSION_SECRET', 'PUBLIC_APP_URL'],
+      requiredSecrets: ['DATABASE_URL', 'SESSION_SECRET', 'PUBLIC_APP_URL'],
+      dnsConfigured: true,
+      healthChecks: [{ name: 'api', status: 'pass' }],
+      smokeTests: [{ name: 'health-endpoint', status: 'pass' }],
+      changeFreeze: { active: true, reason: 'payday-traffic-window' },
+      activeIncidents: [
+        { id: 'INC-100', severity: 'sev1', status: 'mitigating' },
+        { id: 'INC-101', severity: 'sev2', status: 'investigating' },
+        { id: 'INC-102', severity: 'sev3', status: 'investigating' },
+        { id: 'INC-103', severity: 'sev1', status: 'resolved' }
+      ],
+      observabilityConfigured: true
+    });
+
+    assert.deepEqual(report.status, 'blocked');
+    assert.deepEqual(report.blockers, [
+      'change_freeze_active:payday-traffic-window',
+      'active_incident:sev1:INC-100',
+      'active_incident:sev2:INC-101'
+    ]);
+  });
+
   it('builds rollback instructions pinned to previous artifact and database state', () => {
     const plan = buildRollbackPlan({
       currentRelease: '2026-05-19.3',
