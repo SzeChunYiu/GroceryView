@@ -47,6 +47,42 @@ export type RetailerSourceRegistryEntry = {
   stubOnly: boolean;
 };
 
+export type RetailerPolicySurface =
+  | 'store_locator'
+  | 'offer'
+  | 'product'
+  | 'search'
+  | 'basket'
+  | 'account'
+  | 'member'
+  | 'app_api';
+
+export type RetailerSourcePolicyLabel =
+  | 'allowed'
+  | 'fixture_review'
+  | 'manual_review'
+  | 'blocked'
+  | 'stub_only';
+
+export type RetailerRobotsPolicyMatrixEntry = {
+  chainId: RetailerChainId;
+  surface: RetailerPolicySurface;
+  policy: RetailerSourcePolicyLabel;
+  canFetch: boolean;
+  robotsUrl: string;
+  robotsTxtStatus: RobotsTxtStatus;
+  checkedAt: string;
+  crawlDelaySeconds?: number;
+  disallowedPathMatches: string[];
+  legalReviewStatus: LegalReviewStatus;
+  requiredActions: string[];
+};
+
+export type RetailerSurfacePolicyInput = {
+  chainId: RetailerChainId;
+  surface: RetailerPolicySurface;
+};
+
 export type StoreLocatorSourceSurface = 'store_locator' | 'store_detail' | 'regional_locator';
 export type StoreIdentifierStatus = 'resolved' | 'fixture_local' | 'unresolved';
 export type StoreLocatorConfidenceReason =
@@ -158,6 +194,136 @@ export type RetailerSourceAccessPlan = {
   reason: string;
   requiredActions: string[];
 };
+
+const ROBOTS_CHECKED_AT = '2026-05-20T00:00:00.000Z';
+
+const RETAILER_ROBOTS_BASE: Record<
+  RetailerChainId,
+  {
+    robotsUrl: string;
+    crawlDelaySeconds?: number;
+    disallowedPaths: Partial<Record<RetailerPolicySurface, string[]>>;
+  }
+> = {
+  ica: {
+    robotsUrl: 'https://www.ica.se/robots.txt',
+    disallowedPaths: {
+      product: ['/templates/ajaxresponse.aspx', '/butiker/*/*/*/*/*'],
+      search: ['/templates/ajaxresponse.aspx']
+    }
+  },
+  willys: {
+    robotsUrl: 'https://www.willys.se/robots.txt',
+    crawlDelaySeconds: 10,
+    disallowedPaths: {
+      search: ['/sok'],
+      basket: ['/varukorg', '/kassa/'],
+      account: ['/mitt-konto/', '/mina-kop/', '/mina-listor/', '/delad-lista/'],
+      member: ['/minavanligastevaror'],
+      product: ['/o/']
+    }
+  },
+  coop: {
+    robotsUrl: 'https://www.coop.se/robots.txt',
+    disallowedPaths: {
+      search: ['/handla/sok/*', '/globalt-sok'],
+      basket: ['/handla/betalning', '/handla/kassa'],
+      account: ['/mitt-coop', '/default-login'],
+      member: ['/mitt-coop']
+    }
+  },
+  hemkop: {
+    robotsUrl: 'https://www.hemkop.se/robots.txt',
+    crawlDelaySeconds: 10,
+    disallowedPaths: {
+      search: ['/*?q=', '/*?sort='],
+      basket: ['/varukorg', '/kassa/'],
+      account: ['/mina-sidor/', '/min-order/'],
+      product: ['/o/', '/dev-info', '/beta/']
+    }
+  },
+  lidl: {
+    robotsUrl: 'https://www.lidl.se/robots.txt',
+    disallowedPaths: {
+      search: ['/q/search?id=*'],
+      product: ['/1*', '/2*', '/3*', '/4*', '/5*', '/6*', '/7*', '/8*', '/9*']
+    }
+  },
+  city_gross: {
+    robotsUrl: 'https://www.citygross.se/robots.txt',
+    disallowedPaths: {
+      search: ['/loop54/'],
+      account: ['/mina-sidor/']
+    }
+  }
+};
+
+const POLICY_SURFACES: RetailerPolicySurface[] = [
+  'store_locator',
+  'offer',
+  'product',
+  'search',
+  'basket',
+  'account',
+  'member',
+  'app_api'
+];
+
+function policyForSurface(surface: RetailerPolicySurface, disallowedPathMatches: string[]): RetailerSourcePolicyLabel {
+  if (surface === 'app_api') return 'stub_only';
+  if (surface === 'basket' || surface === 'account' || surface === 'member') return 'blocked';
+  if (surface === 'search' && disallowedPathMatches.length > 0) return 'blocked';
+  if (surface === 'store_locator' || surface === 'offer') return 'fixture_review';
+  return 'manual_review';
+}
+
+function requiredActionsForPolicy(policy: RetailerSourcePolicyLabel, crawlDelaySeconds: number | undefined): string[] {
+  const actions: string[] = [];
+  if (policy === 'fixture_review') actions.push('fixture_review_required', 'legal_review_approval_required');
+  if (policy === 'manual_review') actions.push('manual_review_required');
+  if (policy === 'blocked') actions.push('source_surface_blocked');
+  if (policy === 'stub_only') actions.push('stub_only_no_network_fetch');
+  if ((policy === 'fixture_review' || policy === 'manual_review' || policy === 'allowed') && crawlDelaySeconds !== undefined) {
+    actions.push(`crawl_delay_${crawlDelaySeconds}s_required`);
+  }
+  return actions;
+}
+
+function buildRetailerRobotsPolicyMatrix(): RetailerRobotsPolicyMatrixEntry[] {
+  return (Object.keys(RETAILER_ROBOTS_BASE) as RetailerChainId[]).flatMap((chainId) => {
+    const base = RETAILER_ROBOTS_BASE[chainId];
+    return POLICY_SURFACES.map((surface) => {
+      const disallowedPathMatches = base.disallowedPaths[surface] ?? [];
+      const policy = policyForSurface(surface, disallowedPathMatches);
+      const legalReviewStatus: LegalReviewStatus = policy === 'allowed' ? 'approved' : policy === 'blocked' ? 'rejected' : 'pending';
+      return {
+        chainId,
+        surface,
+        policy,
+        canFetch: policy === 'allowed',
+        robotsUrl: base.robotsUrl,
+        robotsTxtStatus: disallowedPathMatches.length > 0 ? 'disallow' : 'allow',
+        checkedAt: ROBOTS_CHECKED_AT,
+        crawlDelaySeconds: base.crawlDelaySeconds,
+        disallowedPathMatches,
+        legalReviewStatus,
+        requiredActions: requiredActionsForPolicy(policy, base.crawlDelaySeconds)
+      };
+    });
+  });
+}
+
+export const retailerRobotsPolicyMatrix: RetailerRobotsPolicyMatrixEntry[] = buildRetailerRobotsPolicyMatrix();
+
+export function planRetailerSurfacePolicy(input: RetailerSurfacePolicyInput): RetailerRobotsPolicyMatrixEntry {
+  const entry = retailerRobotsPolicyMatrix.find((candidate) => candidate.chainId === input.chainId && candidate.surface === input.surface);
+  if (!entry) throw new Error(`No retailer source policy for ${input.chainId}:${input.surface}.`);
+  return {
+    ...entry,
+    disallowedPathMatches: [...entry.disallowedPathMatches],
+    requiredActions: [...entry.requiredActions]
+  };
+}
 
 export type RetailerConnectorHealthStatus = 'pass' | 'fail' | 'not_run';
 
