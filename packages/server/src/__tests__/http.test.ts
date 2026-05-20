@@ -154,6 +154,27 @@ describe('createHttpHandler', () => {
       ]
     });
 
+
+
+    const terminal = await handle(new Request('http://localhost/api/products/coffee/terminal?asOf=2026-05-19T00:00:00.000Z'));
+    assert.equal(terminal.status, 200);
+    const terminalBody = await json(terminal) as {
+      quote: { bestPrice: number; range52Week: { low: number; high: number }; evidenceVolume: { currentPrices: number } };
+      distributions: Array<{ label: string; median: number; currentPercentile: number; customerRead: string }>;
+      chart: { series: Array<{ id: string; points: Array<{ value: number }> }> };
+      historySummary: { isNewLow: boolean };
+    };
+    assert.equal(terminalBody.quote.bestPrice, 49.9);
+    assert.deepEqual(terminalBody.quote.range52Week, { low: 49.9, high: 69.9 });
+    assert.equal(terminalBody.quote.evidenceVolume.currentPrices, 3);
+    assert.deepEqual(terminalBody.distributions.map((distribution) => distribution.label), ['Whole Stockholm', 'Odenplan local area']);
+    assert.equal(terminalBody.distributions[0].median, 59.9);
+    assert.equal(terminalBody.distributions[0].currentPercentile, 8);
+    assert.match(terminalBody.distributions[0].customerRead, /cheaper than 92%/);
+    assert.equal(terminalBody.chart.series[0].id, 'willys-odenplan:shelf');
+    assert.deepEqual(terminalBody.chart.series[0].points.map((point) => point.value), [69.9, 59.9, 49.9]);
+    assert.equal(terminalBody.historySummary.isNewLow, true);
+
     const equivalents = await handle(new Request('http://localhost/api/products/milk/equivalents'));
     assert.equal(equivalents.status, 200);
     assert.deepEqual(await json(equivalents), [
@@ -225,6 +246,10 @@ describe('createHttpHandler', () => {
     const history = await handle(new Request('http://localhost/api/products/missing-product/history'));
     assert.equal(history.status, 404);
     assert.deepEqual(await json(history), { error: 'Product not found.' });
+
+    const terminal = await handle(new Request('http://localhost/api/products/missing-product/terminal'));
+    assert.equal(terminal.status, 404);
+    assert.deepEqual(await json(terminal), { error: 'Product not found.' });
 
     const dealScore = await handle(new Request('http://localhost/api/products/missing-product/deal-score'));
     assert.equal(dealScore.status, 404);

@@ -1,4 +1,5 @@
 import {
+  buildPriceChartSeries,
   buildWatchlistAlerts,
   calculateDealScore,
   calculateFixedBasketIndex,
@@ -7,9 +8,13 @@ import {
   scoreBand,
   searchProducts,
   summarizeBudget,
+  summarizePriceHistory,
   summarizeHousehold,
   type BasketComparisonResult,
   type BudgetSummary,
+  type PriceChartAdapterResult,
+  type PriceChartObservation,
+  type PriceHistorySummary,
   type HouseholdBasketItem,
   type HouseholdMember,
   type HouseholdSnapshot,
@@ -93,6 +98,47 @@ export type PriceFreshnessReport = {
   summary: Record<PriceFreshnessStatus, number>;
   products: ProductPriceFreshness[];
   backfillProductIds: string[];
+};
+
+export type ProductPriceDistributionScope = 'stockholm' | 'local_area';
+
+export type ProductPriceDistribution = {
+  scope: ProductPriceDistributionScope;
+  label: string;
+  sampleSize: number;
+  currentPrice: number;
+  currentPercentile: number;
+  cheaperThanPercent: number;
+  min: number;
+  p05: number;
+  p25: number;
+  median: number;
+  p75: number;
+  p95: number;
+  max: number;
+  customerRead: string;
+};
+
+export type ProductPriceTerminalReport = {
+  productId: string;
+  ticker: string;
+  productName: string;
+  asOf: string;
+  quote: {
+    bestPrice: number | null;
+    bestStoreId: string | null;
+    bestStoreName: string | null;
+    unitPrice: string;
+    dealScore: number;
+    band: ReturnType<typeof scoreBand>;
+    oneMonthMovePercent: number | null;
+    range52Week: { low: number; high: number } | null;
+    evidenceVolume: { currentPrices: number; historyPoints: number; verifiedHistoryPoints: number };
+  };
+  distributions: ProductPriceDistribution[];
+  chart: PriceChartAdapterResult;
+  historySummary: PriceHistorySummary | null;
+  evidenceGuardrails: string[];
 };
 
 export type StoreDeal = {
@@ -358,6 +404,133 @@ function roundPercent(value: number): number {
   return Math.round((value + Number.EPSILON) * 10) / 10;
 }
 
+function roundPrice(value: number): number {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+function quantile(sorted: number[], q: number): number {
+  if (sorted.length === 0) return 0;
+  if (sorted.length === 1) return roundPrice(sorted[0]!);
+  const position = (sorted.length - 1) * q;
+  const lower = Math.floor(position);
+  const upper = Math.ceil(position);
+  const weight = position - lower;
+  return roundPrice(sorted[lower]! * (1 - weight) + sorted[upper]! * weight);
+}
+
+function storeDistrict(storeId: string): string | null {
+  return stores.find((store) => store.id === storeId)?.district ?? null;
+}
+
+function distributionFor(
+  product: ProductDetail,
+  scope: ProductPriceDistributionScope,
+  label: string,
+  prices: StorePrice[],
+  currentPercentileOverride?: number
+): ProductPriceDistribution | null {
+  if (prices.length === 0) return null;
+  const sortedPrices = sortPricesByValue(prices);
+  const values = sortedPrices.map((price) => price.price).sort((left, right) => left - right);
+  const current = sortedPrices[0]!;
+  const currentPercentile = currentPercentileOverride ?? roundPercent(((values.filter((price) => price <= current.price).length) / values.length) * 100);
+  const cheaperThanPercent = roundPercent(100 - currentPercentile);
+  const scopeText = scope === 'stockholm' ? 'verified Stockholm observations' : `${label} observations`;
+  return {
+    scope,
+    label,
+    sampleSize: values.length,
+    currentPrice: current.price,
+    currentPercentile,
+    cheaperThanPercent,
+    min: roundPrice(values[0]!),
+    p05: quantile(values, 0.05),
+    p25: quantile(values, 0.25),
+    median: quantile(values, 0.5),
+    p75: quantile(values, 0.75),
+    p95: quantile(values, 0.95),
+    max: roundPrice(values.at(-1)!),
+    customerRead: `${current.price.toFixed(2)} SEK at ${current.storeName} is cheaper than ${cheaperThanPercent}% of ${scopeText}.`
+  };
+}
+
+function toIsoObservedAt(value: string): string {
+  return isoDatePattern.test(value) ? `${value}T00:00:00.000Z` : value;
+}
+
+function chartObservationsFor(product: ProductDetail): PriceChartObservation[] {
+  const bestPrice = bestPriceFor(product) ?? product.currentPrices[0];
+  return product.history.map((point) => ({
+    storeId: bestPrice?.storeId ?? 'unknown-store',
+    storeName: bestPrice?.storeName ?? 'Unknown store',
+    observedAt: toIsoObservedAt(point.date),
+    price: point.price,
+    sourceType: point.verified ? 'shelf' : 'estimated',
+    confidence: point.verified ? product.dealSignals.sourceConfidence : 0.35,
+    provenanceLabel: point.verified ? 'Verified price history' : 'Estimated history'
+  }));
+}
+
+function productPriceTerminalFor(product: ProductDetail, asOf?: string): ProductPriceTerminalReport {
+  const bestPrice = bestPriceFor(product);
+  const sortedHistory = [...product.history].sort((left, right) => Date.parse(toIsoObservedAt(left.date)) - Date.parse(toIsoObservedAt(right.date)));
+  const latestHistory = sortedHistory.at(-1);
+  const previousHistory = sortedHistory.at(-2);
+  const oneMonthMovePercent = latestHistory && previousHistory && previousHistory.price > 0
+    ? roundPercent(((latestHistory.price - previousHistory.price) / previousHistory.price) * 100)
+    : null;
+  const historyPrices = sortedHistory.map((point) => point.price);
+  const range52Week = historyPrices.length > 0
+    ? { low: roundPrice(Math.min(...historyPrices)), high: roundPrice(Math.max(...historyPrices)) }
+    : null;
+  const localDistrict = bestPrice ? storeDistrict(bestPrice.storeId) : null;
+  const localPrices = localDistrict
+    ? product.currentPrices.filter((price) => storeDistrict(price.storeId) === localDistrict)
+    : [];
+  const distributions = [
+    distributionFor(product, 'stockholm', 'Whole Stockholm', product.currentPrices, product.dealSignals.currentCityPercentile),
+    distributionFor(product, 'local_area', `${localDistrict ?? 'Local'} local area`, localPrices)
+  ].filter((row): row is ProductPriceDistribution => row !== null);
+  const chartAsOf = asOf ?? (latestHistory ? toIsoObservedAt(latestHistory.date) : undefined);
+  const chart = buildPriceChartSeries({
+    observations: chartObservationsFor(product),
+    ...(chartAsOf ? { asOf: chartAsOf } : {}),
+    rangeDays: 365,
+    markerLimitPerSeries: 8
+  });
+  return {
+    productId: product.id,
+    ticker: product.ticker,
+    productName: product.name,
+    asOf: chartAsOf ?? new Date().toISOString(),
+    quote: {
+      bestPrice: bestPrice?.price ?? null,
+      bestStoreId: bestPrice?.storeId ?? null,
+      bestStoreName: bestPrice?.storeName ?? null,
+      unitPrice: product.unitPrice,
+      dealScore: product.dealScore,
+      band: scoreBand(product.dealScore),
+      oneMonthMovePercent,
+      range52Week,
+      evidenceVolume: {
+        currentPrices: product.currentPrices.length,
+        historyPoints: product.history.length,
+        verifiedHistoryPoints: product.history.filter((point) => point.verified).length
+      }
+    },
+    distributions,
+    chart,
+    historySummary: product.history.length > 0
+      ? summarizePriceHistory(product.history.map((point) => ({ observedAt: toIsoObservedAt(point.date), price: point.price })))
+      : null,
+    evidenceGuardrails: [
+      'Verified shelf or retailer-page prices can power current quote, Deal Score, and basket totals.',
+      'Member, promotion, estimated, and low-confidence rows must stay explicitly labeled before customer action.',
+      'Distribution and chart samples include sample size and provenance-aware confidence styling.'
+    ]
+  };
+}
+
 function buildDealScoreReasons(product: ProductDetail, bestPrice: StorePrice | null, band: ReturnType<typeof scoreBand>): string[] {
   const reasons = [
     `${product.name} is in the ${product.dealSignals.currentCityPercentile}th city price percentile.`,
@@ -558,6 +731,12 @@ export function createGroceryViewApi() {
 
     getProductHistory(id: string) {
       return this.getProduct(id)?.history ?? [];
+    },
+
+    getProductPriceTerminal(id: string, options: { asOf?: string } = {}): ProductPriceTerminalReport | null {
+      const product = this.getProduct(id);
+      if (!product) return null;
+      return productPriceTerminalFor(product, options.asOf);
     },
 
     getDealScore(productId: string, options: { distanceKm?: number } = {}): DealScoreReport | null {
