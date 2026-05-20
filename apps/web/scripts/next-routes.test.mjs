@@ -41,4 +41,21 @@ describe('Next.js web scaffold', () => {
     assert.match(marketShell, /\/stores\/\$\{store\.slug\}/);
     assert.match(marketShell, /Stockholm store tape/);
   });
+
+  it('surfaces category instruments from the homepage driver data', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+
+    const categorySection = demoData.split('export const categories = ')[1] ?? '';
+    const categorySlugs = categorySection.match(/slug: '[^']+'/g) ?? [];
+
+    assert.ok(categorySlugs.length >= 8, 'homepage driver data should expose at least 8 category instruments');
+    assert.match(demoData, /slug: 'rice'/);
+    assert.match(demoData, /slug: 'butter'/);
+    assert.match(demoData, /ELDORADO-BASMATI-RICE-1KG/);
+    assert.match(demoData, /BREGOTT-NORMALSALTAT-600G/);
+    assert.match(marketShell, /categories\.map/);
+    assert.match(marketShell, /\/categories\/\$\{category\.slug\}/);
+    assert.match(marketShell, /Category market tape/);
+  });
 });

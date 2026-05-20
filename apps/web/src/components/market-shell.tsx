@@ -58,6 +58,30 @@ export function MarketShell() {
 
       <section className="rounded-lg border border-market-ink/10 bg-white">
         <div className="border-b border-market-ink/10 px-4 py-3">
+          <h2 className="text-lg font-black">Category market tape</h2>
+          <p className="mt-1 text-sm text-market-ink/60">
+            Category instruments expose index movement and the current top product signal from the same driver data.
+          </p>
+        </div>
+        <div className="grid gap-0 md:grid-cols-2 lg:grid-cols-4">
+          {categories.map((category) => (
+            <Link
+              key={category.slug}
+              href={`/categories/${category.slug}`}
+              className="border-b border-market-ink/10 px-4 py-4 text-sm hover:bg-market-oat/45 md:border-r"
+            >
+              <span className="block text-xs font-bold uppercase text-market-ink/50">{category.name}</span>
+              <span className="mt-2 block text-2xl font-black">{category.index}</span>
+              <span className="mt-1 block font-semibold text-market-ink/70">
+                {category.movement} · {category.topDeal}
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="border-b border-market-ink/10 px-4 py-3">
           <h2 className="text-lg font-black">Stockholm store tape</h2>
           <p className="mt-1 text-sm text-market-ink/60">
             Store coverage is visible on the homepage and links directly to each store profile.
