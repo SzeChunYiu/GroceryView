@@ -22,6 +22,7 @@ describe('buildOpenApiDocument', () => {
       '/api/indices/{id}',
       '/api/market/overview',
       '/api/metrics/notifications',
+      '/api/notifications/provider-suppression-events',
       '/api/notifications/suppression-events',
       '/api/products/search',
       '/api/products/{id}',
@@ -46,6 +47,7 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/metrics/notifications'].get?.security, [{ metricsToken: [] }]);
     assert.deepEqual(doc.paths['/api/readiness/postgres'].get?.security, [{ metricsToken: [] }]);
     assert.deepEqual(doc.paths['/api/notifications/suppression-events'].post?.security, [{ webhookSignature: [] }]);
+    assert.deepEqual(doc.paths['/api/notifications/provider-suppression-events'].post?.security, [{ webhookSignature: [] }]);
     assert.match(doc.paths['/api/health'].get?.summary ?? '', /without exposing secrets/i);
     assert.equal(doc.paths['/api/market/overview'].get?.security, undefined);
   });

@@ -247,6 +247,63 @@ describe('createHttpHandler', () => {
     ]);
   });
 
+  it('accepts signed Stripe-compatible subscription webhooks and persists entitlement mutations', async () => {
+    const persisted: unknown[] = [];
+    const secret = 'billing-webhook-secret';
+    const body = JSON.stringify({
+      id: 'evt_stripe_subscription_active_1',
+      type: 'customer.subscription.updated',
+      created: 1779278400,
+      data: {
+        object: {
+          id: 'sub_provider_1',
+          customer: 'cus_provider_1',
+          status: 'active',
+          current_period_end: 1810771200,
+          metadata: { userId: 'user-1' },
+          items: { data: [{ price: { id: 'price_yearly_123' } }] }
+        }
+      }
+    });
+    const handle = createHttpHandler(undefined, {
+      billingWebhookSecret: secret,
+      billingPriceIdPlanMap: { price_yearly_123: 'premium_yearly' },
+      now: new Date('2026-05-20T12:00:00.000Z'),
+      billingSubscriptionSink: {
+        async upsertSubscriptionEntitlement(entitlement) {
+          persisted.push(entitlement);
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/subscription-events', {
+      method: 'POST',
+      headers: { 'x-groceryview-billing-signature': signBillingWebhookBody(body, secret) },
+      body
+    }));
+
+    assert.equal(response.status, 202);
+    assert.deepEqual(await json(response), {
+      accepted: true,
+      persisted: true,
+      userId: 'user-1',
+      status: 'active'
+    });
+    assert.deepEqual(persisted, [
+      {
+        userId: 'user-1',
+        tier: 'premium',
+        plan: 'premium_yearly',
+        status: 'active',
+        currentPeriodEndsAt: '2027-05-20T00:00:00.000Z',
+        provider: 'stripe_compatible',
+        providerCustomerId: 'cus_provider_1',
+        providerSubscriptionId: 'sub_provider_1',
+        updatedAt: '2026-05-20T12:00:00.000Z'
+      }
+    ]);
+  });
+
   it('fails billing subscription events closed without configured secret, valid signature, and sink', async () => {
     const secret = 'billing-webhook-secret';
     const body = JSON.stringify({
