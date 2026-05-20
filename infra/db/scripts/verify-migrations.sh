@@ -53,6 +53,7 @@ REQUIRED_TABLES=(
   aliases
   source_runs
   raw_records
+  retailer_source_policies
   observations
   latest_prices
   users

@@ -16,6 +16,7 @@ Price and ingestion records expose provenance directly:
 
 - `source_runs.provenance`: run-level metadata such as collector version, schedule, retailer scope, HTTP metadata, and operator notes.
 - `raw_records.provenance`: raw payload metadata such as fetch URL, capture timestamp, parser version, and source checksum.
+- `retailer_source_policies.provenance`: source-policy metadata such as robots crawl evidence, reviewer, policy matrix version, and source-policy notes.
 - `observations.provenance`: normalized price metadata such as extraction rule, original displayed price, campaign identifiers, and review notes.
 - `latest_prices.provenance`: copied from the winning observation so API callers can show source context without joining.
 
@@ -84,6 +85,16 @@ Raw payloads captured during ingestion before normalization.
 Key columns: `source_run_id`, `record_type`, `external_ref`, `observed_at`, `payload`, `payload_hash`, `provenance`.
 
 Indexes: `raw_records_payload_gin_idx`.
+
+### `retailer_source_policies`
+
+Per-chain source policy decisions for store locator, offer, product, search, basket, account, member, and app/API surfaces. Workers should read this table before attempting source access so blocked, manual-review, fixture-review, and stub-only surfaces fail closed before any fetch.
+
+Key columns: `chain_id`, `source_surface`, `policy_label`, `robots_url`, `disallowed_path_matches`, `crawl_delay_seconds`, `legal_review_status`, `source_url`, `provenance`, `reviewed_at`, `updated_at`.
+
+Allowed `policy_label` values: `allowed`, `fixture_review`, `manual_review`, `blocked`, `stub_only`.
+
+Indexes: `retailer_source_policies_label_review_idx`, `retailer_source_policies_disallowed_gin_idx`, and `retailer_source_policies_provenance_gin_idx`.
 
 ### `observations`
 

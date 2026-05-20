@@ -10,8 +10,10 @@ const repositoryMigration = readFileSync(join(repoRoot, 'infra/db/migrations/002
 const entitlementMigration = readFileSync(join(repoRoot, 'infra/db/migrations/003_subscription_entitlements.sql'), 'utf8').toLowerCase();
 const alertRulesMigration = readFileSync(join(repoRoot, 'infra/db/migrations/004_alert_rules.sql'), 'utf8').toLowerCase();
 const pantryInventoryMigration = readFileSync(join(repoRoot, 'infra/db/migrations/005_pantry_inventory.sql'), 'utf8').toLowerCase();
+const sourceRunsOfficialApiMigration = readFileSync(join(repoRoot, 'infra/db/migrations/006_source_runs_official_api.sql'), 'utf8').toLowerCase();
 const receiptUploadsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/007_receipt_uploads.sql'), 'utf8').toLowerCase();
 const householdPlansMigration = readFileSync(join(repoRoot, 'infra/db/migrations/008_household_plans.sql'), 'utf8').toLowerCase();
+const retailerSourcePoliciesMigration = readFileSync(join(repoRoot, 'infra/db/migrations/009_retailer_source_policies.sql'), 'utf8').toLowerCase();
 const migrationsDir = join(repoRoot, 'infra/db/migrations');
 const allMigrations = readdirSync(migrationsDir)
   .filter((entry) => entry.endsWith('.sql'))
@@ -19,6 +21,7 @@ const allMigrations = readdirSync(migrationsDir)
   .map((entry) => readFileSync(join(migrationsDir, entry), 'utf8').toLowerCase())
   .join('\n');
 const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}`;
+const sourcePolicyTables = ['retailer_source_policies'];
 const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
 
@@ -75,6 +78,12 @@ function repositoryTableDefinition(table: string): string {
   return match[1];
 }
 
+function sourcePolicyTableDefinition(table: string): string {
+  const match = retailerSourcePoliciesMigration.match(new RegExp(`create table if not exists ${table} \\(([\\s\\S]*?)\\n\\);`));
+  assert.ok(match, `${table} source policy table missing`);
+  return match[1];
+}
+
 describe('infra/db PostgreSQL schema contract', () => {
   it('enables required PostgreSQL extensions for uuid, location, and fuzzy matching', () => {
     for (const extension of ['pgcrypto', 'postgis', 'pg_trgm']) {
@@ -113,9 +122,32 @@ describe('infra/db PostgreSQL schema contract', () => {
   });
 
   it('allows official public API source runs for persisted Open Prices pulls', () => {
-    assert.match(allMigrations, /official_api/, 'official_api source run migration missing');
+    assert.match(sourceRunsOfficialApiMigration, /official_api/, 'official_api source run migration missing');
     assert.match(schemaDoc, /official public api/, 'official API source run docs missing');
     assert.match(schemaDoc, /open prices/, 'Open Prices persistence docs missing');
+  });
+
+  it('persists retailer source policy decisions before ingestion fetches run', () => {
+    const sourcePolicies = sourcePolicyTableDefinition('retailer_source_policies');
+    assert.match(sourcePolicies, /chain_id uuid not null references chains\(id\) on delete cascade/);
+    assert.match(sourcePolicies, /source_surface text not null check/);
+    assert.match(sourcePolicies, /policy_label text not null check/);
+    assert.match(sourcePolicies, /robots_url text not null/);
+    assert.match(sourcePolicies, /disallowed_path_matches text\[\] not null default array\[\]::text\[\]/);
+    assert.match(sourcePolicies, /crawl_delay_seconds integer check \(crawl_delay_seconds is null or crawl_delay_seconds >= 0\)/);
+    assert.match(sourcePolicies, /legal_review_status text not null check/);
+    assert.match(sourcePolicies, /provenance jsonb not null default '\{\}'::jsonb/);
+    for (const value of ['allowed', 'fixture_review', 'manual_review', 'blocked', 'stub_only']) {
+      assert.match(sourcePolicies, new RegExp(`'${value}'`));
+    }
+    for (const surface of ['store_locator', 'offer', 'product', 'search', 'basket', 'account', 'member', 'app_api']) {
+      assert.match(sourcePolicies, new RegExp(`'${surface}'`));
+    }
+    assert.match(retailerSourcePoliciesMigration, /retailer_source_policies_label_review_idx/);
+    assert.match(retailerSourcePoliciesMigration, /retailer_source_policies_disallowed_gin_idx/);
+    assert.match(retailerSourcePoliciesMigration, /retailer_source_policies_provenance_gin_idx/);
+    assert.match(schemaDoc, /### `retailer_source_policies`/);
+    assert.match(schemaDoc, /blocked, manual-review, fixture-review, and stub-only surfaces fail closed/);
   });
 
   it('indexes geospatial store lookup and fuzzy product matching', () => {
@@ -183,7 +215,7 @@ describe('infra/db PostgreSQL schema contract', () => {
   });
 
   it('keeps the migration verifier aligned with catalog and repository tables', () => {
-    for (const table of [...requiredTables, ...repositoryTables]) {
+    for (const table of [...requiredTables, ...repositoryTables, ...sourcePolicyTables]) {
       assert.match(migrationVerifier, new RegExp(`\\b${table}\\b`), `${table} missing from migration verifier`);
     }
     assert.match(migrationVerifier, /create table if not exists schema_migrations/);
