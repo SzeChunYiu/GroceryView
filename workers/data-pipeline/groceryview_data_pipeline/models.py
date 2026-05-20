@@ -213,6 +213,22 @@ class OpenPricesIngestionRunPlan:
 
 
 @dataclass(frozen=True)
+class OpenPricesArtifactImportPlan:
+    status: Literal["ready", "blocked"]
+    source_asset: str
+    import_command: str
+    required_env: list[str]
+    required_actions: list[str]
+    required_packages: list[str]
+    database_targets: list[str]
+    evidence_fields: list[str]
+    demo: bool = False
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class ObservationCoverageSummary:
     status: Literal["ready", "partial"]
     observation_count: int

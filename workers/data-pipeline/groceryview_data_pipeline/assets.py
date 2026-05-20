@@ -20,6 +20,7 @@ from .models import (
     LatestPriceRow,
     ObservationCoverageSummary,
     ObservationFreshnessSummary,
+    OpenPricesArtifactImportPlan,
     OpenPricesIngestionRunPlan,
     OpenPricesPullPlan,
     PriceObservationRow,
@@ -380,6 +381,47 @@ def build_open_prices_ingestion_run_plan(
     )
 
 
+def build_open_prices_artifact_import_plan(
+    *,
+    database_url_present: bool = False,
+    input_artifact_present: bool = False,
+    db_package_built: bool = False,
+) -> OpenPricesArtifactImportPlan:
+    required_actions: list[str] = []
+    if not database_url_present:
+        required_actions.append("set_database_url")
+    if not input_artifact_present:
+        required_actions.append("provide_open_prices_input_artifact")
+    if not db_package_built:
+        required_actions.append("build_groceryview_db_package")
+
+    return OpenPricesArtifactImportPlan(
+        status="ready" if not required_actions else "blocked",
+        source_asset="open_prices_real_pull_plan",
+        import_command="npm run build --workspace @groceryview/db && DATABASE_URL=<postgres-url> OPEN_PRICES_INPUT_PATH=<artifact.json> infra/scripts/import-open-prices-artifact.sh",
+        required_env=["DATABASE_URL", "OPEN_PRICES_INPUT_PATH"],
+        required_actions=required_actions,
+        required_packages=["@groceryview/db", "pg"],
+        database_targets=[
+            "source_runs",
+            "raw_records",
+            "products",
+            "aliases",
+            "observations",
+            "latest_prices",
+        ],
+        evidence_fields=[
+            "status",
+            "sourceRunId",
+            "acceptedCount",
+            "rawRecordCount",
+            "observationCount",
+            "productCount",
+            "chainCount",
+        ],
+    )
+
+
 def build_observation_coverage_summary(
     observations: Iterable[PriceObservationRow],
     stores: Iterable[StoreSeed],
@@ -596,6 +638,15 @@ def open_prices_ingestion_run_plan(open_prices_real_pull_plan: dict[str, object]
         database_url_present=False,
         raw_snapshot_storage_present=False,
         schedule_enabled=False,
+    ).to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
+def open_prices_artifact_import_plan(open_prices_real_pull_plan: dict[str, object]) -> dict[str, object]:
+    return build_open_prices_artifact_import_plan(
+        database_url_present=False,
+        input_artifact_present=open_prices_real_pull_plan.get("status") == "ready",
+        db_package_built=False,
     ).to_dict()
 
 
