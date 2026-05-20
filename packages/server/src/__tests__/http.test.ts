@@ -83,6 +83,13 @@ describe('createHttpHandler', () => {
       body: JSON.stringify({ productId: 'coffee', quantity: 1 })
     }))).status, 201);
 
+    const mergedBasket = await handle(new Request('http://localhost/api/basket/items?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ productId: 'coffee', quantity: 2 })
+    }));
+    assert.equal(mergedBasket.status, 201);
+    assert.deepEqual((await json(mergedBasket) as { items: unknown[] }).items, [{ productId: 'coffee', quantity: 3 }]);
+
     assert.equal((await handle(new Request('http://localhost/api/budget?userId=user-1', {
       method: 'PATCH',
       body: JSON.stringify({ weeklyBudget: 800, monthlyBudget: 3200 })
@@ -92,10 +99,10 @@ describe('createHttpHandler', () => {
     assert.equal(watchlist.alerts.length, 3);
 
     const comparison = await json(await handle(new Request('http://localhost/api/basket/compare?userId=user-1', { method: 'POST' }))) as { cheapestByProduct: { total: number } };
-    assert.equal(comparison.cheapestByProduct.total, 49.9);
+    assert.equal(comparison.cheapestByProduct.total, 149.7);
 
     const budget = await json(await handle(new Request('http://localhost/api/budget/summary?userId=user-1'))) as { weeklyRemainingAfterEstimate: number };
-    assert.equal(budget.weeklyRemainingAfterEstimate, 750.1);
+    assert.equal(budget.weeklyRemainingAfterEstimate, 650.3);
   });
 
   it('returns explicit errors for invalid JSON, missing user id, and unknown routes', async () => {

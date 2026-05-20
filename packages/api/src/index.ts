@@ -264,7 +264,19 @@ export function createGroceryViewApi() {
       if (!Number.isInteger(item.quantity) || item.quantity <= 0 || item.quantity > 99) {
         throw new Error('quantity must be an integer between 1 and 99');
       }
-      baskets.set(userId, [...(baskets.get(userId) ?? []), item]);
+      const current = baskets.get(userId) ?? [];
+      const existing = current.find((basketItem) => basketItem.productId === item.productId);
+      if (existing) {
+        const quantity = existing.quantity + item.quantity;
+        if (quantity > 99) {
+          throw new Error('quantity must be an integer between 1 and 99');
+        }
+        baskets.set(userId, current.map((basketItem) =>
+          basketItem.productId === item.productId ? { ...basketItem, quantity } : basketItem
+        ));
+        return;
+      }
+      baskets.set(userId, [...current, item]);
     },
 
     getBasket(userId: string) {
