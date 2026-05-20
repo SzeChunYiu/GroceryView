@@ -361,10 +361,11 @@ const myStoresBasketIndex = [
   { store: 'Coop Farsta', basketTotal: 811, indexValue: 105.6, confidence: 'Estimated' }
 ];
 
-const communityReports = [
-  { product: 'Zoégas Coffee 450g', report: 'Wrong price', evidence: 'Shelf photo', status: 'Needs review', trust: 'trusted reporter' },
-  { product: 'Arla Milk 1L', report: 'Out of stock', evidence: 'Receipt mismatch', status: 'Queued', trust: 'new reporter' },
-  { product: 'Butter 600g', report: 'Promo expired', evidence: 'Retailer page', status: 'Accepted', trust: 'verified history' }
+const budgetModes = [
+  { mode: 'Strict Budget', guardrail: 'Warn before optional overspend', suggestion: 'Private-label swap first' },
+  { mode: 'Student Budget', guardrail: 'Keep basket under 500 SEK', suggestion: 'Cheapest protein per krona' },
+  { mode: 'Family Budget', guardrail: 'Owner approval over 400 SEK', suggestion: 'Bulk recurring staples' },
+  { mode: 'Healthy Budget', guardrail: 'Respect diet constraints', suggestion: 'Nutrition-per-krona swap' }
 ];
 
 const app = document.querySelector<HTMLDivElement>('#app');
@@ -868,12 +869,20 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
-        <h2>Community price reports</h2>
-        <p class="lede">User-submitted price reports flow through a trust-ranked queue. Trusted reporters accelerate verification; new reporters require manual review before any price update.</p>
+        <h2>Budget modes</h2>
+        <p class="lede">Mode-specific guardrails keep basket advice aligned with the household plan before smart swaps are recommended.</p>
+        <div class="grid">
+          <div class="metric"><strong>Strict</strong><span>overspend warning</span></div>
+          <div class="metric"><strong>Student</strong><span>protein per krona</span></div>
+          <div class="metric"><strong>Healthy</strong><span>diet-aware swaps</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Mode rules</h2>
         <table class="table">
-          <thead><tr><th>Product</th><th>Report type</th><th>Evidence</th><th>Status</th><th>Trust</th></tr></thead>
+          <thead><tr><th>Mode</th><th>Guardrail</th><th>Suggestion</th></tr></thead>
           <tbody>
-            ${communityReports.map((r) => `<tr><td>${r.product}</td><td>${r.report}</td><td>${r.evidence}</td><td><span class="status">${r.status}</span></td><td>${r.trust}</td></tr>`).join('')}
+            ${budgetModes.map((mode) => `<tr><td>${mode.mode}</td><td>${mode.guardrail}</td><td>${mode.suggestion}</td></tr>`).join('')}
           </tbody>
         </table>
       </div>
