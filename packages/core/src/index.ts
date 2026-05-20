@@ -85,6 +85,9 @@ export type SingleStoreOption = {
 export type BasketComparisonResult = {
   cheapestByProduct: BasketStrategy;
   singleStoreOptions: SingleStoreOption[];
+  bestSingleStore?: SingleStoreOption;
+  savingsVsBestSingleStore: number;
+  splitStoreCount: number;
   missingProductIds: string[];
 };
 
@@ -126,12 +129,19 @@ export function compareBasketStrategies(input: BasketComparisonInput): BasketCom
     });
   }
 
+  const cheapestByProduct = {
+    total: roundMoney(assignments.reduce((sum, item) => sum + item.lineTotal, 0)),
+    assignments
+  };
+  const singleStoreOptions = [...storeTotals.values()].sort((a, b) => a.total - b.total);
+  const bestSingleStore = singleStoreOptions.find((option) => option.itemCount === assignments.length);
+
   return {
-    cheapestByProduct: {
-      total: roundMoney(assignments.reduce((sum, item) => sum + item.lineTotal, 0)),
-      assignments
-    },
-    singleStoreOptions: [...storeTotals.values()].sort((a, b) => a.total - b.total),
+    cheapestByProduct,
+    singleStoreOptions,
+    bestSingleStore,
+    savingsVsBestSingleStore: bestSingleStore ? roundMoney(bestSingleStore.total - cheapestByProduct.total) : 0,
+    splitStoreCount: new Set(assignments.map((assignment) => assignment.storeId)).size,
     missingProductIds
   };
 }
