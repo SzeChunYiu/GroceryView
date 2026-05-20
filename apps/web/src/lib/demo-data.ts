@@ -182,6 +182,42 @@ export const products = [
     confidence: 'high',
     observedAt: '2026-05-20 09:35 CET',
     source: 'retailer flyer observation'
+  },
+  {
+    slug: 'garant-havregryn-1kg',
+    ticker: 'GARANT-HAVREGRYN-1KG',
+    name: 'Garant Havregryn 1kg',
+    store: 'Tempo Hornstull',
+    price: '21.90 SEK',
+    unitPrice: '21.90 SEK/kg',
+    priceType: 'shelf',
+    confidence: 'high',
+    observedAt: '2026-05-20 13:05 CET',
+    source: 'in-store shelf observation'
+  },
+  {
+    slug: 'zeta-olivolja-classico-500ml',
+    ticker: 'ZETA-OLIVOLJA-CLASSICO-500ML',
+    name: 'Zeta Olivolja Classico 500ml',
+    store: 'Coop Swedenborgsgatan',
+    price: '79.90 SEK',
+    unitPrice: '159.80 SEK/l',
+    priceType: 'member promo',
+    confidence: 'medium',
+    observedAt: '2026-05-20 13:25 CET',
+    source: 'retailer flyer observation'
+  },
+  {
+    slug: 'santa-maria-taco-spice-28g',
+    ticker: 'SANTA-MARIA-TACO-SPICE-28G',
+    name: 'Santa Maria Taco Spice Mix 28g',
+    store: 'ICA Nära Sergels Torg',
+    price: '11.95 SEK',
+    unitPrice: '426.79 SEK/kg',
+    priceType: 'shelf',
+    confidence: 'high',
+    observedAt: '2026-05-20 13:40 CET',
+    source: 'in-store shelf observation'
   }
 ];
 
@@ -189,6 +225,7 @@ export const stores = [
   {
     slug: 'willys-odenplan',
     name: 'Willys Odenplan',
+    ingestionFixture: 'Willys Odenplan',
     district: 'Vasastan',
     format: 'discount supermarket',
     bestCategory: 'Coffee',
@@ -197,6 +234,7 @@ export const stores = [
   {
     slug: 'ica-nara-sergels-torg',
     name: 'ICA Nära Sergels Torg',
+    ingestionFixture: 'ICA Nara Sergels Torg',
     district: 'Norrmalm',
     format: 'convenience supermarket',
     bestCategory: 'Snacks',
@@ -205,6 +243,7 @@ export const stores = [
   {
     slug: 'coop-swedenborgsgatan',
     name: 'Coop Swedenborgsgatan',
+    ingestionFixture: 'Coop Swedenborgsgatan',
     district: 'Södermalm',
     format: 'mid-size supermarket',
     bestCategory: 'Dairy',
@@ -213,6 +252,7 @@ export const stores = [
   {
     slug: 'lidl-sveavagen',
     name: 'Lidl Sveavägen',
+    ingestionFixture: 'Lidl Sveavagen',
     district: 'Vasastan',
     format: 'discount supermarket',
     bestCategory: 'Dairy',
@@ -221,6 +261,7 @@ export const stores = [
   {
     slug: 'hemkop-stockholm',
     name: 'Hemköp Stockholm',
+    ingestionFixture: 'Hemkop Stockholm locator result',
     district: 'Norrmalm',
     format: 'mid-size supermarket',
     bestCategory: 'Pantry',
@@ -229,6 +270,7 @@ export const stores = [
   {
     slug: 'city-gross-stockholm',
     name: 'City Gross Stockholm',
+    ingestionFixture: 'City Gross Stockholm county locator result',
     district: 'Stockholm County',
     format: 'big-box supermarket',
     bestCategory: 'Frozen',
@@ -241,6 +283,14 @@ export const stores = [
     format: 'social supermarket',
     bestCategory: 'Pantry',
     distanceLabel: '5.8 km from saved area'
+  },
+  {
+    slug: 'tempo-hornstull',
+    name: 'Tempo Hornstull',
+    district: 'Södermalm',
+    format: 'neighborhood supermarket',
+    bestCategory: 'Breakfast',
+    distanceLabel: '3.1 km from saved area'
   }
 ];
 
@@ -300,17 +350,75 @@ export const categories = [
     index: '106.9',
     movement: '+6.9%',
     topDeal: 'BREGOTT-NORMALSALTAT-600G'
+  },
+  {
+    slug: 'breakfast',
+    name: 'Breakfast',
+    index: '93.4',
+    movement: '-6.6%',
+    topDeal: 'GARANT-HAVREGRYN-1KG'
   }
 ];
 
 export const stockholmAreas = [
   { slug: 'norrmalm',   name: 'Norrmalm',   storeCount: 2, topSavings: 'Snacks' },
-  { slug: 'sodermalm',  name: 'Södermalm',  storeCount: 1, topSavings: 'Dairy' },
+  { slug: 'sodermalm',  name: 'Södermalm',  storeCount: 2, topSavings: 'Breakfast' },
   { slug: 'vasastan',   name: 'Vasastan',   storeCount: 2, topSavings: 'Coffee' },
   { slug: 'hagersten',  name: 'Hägersten',  storeCount: 1, topSavings: 'Rice' },
   { slug: 'stockholm-county', name: 'Stockholm County', storeCount: 1, topSavings: 'Pasta' },
   { slug: 'kungsholmen',name: 'Kungsholmen',storeCount: 0, topSavings: '—' },
   { slug: 'ostermalm',  name: 'Östermalm',  storeCount: 0, topSavings: '—' }
+];
+
+export const sourceCoverage = [
+  {
+    chain: 'ICA',
+    fixture: 'Store locator',
+    surface: 'public locator',
+    status: 'ready',
+    visibleRows: 2,
+    newestSignal: 'Nära Sergels Torg matched to snacks and egg rows'
+  },
+  {
+    chain: 'Willys',
+    fixture: 'Weekly offers',
+    surface: 'public flyer',
+    status: 'ready',
+    visibleRows: 4,
+    newestSignal: 'Coffee, peas, fil, and butter prices anchor basket planning'
+  },
+  {
+    chain: 'Coop',
+    fixture: 'Store profile',
+    surface: 'district store',
+    status: 'ready',
+    visibleRows: 2,
+    newestSignal: 'Swedenborgsgatan contributes dairy and bread observations'
+  },
+  {
+    chain: 'Hemköp',
+    fixture: 'Offer review',
+    surface: 'weekly deal',
+    status: 'review',
+    visibleRows: 2,
+    newestSignal: 'Ketchup and soup stay medium-confidence until receipt review'
+  },
+  {
+    chain: 'Lidl',
+    fixture: 'Online shelf',
+    surface: 'product page',
+    status: 'ready',
+    visibleRows: 2,
+    newestSignal: 'Milk and chocolate rows provide cross-store comparisons'
+  },
+  {
+    chain: 'City Gross',
+    fixture: 'Regional offer',
+    surface: 'weekly page',
+    status: 'stub',
+    visibleRows: 1,
+    newestSignal: 'Pasta row is visible while county coverage expands'
+  }
 ];
 
 export const indexHistory = [
@@ -335,12 +443,13 @@ export const weeklyBasket = [
   { slug: 'findus-arter-650g',           qty: 1, total: '24.90 SEK', vsLastWeek: '-1.4%' },
   { slug: 'eldorado-basmati-rice-1kg',   qty: 1, total: '18.90 SEK', vsLastWeek: '-7.2%' },
   { slug: 'barilla-spaghetti-1kg',        qty: 2, total: '55.80 SEK', vsLastWeek: '-1.9%' },
-  { slug: 'bregott-normalsaltat-600g',    qty: 1, total: '56.90 SEK', vsLastWeek: '+6.9%' }
+  { slug: 'bregott-normalsaltat-600g',    qty: 1, total: '56.90 SEK', vsLastWeek: '+6.9%' },
+  { slug: 'garant-havregryn-1kg',         qty: 1, total: '21.90 SEK', vsLastWeek: '-6.6%' }
 ];
 
 export const householdSavings = {
-  weeklyTotal: '416.60 SEK',
-  vsLastWeek: '-15.30 SEK',
-  vsLastMonth: '-61.40 SEK',
-  topSaving: { product: 'Zoegas Coffee 450g', amount: '-4.60 SEK', driver: 'member promo' }
+  weeklyTotal: '438.50 SEK',
+  vsLastWeek: '-19.20 SEK',
+  vsLastMonth: '-66.10 SEK',
+  topSaving: { product: 'Garant Havregryn 1kg', amount: '-3.90 SEK', driver: 'breakfast staple shelf drop' }
 };
