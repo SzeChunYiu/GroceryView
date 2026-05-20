@@ -85,11 +85,18 @@ export type DeploymentReadinessReport = {
   summary: string;
 };
 
-export type ReleaseCheckStatus = 'success' | 'failure' | 'cancelled' | 'skipped' | 'in_progress' | 'queued' | 'missing';
-
-export type ReleaseGateCheck = {
-  name: string;
-  status: ReleaseCheckStatus;
+export type GateBlockerSummary = {
+  total: number;
+  missingSecrets: number;
+  missingArtifacts: number;
+  releaseValidation: number;
+  smokeTests: number;
+  healthChecks: number;
+  scheduledJobs: number;
+  changeControls: number;
+  incidents: number;
+  rollbackPlan: number;
+  deploymentPrerequisites: number;
 };
 
 export type GateWarningSummary = {
@@ -158,16 +165,7 @@ export function summarizeDeploymentReadinessReport(report: DeploymentReadinessRe
     blockers: summarizeGateBlockers(report.blockers),
     warnings: summarizeGateWarnings(report.warnings)
   };
-  now: string;
-  maxMainValidationAgeMinutes: number;
-};
-
-export type ReleaseGateEvidenceReport = {
-  status: 'ready' | 'blocked';
-  blockers: string[];
-  passedChecks: string[];
-  summary: string;
-};
+}
 
 export function buildDeploymentReadinessReport(input: DeploymentReadinessInput): DeploymentReadinessReport {
   const blockers: string[] = [];
@@ -213,44 +211,6 @@ export function buildDeploymentReadinessReport(input: DeploymentReadinessInput):
     blockers,
     warnings,
     summary: blockers.length === 0 ? 'Deployment readiness gates passed.' : 'Deployment is blocked until required gates pass.'
-  };
-}
-
-export function buildReleaseGateEvidenceReport(input: ReleaseGateEvidenceInput): ReleaseGateEvidenceReport {
-  const blockers: string[] = [];
-  const passedChecks: string[] = [];
-  const checksByName = new Map(input.checks.map((check) => [check.name, check.status]));
-
-  for (const checkName of input.requiredChecks) {
-    const status = checksByName.get(checkName) ?? 'missing';
-    if (status === 'success') {
-      passedChecks.push(checkName);
-    } else {
-      blockers.push(`required_check_${status}:${checkName}`);
-    }
-  }
-
-  if (input.mainReleaseValidation.status !== 'success') {
-    blockers.push(`main_release_validation_${input.mainReleaseValidation.status}`);
-  } else if (!input.mainReleaseValidation.completedAt) {
-    blockers.push('main_release_validation_missing_completed_at');
-  } else {
-    const completedAt = Date.parse(input.mainReleaseValidation.completedAt);
-    const now = Date.parse(input.now);
-    if (!Number.isFinite(completedAt) || !Number.isFinite(now)) {
-      blockers.push('main_release_validation_invalid_timestamp');
-    } else {
-      const ageMinutes = (now - completedAt) / 60000;
-      if (ageMinutes < 0) blockers.push('main_release_validation_completed_in_future');
-      if (ageMinutes > input.maxMainValidationAgeMinutes) blockers.push('main_release_validation_stale');
-    }
-  }
-
-  return {
-    status: blockers.length === 0 ? 'ready' : 'blocked',
-    blockers,
-    passedChecks,
-    summary: blockers.length === 0 ? 'Release gate evidence is current and complete.' : 'Release gate evidence is incomplete.'
   };
 }
 
