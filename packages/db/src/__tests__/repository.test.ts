@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   applyNotificationTaskAcknowledgements,
   buildSourceRunHealthReport,
+  checkSourceRunHealth,
   createMemoryRepository,
   summarizeSourceRunHealthReport
 } from '../index.js';
@@ -686,6 +687,106 @@ describe('buildSourceRunHealthReport', () => {
         missingFinishedAt: 1,
         startedInFuture: 1,
         finishedInFuture: 1
+      },
+      evidence: {
+        total: 0,
+        succeeded: 0
+      },
+      running: 0,
+      stale: 0
+    });
+  });
+
+  it('checks source run health through a repository reader without hiding terminal blockers', async () => {
+    const calls: unknown[] = [];
+    const result = await checkSourceRunHealth({
+      now: '2026-05-20T08:30:00.000Z',
+      maxRunningMinutes: 30,
+      staleAfterMinutes: 60,
+      filter: { sourceType: 'retailer_api', limit: 25 },
+      reader: {
+        async listSourceRuns(filter) {
+          calls.push(filter);
+          return [
+            {
+              sourceRunId: 'successful-run',
+              sourceType: 'retailer_api',
+              sourceName: 'Willys API',
+              startedAt: '2026-05-20T08:00:00.000Z',
+              finishedAt: '2026-05-20T08:05:00.000Z',
+              status: 'succeeded',
+              provenance: {}
+            },
+            {
+              sourceRunId: 'failed-run',
+              sourceType: 'retailer_api',
+              sourceName: 'Willys API',
+              startedAt: '2026-05-20T08:10:00.000Z',
+              finishedAt: '2026-05-20T08:11:00.000Z',
+              status: 'failed',
+              provenance: {}
+            }
+          ];
+        }
+      }
+    });
+
+    assert.deepEqual(calls, [{ sourceType: 'retailer_api', limit: 25 }]);
+    assert.equal(result.runCount, 2);
+    assert.deepEqual(result.filter, { sourceType: 'retailer_api', limit: 25 });
+    assert.deepEqual(result.report.blockers, ['source_run_failed:failed-run']);
+    assert.deepEqual(result.report.evidence, ['source_run_succeeded:successful-run']);
+    assert.deepEqual(result.summary, {
+      status: 'blocked',
+      blockers: {
+        total: 1,
+        failed: 1,
+        partial: 0,
+        stale: 0,
+        stuckRunning: 0,
+        missingFinishedAt: 0,
+        startedInFuture: 0,
+        finishedInFuture: 0
+      },
+      evidence: {
+        total: 1,
+        succeeded: 1
+      },
+      running: 0,
+      stale: 0,
+      latestSuccessfulRunId: 'successful-run',
+      latestSuccessfulFinishedAt: '2026-05-20T08:05:00.000Z'
+    });
+  });
+
+  it('uses a bounded default source run health read window', async () => {
+    const calls: unknown[] = [];
+    const result = await checkSourceRunHealth({
+      now: '2026-05-20T08:30:00.000Z',
+      maxRunningMinutes: 30,
+      staleAfterMinutes: 60,
+      reader: {
+        async listSourceRuns(filter) {
+          calls.push(filter);
+          return [];
+        }
+      }
+    });
+
+    assert.deepEqual(calls, [{ limit: 100 }]);
+    assert.equal(result.runCount, 0);
+    assert.deepEqual(result.filter, { limit: 100 });
+    assert.deepEqual(result.summary, {
+      status: 'healthy',
+      blockers: {
+        total: 0,
+        failed: 0,
+        partial: 0,
+        stale: 0,
+        stuckRunning: 0,
+        missingFinishedAt: 0,
+        startedInFuture: 0,
+        finishedInFuture: 0
       },
       evidence: {
         total: 0,
