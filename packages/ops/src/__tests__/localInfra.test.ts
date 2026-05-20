@@ -175,6 +175,8 @@ describe('local infrastructure compose', () => {
   });
 
   it('verifies official API source runs and receipt constraints in migration smoke checks', () => {
+    assert.match(verifyMigrationsScript, /POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD/);
+    assert.match(verifyMigrationsScript, /\$required_name must not be empty/);
     assert.match(verifyMigrationsScript, /insert into source_runs\(source_type, source_name, status\)/);
     assert.match(verifyMigrationsScript, /values \('official_api', 'Open Prices verifier', 'succeeded'\)/);
     assert.match(verifyMigrationsScript, /unsupported_source/);
