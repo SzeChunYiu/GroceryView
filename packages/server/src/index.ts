@@ -151,8 +151,8 @@ function requiredSuppressionEventType(value: unknown): NotificationSuppressionEv
 }
 
 function requiredSuppressionWebhookProvider(value: unknown): NotificationSuppressionWebhookProvider {
-  if (value === 'sendgrid' || value === 'ses') return value;
-  throw new Error('provider must be sendgrid or ses.');
+  if (value === 'sendgrid' || value === 'ses' || value === 'expo') return value;
+  throw new Error('provider must be sendgrid, ses, or expo.');
 }
 
 function optionalNumber(value: unknown, field: string): number | undefined {
@@ -807,7 +807,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/metrics/notifications': { get: metricsOperation('Export notification operations metrics.') },
       '/api/readiness/postgres': { get: metricsOperation('Check PostgreSQL schema and migration readiness without exposing database secrets.') },
       '/api/notifications/suppression-events': { post: webhookOperation('Accept signed normalized notification suppression events.') },
-      '/api/notifications/provider-suppression-events': { post: webhookOperation('Accept signed SendGrid or SES suppression payloads.') }
+      '/api/notifications/provider-suppression-events': { post: webhookOperation('Accept signed SendGrid, SES, or Expo suppression payloads.') }
     }
   };
 }
