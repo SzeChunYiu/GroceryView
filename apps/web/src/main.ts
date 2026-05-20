@@ -91,6 +91,13 @@ const alertPreferences = [
   { rule: 'Receipt review reminder', channel: 'Push', quietHours: 'Immediate', scope: 'Household queue' }
 ];
 
+const watchlistRows = [
+  { product: 'Zoégas Coffee 450g', target: '50 SEK', current: '49.90 SEK', trigger: 'Deal Score >= 80', status: 'Ready for push' },
+  { product: 'Butter 600g', target: '45 SEK', current: '54.90 SEK', trigger: '52-week low', status: 'Watching' },
+  { product: 'Eggs 12-pack', target: '35 SEK', current: '34.90 SEK', trigger: 'Favorite stores only', status: 'Ready for email' },
+  { product: 'Loose tomatoes', target: '29 SEK/kg', current: 'Estimated', trigger: 'Confidence >= 80%', status: 'Held for review' }
+];
+
 const budget = summarizeBudget({
   weeklyBudget: 800,
   monthlyBudget: 3200,
@@ -365,6 +372,7 @@ app.innerHTML = `
     <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Watchlist alerts</h2>
+        <p class="lede"><a href="/watchlist/">Open the watchlist workbench</a> for target prices, alert state, and confidence guardrails.</p>
         <table class="table">
           <thead><tr><th>Type</th><th>Message</th></tr></thead>
           <tbody>
@@ -379,6 +387,19 @@ app.innerHTML = `
           </tbody>
         </table>
       </div>
+      <div class="card">
+        <h2>Watchlist workbench</h2>
+        <p class="lede">Target-price rows show whether an alert is ready, still watching, or held because price evidence is estimated.</p>
+        <table class="table">
+          <thead><tr><th>Product</th><th>Target</th><th>Current</th><th>Status</th></tr></thead>
+          <tbody>
+            ${watchlistRows.map((row) => `<tr><td><strong>${row.product}</strong><br><span class="footer-note">${row.trigger}</span></td><td>${row.target}</td><td>${row.current}</td><td><span class="status">${row.status}</span></td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Privacy controls</h2>
         <p class="lede">Sensitive receipt, location, and contribution settings stay visible before data is shared with household or catalog workflows.</p>
