@@ -7,6 +7,8 @@ import { fileURLToPath } from 'node:url';
 const repoRoot = join(fileURLToPath(new URL('.', import.meta.url)), '../../../..');
 const migration = readFileSync(join(repoRoot, 'infra/db/migrations/001_groceryview_schema.sql'), 'utf8').toLowerCase();
 const repositoryMigration = readFileSync(join(repoRoot, 'infra/db/migrations/002_repository_support_schema.sql'), 'utf8').toLowerCase();
+const entitlementMigration = readFileSync(join(repoRoot, 'infra/db/migrations/003_subscription_entitlements.sql'), 'utf8').toLowerCase();
+const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}`;
 const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
 
@@ -37,6 +39,7 @@ const repositoryTables = [
   'human_review_assignments',
   'human_reviewers',
   'community_reporter_trust',
+  'subscription_entitlements',
   'notification_tasks',
   'notification_suppressions'
 ];
@@ -48,7 +51,7 @@ function tableDefinition(table: string): string {
 }
 
 function repositoryTableDefinition(table: string): string {
-  const match = repositoryMigration.match(new RegExp(`create table if not exists ${table} \\(([\\s\\S]*?)\\n\\);`));
+  const match = repositoryMigrations.match(new RegExp(`create table if not exists ${table} \\(([\\s\\S]*?)\\n\\);`));
   assert.ok(match, `${table} repository table missing`);
   return match[1];
 }
@@ -98,10 +101,12 @@ describe('infra/db PostgreSQL schema contract', () => {
 
   it('migrates every table used by the PostgreSQL repository adapter', () => {
     for (const table of repositoryTables) {
-      assert.match(repositoryMigration, new RegExp(`create table if not exists ${table}\\b`), `${table} repository table missing`);
+      assert.match(repositoryMigrations, new RegExp(`create table if not exists ${table}\\b`), `${table} repository table missing`);
     }
     assert.match(repositoryTableDefinition('favorite_stores'), /primary key \(user_id, store_id\)/);
     assert.match(repositoryTableDefinition('weekly_baskets'), /unique \(user_id, week_start\)/);
+    assert.match(repositoryTableDefinition('subscription_entitlements'), /user_id text primary key references app_users\(id\) on delete cascade/);
+    assert.match(repositoryTableDefinition('subscription_entitlements'), /provider_subscription_id text/);
     assert.match(repositoryTableDefinition('notification_tasks'), /status text not null check/);
     assert.match(repositoryTableDefinition('notification_suppressions'), /channel text check \(channel in \('push', 'email'\)\)/);
   });
@@ -110,6 +115,7 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryMigration, /watchlist_items_user_idx on watchlist_items \(user_id, id\)/);
     assert.match(repositoryMigration, /weekly_baskets_user_week_idx on weekly_baskets \(user_id, week_start desc\)/);
     assert.match(repositoryMigration, /human_review_assignments_open_idx on human_review_assignments \(status, due_at, id\)/);
+    assert.match(entitlementMigration, /subscription_entitlements_status_idx on subscription_entitlements \(status, updated_at desc\)/);
     assert.match(repositoryMigration, /notification_tasks_due_idx on notification_tasks \(status, send_at, id\)/);
     assert.match(repositoryMigration, /notification_suppressions_active_idx on notification_suppressions \(active, recipient, channel, id\)/);
   });

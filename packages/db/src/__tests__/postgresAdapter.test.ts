@@ -72,6 +72,19 @@ class RecordingQueryExecutor implements QueryExecutor {
       created_at: '2026-05-20T08:00:01.000Z'
     }
   ];
+  subscriptionEntitlementRows: unknown[] = [
+    {
+      user_id: 'user-1',
+      tier: 'premium',
+      plan: 'premium_monthly',
+      status: 'active',
+      current_period_ends_at: new Date('2026-06-20T00:00:00.000Z'),
+      provider: 'stripe_compatible',
+      provider_customer_id: 'cus_123',
+      provider_subscription_id: 'sub_123',
+      updated_at: '2026-05-20T00:00:00.000Z'
+    }
+  ];
   observationHistoryRows: unknown[] = [
     {
       id: 'observation-3',
@@ -166,6 +179,7 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('from latest_prices')) return this.latestPriceRows as T[];
     if (sql.includes('from observations')) return this.observationHistoryRows as T[];
     if (sql.includes('from products')) return this.productRows as T[];
+    if (sql.includes('from subscription_entitlements')) return this.subscriptionEntitlementRows as T[];
     if (sql.includes('select store_id')) return [{ store_id: 'willys-odenplan' }] as T[];
     if (sql.includes('select weekly_budget')) return [{ weekly_budget: '800', monthly_budget: '3200' }] as T[];
     if (sql.includes('insert into weekly_baskets')) return this.basketId === undefined ? ([] as T[]) : ([{ id: this.basketId }] as T[]);
@@ -272,6 +286,50 @@ describe('createPostgresRepository', () => {
       /Weekly basket was not returned for user: user-1/
     );
     assert.equal(executor.calls.some((call) => call.sql.includes('insert into basket_items')), false);
+  });
+
+  it('persists and reads subscription entitlements with parameterized billing identifiers', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.upsertSubscriptionEntitlement({
+      userId: 'user-1',
+      tier: 'premium',
+      plan: 'premium_monthly',
+      status: 'active',
+      currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
+      provider: 'stripe_compatible',
+      providerCustomerId: 'cus_123',
+      providerSubscriptionId: 'sub_123',
+      updatedAt: '2026-05-20T00:00:00.000Z'
+    });
+
+    assert.deepEqual(await repo.getSubscriptionEntitlement('user-1'), {
+      userId: 'user-1',
+      tier: 'premium',
+      plan: 'premium_monthly',
+      status: 'active',
+      currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
+      provider: 'stripe_compatible',
+      providerCustomerId: 'cus_123',
+      providerSubscriptionId: 'sub_123',
+      updatedAt: '2026-05-20T00:00:00.000Z'
+    });
+
+    assert.match(executor.calls[0].sql, /insert into subscription_entitlements/);
+    assert.match(executor.calls[0].sql, /on conflict \(user_id\) do update/);
+    assert.deepEqual(executor.calls[0].params, [
+      'user-1',
+      'premium',
+      'premium_monthly',
+      'active',
+      '2026-06-20T00:00:00.000Z',
+      'stripe_compatible',
+      'cus_123',
+      'sub_123',
+      '2026-05-20T00:00:00.000Z'
+    ]);
+    assert.deepEqual(executor.calls[1].params, ['user-1']);
   });
 
   it('persists and lists open human review assignments', async () => {

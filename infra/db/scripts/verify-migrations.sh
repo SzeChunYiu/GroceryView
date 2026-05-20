@@ -49,6 +49,7 @@ REQUIRED_TABLES=(
   human_review_assignments
   human_reviewers
   community_reporter_trust
+  subscription_entitlements
   notification_tasks
   notification_suppressions
 )
