@@ -162,6 +162,12 @@ const categoryBudgets = [
   { name: 'Protein', planned: 260, spent: 190, status: 'under' }
 ];
 
+const budgetForecastRows = [
+  { period: 'This week actuals', budget: '800 SEK', value: `${budget.weeklyActualSpend} SEK`, variance: `${budget.weeklyRemainingActual} SEK left`, status: budget.weeklyStatus },
+  { period: 'Next planned basket', budget: '800 SEK', value: `${budget.estimatedBasketTotal} SEK`, variance: `${budget.weeklyRemainingAfterEstimate} SEK left`, status: 'needs review' },
+  { period: 'Month-end projection', budget: '3 200 SEK', value: '3 084 SEK', variance: '116 SEK left', status: 'on track' }
+];
+
 const inStoreRun = {
   runningTotal: 312,
   pendingReceiptReviews: 2,
