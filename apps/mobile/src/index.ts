@@ -805,6 +805,9 @@ export function buildMobileScreenBlueprints(): MobileScreenBlueprintPlan {
     blockedWithoutProviders: screens
       .filter((screen) => screen.providerRequirements.some((provider) => provider !== 'secure-session'))
       .map((screen) => ({ route: screen.route, providers: screen.providerRequirements }))
+  };
+}
+
 export type MobileOfflineMutation = {
   id: string;
   kind: 'add_to_basket' | 'remove_from_basket' | 'add_to_watchlist' | 'update_budget' | 'save_receipt_match';
