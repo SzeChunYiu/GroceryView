@@ -24,4 +24,21 @@ describe('Next.js web scaffold', () => {
     assert.ok(packageJson.dependencies['@tanstack/react-query']);
     assert.ok(packageJson.dependencies['class-variance-authority']);
   });
+
+  it('keeps the homepage backed by visible product and store driver data', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+
+    const productSlugs = demoData.match(/slug: '[^']+'/g) ?? [];
+    const storeNames = demoData.match(/name: '[A-ZÅÄÖ]/g) ?? [];
+
+    assert.ok(productSlugs.length >= 14, 'homepage driver data should expose at least 14 product/category/store slugs');
+    assert.ok(storeNames.length >= 7, 'homepage driver data should expose at least 7 named Stockholm stores');
+    assert.match(demoData, /matmissionen-hagersten/);
+    assert.match(demoData, /eldorado-basmati-rice-1kg/);
+    assert.match(demoData, /barilla-spaghetti-1kg/);
+    assert.match(marketShell, /stores\.map/);
+    assert.match(marketShell, /\/stores\/\$\{store\.slug\}/);
+    assert.match(marketShell, /Stockholm store tape/);
+  });
 });
