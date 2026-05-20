@@ -16,6 +16,13 @@ export type PrivacyControl = {
   state: string;
 };
 
+export type ScannerQueueItem = {
+  item: string;
+  status: string;
+  confidence: number;
+  owner: string;
+};
+
 export const basketItems: BasketItem[] = [
   { name: 'Zoegas Coffee', currentPrice: 49.9 },
   { name: 'Arla Milk', currentPrice: 13.9 },
@@ -50,6 +57,12 @@ export const privacyControls: PrivacyControl[] = [
     detail: 'No raw receipt lines, household identity, or private notes are exposed.',
     state: 'Aggregated'
   }
+];
+
+export const scannerQueue: ScannerQueueItem[] = [
+  { item: 'Coop Farsta receipt', status: 'Needs review', confidence: 71, owner: 'Mina' },
+  { item: 'Arla Milk barcode', status: 'Matched', confidence: 98, owner: 'Alex' },
+  { item: 'Loose tomatoes label', status: 'Low confidence', confidence: 54, owner: 'Sam' }
 ];
 
 export function formatSek(value: number) {
