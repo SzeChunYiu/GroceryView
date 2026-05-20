@@ -805,6 +805,69 @@ export function buildMobileScreenBlueprints(): MobileScreenBlueprintPlan {
     blockedWithoutProviders: screens
       .filter((screen) => screen.providerRequirements.some((provider) => provider !== 'secure-session'))
       .map((screen) => ({ route: screen.route, providers: screen.providerRequirements }))
+export type MobilePrivacyRequestType = 'export_data' | 'delete_account' | 'ad_privacy' | 'receipt_retention';
+
+export type MobilePrivacyRequestInput = {
+  userId: string;
+  requestType: MobilePrivacyRequestType;
+  authenticated: boolean;
+  networkOnline: boolean;
+  confirmedDestructiveAction?: boolean;
+  receiptImageRetentionDays?: number;
+};
+
+export type MobilePrivacyRequestPlan = {
+  userId: string;
+  route: '/privacy';
+  requestType: MobilePrivacyRequestType;
+  confirmationRequired: boolean;
+  exportSections: Array<'profile' | 'favorite_stores' | 'watchlist' | 'receipts' | 'households'>;
+  blockers: string[];
+  actions: Array<'reauthenticate' | 'retry_online' | 'download_export' | 'confirm_account_deletion' | 'open_ad_privacy_controls' | 'schedule_receipt_image_cleanup'>;
+};
+
+export function buildMobilePrivacyRequestPlan(input: MobilePrivacyRequestInput): MobilePrivacyRequestPlan {
+  if (!input.userId) throw new Error('userId is required.');
+  if (input.receiptImageRetentionDays !== undefined && input.receiptImageRetentionDays < 0) {
+    throw new Error('receiptImageRetentionDays must be zero or greater.');
+  }
+
+  const blockers: string[] = [];
+  const actions: MobilePrivacyRequestPlan['actions'] = [];
+
+  if (!input.authenticated) {
+    blockers.push('mobile_reauthentication_required');
+    actions.push('reauthenticate');
+  }
+
+  if (!input.networkOnline) {
+    blockers.push('network_required_for_privacy_request');
+    actions.push('retry_online');
+  }
+
+  const confirmationRequired = input.requestType === 'delete_account';
+  if (confirmationRequired && !input.confirmedDestructiveAction) {
+    blockers.push('account_deletion_confirmation_required');
+    actions.push('confirm_account_deletion');
+  }
+
+  const exportSections: MobilePrivacyRequestPlan['exportSections'] =
+    input.requestType === 'export_data' ? ['profile', 'favorite_stores', 'watchlist', 'receipts', 'households'] : [];
+
+  if (blockers.length === 0) {
+    if (input.requestType === 'export_data') actions.push('download_export');
+    if (input.requestType === 'ad_privacy') actions.push('open_ad_privacy_controls');
+    if (input.requestType === 'receipt_retention') actions.push('schedule_receipt_image_cleanup');
+  }
+
+  return {
+    userId: input.userId,
+    route: '/privacy',
+    requestType: input.requestType,
+    confirmationRequired,
+    exportSections,
+    blockers,
+    actions
   };
 }
 
