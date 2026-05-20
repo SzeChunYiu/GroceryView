@@ -12,6 +12,7 @@ describe('buildStaticPages', () => {
       const pages = await buildStaticPages(root);
       assert.deepEqual(pages.sort(), [
         'account/index.html',
+        'admin/human-review/index.html',
         'basket/index.html',
         'categories/coffee/index.html',
         'household/index.html',
@@ -67,6 +68,13 @@ describe('buildStaticPages', () => {
       assert.match(scanner, /manual review queue/);
       assert.match(scanner, /Coop Farsta receipt/);
       assert.match(scanner, /Route to product matching queue/);
+
+      const humanReview = await readFile(join(root, 'admin/human-review/index.html'), 'utf8');
+      assert.match(humanReview, /Human review operations/);
+      assert.match(humanReview, /Moderator assignments/);
+      assert.match(humanReview, /SLA breached/);
+      assert.match(humanReview, /Approve product match/);
+      assert.match(humanReview, /approve_product_match/);
 
       const privacy = await readFile(join(root, 'privacy/index.html'), 'utf8');
       assert.match(privacy, /Export or delete your data/);

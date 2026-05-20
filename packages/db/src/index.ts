@@ -14,6 +14,11 @@ export type SqlExecutor = {
   recordMigration(version: string): Promise<void>;
 };
 
+export const SCHEMA_MIGRATIONS_TABLE_SQL = `create table if not exists schema_migrations (
+  version text primary key,
+  applied_at timestamptz not null default now()
+)`;
+
 export function migrationVersionFromPath(path: string): string {
   const filename = path.split(/[\\/]/).filter(Boolean).at(-1);
   if (!filename || !filename.endsWith('.sql')) throw new Error(`Migration path must end in .sql: ${path}`);
@@ -132,6 +137,29 @@ export async function applyMigrations(executor: SqlExecutor, migrations: Migrati
   return pending.map((migration) => migration.version);
 }
 
+export function createPostgresMigrationExecutor(executor: QueryExecutor): SqlExecutor {
+  async function ensureSchemaMigrationsTable(): Promise<void> {
+    await executor.query(SCHEMA_MIGRATIONS_TABLE_SQL);
+  }
+
+  return {
+    async getAppliedMigrationVersions() {
+      await ensureSchemaMigrationsTable();
+      const rows = await executor.query<MigrationVersionRow>('select version from schema_migrations order by version');
+      return rows.map((row) => row.version);
+    },
+
+    async execute(sql) {
+      await executor.query(sql);
+    },
+
+    async recordMigration(version) {
+      await ensureSchemaMigrationsTable();
+      await executor.query('insert into schema_migrations(version) values ($1) on conflict (version) do nothing', [version]);
+    }
+  };
+}
+
 export type UserRecord = {
   id: string;
   email?: string;
@@ -152,6 +180,162 @@ export type WatchlistRecord = {
 export type BasketRecord = {
   productId: string;
   quantity: number;
+};
+
+export type PriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'estimated';
+
+export type ProductCatalogRecord = {
+  productId: string;
+  slug: string;
+  canonicalName: string;
+  brand?: string;
+  brandOwner?: string;
+  privateLabelOwner?: string;
+  barcode?: string;
+  categoryPath: string[];
+  packageSize?: number;
+  packageUnit?: string;
+  comparableUnit: string;
+  nutrition: Record<string, unknown>;
+  imageUrl?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type PostgresCatalogReader = {
+  getProductBySlug(slug: string): Promise<ProductCatalogRecord | null>;
+};
+
+export type PriceObservationRecord = {
+  productId: string;
+  chainId: string;
+  storeId?: string;
+  sourceRunId?: string;
+  rawRecordId?: string;
+  retailerProductRef?: string;
+  priceType: PriceType;
+  price: number;
+  regularPrice?: number;
+  unitPrice: number;
+  currency?: string;
+  quantity?: number;
+  quantityUnit?: string;
+  promotionText?: string;
+  promotionStartsOn?: string;
+  promotionEndsOn?: string;
+  memberRequired?: boolean;
+  observedAt: string;
+  validFrom?: string;
+  validUntil?: string;
+  confidence: number;
+  provenance: Record<string, unknown>;
+};
+
+export type PriceObservationWriteResult = {
+  observationId: string;
+};
+
+export type PostgresPriceObservationWriter = {
+  recordPriceObservation(observation: PriceObservationRecord): Promise<PriceObservationWriteResult>;
+};
+
+export type PriceObservationHistoryRecord = PriceObservationRecord & {
+  observationId: string;
+  currency: string;
+  memberRequired: boolean;
+};
+
+export type PriceObservationHistoryFilter = {
+  productId: string;
+  chainId?: string;
+  storeId?: string;
+  priceType?: PriceType;
+  observedFrom?: string;
+  observedTo?: string;
+  limit?: number;
+};
+
+export type LatestPriceRecord = {
+  productId: string;
+  chainId: string;
+  storeId?: string;
+  priceType: PriceType;
+  observationId: string;
+  price: number;
+  regularPrice?: number;
+  unitPrice: number;
+  currency: string;
+  observedAt: string;
+  confidence: number;
+  provenance: Record<string, unknown>;
+};
+
+export type PostgresPriceReader = {
+  listLatestPricesForProduct(productId: string): Promise<LatestPriceRecord[]>;
+  listPriceObservationHistory(filter: PriceObservationHistoryFilter): Promise<PriceObservationHistoryRecord[]>;
+};
+
+export type SourceRunRecord = {
+  sourceType: 'retailer_api' | 'retailer_page' | 'weekly_leaflet' | 'receipt_ocr' | 'community_report' | 'manual_seed';
+  sourceName: string;
+  sourceUrl?: string;
+  startedAt?: string;
+  finishedAt?: string;
+  status: 'running' | 'succeeded' | 'failed' | 'partial';
+  provenance: Record<string, unknown>;
+  errorMessage?: string;
+};
+
+export type RawRecordRecord = {
+  sourceRunId: string;
+  recordType: 'product' | 'store' | 'price' | 'promotion' | 'receipt' | 'community_report';
+  externalRef?: string;
+  observedAt?: string;
+  payload: Record<string, unknown>;
+  payloadHash: string;
+  provenance: Record<string, unknown>;
+};
+
+export type RawRecordReadRecord = RawRecordRecord & {
+  rawRecordId: string;
+  createdAt: string;
+};
+
+export type SourceRunReadRecord = SourceRunRecord & {
+  sourceRunId: string;
+  startedAt: string;
+};
+
+export type SourceRunListFilter = {
+  status?: SourceRunRecord['status'];
+  sourceType?: SourceRunRecord['sourceType'];
+  limit?: number;
+};
+
+export type FinishSourceRunRecord = {
+  sourceRunId: string;
+  finishedAt?: string;
+  status: 'succeeded' | 'failed' | 'partial';
+  errorMessage?: string;
+};
+
+export type SourceRunWriteResult = {
+  sourceRunId: string;
+};
+
+export type RawRecordWriteResult = {
+  rawRecordId: string;
+};
+
+export type PostgresSourceRecordWriter = {
+  createSourceRun(sourceRun: SourceRunRecord): Promise<SourceRunWriteResult>;
+  finishSourceRun(sourceRun: FinishSourceRunRecord): Promise<SourceRunWriteResult>;
+  upsertRawRecord(rawRecord: RawRecordRecord): Promise<RawRecordWriteResult>;
+};
+
+export type PostgresSourceRecordReader = {
+  listSourceRuns(filter?: SourceRunListFilter): Promise<SourceRunReadRecord[]>;
+  getRawRecordByHash(sourceRunId: string, payloadHash: string): Promise<RawRecordReadRecord | null>;
 };
 
 export type HumanReviewerRecord = {
@@ -462,9 +646,190 @@ type HumanReviewAssignmentRow = {
   due_at: string | Date;
   status: HumanReviewAssignmentRecord['status'];
 };
+type LatestPriceRow = {
+  product_id: string;
+  chain_id: string;
+  store_id: string | null;
+  price_type: PriceType;
+  observation_id: string;
+  price: string | number;
+  regular_price: string | number | null;
+  unit_price: string | number;
+  currency: string;
+  observed_at: string | Date;
+  confidence: string | number;
+  provenance: Record<string, unknown> | string | null;
+};
+type PriceObservationHistoryRow = {
+  id: string;
+  product_id: string;
+  chain_id: string;
+  store_id: string | null;
+  source_run_id: string | null;
+  raw_record_id: string | null;
+  retailer_product_ref: string | null;
+  price_type: PriceType;
+  price: string | number;
+  regular_price: string | number | null;
+  unit_price: string | number;
+  currency: string;
+  quantity: string | number | null;
+  quantity_unit: string | null;
+  promotion_text: string | null;
+  promotion_starts_on: string | Date | null;
+  promotion_ends_on: string | Date | null;
+  member_required: boolean;
+  observed_at: string | Date;
+  valid_from: string | Date | null;
+  valid_until: string | Date | null;
+  confidence: string | number;
+  provenance: Record<string, unknown> | string | null;
+};
+type RawRecordRow = {
+  id: string;
+  source_run_id: string;
+  record_type: RawRecordRecord['recordType'];
+  external_ref: string | null;
+  observed_at: string | Date | null;
+  payload: Record<string, unknown> | string;
+  payload_hash: string;
+  provenance: Record<string, unknown> | string | null;
+  created_at: string | Date;
+};
+type SourceRunRow = {
+  id: string;
+  source_type: SourceRunRecord['sourceType'];
+  source_name: string;
+  source_url: string | null;
+  started_at: string | Date;
+  finished_at: string | Date | null;
+  status: SourceRunRecord['status'];
+  provenance: Record<string, unknown> | string | null;
+  error_message: string | null;
+};
+type ProductCatalogRow = {
+  id: string;
+  slug: string;
+  canonical_name: string;
+  brand: string | null;
+  brand_owner: string | null;
+  private_label_owner: string | null;
+  barcode: string | null;
+  category_path: string[];
+  package_size: string | number | null;
+  package_unit: string | null;
+  comparable_unit: string;
+  nutrition: Record<string, unknown> | string | null;
+  image_url: string | null;
+  created_at: string | Date;
+  updated_at: string | Date;
+};
 
 function asIso(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : value;
+}
+
+function asRecord(value: Record<string, unknown> | string | null): Record<string, unknown> {
+  if (!value) return {};
+  if (typeof value === 'string') return JSON.parse(value) as Record<string, unknown>;
+  return value;
+}
+
+function mapLatestPrice(row: LatestPriceRow): LatestPriceRecord {
+  return {
+    productId: row.product_id,
+    chainId: row.chain_id,
+    ...(row.store_id ? { storeId: row.store_id } : {}),
+    priceType: row.price_type,
+    observationId: row.observation_id,
+    price: Number(row.price),
+    ...(row.regular_price === null ? {} : { regularPrice: Number(row.regular_price) }),
+    unitPrice: Number(row.unit_price),
+    currency: row.currency,
+    observedAt: asIso(row.observed_at),
+    confidence: Number(row.confidence),
+    provenance: asRecord(row.provenance)
+  };
+}
+
+function optionalIso(value: string | Date | null): string | undefined {
+  return value === null ? undefined : asIso(value);
+}
+
+function mapPriceObservationHistory(row: PriceObservationHistoryRow): PriceObservationHistoryRecord {
+  return {
+    observationId: row.id,
+    productId: row.product_id,
+    chainId: row.chain_id,
+    ...(row.store_id ? { storeId: row.store_id } : {}),
+    ...(row.source_run_id ? { sourceRunId: row.source_run_id } : {}),
+    ...(row.raw_record_id ? { rawRecordId: row.raw_record_id } : {}),
+    ...(row.retailer_product_ref ? { retailerProductRef: row.retailer_product_ref } : {}),
+    priceType: row.price_type,
+    price: Number(row.price),
+    ...(row.regular_price === null ? {} : { regularPrice: Number(row.regular_price) }),
+    unitPrice: Number(row.unit_price),
+    currency: row.currency,
+    ...(row.quantity === null ? {} : { quantity: Number(row.quantity) }),
+    ...(row.quantity_unit ? { quantityUnit: row.quantity_unit } : {}),
+    ...(row.promotion_text ? { promotionText: row.promotion_text } : {}),
+    ...(optionalIso(row.promotion_starts_on) ? { promotionStartsOn: optionalIso(row.promotion_starts_on) } : {}),
+    ...(optionalIso(row.promotion_ends_on) ? { promotionEndsOn: optionalIso(row.promotion_ends_on) } : {}),
+    memberRequired: row.member_required,
+    observedAt: asIso(row.observed_at),
+    ...(optionalIso(row.valid_from) ? { validFrom: optionalIso(row.valid_from) } : {}),
+    ...(optionalIso(row.valid_until) ? { validUntil: optionalIso(row.valid_until) } : {}),
+    confidence: Number(row.confidence),
+    provenance: asRecord(row.provenance)
+  };
+}
+
+function mapRawRecord(row: RawRecordRow): RawRecordReadRecord {
+  return {
+    rawRecordId: row.id,
+    sourceRunId: row.source_run_id,
+    recordType: row.record_type,
+    ...(row.external_ref ? { externalRef: row.external_ref } : {}),
+    ...(row.observed_at ? { observedAt: asIso(row.observed_at) } : {}),
+    payload: asRecord(row.payload),
+    payloadHash: row.payload_hash,
+    provenance: asRecord(row.provenance),
+    createdAt: asIso(row.created_at)
+  };
+}
+
+function mapSourceRun(row: SourceRunRow): SourceRunReadRecord {
+  return {
+    sourceRunId: row.id,
+    sourceType: row.source_type,
+    sourceName: row.source_name,
+    ...(row.source_url ? { sourceUrl: row.source_url } : {}),
+    startedAt: asIso(row.started_at),
+    ...(row.finished_at ? { finishedAt: asIso(row.finished_at) } : {}),
+    status: row.status,
+    provenance: asRecord(row.provenance),
+    ...(row.error_message ? { errorMessage: row.error_message } : {})
+  };
+}
+
+function mapProductCatalog(row: ProductCatalogRow): ProductCatalogRecord {
+  return {
+    productId: row.id,
+    slug: row.slug,
+    canonicalName: row.canonical_name,
+    ...(row.brand ? { brand: row.brand } : {}),
+    ...(row.brand_owner ? { brandOwner: row.brand_owner } : {}),
+    ...(row.private_label_owner ? { privateLabelOwner: row.private_label_owner } : {}),
+    ...(row.barcode ? { barcode: row.barcode } : {}),
+    categoryPath: [...row.category_path],
+    ...(row.package_size === null ? {} : { packageSize: Number(row.package_size) }),
+    ...(row.package_unit ? { packageUnit: row.package_unit } : {}),
+    comparableUnit: row.comparable_unit,
+    nutrition: asRecord(row.nutrition),
+    ...(row.image_url ? { imageUrl: row.image_url } : {}),
+    createdAt: asIso(row.created_at),
+    updatedAt: asIso(row.updated_at)
+  };
 }
 
 function mapHumanReviewAssignment(row: HumanReviewAssignmentRow): HumanReviewAssignmentRecord {
@@ -797,6 +1162,35 @@ export function createPgQueryExecutor(client: PgLikeClient): QueryExecutor {
   };
 }
 
+export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCatalogReader {
+  return {
+    async getProductBySlug(slug) {
+      const rows = await executor.query<ProductCatalogRow>(
+        `select id,
+                slug,
+                canonical_name,
+                brand,
+                brand_owner,
+                private_label_owner,
+                barcode,
+                category_path,
+                package_size,
+                package_unit,
+                comparable_unit,
+                nutrition,
+                image_url,
+                created_at,
+                updated_at
+         from products
+         where slug = $1`,
+        [slug]
+      );
+      const row = rows[0];
+      return row ? mapProductCatalog(row) : null;
+    }
+  };
+}
+
 export type PostgresIntegrationProbe = {
   requiredTables: string[];
   existingTables: string[];
@@ -813,6 +1207,11 @@ export type PostgresRepositoryProbe = {
   run(executor: QueryExecutor): Promise<void>;
 };
 
+export type BuildPostgresRepositorySmokeProbesInput = {
+  runId: string;
+  now: string;
+};
+
 export type CollectPostgresIntegrationProbeInput = {
   executor: QueryExecutor;
   requiredTables?: readonly string[];
@@ -823,8 +1222,18 @@ export type CollectPostgresIntegrationProbeInput = {
 export type CheckPostgresIntegrationReadinessInput = CollectPostgresIntegrationProbeInput;
 
 export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
+  'chains',
+  'products',
+  'source_runs',
+  'raw_records',
+  'observations',
+  'latest_prices',
   'app_users',
   'favorite_stores',
+  'user_preferences',
+  'watchlist_items',
+  'weekly_baskets',
+  'basket_items',
   'human_review_assignments',
   'human_reviewers',
   'community_reporter_trust',
@@ -833,14 +1242,137 @@ export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
 ] as const;
 
 export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
-  '001_initial_schema',
-  '003_human_review_assignments',
-  '004_human_reviewers',
-  '005_community_reporter_trust',
-  '006_notification_tasks',
-  '007_notification_suppressions',
-  '008_notification_task_suppressed_status'
+  '001_groceryview_schema',
+  '002_repository_support_schema'
 ] as const;
+
+function assertProbe(condition: boolean, message: string): void {
+  if (!condition) throw new Error(message);
+}
+
+export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositorySmokeProbesInput): PostgresRepositoryProbe[] {
+  const safeId = input.runId.replace(/[^a-zA-Z0-9_-]/g, '-');
+  const userId = `postgres-probe-user-${safeId}`;
+  const assignmentId = `postgres-probe-assignment-${safeId}`;
+  const suppressionId = `postgres-probe-suppression-${safeId}`;
+  const chainSlug = `postgres-probe-chain-${safeId}`;
+  const productSlug = `postgres-probe-product-${safeId}`;
+
+  return [
+    {
+      name: 'user_budget_round_trip',
+      async run(executor) {
+        const repository = createPostgresRepository(executor);
+        await repository.upsertUser({ id: userId, email: `${userId}@example.invalid` });
+        await repository.upsertBudget(userId, { weeklyBudget: 1000, monthlyBudget: 4000 });
+        const budget = await repository.getBudget(userId);
+        assertProbe(budget?.weeklyBudget === 1000 && budget.monthlyBudget === 4000, 'user budget round trip did not return the written values');
+      }
+    },
+    {
+      name: 'human_review_assignment_round_trip',
+      async run(executor) {
+        const repository = createPostgresRepository(executor);
+        await repository.saveHumanReviewAssignment({
+          id: assignmentId,
+          reviewId: assignmentId,
+          subjectType: 'product_match',
+          subjectId: `postgres-probe-match-${safeId}`,
+          priority: 'low',
+          reason: 'PostgreSQL integration smoke probe.',
+          assigneeId: `postgres-probe-reviewer-${safeId}`,
+          assignedAt: input.now,
+          dueAt: input.now,
+          status: 'assigned'
+        });
+        const assignments = await repository.listOpenHumanReviewAssignments();
+        assertProbe(assignments.some((assignment) => assignment.id === assignmentId), 'human review assignment probe row was not readable');
+      }
+    },
+    {
+      name: 'notification_suppression_round_trip',
+      async run(executor) {
+        const repository = createPostgresRepository(executor);
+        await repository.upsertNotificationSuppression({
+          id: suppressionId,
+          recipient: `${userId}@example.invalid`,
+          channel: 'email',
+          reason: 'unsubscribed',
+          active: true,
+          updatedAt: input.now
+        });
+        const suppressions = await repository.listActiveNotificationSuppressions();
+        assertProbe(suppressions.some((suppression) => suppression.id === suppressionId), 'notification suppression probe row was not readable');
+      }
+    },
+    {
+      name: 'price_observation_pipeline_round_trip',
+      async run(executor) {
+        const chainRows = await executor.query<ProbeIdRow>(
+          `insert into chains(slug, name, country_code)
+           values ($1, $2, 'SE')
+           on conflict (slug) do update set name = excluded.name, updated_at = now()
+           returning id`,
+          [chainSlug, `Postgres Probe Chain ${safeId}`]
+        );
+        const chainId = chainRows[0]?.id;
+        assertProbe(Boolean(chainId), 'price observation probe chain id was not returned');
+
+        const productRows = await executor.query<ProbeIdRow>(
+          `insert into products(slug, canonical_name, comparable_unit)
+           values ($1, $2, 'pcs')
+           on conflict (slug) do update set canonical_name = excluded.canonical_name, updated_at = now()
+           returning id`,
+          [productSlug, `Postgres Probe Product ${safeId}`]
+        );
+        const productId = productRows[0]?.id;
+        assertProbe(Boolean(productId), 'price observation probe product id was not returned');
+
+        const sourceWriter = createPostgresSourceRecordWriter(executor);
+        const priceWriter = createPostgresPriceObservationWriter(executor);
+        const sourceRun = await sourceWriter.createSourceRun({
+          sourceType: 'manual_seed',
+          sourceName: 'Postgres integration probe',
+          startedAt: input.now,
+          finishedAt: input.now,
+          status: 'succeeded',
+          provenance: { runId: input.runId, probe: 'price_observation_pipeline_round_trip' }
+        });
+        const rawRecord = await sourceWriter.upsertRawRecord({
+          sourceRunId: sourceRun.sourceRunId,
+          recordType: 'price',
+          observedAt: input.now,
+          payload: { chainSlug, productSlug, price: 12.34 },
+          payloadHash: `postgres-probe-price-${safeId}`,
+          provenance: { runId: input.runId }
+        });
+        const observation = await priceWriter.recordPriceObservation({
+          productId,
+          chainId,
+          sourceRunId: sourceRun.sourceRunId,
+          rawRecordId: rawRecord.rawRecordId,
+          retailerProductRef: `postgres-probe-ref-${safeId}`,
+          priceType: 'online',
+          price: 12.34,
+          unitPrice: 12.34,
+          observedAt: input.now,
+          confidence: 0.99,
+          provenance: { runId: input.runId, sourceRunId: sourceRun.sourceRunId, rawRecordId: rawRecord.rawRecordId }
+        });
+        const latestRows = await executor.query<LatestPriceProbeRow>(
+          `select observation_id
+           from latest_prices
+           where product_id = $1 and chain_id = $2 and store_id is null and price_type = 'online'`,
+          [productId, chainId]
+        );
+        assertProbe(
+          latestRows.some((row) => row.observation_id === observation.observationId),
+          'latest price probe row did not reference the written observation'
+        );
+      }
+    }
+  ];
+}
 
 export type PostgresIntegrationReadinessReport = {
   status: 'ready' | 'blocked';
@@ -851,6 +1383,319 @@ export type PostgresIntegrationReadinessReport = {
 
 type TableNameRow = { table_name: string };
 type MigrationVersionRow = { version: string };
+type ProbeIdRow = { id: string };
+type LatestPriceProbeRow = { observation_id: string };
+type ObservationIdRow = { id: string };
+type SourceRunIdRow = { id: string };
+type RawRecordIdRow = { id: string };
+
+export function createPostgresSourceRecordWriter(executor: QueryExecutor): PostgresSourceRecordWriter {
+  return {
+    async createSourceRun(sourceRun) {
+      const rows = await executor.query<SourceRunIdRow>(
+        `insert into source_runs(
+           source_type,
+           source_name,
+           source_url,
+           started_at,
+           finished_at,
+           status,
+           provenance,
+           error_message
+         ) values ($1, $2, $3, coalesce($4, now()), $5, $6, $7::jsonb, $8)
+         returning id`,
+        [
+          sourceRun.sourceType,
+          sourceRun.sourceName,
+          sourceRun.sourceUrl ?? null,
+          sourceRun.startedAt ?? null,
+          sourceRun.finishedAt ?? null,
+          sourceRun.status,
+          JSON.stringify(sourceRun.provenance),
+          sourceRun.errorMessage ?? null
+        ]
+      );
+      const sourceRunId = rows[0]?.id;
+      if (!sourceRunId) throw new Error('Source run insert did not return an id');
+      return { sourceRunId };
+    },
+
+    async finishSourceRun(sourceRun) {
+      const rows = await executor.query<SourceRunIdRow>(
+        `update source_runs
+         set finished_at = coalesce($2, now()),
+             status = $3,
+             error_message = $4
+         where id = $1
+         returning id`,
+        [sourceRun.sourceRunId, sourceRun.finishedAt ?? null, sourceRun.status, sourceRun.errorMessage ?? null]
+      );
+      const sourceRunId = rows[0]?.id;
+      if (!sourceRunId) throw new Error(`Source run update did not return an id: ${sourceRun.sourceRunId}`);
+      return { sourceRunId };
+    },
+
+    async upsertRawRecord(rawRecord) {
+      const rows = await executor.query<RawRecordIdRow>(
+        `insert into raw_records(
+           source_run_id,
+           record_type,
+           external_ref,
+           observed_at,
+           payload,
+           payload_hash,
+           provenance
+         ) values ($1, $2, $3, $4, $5::jsonb, $6, $7::jsonb)
+         on conflict (source_run_id, payload_hash) do update set
+           record_type = excluded.record_type,
+           external_ref = excluded.external_ref,
+           observed_at = excluded.observed_at,
+           payload = excluded.payload,
+           provenance = excluded.provenance
+         returning id`,
+        [
+          rawRecord.sourceRunId,
+          rawRecord.recordType,
+          rawRecord.externalRef ?? null,
+          rawRecord.observedAt ?? null,
+          JSON.stringify(rawRecord.payload),
+          rawRecord.payloadHash,
+          JSON.stringify(rawRecord.provenance)
+        ]
+      );
+      const rawRecordId = rows[0]?.id;
+      if (!rawRecordId) throw new Error('Raw record upsert did not return an id');
+      return { rawRecordId };
+    }
+  };
+}
+
+export function createPostgresSourceRecordReader(executor: QueryExecutor): PostgresSourceRecordReader {
+  return {
+    async listSourceRuns(filter = {}) {
+      const limit = Math.min(Math.max(filter.limit ?? 100, 1), 500);
+      const rows = await executor.query<SourceRunRow>(
+        `select id,
+                source_type,
+                source_name,
+                source_url,
+                started_at,
+                finished_at,
+                status,
+                provenance,
+                error_message
+         from source_runs
+         where ($1::text is null or status = $1)
+           and ($2::text is null or source_type = $2)
+         order by started_at desc, id
+         limit $3`,
+        [filter.status ?? null, filter.sourceType ?? null, limit]
+      );
+      return rows.map(mapSourceRun);
+    },
+
+    async getRawRecordByHash(sourceRunId, payloadHash) {
+      const rows = await executor.query<RawRecordRow>(
+        `select id,
+                source_run_id,
+                record_type,
+                external_ref,
+                observed_at,
+                payload,
+                payload_hash,
+                provenance,
+                created_at
+         from raw_records
+         where source_run_id = $1 and payload_hash = $2`,
+        [sourceRunId, payloadHash]
+      );
+      const row = rows[0];
+      return row ? mapRawRecord(row) : null;
+    }
+  };
+}
+
+export function createPostgresPriceObservationWriter(executor: QueryExecutor): PostgresPriceObservationWriter {
+  return {
+    async recordPriceObservation(observation) {
+      const provenanceJson = JSON.stringify(observation.provenance);
+      const rows = await executor.query<ObservationIdRow>(
+        `insert into observations(
+           product_id,
+           chain_id,
+           store_id,
+           source_run_id,
+           raw_record_id,
+           retailer_product_ref,
+           price_type,
+           price,
+           regular_price,
+           unit_price,
+           currency,
+           quantity,
+           quantity_unit,
+           promotion_text,
+           promotion_starts_on,
+           promotion_ends_on,
+           member_required,
+           observed_at,
+           valid_from,
+           valid_until,
+           confidence,
+           provenance
+         ) values (
+           $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
+           $13, $14, $15, $16, $17, $18, $19, $20, $21, $22::jsonb
+         )
+         returning id`,
+        [
+          observation.productId,
+          observation.chainId,
+          observation.storeId ?? null,
+          observation.sourceRunId ?? null,
+          observation.rawRecordId ?? null,
+          observation.retailerProductRef ?? null,
+          observation.priceType,
+          observation.price,
+          observation.regularPrice ?? null,
+          observation.unitPrice,
+          observation.currency ?? 'SEK',
+          observation.quantity ?? null,
+          observation.quantityUnit ?? null,
+          observation.promotionText ?? null,
+          observation.promotionStartsOn ?? null,
+          observation.promotionEndsOn ?? null,
+          observation.memberRequired ?? false,
+          observation.observedAt,
+          observation.validFrom ?? null,
+          observation.validUntil ?? null,
+          observation.confidence,
+          provenanceJson
+        ]
+      );
+      const observationId = rows[0]?.id;
+      if (!observationId) throw new Error('Price observation insert did not return an id');
+
+      await executor.query(
+        `insert into latest_prices(
+           product_id,
+           chain_id,
+           store_id,
+           price_type,
+           observation_id,
+           price,
+           regular_price,
+           unit_price,
+           currency,
+           observed_at,
+           confidence,
+           provenance
+         ) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12::jsonb)
+         on conflict (product_id, chain_id, store_id, price_type) do update set
+           observation_id = excluded.observation_id,
+           price = excluded.price,
+           regular_price = excluded.regular_price,
+           unit_price = excluded.unit_price,
+           currency = excluded.currency,
+           observed_at = excluded.observed_at,
+           confidence = excluded.confidence,
+           provenance = excluded.provenance,
+           updated_at = now()
+         where latest_prices.observed_at <= excluded.observed_at`,
+        [
+          observation.productId,
+          observation.chainId,
+          observation.storeId ?? null,
+          observation.priceType,
+          observationId,
+          observation.price,
+          observation.regularPrice ?? null,
+          observation.unitPrice,
+          observation.currency ?? 'SEK',
+          observation.observedAt,
+          observation.confidence,
+          provenanceJson
+        ]
+      );
+
+      return { observationId };
+    }
+  };
+}
+
+export function createPostgresPriceReader(executor: QueryExecutor): PostgresPriceReader {
+  return {
+    async listLatestPricesForProduct(productId) {
+      const rows = await executor.query<LatestPriceRow>(
+        `select product_id,
+                chain_id,
+                store_id,
+                price_type,
+                observation_id,
+                price,
+                regular_price,
+                unit_price,
+                currency,
+                observed_at,
+                confidence,
+                provenance
+         from latest_prices
+         where product_id = $1
+         order by observed_at desc, chain_id, store_id, price_type`,
+        [productId]
+      );
+      return rows.map(mapLatestPrice);
+    },
+
+    async listPriceObservationHistory(filter) {
+      const limit = Math.min(Math.max(filter.limit ?? 500, 1), 1000);
+      const rows = await executor.query<PriceObservationHistoryRow>(
+        `select id,
+                product_id,
+                chain_id,
+                store_id,
+                source_run_id,
+                raw_record_id,
+                retailer_product_ref,
+                price_type,
+                price,
+                regular_price,
+                unit_price,
+                currency,
+                quantity,
+                quantity_unit,
+                promotion_text,
+                promotion_starts_on,
+                promotion_ends_on,
+                member_required,
+                observed_at,
+                valid_from,
+                valid_until,
+                confidence,
+                provenance
+         from observations
+         where product_id = $1
+           and ($2::uuid is null or chain_id = $2::uuid)
+           and ($3::uuid is null or store_id = $3::uuid)
+           and ($4::text is null or price_type = $4)
+           and ($5::timestamptz is null or observed_at >= $5::timestamptz)
+           and ($6::timestamptz is null or observed_at <= $6::timestamptz)
+         order by observed_at desc, chain_id, store_id, price_type, id
+         limit $7`,
+        [
+          filter.productId,
+          filter.chainId ?? null,
+          filter.storeId ?? null,
+          filter.priceType ?? null,
+          filter.observedFrom ?? null,
+          filter.observedTo ?? null,
+          limit
+        ]
+      );
+      return rows.map(mapPriceObservationHistory);
+    }
+  };
+}
 
 export async function collectPostgresIntegrationProbe(input: CollectPostgresIntegrationProbeInput): Promise<PostgresIntegrationProbe> {
   const requiredTables = [...(input.requiredTables ?? POSTGRES_INTEGRATION_REQUIRED_TABLES)];

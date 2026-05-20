@@ -118,7 +118,10 @@ describe('infra/db PostgreSQL schema contract', () => {
     for (const table of [...requiredTables, ...repositoryTables]) {
       assert.match(migrationVerifier, new RegExp(`\\b${table}\\b`), `${table} missing from migration verifier`);
     }
+    assert.match(migrationVerifier, /create table if not exists schema_migrations/);
+    assert.match(migrationVerifier, /insert into schema_migrations\(version\)/);
     assert.match(migrationVerifier, /information_schema\.tables/);
+    assert.match(migrationVerifier, /migration metadata assertion failed/);
     assert.match(migrationVerifier, /migration table assertion failed/);
   });
 });

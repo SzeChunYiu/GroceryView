@@ -1,4 +1,14 @@
-import { buildWatchlistAlerts, calculateDealScore, calculateFixedBasketIndex, compareBasketStrategies, scoreBand, searchProducts, summarizeBudget } from '@groceryview/core';
+import {
+  applyHumanReviewDecision,
+  buildWatchlistAlerts,
+  calculateDealScore,
+  calculateFixedBasketIndex,
+  compareBasketStrategies,
+  scoreBand,
+  searchProducts,
+  summarizeBudget,
+  summarizeHumanReviewSla
+} from '@groceryview/core';
 
 type ProductRow = {
   ticker: string;
@@ -107,6 +117,52 @@ const scannerReviews = [
   }
 ];
 
+const humanReviewAssignments = [
+  {
+    id: 'assignment-review-match-1-moderator-1',
+    reviewId: 'review-match-1',
+    subjectType: 'product_match' as const,
+    subjectId: 'match-1',
+    priority: 'high' as const,
+    reason: 'Loose tomatoes label has low confidence and high quality risk.',
+    assigneeId: 'moderator-1',
+    assignedAt: '2026-05-19T10:00:00.000Z',
+    dueAt: '2026-05-19T12:00:00.000Z',
+    status: 'assigned' as const
+  },
+  {
+    id: 'assignment-review-report-1-moderator-2',
+    reviewId: 'review-report-1',
+    subjectType: 'community_report' as const,
+    subjectId: 'report-1',
+    priority: 'medium' as const,
+    reason: 'Community report for coffee price has low confidence score.',
+    assigneeId: 'moderator-2',
+    assignedAt: '2026-05-19T09:30:00.000Z',
+    dueAt: '2026-05-20T09:30:00.000Z',
+    status: 'in_progress' as const
+  }
+];
+
+const humanReviewSla = summarizeHumanReviewSla({
+  assignments: humanReviewAssignments,
+  now: '2026-05-19T12:30:00.000Z'
+});
+
+const humanReviewDecisionPreview = applyHumanReviewDecision({
+  item: {
+    id: humanReviewAssignments[0].reviewId,
+    subjectType: humanReviewAssignments[0].subjectType,
+    subjectId: humanReviewAssignments[0].subjectId,
+    priority: humanReviewAssignments[0].priority,
+    reason: humanReviewAssignments[0].reason
+  },
+  decision: 'approve',
+  reviewerId: humanReviewAssignments[0].assigneeId,
+  decidedAt: '2026-05-19T12:45:00.000Z',
+  notes: 'Shelf photo confirms equivalent produce unit.'
+});
+
 const privacyControls = [
   { setting: 'Receipt images', state: 'Auto-delete after review', detail: '7 day retention window' },
   { setting: 'Location precision', state: 'District only', detail: 'Street address hidden from exports' },
@@ -198,6 +254,34 @@ app.innerHTML = `
           <div class="metric"><strong>${scannerReviews.filter((review) => review.status === 'Matched').length}</strong><span>matched capture</span></div>
           <div class="metric"><strong>${scannerReviews.filter((review) => review.status !== 'Matched').length}</strong><span>review queue</span></div>
           <div class="metric"><strong>${Math.round(scannerReviews.reduce((sum, review) => sum + review.confidence, 0) / scannerReviews.length)}%</strong><span>average confidence</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Human review operations</h2>
+        <p class="lede">Admin reviewers see assignment ownership, SLA state, and the exact writeback action before a product match or community report changes catalog data.</p>
+        <table class="table">
+          <thead><tr><th>Review</th><th>Priority</th><th>Assignee</th><th>Due</th><th>Status</th></tr></thead>
+          <tbody>
+            ${humanReviewAssignments.map((assignment) => `<tr>
+              <td><strong>${assignment.reviewId}</strong><br><span class="footer-note">${assignment.reason}</span></td>
+              <td>${assignment.priority}</td>
+              <td>${assignment.assigneeId}</td>
+              <td>${assignment.dueAt.replace('T', ' ').slice(0, 16)}</td>
+              <td><span class="status">${assignment.status}</span></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Decision controls</h2>
+        <p class="lede">Only assigned moderators can submit decisions; approvals and rejections are previewed as auditable writeback actions.</p>
+        <div class="grid">
+          <div class="metric"><strong>${humanReviewSla.status}</strong><span>SLA state</span></div>
+          <div class="metric"><strong>${humanReviewSla.overdueAssignments}</strong><span>overdue assignment</span></div>
+          <div class="metric"><strong>${humanReviewDecisionPreview.writeback.action.replaceAll('_', ' ')}</strong><span>next writeback</span></div>
         </div>
       </div>
     </section>

@@ -74,14 +74,46 @@ done
 
 docker exec "$CONTAINER_NAME" pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" >/dev/null
 
+docker exec "$CONTAINER_NAME" \
+  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 \
+  -c "create table if not exists schema_migrations (version text primary key, applied_at timestamptz not null default now())" >/dev/null
+
 for migration in "${MIGRATIONS[@]}"; do
   echo "applying $(basename "$migration")"
   docker exec -i "$CONTAINER_NAME" \
     psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 \
     < "$migration"
+  version="$(basename "$migration" .sql)"
+  docker exec "$CONTAINER_NAME" \
+    psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -v ON_ERROR_STOP=1 \
+    -c "insert into schema_migrations(version) values ('${version}') on conflict (version) do nothing" >/dev/null
 done
 
 echo "applied ${#MIGRATIONS[@]} migration(s) successfully"
+
+required_migration_values=""
+for migration in "${MIGRATIONS[@]}"; do
+  required_migration_values="${required_migration_values}('$(basename "$migration" .sql)'),"
+done
+required_migration_values="${required_migration_values%,}"
+
+missing_migrations="$(
+  docker exec "$CONTAINER_NAME" \
+    psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc \
+    "with required(version) as (values ${required_migration_values})
+     select coalesce(string_agg(required.version, ',' order by required.version), '')
+     from required
+     left join schema_migrations applied
+       on applied.version = required.version
+     where applied.version is null"
+)"
+
+if [ -n "$missing_migrations" ]; then
+  echo "migration metadata assertion failed: missing ${missing_migrations}" >&2
+  exit 1
+fi
+
+echo "migration metadata ok"
 
 required_table_values=""
 for table in "${REQUIRED_TABLES[@]}"; do
