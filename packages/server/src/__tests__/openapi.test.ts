@@ -16,6 +16,7 @@ describe('buildOpenApiDocument', () => {
       '/api/basket/current',
       '/api/basket/items',
       '/api/basket/items/{productId}',
+      '/api/basket/local-offers',
       '/api/billing/subscription-events',
       '/api/budget',
       '/api/budget/categories',
@@ -69,6 +70,7 @@ describe('buildOpenApiDocument', () => {
     assert.equal(doc.paths['/api/auth/session'].post?.security, undefined);
     assert.deepEqual(doc.paths['/api/billing/subscription-events'].post?.security, [{ billingWebhookSignature: [] }]);
     assert.deepEqual(doc.paths['/api/basket/comparison-report'].get?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/basket/local-offers'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/budget/categories'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/budget/categories'].patch?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/watchlist'].get?.security, [{ bearerAuth: [] }]);

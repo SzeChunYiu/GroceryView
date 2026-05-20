@@ -1076,6 +1076,14 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(api.compareBasketReport(user));
       }
 
+      if (path === '/api/basket/local-offers') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(api.getLocalOfferBasketReport(user, url.searchParams.get('asOf') ?? undefined));
+      }
+
       if (path === '/api/budget') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -1357,6 +1365,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       },
       '/api/basket/compare': { post: protectedOperation('Compare basket strategies.') },
       '/api/basket/comparison-report': { get: protectedOperation('Get basket comparison strategies with assignment and trust labels.') },
+      '/api/basket/local-offers': { get: protectedOperation('Get local offer basket coverage, freshness, confidence, and savings by selected stores.') },
       '/api/budget': { patch: protectedOperation('Update budget.') },
       '/api/budget/categories': {
         get: protectedOperation('Get category budget summary.'),

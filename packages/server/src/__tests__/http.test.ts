@@ -476,6 +476,43 @@ describe('createHttpHandler', () => {
       priceLabel: assignment.priceLabel
     })), [{ productId: 'coffee', lineTotal: 99.8, priceLabel: 'verified_shelf' }]);
 
+    const localOffers = await json(await handle(new Request('http://localhost/api/basket/local-offers?userId=user-1&asOf=2026-05-20T12:00:00.000Z'))) as {
+      storeIds: string[];
+      basketItemCount: number;
+      baselineTotal: number;
+      bestStore?: { storeId: string; subtotal: number; coveragePercent: number; savingsVsBaseline?: number };
+      guardrails: string[];
+    };
+    assert.deepEqual(localOffers.storeIds, ['willys-odenplan']);
+    assert.equal(localOffers.basketItemCount, 1);
+    assert.equal(localOffers.baselineTotal, 119.8);
+    assert.deepEqual(localOffers.bestStore, {
+      storeId: 'willys-odenplan',
+      storeName: 'Willys Odenplan',
+      subtotal: 99.8,
+      matchedProductIds: ['coffee'],
+      missingProductIds: [],
+      unavailableProductIds: [],
+      staleProductIds: [],
+      coveragePercent: 100,
+      averageConfidence: 0.9,
+      confidenceLabel: 'high',
+      freshnessLabel: 'fresh',
+      sourceTypes: ['online'],
+      lines: [{
+        productId: 'coffee',
+        quantity: 2,
+        unitPrice: 49.9,
+        lineTotal: 99.8,
+        sourceType: 'online',
+        confidence: 0.9,
+        observedAt: '2026-05-19T08:00:00.000Z',
+        stale: false
+      }],
+      savingsVsBaseline: 20
+    });
+    assert.match(localOffers.guardrails[0], /favorite stores/);
+
     const budget = await json(await handle(new Request('http://localhost/api/budget/summary?userId=user-1'))) as { weeklyRemainingAfterEstimate: number };
     assert.equal(budget.weeklyRemainingAfterEstimate, 700.2);
 
