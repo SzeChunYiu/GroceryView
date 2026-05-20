@@ -77,28 +77,15 @@ export type MobilePriceTerminalSummary = {
   guardrails: string[];
 };
 
-function buildMobilePriceTerminalSummary(product: ProductDetail, terminal: ProductPriceTerminalReport | null): MobilePriceTerminalSummary {
-  if (!terminal) {
-    return {
-      quote: {
-        bestPrice: product.currentPrices[0]?.price ?? null,
-        bestStoreName: product.currentPrices[0]?.storeName ?? null,
-        unitPrice: 'unknown',
-        dealScore: product.dealScore,
-        range52Week: null,
-        evidenceVolume: { currentPrices: product.currentPrices.length, historyPoints: product.history.length, verifiedHistoryPoints: product.history.filter((point) => point.verified).length }
-      },
-      distributionSummaries: [],
-      chartSummary: {
-        seriesCount: 0,
-        markerCount: 0,
-        historyPointCount: product.history.length,
-        isNewLow: false
-      },
-      guardrails: ['Product terminal report unavailable; use current prices as a fallback only.']
-    };
-  }
+export type MobileProductTerminalLoadInput = {
+  apiBase: string;
+  productId: string;
+  asOf?: string;
+  bearerToken?: string;
+  fetcher?: typeof fetch;
+};
 
+function mobilePriceTerminalSummaryFromReport(terminal: ProductPriceTerminalReport): MobilePriceTerminalSummary {
   return {
     quote: {
       bestPrice: terminal.quote.bestPrice,
@@ -126,6 +113,54 @@ function buildMobilePriceTerminalSummary(product: ProductDetail, terminal: Produ
     },
     guardrails: [...terminal.evidenceGuardrails]
   };
+}
+
+function buildMobilePriceTerminalSummary(product: ProductDetail, terminal: ProductPriceTerminalReport | null): MobilePriceTerminalSummary {
+  if (!terminal) {
+    return {
+      quote: {
+        bestPrice: product.currentPrices[0]?.price ?? null,
+        bestStoreName: product.currentPrices[0]?.storeName ?? null,
+        unitPrice: 'unknown',
+        dealScore: product.dealScore,
+        range52Week: null,
+        evidenceVolume: { currentPrices: product.currentPrices.length, historyPoints: product.history.length, verifiedHistoryPoints: product.history.filter((point) => point.verified).length }
+      },
+      distributionSummaries: [],
+      chartSummary: {
+        seriesCount: 0,
+        markerCount: 0,
+        historyPointCount: product.history.length,
+        isNewLow: false
+      },
+      guardrails: ['Product terminal report unavailable; use current prices as a fallback only.']
+    };
+  }
+
+  return mobilePriceTerminalSummaryFromReport(terminal);
+}
+
+export async function loadMobileProductTerminal(input: MobileProductTerminalLoadInput): Promise<MobilePriceTerminalSummary> {
+  const apiBase = input.apiBase.trim();
+  const productId = input.productId.trim();
+  if (!apiBase) throw new Error('apiBase is required.');
+  if (!productId) throw new Error('productId is required.');
+  const fetcher = input.fetcher ?? globalThis.fetch;
+  if (!fetcher) throw new Error('fetch is required to load the product terminal.');
+
+  const url = new URL(`/api/products/${encodeURIComponent(productId)}/terminal`, apiBase);
+  if (input.asOf) url.searchParams.set('asOf', input.asOf);
+  const response = await fetcher(url.toString(), {
+    method: 'GET',
+    headers: input.bearerToken ? { authorization: `Bearer ${input.bearerToken}` } : undefined
+  });
+  const payload = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const message = payload && typeof payload.error === 'string' ? payload.error : `HTTP ${response.status}`;
+    throw new Error(message);
+  }
+
+  return mobilePriceTerminalSummaryFromReport(payload as ProductPriceTerminalReport);
 }
 
 export function createMobileViewModel(userId: string, api: MobileApi = createGroceryViewApi()): MobileViewModel {
