@@ -5,9 +5,6 @@ import {
   calculateFixedBasketIndex,
   compareBasketStrategies,
   createHouseholdState,
-  rankNutritionPerKrona,
-  planPantryReplenishment,
-  reviewReceiptScan,
   scoreBand,
   searchProducts,
   summarizeBudget,
@@ -18,33 +15,21 @@ import {
   type PriceChartAdapterResult,
   type PriceChartObservation,
   type PriceHistorySummary,
-  type ReceiptReview,
   type HouseholdBasketItem,
   type HouseholdMember,
   type HouseholdSnapshot,
   type HouseholdSummary,
   type HouseholdWatchlistItem,
-  type NutritionMetric,
-  type NutritionProduct,
-  type NutritionRank,
-  type PantryInventoryItem,
-  type PantryPlan,
   type SearchableProduct,
   type StorePrice,
   type WatchlistAlert,
   type WatchlistItem
 } from '@groceryview/core';
 import {
-  buildAdDeliveryComplianceReport,
-  buildAdPlacementPlan,
   buildSubscriptionAccessPolicy,
-  type AdDeliveryComplianceReport,
-  type AdPlacementPlan,
-  type AdSurface,
   type SubscriptionAccessPolicy,
   type SubscriptionEntitlementSnapshot,
-  type SubscriptionPlan,
-  type UserTier
+  type SubscriptionPlan
 } from '@groceryview/monetization';
 
 export type Store = {
@@ -227,41 +212,6 @@ export type DealScoreReport = {
   reasons: string[];
 };
 
-export type BasketComparisonReportAssignment = {
-  productId: string;
-  productName: string;
-  quantity: number;
-  storeId: string;
-  storeName: string;
-  unitPrice: number;
-  lineTotal: number;
-  priceLabel: 'verified_shelf' | 'missing_price' | 'estimated';
-  substitutionForProductId?: string;
-  substitutionForProductName?: string;
-};
-
-export type BasketComparisonReportStrategy = {
-  id: 'cheapest_across_selected' | 'all_at_one_store' | 'favorite_only' | 'private_label_substitution';
-  label: string;
-  total: number | null;
-  savingsVsBestSingleStore: number;
-  storeCount: number;
-  assignments: BasketComparisonReportAssignment[];
-  missingProductIds: string[];
-  estimatedProductIds: string[];
-  warnings: string[];
-};
-
-export type BasketComparisonReport = {
-  userId: string;
-  currency: 'SEK';
-  favoriteStoreIds: string[];
-  itemCount: number;
-  strategies: BasketComparisonReportStrategy[];
-  missingProductIds: string[];
-  estimatedProductIds: string[];
-};
-
 export type ProductEquivalent = {
   productId: string;
   productName: string;
@@ -336,38 +286,6 @@ export type ProductPriceTerminalReport = {
   evidenceGuardrails: string[];
 };
 
-export type MarketMover = {
-  productId: string;
-  ticker: string;
-  productName: string;
-  currentPrice: number | null;
-  bestStoreId: string | null;
-  bestStoreName: string | null;
-  oneMonthMovePercent: number | null;
-  range52Week: { low: number; high: number } | null;
-  range52WeekPositionPercent: number | null;
-  stockholmMedianGap: number | null;
-  historyPoints: number;
-  verifiedHistoryPoints: number;
-};
-
-export type CategoryMarketRow = MarketMover & {
-  category: string;
-  unitPrice: string;
-  dealScore: number;
-  band: ReturnType<typeof scoreBand>;
-  customerRead: string;
-};
-
-export type CategoryMarketReport = {
-  category: string;
-  city: string;
-  productCount: number;
-  topDeal: { productId: string; currentPrice: number | null; dealScore: number } | null;
-  rows: CategoryMarketRow[];
-  guardrails: string[];
-};
-
 export type StoreDeal = {
   productId: string;
   ticker: string;
@@ -389,30 +307,6 @@ export type BasketItemRequest = {
 export type UserBudgetPatch = {
   weeklyBudget: number;
   monthlyBudget: number;
-};
-
-export type CategoryBudgetPatch = {
-  category: string;
-  weeklyBudget: number;
-};
-
-export type CategoryBudgetLine = {
-  category: string;
-  weeklyBudget: number;
-  estimatedSpend: number;
-  remaining: number;
-  status: 'under' | 'over';
-  productIds: string[];
-};
-
-export type CategoryBudgetSummary = {
-  userId: string;
-  categories: CategoryBudgetLine[];
-  unbudgetedCategories: Array<{
-    category: string;
-    estimatedSpend: number;
-    productIds: string[];
-  }>;
 };
 
 export type HouseholdPlanRequest = {
@@ -437,64 +331,6 @@ export type HouseholdPlan = {
   household: HouseholdSnapshot;
   summary: HouseholdSummary;
   approvalPolicy: HouseholdApprovalPolicy;
-};
-
-export type NutritionValueReport = {
-  metric: NutritionMetric;
-  currency: 'SEK';
-  rows: NutritionRank[];
-  leader: {
-    productId: string;
-    name: string;
-    valuePer10Sek: number;
-    saltWarning: boolean;
-  } | null;
-  guardrails: string[];
-};
-
-export type LoyaltyOfferStatus = 'eligible' | 'needs_coupon' | 'needs_membership';
-
-export type LoyaltyOffer = {
-  productId: string;
-  productName: string;
-  chain: string;
-  publicShelfPrice: number;
-  memberPrice: number;
-  savings: number;
-  requirement: string;
-  status: LoyaltyOfferStatus;
-  actionRequired: boolean;
-};
-
-export type LoyaltyOfferReport = {
-  userId: string;
-  offers: LoyaltyOffer[];
-  totalEligibleSavings: number;
-  requiresActionCount: number;
-  membershipRequiredCount: number;
-  guardrails: string[];
-};
-
-export type ReceiptReviewReport = {
-  userId: string;
-  review: ReceiptReview;
-  lineCount: number;
-  matchedCount: number;
-  needsReviewCount: number;
-  guardrails: string[];
-};
-
-export type AdDisclosureReport = {
-  userId: string;
-  userTier: UserTier;
-  placementPlan: AdPlacementPlan;
-  compliance: AdDeliveryComplianceReport;
-  allowedCount: number;
-  blockedCount: number;
-  excludedSurfaces: AdSurface[];
-  premiumAdsRemoved: boolean;
-  affectsDealScore: false;
-  guardrails: string[];
 };
 
 const stores: Store[] = [
@@ -548,25 +384,6 @@ const products: ProductDetail[] = [
   }
 ,
   {
-    id: 'private-label-milk',
-    ticker: 'GARANT-MILK-1L',
-    name: 'Garant Milk 1L',
-    category: 'dairy',
-    brandTier: 'standard_private_label',
-    availableChains: ['willys'],
-    currentPrices: [
-      { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 12.9 }
-    ],
-    dealScore: calculateDealScore({ currentCityPercentile: 22, knownPromoHistoryPercentile: 25, equivalentUnitPricePercentile: 10, discountDepthPercent: 12, sourceConfidence: 0.82 }),
-    verdict: 'Buy',
-    unitPrice: '12.90 SEK/l',
-    dealSignals: { currentCityPercentile: 22, knownPromoHistoryPercentile: 25, equivalentUnitPricePercentile: 10, discountDepthPercent: 12, sourceConfidence: 0.82 },
-    history: [
-      { date: '2026-05-01', price: 13.9, verified: true },
-      { date: '2026-05-19', price: 12.9, verified: true }
-    ]
-  },
-  {
     id: 'butter',
     ticker: 'BUTTER-600G',
     name: 'Butter 600g',
@@ -585,58 +402,6 @@ const products: ProductDetail[] = [
       { date: '2026-04-01', price: 52.9, verified: true },
       { date: '2026-05-19', price: 54.9, verified: true }
     ]
-  }
-];
-
-const nutritionProducts: NutritionProduct[] = [
-  { productId: 'chicken', name: 'Chicken thighs', price: 69.9, nutritionPerPackage: { proteinGrams: 160, calories: 900, fiberGrams: 0, sugarGrams: 0, saltGrams: 2.4 } },
-  { productId: 'eggs', name: 'Eggs 12-pack', price: 34.9, nutritionPerPackage: { proteinGrams: 75, calories: 840, fiberGrams: 0, sugarGrams: 1, saltGrams: 1.8 } },
-  { productId: 'yogurt', name: 'Greek yogurt', price: 34.9, nutritionPerPackage: { proteinGrams: 55, calories: 380, fiberGrams: 0, sugarGrams: 16, saltGrams: 0.5 } }
-];
-
-const defaultPantry: PantryInventoryItem[] = [
-  { productId: 'coffee', name: 'Zoégas Coffee 450g', category: 'pantry', quantity: 1, unit: 'pack', minimumQuantity: 1, targetQuantity: 3 },
-  { productId: 'milk', name: 'Arla Milk 1L', category: 'dairy', quantity: 1, unit: 'l', minimumQuantity: 1, targetQuantity: 2, expiresAt: '2026-05-22T08:00:00.000Z' },
-  { productId: 'butter', name: 'Butter 600g', category: 'dairy', quantity: 1, unit: 'pack', minimumQuantity: 0.5, targetQuantity: 2 }
-];
-
-const defaultPantryUsage = [
-  { productId: 'coffee', quantityUsed: 0.5, usedAt: '2026-05-19T07:00:00.000Z' }
-];
-
-const loyaltyOffers: LoyaltyOffer[] = [
-  {
-    productId: 'coffee',
-    productName: 'Zoégas Coffee 450g',
-    chain: 'ica',
-    publicShelfPrice: 56.9,
-    memberPrice: 49.9,
-    savings: 7,
-    requirement: 'ICA Stammis linked',
-    status: 'eligible',
-    actionRequired: false
-  },
-  {
-    productId: 'milk',
-    productName: 'Arla Milk 1L',
-    chain: 'coop',
-    publicShelfPrice: 25.9,
-    memberPrice: 13.9,
-    savings: 12,
-    requirement: 'Clip Coop Medmera coupon before checkout',
-    status: 'needs_coupon',
-    actionRequired: true
-  },
-  {
-    productId: 'private-label-milk',
-    productName: 'Garant Milk 1L',
-    chain: 'willys',
-    publicShelfPrice: 19.9,
-    memberPrice: 12.9,
-    savings: 7,
-    requirement: 'Willys Plus member account verified',
-    status: 'eligible',
-    actionRequired: false
   }
 ];
 
@@ -674,7 +439,8 @@ function requireKnownStore(storeId: string) {
   }
 }
 
-function requirePositiveFinite(value: number, label: string) {
+function requirePositiveFinite(value: number | undefined, label: string) {
+  if (value === undefined) return;
   if (!Number.isFinite(value) || value <= 0) {
     throw new Error(`${label} must be positive`);
   }
@@ -692,610 +458,11 @@ function requireScoreThreshold(value: number | undefined) {
   }
 }
 
-function requireArray<T>(value: T[] | undefined, label: string): T[] {
-  if (!Array.isArray(value)) throw new Error(`${label} must be an array`);
-  return value;
-}
-
-function requireZeroOrPositiveFinite(value: number, label: string) {
-  if (!Number.isFinite(value) || value < 0) {
-    throw new Error(`${label} must be zero or positive`);
-  }
-}
-
-function requireOneOf<T extends string>(value: unknown, label: string, allowed: readonly T[]): T {
-  if (typeof value !== 'string' || !(allowed as readonly string[]).includes(value)) {
-    throw new Error(`${label} must be one of: ${allowed.join(', ')}`);
-  }
-  return value as T;
-}
-
-function optionalOneOf<T extends string>(value: unknown, label: string, allowed: readonly T[]): T | undefined {
-  if (value === undefined) return undefined;
-  return requireOneOf(value, label, allowed);
-}
-
-const isoDatePattern = /^\d{4}-\d{2}-\d{2}$/;
-const isoTimestampPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
-
-function requireIsoTimestamp(value: unknown, label: string): string {
-  if (
-    typeof value !== 'string' ||
-    value.trim() !== value ||
-    !isoTimestampPattern.test(value) ||
-    !Number.isFinite(Date.parse(value))
-  ) {
-    throw new Error(`${label} must be an ISO timestamp`);
-  }
-  return value;
-}
-
-function optionalIsoTimestamp(value: unknown, label: string): string | undefined {
-  if (value === undefined) return undefined;
-  return requireIsoTimestamp(value, label);
-}
-
-function requireIsoDateOrTimestamp(value: string, label: string): string {
-  if (isoDatePattern.test(value) && Number.isFinite(Date.parse(`${value}T00:00:00.000Z`))) return value;
-  return requireIsoTimestamp(value, label);
-}
-
-function toUtcDay(value: string): number {
-  const parsed = isoDatePattern.test(value) ? Date.parse(`${value}T00:00:00.000Z`) : Date.parse(value);
-  return Math.floor(parsed / 86_400_000);
-}
-
-function normalizeSubscriptionEntitlement(input: SubscriptionEntitlementSnapshot): SubscriptionEntitlementSnapshot {
-  const candidate = input as Record<string, unknown>;
-  const tier = requireOneOf(candidate.tier, 'tier', ['free', 'premium'] as const);
-  const status = requireOneOf(candidate.status, 'status', ['active', 'past_due', 'canceled'] as const);
-  const plan = optionalOneOf(candidate.plan, 'plan', ['premium_monthly', 'premium_yearly'] as const);
-  const currentPeriodEndsAt = optionalIsoTimestamp(candidate.currentPeriodEndsAt, 'currentPeriodEndsAt');
-  const provider = optionalOneOf(candidate.provider, 'provider', ['stripe_compatible'] as const);
-  const updatedAt = requireIsoTimestamp(candidate.updatedAt, 'updatedAt');
-
-  return {
-    tier,
-    ...(plan ? { plan: plan as SubscriptionPlan } : {}),
-    status,
-    ...(currentPeriodEndsAt ? { currentPeriodEndsAt } : {}),
-    ...(provider ? { provider } : {}),
-    updatedAt
-  };
-}
-
-function sortPricesByValue(prices: StorePrice[]) {
-  return [...prices].sort((left, right) => left.price - right.price || left.storeName.localeCompare(right.storeName));
-}
-
-function bestPriceFor(product: ProductDetail) {
-  return sortPricesByValue(product.currentPrices)[0] ?? null;
-}
-
-function medianPrice(prices: StorePrice[]): number | null {
-  if (prices.length === 0) return null;
-  const sorted = sortPricesByValue(prices).map((price) => price.price);
-  const middle = Math.floor(sorted.length / 2);
-  if (sorted.length % 2 === 1) return sorted[middle]!;
-  return (sorted[middle - 1]! + sorted[middle]!) / 2;
-}
-
-function roundPercent(value: number): number {
-  return Math.round((value + Number.EPSILON) * 10) / 10;
-}
-
-function roundPrice(value: number): number {
-  return Math.round((value + Number.EPSILON) * 100) / 100;
-}
-
-function range52WeekFrom(history: Array<{ price: number }>, bestPrice: StorePrice | null): { low: number; high: number } | null {
-  const prices = history.map((point) => point.price);
-  if (bestPrice) prices.push(bestPrice.price);
-  return prices.length > 0
-    ? { low: roundPrice(Math.min(...prices)), high: roundPrice(Math.max(...prices)) }
-    : null;
-}
-
-function quantile(sorted: number[], q: number): number {
-  if (sorted.length === 0) return 0;
-  if (sorted.length === 1) return roundPrice(sorted[0]!);
-  const position = (sorted.length - 1) * q;
-  const lower = Math.floor(position);
-  const upper = Math.ceil(position);
-  const weight = position - lower;
-  return roundPrice(sorted[lower]! * (1 - weight) + sorted[upper]! * weight);
-}
-
-function storeDistrict(storeId: string): string | null {
-  return stores.find((store) => store.id === storeId)?.district ?? null;
-}
-
-function distributionFor(
-  product: ProductDetail,
-  scope: ProductPriceDistributionScope,
-  label: string,
-  prices: StorePrice[],
-  currentPercentileOverride?: number
-): ProductPriceDistribution | null {
-  if (prices.length === 0) return null;
-  const sortedPrices = sortPricesByValue(prices);
-  const values = sortedPrices.map((price) => price.price).sort((left, right) => left - right);
-  const current = sortedPrices[0]!;
-  const currentPercentile = currentPercentileOverride ?? roundPercent(((values.filter((price) => price <= current.price).length) / values.length) * 100);
-  const cheaperThanPercent = roundPercent(100 - currentPercentile);
-  const scopeText = scope === 'stockholm' ? 'verified Stockholm observations' : `${label} observations`;
-  return {
-    scope,
-    label,
-    sampleSize: values.length,
-    currentPrice: current.price,
-    currentPercentile,
-    cheaperThanPercent,
-    min: roundPrice(values[0]!),
-    p05: quantile(values, 0.05),
-    p25: quantile(values, 0.25),
-    median: quantile(values, 0.5),
-    p75: quantile(values, 0.75),
-    p95: quantile(values, 0.95),
-    max: roundPrice(values.at(-1)!),
-    customerRead: `${current.price.toFixed(2)} SEK at ${current.storeName} is cheaper than ${cheaperThanPercent}% of ${scopeText}.`
-  };
-}
-
-function toIsoObservedAt(value: string): string {
-  return isoDatePattern.test(value) ? `${value}T00:00:00.000Z` : value;
-}
-
-function chartObservationsFor(product: ProductDetail): PriceChartObservation[] {
-  const bestPrice = bestPriceFor(product) ?? product.currentPrices[0];
-  return product.history.map((point) => ({
-    storeId: bestPrice?.storeId ?? 'unknown-store',
-    storeName: bestPrice?.storeName ?? 'Unknown store',
-    observedAt: toIsoObservedAt(point.date),
-    price: point.price,
-    sourceType: point.verified ? 'shelf' : 'estimated',
-    confidence: point.verified ? product.dealSignals.sourceConfidence : 0.35,
-    provenanceLabel: point.verified ? 'Verified price history' : 'Estimated history'
-  }));
-}
-
-function productPriceTerminalFor(product: ProductDetail, asOf?: string): ProductPriceTerminalReport {
-  const bestPrice = bestPriceFor(product);
-  const sortedHistory = [...product.history].sort((left, right) => Date.parse(toIsoObservedAt(left.date)) - Date.parse(toIsoObservedAt(right.date)));
-  const latestHistory = sortedHistory.at(-1);
-  const previousHistory = sortedHistory.at(-2);
-  const oneMonthMovePercent = latestHistory && previousHistory && previousHistory.price > 0
-    ? roundPercent(((latestHistory.price - previousHistory.price) / previousHistory.price) * 100)
-    : null;
-  const range52Week = range52WeekFrom(sortedHistory, bestPrice);
-  const localDistrict = bestPrice ? storeDistrict(bestPrice.storeId) : null;
-  const localPrices = localDistrict
-    ? product.currentPrices.filter((price) => storeDistrict(price.storeId) === localDistrict)
-    : [];
-  const distributions = [
-    distributionFor(product, 'stockholm', 'Whole Stockholm', product.currentPrices, product.dealSignals.currentCityPercentile),
-    distributionFor(product, 'local_area', `${localDistrict ?? 'Local'} local area`, localPrices)
-  ].filter((row): row is ProductPriceDistribution => row !== null);
-  const chartAsOf = asOf ?? (latestHistory ? toIsoObservedAt(latestHistory.date) : undefined);
-  const chart = buildPriceChartSeries({
-    observations: chartObservationsFor(product),
-    ...(chartAsOf ? { asOf: chartAsOf } : {}),
-    rangeDays: 365,
-    markerLimitPerSeries: 8
-  });
-  return {
-    productId: product.id,
-    ticker: product.ticker,
-    productName: product.name,
-    asOf: chartAsOf ?? new Date().toISOString(),
-    quote: {
-      bestPrice: bestPrice?.price ?? null,
-      bestStoreId: bestPrice?.storeId ?? null,
-      bestStoreName: bestPrice?.storeName ?? null,
-      unitPrice: product.unitPrice,
-      dealScore: product.dealScore,
-      band: scoreBand(product.dealScore),
-      oneMonthMovePercent,
-      range52Week,
-      evidenceVolume: {
-        currentPrices: product.currentPrices.length,
-        historyPoints: product.history.length,
-        verifiedHistoryPoints: product.history.filter((point) => point.verified).length
-      }
-    },
-    distributions,
-    chart,
-    historySummary: product.history.length > 0
-      ? summarizePriceHistory(product.history.map((point) => ({ observedAt: toIsoObservedAt(point.date), price: point.price })))
-      : null,
-    evidenceGuardrails: [
-      'Verified shelf or retailer-page prices can power current quote, Deal Score, and basket totals.',
-      'Member, promotion, estimated, and low-confidence rows must stay explicitly labeled before customer action.',
-      'Distribution and chart samples include sample size and provenance-aware confidence styling.'
-    ]
-  };
-}
-
-function marketMoverFor(product: ProductDetail): MarketMover {
-  const bestPrice = bestPriceFor(product);
-  const sortedHistory = [...product.history].sort((left, right) => Date.parse(toIsoObservedAt(left.date)) - Date.parse(toIsoObservedAt(right.date)));
-  const latestHistory = sortedHistory.at(-1);
-  const previousHistory = sortedHistory.at(-2);
-  const oneMonthMovePercent = latestHistory && previousHistory && previousHistory.price > 0
-    ? roundPercent(((latestHistory.price - previousHistory.price) / previousHistory.price) * 100)
-    : null;
-  const range52Week = range52WeekFrom(sortedHistory, bestPrice);
-  const rangeSpread = range52Week ? range52Week.high - range52Week.low : 0;
-  const range52WeekPositionPercent = bestPrice && range52Week && rangeSpread > 0
-    ? roundPercent(Math.max(0, Math.min(100, ((bestPrice.price - range52Week.low) / rangeSpread) * 100)))
-    : null;
-  const stockholmMedian = medianPrice(product.currentPrices);
-  return {
-    productId: product.id,
-    ticker: product.ticker,
-    productName: product.name,
-    currentPrice: bestPrice?.price ?? null,
-    bestStoreId: bestPrice?.storeId ?? null,
-    bestStoreName: bestPrice?.storeName ?? null,
-    oneMonthMovePercent,
-    range52Week,
-    range52WeekPositionPercent,
-    stockholmMedianGap: bestPrice && stockholmMedian != null ? roundPrice(bestPrice.price - stockholmMedian) : null,
-    historyPoints: product.history.length,
-    verifiedHistoryPoints: product.history.filter((point) => point.verified).length
-  };
-}
-
-function categoryMarketRowFor(product: ProductDetail): CategoryMarketRow {
-  const mover = marketMoverFor(product);
-  const priceText = mover.currentPrice == null ? 'No verified current price' : `${mover.currentPrice.toFixed(2)} SEK`;
-  const storeText = mover.bestStoreName ?? 'unknown store';
-  const medianText = mover.stockholmMedianGap == null
-    ? 'without a Stockholm median comparison'
-    : `${Math.abs(mover.stockholmMedianGap).toFixed(2)} SEK ${mover.stockholmMedianGap <= 0 ? 'below' : 'above'} Stockholm median`;
-  const moveText = mover.oneMonthMovePercent == null
-    ? 'with no 1M move yet'
-    : `${mover.oneMonthMovePercent > 0 ? '+' : ''}${mover.oneMonthMovePercent.toFixed(1)}% over 1M`;
-  return {
-    ...mover,
-    category: product.category,
-    unitPrice: product.unitPrice,
-    dealScore: product.dealScore,
-    band: scoreBand(product.dealScore),
-    customerRead: `${priceText} at ${storeText} is ${moveText} and ${medianText}; ${mover.verifiedHistoryPoints}/${mover.historyPoints} verified history points.`
-  };
-}
-
-function categoryMarketFor(category: string): CategoryMarketReport | null {
-  const normalizedCategory = category.trim().toLowerCase();
-  if (!normalizedCategory) throw new Error('category is required');
-  const rows = products
-    .filter((product) => product.category.toLowerCase() === normalizedCategory)
-    .map(categoryMarketRowFor)
-    .sort((left, right) => right.dealScore - left.dealScore || Math.abs(right.oneMonthMovePercent ?? 0) - Math.abs(left.oneMonthMovePercent ?? 0) || left.productName.localeCompare(right.productName));
-  if (rows.length === 0) return null;
-  const leader = rows[0]!;
-  return {
-    category: normalizedCategory,
-    city: 'Stockholm',
-    productCount: rows.length,
-    topDeal: { productId: leader.productId, currentPrice: leader.currentPrice, dealScore: leader.dealScore },
-    rows,
-    guardrails: [
-      'Only verified category rows can lead the category market board.',
-      '52-week ranges include the current quote so shoppers never see a price outside the displayed range.',
-      'Same-category rows keep Deal Score, median gap, and verified-history evidence visible before customer action.'
-    ]
-  };
-}
-
-function buildDealScoreReasons(product: ProductDetail, bestPrice: StorePrice | null, band: ReturnType<typeof scoreBand>): string[] {
-  const reasons = [
-    `${product.name} is in the ${product.dealSignals.currentCityPercentile}th city price percentile.`,
-    `Historical promo percentile is ${product.dealSignals.knownPromoHistoryPercentile}.`,
-    `Equivalent unit-price percentile is ${product.dealSignals.equivalentUnitPricePercentile}.`,
-    `Source confidence is ${Math.round(product.dealSignals.sourceConfidence * 100)}%.`,
-    `Default verdict is ${band.verdict}.`
-  ];
-  if (bestPrice) reasons.unshift(`Best current quote is ${bestPrice.price.toFixed(2)} SEK at ${bestPrice.storeName}.`);
-  return reasons;
-}
-
-function productEquivalentFor(product: ProductDetail): ProductEquivalent {
-  const bestPrice = bestPriceFor(product);
-  return {
-    productId: product.id,
-    productName: product.name,
-    category: product.category,
-    bestPrice: bestPrice?.price ?? null,
-    bestStoreId: bestPrice?.storeId ?? null,
-    dealScore: product.dealScore,
-    reason: `Same ${product.category} category with comparable current price evidence.`
-  };
-}
-
-function latestVerifiedPriceDate(product: ProductDetail): string | null {
-  const verifiedDates = product.history.filter((point) => point.verified).map((point) => point.date);
-  return verifiedDates.sort().at(-1) ?? null;
-}
-
-function priceFreshnessStatus(ageDays: number | null): PriceFreshnessStatus {
-  if (ageDays === null || ageDays > 14) return 'stale';
-  if (ageDays > 7) return 'aging';
-  return 'fresh';
-}
-
-function cheapestPriceByProductId(productIds: string[]): Record<string, number> {
-  const priceByProductId: Record<string, number> = {};
-  for (const productId of new Set(productIds)) {
-    const product = products.find((candidate) => candidate.id === productId);
-    if (!product) throw new Error(`Unknown productId: ${productId}`);
-    priceByProductId[productId] = bestPriceFor(product)?.price ?? 0;
-  }
-  return priceByProductId;
-}
-
-function normalizeHouseholdPlan(userId: string, input: HouseholdPlanRequest): HouseholdPlan {
-  requireNonEmptyId(userId, 'userId');
-  requireNonEmptyId(input.householdId, 'householdId');
-  requireNonEmptyId(input.name, 'name');
-  requireZeroOrPositiveFinite(input.weeklyBudget, 'weeklyBudget');
-  requireZeroOrPositiveFinite(input.approvalLimit, 'approvalLimit');
-  requireNonEmptyId(input.reviewer, 'reviewer');
-
-  const members = requireArray(input.members, 'members').map((member) => {
-    requireNonEmptyId(member.userId, 'member.userId');
-    requireNonEmptyId(member.displayName, 'member.displayName');
-    return { userId: member.userId, displayName: member.displayName };
-  });
-  if (members.length === 0) throw new Error('members must include at least one household member');
-  const memberIds = new Set(members.map((member) => member.userId));
-  if (memberIds.size !== members.length) throw new Error('members must have unique userId values');
-  if (!memberIds.has(userId)) throw new Error('signed-in user must be a household member');
-  if (!memberIds.has(input.reviewer)) throw new Error(`Household member not found: ${input.reviewer}`);
-
-  const household = createHouseholdState({
-    id: input.householdId,
-    name: input.name,
-    weeklyBudget: input.weeklyBudget,
-    members
-  });
-
-  for (const item of input.basketItems ?? []) {
-    requireKnownProduct(item.productId);
-    if (!Number.isInteger(item.quantity) || item.quantity <= 0 || item.quantity > 99) {
-      throw new Error('quantity must be an integer between 1 and 99');
-    }
-    household.addBasketItem({ productId: item.productId, quantity: item.quantity, addedBy: item.addedBy });
-  }
-
-  for (const item of input.watchlistItems ?? []) {
-    requireKnownProduct(item.productId);
-    requireOptionalPositiveFinite(item.targetPrice, 'targetPrice');
-    household.addWatchlistItem({
-      productId: item.productId,
-      addedBy: item.addedBy,
-      ...(item.targetPrice === undefined ? {} : { targetPrice: item.targetPrice })
-    });
-  }
-
-  const sharedFavoriteStoreIds = input.sharedFavoriteStoreIds ?? [];
-  for (const storeId of sharedFavoriteStoreIds) requireKnownStore(storeId);
-  household.setSharedFavoriteStores(sharedFavoriteStoreIds);
-
-  const snapshot = household.snapshot();
-  const summary = summarizeHousehold(
-    snapshot,
-    cheapestPriceByProductId(snapshot.basketItems.map((item) => item.productId))
-  );
-
-  return {
-    household: snapshot,
-    summary,
-    approvalPolicy: {
-      approvalLimit: input.approvalLimit,
-      reviewer: input.reviewer,
-      requiresOwnerApproval: summary.estimatedTotal > input.approvalLimit
-    }
-  };
-}
-
-function basketInputItems(userItems: BasketItemRequest[]) {
-  return userItems.map((item) => {
-    const product = products.find((candidate) => candidate.id === item.productId);
-    return { productId: item.productId, quantity: item.quantity, prices: product?.currentPrices ?? [] };
-  });
-}
-
-function productName(productId: string): string {
-  return products.find((product) => product.id === productId)?.name ?? productId;
-}
-
-function comparableUnit(product: ProductDetail): string {
-  return product.unitPrice.split('/').at(-1)?.trim().toLowerCase() ?? '';
-}
-
-function reportAssignment(
-  assignment: { productId: string; quantity: number; storeId: string; storeName: string; unitPrice: number; lineTotal: number },
-  substitution?: ProductDetail
-): BasketComparisonReportAssignment {
-  const originalName = productName(assignment.productId);
-  return {
-    productId: substitution?.id ?? assignment.productId,
-    productName: substitution?.name ?? originalName,
-    quantity: assignment.quantity,
-    storeId: assignment.storeId,
-    storeName: assignment.storeName,
-    unitPrice: assignment.unitPrice,
-    lineTotal: assignment.lineTotal,
-    priceLabel: 'verified_shelf',
-    ...(substitution ? { substitutionForProductId: assignment.productId, substitutionForProductName: originalName } : {})
-  };
-}
-
-function strategyWarnings(missingProductIds: string[], estimatedProductIds: string[]): string[] {
-  const warnings: string[] = [];
-  if (missingProductIds.length > 0) warnings.push('Some basket items are missing verified prices for this strategy.');
-  if (estimatedProductIds.length > 0) warnings.push('Estimated prices are labeled and excluded from verified shelf totals.');
-  if (warnings.length === 0) warnings.push('All included prices are verified shelf demo prices.');
-  return warnings;
-}
-
-function privateLabelStrategy(
-  userItems: BasketItemRequest[],
-  favoriteStoreIds: string[],
-  bestSingleStoreTotal: number | null
-): BasketComparisonReportStrategy {
-  const favoriteStores = new Set(favoriteStoreIds);
-  const assignments: BasketComparisonReportAssignment[] = [];
-  const missingProductIds: string[] = [];
-
-  for (const item of userItems) {
-    const source = products.find((product) => product.id === item.productId);
-    if (!source) {
-      missingProductIds.push(item.productId);
-      continue;
-    }
-    const candidates = [
-      source,
-      ...products.filter((product) =>
-        product.category === source.category &&
-        product.brandTier.includes('private_label') &&
-        comparableUnit(product) === comparableUnit(source)
-      )
-    ];
-    const pricedCandidates = candidates
-      .flatMap((product) => product.currentPrices
-        .filter((price) => favoriteStores.has(price.storeId))
-        .map((price) => ({ product, price })))
-      .sort((left, right) => left.price.price - right.price.price || left.product.name.localeCompare(right.product.name));
-    const best = pricedCandidates[0];
-    if (!best) {
-      missingProductIds.push(item.productId);
-      continue;
-    }
-    assignments.push(reportAssignment({
-      productId: source.id,
-      quantity: item.quantity,
-      storeId: best.price.storeId,
-      storeName: best.price.storeName,
-      unitPrice: best.price.price,
-      lineTotal: roundPrice(best.price.price * item.quantity)
-    }, best.product.id === source.id ? undefined : best.product));
-  }
-
-  const total = assignments.length > 0 ? roundPrice(assignments.reduce((sum, assignment) => sum + assignment.lineTotal, 0)) : null;
-  return {
-    id: 'private_label_substitution',
-    label: 'Private-label substitution',
-    total,
-    savingsVsBestSingleStore: total !== null && bestSingleStoreTotal !== null ? roundPrice(bestSingleStoreTotal - total) : 0,
-    storeCount: new Set(assignments.map((assignment) => assignment.storeId)).size,
-    assignments,
-    missingProductIds,
-    estimatedProductIds: [],
-    warnings: strategyWarnings(missingProductIds, [])
-  };
-}
-
-function buildBasketComparisonReport(userId: string, favoriteStoreIds: string[], userItems: BasketItemRequest[]): BasketComparisonReport {
-  const comparison = compareBasketStrategies({ favoriteStoreIds, items: basketInputItems(userItems) });
-  const cheapestAssignments = comparison.cheapestByProduct.assignments.map((assignment) => reportAssignment(assignment));
-  const bestSingleStoreAssignments = comparison.bestSingleStore
-    ? userItems.flatMap((item) => {
-      const product = products.find((candidate) => candidate.id === item.productId);
-      const price = product?.currentPrices.find((candidate) => candidate.storeId === comparison.bestSingleStore?.storeId);
-      if (!price) return [];
-      return [reportAssignment({
-        productId: item.productId,
-        quantity: item.quantity,
-        storeId: price.storeId,
-        storeName: price.storeName,
-        unitPrice: price.price,
-        lineTotal: roundPrice(price.price * item.quantity)
-      })];
-    })
-    : [];
-  const bestSingleStoreTotal = comparison.bestSingleStore?.total ?? null;
-  const estimatedProductIds: string[] = [];
-
-  return {
-    userId,
-    currency: 'SEK',
-    favoriteStoreIds,
-    itemCount: userItems.reduce((sum, item) => sum + item.quantity, 0),
-    strategies: [
-      {
-        id: 'cheapest_across_selected',
-        label: 'Cheapest across selected stores',
-        total: comparison.cheapestByProduct.total,
-        savingsVsBestSingleStore: comparison.savingsVsBestSingleStore,
-        storeCount: comparison.splitStoreCount,
-        assignments: cheapestAssignments,
-        missingProductIds: comparison.missingProductIds,
-        estimatedProductIds,
-        warnings: strategyWarnings(comparison.missingProductIds, estimatedProductIds)
-      },
-      {
-        id: 'all_at_one_store',
-        label: 'All at one store',
-        total: bestSingleStoreTotal,
-        savingsVsBestSingleStore: 0,
-        storeCount: bestSingleStoreAssignments.length > 0 ? 1 : 0,
-        assignments: bestSingleStoreAssignments,
-        missingProductIds: comparison.bestSingleStore ? [] : userItems.map((item) => item.productId),
-        estimatedProductIds,
-        warnings: strategyWarnings(comparison.bestSingleStore ? [] : userItems.map((item) => item.productId), estimatedProductIds)
-      },
-      {
-        id: 'favorite_only',
-        label: 'Favorite stores only',
-        total: comparison.cheapestByProduct.total,
-        savingsVsBestSingleStore: comparison.savingsVsBestSingleStore,
-        storeCount: comparison.splitStoreCount,
-        assignments: cheapestAssignments,
-        missingProductIds: comparison.missingProductIds,
-        estimatedProductIds,
-        warnings: [
-          `Restricted to favorite stores: ${favoriteStoreIds.join(', ') || 'none'}.`,
-          ...strategyWarnings(comparison.missingProductIds, estimatedProductIds)
-        ]
-      },
-      privateLabelStrategy(userItems, favoriteStoreIds, bestSingleStoreTotal)
-    ],
-    missingProductIds: comparison.missingProductIds,
-    estimatedProductIds
-  };
-}
-
-function storeDealsFor(storeId: string): StoreDeal[] {
-  requireKnownStore(storeId);
-  return products
-    .flatMap((product) => {
-      const price = product.currentPrices.find((candidate) => candidate.storeId === storeId);
-      if (!price) return [];
-      return [{
-        productId: product.id,
-        ticker: product.ticker,
-        productName: product.name,
-        category: product.category,
-        storeId: price.storeId,
-        storeName: price.storeName,
-        price: price.price,
-        dealScore: product.dealScore,
-        band: scoreBand(product.dealScore),
-        unitPrice: product.unitPrice
-      }];
-    })
-    .sort((left, right) => right.dealScore - left.dealScore || left.price - right.price || left.productName.localeCompare(right.productName));
-}
-
 export function createGroceryViewApi() {
   const favoriteStores = new Map<string, Set<string>>();
   const watchlists = new Map<string, WatchlistItem[]>();
   const baskets = new Map<string, BasketItemRequest[]>();
   const budgets = new Map<string, UserBudgetPatch>();
-  const categoryBudgets = new Map<string, CategoryBudgetPatch[]>();
   const subscriptionEntitlements = new Map<string, SubscriptionEntitlementSnapshot>();
   const householdPlans = new Map<string, HouseholdPlan>();
 
@@ -1314,9 +481,6 @@ export function createGroceryViewApi() {
 
   return {
     getMarketOverview() {
-      const movers = [...products]
-        .map(marketMoverFor)
-        .sort((left, right) => Math.abs(right.oneMonthMovePercent ?? 0) - Math.abs(left.oneMonthMovePercent ?? 0));
       const topDeals = [...products]
         .sort((a, b) => b.dealScore - a.dealScore)
         .map((product) => {
@@ -1330,168 +494,7 @@ export function createGroceryViewApi() {
             band: scoreBand(product.dealScore)
           };
         });
-      return { city: 'Stockholm', indices: [index], movers, topDeals };
-    },
-
-    getNutritionValueReport(metric: NutritionMetric = 'protein'): NutritionValueReport {
-      const rows = rankNutritionPerKrona(nutritionProducts, metric);
-      const leader = rows[0]
-        ? {
-            productId: rows[0].productId,
-            name: rows[0].name,
-            valuePer10Sek: rows[0].valuePer10Sek,
-            saltWarning: rows[0].saltWarning
-          }
-        : null;
-      return {
-        metric,
-        currency: 'SEK',
-        rows,
-        leader,
-        guardrails: [
-          'Verified nutrition labels cannot override allergen locks or household diet rules.',
-          'Salt and sugar warnings remain visible even when a product has strong value per krona.',
-          'Nutrition value is advisory and cannot rewrite basket or meal-plan decisions without user confirmation.'
-        ]
-      };
-    },
-
-    getPantryReplenishment(userId: string, asOf = '2026-05-20T08:00:00.000Z'): PantryPlan {
-      requireNonEmptyId(userId, 'userId');
-      const basketItems = baskets.get(userId) ?? [];
-      const household: HouseholdSnapshot = {
-        id: userId,
-        name: `${userId} pantry`,
-        weeklyBudget: budgets.get(userId)?.weeklyBudget ?? 0,
-        members: [{ userId, displayName: userId }],
-        basketItems: basketItems.map((item) => ({ productId: item.productId, quantity: item.quantity, addedBy: userId })),
-        watchlistItems: (watchlists.get(userId) ?? []).map((item) => ({ productId: item.productId, targetPrice: item.targetPrice, addedBy: userId })),
-        sharedFavoriteStoreIds: this.getFavoriteStores(userId).map((store) => store.id)
-      };
-      const deals = products.flatMap((product) => {
-        const bestPrice = bestPriceFor(product);
-        return bestPrice
-          ? [{ productId: product.id, storeId: bestPrice.storeId, storeName: bestPrice.storeName, price: bestPrice.price, dealScore: product.dealScore }]
-          : [];
-      });
-      return planPantryReplenishment({
-        now: asOf,
-        household,
-        pantry: defaultPantry,
-        usage: defaultPantryUsage,
-        deals
-      });
-    },
-
-    getLoyaltyOfferReport(userId: string): LoyaltyOfferReport {
-      requireNonEmptyId(userId, 'userId');
-      return {
-        userId,
-        offers: loyaltyOffers.map((offer) => ({ ...offer })),
-        totalEligibleSavings: loyaltyOffers
-          .filter((offer) => offer.status !== 'needs_membership')
-          .reduce((sum, offer) => roundPrice(sum + offer.savings), 0),
-        requiresActionCount: loyaltyOffers.filter((offer) => offer.actionRequired).length,
-        membershipRequiredCount: 1,
-        guardrails: [
-          'Member-only savings never overwrite verified public shelf evidence.',
-          'Coupon-required offers need explicit action before checkout routing.',
-          'Unlinked loyalty programs stay out of realized savings until the household confirms access.'
-        ]
-      };
-    },
-
-    getAdDisclosureReport(userId: string, entitlementOverride?: SubscriptionEntitlementSnapshot | null): AdDisclosureReport {
-      requireNonEmptyId(userId, 'userId');
-      const entitlement = entitlementOverride ?? subscriptionEntitlements.get(userId);
-      const userTier: UserTier = entitlement?.tier === 'premium' && entitlement.status === 'active' ? 'premium' : 'free';
-      const placementPlan = buildAdPlacementPlan({ userTier, configuredProviders: ['adsense', 'admob'] });
-      const deliverySlots = buildAdPlacementPlan({ userTier: 'free', configuredProviders: ['adsense', 'admob'] }).slots;
-      const candidateSlots = [
-        ...deliverySlots.map((slot) => ({
-          surface: slot.surface,
-          provider: slot.provider,
-          userTier,
-          label: slot.label,
-          organicRankingSeparated: slot.organicRankingSeparated,
-          affectsDealScore: false
-        })),
-        {
-          surface: 'deal_score' as const,
-          provider: 'adsense' as const,
-          userTier,
-          label: 'Sponsored',
-          organicRankingSeparated: true,
-          affectsDealScore: true
-        },
-        {
-          surface: 'checkout_decision' as const,
-          provider: 'admob' as const,
-          userTier,
-          label: 'Sponsored',
-          organicRankingSeparated: true,
-          affectsDealScore: false
-        }
-      ];
-      const compliance = buildAdDeliveryComplianceReport(candidateSlots);
-      return {
-        userId,
-        userTier,
-        placementPlan,
-        compliance,
-        allowedCount: compliance.allowed.length,
-        blockedCount: compliance.blocked.length,
-        excludedSurfaces: placementPlan.excludedSurfaces,
-        premiumAdsRemoved: userTier === 'premium' && placementPlan.slots.length === 0,
-        affectsDealScore: placementPlan.affectsDealScore,
-        guardrails: [
-          'Sponsored placements cannot change Deal Score, basket totals, or store ordering.',
-          'Premium entitlements remove non-critical ads before delivery.',
-          'Advertiser payloads stay aggregated and never include raw receipts.'
-        ]
-      };
-    },
-
-    getReceiptReviewReport(userId: string): ReceiptReviewReport {
-      requireNonEmptyId(userId, 'userId');
-      const review = reviewReceiptScan({
-        receipt: {
-          storeId: 'willys-odenplan',
-          purchasedAt: '2026-05-19T16:00:00.000Z',
-          totalAmount: 642,
-          ocrConfidence: 0.82,
-          rows: [
-            { rawName: 'ZOEGA SKANEROST', quantity: 1, itemTotal: 49.9 },
-            { rawName: 'CHEESE 500G', quantity: 1, itemTotal: 78 },
-            { rawName: 'SMUDGED ITEM', quantity: 1, itemTotal: 18 }
-          ]
-        },
-        aliases: [
-          { rawName: 'ZOEGA SKANEROST', productId: 'coffee', canonicalName: 'Zoégas Coffee 450g', matchConfidence: 0.9 },
-          { rawName: 'CHEESE 500G', productId: 'cheese', canonicalName: 'Cheese 500g', matchConfidence: 0.7 }
-        ],
-        localMedians: { coffee: 64.9, cheese: 60 },
-        weeklyBudget: 800,
-        weekSpendBeforeReceipt: 120
-      });
-      const matchedCount = review.matchedItems.filter((item) => item.productId !== null).length;
-      const needsReviewCount = review.matchedItems.filter((item) => item.productId === null || item.matchConfidence < 0.8).length;
-      return {
-        userId,
-        review,
-        lineCount: review.matchedItems.length,
-        matchedCount,
-        needsReviewCount,
-        guardrails: [
-          'Low confidence receipt rows cannot update catalog or Deal Score.',
-          'Loyalty discount lines affect receipt totals without overwriting public shelf prices.',
-          'Only verified product matches can update household spend and product price history.'
-        ]
-      };
-    },
-
-    getCategoryMarket(category: string): CategoryMarketReport | null {
-      return categoryMarketFor(category);
+      return { city: 'Stockholm', indices: [index], topDeals };
     },
 
     getStores() {
@@ -1608,14 +611,6 @@ export function createGroceryViewApi() {
       favoriteStores.set(userId, set);
     },
 
-    removeFavoriteStore(userId: string, storeId: string) {
-      requireNonEmptyId(userId, 'userId');
-      requireKnownStore(storeId);
-      const set = favoriteStores.get(userId) ?? new Set<string>();
-      set.delete(storeId);
-      favoriteStores.set(userId, set);
-    },
-
     getFavoriteStores(userId: string) {
       const ids = favoriteStores.get(userId) ?? new Set<string>();
       return stores.filter((store) => ids.has(store.id));
@@ -1669,19 +664,7 @@ export function createGroceryViewApi() {
       if (!Number.isInteger(item.quantity) || item.quantity <= 0 || item.quantity > 99) {
         throw new Error('quantity must be an integer between 1 and 99');
       }
-      const current = baskets.get(userId) ?? [];
-      const existing = current.find((basketItem) => basketItem.productId === item.productId);
-      if (existing) {
-        const quantity = existing.quantity + item.quantity;
-        if (quantity > 99) {
-          throw new Error('quantity must be an integer between 1 and 99');
-        }
-        baskets.set(userId, current.map((basketItem) =>
-          basketItem.productId === item.productId ? { ...basketItem, quantity } : basketItem
-        ));
-        return;
-      }
-      baskets.set(userId, [...current, item]);
+      baskets.set(userId, [...(baskets.get(userId) ?? []), item]);
     },
 
     updateBasketItem(userId: string, productId: string, quantity: number) {
@@ -1713,12 +696,11 @@ export function createGroceryViewApi() {
 
     compareBasket(userId: string): BasketComparisonResult {
       const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
-      return compareBasketStrategies({ favoriteStoreIds, items: basketInputItems(baskets.get(userId) ?? []) });
-    },
-
-    compareBasketReport(userId: string): BasketComparisonReport {
-      const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
-      return buildBasketComparisonReport(userId, favoriteStoreIds, baskets.get(userId) ?? []);
+      const items = (baskets.get(userId) ?? []).map((item) => {
+        const product = products.find((candidate) => candidate.id === item.productId);
+        return { productId: item.productId, quantity: item.quantity, prices: product?.currentPrices ?? [] };
+      });
+      return compareBasketStrategies({ favoriteStoreIds, items });
     },
 
     updateBudget(userId: string, patch: UserBudgetPatch) {
@@ -1735,57 +717,6 @@ export function createGroceryViewApi() {
     getBudgetSummary(userId: string): BudgetSummary {
       const budget = budgets.get(userId) ?? { weeklyBudget: 0, monthlyBudget: 0 };
       return summarizeBudget({ ...budget, estimatedBasketTotal: this.compareBasket(userId).cheapestByProduct.total, receiptTotalsThisWeek: [], receiptTotalsThisMonth: [] });
-    },
-
-    updateCategoryBudgets(userId: string, patches: CategoryBudgetPatch[]) {
-      requireNonEmptyId(userId, 'userId');
-      if (!Array.isArray(patches)) throw new Error('categories must be an array');
-      const normalized = patches.map((patch) => {
-        requireNonEmptyId(patch.category, 'category');
-        requireZeroOrPositiveFinite(patch.weeklyBudget, 'weeklyBudget');
-        return { category: patch.category.trim().toLowerCase(), weeklyBudget: patch.weeklyBudget };
-      });
-      const categories = new Set(normalized.map((patch) => patch.category));
-      if (categories.size !== normalized.length) throw new Error('categories must be unique');
-      categoryBudgets.set(userId, normalized.sort((left, right) => left.category.localeCompare(right.category)));
-    },
-
-    getCategoryBudgetSummary(userId: string): CategoryBudgetSummary {
-      requireNonEmptyId(userId, 'userId');
-      const spendByCategory = new Map<string, { estimatedSpend: number; productIds: Set<string> }>();
-      for (const item of baskets.get(userId) ?? []) {
-        const product = products.find((candidate) => candidate.id === item.productId);
-        if (!product) continue;
-        const current = spendByCategory.get(product.category) ?? { estimatedSpend: 0, productIds: new Set<string>() };
-        current.estimatedSpend = Math.round((current.estimatedSpend + (bestPriceFor(product)?.price ?? 0) * item.quantity) * 100) / 100;
-        current.productIds.add(product.id);
-        spendByCategory.set(product.category, current);
-      }
-      const categories = (categoryBudgets.get(userId) ?? []).map((budget) => {
-        const spend = spendByCategory.get(budget.category) ?? { estimatedSpend: 0, productIds: new Set<string>() };
-        const remaining = Math.round((budget.weeklyBudget - spend.estimatedSpend) * 100) / 100;
-        return {
-          category: budget.category,
-          weeklyBudget: budget.weeklyBudget,
-          estimatedSpend: spend.estimatedSpend,
-          remaining,
-          status: remaining >= 0 ? 'under' : 'over',
-          productIds: [...spend.productIds].sort()
-        } satisfies CategoryBudgetLine;
-      });
-      const budgeted = new Set(categories.map((line) => line.category));
-      return {
-        userId,
-        categories,
-        unbudgetedCategories: [...spendByCategory.entries()]
-          .filter(([category]) => !budgeted.has(category))
-          .map(([category, spend]) => ({
-            category,
-            estimatedSpend: spend.estimatedSpend,
-            productIds: [...spend.productIds].sort()
-          }))
-          .sort((left, right) => left.category.localeCompare(right.category))
-      };
     },
 
     upsertHouseholdPlan(userId: string, input: HouseholdPlanRequest): HouseholdPlan {

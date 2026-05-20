@@ -3,6 +3,9 @@ export type CatalogProductCoverage = {
   categoryId: string;
   observedChainIds: string[];
   observedStoreIds: string[];
+  observedPriceCount?: number;
+  freshPriceCount?: number;
+  medianConfidenceScore?: number;
 };
 
 export type CatalogCoverageInput = {
@@ -10,6 +13,9 @@ export type CatalogCoverageInput = {
   targetChains: string[];
   targetStores: string[];
   products: CatalogProductCoverage[];
+  minimumObservationsPerProduct?: number;
+  minimumFreshPriceShare?: number;
+  minimumMedianConfidenceScore?: number;
 };
 
 export type CoverageDimension = {
@@ -22,6 +28,13 @@ export type CoverageDimension = {
 export type CatalogCoverageReport = {
   status: 'complete' | 'incomplete';
   productCount: number;
+  quality: {
+    observedPriceCount: number;
+    freshPriceCount: number;
+    freshPriceShare: number;
+    observationsPerProduct: number;
+    medianConfidenceScore: number | null;
+  };
   coverage: {
     categories: CoverageDimension;
     chains: CoverageDimension;
@@ -66,21 +79,61 @@ function actionFor(label: string, missing: string[]): string | null {
   return missing.length === 0 ? null : `backfill_${label}:${missing.join(',')}`;
 }
 
+function median(values: number[]): number | null {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((left, right) => left - right);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? roundPercent((sorted[middle - 1] + sorted[middle]) / 2) : roundPercent(sorted[middle]);
+}
+
+function buildQualityActions(
+  quality: CatalogCoverageReport['quality'],
+  input: CatalogCoverageInput
+): string[] {
+  const requiredActions: string[] = [];
+  if (input.minimumObservationsPerProduct !== undefined && quality.observationsPerProduct < input.minimumObservationsPerProduct) {
+    requiredActions.push(`increase_price_observation_depth:min_${input.minimumObservationsPerProduct}_per_product`);
+  }
+  if (input.minimumFreshPriceShare !== undefined && quality.freshPriceShare < input.minimumFreshPriceShare) {
+    requiredActions.push(`refresh_price_observations:min_${roundPercent(input.minimumFreshPriceShare * 100)}_percent_fresh`);
+  }
+  if (
+    input.minimumMedianConfidenceScore !== undefined &&
+    (quality.medianConfidenceScore === null || quality.medianConfidenceScore < input.minimumMedianConfidenceScore)
+  ) {
+    requiredActions.push(`raise_source_confidence:min_${input.minimumMedianConfidenceScore}`);
+  }
+  return requiredActions;
+}
+
 export function buildCatalogCoverageReport(input: CatalogCoverageInput): CatalogCoverageReport {
   const observedCategories = new Set(input.products.map((product) => product.categoryId));
   const observedChains = new Set(input.products.flatMap((product) => product.observedChainIds));
   const observedStores = new Set(input.products.flatMap((product) => product.observedStoreIds));
+  const observedPriceCount = input.products.reduce((total, product) => total + (product.observedPriceCount ?? 0), 0);
+  const freshPriceCount = input.products.reduce((total, product) => total + (product.freshPriceCount ?? 0), 0);
+  const quality = {
+    observedPriceCount,
+    freshPriceCount,
+    freshPriceShare: observedPriceCount === 0 ? 0 : roundPercent(freshPriceCount / observedPriceCount),
+    observationsPerProduct: input.products.length === 0 ? 0 : roundPercent(observedPriceCount / input.products.length),
+    medianConfidenceScore: median(input.products.flatMap((product) => (product.medianConfidenceScore === undefined ? [] : [product.medianConfidenceScore])))
+  };
 
   const categories = summarizeCoverage(input.targetCategories, observedCategories);
   const chains = summarizeCoverage(input.targetChains, observedChains);
   const stores = summarizeCoverage(input.targetStores, observedStores);
-  const requiredActions = [actionFor('categories', categories.missing), actionFor('chains', chains.missing), actionFor('stores', stores.missing)].filter(
-    (action): action is string => action !== null
-  );
+  const requiredActions = [
+    actionFor('categories', categories.missing),
+    actionFor('chains', chains.missing),
+    actionFor('stores', stores.missing),
+    ...buildQualityActions(quality, input)
+  ].filter((action): action is string => action !== null);
 
   return {
     status: requiredActions.length === 0 ? 'complete' : 'incomplete',
     productCount: input.products.length,
+    quality,
     coverage: { categories, chains, stores },
     requiredActions
   };

@@ -66,7 +66,21 @@ export type MobileViewModel = {
   };
 };
 
-type MobileApi = ReturnType<typeof createGroceryViewApi>;
+type MobileApi = {
+  getMarketOverview(): {
+    city: string;
+    topDeals: Array<{ ticker: string; dealScore: number; bestPrice: number | null }>;
+  };
+  getFavoriteStores(userId: string): Array<{ id: string; name: string }>;
+  getProduct(productId: string): {
+    id: string;
+    ticker: string;
+    name: string;
+    currentPrices: Array<{ price: number }>;
+    dealScore: number;
+    verdict: string;
+  } | null;
+};
 
 export type MobilePriceTerminalSummary = {
   quote: {

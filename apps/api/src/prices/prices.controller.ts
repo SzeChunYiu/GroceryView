@@ -1,31 +1,28 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { groceryApi, productPrices } from '../demo-data.js';
+import { Controller, Get, Param } from '@nestjs/common';
+import { ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { demoPrices, demoSeries } from '../demo-data';
 
 @ApiTags('prices')
-@Controller('products/:productId')
+@Controller('products/:slug')
 export class PricesController {
   @Get('prices')
-  @ApiOkResponse({ description: 'Latest store prices with provenance' })
-  latest(@Param('productId') productId: string) {
-    if (!groceryApi.getProduct(productId)) throw new NotFoundException('Product not found');
-    return productPrices(productId);
+  @ApiParam({ name: 'slug', example: 'zoegas-skane-mellanrost-450g' })
+  @ApiOkResponse({ description: 'Demo product price quotes.' })
+  listPrices(@Param('slug') slug: string) {
+    return demoPrices.filter((price) => price.productSlug === slug);
   }
 
-  @Get('observations')
-  @ApiOkResponse({ description: 'Price observations' })
-  observations(@Param('productId') productId: string) {
-    const product = groceryApi.getProduct(productId);
-    if (!product) throw new NotFoundException('Product not found');
-    return product.history.map((point) => ({
-      productId,
-      observedAt: `${point.date}T09:00:00Z`,
-      price: point.price,
-      currency: 'SEK',
-      priceType: 'shelf',
-      confidence: point.verified ? 'high' : 'low',
-      sourceType: 'demo_seed',
-      provenance: `demo://history/${productId}/${point.date}`
-    }));
+  @Get('series')
+  @ApiParam({ name: 'slug', example: 'zoegas-skane-mellanrost-450g' })
+  @ApiOkResponse({ description: 'Demo 90-day price series.' })
+  getSeries(@Param('slug') slug: string) {
+    return (
+      demoSeries.find((series) => series.productSlug === slug) ?? {
+        productSlug: slug,
+        range: '90d',
+        points: [],
+        demo: true,
+      }
+    );
   }
 }

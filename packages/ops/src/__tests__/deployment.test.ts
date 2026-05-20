@@ -1,18 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import {
-  buildDeploymentGateDigest,
-  buildDeploymentReadinessReport,
-  buildDeploymentSmokeEvidenceReport,
-  buildHostedSmokeCommandPlan,
-  buildRollbackPlan,
-  buildSecretRotationReadinessReport,
-  summarizeSecretRotationReadinessReport,
-  summarizeDeploymentSmokeEvidenceReport,
-  summarizeDeploymentReadinessReport,
-  summarizeGateBlockers,
-  summarizeGateWarnings
-} from '../index.js';
+import { buildDeploymentReadinessReport, buildReleasePromotionReport, buildRollbackPlan } from '../index.js';
 
 describe('deployment ops foundation', () => {
   it('passes readiness only when provider, secrets, DNS, health checks, and smoke tests are ready', () => {
@@ -234,120 +222,66 @@ describe('deployment ops foundation', () => {
     });
   });
 
-  it('builds hosted smoke command plans without embedding secret token values', () => {
-    const plan = buildHostedSmokeCommandPlan({
-      serverUrl: 'https://api.groceryview.example/',
-      webUrl: 'https://groceryview.example',
-      includePostgresReadiness: true,
-      metricsTokenEnvVar: 'PROD_METRICS_TOKEN',
-      timeoutSeconds: 20
-    });
-
-    assert.deepEqual(plan, {
-      commands: [
-        'GROCERYVIEW_SERVER_URL=https://api.groceryview.example GROCERYVIEW_WEB_URL=https://groceryview.example GROCERYVIEW_TERMINAL_PRODUCT_ID=coffee HTTP_SMOKE_TIMEOUT_SECONDS=20 infra/scripts/smoke-hosted-http.sh',
-        'GROCERYVIEW_SERVER_URL=https://api.groceryview.example METRICS_TOKEN=$PROD_METRICS_TOKEN READINESS_TIMEOUT_SECONDS=20 infra/scripts/smoke-hosted-readiness.sh'
+  it('blocks promotion unless release validation, artifacts, smoke tests, and rollback approval pass', () => {
+    const report = buildReleasePromotionReport({
+      releaseValidation: { status: 'fail', runUrl: 'https://github.example/runs/42' },
+      requiredArtifacts: ['web-static', 'api-image', 'worker-bundle'],
+      producedArtifacts: ['web-static'],
+      smokeTests: [
+        { name: 'web-market-page', status: 'pass' },
+        { name: 'api-health', status: 'not_run' }
       ],
-      requiredSecrets: ['PROD_METRICS_TOKEN'],
-      evidence: ['hosted_api_health', 'hosted_product_terminal', 'hosted_web', 'hosted_postgres_readiness']
-    });
-
-    assert.throws(() => buildHostedSmokeCommandPlan({
-      serverUrl: 'https://api.groceryview.example',
-      includePostgresReadiness: false,
-      timeoutSeconds: 0
-    }), /timeoutSeconds must be a positive integer/);
-
-    assert.throws(
-      () =>
-        buildHostedSmokeCommandPlan({
-          serverUrl: ' ',
-          includePostgresReadiness: false
-        }),
-      /serverUrl is required/
-    );
-
-    assert.throws(
-      () =>
-        buildHostedSmokeCommandPlan({
-          serverUrl: 'api.groceryview.example',
-          includePostgresReadiness: false
-        }),
-      /serverUrl must be a valid absolute URL/
-    );
-
-    assert.throws(
-      () =>
-        buildHostedSmokeCommandPlan({
-          serverUrl: 'ftp://api.groceryview.example',
-          includePostgresReadiness: false
-        }),
-      /serverUrl must use http or https/
-    );
-  });
-
-  it('summarizes hosted smoke evidence blockers for deployment dashboards', () => {
-    const report = buildDeploymentSmokeEvidenceReport({
-      checkedAt: '2026-05-20T08:00:00.000Z',
-      maxAgeMinutes: 30,
-      requiredSmokeTests: ['hosted_api_health', 'hosted_product_terminal', 'hosted_web', 'hosted_postgres_readiness', 'hosted_worker'],
-      evidence: [
-        { name: 'hosted_api_health', status: 'pass', checkedAt: '2026-05-20T07:45:00.000Z', url: 'https://api.example.com/api/health' },
-        { name: 'hosted_product_terminal', status: 'fail', checkedAt: '2026-05-20T07:55:00.000Z', url: 'https://api.example.com/api/products/coffee/terminal' },
-        { name: 'hosted_web', status: 'pass', checkedAt: '2026-05-20T07:00:00.000Z', url: 'https://groceryview.example' },
-        { name: 'hosted_postgres_readiness', status: 'not_run', checkedAt: '2026-05-20T07:50:00.000Z', url: '' }
-      ]
-    });
-
-    assert.deepEqual(summarizeDeploymentSmokeEvidenceReport(report), {
-      status: 'blocked',
-      totalBlockers: 5,
-      missingEvidence: 1,
-      staleEvidence: 1,
-      failedEvidence: 1,
-      notRunEvidence: 1,
-      missingUrls: 1,
-      passedEvidence: 2
-    });
-  });
-
-  it('blocks deployment when required secrets are missing, stale, or lack rotation ownership', () => {
-    const report = buildSecretRotationReadinessReport({
-      checkedAt: '2026-05-20T08:00:00.000Z',
-      maxAgeDays: 90,
-      requiredSecrets: ['DATABASE_URL', 'SESSION_SECRET', 'METRICS_TOKEN', 'BILLING_WEBHOOK_SECRET'],
-      secrets: [
-        {
-          name: 'DATABASE_URL',
-          present: true,
-          rotatedAt: '2026-01-01T00:00:00.000Z',
-          owner: 'platform'
-        },
-        {
-          name: 'SESSION_SECRET',
-          present: true,
-          rotatedAt: '2026-05-01T00:00:00.000Z'
-        },
-        {
-          name: 'METRICS_TOKEN',
-          present: false,
-          rotatedAt: '2026-05-01T00:00:00.000Z',
-          owner: 'platform'
-        }
-      ]
+      rollbackPlanApproved: false
     });
 
     assert.deepEqual(report, {
       status: 'blocked',
       blockers: [
-        'secret_rotation_stale:DATABASE_URL',
-        'secret_rotation_owner_missing:SESSION_SECRET',
-        'secret_missing:METRICS_TOKEN',
-        'secret_missing:BILLING_WEBHOOK_SECRET'
+        'release_validation_fail',
+        'missing_artifact:api-image',
+        'missing_artifact:worker-bundle',
+        'smoke_test_not_run:api-health',
+        'rollback_plan_not_approved'
       ],
-      readySecrets: [],
-      requiredSecretCount: 4,
-      summary: 'Secret rotation readiness is blocked until required deployment secrets are present, fresh, and owned.'
+      evidence: ['smoke_test_passed:web-market-page'],
+      summary: 'Release candidate is blocked until promotion gates pass.'
+    });
+  });
+
+  it('marks a candidate promotable when all release promotion gates are satisfied', () => {
+    const report = buildReleasePromotionReport({
+      releaseValidation: { status: 'pass', runUrl: 'https://github.example/runs/43' },
+      requiredArtifacts: ['web-static', 'api-image'],
+      producedArtifacts: ['api-image', 'web-static'],
+      smokeTests: [
+        { name: 'web-market-page', status: 'pass' },
+        { name: 'api-health', status: 'pass' }
+      ],
+      rollbackPlanApproved: true
+    });
+
+    assert.deepEqual(report, {
+      status: 'promotable',
+      blockers: [],
+      evidence: ['release_validation:https://github.example/runs/43', 'smoke_test_passed:web-market-page', 'smoke_test_passed:api-health'],
+      summary: 'Release candidate can be promoted.'
+    });
+  });
+
+  it('blocks promotion when no smoke tests are defined', () => {
+    const report = buildReleasePromotionReport({
+      releaseValidation: { status: 'pass' },
+      requiredArtifacts: ['web-static'],
+      producedArtifacts: ['web-static'],
+      smokeTests: [],
+      rollbackPlanApproved: true
+    });
+
+    assert.deepEqual(report, {
+      status: 'blocked',
+      blockers: ['no_smoke_tests_defined'],
+      evidence: ['release_validation:pass'],
+      summary: 'Release candidate is blocked until promotion gates pass.'
     });
   });
 
@@ -365,79 +299,11 @@ describe('deployment ops foundation', () => {
 
     assert.deepEqual(summarizeSecretRotationReadinessReport(report), {
       status: 'blocked',
-      requiredSecrets: 4,
       totalBlockers: 3,
       missingSecrets: 1,
       staleSecrets: 1,
       ownerlessSecrets: 1,
       readySecrets: 1
     });
-  });
-
-  it('builds a combined deployment gate digest for release dashboards', () => {
-    const readiness = buildDeploymentReadinessReport({
-      providerSelected: true,
-      requiredSecretsPresent: ['DATABASE_URL'],
-      requiredSecrets: ['DATABASE_URL'],
-      dnsConfigured: true,
-      healthChecks: [{ name: 'api', status: 'pass' }],
-      smokeTests: [{ name: 'health-endpoint', status: 'pass' }],
-      observabilityConfigured: true
-    });
-    const smokeEvidence = buildDeploymentSmokeEvidenceReport({
-      checkedAt: '2026-05-20T08:00:00.000Z',
-      maxAgeMinutes: 30,
-      requiredSmokeTests: ['hosted_api_health'],
-      evidence: [{ name: 'hosted_api_health', status: 'pass', checkedAt: '2026-05-20T07:45:00.000Z', url: 'https://example.com/health' }]
-    });
-    const secretRotation = buildSecretRotationReadinessReport({
-      checkedAt: '2026-05-20T08:00:00.000Z',
-      maxAgeDays: 90,
-      requiredSecrets: ['DATABASE_URL'],
-      secrets: [{ name: 'DATABASE_URL', present: true, rotatedAt: '2026-05-01T00:00:00.000Z', owner: 'platform' }]
-    });
-
-    assert.deepEqual(buildDeploymentGateDigest({ readiness, smokeEvidence, secretRotation, releaseValidation: 'pass' }), {
-      status: 'ready',
-      blockers: [],
-      totalBlockers: 0,
-      readyChecks: 4,
-      blockedChecks: 0,
-      checks: {
-        deploymentReadiness: 'ready',
-        smokeEvidence: 'ready',
-        secretRotation: 'ready',
-        releaseValidation: 'pass'
-      },
-      summary: 'Deployment gate digest is ready.'
-    });
-
-    assert.deepEqual(
-      buildDeploymentGateDigest({
-        readiness: { ...readiness, status: 'blocked', blockers: ['observability_not_configured'] },
-        smokeEvidence: { ...smokeEvidence, status: 'blocked', blockers: ['smoke_evidence_stale:hosted_api_health'] },
-        secretRotation: { ...secretRotation, status: 'blocked', blockers: ['secret_rotation_stale:DATABASE_URL'] },
-        releaseValidation: 'fail'
-      }),
-      {
-        status: 'blocked',
-        blockers: [
-          'deployment:observability_not_configured',
-          'smoke:smoke_evidence_stale:hosted_api_health',
-          'secret_rotation:secret_rotation_stale:DATABASE_URL',
-          'release_validation_failed'
-        ],
-        totalBlockers: 4,
-        readyChecks: 0,
-        blockedChecks: 4,
-        checks: {
-          deploymentReadiness: 'blocked',
-          smokeEvidence: 'blocked',
-          secretRotation: 'blocked',
-          releaseValidation: 'fail'
-        },
-        summary: 'Deployment gate digest is blocked until every required gate passes.'
-      }
-    );
   });
 });

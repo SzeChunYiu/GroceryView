@@ -1,13 +1,13 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { groceryApi } from '../demo-data.js';
+import { demoAlerts } from '../demo-data';
 
 @ApiTags('alerts')
-@Controller('users/demo/alerts')
+@Controller('me/alerts')
 export class AlertsController {
   @Get()
-  @ApiOkResponse({ description: 'Demo user alert stream' })
-  list() {
-    return groceryApi.getWatchlist('demo').alerts;
+  @ApiOkResponse({ description: 'Demo user alert rules.' })
+  getAlerts() {
+    return demoAlerts;
   }
 }

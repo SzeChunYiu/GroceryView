@@ -5,8 +5,18 @@ import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 @Controller('health')
 export class HealthController {
   @Get()
-  @ApiOkResponse({ description: 'Service health' })
-  health() {
-    return { status: 'ok', service: 'api' };
+  @ApiOkResponse({
+    schema: {
+      example: {
+        status: 'ok',
+        service: 'api',
+      },
+    },
+  })
+  getHealth() {
+    return {
+      status: 'ok',
+      service: 'api',
+    };
   }
 }

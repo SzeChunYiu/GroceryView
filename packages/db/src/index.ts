@@ -89,81 +89,46 @@ export function buildMigrationPlanStatus(migrations: Migration[], appliedVersion
 
 export function parseSqlStatements(sql: string): string[] {
   const statements: string[] = [];
-  let statement = '';
-  let index = 0;
-  let singleQuoted = false;
-  let doubleQuoted = false;
-  let dollarQuoteTag: string | null = null;
+  let current = '';
+  let inSingleQuote = false;
+  let inDoubleQuote = false;
 
-  while (index < sql.length) {
-    const char = sql[index];
-    const next = sql[index + 1];
+  for (const rawLine of sql.split('\n')) {
+    const line = rawLine.trim();
+    if (line.length === 0 || line.startsWith('--')) continue;
 
-    if (!singleQuoted && !doubleQuoted && !dollarQuoteTag && char === '-' && next === '-') {
-      index += 2;
-      while (index < sql.length && sql[index] !== '\n') index += 1;
-      continue;
-    }
+    for (let index = 0; index < line.length; index += 1) {
+      const character = line[index];
+      const nextCharacter = line[index + 1];
 
-    if (!singleQuoted && !doubleQuoted && !dollarQuoteTag && char === '/' && next === '*') {
-      index += 2;
-      while (index < sql.length && !(sql[index] === '*' && sql[index + 1] === '/')) index += 1;
-      index += index < sql.length ? 2 : 0;
-      continue;
-    }
+      current += character;
 
-    if (!singleQuoted && !doubleQuoted && char === '$') {
-      const tag = sql.slice(index).match(/^\$[A-Za-z_][A-Za-z0-9_]*\$|^\$\$/)?.[0];
-      if (tag) {
-        if (!dollarQuoteTag) {
-          dollarQuoteTag = tag;
-        } else if (dollarQuoteTag === tag) {
-          dollarQuoteTag = null;
+      if (character === "'" && !inDoubleQuote) {
+        if (inSingleQuote && nextCharacter === "'") {
+          current += nextCharacter;
+          index += 1;
+          continue;
         }
-        statement += tag;
-        index += tag.length;
-        continue;
+        inSingleQuote = !inSingleQuote;
+      } else if (character === '"' && !inSingleQuote) {
+        if (inDoubleQuote && nextCharacter === '"') {
+          current += nextCharacter;
+          index += 1;
+          continue;
+        }
+        inDoubleQuote = !inDoubleQuote;
+      } else if (character === ';' && !inSingleQuote && !inDoubleQuote) {
+        const statement = current.slice(0, -1).trim();
+        if (statement) statements.push(statement);
+        current = '';
       }
     }
 
-    if (!doubleQuoted && !dollarQuoteTag && char === "'") {
-      statement += char;
-      if (singleQuoted && next === "'") {
-        statement += next;
-        index += 2;
-        continue;
-      }
-      singleQuoted = !singleQuoted;
-      index += 1;
-      continue;
-    }
-
-    if (!singleQuoted && !dollarQuoteTag && char === '"') {
-      statement += char;
-      if (doubleQuoted && next === '"') {
-        statement += next;
-        index += 2;
-        continue;
-      }
-      doubleQuoted = !doubleQuoted;
-      index += 1;
-      continue;
-    }
-
-    if (!singleQuoted && !doubleQuoted && !dollarQuoteTag && char === ';') {
-      const trimmed = statement.trim();
-      if (trimmed) statements.push(trimmed);
-      statement = '';
-      index += 1;
-      continue;
-    }
-
-    statement += char;
-    index += 1;
+    current += '\n';
   }
 
-  const trimmed = statement.trim();
-  if (trimmed) statements.push(trimmed);
+  const trailingStatement = current.trim();
+  if (trailingStatement) statements.push(trailingStatement);
   return statements;
 }
 

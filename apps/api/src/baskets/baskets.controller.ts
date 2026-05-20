@@ -1,36 +1,26 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { IsNumber, IsString, Min } from 'class-validator';
-import { groceryApi } from '../demo-data.js';
-
-class BasketItemDto {
-  @IsString()
-  productId!: string;
-
-  @IsNumber()
-  @Min(1)
-  quantity!: number;
-}
+import type { BasketItem } from '@groceryview/api-contracts';
+import { demoBasket } from '../demo-data';
+import { parseBasketItemBody } from '../request-validation';
 
 @ApiTags('baskets')
-@Controller('users/demo/basket')
+@Controller('me/weekly-basket')
 export class BasketsController {
   @Get()
-  @ApiOkResponse({ description: 'Demo user basket' })
-  basket() {
-    return groceryApi.getBasket('demo');
-  }
-
-  @Get('comparison')
-  @ApiOkResponse({ description: 'Basket price comparison' })
-  comparison() {
-    return groceryApi.compareBasketReport('demo');
+  @ApiOkResponse({ description: 'Demo weekly basket summary.' })
+  getBasket() {
+    return demoBasket;
   }
 
   @Post('items')
-  @ApiCreatedResponse({ description: 'Basket item created' })
-  addItem(@Body() body: BasketItemDto) {
-    groceryApi.addBasketItem('demo', body);
-    return body;
+  @ApiCreatedResponse({ description: 'Demo basket item echo.' })
+  createBasketItem(@Body() body: unknown): BasketItem {
+    const item = parseBasketItemBody(body);
+    return {
+      productSlug: item.productSlug,
+      quantity: item.quantity ?? 1,
+      demo: true,
+    };
   }
 }

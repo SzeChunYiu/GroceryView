@@ -1,16 +1,26 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "../..",
-    "declaration": false,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "noEmit": false,
-    "outDir": "dist",
-    "rootDir": ".",
-    "sourceMap": true
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2022",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "paths": {
+      "@groceryview/api-contracts": ["../../packages/api-contracts/src/index.ts"]
+    },
+    "incremental": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "esModuleInterop": true,
+    "types": ["node", "jest"]
   },
-  "include": ["src/**/*.ts", "test/**/*.ts"]
+  "include": ["src/**/*.ts", "test/**/*.ts"],
+  "exclude": ["node_modules", "dist"]
 }

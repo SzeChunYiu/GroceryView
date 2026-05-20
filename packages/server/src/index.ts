@@ -139,6 +139,35 @@ type JsonRecord = Record<string, unknown>;
 const require = createRequire(import.meta.url);
 const jsonHeaders = { 'content-type': 'application/json; charset=utf-8' };
 
+type GroceryViewApi = {
+  getMarketOverview(): unknown;
+  getStores(): unknown;
+  getStore(id: string): unknown | null;
+  searchProducts(query: string): unknown;
+  getProduct(id: string): unknown | null;
+  getProductPrices(id: string): unknown;
+  getProductHistory(id: string): unknown;
+  getFavoriteStores(userId: string): unknown;
+  addFavoriteStore(userId: string, storeId: string): void;
+  getWatchlist(userId: string): unknown;
+  addWatchlistItem(
+    userId: string,
+    item: {
+      productId: string;
+      targetPrice?: number;
+      alertDealScoreAt?: number;
+      favoriteStoresOnly: boolean;
+    }
+  ): void;
+  getBasket(userId: string): unknown;
+  addBasketItem(userId: string, item: { productId: string; quantity: number }): void;
+  compareBasket(userId: string): unknown;
+  updateBudget(userId: string, patch: { weeklyBudget: number; monthlyBudget: number }): void;
+  getBudgetSummary(userId: string): unknown;
+  getIndices(): unknown;
+  getIndex(id: string): unknown | null;
+};
+
 function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   return new Response(JSON.stringify(body), {
     ...init,
@@ -363,167 +392,9 @@ function userIdFrom(url: URL): string | Response {
   return userId;
 }
 
-function signNotificationWebhookBody(body: string, secret: string): string {
-  return `sha256=${createHmac('sha256', secret).update(body).digest('hex')}`;
-}
-
-function hasValidNotificationWebhookSignature(request: Request, body: string, secret: string): boolean {
-  const provided = request.headers.get('x-groceryview-signature');
-  if (!provided) return false;
-
-  const expected = signNotificationWebhookBody(body, secret);
-  const providedBuffer = Buffer.from(provided);
-  const expectedBuffer = Buffer.from(expected);
-  return providedBuffer.length === expectedBuffer.length && timingSafeEqual(providedBuffer, expectedBuffer);
-}
-
-function signBillingWebhookBody(body: string, secret: string): string {
-  return `sha256=${createHmac('sha256', secret).update(body).digest('hex')}`;
-}
-
-function hasValidBillingWebhookSignature(request: Request, body: string, secret: string): boolean {
-  const provided = request.headers.get('x-groceryview-billing-signature');
-  if (!provided) return false;
-
-  const expected = signBillingWebhookBody(body, secret);
-  const providedBuffer = Buffer.from(provided);
-  const expectedBuffer = Buffer.from(expected);
-  return providedBuffer.length === expectedBuffer.length && timingSafeEqual(providedBuffer, expectedBuffer);
-}
-
-function hasValidMetricsToken(request: Request, token: string): boolean {
-  const provided = request.headers.get('x-groceryview-metrics-token');
-  if (!provided) return false;
-  const providedBuffer = Buffer.from(provided);
-  const expectedBuffer = Buffer.from(token);
-  return providedBuffer.length === expectedBuffer.length && timingSafeEqual(providedBuffer, expectedBuffer);
-}
-
-export type PostgresReadinessDiagnostics = {
-  blockers: {
-    total: number;
-    missingTables: number;
-    missingMigrations: number;
-    repositoryChecks: number;
-  };
-  evidence: {
-    total: number;
-    tables: number;
-    migrations: number;
-    repositoryChecks: number;
-  };
-};
-
-export type HttpPostgresReadinessReport = PostgresIntegrationReadinessReport & {
-  diagnostics: PostgresReadinessDiagnostics;
-};
-
-export function summarizePostgresReadinessForHttp(report: PostgresIntegrationReadinessReport): PostgresReadinessDiagnostics {
-  return {
-    blockers: report.blockers.reduce<PostgresReadinessDiagnostics['blockers']>(
-      (summary, blocker) => {
-        summary.total += 1;
-        if (blocker.startsWith('missing_table:')) summary.missingTables += 1;
-        if (blocker.startsWith('missing_migration:')) summary.missingMigrations += 1;
-        if (blocker.startsWith('repository_check_')) summary.repositoryChecks += 1;
-        return summary;
-      },
-      { total: 0, missingTables: 0, missingMigrations: 0, repositoryChecks: 0 }
-    ),
-    evidence: report.evidence.reduce<PostgresReadinessDiagnostics['evidence']>(
-      (summary, entry) => {
-        summary.total += 1;
-        if (entry.startsWith('table:')) summary.tables += 1;
-        if (entry.startsWith('migration:')) summary.migrations += 1;
-        if (entry.startsWith('repository_check:')) summary.repositoryChecks += 1;
-        return summary;
-      },
-      { total: 0, tables: 0, migrations: 0, repositoryChecks: 0 }
-    )
-  };
-}
-
-function postgresReadinessResponse(report: PostgresIntegrationReadinessReport): HttpPostgresReadinessReport {
-  return {
-    ...report,
-    diagnostics: summarizePostgresReadinessForHttp(report)
-  };
-}
-
-const sensitiveBillingEventFields = new Set([
-  'cardnumber',
-  'card',
-  'cvc',
-  'cvv',
-  'clientsecret',
-  'paymentintentclientsecret',
-  'setupintentclientsecret',
-  'rawcard',
-  'paymentmethod'
-]);
-
-function rejectSensitiveBillingEventFields(body: JsonRecord): void {
-  const blocked = Object.keys(body).filter((field) => sensitiveBillingEventFields.has(field.toLowerCase()));
-  if (blocked.length > 0) throw new Error('Billing subscription events must not include sensitive payment fields.');
-}
-
-function requiredBillingEventType(value: unknown): BillingSubscriptionEventType {
-  if (value === 'subscription.active' || value === 'subscription.past_due' || value === 'subscription.canceled') return value;
-  throw new Error('type must be subscription.active, subscription.past_due, or subscription.canceled.');
-}
-
-function requiredBillingProvider(value: unknown): BillingSubscriptionEvent['provider'] {
-  if (value === 'stripe_compatible') return value;
-  throw new Error('provider must be stripe_compatible.');
-}
-
-function optionalSubscriptionPlan(value: unknown): SubscriptionPlan | undefined {
-  if (value === undefined) return undefined;
-  if (value === 'premium_monthly' || value === 'premium_yearly') return value;
-  throw new Error('plan must be premium_monthly or premium_yearly.');
-}
-
-function parseBillingSubscriptionEvent(body: JsonRecord): BillingSubscriptionEvent {
-  rejectSensitiveBillingEventFields(body);
-  const type = requiredBillingEventType(body.type);
-  const plan = optionalSubscriptionPlan(body.plan);
-  const currentPeriodEndsAt = optionalIsoTimestamp(body.currentPeriodEndsAt, 'currentPeriodEndsAt');
-  const providerCustomerId = optionalString(body.providerCustomerId, 'providerCustomerId');
-  const providerSubscriptionId = optionalString(body.providerSubscriptionId, 'providerSubscriptionId');
-  if (type !== 'subscription.canceled' && !plan) {
-    throw new Error('plan is required for active or past_due billing subscription events.');
-  }
-
-  return {
-    provider: requiredBillingProvider(body.provider),
-    providerEventId: requiredString(body.providerEventId, 'providerEventId'),
-    type,
-    userId: requiredString(body.userId, 'userId'),
-    ...(plan ? { plan } : {}),
-    ...(currentPeriodEndsAt ? { currentPeriodEndsAt } : {}),
-    ...(providerCustomerId ? { providerCustomerId } : {}),
-    ...(providerSubscriptionId ? { providerSubscriptionId } : {}),
-    occurredAt: requiredIsoTimestamp(body.occurredAt, 'occurredAt')
-  };
-}
-
-function parseBillingSubscriptionWebhookBody(body: JsonRecord, authOptions: AuthOptions): BillingSubscriptionEvent {
-  rejectSensitiveBillingEventFields(body);
-  if (body.provider !== undefined) return parseBillingSubscriptionEvent(body);
-
-  const receivedAt = (authOptions.now ?? new Date()).toISOString();
-  const event = parseStripeCompatibleSubscriptionEvent({
-    payload: body,
-    receivedAt,
-    priceIdPlanMap: authOptions.billingPriceIdPlanMap
-  });
-  if (!event) throw new Error('Unsupported billing subscription webhook event.');
-  return event;
-}
-
-export function createHttpHandler(api = createGroceryViewApi(), authOptions: AuthOptions = {}): HttpHandler {
-  const requireSession = async (request: Request): Promise<SessionPayload | Response> => {
-    if (!authOptions.authSecret) return errorResponse(503, 'Auth secret is not configured.');
+export function createHttpHandler(api: GroceryViewApi = createGroceryViewApi(), authOptions: AuthOptions = {}): HttpHandler {
+  const authorizeUser = async (request: Request, userId: string): Promise<Response | null> => {
+    if (!authOptions.authSecret) return null;
     const token = parseBearerToken(request.headers.get('authorization'));
     if (!token) return errorResponse(401, 'Bearer session token is required.');
     return verifySessionToken(token, authOptions.authSecret, authOptions.now);

@@ -346,36 +346,15 @@ function trimTrailingSlash(url: string): string {
   return url.replace(/\/+$/, '');
 }
 
-function normalizeHostedSmokeUrl(url: string, field: string): string {
-  const normalizedUrl = trimTrailingSlash(url.trim());
-  if (normalizedUrl.length === 0) {
-    throw new Error(`${field} is required for hosted smoke command plans.`);
-  }
-
-  let parsedUrl: URL;
-  try {
-    parsedUrl = new URL(normalizedUrl);
-  } catch (error) {
-    throw new Error(`${field} must be a valid absolute URL.`);
-  }
-
-  if (parsedUrl.protocol !== 'http:' && parsedUrl.protocol !== 'https:') {
-    throw new Error(`${field} must use http or https.`);
-  }
-
-  return normalizedUrl;
-}
-
 export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput): HostedSmokeCommandPlan {
   const timeout = input.timeoutSeconds ?? 15;
   if (!Number.isInteger(timeout) || timeout <= 0) throw new Error('timeoutSeconds must be a positive integer.');
-  const serverUrl = normalizeHostedSmokeUrl(input.serverUrl, 'serverUrl');
-  const webUrl = input.webUrl ? normalizeHostedSmokeUrl(input.webUrl, 'webUrl') : undefined;
+  const serverUrl = trimTrailingSlash(input.serverUrl);
   const terminalProductId = input.terminalProductId ?? 'coffee';
   const commands = [
     [
       `GROCERYVIEW_SERVER_URL=${serverUrl}`,
-      webUrl ? `GROCERYVIEW_WEB_URL=${webUrl}` : undefined,
+      input.webUrl ? `GROCERYVIEW_WEB_URL=${trimTrailingSlash(input.webUrl)}` : undefined,
       `GROCERYVIEW_TERMINAL_PRODUCT_ID=${terminalProductId}`,
       `HTTP_SMOKE_TIMEOUT_SECONDS=${timeout}`,
       'infra/scripts/smoke-hosted-http.sh'
@@ -386,7 +365,7 @@ export function buildHostedSmokeCommandPlan(input: HostedSmokeCommandPlanInput):
   const evidence = ['hosted_api_health', 'hosted_product_terminal'];
   const requiredSecrets: string[] = [];
 
-  if (webUrl) evidence.push('hosted_web');
+  if (input.webUrl) evidence.push('hosted_web');
 
   if (input.includePostgresReadiness) {
     const metricsTokenEnvVar = input.metricsTokenEnvVar ?? 'METRICS_TOKEN';
@@ -566,137 +545,54 @@ export function buildRollbackPlan(input: RollbackPlanInput): RollbackPlan {
   };
 }
 
-export type DeploymentManifestService = {
-  name?: unknown;
-  type?: unknown;
-  workspace?: unknown;
-  startCommand?: unknown;
-  buildCommand?: unknown;
-  outputDirectory?: unknown;
-  healthCheck?: unknown;
-  requiredEnv?: unknown;
+export type ReleaseValidationStatus = 'pass' | 'fail' | 'pending' | 'missing';
+
+export type ReleasePromotionInput = {
+  releaseValidation: {
+    status: ReleaseValidationStatus;
+    runUrl?: string;
+  };
+  requiredArtifacts: string[];
+  producedArtifacts: string[];
+  smokeTests: Array<{ name: string; status: GateStatus }>;
+  rollbackPlanApproved: boolean;
 };
 
-export type DeploymentManifest = {
-  version?: unknown;
-  services?: unknown;
-};
-
-export type DeploymentManifestValidationReport = {
-  status: 'ready' | 'blocked';
+export type ReleasePromotionReport = {
+  status: 'promotable' | 'blocked';
   blockers: string[];
-  warnings: string[];
-  serviceNames: string[];
+  evidence: string[];
+  summary: string;
 };
 
-export type DeploymentManifestValidationSummary = {
-  status: DeploymentManifestValidationReport['status'];
-  serviceCount: number;
-  totalBlockers: number;
-  totalWarnings: number;
-  unsupportedVersion: number;
-  missingServices: number;
-  duplicateServices: number;
-  serviceMetadata: number;
-  invalidWorkspaces: number;
-  commandOrOutput: number;
-  healthChecks: number;
-  requiredEnv: number;
-  servicesWithoutRequiredEnv: number;
-};
-
-type HealthCheckShape = {
-  path?: unknown;
-  expectedStatus?: unknown;
-};
-
-export function summarizeDeploymentManifestValidationReport(
-  report: DeploymentManifestValidationReport
-): DeploymentManifestValidationSummary {
-  return report.blockers.reduce<DeploymentManifestValidationSummary>(
-    (summary, blocker) => {
-      summary.totalBlockers += 1;
-      if (blocker === 'manifest_version_not_supported') summary.unsupportedVersion += 1;
-      if (blocker === 'services_missing') summary.missingServices += 1;
-      if (blocker.startsWith('duplicate_service:')) summary.duplicateServices += 1;
-      if (blocker.startsWith('service_name_missing:') || blocker.startsWith('service_type_missing:')) summary.serviceMetadata += 1;
-      if (blocker.startsWith('workspace_invalid:')) summary.invalidWorkspaces += 1;
-      if (blocker.startsWith('start_command_missing:') || blocker.startsWith('build_command_missing:') || blocker.startsWith('output_directory_missing:')) {
-        summary.commandOrOutput += 1;
-      }
-      if (blocker.startsWith('health_check_')) summary.healthChecks += 1;
-      if (blocker.startsWith('required_env_invalid:')) summary.requiredEnv += 1;
-      return summary;
-    },
-    {
-      status: report.status,
-      serviceCount: report.serviceNames.length,
-      totalBlockers: 0,
-      totalWarnings: report.warnings.length,
-      unsupportedVersion: 0,
-      missingServices: 0,
-      duplicateServices: 0,
-      serviceMetadata: 0,
-      invalidWorkspaces: 0,
-      commandOrOutput: 0,
-      healthChecks: 0,
-      requiredEnv: 0,
-      servicesWithoutRequiredEnv: report.warnings.filter((warning) => warning.startsWith('no_required_env:')).length
-    }
-  );
-}
-
-export function validateDeploymentManifest(manifest: DeploymentManifest): DeploymentManifestValidationReport {
+export function buildReleasePromotionReport(input: ReleasePromotionInput): ReleasePromotionReport {
   const blockers: string[] = [];
-  const warnings: string[] = [];
-  const serviceNames: string[] = [];
+  const evidence: string[] = [];
+  const produced = new Set(input.producedArtifacts);
 
-  if (manifest.version !== 1) blockers.push('manifest_version_not_supported');
-  if (!Array.isArray(manifest.services) || manifest.services.length === 0) {
-    blockers.push('services_missing');
-    return { status: 'blocked', blockers, warnings, serviceNames };
+  if (input.releaseValidation.status !== 'pass') {
+    blockers.push(`release_validation_${input.releaseValidation.status}`);
+  } else {
+    evidence.push(input.releaseValidation.runUrl ? `release_validation:${input.releaseValidation.runUrl}` : 'release_validation:pass');
   }
 
-  const seenNames = new Set<string>();
-  for (const [index, rawService] of manifest.services.entries()) {
-    const service = rawService as DeploymentManifestService;
-    const name = typeof service.name === 'string' && service.name.trim().length > 0 ? service.name : `service_${index}`;
-    if (name === `service_${index}`) blockers.push(`service_name_missing:${index}`);
-    if (seenNames.has(name)) blockers.push(`duplicate_service:${name}`);
-    seenNames.add(name);
-    serviceNames.push(name);
-
-    if (typeof service.workspace !== 'string' || !service.workspace.startsWith('@groceryview/')) {
-      blockers.push(`workspace_invalid:${name}`);
-    }
-    if (typeof service.type !== 'string' || service.type.trim().length === 0) blockers.push(`service_type_missing:${name}`);
-
-    const healthCheck = service.healthCheck as HealthCheckShape | undefined;
-    if (!healthCheck || typeof healthCheck.path !== 'string' || !healthCheck.path.startsWith('/')) {
-      blockers.push(`health_check_path_invalid:${name}`);
-    }
-    if (!healthCheck || typeof healthCheck.expectedStatus !== 'number' || healthCheck.expectedStatus < 200 || healthCheck.expectedStatus > 399) {
-      blockers.push(`health_check_status_invalid:${name}`);
-    }
-
-    if (!Array.isArray(service.requiredEnv) || !service.requiredEnv.every((envVar) => typeof envVar === 'string' && /^[A-Z][A-Z0-9_]*$/.test(envVar))) {
-      blockers.push(`required_env_invalid:${name}`);
-    }
-
-    if (service.type === 'node-http' && (typeof service.startCommand !== 'string' || service.startCommand.trim().length === 0)) {
-      blockers.push(`start_command_missing:${name}`);
-    }
-    if (service.type === 'static-site') {
-      if (typeof service.buildCommand !== 'string' || service.buildCommand.trim().length === 0) blockers.push(`build_command_missing:${name}`);
-      if (typeof service.outputDirectory !== 'string' || service.outputDirectory.trim().length === 0) blockers.push(`output_directory_missing:${name}`);
-    }
-    if (Array.isArray(service.requiredEnv) && service.requiredEnv.length === 0) warnings.push(`no_required_env:${name}`);
+  for (const artifact of input.requiredArtifacts) {
+    if (!produced.has(artifact)) blockers.push(`missing_artifact:${artifact}`);
   }
+
+  for (const smoke of input.smokeTests) {
+    if (smoke.status === 'fail') blockers.push(`smoke_test_failed:${smoke.name}`);
+    if (smoke.status === 'not_run') blockers.push(`smoke_test_not_run:${smoke.name}`);
+    if (smoke.status === 'pass') evidence.push(`smoke_test_passed:${smoke.name}`);
+  }
+  if (input.smokeTests.length === 0) blockers.push('no_smoke_tests_defined');
+
+  if (!input.rollbackPlanApproved) blockers.push('rollback_plan_not_approved');
 
   return {
-    status: blockers.length === 0 ? 'ready' : 'blocked',
+    status: blockers.length === 0 ? 'promotable' : 'blocked',
     blockers,
-    warnings,
-    serviceNames
+    evidence,
+    summary: blockers.length === 0 ? 'Release candidate can be promoted.' : 'Release candidate is blocked until promotion gates pass.'
   };
 }

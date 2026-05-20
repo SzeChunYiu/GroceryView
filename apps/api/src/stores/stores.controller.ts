@@ -1,21 +1,24 @@
 import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { allStores, groceryApi } from '../demo-data.js';
+import { ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { demoStores, toStoreSummary } from '../demo-data';
 
 @ApiTags('stores')
 @Controller('stores')
 export class StoresController {
   @Get()
-  @ApiOkResponse({ description: 'Store list' })
-  list() {
-    return allStores();
+  @ApiOkResponse({ description: 'Demo store list.' })
+  listStores() {
+    return demoStores.map(toStoreSummary);
   }
 
-  @Get(':id')
-  @ApiOkResponse({ description: 'Store detail' })
-  detail(@Param('id') id: string) {
-    const store = groceryApi.getStore(id);
-    if (!store) throw new NotFoundException('Store not found');
-    return { ...store, demo: true };
+  @Get(':slug')
+  @ApiParam({ name: 'slug', example: 'willys-odenplan' })
+  @ApiOkResponse({ description: 'Demo store detail.' })
+  getStore(@Param('slug') slug: string) {
+    const store = demoStores.find((item) => item.slug === slug);
+    if (!store) {
+      throw new NotFoundException(`Unknown store slug: ${slug}`);
+    }
+    return store;
   }
 }

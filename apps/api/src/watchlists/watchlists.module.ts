@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
-import { WatchlistsController } from './watchlists.controller.js';
+import { WatchlistsController } from './watchlists.controller';
 
-@Module({ controllers: [WatchlistsController] })
+@Module({
+  controllers: [WatchlistsController],
+})
 export class WatchlistsModule {}
