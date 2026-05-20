@@ -21,6 +21,7 @@ describe('buildStaticPages', () => {
         'privacy/index.html',
         'products/coffee/index.html',
         'scanner/index.html',
+        'stores/compare/index.html',
         'stores/willys-odenplan/index.html'
       ]);
 
@@ -36,6 +37,13 @@ describe('buildStaticPages', () => {
       assert.match(store, /Store highlights/);
       assert.match(store, /Verified shelf/);
       assert.match(store, /Watchlist only/);
+
+      const storeComparison = await readFile(join(root, 'stores/compare/index.html'), 'utf8');
+      assert.match(storeComparison, /Compare Stockholm stores/);
+      assert.match(storeComparison, /Favorite-store comparison/);
+      assert.match(storeComparison, /Verified coverage/);
+      assert.match(storeComparison, /Low-confidence rows/);
+      assert.match(storeComparison, /Low-confidence receipt rows stay out of Deal Score/);
 
       const category = await readFile(join(root, 'categories/coffee/index.html'), 'utf8');
       assert.match(category, /Category signals/);
