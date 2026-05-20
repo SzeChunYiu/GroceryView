@@ -347,6 +347,11 @@ describe('createHttpHandler', () => {
       body: JSON.stringify({ weeklyBudget: 800, monthlyBudget: 3200 })
     }))).status, 200);
 
+    assert.equal((await handle(new Request('http://localhost/api/budget/categories?userId=user-1', {
+      method: 'PATCH',
+      body: JSON.stringify({ categories: [{ category: 'coffee', weeklyBudget: 100 }, { category: 'dairy', weeklyBudget: 40 }] })
+    }))).status, 200);
+
     const watchlist = await json(await handle(new Request('http://localhost/api/watchlist?userId=user-1'))) as { alerts: unknown[] };
     assert.equal(watchlist.alerts.length, 2);
 
@@ -355,6 +360,14 @@ describe('createHttpHandler', () => {
 
     const budget = await json(await handle(new Request('http://localhost/api/budget/summary?userId=user-1'))) as { weeklyRemainingAfterEstimate: number };
     assert.equal(budget.weeklyRemainingAfterEstimate, 700.2);
+
+    const categoryBudget = await json(await handle(new Request('http://localhost/api/budget/categories?userId=user-1'))) as {
+      categories: Array<{ category: string; estimatedSpend: number; remaining: number; status: string }>;
+    };
+    assert.deepEqual(categoryBudget.categories, [
+      { category: 'coffee', weeklyBudget: 100, estimatedSpend: 99.8, remaining: 0.2, status: 'under', productIds: ['coffee'] },
+      { category: 'dairy', weeklyBudget: 40, estimatedSpend: 0, remaining: 40, status: 'under', productIds: [] }
+    ]);
 
     assert.equal((await handle(new Request('http://localhost/api/watchlist/items/coffee?userId=user-1', { method: 'DELETE' }))).status, 200);
     assert.equal((await handle(new Request('http://localhost/api/basket/items/coffee?userId=user-1', { method: 'DELETE' }))).status, 200);

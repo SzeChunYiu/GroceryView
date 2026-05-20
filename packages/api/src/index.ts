@@ -376,6 +376,30 @@ export type UserBudgetPatch = {
   monthlyBudget: number;
 };
 
+export type CategoryBudgetPatch = {
+  category: string;
+  weeklyBudget: number;
+};
+
+export type CategoryBudgetLine = {
+  category: string;
+  weeklyBudget: number;
+  estimatedSpend: number;
+  remaining: number;
+  status: 'under' | 'over';
+  productIds: string[];
+};
+
+export type CategoryBudgetSummary = {
+  userId: string;
+  categories: CategoryBudgetLine[];
+  unbudgetedCategories: Array<{
+    category: string;
+    estimatedSpend: number;
+    productIds: string[];
+  }>;
+};
+
 export type HouseholdPlanRequest = {
   householdId: string;
   name: string;
@@ -1146,6 +1170,7 @@ export function createGroceryViewApi() {
   const watchlists = new Map<string, WatchlistItem[]>();
   const baskets = new Map<string, BasketItemRequest[]>();
   const budgets = new Map<string, UserBudgetPatch>();
+  const categoryBudgets = new Map<string, CategoryBudgetPatch[]>();
   const subscriptionEntitlements = new Map<string, SubscriptionEntitlementSnapshot>();
   const householdPlans = new Map<string, HouseholdPlan>();
 
@@ -1428,6 +1453,57 @@ export function createGroceryViewApi() {
     getBudgetSummary(userId: string): BudgetSummary {
       const budget = budgets.get(userId) ?? { weeklyBudget: 0, monthlyBudget: 0 };
       return summarizeBudget({ ...budget, estimatedBasketTotal: this.compareBasket(userId).cheapestByProduct.total, receiptTotalsThisWeek: [], receiptTotalsThisMonth: [] });
+    },
+
+    updateCategoryBudgets(userId: string, patches: CategoryBudgetPatch[]) {
+      requireNonEmptyId(userId, 'userId');
+      if (!Array.isArray(patches)) throw new Error('categories must be an array');
+      const normalized = patches.map((patch) => {
+        requireNonEmptyId(patch.category, 'category');
+        requireZeroOrPositiveFinite(patch.weeklyBudget, 'weeklyBudget');
+        return { category: patch.category.trim().toLowerCase(), weeklyBudget: patch.weeklyBudget };
+      });
+      const categories = new Set(normalized.map((patch) => patch.category));
+      if (categories.size !== normalized.length) throw new Error('categories must be unique');
+      categoryBudgets.set(userId, normalized.sort((left, right) => left.category.localeCompare(right.category)));
+    },
+
+    getCategoryBudgetSummary(userId: string): CategoryBudgetSummary {
+      requireNonEmptyId(userId, 'userId');
+      const spendByCategory = new Map<string, { estimatedSpend: number; productIds: Set<string> }>();
+      for (const item of baskets.get(userId) ?? []) {
+        const product = products.find((candidate) => candidate.id === item.productId);
+        if (!product) continue;
+        const current = spendByCategory.get(product.category) ?? { estimatedSpend: 0, productIds: new Set<string>() };
+        current.estimatedSpend = Math.round((current.estimatedSpend + (bestPriceFor(product)?.price ?? 0) * item.quantity) * 100) / 100;
+        current.productIds.add(product.id);
+        spendByCategory.set(product.category, current);
+      }
+      const categories = (categoryBudgets.get(userId) ?? []).map((budget) => {
+        const spend = spendByCategory.get(budget.category) ?? { estimatedSpend: 0, productIds: new Set<string>() };
+        const remaining = Math.round((budget.weeklyBudget - spend.estimatedSpend) * 100) / 100;
+        return {
+          category: budget.category,
+          weeklyBudget: budget.weeklyBudget,
+          estimatedSpend: spend.estimatedSpend,
+          remaining,
+          status: remaining >= 0 ? 'under' : 'over',
+          productIds: [...spend.productIds].sort()
+        } satisfies CategoryBudgetLine;
+      });
+      const budgeted = new Set(categories.map((line) => line.category));
+      return {
+        userId,
+        categories,
+        unbudgetedCategories: [...spendByCategory.entries()]
+          .filter(([category]) => !budgeted.has(category))
+          .map(([category, spend]) => ({
+            category,
+            estimatedSpend: spend.estimatedSpend,
+            productIds: [...spend.productIds].sort()
+          }))
+          .sort((left, right) => left.category.localeCompare(right.category))
+      };
     },
 
     upsertHouseholdPlan(userId: string, input: HouseholdPlanRequest): HouseholdPlan {

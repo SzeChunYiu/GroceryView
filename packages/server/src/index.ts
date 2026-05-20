@@ -3,7 +3,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from 'node:ht
 import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { createGroceryViewApi, type HouseholdPlanRequest } from '@groceryview/api';
+import { createGroceryViewApi, type CategoryBudgetPatch, type HouseholdPlanRequest } from '@groceryview/api';
 import { createSessionToken, parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
 import {
   checkPostgresIntegrationReadiness,
@@ -342,6 +342,13 @@ function privacyRequestsFromBody(body: JsonRecord, userId: string): PrivacyReque
       status: requiredPrivacyRequestStatus(request.status)
     };
   });
+}
+
+function categoryBudgetPatchesFromBody(body: JsonRecord): CategoryBudgetPatch[] {
+  return requiredRecordArray(body.categories, 'categories').map((category) => ({
+    category: requiredString(category.category, 'categories.category'),
+    weeklyBudget: requiredNumber(category.weeklyBudget, 'categories.weeklyBudget')
+  }));
 }
 
 function userIdFrom(url: URL): string | Response {
@@ -968,6 +975,19 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(api.getBudgetSummary(user));
       }
 
+      if (path === '/api/budget/categories') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(api.getCategoryBudgetSummary(user));
+        if (method === 'PATCH') {
+          const body = await readJson(request);
+          api.updateCategoryBudgets(user, categoryBudgetPatchesFromBody(body));
+          return jsonResponse(api.getCategoryBudgetSummary(user));
+        }
+      }
+
       if (path === '/api/households/current') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -1204,6 +1224,10 @@ export function buildOpenApiDocument(): OpenApiDocument {
       },
       '/api/basket/compare': { post: protectedOperation('Compare basket strategies.') },
       '/api/budget': { patch: protectedOperation('Update budget.') },
+      '/api/budget/categories': {
+        get: protectedOperation('Get category budget summary.'),
+        patch: protectedOperation('Replace category budget limits.')
+      },
       '/api/budget/summary': { get: protectedOperation('Get budget summary.') },
       '/api/indices': { get: publicOperation('List grocery indices.') },
       '/api/indices/{id}': { get: publicOperation('Get grocery index detail.') },
