@@ -128,6 +128,20 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
     const method = request.method.toUpperCase();
 
     try {
+      if (method === 'GET' && path === '/api/health') {
+        return jsonResponse(
+          buildHealthReport({
+            nodeEnv: (process.env.NODE_ENV ?? 'development') as RuntimeConfig['nodeEnv'],
+            port: Number(process.env.PORT ?? '3000'),
+            authSecret: authOptions.authSecret ?? process.env.AUTH_SECRET,
+            databaseUrl: process.env.DATABASE_URL,
+            publicWebUrl: process.env.PUBLIC_WEB_URL,
+            notificationWebhookSecret: authOptions.notificationWebhookSecret ?? process.env.NOTIFICATION_WEBHOOK_SECRET,
+            metricsToken: authOptions.notificationMetricsToken ?? process.env.METRICS_TOKEN
+          })
+        );
+      }
+
       if (method === 'GET' && path === '/api/market/overview') return jsonResponse(api.getMarketOverview());
       if (method === 'GET' && path === '/api/stores') return jsonResponse(api.getStores());
 
@@ -352,6 +366,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       }
     },
     paths: {
+      '/api/health': { get: publicOperation('Get API runtime health without exposing secrets.') },
       '/api/market/overview': { get: publicOperation('Get Stockholm grocery market overview.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/stores/{id}': { get: publicOperation('Get store profile.') },

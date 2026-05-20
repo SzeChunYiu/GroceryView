@@ -26,6 +26,42 @@ describe('parseSqlStatements', () => {
       'create index a_idx on a(id)'
     ]);
   });
+
+  it('does not split semicolons inside quoted SQL values or identifiers', () => {
+    assert.deepEqual(
+      parseSqlStatements(`
+        insert into source_runs(source_name, provenance)
+        values ('weekly; leaflet', '{"note":"trusted; source"}');
+        create table "prices;archive"(id text);
+      `),
+      [
+        `insert into source_runs(source_name, provenance)
+        values ('weekly; leaflet', '{"note":"trusted; source"}')`,
+        'create table "prices;archive"(id text)'
+      ]
+    );
+  });
+
+  it('keeps dollar-quoted migration blocks intact', () => {
+    assert.deepEqual(
+      parseSqlStatements(`
+        do $$
+        begin
+          raise notice 'seed; ready';
+        end
+        $$;
+        create index latest_prices_observed_idx on latest_prices(observed_at);
+      `),
+      [
+        `do $$
+        begin
+          raise notice 'seed; ready';
+        end
+        $$`,
+        'create index latest_prices_observed_idx on latest_prices(observed_at)'
+      ]
+    );
+  });
 });
 
 describe('migrationVersionFromPath', () => {
