@@ -336,6 +336,56 @@ describe('parseNotificationSuppressionWebhook', () => {
       }
     });
   });
+
+  it('normalizes Expo DeviceNotRegistered receipts into push suppressions', () => {
+    const events = parseNotificationSuppressionWebhook({
+      provider: 'expo',
+      receivedAt: '2026-05-20T12:00:00.000Z',
+      payload: {
+        receipts: {
+          receipt1: {
+            status: 'error',
+            to: 'ExponentPushToken[stale-device]',
+            details: { error: 'DeviceNotRegistered' },
+            occurredAt: '2026-05-20T11:57:00.000Z'
+          },
+          receipt2: {
+            status: 'ok',
+            to: 'ExponentPushToken[active-device]'
+          },
+          receipt3: {
+            status: 'error',
+            to: 'ExponentPushToken[temporary-failure]',
+            details: { error: 'MessageRateExceeded' }
+          }
+        }
+      }
+    });
+
+    assert.deepEqual(events, [
+      {
+        provider: 'expo',
+        providerEventId: 'receipt1:ExponentPushToken[stale-device]:DeviceNotRegistered',
+        eventType: 'unsubscribe',
+        recipient: 'ExponentPushToken[stale-device]',
+        channel: 'push',
+        occurredAt: '2026-05-20T11:57:00.000Z'
+      }
+    ]);
+    assert.deepEqual(processNotificationSuppressionEvent(events[0]!), {
+      id: 'suppression-expo-receipt1:ExponentPushToken[stale-device]:DeviceNotRegistered',
+      recipient: 'ExponentPushToken[stale-device]',
+      channel: 'push',
+      reason: 'unsubscribed',
+      active: true,
+      updatedAt: '2026-05-20T11:57:00.000Z',
+      source: {
+        provider: 'expo',
+        providerEventId: 'receipt1:ExponentPushToken[stale-device]:DeviceNotRegistered',
+        eventType: 'unsubscribe'
+      }
+    });
+  });
 });
 
 

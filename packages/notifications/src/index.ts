@@ -30,7 +30,7 @@ export type NotificationSuppressionEvent = {
   occurredAt: string;
 };
 
-export type NotificationSuppressionWebhookProvider = 'sendgrid' | 'ses';
+export type NotificationSuppressionWebhookProvider = 'sendgrid' | 'ses' | 'expo';
 
 export type ParseNotificationSuppressionWebhookInput = {
   provider: NotificationSuppressionWebhookProvider;
@@ -481,12 +481,45 @@ function parseSesSuppressionWebhook(input: ParseNotificationSuppressionWebhookIn
   });
 }
 
+function expoReceiptRecords(payload: unknown): Array<{ receiptId: string; record: Record<string, unknown> }> {
+  if (Array.isArray(payload)) {
+    return payload.flatMap((record, index) => (isRecord(record) ? [{ receiptId: readString(record, 'id') ?? `expo-receipt-${index}`, record }] : []));
+  }
+
+  if (!isRecord(payload)) return [];
+  const receipts = isRecord(payload.receipts) ? payload.receipts : payload;
+  return Object.entries(receipts).flatMap(([receiptId, record]) => (isRecord(record) ? [{ receiptId, record }] : []));
+}
+
+function parseExpoSuppressionWebhook(input: ParseNotificationSuppressionWebhookInput): NotificationSuppressionEvent[] {
+  const events: NotificationSuppressionEvent[] = [];
+  for (const { receiptId, record } of expoReceiptRecords(input.payload)) {
+    const status = readString(record, 'status');
+    const details = isRecord(record.details) ? record.details : {};
+    const error = readString(details, 'error') ?? readString(record, 'error');
+    const recipient = readString(record, 'to') ?? readString(record, 'recipient') ?? readString(record, 'pushToken');
+
+    if (status !== 'error' || error !== 'DeviceNotRegistered' || !recipient) continue;
+
+    events.push({
+      provider: 'expo',
+      providerEventId: providerEventId(record, ['id'], [receiptId, recipient, error]),
+      eventType: 'unsubscribe',
+      recipient,
+      channel: 'push',
+      occurredAt: validIsoOrFallback(readString(record, 'occurredAt'), input.receivedAt)
+    });
+  }
+  return events;
+}
+
 export function parseNotificationSuppressionWebhook(
   input: ParseNotificationSuppressionWebhookInput
 ): NotificationSuppressionEvent[] {
   if (Number.isNaN(Date.parse(input.receivedAt))) throw new Error('receivedAt must be an ISO date.');
   if (input.provider === 'sendgrid') return parseSendgridSuppressionWebhook(input);
-  return parseSesSuppressionWebhook(input);
+  if (input.provider === 'ses') return parseSesSuppressionWebhook(input);
+  return parseExpoSuppressionWebhook(input);
 }
 
 export function processNotificationSuppressionEvent(event: NotificationSuppressionEvent): NotificationSuppressionMutation {
