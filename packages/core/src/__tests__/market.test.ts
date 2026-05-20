@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildWatchlistAlerts, searchProducts, summarizeBudget } from '../index.js';
+import { buildWatchlistAlerts, searchProducts, summarizeBudget, summarizeCategoryDealLeaders } from '../index.js';
 
 describe('searchProducts', () => {
   it('finds products by ticker, name, category, or chain availability', () => {
@@ -10,6 +10,91 @@ describe('searchProducts', () => {
     ], 'willys coffee');
 
     assert.deepEqual(results.map((product) => product.id), ['coffee']);
+  });
+});
+
+describe('summarizeCategoryDealLeaders', () => {
+  it('selects the strongest trusted deal signal for each category', () => {
+    const leaders = summarizeCategoryDealLeaders({
+      candidates: [
+        {
+          productId: 'coffee-zoegas',
+          productName: 'Zoégas Coffee 450g',
+          category: 'coffee',
+          storeName: 'Willys Odenplan',
+          price: 49.9,
+          dealScore: 86,
+          sourceConfidence: 0.92
+        },
+        {
+          productId: 'coffee-garant',
+          productName: 'Garant Coffee 450g',
+          category: 'coffee',
+          storeName: 'Hemköp City',
+          price: 42.9,
+          dealScore: 86,
+          sourceConfidence: 0.86
+        },
+        {
+          productId: 'milk-arla',
+          productName: 'Arla Milk 1L',
+          category: 'dairy',
+          storeName: 'Lidl Sveavägen',
+          price: 13.9,
+          dealScore: 77,
+          sourceConfidence: 0.75
+        },
+        {
+          productId: 'eggs-private',
+          productName: 'Private-label Eggs 12-pack',
+          category: 'eggs',
+          storeName: 'Coop Odenplan',
+          price: 32.9,
+          dealScore: 91,
+          sourceConfidence: 0.42
+        }
+      ]
+    });
+
+    assert.deepEqual(leaders, [
+      {
+        productId: 'coffee-garant',
+        productName: 'Garant Coffee 450g',
+        category: 'coffee',
+        storeName: 'Hemköp City',
+        price: 42.9,
+        dealScore: 86,
+        sourceConfidence: 0.86,
+        signal: 'Good deal at 42.90 SEK'
+      },
+      {
+        productId: 'milk-arla',
+        productName: 'Arla Milk 1L',
+        category: 'dairy',
+        storeName: 'Lidl Sveavägen',
+        price: 13.9,
+        dealScore: 77,
+        sourceConfidence: 0.75,
+        signal: 'Good deal at 13.90 SEK'
+      }
+    ]);
+  });
+
+  it('honors the caller confidence threshold', () => {
+    assert.deepEqual(summarizeCategoryDealLeaders({
+      minimumSourceConfidence: 0.9,
+      candidates: [
+        {
+          productId: 'milk-arla',
+          productName: 'Arla Milk 1L',
+          category: 'dairy',
+          storeName: 'Lidl Sveavägen',
+          price: 13.9,
+          dealScore: 77,
+          sourceConfidence: 0.75
+        }
+      ]
+    }), []);
   });
 });
 
