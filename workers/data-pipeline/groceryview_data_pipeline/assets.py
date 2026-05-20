@@ -763,6 +763,9 @@ def summarize_data_pipeline_quality_gate(gate: DataPipelineQualityGateSummary) -
         duplicate_blockers=sum(1 for blocker in gate.blockers if blocker.startswith("duplicate_")),
         volume_blockers=sum(1 for blocker in gate.blockers if blocker in {"observations_below_minimum", "latest_rollup_empty"}),
         ingestion_blockers=sum(1 for blocker in gate.blockers if blocker.startswith("open_prices_")),
+        schedule_health_blockers=sum(
+            1 for blocker in gate.blockers if blocker == "open_prices_schedule_health_plan_blocked"
+        ),
     )
 
 
