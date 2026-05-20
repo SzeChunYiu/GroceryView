@@ -162,11 +162,23 @@ const budget = summarizeBudget({
   receiptTotalsThisMonth: [321, 180, 760, 690]
 });
 
+const categoryBudgets = [
+  { name: 'Coffee', planned: 120, spent: 49.9, status: 'under' },
+  { name: 'Dairy', planned: 180, spent: 122.6, status: 'watch' },
+  { name: 'Protein', planned: 260, spent: 190, status: 'under' }
+];
+
 const budgetForecastRows = [
   { period: 'This week actuals', budget: '800 SEK', value: `${budget.weeklyActualSpend} SEK`, variance: `${budget.weeklyRemainingActual} SEK left`, status: budget.weeklyStatus },
   { period: 'Next planned basket', budget: '800 SEK', value: `${budget.estimatedBasketTotal} SEK`, variance: `${budget.weeklyRemainingAfterEstimate} SEK left`, status: 'needs review' },
   { period: 'Month-end projection', budget: '3 200 SEK', value: '3 084 SEK', variance: '116 SEK left', status: 'on track' }
 ];
+
+const inStoreRun = {
+  runningTotal: 312,
+  pendingReceiptReviews: 2,
+  mode: 'placeholder'
+};
 
 const scannerReviews = [
   {
@@ -741,12 +753,30 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
-        <h2>Household rules</h2>
-        <p class="lede">Budget shares, diet constraints, and approval rules travel with basket decisions before smart swaps are recommended.</p>
+        <h2>Budget tracker</h2>
+        <p class="lede">Weekly and monthly guardrails stay visible before basket forecasts become receipt-backed spend.</p>
+        <div class="grid">
+          <div class="metric"><strong>${budget.weeklyBudget} SEK</strong><span>weekly budget</span></div>
+          <div class="metric"><strong>${budget.monthlyBudget} SEK</strong><span>monthly budget</span></div>
+          <div class="metric"><strong>${budget.estimatedBasketTotal} SEK</strong><span>basket forecast</span></div>
+        </div>
+        <div class="grid">
+          <div class="metric"><strong>${inStoreRun.runningTotal} SEK</strong><span>in-store running total (${inStoreRun.mode})</span></div>
+          <div class="metric"><strong>${budget.weeklyRemainingAfterEstimate} SEK</strong><span>left after basket forecast</span></div>
+          <div class="metric"><strong>${inStoreRun.pendingReceiptReviews}</strong><span>receipt reviews pending</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Category budgets</h2>
         <table class="table">
-          <thead><tr><th>Member</th><th>Budget</th><th>Rule</th><th>Diet</th></tr></thead>
+          <thead><tr><th>Category</th><th>Planned</th><th>Spent</th><th>Status</th></tr></thead>
           <tbody>
-            ${householdRules.map((member) => `<tr><td>${member.member}</td><td>${member.budgetShare}</td><td>${member.rule}</td><td>${member.dietary}</td></tr>`).join('')}
+            ${categoryBudgets.map((category) => `<tr>
+              <td><strong>${category.name}</strong></td>
+              <td>${category.planned.toFixed(2)} SEK</td>
+              <td>${category.spent.toFixed(2)} SEK</td>
+              <td><span class="status">${category.status}</span></td>
+            </tr>`).join('')}
           </tbody>
         </table>
       </div>
