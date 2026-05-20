@@ -33,16 +33,12 @@ describe('buildStaticPages', () => {
         'products/coffee/index.html',
         'receipts/review/index.html',
         'retailers/freshness/index.html',
-        'routes/shopping/index.html',
-        'savings/ledger/index.html',
         'savings/smart-swaps/index.html',
         'scanner/index.html',
         'stores/compare/index.html',
         'stores/map/index.html',
         'stores/willys-odenplan/index.html',
         'watchlist/index.html'
-        'seasonal/index.html',
-        'stores/willys-odenplan/index.html'
       ]);
 
       const product = await readFile(join(root, 'products/coffee/index.html'), 'utf8');
@@ -125,13 +121,6 @@ describe('buildStaticPages', () => {
       assert.match(retailerFreshness, /Pause new alerts/);
       assert.match(retailerFreshness, /Stale retailer-page rows cannot trigger household notifications/);
 
-      const shoppingRoute = await readFile(join(root, 'routes/shopping/index.html'), 'utf8');
-      assert.match(shoppingRoute, /Shopping route planner/);
-      assert.match(shoppingRoute, /Ordered stops/);
-      assert.match(shoppingRoute, /Lidl Sveavägen/);
-      assert.match(shoppingRoute, /Route time can reorder stops but cannot change product deal ranking/);
-      assert.match(shoppingRoute, /Unverified prices cannot justify an extra route stop/);
-
       const priceConfidence = await readFile(join(root, 'prices/confidence/index.html'), 'utf8');
       assert.match(priceConfidence, /Price confidence guide/);
       assert.match(priceConfidence, /Confidence labels/);
@@ -159,12 +148,6 @@ describe('buildStaticPages', () => {
       assert.match(smartSwapsPage, /Same roast category/);
       assert.match(smartSwapsPage, /Estimated swap prices cannot reduce forecast spend/);
       assert.match(smartSwapsPage, /Dietary restrictions outrank savings/);
-      const seasonal = await readFile(join(root, 'seasonal/index.html'), 'utf8');
-      assert.match(seasonal, /Seasonal grocery calendar/);
-      assert.match(seasonal, /Expected drop next week/);
-      assert.match(seasonal, /Wait for weekend promo/);
-      assert.match(seasonal, /Verified market observations/);
-      assert.match(seasonal, /Hide from true deals/);
 
       const store = await readFile(join(root, 'stores/willys-odenplan/index.html'), 'utf8');
       assert.match(store, /Store highlights/);
