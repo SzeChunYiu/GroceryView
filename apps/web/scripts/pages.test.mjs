@@ -20,6 +20,7 @@ describe('buildStaticPages', () => {
         'household/index.html',
         'login/index.html',
         'market/index.html',
+        'notifications/inbox/index.html',
         'privacy/index.html',
         'products/coffee/index.html',
         'receipts/review/index.html',
@@ -94,6 +95,13 @@ describe('buildStaticPages', () => {
       assert.match(watchlist, /Ready for push/);
       assert.match(watchlist, /Held for review/);
       assert.match(watchlist, /Estimated prices cannot trigger household notifications/);
+
+      const notificationInbox = await readFile(join(root, 'notifications/inbox/index.html'), 'utf8');
+      assert.match(notificationInbox, /Grocery alert inbox/);
+      assert.match(notificationInbox, /Alert delivery queue/);
+      assert.match(notificationInbox, /Quiet hours 21:00-07:00/);
+      assert.match(notificationInbox, /Provider token invalid/);
+      assert.match(notificationInbox, /Invalid tokens stop future sends/);
 
       const household = await readFile(join(root, 'household/index.html'), 'utf8');
       assert.match(household, /Shared household basket/);
