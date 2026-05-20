@@ -16,6 +16,8 @@ export type {
 } from './offlineMutations.js';
 export { buildMobileDeepLink, buildMobileRouteManifest, findMobileRoute } from './routeManifest.js';
 export type { MobileMvpRoute, MobileMvpRouteId, MobileMvpRoutePath, MobileRouteManifest, MobileRouteParam } from './routeManifest.js';
+export { buildMobilePermissionPlan, nextMobilePermissionPrompt, summarizeMobilePermissionPlan } from './permissions.js';
+export type { MobilePermissionKind, MobilePermissionPlan, MobilePermissionPrompt, MobilePermissionSnapshot, MobilePermissionState, MobilePermissionSurface } from './permissions.js';
 export { buildMobilePersistedCachePlan, buildMobileQueryKey, buildMobileQueryRegistry } from './queryCache.js';
 export type { MobilePersistedCachePlan, MobileQueryDefinition, MobileQueryId, MobileQueryKeyInput, MobileScreenRoute } from './queryCache.js';
 
