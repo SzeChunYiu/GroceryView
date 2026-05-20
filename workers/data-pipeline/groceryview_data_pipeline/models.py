@@ -255,6 +255,21 @@ class DataPipelineQualityGateSummary:
         return asdict(self)
 
 
+@dataclass(frozen=True)
+class DataPipelineQualityGateDigest:
+    status: Literal["ready", "blocked"]
+    total_blockers: int
+    provenance_blockers: int
+    freshness_blockers: int
+    coverage_blockers: int
+    duplicate_blockers: int
+    volume_blockers: int
+    demo: bool = True
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
 def utc_now() -> str:
     return datetime.now(tz=timezone.utc).isoformat()
 

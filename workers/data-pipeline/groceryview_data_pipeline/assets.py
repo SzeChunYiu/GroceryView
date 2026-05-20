@@ -15,6 +15,7 @@ except ModuleNotFoundError:
 
 from .fixtures import FETCHED_AT, HERO_PRODUCTS, RETAILER_PRICE_SNAPSHOT, STOCKHOLM_STORES
 from .models import (
+    DataPipelineQualityGateDigest,
     DataPipelineQualityGateSummary,
     LatestPriceRow,
     ObservationCoverageSummary,
@@ -460,6 +461,18 @@ def build_data_pipeline_quality_gate(
             "price_observation_coverage",
             *([] if open_prices_ingestion is None else ["open_prices_ingestion_run_plan"]),
         ],
+    )
+
+
+def summarize_data_pipeline_quality_gate(gate: DataPipelineQualityGateSummary) -> DataPipelineQualityGateDigest:
+    return DataPipelineQualityGateDigest(
+        status=gate.status,
+        total_blockers=len(gate.blockers),
+        provenance_blockers=sum(1 for blocker in gate.blockers if "provenance" in blocker),
+        freshness_blockers=sum(1 for blocker in gate.blockers if "freshness" in blocker),
+        coverage_blockers=sum(1 for blocker in gate.blockers if "coverage" in blocker),
+        duplicate_blockers=sum(1 for blocker in gate.blockers if blocker.startswith("duplicate_")),
+        volume_blockers=sum(1 for blocker in gate.blockers if blocker in {"observations_below_minimum", "latest_rollup_empty"}),
     )
 
 
