@@ -22,6 +22,8 @@ describe('buildStaticPages', () => {
         'market/index.html',
         'privacy/index.html',
         'products/coffee/index.html',
+        'receipts/review/index.html',
+        'savings/smart-swaps/index.html',
         'scanner/index.html',
         'stores/compare/index.html',
         'stores/willys-odenplan/index.html',
@@ -42,6 +44,13 @@ describe('buildStaticPages', () => {
       assert.match(deals, /Deal Score/);
       assert.match(deals, /Ads excluded from ranking/);
       assert.match(deals, /Estimated rows held back/);
+
+      const smartSwapsPage = await readFile(join(root, 'savings/smart-swaps/index.html'), 'utf8');
+      assert.match(smartSwapsPage, /Smart grocery swaps/);
+      assert.match(smartSwapsPage, /Swap candidates/);
+      assert.match(smartSwapsPage, /Same roast category/);
+      assert.match(smartSwapsPage, /Estimated swap prices cannot reduce forecast spend/);
+      assert.match(smartSwapsPage, /Dietary restrictions outrank savings/);
 
       const store = await readFile(join(root, 'stores/willys-odenplan/index.html'), 'utf8');
       assert.match(store, /Store highlights/);
@@ -119,6 +128,13 @@ describe('buildStaticPages', () => {
       assert.match(scanner, /data-groceryview-flow="scanner"/);
       assert.match(scanner, /accept="image\/\*"/);
       assert.match(scanner, /data-flow-action="route-review"/);
+
+      const receiptReview = await readFile(join(root, 'receipts/review/index.html'), 'utf8');
+      assert.match(receiptReview, /Receipt review desk/);
+      assert.match(receiptReview, /Line-item decisions/);
+      assert.match(receiptReview, /Post to weekly actuals/);
+      assert.match(receiptReview, /Route to human review/);
+      assert.match(receiptReview, /Cannot update catalog or Deal Score/);
 
       const humanReview = await readFile(join(root, 'admin/human-review/index.html'), 'utf8');
       assert.match(humanReview, /Human review operations/);
