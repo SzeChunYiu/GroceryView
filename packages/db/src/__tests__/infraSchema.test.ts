@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 const repoRoot = join(fileURLToPath(new URL('.', import.meta.url)), '../../../..');
 const migration = readFileSync(join(repoRoot, 'infra/db/migrations/001_groceryview_schema.sql'), 'utf8').toLowerCase();
 const repositoryMigration = readFileSync(join(repoRoot, 'infra/db/migrations/002_repository_support_schema.sql'), 'utf8').toLowerCase();
+const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
 
 const requiredTables = [
@@ -111,5 +112,13 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryMigration, /human_review_assignments_open_idx on human_review_assignments \(status, due_at, id\)/);
     assert.match(repositoryMigration, /notification_tasks_due_idx on notification_tasks \(status, send_at, id\)/);
     assert.match(repositoryMigration, /notification_suppressions_active_idx on notification_suppressions \(active, recipient, channel, id\)/);
+  });
+
+  it('keeps the migration verifier aligned with catalog and repository tables', () => {
+    for (const table of [...requiredTables, ...repositoryTables]) {
+      assert.match(migrationVerifier, new RegExp(`\\b${table}\\b`), `${table} missing from migration verifier`);
+    }
+    assert.match(migrationVerifier, /information_schema\.tables/);
+    assert.match(migrationVerifier, /migration table assertion failed/);
   });
 });

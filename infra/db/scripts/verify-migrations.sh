@@ -26,6 +26,33 @@ if [ "${#MIGRATIONS[@]}" -eq 0 ]; then
   exit 1
 fi
 
+REQUIRED_TABLES=(
+  chains
+  stores
+  products
+  aliases
+  source_runs
+  raw_records
+  observations
+  latest_prices
+  users
+  watchlists
+  baskets
+  budgets
+  alerts
+  app_users
+  favorite_stores
+  user_preferences
+  watchlist_items
+  weekly_baskets
+  basket_items
+  human_review_assignments
+  human_reviewers
+  community_reporter_trust
+  notification_tasks
+  notification_suppressions
+)
+
 cleanup() {
   docker rm -f "$CONTAINER_NAME" >/dev/null 2>&1 || true
 }
@@ -55,6 +82,31 @@ for migration in "${MIGRATIONS[@]}"; do
 done
 
 echo "applied ${#MIGRATIONS[@]} migration(s) successfully"
+
+required_table_values=""
+for table in "${REQUIRED_TABLES[@]}"; do
+  required_table_values="${required_table_values}('${table}'),"
+done
+required_table_values="${required_table_values%,}"
+
+missing_tables="$(
+  docker exec "$CONTAINER_NAME" \
+    psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc \
+    "with required(table_name) as (values ${required_table_values})
+     select coalesce(string_agg(required.table_name, ',' order by required.table_name), '')
+     from required
+     left join information_schema.tables existing
+       on existing.table_schema = 'public'
+      and existing.table_name = required.table_name
+     where existing.table_name is null"
+)"
+
+if [ -n "$missing_tables" ]; then
+  echo "migration table assertion failed: missing ${missing_tables}" >&2
+  exit 1
+fi
+
+echo "required migration tables ok"
 
 if [ -d "$SEEDS_DIR" ]; then
   mapfile -t SEEDS < <(find "$SEEDS_DIR" -maxdepth 1 -type f -name '*.sql' | sort)
