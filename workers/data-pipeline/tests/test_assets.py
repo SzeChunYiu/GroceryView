@@ -12,6 +12,7 @@ from groceryview_data_pipeline.assets import (
     build_retailer_fetch_stubs,
     build_seed_products,
     build_seed_stores,
+    summarize_data_pipeline_quality_gate,
 )
 from groceryview_data_pipeline.models import LatestPriceRow, ObservationFreshnessSummary, PriceObservationRow, PriceProvenance
 
@@ -368,3 +369,31 @@ def test_data_pipeline_quality_gate_combines_quality_freshness_and_coverage_chec
     assert blocked_open_prices_gate.status == "blocked"
     assert blocked_open_prices_gate.blockers == ["open_prices_ingestion_plan_blocked"]
     assert blocked_open_prices_gate.checked_assets[-1] == "open_prices_ingestion_run_plan"
+
+
+def test_data_pipeline_quality_gate_digest_counts_blocker_classes() -> None:
+    gate = build_data_pipeline_quality_gate(
+        quality=build_quality_checks([], [], []),
+        freshness=ObservationFreshnessSummary(
+            status="blocked",
+            observation_count=0,
+            fresh_count=0,
+            stale_count=0,
+            future_count=0,
+            missing_observed_at_count=0,
+            max_age_hours=48,
+            checked_at="2026-05-20T10:00:00+00:00",
+        ),
+        coverage=build_observation_coverage_summary([], build_seed_stores(), build_seed_products()),
+    )
+
+    assert summarize_data_pipeline_quality_gate(gate).to_dict() == {
+        "status": "blocked",
+        "total_blockers": 4,
+        "provenance_blockers": 0,
+        "freshness_blockers": 1,
+        "coverage_blockers": 1,
+        "duplicate_blockers": 0,
+        "volume_blockers": 2,
+        "demo": True,
+    }
