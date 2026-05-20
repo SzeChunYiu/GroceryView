@@ -502,37 +502,59 @@ export function buildSubscriptionCheckoutPlan(input: SubscriptionCheckoutInput):
   };
 }
 
-export function buildMobilePremiumEntitlementPlan(input: MobilePremiumEntitlementInput): MobilePremiumEntitlementPlan {
-  if (!input.userId) throw new Error('userId is required.');
+export type ReferralPartnerType = 'online_grocery' | 'delivery_provider' | 'cashback';
+
+export type ReferralOfferInput = {
+  partnerId: string;
+  partnerType: ReferralPartnerType;
+  destinationUrl: string;
+  label: string;
+  commissionDisclosure: string;
+  sponsoredLabelVisible: boolean;
+  organicRankingSeparated: boolean;
+  allowedSurfaces: Array<'store_detail' | 'basket_checkout' | 'weekly_report'>;
+  requestedEventFields: string[];
+};
+
+export type ReferralOfferPlan = {
+  status: 'ready' | 'blocked';
+  partnerId: string;
+  partnerType: ReferralPartnerType;
+  label: string;
+  destinationUrl: string;
+  allowedSurfaces: Array<'store_detail' | 'basket_checkout' | 'weekly_report'>;
+  outboundEventFields: string[];
+  blockers: string[];
+  summary: string;
+};
+
+const allowedReferralEventFields = new Set(['partnerId', 'partnerType', 'surface', 'clickedAt', 'campaignId']);
+const privateReferralEventFields = new Set(['userId', 'receiptId', 'basketTotal', 'budgetAmount', 'householdId', 'rawProductIds']);
+
+export function buildReferralOfferPlan(input: ReferralOfferInput): ReferralOfferPlan {
   const blockers: string[] = [];
-  const actions: MobilePremiumEntitlementPlan['actions'] = [];
-  let premiumActive = input.userTier === 'premium';
+  const outboundEventFields = input.requestedEventFields.filter((field) => allowedReferralEventFields.has(field));
 
-  if (input.expiresAt) {
-    const expiresAtMs = Date.parse(input.expiresAt);
-    const nowMs = Date.parse(input.now);
-    if (Number.isNaN(expiresAtMs)) throw new Error('expiresAt must be an ISO date.');
-    if (Number.isNaN(nowMs)) throw new Error('now must be an ISO date.');
-    premiumActive = premiumActive && expiresAtMs > nowMs;
-  }
+  if (!input.partnerId.trim()) blockers.push('partner_id_required');
+  if (!input.destinationUrl.startsWith('https://')) blockers.push('https_destination_required');
+  if (!input.commissionDisclosure.trim()) blockers.push('commission_disclosure_required');
+  if (!input.sponsoredLabelVisible) blockers.push('sponsored_label_not_visible');
+  if (!input.organicRankingSeparated) blockers.push('organic_ranking_not_separated');
+  if (input.allowedSurfaces.length === 0) blockers.push('no_referral_surfaces_enabled');
 
-  if (premiumActive) {
-    actions.push('hide_mobile_ads', 'refresh_subscription_status');
-  } else {
-    actions.push('show_mobile_deals_ads');
-    if (input.billingProviderConfigured) {
-      actions.push('start_premium_checkout', 'restore_purchase');
-    } else {
-      blockers.push('mobile_billing_provider_not_configured');
-    }
+  for (const field of input.requestedEventFields) {
+    if (privateReferralEventFields.has(field)) blockers.push(`private_event_field_requested:${field}`);
   }
 
   return {
-    userId: input.userId,
-    platform: input.platform,
-    premiumActive,
-    adPlan: buildAdPlacementPlan({ userTier: premiumActive ? 'premium' : 'free', configuredProviders: ['admob'] }),
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    partnerId: input.partnerId,
+    partnerType: input.partnerType,
+    label: input.label,
+    destinationUrl: input.destinationUrl,
+    allowedSurfaces: [...input.allowedSurfaces],
+    outboundEventFields,
     blockers,
-    actions
+    summary: blockers.length === 0 ? 'Referral offer can be shown with privacy-safe attribution.' : 'Referral offer is blocked until trust and privacy controls pass.'
   };
 }
