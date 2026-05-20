@@ -7,6 +7,44 @@ async function json(response: Response) {
 }
 
 describe('createHttpHandler', () => {
+  it('serves runtime health without leaking configured secret values', async () => {
+    const previousDatabaseUrl = process.env.DATABASE_URL;
+    const previousNodeEnv = process.env.NODE_ENV;
+    process.env.DATABASE_URL = 'postgres://user:secret@localhost:5432/groceryview';
+    process.env.NODE_ENV = 'test';
+
+    try {
+      const handle = createHttpHandler(undefined, {
+        authSecret: 'session-secret',
+        notificationWebhookSecret: 'webhook-secret',
+        notificationMetricsToken: 'metrics-secret'
+      });
+
+      const response = await handle(new Request('http://localhost/api/health'));
+      assert.equal(response.status, 200);
+      assert.deepEqual(await json(response), {
+        status: 'ok',
+        service: 'groceryview-server',
+        environment: 'test',
+        hasDatabase: true,
+        hasAuthSecret: true,
+        hasNotificationWebhookSecret: true,
+        hasMetricsToken: true
+      });
+    } finally {
+      if (previousDatabaseUrl === undefined) {
+        delete process.env.DATABASE_URL;
+      } else {
+        process.env.DATABASE_URL = previousDatabaseUrl;
+      }
+      if (previousNodeEnv === undefined) {
+        delete process.env.NODE_ENV;
+      } else {
+        process.env.NODE_ENV = previousNodeEnv;
+      }
+    }
+  });
+
   it('serves market, store, product, and index GET endpoints as JSON', async () => {
     const handle = createHttpHandler();
 
