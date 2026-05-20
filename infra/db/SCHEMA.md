@@ -121,7 +121,7 @@ The table stores billing-provider identifiers only. Payment card numbers, CVCs, 
 
 User watchlists for product or category target prices.
 
-Key columns: `user_id`, `name`, `product_id`, `category_path`, `target_price`, `favorite_stores_only`, `include_member_prices`.
+Key columns: `user_id`, `name`, `product_id`, `category_path`, `target_price`, `favorite_stores_only`, `include_member_prices`, `allowed_price_types`.
 
 Indexes: `watchlists_user_idx`.
 
@@ -181,7 +181,7 @@ Key columns: `user_id`, `weekly_budget`, `monthly_budget`, `updated_at`.
 
 Legacy app repository watchlist rows used by existing package APIs.
 
-Key columns: `user_id`, `product_id`, `target_price`, `alert_deal_score_at`, `favorite_stores_only`.
+Key columns: `user_id`, `product_id`, `target_price`, `alert_deal_score_at`, `favorite_stores_only`, `allowed_price_types`.
 
 ### `weekly_baskets`
 

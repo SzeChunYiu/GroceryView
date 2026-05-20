@@ -158,6 +158,10 @@ create table if not exists watchlists (
   target_price numeric(12, 2) check (target_price is null or target_price >= 0),
   favorite_stores_only boolean not null default true,
   include_member_prices boolean not null default false,
+  allowed_price_types text[] not null default array['shelf']::text[] check (
+    cardinality(allowed_price_types) > 0
+    and allowed_price_types <@ array['shelf', 'member', 'promotion', 'estimated']::text[]
+  ),
   created_at timestamptz not null default now(),
   check (product_id is not null or category_path is not null)
 );
