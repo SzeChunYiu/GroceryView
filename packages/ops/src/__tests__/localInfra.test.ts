@@ -91,14 +91,16 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /smoke-retailer-connector\.sh/);
   });
 
-  it('documents hosted deployment smoke commands for API, web, and PostgreSQL readiness evidence', () => {
+  it('documents hosted deployment smoke commands for API, product terminal, web, and PostgreSQL readiness evidence', () => {
     assert.match(infraReadme, /## Hosted deployment smoke/);
     assert.match(infraReadme, /infra\/scripts\/smoke-hosted-http\.sh/);
     assert.match(infraReadme, /infra\/scripts\/smoke-hosted-readiness\.sh/);
     assert.match(infraReadme, /GROCERYVIEW_SERVER_URL/);
     assert.match(infraReadme, /GROCERYVIEW_WEB_URL/);
+    assert.match(infraReadme, /GROCERYVIEW_TERMINAL_PRODUCT_ID/);
     assert.match(infraReadme, /METRICS_TOKEN/);
     assert.match(infraReadme, /\/api\/health/);
+    assert.match(infraReadme, /\/api\/products\/\$\{GROCERYVIEW_TERMINAL_PRODUCT_ID:-coffee\}\/terminal/);
     assert.match(infraReadme, /\/api\/readiness\/postgres/);
   });
 
@@ -124,13 +126,20 @@ describe('local infrastructure compose', () => {
     assert.match(smokeRetailerConnectorScript, /investigate_connector_http_status/);
   });
 
-  it('ships a hosted HTTP smoke script for API health and optional web checks', () => {
+  it('ships a hosted HTTP smoke script for API health, product terminal, and optional web checks', () => {
     assert.match(hostedHttpSmokeScript, /GROCERYVIEW_SERVER_URL/);
     assert.match(hostedHttpSmokeScript, /GROCERYVIEW_WEB_URL/);
+    assert.match(hostedHttpSmokeScript, /GROCERYVIEW_TERMINAL_PRODUCT_ID/);
     assert.match(hostedHttpSmokeScript, /HTTP_SMOKE_TIMEOUT_SECONDS/);
     assert.match(hostedHttpSmokeScript, /\/api\/health/);
+    assert.match(hostedHttpSmokeScript, /\/api\/products\/\$\{GROCERYVIEW_TERMINAL_PRODUCT_ID\}\/terminal/);
     assert.match(hostedHttpSmokeScript, /curl -fsS/);
     assert.match(hostedHttpSmokeScript, /"status"\[\[:space:\]\]\*:\[\[:space:\]\]\*"ok"/);
     assert.match(hostedHttpSmokeScript, /"service"\[\[:space:\]\]\*:\[\[:space:\]\]\*"groceryview-server"/);
+    assert.match(hostedHttpSmokeScript, /"productId"\[\[:space:\]\]\*:/);
+    assert.match(hostedHttpSmokeScript, /"quote"\[\[:space:\]\]\*:/);
+    assert.match(hostedHttpSmokeScript, /"distributions"\[\[:space:\]\]\*:/);
+    assert.match(hostedHttpSmokeScript, /"chart"\[\[:space:\]\]\*:/);
+    assert.match(hostedHttpSmokeScript, /Hosted product terminal smoke passed/);
   });
 });
