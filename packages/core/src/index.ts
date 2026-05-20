@@ -709,6 +709,50 @@ export type PriceChartAdapterResult = {
   windowEnd?: string;
 };
 
+export type PriceHistoryConfidenceState =
+  | 'high_confidence_history'
+  | 'limited_history'
+  | 'sparse_observations'
+  | 'missing_source_evidence'
+  | 'no_observed_offer'
+  | 'estimated_price'
+  | 'member_price_excluded';
+
+export type PriceHistoryLegalCopyMode = 'lowest_in_window' | 'observed_low_only';
+
+export type PriceHistoryConfidenceDisclosureInput = {
+  rangeDays: 30 | 90 | 365;
+  firstObservedAt?: string;
+  lastObservedAt?: string;
+  observationCount: number;
+  sourceTypesIncluded: PriceChartSourceType[];
+  expectedSourceTypes?: PriceChartSourceType[];
+  availabilityGapCount?: number;
+  hasConfirmedOutOfStock?: boolean;
+  hasEstimatedPoints?: boolean;
+  hasMemberOnlyExcluded?: boolean;
+  productScopeKnown?: boolean;
+  storeScopeKnown?: boolean;
+};
+
+export type PriceHistoryConfidenceDisclosure = {
+  rangeDays: 30 | 90 | 365;
+  firstObservedAt?: string;
+  lastObservedAt?: string;
+  observationCount: number;
+  sourceTypesIncluded: PriceChartSourceType[];
+  sourceTypesMissing: PriceChartSourceType[];
+  availabilityGapCount: number;
+  hasConfirmedOutOfStock: boolean;
+  hasEstimatedPoints: boolean;
+  hasMemberOnlyExcluded: boolean;
+  confidenceState: PriceHistoryConfidenceState;
+  headlineCopy: string;
+  detailCopy: string;
+  canClaimLowestInWindow: boolean;
+  legalCopyMode: PriceHistoryLegalCopyMode;
+};
+
 const chartLineStyleWeight: Record<PriceChartLineStyle, number> = {
   solid: 0,
   dashed: 1,
@@ -745,6 +789,101 @@ export function summarizePriceHistory(points: PriceHistoryPoint[]): PriceHistory
     isNewLow: latest.price < historicalLow,
     observedCount: ordered.length,
     latestObservedAt: latest.observedAt
+  };
+}
+
+function uniqueSourceTypes(sourceTypes: PriceChartSourceType[]): PriceChartSourceType[] {
+  return [...new Set(sourceTypes)].sort();
+}
+
+function sourceTypeList(sourceTypes: PriceChartSourceType[]): string {
+  if (sourceTypes.length === 0) return 'no source';
+  return sourceTypes.map((sourceType) => sourceType.replace(/_/g, ' ')).join('/');
+}
+
+function observedSpanDays(firstObservedAt?: string, lastObservedAt?: string): number | undefined {
+  if (!firstObservedAt || !lastObservedAt) return undefined;
+  const first = Date.parse(firstObservedAt);
+  const last = Date.parse(lastObservedAt);
+  if (Number.isNaN(first) || Number.isNaN(last)) throw new Error('Price history disclosure dates must be ISO dates.');
+  if (last < first) throw new Error('lastObservedAt must be after firstObservedAt.');
+  return Math.max(1, Math.ceil((last - first) / (24 * 60 * 60 * 1000)) + 1);
+}
+
+export function summarizePriceHistoryConfidence(input: PriceHistoryConfidenceDisclosureInput): PriceHistoryConfidenceDisclosure {
+  if (input.observationCount < 0) throw new Error('observationCount must be non-negative.');
+  const availabilityGapCount = input.availabilityGapCount ?? 0;
+  if (availabilityGapCount < 0) throw new Error('availabilityGapCount must be non-negative.');
+
+  const sourceTypesIncluded = uniqueSourceTypes(input.sourceTypesIncluded);
+  const expectedSourceTypes = uniqueSourceTypes(input.expectedSourceTypes ?? sourceTypesIncluded);
+  const sourceTypesMissing = expectedSourceTypes.filter((sourceType) => !sourceTypesIncluded.includes(sourceType));
+  const spanDays = observedSpanDays(input.firstObservedAt, input.lastObservedAt);
+  const hasCompleteWindow = spanDays !== undefined && spanDays >= input.rangeDays;
+  const hasEstimatedPoints = input.hasEstimatedPoints === true || sourceTypesIncluded.includes('estimated');
+  const hasMemberOnlyExcluded = input.hasMemberOnlyExcluded === true;
+  const hasConfirmedOutOfStock = input.hasConfirmedOutOfStock === true;
+
+  let confidenceState: PriceHistoryConfidenceState = 'high_confidence_history';
+  let headlineCopy = 'High confidence history';
+  let detailCopy = `Compared with ${input.rangeDays} days of observed prices from ${sourceTypeList(sourceTypesIncluded)}.`;
+
+  if (input.observationCount === 0 || availabilityGapCount > 0) {
+    confidenceState = 'no_observed_offer';
+    headlineCopy = hasConfirmedOutOfStock ? 'Confirmed out of stock' : 'No observed offer';
+    detailCopy = hasConfirmedOutOfStock
+      ? 'The retailer source indicated out of stock during this period.'
+      : 'We did not observe an available offer for this source during this period.';
+  } else if (hasEstimatedPoints) {
+    confidenceState = 'estimated_price';
+    headlineCopy = 'Estimated price';
+    detailCopy = 'This range includes estimated prices and should not trigger a deal alert without a confirmed source.';
+  } else if (hasMemberOnlyExcluded) {
+    confidenceState = 'member_price_excluded';
+    headlineCopy = 'Member price excluded';
+    detailCopy = 'Personalized or login-only offers are not included in this default history.';
+  } else if (sourceTypesMissing.length > 0) {
+    confidenceState = 'missing_source_evidence';
+    headlineCopy = sourceTypesMissing.includes('shelf') ? 'No shelf-price evidence' : 'Source evidence missing';
+    detailCopy = `This chart uses ${sourceTypeList(sourceTypesIncluded)} observations; ${sourceTypeList(sourceTypesMissing)} prices may differ.`;
+  } else if (input.observationCount < 3) {
+    confidenceState = 'sparse_observations';
+    headlineCopy = 'Sparse observations';
+    detailCopy = `Only ${input.observationCount} price observation${input.observationCount === 1 ? '' : 's'} are available in this range.`;
+  } else if (!hasCompleteWindow) {
+    confidenceState = 'limited_history';
+    headlineCopy = 'Limited history';
+    detailCopy = spanDays === undefined
+      ? `We do not have a complete ${input.rangeDays}-day observation window for this item.`
+      : `We have observed this item for ${spanDays} days, so older lows may be missing.`;
+  }
+
+  const hasSingleSourceScope = sourceTypesIncluded.length === 1;
+  const hasKnownScope = input.productScopeKnown !== false && input.storeScopeKnown !== false;
+  const canClaimLowestInWindow = input.observationCount >= 3 &&
+    hasCompleteWindow &&
+    hasSingleSourceScope &&
+    hasKnownScope &&
+    !hasEstimatedPoints &&
+    !hasMemberOnlyExcluded &&
+    availabilityGapCount === 0;
+
+  return {
+    rangeDays: input.rangeDays,
+    firstObservedAt: input.firstObservedAt,
+    lastObservedAt: input.lastObservedAt,
+    observationCount: input.observationCount,
+    sourceTypesIncluded,
+    sourceTypesMissing,
+    availabilityGapCount,
+    hasConfirmedOutOfStock,
+    hasEstimatedPoints,
+    hasMemberOnlyExcluded,
+    confidenceState,
+    headlineCopy,
+    detailCopy,
+    canClaimLowestInWindow,
+    legalCopyMode: canClaimLowestInWindow ? 'lowest_in_window' : 'observed_low_only'
   };
 }
 
