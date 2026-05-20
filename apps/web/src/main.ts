@@ -69,6 +69,12 @@ const alerts = buildWatchlistAlerts({
   favoriteStoreIds: ['willys-odenplan', 'lidl-sveavagen']
 });
 
+const alertPreferences = [
+  { rule: 'Coffee below 50 SEK', channel: 'Push', quietHours: '21:00-07:00', scope: 'Favorite stores' },
+  { rule: 'Butter deal score above 80', channel: 'Email', quietHours: 'Daily digest', scope: 'All Stockholm stores' },
+  { rule: 'Receipt review reminder', channel: 'Push', quietHours: 'Immediate', scope: 'Household queue' }
+];
+
 const budget = summarizeBudget({
   weeklyBudget: 800,
   monthlyBudget: 3200,
@@ -216,6 +222,13 @@ app.innerHTML = `
           <thead><tr><th>Type</th><th>Message</th></tr></thead>
           <tbody>
             ${alerts.map((alert) => `<tr><td>${alert.type.replaceAll('_', ' ')}</td><td>${alert.message}</td></tr>`).join('')}
+          </tbody>
+        </table>
+        <h2 style="margin-top:24px">Alert preferences</h2>
+        <table class="table">
+          <thead><tr><th>Rule</th><th>Channel</th><th>Quiet hours</th><th>Scope</th></tr></thead>
+          <tbody>
+            ${alertPreferences.map((preference) => `<tr><td>${preference.rule}</td><td><span class="status">${preference.channel}</span></td><td>${preference.quietHours}</td><td>${preference.scope}</td></tr>`).join('')}
           </tbody>
         </table>
       </div>
