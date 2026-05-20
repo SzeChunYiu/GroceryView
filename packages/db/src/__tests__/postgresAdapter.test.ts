@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  createPostgresCatalogReader,
   createPostgresPriceObservationWriter,
   createPostgresPriceReader,
   createPostgresRepository,
@@ -15,6 +16,25 @@ class RecordingQueryExecutor implements QueryExecutor {
   observationId: string | undefined = 'observation-1';
   sourceRunId: string | undefined = 'source-run-1';
   rawRecordId: string | undefined = 'raw-record-1';
+  productRows: unknown[] = [
+    {
+      id: 'product-1',
+      slug: 'bryggkaffe-450g',
+      canonical_name: 'Bryggkaffe mellanrost 450 g',
+      brand: 'Rosteriet',
+      brand_owner: null,
+      private_label_owner: 'Willys',
+      barcode: '0731000000000',
+      category_path: ['Pantry', 'Coffee'],
+      package_size: '450.000',
+      package_unit: 'g',
+      comparable_unit: 'kg',
+      nutrition: '{"caffeineMg":85}',
+      image_url: 'https://example.invalid/coffee.png',
+      created_at: new Date('2026-05-20T07:00:00.000Z'),
+      updated_at: '2026-05-20T07:01:00.000Z'
+    }
+  ];
   sourceRunRows: unknown[] = [
     {
       id: 'source-run-1',
@@ -145,6 +165,7 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('insert into observations')) return this.observationId === undefined ? ([] as T[]) : ([{ id: this.observationId }] as T[]);
     if (sql.includes('from latest_prices')) return this.latestPriceRows as T[];
     if (sql.includes('from observations')) return this.observationHistoryRows as T[];
+    if (sql.includes('from products')) return this.productRows as T[];
     if (sql.includes('select store_id')) return [{ store_id: 'willys-odenplan' }] as T[];
     if (sql.includes('select weekly_budget')) return [{ weekly_budget: '800', monthly_budget: '3200' }] as T[];
     if (sql.includes('insert into weekly_baskets')) return this.basketId === undefined ? ([] as T[]) : ([{ id: this.basketId }] as T[]);
@@ -423,6 +444,42 @@ describe('createPostgresRepository', () => {
       true,
       '2026-05-19T20:31:00.000Z'
     ]);
+  });
+});
+
+describe('createPostgresCatalogReader', () => {
+  it('reads products by slug with catalog metadata mapping', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresCatalogReader(executor);
+
+    assert.deepEqual(await reader.getProductBySlug('bryggkaffe-450g'), {
+      productId: 'product-1',
+      slug: 'bryggkaffe-450g',
+      canonicalName: 'Bryggkaffe mellanrost 450 g',
+      brand: 'Rosteriet',
+      privateLabelOwner: 'Willys',
+      barcode: '0731000000000',
+      categoryPath: ['Pantry', 'Coffee'],
+      packageSize: 450,
+      packageUnit: 'g',
+      comparableUnit: 'kg',
+      nutrition: { caffeineMg: 85 },
+      imageUrl: 'https://example.invalid/coffee.png',
+      createdAt: '2026-05-20T07:00:00.000Z',
+      updatedAt: '2026-05-20T07:01:00.000Z'
+    });
+
+    assert.match(executor.calls[0]!.sql, /from products/);
+    assert.match(executor.calls[0]!.sql, /where slug = \$1/);
+    assert.deepEqual(executor.calls[0]!.params, ['bryggkaffe-450g']);
+  });
+
+  it('returns null when a product slug is unknown', async () => {
+    const executor = new RecordingQueryExecutor();
+    executor.productRows = [];
+    const reader = createPostgresCatalogReader(executor);
+
+    assert.equal(await reader.getProductBySlug('missing-product'), null);
   });
 });
 
