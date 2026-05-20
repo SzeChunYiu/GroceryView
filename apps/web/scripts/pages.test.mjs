@@ -35,6 +35,7 @@ describe('buildStaticPages', () => {
         'prices/confidence/index.html',
         'privacy/index.html',
         'products/coffee/index.html',
+        'products/compare/index.html',
         'receipts/review/index.html',
         'receipts/upload/index.html',
         'retailers/freshness/index.html',
@@ -85,6 +86,13 @@ describe('buildStaticPages', () => {
       assert.match(product, /Estimated fallback\. Never styled as an official shelf price/);
       assert.match(product, /2026-05-16 08:45 UTC/);
       assert.match(product, /Price evidence guardrails/);
+
+      const productComparison = await readFile(join(root, 'products/compare/index.html'), 'utf8');
+      assert.match(productComparison, /Compare grocery products/);
+      assert.match(productComparison, /Comparable products/);
+      assert.match(productComparison, /Garant Bryggkaffe 450g/);
+      assert.match(productComparison, /Products must normalize to the same unit before savings are shown/);
+      assert.match(productComparison, /Estimated rows can display but cannot become the recommended substitute/);
 
       const styles = await readFile(join(process.cwd(), 'public/styles.css'), 'utf8');
       assert.match(styles, /\.quote-strip/);
