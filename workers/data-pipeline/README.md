@@ -16,7 +16,7 @@ Dagster scaffold for the GroceryView data-worker lane.
 - The quality gate also checks `open_prices_hosted_smoke_plan`, so launch readiness remains blocked until hosted API, imported product-terminal, and PostgreSQL readiness smoke prerequisites are configured.
 - The quality gate also checks `open_prices_schedule_health_plan`, so hosted scheduled-worker proof remains blocked until both Open Prices schedules and their health probe are configured.
 - The quality gate digest separates schedule-health blockers from the broader Open Prices ingestion blocker count for operator dashboards.
-- Open Prices real-data pull plan asset with required User-Agent, endpoint, parser, smoke command, and evidence fields.
+- Open Prices real-data pull plan asset with required User-Agent, endpoint, parser, smoke command, evidence fields, and normalized artifact path.
 - Open Prices artifact import plan asset with the PostgreSQL import command, required env, database targets, and persisted evidence fields.
 - Open Prices ingestion run plan asset with schedule, persistence targets, idempotency keys, and fail-closed deployment requirements.
 - Open Prices hosted smoke plan asset with the hosted API, imported product-terminal, and PostgreSQL readiness smoke commands.
@@ -63,6 +63,8 @@ Example Dagster schedules in this lane:
 - `open_prices_import_readiness_schedule`
 
 ## Open Prices ingestion run plan
+
+`open_prices_real_pull_plan` points the smoke command at `OPEN_PRICES_OUTPUT_PATH=/tmp/groceryview-open-prices-preview.json`, so a successful real-data pull leaves a normalized artifact for inspection or PostgreSQL import handoff.
 
 `open_prices_ingestion_run_plan` is blocked by default. It turns the public Open Prices smoke into a production ingestion checklist without pretending live infrastructure is configured. The plan requires:
 

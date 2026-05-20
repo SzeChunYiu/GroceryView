@@ -323,7 +323,11 @@ def build_open_prices_pull_plan(open_prices_user_agent_present: bool = False) ->
         parser_version=OPEN_PRICES_PARSER_VERSION,
         required_env=["OPEN_PRICES_USER_AGENT"],
         required_actions=[] if open_prices_user_agent_present else ["set_open_prices_user_agent", "run_open_prices_smoke"],
-        smoke_command="OPEN_PRICES_USER_AGENT=<app/version contact> infra/scripts/smoke-open-prices.sh",
+        smoke_command=(
+            "OPEN_PRICES_USER_AGENT=<app/version contact> "
+            "OPEN_PRICES_OUTPUT_PATH=/tmp/groceryview-open-prices-preview.json "
+            "infra/scripts/smoke-open-prices.sh"
+        ),
         evidence_fields=[
             "sourceUrl",
             "statusCode",
@@ -331,6 +335,9 @@ def build_open_prices_pull_plan(open_prices_user_agent_present: bool = False) ->
             "rawSnapshotRef",
             "acceptedCount",
             "firstProduct",
+        ],
+        evidence_artifacts=[
+            "/tmp/groceryview-open-prices-preview.json",
         ],
     )
 

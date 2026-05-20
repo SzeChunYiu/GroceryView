@@ -188,6 +188,7 @@ class OpenPricesPullPlan:
     required_actions: list[str]
     smoke_command: str
     evidence_fields: list[str]
+    evidence_artifacts: list[str]
     demo: bool = False
 
     def to_dict(self) -> dict[str, object]:
