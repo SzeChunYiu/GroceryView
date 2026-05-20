@@ -52,6 +52,38 @@ describe('createGroceryViewApi', () => {
     ]);
   });
 
+  it('serves product equivalents and Deal Score detail for comparison routes', () => {
+    const api = createGroceryViewApi();
+
+    assert.deepEqual(api.getProductEquivalents('milk'), [
+      {
+        productId: 'butter',
+        productName: 'Butter 600g',
+        category: 'dairy',
+        bestPrice: 54.9,
+        bestStoreId: 'coop-odenplan',
+        dealScore: 40,
+        reason: 'Same dairy category with comparable current price evidence.'
+      }
+    ]);
+    assert.deepEqual(api.getProductEquivalents('coffee'), []);
+    assert.deepEqual(api.getProductEquivalents('missing-product'), []);
+
+    assert.deepEqual(api.getProductDealScore('coffee'), {
+      productId: 'coffee',
+      productName: 'Zoégas Coffee 450g',
+      dealScore: 82,
+      band: { label: 'Good deal', verdict: 'Buy' },
+      bestPrice: 49.9,
+      bestStoreId: 'willys-odenplan',
+      verdict: 'Buy',
+      unitPrice: '110.89 SEK/kg',
+      historyPoints: 3,
+      verifiedHistoryPoints: 3
+    });
+    assert.equal(api.getProductDealScore('missing-product'), null);
+  });
+
   it('supports favorite stores, watchlist, basket, budget, and index endpoints', () => {
     const api = createGroceryViewApi();
 

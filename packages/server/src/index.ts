@@ -551,6 +551,15 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       const productHistoryMatch = path.match(/^\/api\/products\/([^/]+)\/history$/);
       if (method === 'GET' && productHistoryMatch) return jsonResponse(api.getProductHistory(decodeURIComponent(productHistoryMatch[1])));
 
+      const productEquivalentsMatch = path.match(/^\/api\/products\/([^/]+)\/equivalents$/);
+      if (method === 'GET' && productEquivalentsMatch) return jsonResponse(api.getProductEquivalents(decodeURIComponent(productEquivalentsMatch[1])));
+
+      const productDealScoreMatch = path.match(/^\/api\/products\/([^/]+)\/deal-score$/);
+      if (method === 'GET' && productDealScoreMatch) {
+        const dealScore = api.getProductDealScore(decodeURIComponent(productDealScoreMatch[1]));
+        return dealScore ? jsonResponse(dealScore) : errorResponse(404, 'Product not found.');
+      }
+
       const favoriteStoreMatch = path.match(/^\/api\/users\/([^/]+)\/favorite-stores$/);
       if (favoriteStoreMatch) {
         const routeUserId = decodeURIComponent(favoriteStoreMatch[1]);
@@ -724,6 +733,8 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/products/{id}': { get: publicOperation('Get product detail.') },
       '/api/products/{id}/prices': { get: publicOperation('Get product prices by store.') },
       '/api/products/{id}/history': { get: publicOperation('Get product price history.') },
+      '/api/products/{id}/equivalents': { get: publicOperation('Get comparable products in the same category.') },
+      '/api/products/{id}/deal-score': { get: publicOperation('Get Deal Score detail for one product.') },
       '/api/users/{userId}/favorite-stores': {
         get: protectedOperation('List favorite stores.'),
         post: protectedOperation('Add favorite store.')

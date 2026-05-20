@@ -37,6 +37,29 @@ export type ProductDetail = SearchableProduct & {
   history: Array<{ date: string; price: number; verified: boolean }>;
 };
 
+export type ProductEquivalent = {
+  productId: string;
+  productName: string;
+  category: string;
+  bestPrice: number | null;
+  bestStoreId: string | null;
+  dealScore: number;
+  reason: string;
+};
+
+export type ProductDealScoreDetail = {
+  productId: string;
+  productName: string;
+  dealScore: number;
+  band: ReturnType<typeof scoreBand>;
+  bestPrice: number | null;
+  bestStoreId: string | null;
+  verdict: string;
+  unitPrice: string;
+  historyPoints: number;
+  verifiedHistoryPoints: number;
+};
+
 export type BasketItemRequest = {
   productId: string;
   quantity: number;
@@ -226,6 +249,19 @@ function bestPriceFor(product: ProductDetail) {
   return sortPricesByValue(product.currentPrices)[0] ?? null;
 }
 
+function productEquivalentFor(product: ProductDetail): ProductEquivalent {
+  const bestPrice = bestPriceFor(product);
+  return {
+    productId: product.id,
+    productName: product.name,
+    category: product.category,
+    bestPrice: bestPrice?.price ?? null,
+    bestStoreId: bestPrice?.storeId ?? null,
+    dealScore: product.dealScore,
+    reason: `Same ${product.category} category with comparable current price evidence.`
+  };
+}
+
 export function createGroceryViewApi() {
   const favoriteStores = new Map<string, Set<string>>();
   const watchlists = new Map<string, WatchlistItem[]>();
@@ -286,6 +322,33 @@ export function createGroceryViewApi() {
 
     getProductHistory(id: string) {
       return this.getProduct(id)?.history ?? [];
+    },
+
+    getProductEquivalents(id: string): ProductEquivalent[] {
+      const product = this.getProduct(id);
+      if (!product) return [];
+      return products
+        .filter((candidate) => candidate.id !== product.id && candidate.category === product.category)
+        .map(productEquivalentFor)
+        .sort((left, right) => right.dealScore - left.dealScore || left.productName.localeCompare(right.productName));
+    },
+
+    getProductDealScore(id: string): ProductDealScoreDetail | null {
+      const product = this.getProduct(id);
+      if (!product) return null;
+      const bestPrice = bestPriceFor(product);
+      return {
+        productId: product.id,
+        productName: product.name,
+        dealScore: product.dealScore,
+        band: scoreBand(product.dealScore),
+        bestPrice: bestPrice?.price ?? null,
+        bestStoreId: bestPrice?.storeId ?? null,
+        verdict: product.verdict,
+        unitPrice: product.unitPrice,
+        historyPoints: product.history.length,
+        verifiedHistoryPoints: product.history.filter((point) => point.verified).length
+      };
     },
 
     addFavoriteStore(userId: string, storeId: string) {

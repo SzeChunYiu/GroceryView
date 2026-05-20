@@ -68,6 +68,36 @@ describe('createHttpHandler', () => {
     assert.equal(product.status, 200);
     assert.equal((await json(product) as { ticker: string }).ticker, 'ZOEGAS-COFFEE-450G');
 
+    const equivalents = await handle(new Request('http://localhost/api/products/milk/equivalents'));
+    assert.equal(equivalents.status, 200);
+    assert.deepEqual((await json(equivalents) as Array<{ productId: string; reason: string }>).map((equivalent) => ({
+      productId: equivalent.productId,
+      reason: equivalent.reason
+    })), [
+      {
+        productId: 'butter',
+        reason: 'Same dairy category with comparable current price evidence.'
+      }
+    ]);
+
+    const dealScore = await handle(new Request('http://localhost/api/products/coffee/deal-score'));
+    assert.equal(dealScore.status, 200);
+    assert.deepEqual(await json(dealScore), {
+      productId: 'coffee',
+      productName: 'Zoégas Coffee 450g',
+      dealScore: 82,
+      band: { label: 'Good deal', verdict: 'Buy' },
+      bestPrice: 49.9,
+      bestStoreId: 'willys-odenplan',
+      verdict: 'Buy',
+      unitPrice: '110.89 SEK/kg',
+      historyPoints: 3,
+      verifiedHistoryPoints: 3
+    });
+
+    const missingDealScore = await handle(new Request('http://localhost/api/products/missing/deal-score'));
+    assert.equal(missingDealScore.status, 404);
+
     const index = await handle(new Request('http://localhost/api/indices/stockholm-grocery-index'));
     assert.equal(index.status, 200);
     assert.equal((await json(index) as { label: string }).label, 'Stockholm Grocery Index');
