@@ -1,5 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import type { SourceRunHealthCheckResult } from '@groceryview/db';
 import { createHttpHandler, summarizePostgresReadinessForHttp } from '../index.js';
 
 const readyDiagnostics = {
@@ -111,5 +112,120 @@ describe('PostgreSQL readiness endpoint', () => {
         evidence: { total: 3, tables: 1, migrations: 1, repositoryChecks: 1 }
       }
     );
+  });
+});
+
+describe('source run readiness endpoint', () => {
+  it('requires a metrics token before exposing source run health evidence', async () => {
+    const healthy: SourceRunHealthCheckResult = {
+      report: {
+        status: 'healthy',
+        blockers: [],
+        evidence: ['source_run_succeeded:run-1'],
+        runningRunIds: [],
+        staleRunIds: [],
+        latestSuccessfulRunId: 'run-1',
+        latestSuccessfulFinishedAt: '2026-05-20T08:05:00.000Z'
+      },
+      summary: {
+        status: 'healthy',
+        blockers: {
+          total: 0,
+          failed: 0,
+          partial: 0,
+          stale: 0,
+          stuckRunning: 0,
+          missingFinishedAt: 0,
+          startedInFuture: 0,
+          finishedInFuture: 0
+        },
+        evidence: { total: 1, succeeded: 1 },
+        running: 0,
+        stale: 0,
+        latestSuccessfulRunId: 'run-1',
+        latestSuccessfulFinishedAt: '2026-05-20T08:05:00.000Z'
+      },
+      runCount: 1,
+      filter: { sourceType: 'retailer_api', limit: 100 }
+    };
+    const handle = createHttpHandler(undefined, {
+      notificationMetricsToken: 'metrics-token',
+      sourceRunHealthProvider: async () => healthy
+    });
+
+    const unauthorized = await handle(new Request('http://localhost/api/readiness/source-runs'));
+    assert.equal(unauthorized.status, 401);
+
+    const authorized = await handle(new Request('http://localhost/api/readiness/source-runs', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }));
+    assert.equal(authorized.status, 200);
+    assert.deepEqual(await authorized.json(), healthy);
+  });
+
+  it('fails closed when source run health is blocked or not configured', async () => {
+    const blockedHealth: SourceRunHealthCheckResult = {
+      report: {
+        status: 'blocked',
+        blockers: ['source_run_failed:run-2'],
+        evidence: [],
+        runningRunIds: [],
+        staleRunIds: []
+      },
+      summary: {
+        status: 'blocked',
+        blockers: {
+          total: 1,
+          failed: 1,
+          partial: 0,
+          stale: 0,
+          stuckRunning: 0,
+          missingFinishedAt: 0,
+          startedInFuture: 0,
+          finishedInFuture: 0
+        },
+        evidence: { total: 0, succeeded: 0 },
+        running: 0,
+        stale: 0
+      },
+      runCount: 1,
+      filter: { limit: 100 }
+    };
+    const blocked = createHttpHandler(undefined, {
+      notificationMetricsToken: 'metrics-token',
+      sourceRunHealthProvider: async () => blockedHealth
+    });
+    const blockedResponse = await blocked(new Request('http://localhost/api/readiness/source-runs', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }));
+    assert.equal(blockedResponse.status, 503);
+    assert.deepEqual(await blockedResponse.json(), blockedHealth);
+
+    const missingToken = createHttpHandler(undefined, {
+      sourceRunHealthProvider: async () => blockedHealth
+    });
+    assert.equal((await missingToken(new Request('http://localhost/api/readiness/source-runs'))).status, 503);
+
+    const missingProvider = createHttpHandler(undefined, { notificationMetricsToken: 'metrics-token' });
+    assert.equal((await missingProvider(new Request('http://localhost/api/readiness/source-runs', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }))).status, 503);
+  });
+
+  it('fails closed without leaking source errors when the health provider throws', async () => {
+    const handle = createHttpHandler(undefined, {
+      notificationMetricsToken: 'metrics-token',
+      async sourceRunHealthProvider() {
+        throw new Error('source token=super-secret could not read source_runs');
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/readiness/source-runs', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }));
+    assert.equal(response.status, 503);
+    const body = await response.json() as SourceRunHealthCheckResult;
+    assert.deepEqual(body.report.blockers, ['source_run_health_probe_failed']);
+    assert.equal(JSON.stringify(body).includes('super-secret'), false);
   });
 });

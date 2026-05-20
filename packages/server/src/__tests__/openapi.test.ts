@@ -48,6 +48,7 @@ describe('buildOpenApiDocument', () => {
       '/api/products/{id}/prices',
       '/api/products/{id}/terminal',
       '/api/readiness/postgres',
+      '/api/readiness/source-runs',
       '/api/receipts/review',
       '/api/scans/process',
       '/api/scans/upload-url',
@@ -89,6 +90,8 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/scans/upload-url'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/metrics/notifications'].get?.security, [{ metricsToken: [] }]);
     assert.deepEqual(doc.paths['/api/readiness/postgres'].get?.security, [{ metricsToken: [] }]);
+    assert.deepEqual(doc.paths['/api/readiness/source-runs'].get?.security, [{ metricsToken: [] }]);
+    assert.match(doc.paths['/api/readiness/source-runs'].get?.summary ?? '', /source run/i);
     assert.deepEqual(doc.paths['/api/notifications/suppression-events'].post?.security, [{ webhookSignature: [] }]);
     assert.deepEqual(doc.paths['/api/notifications/provider-suppression-events'].post?.security, [{ webhookSignature: [] }]);
     assert.deepEqual(doc.paths['/api/notifications/inbox'].get?.security, [{ bearerAuth: [] }]);
