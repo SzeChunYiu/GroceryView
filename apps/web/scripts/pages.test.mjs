@@ -14,6 +14,7 @@ describe('buildStaticPages', () => {
         'account/index.html',
         'admin/human-review/index.html',
         'basket/index.html',
+        'billing/status/index.html',
         'budget/forecast/index.html',
         'catalog/coverage/index.html',
         'categories/coffee/index.html',
@@ -143,6 +144,13 @@ describe('buildStaticPages', () => {
       assert.match(account, /fetch\(apiUrl\('\/api\/watchlist/);
       assert.match(account, /fetch\(apiUrl\('\/api\/account\/subscription-access/);
       assert.match(account, /authorization: 'Bearer '/);
+
+      const billingStatus = await readFile(join(root, 'billing/status/index.html'), 'utf8');
+      assert.match(billingStatus, /Billing status/);
+      assert.match(billingStatus, /Entitlement state/);
+      assert.match(billingStatus, /premium_monthly/);
+      assert.match(billingStatus, /Missing or past-due entitlements keep checkout required/);
+      assert.match(billingStatus, /Provider updates must be newer than stored entitlement state/);
 
       const watchlist = await readFile(join(root, 'watchlist/index.html'), 'utf8');
       assert.match(watchlist, /Price watchlist workbench/);
