@@ -208,6 +208,9 @@ describe('buildStaticPages', () => {
       assert.match(scanner, /accept="image\/\*"/);
       assert.match(scanner, /data-flow-action="route-review"/);
       assert.match(scanner, /fetch\(apiUrl\('\/api\/scans\/upload-url/);
+      assert.match(scanner, /fetch\(ticket\.uploadUrl/);
+      assert.match(scanner, /method: 'PUT'/);
+      assert.match(scanner, /body: filePayload/);
       assert.match(scanner, /fetch\(apiUrl\('\/api\/scans\/process/);
       assert.match(scanner, /payloadUri/);
       assert.match(scanner, /private-upload:\/\/scanner-preview/);

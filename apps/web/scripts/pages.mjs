@@ -42,6 +42,9 @@ window.GroceryViewFlowActions = (() => {
     }
     return payload;
   };
+  const requireUploadSuccess = async (response) => {
+    if (!response.ok) throw new Error('Upload failed with HTTP ' + response.status);
+  };
   const configureApiSessionPanel = () => {
     const panel = document.querySelector('[data-api-session-panel]');
     if (!panel) return;
@@ -200,6 +203,12 @@ window.GroceryViewFlowActions = (() => {
       }));
       const ticket = uploadTicket.result?.status === 'ready' ? uploadTicket.result.ticket : null;
       if (!ticket) throw new Error(uploadTicket.result?.reason || 'Scan upload storage is not configured.');
+      const filePayload = file && typeof file === 'object' ? file : new Blob([]);
+      await requireUploadSuccess(await fetch(ticket.uploadUrl, {
+        method: 'PUT',
+        headers: ticket.headers || {},
+        body: filePayload
+      }));
 
       const payload = {
         scanId,
@@ -214,7 +223,7 @@ window.GroceryViewFlowActions = (() => {
       });
       const result = await requireApiSuccess(response);
       const reviewCount = Array.isArray(result.reviewWorkItems) ? result.reviewWorkItems.length : 0;
-      setResult('scanner', 'Connected API: upload ticket stored as ' + (ticket.payloadUri || payload.payload) + '; scan processed as ' + (result.result?.status || 'unknown') + ' with ' + reviewCount + ' review work items.');
+      setResult('scanner', 'Connected API: uploaded scan bytes to private storage as ' + (ticket.payloadUri || payload.payload) + '; scan processed as ' + (result.result?.status || 'unknown') + ' with ' + reviewCount + ' review work items.');
     } catch (error) {
       setResult('scanner', 'Scan API processing failed: ' + error.message + '. Local preview remains staged.');
     }
