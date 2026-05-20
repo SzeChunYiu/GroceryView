@@ -43,6 +43,7 @@ import {
   type NotificationSuppressionEventType,
   type NotificationSuppressionMutation
 } from '@groceryview/notifications';
+import { planScanReviewWorkItems, processScanUpload, type ScanProviders, type ScanUpload } from '@groceryview/scanning';
 
 export type HttpHandler = (request: Request) => Promise<Response>;
 
@@ -70,6 +71,7 @@ export type AuthOptions = {
   notificationMetricsToken?: string;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
+  scanProviders?: ScanProviders;
 };
 
 export type SubscriptionEntitlementLookupRecord = SubscriptionEntitlementSnapshot & {
@@ -137,6 +139,11 @@ function parseJsonObject(text: string): JsonRecord {
 function requiredString(value: unknown, field: string): string {
   if (typeof value !== 'string' || value.trim() === '') throw new Error(`${field} is required.`);
   return value;
+}
+
+function requiredScanKind(value: unknown): ScanUpload['kind'] {
+  if (value === 'barcode' || value === 'receipt') return value;
+  throw new Error('kind must be barcode or receipt.');
 }
 
 function optionalDeliveryChannel(value: unknown): DeliveryChannel | undefined {
@@ -696,6 +703,31 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'POST') return jsonResponse({ ...planAccountDeletion(user), destructiveAction: false, requiresReauthentication: true });
       }
 
+      if (path === '/api/scans/process') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'POST') {
+          const body = await readJson(request);
+          const scanId = requiredString(body.scanId, 'scanId');
+          const result = await processScanUpload({
+            upload: {
+              kind: requiredScanKind(body.kind),
+              payload: requiredString(body.payload, 'payload'),
+              uploadedAt: optionalIsoTimestamp(body.uploadedAt, 'uploadedAt') ?? (authOptions.now ?? new Date()).toISOString()
+            },
+            providers: authOptions.scanProviders ?? {}
+          });
+          return jsonResponse({
+            userId: user,
+            scanId,
+            result,
+            reviewWorkItems: planScanReviewWorkItems([{ scanId, result }])
+          });
+        }
+      }
+
       if (method === 'GET' && path === '/api/indices') return jsonResponse(api.getIndices());
       const indexMatch = path.match(/^\/api\/indices\/([^/]+)$/);
       if (method === 'GET' && indexMatch) {
@@ -787,6 +819,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/products/{id}/history': { get: publicOperation('Get product price history.') },
       '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
       '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
+      '/api/scans/process': { post: protectedOperation('Process barcode or receipt scan payloads through configured providers and return review routing work.') },
       '/api/users/{userId}/favorite-stores': {
         get: protectedOperation('List favorite stores.'),
         post: protectedOperation('Add favorite store.')
