@@ -216,12 +216,21 @@ def test_open_prices_hosted_smoke_plan_blocks_until_hosted_proof_is_configured()
     assert plan.to_dict()["demo"] is False
 
     ready = build_open_prices_hosted_smoke_plan(
-        deployment_url_present=True,
+        deployment_url=" https://api.groceryview.example/ ",
         metrics_token_present=True,
         imported_terminal_product_id_present=True,
     )
     assert ready.status == "ready"
     assert ready.required_actions == []
+    assert "GROCERYVIEW_SERVER_URL=https://api.groceryview.example " in ready.smoke_command
+
+    invalid_url = build_open_prices_hosted_smoke_plan(
+        deployment_url="groceryview.example",
+        metrics_token_present=True,
+        imported_terminal_product_id_present=True,
+    )
+    assert invalid_url.status == "blocked"
+    assert invalid_url.required_actions == ["fix_groceryview_server_url"]
 
 
 def test_open_prices_ingestion_run_plan_summary_counts_operator_requirements() -> None:
