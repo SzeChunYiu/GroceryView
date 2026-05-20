@@ -29,6 +29,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-category-market-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setPriceFreshnessMetric = (metric, message) => {
+    const target = document.querySelector('[data-price-freshness-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setApiSessionResult = (message) => {
     const target = document.querySelector('[data-api-session-result]');
     if (target) target.textContent = message;
@@ -485,6 +489,33 @@ window.GroceryViewFlowActions = (() => {
       setResult('category-market', 'Category market API load failed: ' + error.message + '. Static category board remains visible.');
     }
   };
+  const loadPriceFreshnessFromApi = async (button) => {
+    const config = getApiConfig();
+    const panel = button.closest('[data-groceryview-flow="price-freshness"]');
+    const asOf = panel?.dataset.asOf || new Date().toISOString();
+    if (!config.apiBase) {
+      setResult('price-freshness', 'Local preview mode: connect the API session bridge before loading live price freshness.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/prices/freshness?asOf=' + encodeURIComponent(asOf), config, false), {
+        method: 'GET',
+        headers: config.bearerToken ? apiHeaders(config) : { 'content-type': 'application/json' }
+      });
+      const payload = await requireApiSuccess(response);
+      const summary = payload.summary || {};
+      const products = Array.isArray(payload.products) ? payload.products : [];
+      const backfillIds = Array.isArray(payload.backfillProductIds) ? payload.backfillProductIds : [];
+      const staleProducts = products.filter((product) => product.status === 'stale').map((product) => product.productName || product.productId);
+      setPriceFreshnessMetric('summary', 'Fresh ' + Number(summary.fresh || 0) + ' · aging ' + Number(summary.aging || 0) + ' · stale ' + Number(summary.stale || 0));
+      setPriceFreshnessMetric('backfill', backfillIds.length ? backfillIds.join(', ') : 'No backfill needed');
+      setPriceFreshnessMetric('thresholds', 'Aging after ' + Number(payload.thresholds?.agingAfterDays || 0) + 'd · stale after ' + Number(payload.thresholds?.staleAfterDays || 0) + 'd');
+      setPriceFreshnessMetric('stale', staleProducts.length ? staleProducts.join(', ') : 'No stale products');
+      setResult('price-freshness', 'Connected price freshness loaded: ' + products.length + ' products as of ' + (payload.asOf || asOf) + '; ' + backfillIds.length + ' backfill actions.');
+    } catch (error) {
+      setResult('price-freshness', 'Price freshness API load failed: ' + error.message + '. Static retailer freshness board remains visible.');
+    }
+  };
   const messages = {
     'toggle-alert': 'Alert rule updated locally; production save waits for authenticated account API.',
     'manage-subscription': 'Billing portal handoff prepared without exposing provider customer IDs.',
@@ -544,6 +575,10 @@ window.GroceryViewFlowActions = (() => {
       }
       if (flow === 'category-market' && action === 'load-category-market') {
         await loadCategoryMarketFromApi(button);
+        return;
+      }
+      if (flow === 'price-freshness' && action === 'load-price-freshness') {
+        await loadPriceFreshnessFromApi(button);
         return;
       }
       if (flow && action) setResult(flow, messages[action] || 'Action preview recorded.');
@@ -664,6 +699,9 @@ const productPriceGuardrails = `
 const categoryMarketLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="category-market" data-category="coffee" style="margin-top:16px"><div class="eyebrow">Connected category market API</div><h2>Pull current coffee category numbers</h2><p class="lede">Fetch <code>/api/categories/coffee/market</code> to refresh category rows with current price, Deal Score, 1M move, 52-week position, Stockholm median gap, and verified-history evidence from the API instead of static copy.</p><div class="grid" aria-label="Live category market API metrics"><div class="metric"><strong data-category-market-leader>Waiting for API pull</strong><span>category leader</span></div><div class="metric"><strong data-category-market-range>Static 52W range preview</strong><span>52W position</span></div><div class="metric"><strong data-category-market-median>Static Stockholm median preview</strong><span>same-product median gap</span></div><div class="metric"><strong data-category-market-evidence>Static verified history preview</strong><span>verified category evidence</span></div></div><div class="flow-panel" aria-label="Connected category market actions"><button type="button" data-flow-action="load-category-market">Load live category market</button></div><p class="flow-result" data-flow-result="category-market" aria-live="polite">Local preview mode: connect the API session bridge before loading live category market numbers.</p></section>`;
 
+const priceFreshnessLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="price-freshness" data-as-of="2026-05-20T00:00:00.000Z" style="margin-top:16px"><div class="eyebrow">Connected price freshness API</div><h2>Pull live freshness and backfill status</h2><p class="lede">Fetch <code>/api/prices/freshness</code> to replace static freshness copy with API counts for fresh, aging, stale, and backfill-needed product rows before those rows power deal boards or alerts.</p><div class="grid" aria-label="Live price freshness API metrics"><div class="metric"><strong data-price-freshness-summary>Waiting for API pull</strong><span>fresh/aging/stale</span></div><div class="metric"><strong data-price-freshness-backfill>Static backfill preview</strong><span>backfill queue</span></div><div class="metric"><strong data-price-freshness-thresholds>Static freshness thresholds</strong><span>aging and stale windows</span></div><div class="metric"><strong data-price-freshness-stale>Static stale-product preview</strong><span>stale products</span></div></div><div class="flow-panel" aria-label="Connected price freshness actions"><button type="button" data-flow-action="load-price-freshness">Load live freshness report</button></div><p class="flow-result" data-flow-result="price-freshness" aria-live="polite">Local preview mode: connect the API session bridge before loading live price freshness.</p></section>`;
+
 const pages = [
   {
     path: 'login/index.html',
@@ -783,7 +821,7 @@ const pages = [
     path: 'retailers/freshness/index.html',
     title: 'Retailer freshness monitor — GroceryView',
     description: 'Monitor GroceryView retailer scrape freshness, parser health, stale catalog rows, and alert eligibility by chain.',
-    body: `<section class="card"><div class="eyebrow">Retailer freshness</div><h1>Retailer freshness monitor</h1><p class="lede">Review chain-level scrape freshness and parser health before retailer-page observations update deals, alerts, or basket totals.</p><div class="grid"><div class="metric"><strong>4</strong><span>chains monitored</span></div><div class="metric"><strong>1</strong><span>stale parser feed</span></div><div class="metric"><strong>93%</strong><span>fresh eligible rows</span></div></div></section><section class="card" style="margin-top:16px"><h2>Freshness by retailer</h2><table class="table"><thead><tr><th>Retailer</th><th>Last scrape</th><th>Parser health</th><th>Eligible rows</th><th>Action</th></tr></thead><tbody><tr><td>Willys</td><td>2026-05-20 07:45</td><td>Healthy</td><td>94%</td><td>Keep publishing</td></tr><tr><td>ICA</td><td>2026-05-20 07:30</td><td>Healthy</td><td>91%</td><td>Backfill loyalty labels</td></tr><tr><td>Coop</td><td>2026-05-19 18:20</td><td>Stale feed</td><td>73%</td><td>Pause new alerts</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Freshness guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Alert freshness</td><td>Stale retailer-page rows cannot trigger household notifications.</td></tr><tr><td>Parser health</td><td>Parser failures keep old prices visible but exclude them from Deal Score updates.</td></tr><tr><td>Chain labels</td><td>Member-only and promotion labels must survive parser backfills.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Retailer freshness</div><h1>Retailer freshness monitor</h1><p class="lede">Review chain-level scrape freshness and parser health before retailer-page observations update deals, alerts, or basket totals.</p><div class="grid"><div class="metric"><strong>4</strong><span>chains monitored</span></div><div class="metric"><strong>1</strong><span>stale parser feed</span></div><div class="metric"><strong>93%</strong><span>fresh eligible rows</span></div></div></section><section class="card" style="margin-top:16px"><h2>Freshness by retailer</h2><table class="table"><thead><tr><th>Retailer</th><th>Last scrape</th><th>Parser health</th><th>Eligible rows</th><th>Action</th></tr></thead><tbody><tr><td>Willys</td><td>2026-05-20 07:45</td><td>Healthy</td><td>94%</td><td>Keep publishing</td></tr><tr><td>ICA</td><td>2026-05-20 07:30</td><td>Healthy</td><td>91%</td><td>Backfill loyalty labels</td></tr><tr><td>Coop</td><td>2026-05-19 18:20</td><td>Stale feed</td><td>73%</td><td>Pause new alerts</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Freshness guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Alert freshness</td><td>Stale retailer-page rows cannot trigger household notifications.</td></tr><tr><td>Parser health</td><td>Parser failures keep old prices visible but exclude them from Deal Score updates.</td></tr><tr><td>Chain labels</td><td>Member-only and promotion labels must survive parser backfills.</td></tr></tbody></table></section>${priceFreshnessLivePanel}`
   },
   {
     path: 'routes/shopping/index.html',

@@ -28,6 +28,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Deal Score report API | PR #316, `createGroceryViewApi().getDealScore()`, `/api/products/{id}/deal-score`, and server/OpenAPI tests expose the score, band, median discount, historical percentile, confidence, and customer-facing reasons | Shipped after merge |
 | Product comparison details API | PR #314, `createGroceryViewApi().getProductEquivalents()`, `/api/products/{id}/equivalents`, and server/OpenAPI tests expose comparable same-category products with best known price, best store, Deal Score, and explanation | Shipped after merge |
 | Price freshness report API | PR #300, `createGroceryViewApi().getPriceFreshnessReport()`, `/api/prices/freshness`, and server/OpenAPI tests expose verified-price age, stale/aging/fresh counts, and backfill product IDs | Shipped after merge |
+| Connected price freshness UI | This PR, `apps/web/scripts/pages.mjs`, and web page-generation tests wire the retailer freshness page to `/api/prices/freshness` and render fresh/aging/stale counts, backfill IDs, thresholds, and stale-product names from the API response | Completed by this PR merge |
 | Watchlist, alerts, budget summaries | PR #2, PR #11 | Foundation shipped |
 | API foundation | PR #3, `packages/api` | Foundation shipped |
 | API mutable route input validation | PR #132, `packages/api` route validation tests | Shipped after merge |
