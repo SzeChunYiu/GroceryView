@@ -1200,6 +1200,16 @@ export type BudgetSummary = {
   monthlyStatus: 'under' | 'over';
 };
 
+export type BudgetMode = 'strict' | 'student' | 'family' | 'healthy';
+
+export type BudgetModePlan = {
+  mode: BudgetMode;
+  weeklyStatus: 'safe' | 'watch' | 'blocked';
+  remainingBufferPercent: number;
+  alertThresholdPercent: number;
+  recommendations: string[];
+};
+
 export function summarizeBudget(input: BudgetInput): BudgetSummary {
   const weeklyActualSpend = roundMoney(input.receiptTotalsThisWeek.reduce((sum, value) => sum + value, 0));
   const monthlyActualSpend = roundMoney(input.receiptTotalsThisMonth.reduce((sum, value) => sum + value, 0));
@@ -1218,6 +1228,34 @@ export function summarizeBudget(input: BudgetInput): BudgetSummary {
     monthlyRemainingActual,
     weeklyStatus: weeklyRemainingActual >= 0 ? 'under' : 'over',
     monthlyStatus: monthlyRemainingActual >= 0 ? 'under' : 'over'
+  };
+}
+
+export function planBudgetMode(summary: BudgetSummary, mode: BudgetMode): BudgetModePlan {
+  const remainingBufferPercent =
+    summary.weeklyBudget <= 0 ? 0 : Math.round((summary.weeklyRemainingAfterEstimate / summary.weeklyBudget) * 100);
+  const alertThresholdPercent = mode === 'strict' ? 10 : mode === 'student' ? 5 : mode === 'family' ? 15 : 12;
+  const weeklyStatus =
+    summary.weeklyRemainingAfterEstimate < 0
+      ? 'blocked'
+      : remainingBufferPercent <= alertThresholdPercent
+        ? 'watch'
+        : 'safe';
+  const recommendations: string[] = [];
+
+  if (weeklyStatus === 'blocked') recommendations.push('Remove or swap items before checkout.');
+  if (weeklyStatus === 'watch') recommendations.push('Keep a buffer for missing receipt lines and deposit fees.');
+  if (mode === 'strict') recommendations.push('Require every basket add to keep the weekly plan under budget.');
+  if (mode === 'student') recommendations.push('Prioritize private-label swaps and price-per-krona staples.');
+  if (mode === 'family') recommendations.push('Protect household staples before optional snack deals.');
+  if (mode === 'healthy') recommendations.push('Prefer nutrition-per-krona deals over lowest absolute price.');
+
+  return {
+    mode,
+    weeklyStatus,
+    remainingBufferPercent,
+    alertThresholdPercent,
+    recommendations
   };
 }
 
