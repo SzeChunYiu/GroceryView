@@ -43,6 +43,9 @@ describe('buildStaticPages', () => {
       const household = await readFile(join(root, 'household/index.html'), 'utf8');
       assert.match(household, /Shared household basket/);
       assert.match(household, /member attribution/);
+      assert.match(household, /Household rules/);
+      assert.match(household, /Owner approval over 400 SEK/);
+      assert.match(household, /No pork, nut alert/);
 
       const basket = await readFile(join(root, 'basket/index.html'), 'utf8');
       assert.match(basket, /Basket lines/);

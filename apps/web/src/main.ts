@@ -113,6 +113,12 @@ const privacyControls = [
   { setting: 'Price contribution', state: 'Anonymous', detail: 'No account identifier in catalog backfill' }
 ];
 
+const householdRules = [
+  { member: 'Alex', budgetShare: '50%', rule: 'Owner approval over 400 SEK', dietary: 'Vegetarian, lactose ok' },
+  { member: 'Mina', budgetShare: '35%', rule: 'Reviews low-confidence receipts', dietary: 'No pork, nut alert' },
+  { member: 'Sam', budgetShare: '15%', rule: 'School lunch staples pinned', dietary: 'Child-friendly swaps' }
+];
+
 const index = calculateFixedBasketIndex({
   id: 'stockholm-grocery-index',
   label: 'Stockholm Grocery Index',
@@ -251,6 +257,16 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Household rules</h2>
+        <p class="lede">Budget shares, diet constraints, and approval rules travel with basket decisions before smart swaps are recommended.</p>
+        <table class="table">
+          <thead><tr><th>Member</th><th>Budget</th><th>Rule</th><th>Diet</th></tr></thead>
+          <tbody>
+            ${householdRules.map((member) => `<tr><td>${member.member}</td><td>${member.budgetShare}</td><td>${member.rule}</td><td>${member.dietary}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Search and budget readiness</h2>
         <p class="lede">Query <strong>willys coffee</strong> returns ${searchHits.length} product ticker match. Weekly actual spend is ${budget.weeklyActualSpend} SEK, with ${budget.weeklyRemainingActual} SEK remaining.</p>
