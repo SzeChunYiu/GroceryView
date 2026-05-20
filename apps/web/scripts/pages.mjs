@@ -89,6 +89,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-receipt-review-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setHumanReviewMetric = (metric, message) => {
+    const target = document.querySelector('[data-human-review-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setSavingsLedgerMetric = (metric, message) => {
     const target = document.querySelector('[data-savings-ledger-' + metric + ']');
     if (target) target.textContent = message;
@@ -1034,6 +1038,30 @@ window.GroceryViewFlowActions = (() => {
       setResult('receipt-review', 'Receipt review API load failed: ' + error.message + '. Static receipt review remains visible.');
     }
   };
+  const loadHumanReviewFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('human-review', 'Local preview mode: connect the API session bridge before loading live human review queue.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/human-review/assignments', config), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const assignments = Array.isArray(payload.assignments) ? payload.assignments : [];
+      const sla = payload.sla || {};
+      const highPriority = assignments.filter((assignment) => assignment.priority === 'high');
+      const inProgress = assignments.filter((assignment) => assignment.status === 'in_progress');
+      setHumanReviewMetric('assignments', assignments.length + ' open assignments · ' + inProgress.length + ' in progress');
+      setHumanReviewMetric('sla', (sla.status || 'unknown SLA') + ' · overdue ' + Number(sla.overdueCount || 0) + ' · due soon ' + Number(sla.dueSoonCount || 0));
+      setHumanReviewMetric('priority', highPriority.length + ' high-priority rows · ' + (assignments[0]?.reviewId || 'no live assignment id'));
+      setResult('human-review', 'Connected human review queue loaded: ' + assignments.length + ' assignments, SLA ' + (sla.status || 'unknown') + ', ' + highPriority.length + ' high-priority rows.');
+    } catch (error) {
+      setResult('human-review', 'Human review API load failed: ' + error.message + '. Static moderator queue remains visible.');
+    }
+  };
   const loadSavingsLedgerFromApi = async () => {
     const config = getApiConfig();
     if (!hasApiSession(config)) {
@@ -1335,6 +1363,10 @@ window.GroceryViewFlowActions = (() => {
         await loadReceiptReviewFromApi();
         return;
       }
+      if (flow === 'human-review' && action === 'load-human-review') {
+        await loadHumanReviewFromApi();
+        return;
+      }
       if (flow === 'savings-ledger' && action === 'load-savings-ledger') {
         await loadSavingsLedgerFromApi();
         return;
@@ -1522,6 +1554,9 @@ const adDisclosureLivePanel = `
 const receiptReviewLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="receipt-review" style="margin-top:16px"><div class="eyebrow">Connected receipt review API</div><h2>Pull live receipt review</h2><p class="lede">Fetch <code>/api/receipts/review</code> through the protected API session bridge to refresh actual receipt spend, local median delta, confidence routing, and writeback guardrails before receipt rows update household actuals or price history.</p><div class="grid" aria-label="Live receipt review API metrics"><div class="metric"><strong data-receipt-review-budget>Waiting for API pull</strong><span>actual spend and budget buffer</span></div><div class="metric"><strong data-receipt-review-lines>Static line-review preview</strong><span>matched lines and review queue</span></div><div class="metric"><strong data-receipt-review-guardrails>Static writeback preview</strong><span>good buys, overspend, and guardrails</span></div></div><div class="flow-panel" aria-label="Connected receipt review actions"><button type="button" data-flow-action="load-receipt-review">Load live receipt review</button></div><p class="flow-result" data-flow-result="receipt-review" aria-live="polite">Local preview mode: connect the API session bridge before loading live receipt review.</p></section>`;
 
+const humanReviewLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="human-review" style="margin-top:16px"><div class="eyebrow">Connected human review API</div><h2>Pull live review queue</h2><p class="lede">Fetch <code>/api/human-review/assignments</code> through the protected reviewer session to refresh open assignment count, SLA status, due-soon or overdue rows, and high-priority review work before catalog writebacks are approved.</p><div class="grid" aria-label="Live human review API metrics"><div class="metric"><strong data-human-review-assignments>Waiting for API pull</strong><span>open assignments and progress</span></div><div class="metric"><strong data-human-review-sla>Static SLA preview</strong><span>SLA status, overdue, due soon</span></div><div class="metric"><strong data-human-review-priority>Static priority preview</strong><span>high-priority rows</span></div></div><div class="flow-panel" aria-label="Connected human review actions"><button type="button" data-flow-action="load-human-review">Load live review queue</button></div><p class="flow-result" data-flow-result="human-review" aria-live="polite">Local preview mode: connect the API session bridge with a reviewer account before loading live human review operations.</p></section>`;
+
 const savingsLedgerLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="savings-ledger" style="margin-top:16px"><div class="eyebrow">Connected savings ledger API</div><h2>Pull live savings ledger</h2><p class="lede">Fetch protected <code>/api/budget/summary</code> and <code>/api/basket/compare</code> to reconcile budget remaining, next-basket estimate, split-basket forecast savings, verified assignment lines, and missing-product blockers before savings are treated as realized.</p><div class="grid" aria-label="Live savings ledger API metrics"><div class="metric"><strong data-savings-ledger-confirmed>Waiting for API pull</strong><span>budget actuals</span></div><div class="metric"><strong data-savings-ledger-forecast>Static forecast preview</strong><span>forecast savings and next basket</span></div><div class="metric"><strong data-savings-ledger-blockers>Static blocker preview</strong><span>assignment evidence and blockers</span></div></div><div class="flow-panel" aria-label="Connected savings ledger actions"><button type="button" data-flow-action="load-savings-ledger">Load live savings ledger</button></div><p class="flow-result" data-flow-result="savings-ledger" aria-live="polite">Local preview mode: connect the API session bridge and save a basket before loading live savings ledger.</p></section>`;
 
@@ -1647,7 +1682,7 @@ const pages = [
     path: 'admin/human-review/index.html',
     title: 'Human review operations — GroceryView',
     description: 'GroceryView admin page scaffold for human-review assignments, SLA status, reviewer authorization, and decision writebacks.',
-    body: `<section class="card"><div class="eyebrow">Operations</div><h1>Human review operations</h1><p class="lede">Review low-confidence product matches and community reports before they can update catalog data.</p><div class="grid"><div class="metric"><strong>breached</strong><span>SLA status</span></div><div class="metric"><strong>2</strong><span>open assignments</span></div><div class="metric"><strong>moderator-owned</strong><span>decision access</span></div></div></section><section class="card" style="margin-top:16px"><h2>Moderator assignments</h2><table class="table"><thead><tr><th>Review</th><th>Priority</th><th>Assignee</th><th>Due</th><th>Action</th></tr></thead><tbody><tr><td>review-match-1</td><td>high</td><td>moderator-1</td><td>SLA breached</td><td>Approve product match</td></tr><tr><td>review-report-1</td><td>medium</td><td>moderator-2</td><td>Due tomorrow</td><td>Keep in review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Decision writeback</h2><p class="lede">Approval writes <strong>approve_product_match</strong>; rejection writes <strong>reject_product_match</strong>; needs-more-info keeps the assignment in progress for a registered reviewer.</p></section>`
+    body: `<section class="card"><div class="eyebrow">Operations</div><h1>Human review operations</h1><p class="lede">Review low-confidence product matches and community reports before they can update catalog data.</p><div class="grid"><div class="metric"><strong>breached</strong><span>SLA status</span></div><div class="metric"><strong>2</strong><span>open assignments</span></div><div class="metric"><strong>moderator-owned</strong><span>decision access</span></div></div></section><section class="card" style="margin-top:16px"><h2>Moderator assignments</h2><table class="table"><thead><tr><th>Review</th><th>Priority</th><th>Assignee</th><th>Due</th><th>Action</th></tr></thead><tbody><tr><td>review-match-1</td><td>high</td><td>moderator-1</td><td>SLA breached</td><td>Approve product match</td></tr><tr><td>review-report-1</td><td>medium</td><td>moderator-2</td><td>Due tomorrow</td><td>Keep in review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Decision writeback</h2><p class="lede">Approval writes <strong>approve_product_match</strong>; rejection writes <strong>reject_product_match</strong>; needs-more-info keeps the assignment in progress for a registered reviewer.</p></section>${humanReviewLivePanel}`
   },
   {
     path: 'market/index.html',
