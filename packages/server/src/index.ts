@@ -4,7 +4,7 @@ import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createGroceryViewApi, type HouseholdPlanRequest } from '@groceryview/api';
-import { parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
+import { createSessionToken, parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
 import {
   checkPostgresIntegrationReadiness,
   createPgQueryExecutor,
@@ -51,6 +51,7 @@ export type AuthOptions = {
   runtimeConfig?: RuntimeConfig;
   authSecret?: string;
   now?: Date;
+  authSessionExchange?: AuthSessionExchangeVerifier;
   subscriptionEntitlementRepository?: {
     getSubscriptionEntitlement(userId: string): Promise<SubscriptionEntitlementLookupRecord | null>;
   };
@@ -72,6 +73,24 @@ export type AuthOptions = {
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   scanProviders?: ScanProviders;
+};
+
+export type AuthProvider = 'magic_link' | 'passkey' | 'oidc';
+
+export type AuthProviderAssertion = {
+  provider: AuthProvider;
+  assertion: string;
+  email?: string;
+};
+
+export type VerifiedAuthProviderUser = {
+  userId: string;
+  email?: string;
+  expiresAt?: string;
+};
+
+export type AuthSessionExchangeVerifier = {
+  verify(assertion: AuthProviderAssertion): Promise<VerifiedAuthProviderUser>;
 };
 
 export type SubscriptionEntitlementLookupRecord = SubscriptionEntitlementSnapshot & {
@@ -146,6 +165,11 @@ function requiredScanKind(value: unknown): ScanUpload['kind'] {
   throw new Error('kind must be barcode or receipt.');
 }
 
+function requiredAuthProvider(value: unknown): AuthProvider {
+  if (value === 'magic_link' || value === 'passkey' || value === 'oidc') return value;
+  throw new Error('provider must be magic_link, passkey, or oidc.');
+}
+
 function optionalDeliveryChannel(value: unknown): DeliveryChannel | undefined {
   if (value === undefined) return undefined;
   if (value === 'push' || value === 'email') return value;
@@ -206,6 +230,19 @@ function requiredIsoTimestamp(value: unknown, field: string): string {
 function optionalIsoTimestamp(value: unknown, field: string): string | undefined {
   if (value === undefined) return undefined;
   return requiredIsoTimestamp(value, field);
+}
+
+function authProviderAssertionFromBody(body: JsonRecord): AuthProviderAssertion {
+  const email = optionalString(body.email, 'email');
+  return {
+    provider: requiredAuthProvider(body.provider),
+    assertion: requiredString(body.assertion, 'assertion'),
+    ...(email ? { email } : {})
+  };
+}
+
+function defaultSessionExpiresAt(now: Date): string {
+  return new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
 }
 
 function requiredRecordArray(value: unknown, field: string): JsonRecord[] {
@@ -417,6 +454,31 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
             metricsToken: authOptions.notificationMetricsToken ?? runtimeConfig?.metricsToken ?? process.env.METRICS_TOKEN
           })
         );
+      }
+
+      if (path === '/api/auth/session') {
+        if (method === 'POST') {
+          if (!authOptions.authSecret) return errorResponse(503, 'Auth secret is not configured.');
+          if (!authOptions.authSessionExchange) return errorResponse(503, 'Auth session exchange is not configured.');
+          const assertion = authProviderAssertionFromBody(await readJson(request));
+          let verified: VerifiedAuthProviderUser;
+          try {
+            verified = await authOptions.authSessionExchange.verify(assertion);
+          } catch {
+            return errorResponse(401, 'Auth provider assertion rejected.');
+          }
+          const userId = requiredString(verified.userId, 'verifiedUser.userId');
+          const email = optionalString(verified.email, 'verifiedUser.email');
+          const expiresAt = optionalIsoTimestamp(verified.expiresAt, 'verifiedUser.expiresAt') ?? defaultSessionExpiresAt(authOptions.now ?? new Date());
+          const accessToken = await createSessionToken({ userId, ...(email ? { email } : {}), expiresAt }, authOptions.authSecret);
+          return jsonResponse({
+            userId,
+            ...(email ? { email } : {}),
+            tokenType: 'Bearer',
+            accessToken,
+            expiresAt
+          });
+        }
       }
 
       if (method === 'GET' && path === '/api/market/overview') return jsonResponse(api.getMarketOverview());
@@ -872,6 +934,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
     },
     paths: {
       '/api/health': { get: publicOperation('Get API runtime health without exposing secrets.') },
+      '/api/auth/session': { post: publicOperation('Exchange a verified auth provider assertion for a short-lived bearer session.') },
       '/api/market/overview': { get: publicOperation('Get Stockholm grocery market overview.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },

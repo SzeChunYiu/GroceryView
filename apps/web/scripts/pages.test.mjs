@@ -127,6 +127,8 @@ describe('buildStaticPages', () => {
       assert.match(login, /sessionStorage\.setItem\('groceryview\.bearerToken'/);
       assert.match(login, /sessionStorage\.getItem\('groceryview\.bearerToken'\)/);
       assert.match(login, /localStorage\.getItem\('groceryview\.apiBase'\)/);
+      assert.match(login, /fetch\(apiUrl\('\/api\/auth\/session/);
+      assert.match(login, /provider: 'magic_link'/);
       assert.doesNotMatch(login, /localStorage\.setItem\('groceryview\.bearerToken'/);
 
       const account = await readFile(join(root, 'account/index.html'), 'utf8');

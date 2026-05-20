@@ -63,6 +63,54 @@ describe('createHttpHandler', () => {
     }
   });
 
+  it('exchanges verified auth provider assertions for bearer sessions', async () => {
+    const handle = createHttpHandler(undefined, {
+      authSecret: 'session-secret',
+      now: new Date('2026-05-20T00:00:00.000Z'),
+      authSessionExchange: {
+        verify: async (assertion) => {
+          assert.deepEqual(assertion, {
+            provider: 'magic_link',
+            assertion: 'valid-code',
+            email: 'shopper@example.com'
+          });
+          return { userId: 'user-1', email: 'shopper@example.com' };
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/auth/session', {
+      method: 'POST',
+      body: JSON.stringify({ provider: 'magic_link', assertion: 'valid-code', email: 'shopper@example.com' })
+    }));
+    assert.equal(response.status, 200);
+    const session = await json(response) as {
+      userId: string;
+      email: string;
+      tokenType: string;
+      accessToken: string;
+      expiresAt: string;
+    };
+    assert.equal(session.userId, 'user-1');
+    assert.equal(session.email, 'shopper@example.com');
+    assert.equal(session.tokenType, 'Bearer');
+    assert.equal(session.expiresAt, '2026-05-27T00:00:00.000Z');
+    assert.equal(session.accessToken.includes('valid-code'), false);
+    assert.equal(JSON.stringify(session).includes('valid-code'), false);
+
+    const protectedResponse = await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
+      headers: { authorization: `Bearer ${session.accessToken}` }
+    }));
+    assert.equal(protectedResponse.status, 200);
+
+    const missingVerifier = createHttpHandler(undefined, { authSecret: 'session-secret' });
+    const unavailable = await missingVerifier(new Request('http://localhost/api/auth/session', {
+      method: 'POST',
+      body: JSON.stringify({ provider: 'magic_link', assertion: 'valid-code' })
+    }));
+    assert.equal(unavailable.status, 503);
+  });
+
   it('serves market, store, product, and index GET endpoints as JSON', async () => {
     const handle = createHttpHandler();
 
