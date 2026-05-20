@@ -78,9 +78,18 @@ describe('buildStaticPages', () => {
       assert.match(product, /data-groceryview-flow="product-terminal"/);
       assert.match(product, /data-flow-action="load-product-terminal"/);
       assert.match(product, /data-flow-result="product-terminal"/);
+      assert.match(product, /data-product-terminal-move/);
+      assert.match(product, /data-product-terminal-range/);
+      assert.match(product, /data-product-terminal-evidence/);
       assert.match(product, /data-api-session-panel/);
       assert.match(product, /name="apiBase"/);
       assert.match(product, /fetch\(apiUrl\('\/api\/products\/' \+ encodeURIComponent\(productId\) \+ '\/terminal'/);
+      assert.match(product, /oneMonthMovePercent/);
+      assert.match(product, /range52Week/);
+      assert.match(product, /verifiedHistoryPoints/);
+      assert.match(product, /1M move/);
+      assert.match(product, /52W range/);
+      assert.match(product, /verified history/);
       assert.match(product, /Local preview mode: connect the API session bridge before loading live product terminal numbers/);
       assert.match(product, /chart series/);
       assert.match(product, /Promo campaign/);

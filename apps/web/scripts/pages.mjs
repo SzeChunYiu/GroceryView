@@ -7,6 +7,9 @@ window.GroceryViewFlowActions = (() => {
   const formatPreciseSek = (value) => Number.isFinite(Number(value))
     ? new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value))
     : 'unknown price';
+  const formatPercent = (value) => Number.isFinite(Number(value))
+    ? (Number(value) > 0 ? '+' : '') + Number(value).toFixed(1) + '%'
+    : 'n/a';
   const setResult = (flow, message) => {
     const target = document.querySelector('[data-flow-result="' + flow + '"]');
     if (target) target.textContent = message;
@@ -334,9 +337,21 @@ window.GroceryViewFlowActions = (() => {
       const bestPrice = quote.bestPrice == null ? 'no verified price' : formatPreciseSek(quote.bestPrice);
       const bestStore = quote.bestStoreName || 'unknown store';
       const historyPointCount = Number(evidenceVolume.historyPoints || 0);
+      const verifiedHistoryPointCount = Number(evidenceVolume.verifiedHistoryPoints || 0);
       const historyMessage = payload.historySummary?.isNewLow ? 'new 52-week low signal' : 'history loaded';
+      const oneMonthMove = quote.oneMonthMovePercent;
+      const range52Week = quote.range52Week;
+      const rangeMessage = range52Week && Number.isFinite(Number(range52Week.low)) && Number.isFinite(Number(range52Week.high))
+        ? formatPreciseSek(range52Week.low) + ' to ' + formatPreciseSek(range52Week.high)
+        : '52W range unavailable';
+      const stockholmMedianDelta = stockholm && Number.isFinite(Number(stockholm.median)) && quote.bestPrice != null
+        ? formatPreciseSek(Number(stockholm.median) - Number(quote.bestPrice)) + ' vs Stockholm median'
+        : 'median comparison unavailable';
 
       setProductTerminalMetric('quote', bestPrice + ' at ' + bestStore);
+      setProductTerminalMetric('move', '1M move ' + formatPercent(oneMonthMove) + ' · ' + stockholmMedianDelta);
+      setProductTerminalMetric('range', '52W range ' + rangeMessage);
+      setProductTerminalMetric('evidence', verifiedHistoryPointCount + '/' + historyPointCount + ' verified history points');
       if (stockholm) {
         setProductTerminalMetric('stockholm', stockholm.label + ': median ' + formatPreciseSek(stockholm.median) + ', current percentile ' + stockholm.currentPercentile + ', sample ' + stockholm.sampleSize + '.');
       }
@@ -345,7 +360,7 @@ window.GroceryViewFlowActions = (() => {
       }
       setProductTerminalMetric('chart', chartSeriesCount + ' chart series · ' + historyPointCount + ' history points · ' + historyMessage + '.');
       const stockholmSummary = stockholm ? stockholm.label + ' median ' + formatPreciseSek(stockholm.median) : 'distribution unavailable';
-      setResult('product-terminal', 'Connected product terminal loaded: ' + bestPrice + ' at ' + bestStore + ' · ' + stockholmSummary + ' · ' + chartSeriesCount + ' chart series.');
+      setResult('product-terminal', 'Connected product terminal loaded: ' + bestPrice + ' at ' + bestStore + ' · 1M move ' + formatPercent(oneMonthMove) + ' · ' + stockholmSummary + ' · ' + chartSeriesCount + ' chart series.');
     } catch (error) {
       setResult('product-terminal', 'Product terminal API load failed: ' + error.message + '. Static evidence remains visible.');
     }
@@ -509,7 +524,7 @@ const productTerminalSections = `
   <section class="card" style="margin-top:16px"><h2>Trading-style price chart</h2><div class="toolbar" aria-label="Chart range"><span class="pill">7D</span><span class="pill">30D</span><span class="pill">90D</span><span class="pill">1Y</span><span class="pill">All verified</span></div><svg class="price-chart" viewBox="0 0 720 300" role="img" aria-label="Trading-style coffee price history with candlesticks, moving median, promo markers, and confidence styling"><line x1="44" y1="42" x2="44" y2="248" stroke="#37524b"/><line x1="44" y1="248" x2="690" y2="248" stroke="#37524b"/><text x="54" y="58" fill="#88a49c" font-size="12">72.90</text><text x="54" y="238" fill="#88a49c" font-size="12">49.90</text><g stroke="#20d9a6" stroke-width="3"><line x1="110" y1="92" x2="110" y2="172"/><rect x="96" y="112" width="28" height="48" rx="4" fill="#0d6f5d"/><line x1="208" y1="110" x2="208" y2="190"/><rect x="194" y="132" width="28" height="44" rx="4" fill="#0d6f5d"/><line x1="306" y1="128" x2="306" y2="206"/><rect x="292" y="146" width="28" height="48" rx="4" fill="#0d6f5d"/><line x1="404" y1="150" x2="404" y2="220"/><rect x="390" y="170" width="28" height="36" rx="4" fill="#0d6f5d"/><line x1="502" y1="164" x2="502" y2="230"/><rect x="488" y="188" width="28" height="28" rx="4" fill="#0d6f5d"/></g><g stroke="#ffca66" stroke-width="3"><line x1="600" y1="152" x2="600" y2="238"/><rect x="586" y="196" width="28" height="30" rx="4" fill="#6a4711"/></g><polyline points="110,120 208,132 306,148 404,166 502,184 600,196" fill="none" stroke="#7cf2ce" stroke-width="3" stroke-dasharray="10 7"/><circle cx="600" cy="226" r="8" fill="#ffca66"/><text x="610" y="214" fill="#ccfff0" font-size="13">weekly promo</text><text x="94" y="272" fill="#88a49c" font-size="12">Apr 01</text><text x="292" y="272" fill="#88a49c" font-size="12">May 01</text><text x="558" y="272" fill="#88a49c" font-size="12">May 20</text></svg><table class="table"><thead><tr><th>Stock-style signal</th><th>Value</th><th>Meaning</th></tr></thead><tbody><tr><td>30D moving median</td><td>59.90 SEK</td><td>Verified shelf quote is 8.3% under median.</td></tr><tr><td>52-week low touch</td><td>Promo-only</td><td>The visible 49.90 low is tracked, but official shelf claims stay at verified shelf evidence.</td></tr><tr><td>Freshness</td><td>4 days old shelf</td><td>Local promo evidence is newer but remains promo-labeled.</td></tr></tbody></table></section>`;
 
 const productTerminalLivePanel = `
-  <section class="card terminal-live-panel" data-groceryview-flow="product-terminal" data-product-id="coffee" style="margin-top:16px"><div class="eyebrow">Connected product terminal API</div><h2>Pull current API terminal numbers</h2><p class="lede">Use the API session bridge to fetch <code>/api/products/coffee/terminal</code> and refresh the customer-facing quote, Stockholm/local distribution, history evidence, and chart-series counts from the live API response.</p><div class="grid" aria-label="Live product terminal API metrics"><div class="metric"><strong data-product-terminal-quote>Waiting for API pull</strong><span>best API quote</span></div><div class="metric"><strong data-product-terminal-stockholm>Static Stockholm preview</strong><span>whole-city distribution</span></div><div class="metric"><strong data-product-terminal-chart>Static chart preview</strong><span>chart series and history</span></div></div><p class="footer-note" data-product-terminal-local>Local area distribution updates after the API pull.</p><div class="flow-panel" aria-label="Connected product terminal actions"><button type="button" data-flow-action="load-product-terminal">Load live terminal numbers</button></div><p class="flow-result" data-flow-result="product-terminal" aria-live="polite">Local preview mode: connect the API session bridge before loading live product terminal numbers.</p></section>`;
+  <section class="card terminal-live-panel" data-groceryview-flow="product-terminal" data-product-id="coffee" style="margin-top:16px"><div class="eyebrow">Connected product terminal API</div><h2>Pull current API terminal numbers</h2><p class="lede">Use the API session bridge to fetch <code>/api/products/coffee/terminal</code> and refresh the customer-facing quote, 1M move, 52W range, Stockholm/local distribution, history evidence, and chart-series counts from the live API response.</p><div class="grid" aria-label="Live product terminal API metrics"><div class="metric"><strong data-product-terminal-quote>Waiting for API pull</strong><span>best API quote</span></div><div class="metric"><strong data-product-terminal-move>Static 1M move preview</strong><span>1M move and median gap</span></div><div class="metric"><strong data-product-terminal-range>Static 52W range preview</strong><span>52W range</span></div><div class="metric"><strong data-product-terminal-stockholm>Static Stockholm preview</strong><span>whole-city distribution</span></div><div class="metric"><strong data-product-terminal-chart>Static chart preview</strong><span>chart series and history</span></div><div class="metric"><strong data-product-terminal-evidence>Static verified history preview</strong><span>verified history</span></div></div><p class="footer-note" data-product-terminal-local>Local area distribution updates after the API pull.</p><div class="flow-panel" aria-label="Connected product terminal actions"><button type="button" data-flow-action="load-product-terminal">Load live terminal numbers</button></div><p class="flow-result" data-flow-result="product-terminal" aria-live="polite">Local preview mode: connect the API session bridge before loading live product terminal numbers.</p></section>`;
 
 const productPriceGuardrails = `
   <section class="card" style="margin-top:16px"><h2>Price evidence guardrails</h2><table class="table"><thead><tr><th>Signal</th><th>Displayed behavior</th></tr></thead><tbody><tr><td>Verified shelf or retailer page</td><td>Can contribute to current price, Deal Score, and basket totals.</td></tr><tr><td>Member or promotion price</td><td>Shown with explicit loyalty or campaign label before shoppers act.</td></tr><tr><td>Estimated or low-confidence row</td><td>Marked unverified and excluded from official shelf-price claims.</td></tr></tbody></table></section>`;
