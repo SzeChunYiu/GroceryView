@@ -106,6 +106,12 @@ const budget = summarizeBudget({
   receiptTotalsThisMonth: [321, 180, 760, 690]
 });
 
+const budgetForecastRows = [
+  { period: 'This week actuals', budget: '800 SEK', value: `${budget.weeklyActualSpend} SEK`, variance: `${budget.weeklyRemainingActual} SEK left`, status: budget.weeklyStatus },
+  { period: 'Next planned basket', budget: '800 SEK', value: `${budget.estimatedBasketTotal} SEK`, variance: `${budget.weeklyRemainingAfterEstimate} SEK left`, status: 'needs review' },
+  { period: 'Month-end projection', budget: '3 200 SEK', value: '3 084 SEK', variance: '116 SEK left', status: 'on track' }
+];
+
 const scannerReviews = [
   {
     source: 'Coop Farsta receipt',
@@ -351,7 +357,7 @@ app.innerHTML = `
     <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Weekly basket strategy</h2>
-        <p class="lede">Cheapest by product across selected favorite stores. Distance is informational only and never reduces savings.</p>
+        <p class="lede">Cheapest by product across selected favorite stores. Distance is informational only and never reduces savings. <a href="/budget/forecast/">Open budget forecast</a>.</p>
         <table class="table">
           <thead><tr><th>Product</th><th>Store</th><th>Total</th></tr></thead>
           <tbody>
@@ -363,6 +369,16 @@ app.innerHTML = `
           <thead><tr><th>Swap</th><th>Saves</th><th>Rule</th></tr></thead>
           <tbody>
             ${smartSwaps.map((swap) => `<tr><td>${swap.from} → ${swap.to}</td><td>${swap.savings} SEK</td><td>${swap.rule}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Budget forecast</h2>
+        <p class="lede">Forecast rows compare actual receipts, planned baskets, and month-end projection before corrective swaps are applied.</p>
+        <table class="table">
+          <thead><tr><th>Period</th><th>Budget</th><th>Value</th><th>Variance</th><th>Status</th></tr></thead>
+          <tbody>
+            ${budgetForecastRows.map((row) => `<tr><td>${row.period}</td><td>${row.budget}</td><td>${row.value}</td><td>${row.variance}</td><td><span class="status">${row.status}</span></td></tr>`).join('')}
           </tbody>
         </table>
       </div>
