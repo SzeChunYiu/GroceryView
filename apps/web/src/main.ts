@@ -119,6 +119,12 @@ const householdRules = [
   { member: 'Sam', budgetShare: '15%', rule: 'School lunch staples pinned', dietary: 'Child-friendly swaps' }
 ];
 
+const storeHighlights = [
+  { store: 'Willys Odenplan', category: 'Coffee', signal: '-12% vs Stockholm average', confidence: 'Verified shelf' },
+  { store: 'Lidl Sveavägen', category: 'Eggs', signal: 'Best basket line', confidence: 'Retailer page' },
+  { store: 'Coop Farsta', category: 'Butter', signal: 'Above usual price', confidence: 'Estimated' }
+];
+
 const index = calculateFixedBasketIndex({
   id: 'stockholm-grocery-index',
   label: 'Stockholm Grocery Index',
@@ -258,12 +264,12 @@ app.innerHTML = `
 
     <section class="market" style="margin-top:16px">
       <div class="card">
-        <h2>Household rules</h2>
-        <p class="lede">Budget shares, diet constraints, and approval rules travel with basket decisions before smart swaps are recommended.</p>
+        <h2>Store highlights</h2>
+        <p class="lede">Store cards separate verified shelf evidence, retailer-page prices, and estimates before they affect basket decisions.</p>
         <table class="table">
-          <thead><tr><th>Member</th><th>Budget</th><th>Rule</th><th>Diet</th></tr></thead>
+          <thead><tr><th>Store</th><th>Category</th><th>Signal</th><th>Confidence</th></tr></thead>
           <tbody>
-            ${householdRules.map((member) => `<tr><td>${member.member}</td><td>${member.budgetShare}</td><td>${member.rule}</td><td>${member.dietary}</td></tr>`).join('')}
+            ${storeHighlights.map((highlight) => `<tr><td>${highlight.store}</td><td>${highlight.category}</td><td>${highlight.signal}</td><td><span class="status">${highlight.confidence}</span></td></tr>`).join('')}
           </tbody>
         </table>
       </div>
@@ -275,6 +281,19 @@ app.innerHTML = `
           <div class="metric"><strong>${budget.monthlyRemainingActual}</strong><span>monthly SEK left</span></div>
           <div class="metric"><strong>${searchHits[0]?.ticker ?? '—'}</strong><span>top search match</span></div>
         </div>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Household rules</h2>
+        <p class="lede">Budget shares, diet constraints, and approval rules travel with basket decisions before smart swaps are recommended.</p>
+        <table class="table">
+          <thead><tr><th>Member</th><th>Budget</th><th>Rule</th><th>Diet</th></tr></thead>
+          <tbody>
+            ${householdRules.map((member) => `<tr><td>${member.member}</td><td>${member.budgetShare}</td><td>${member.rule}</td><td>${member.dietary}</td></tr>`).join('')}
+          </tbody>
+        </table>
       </div>
     </section>
   </main>
