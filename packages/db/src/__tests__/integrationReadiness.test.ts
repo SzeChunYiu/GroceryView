@@ -124,6 +124,23 @@ class RepositorySmokeQueryExecutor implements QueryExecutor {
         }
       ] as T[];
     }
+    if (sql.includes('from alert_rules')) {
+      return [
+        {
+          id: 'postgres-probe-alert-run-42',
+          user_id: 'postgres-probe-user-run-42',
+          product_id: 'postgres-probe-product-run-42',
+          store_id: null,
+          channel: 'push',
+          alert_type: 'target_price',
+          target_price: '49.90',
+          deal_score_threshold: null,
+          active: true,
+          created_at: '2026-05-20T00:00:00.000Z',
+          updated_at: '2026-05-20T00:00:00.000Z'
+        }
+      ] as T[];
+    }
     return [] as T[];
   }
 }
@@ -144,6 +161,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
 
     assert.equal(report.status, 'blocked');
     assert.deepEqual(report.blockers, [
+      'missing_table:alert_rules',
       'missing_table:basket_items',
       'missing_table:chains',
       'missing_table:community_reporter_trust',
@@ -161,6 +179,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_table:weekly_baskets',
       'missing_migration:002_repository_support_schema',
       'missing_migration:003_subscription_entitlements',
+      'missing_migration:004_alert_rules',
       'repository_check_fail:human_review_assignment_round_trip',
       'repository_check_not_run:notification_suppression_round_trip'
     ]);
@@ -191,6 +210,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       status: 'ready',
       blockers: [],
       evidence: [
+        'table:alert_rules',
         'table:app_users',
         'table:basket_items',
         'table:chains',
@@ -212,6 +232,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'migration:001_groceryview_schema',
         'migration:002_repository_support_schema',
         'migration:003_subscription_entitlements',
+        'migration:004_alert_rules',
         'repository_check:favorite_store_round_trip',
         'repository_check:human_review_assignment_round_trip',
         'repository_check:notification_suppression_round_trip',
@@ -410,6 +431,7 @@ describe('buildPostgresRepositorySmokeProbes', () => {
       'user_subscription_entitlement_round_trip',
       'human_review_assignment_round_trip',
       'notification_suppression_round_trip',
+      'alert_rule_round_trip',
       'price_observation_pipeline_round_trip'
     ]);
 
@@ -421,6 +443,7 @@ describe('buildPostgresRepositorySmokeProbes', () => {
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-subscription-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-assignment-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-suppression-run-42')), true);
+    assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-alert-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-chain-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-product-run-42')), true);
   });
