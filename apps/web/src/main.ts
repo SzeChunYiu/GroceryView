@@ -51,6 +51,12 @@ const scoredProducts = products.map((product) => {
   return { ...product, score, band: scoreBand(score) };
 });
 
+const dailyDealActions = [
+  { product: 'Zoégas Coffee 450g', store: 'Willys Odenplan', score: 82, confidence: 'Verified shelf', action: 'Buy two for this week' },
+  { product: 'Eggs 12-pack', store: 'Lidl Sveavägen', score: 76, confidence: 'Retailer page', action: 'Add to split basket' },
+  { product: 'Garant Bryggkaffe 450g', store: 'Willys Odenplan', score: 73, confidence: 'Verified shelf', action: 'Use as private-label swap' }
+];
+
 const basket = compareBasketStrategies({
   favoriteStoreIds: ['willys-odenplan', 'lidl-sveavagen'],
   items: [
@@ -295,6 +301,7 @@ app.innerHTML = `
     <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Top movers and true deals</h2>
+        <p class="lede"><a href="/deals/today/">Open today’s ranked deal board</a> for shopper actions and ranking guardrails.</p>
         <table class="table">
           <thead><tr><th>Ticker</th><th>Best price</th><th>7D</th><th>Deal</th><th>Verdict</th></tr></thead>
           <tbody>
@@ -309,6 +316,19 @@ app.innerHTML = `
         </table>
       </div>
 
+      <div class="card">
+        <h2>Daily deal actions</h2>
+        <p class="lede">Deal actions combine Deal Score, confidence, and basket fit so shoppers can act without treating estimates as verified prices.</p>
+        <table class="table">
+          <thead><tr><th>Product</th><th>Store</th><th>Deal</th><th>Confidence</th><th>Action</th></tr></thead>
+          <tbody>
+            ${dailyDealActions.map((deal) => `<tr><td>${deal.product}</td><td>${deal.store}</td><td>${deal.score}</td><td><span class="status">${deal.confidence}</span></td><td>${deal.action}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Category signals</h2>
         <p class="lede">Category pages expose the product, store, and signal that drives each index movement.</p>
