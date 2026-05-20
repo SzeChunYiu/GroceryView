@@ -45,6 +45,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-budget-summary-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setStoreDealsMetric = (metric, message) => {
+    const target = document.querySelector('[data-store-deals-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setApiSessionResult = (message) => {
     const target = document.querySelector('[data-api-session-result]');
     if (target) target.textContent = message;
@@ -627,6 +631,33 @@ window.GroceryViewFlowActions = (() => {
       setResult('budget-summary', 'Budget summary API load failed: ' + error.message + '. Static budget forecast remains visible.');
     }
   };
+  const loadStoreDealsFromApi = async (button) => {
+    const config = getApiConfig();
+    const panel = button.closest('[data-groceryview-flow="store-deals"]');
+    const storeId = panel?.dataset.storeId || 'willys-odenplan';
+    if (!config.apiBase) {
+      setResult('store-deals', 'Local preview mode: connect the API session bridge before loading live store deals.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/stores/' + encodeURIComponent(storeId) + '/deals', config, false), {
+        method: 'GET',
+        headers: config.bearerToken ? apiHeaders(config) : { 'content-type': 'application/json' }
+      });
+      const deals = await requireApiSuccess(response);
+      const rows = Array.isArray(deals) ? deals : [];
+      const leader = rows[0] || {};
+      const categories = [...new Set(rows.map((deal) => deal.category).filter(Boolean))];
+      const buyDeals = rows.filter((deal) => deal.band?.verdict === 'Buy');
+      const compareDeals = rows.filter((deal) => deal.band?.verdict === 'Compare');
+      setStoreDealsMetric('leader', (leader.ticker || leader.productName || 'Top store deal') + ' · ' + formatPreciseSek(leader.price) + ' · Deal Score ' + Number(leader.dealScore || 0));
+      setStoreDealsMetric('count', rows.length + ' store deals · ' + (categories.length ? categories.join(', ') : 'no categories'));
+      setStoreDealsMetric('verdict', (leader.band?.verdict || 'no verdict') + ' leader · ' + buyDeals.length + ' buy · ' + compareDeals.length + ' compare');
+      setResult('store-deals', 'Connected store deals loaded: ' + rows.length + ' deals from /api/stores/' + storeId + '/deals; leader ' + (leader.ticker || leader.productId || 'n/a') + '.');
+    } catch (error) {
+      setResult('store-deals', 'Store deals API load failed: ' + error.message + '. Static store highlights remain visible.');
+    }
+  };
   const messages = {
     'toggle-alert': 'Alert rule updated locally; production save waits for authenticated account API.',
     'manage-subscription': 'Billing portal handoff prepared without exposing provider customer IDs.',
@@ -706,6 +737,10 @@ window.GroceryViewFlowActions = (() => {
       }
       if (flow === 'budget-summary' && action === 'load-budget-summary') {
         await loadBudgetSummaryFromApi();
+        return;
+      }
+      if (flow === 'store-deals' && action === 'load-store-deals') {
+        await loadStoreDealsFromApi(button);
         return;
       }
       if (flow && action) setResult(flow, messages[action] || 'Action preview recorded.');
@@ -837,6 +872,9 @@ const dailyDealsLivePanel = `
 
 const budgetSummaryLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="budget-summary" style="margin-top:16px"><div class="eyebrow">Connected budget API</div><h2>Pull live household budget summary</h2><p class="lede">Fetch <code>/api/budget/summary</code> through the protected API session bridge to refresh weekly budget, month-to-date spend, next-basket estimate, remaining buffers, and over/under status from account data.</p><div class="grid" aria-label="Live budget summary API metrics"><div class="metric"><strong data-budget-summary-weekly>Waiting for API pull</strong><span>weekly budget status</span></div><div class="metric"><strong data-budget-summary-monthly>Static monthly preview</strong><span>monthly budget status</span></div><div class="metric"><strong data-budget-summary-estimate>Static basket estimate preview</strong><span>next basket buffer</span></div></div><div class="flow-panel" aria-label="Connected budget summary actions"><button type="button" data-flow-action="load-budget-summary">Load live budget summary</button></div><p class="flow-result" data-flow-result="budget-summary" aria-live="polite">Local preview mode: connect the API session bridge before loading live budget summary.</p></section>`;
+
+const storeDealsLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="store-deals" data-store-id="willys-odenplan" style="margin-top:16px"><div class="eyebrow">Connected store deals API</div><h2>Pull live in-store deal board</h2><p class="lede">Fetch <code>/api/stores/willys-odenplan/deals</code> to refresh this favorite-store profile with ranked products, current store price, Deal Score, category coverage, and Buy/Compare verdict mix from the public API.</p><div class="grid" aria-label="Live store deals API metrics"><div class="metric"><strong data-store-deals-leader>Waiting for API pull</strong><span>top in-store deal</span></div><div class="metric"><strong data-store-deals-count>Static deal-count preview</strong><span>ranked store products and categories</span></div><div class="metric"><strong data-store-deals-verdict>Static verdict preview</strong><span>Buy and Compare mix</span></div></div><div class="flow-panel" aria-label="Connected store deal actions"><button type="button" data-flow-action="load-store-deals">Load live store deals</button></div><p class="flow-result" data-flow-result="store-deals" aria-live="polite">Local preview mode: connect the API session bridge before loading live store deals.</p></section>`;
 
 const pages = [
   {
@@ -999,7 +1037,7 @@ const pages = [
     path: 'stores/willys-odenplan/index.html',
     title: 'Willys Odenplan store deals — GroceryView',
     description: 'Willys Odenplan profile with deal score, price level, and best categories.',
-    body: `<section class="card"><div class="eyebrow">Store</div><h1>Willys Odenplan</h1><p class="lede">Favorite-store profile for Odenplan grocery deals.</p><div class="grid"><div class="metric"><strong>82</strong><span>Deal Score Today</span></div><div class="metric"><strong>-12%</strong><span>vs Stockholm average</span></div><div class="metric"><strong>Coffee</strong><span>Best category</span></div></div></section><section class="card" style="margin-top:16px"><h2>Store highlights</h2><table class="table"><thead><tr><th>Category</th><th>Signal</th><th>Confidence</th></tr></thead><tbody><tr><td>Coffee</td><td>-12% vs Stockholm average</td><td>Verified shelf</td></tr><tr><td>Milk</td><td>Competitive family basket line</td><td>Retailer page</td></tr><tr><td>Butter</td><td>Watchlist only, above usual price</td><td>Estimated</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Store</div><h1>Willys Odenplan</h1><p class="lede">Favorite-store profile for Odenplan grocery deals.</p><div class="grid"><div class="metric"><strong>82</strong><span>Deal Score Today</span></div><div class="metric"><strong>-12%</strong><span>vs Stockholm average</span></div><div class="metric"><strong>Coffee</strong><span>Best category</span></div></div></section><section class="card" style="margin-top:16px"><h2>Store highlights</h2><table class="table"><thead><tr><th>Category</th><th>Signal</th><th>Confidence</th></tr></thead><tbody><tr><td>Coffee</td><td>-12% vs Stockholm average</td><td>Verified shelf</td></tr><tr><td>Milk</td><td>Competitive family basket line</td><td>Retailer page</td></tr><tr><td>Butter</td><td>Watchlist only, above usual price</td><td>Estimated</td></tr></tbody></table></section>${storeDealsLivePanel}`
   },
   {
     path: 'stores/compare/index.html',
