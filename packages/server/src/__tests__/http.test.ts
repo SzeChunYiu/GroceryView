@@ -135,6 +135,48 @@ describe('createHttpHandler', () => {
     ]);
     assert.equal(nutritionBody.leader.productId, 'chicken');
 
+    const pantry = await handle(new Request('http://localhost/api/pantry/replenishment?userId=user-1&asOf=2026-05-20T08:00:00.000Z'));
+    assert.equal(pantry.status, 200);
+    const pantryBody = await json(pantry) as { statuses: Array<{ productId: string; status: string }>; replenishment: Array<{ productId: string; alreadyInBasket: boolean }>; expiringSoonProductIds: string[] };
+    assert.deepEqual(pantryBody.statuses.map((row) => [row.productId, row.status]), [
+      ['coffee', 'low_stock'],
+      ['milk', 'expiring_soon'],
+      ['butter', 'in_stock']
+    ]);
+    assert.deepEqual(pantryBody.replenishment.map((row) => [row.productId, row.alreadyInBasket]), [['coffee', false]]);
+    assert.deepEqual(pantryBody.expiringSoonProductIds, ['milk']);
+
+    const loyalty = await handle(new Request('http://localhost/api/loyalty/offers?userId=user-1'));
+    assert.equal(loyalty.status, 200);
+    const loyaltyBody = await json(loyalty) as { totalEligibleSavings: number; requiresActionCount: number; offers: Array<{ productId: string; status: string; savings: number }> };
+    assert.equal(loyaltyBody.totalEligibleSavings, 26);
+    assert.equal(loyaltyBody.requiresActionCount, 1);
+    assert.deepEqual(loyaltyBody.offers.map((offer) => [offer.productId, offer.status, offer.savings]), [
+      ['coffee', 'eligible', 7],
+      ['milk', 'needs_coupon', 12],
+      ['private-label-milk', 'eligible', 7]
+    ]);
+
+    const receiptReview = await handle(new Request('http://localhost/api/receipts/review?userId=user-1'));
+    assert.equal(receiptReview.status, 200);
+    const receiptReviewBody = await json(receiptReview) as {
+      userId: string;
+      lineCount: number;
+      matchedCount: number;
+      needsReviewCount: number;
+      review: { budget: { afterReceiptSpend: number; remaining: number }; comparedWithLocalMedianDelta: number; confidenceLabel: string };
+      guardrails: string[];
+    };
+    assert.equal(receiptReviewBody.userId, 'user-1');
+    assert.equal(receiptReviewBody.lineCount, 3);
+    assert.equal(receiptReviewBody.matchedCount, 2);
+    assert.equal(receiptReviewBody.needsReviewCount, 2);
+    assert.equal(receiptReviewBody.review.budget.afterReceiptSpend, 762);
+    assert.equal(receiptReviewBody.review.budget.remaining, 38);
+    assert.equal(receiptReviewBody.review.comparedWithLocalMedianDelta, 3);
+    assert.equal(receiptReviewBody.review.confidenceLabel, 'medium-high');
+    assert.match(receiptReviewBody.guardrails[0] ?? '', /cannot update catalog or Deal Score/i);
+
     const categoryMarket = await handle(new Request('http://localhost/api/categories/coffee/market'));
     assert.equal(categoryMarket.status, 200);
     const categoryMarketBody = await json(categoryMarket) as {

@@ -4,6 +4,7 @@ from .assets import (
     data_pipeline_quality_gate,
     latest_price_rollup,
     open_prices_artifact_import_plan,
+    open_prices_hosted_smoke_plan,
     open_prices_ingestion_run_plan,
     open_prices_launch_readiness,
     normalized_products,
@@ -35,6 +36,7 @@ open_prices_import_readiness_job = define_asset_job(
     selection=AssetSelection.keys(
         "open_prices_real_pull_plan",
         "open_prices_artifact_import_plan",
+        "open_prices_hosted_smoke_plan",
         "open_prices_ingestion_run_plan",
         "open_prices_launch_readiness",
         "quality_checks",
@@ -70,6 +72,7 @@ defs = Definitions(
         price_observation_freshness,
         open_prices_real_pull_plan,
         open_prices_artifact_import_plan,
+        open_prices_hosted_smoke_plan,
         open_prices_ingestion_run_plan,
         open_prices_launch_readiness,
         price_observation_coverage,

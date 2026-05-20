@@ -568,10 +568,62 @@ export type DeploymentManifestValidationReport = {
   serviceNames: string[];
 };
 
+export type DeploymentManifestValidationSummary = {
+  status: DeploymentManifestValidationReport['status'];
+  serviceCount: number;
+  totalBlockers: number;
+  totalWarnings: number;
+  unsupportedVersion: number;
+  missingServices: number;
+  duplicateServices: number;
+  serviceMetadata: number;
+  invalidWorkspaces: number;
+  commandOrOutput: number;
+  healthChecks: number;
+  requiredEnv: number;
+  servicesWithoutRequiredEnv: number;
+};
+
 type HealthCheckShape = {
   path?: unknown;
   expectedStatus?: unknown;
 };
+
+export function summarizeDeploymentManifestValidationReport(
+  report: DeploymentManifestValidationReport
+): DeploymentManifestValidationSummary {
+  return report.blockers.reduce<DeploymentManifestValidationSummary>(
+    (summary, blocker) => {
+      summary.totalBlockers += 1;
+      if (blocker === 'manifest_version_not_supported') summary.unsupportedVersion += 1;
+      if (blocker === 'services_missing') summary.missingServices += 1;
+      if (blocker.startsWith('duplicate_service:')) summary.duplicateServices += 1;
+      if (blocker.startsWith('service_name_missing:') || blocker.startsWith('service_type_missing:')) summary.serviceMetadata += 1;
+      if (blocker.startsWith('workspace_invalid:')) summary.invalidWorkspaces += 1;
+      if (blocker.startsWith('start_command_missing:') || blocker.startsWith('build_command_missing:') || blocker.startsWith('output_directory_missing:')) {
+        summary.commandOrOutput += 1;
+      }
+      if (blocker.startsWith('health_check_')) summary.healthChecks += 1;
+      if (blocker.startsWith('required_env_invalid:')) summary.requiredEnv += 1;
+      return summary;
+    },
+    {
+      status: report.status,
+      serviceCount: report.serviceNames.length,
+      totalBlockers: 0,
+      totalWarnings: report.warnings.length,
+      unsupportedVersion: 0,
+      missingServices: 0,
+      duplicateServices: 0,
+      serviceMetadata: 0,
+      invalidWorkspaces: 0,
+      commandOrOutput: 0,
+      healthChecks: 0,
+      requiredEnv: 0,
+      servicesWithoutRequiredEnv: report.warnings.filter((warning) => warning.startsWith('no_required_env:')).length
+    }
+  );
+}
 
 export function validateDeploymentManifest(manifest: DeploymentManifest): DeploymentManifestValidationReport {
   const blockers: string[] = [];

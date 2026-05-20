@@ -158,6 +158,36 @@ class RepositorySmokeQueryExecutor implements QueryExecutor {
         }
       ] as T[];
     }
+    if (sql.includes('from receipt_uploads')) {
+      return [
+        {
+          id: 'postgres-probe-receipt-run-42',
+          user_id: 'postgres-probe-user-run-42',
+          store_id: null,
+          image_uri: 'scan://postgres-probe/run-42',
+          purchased_at: '2026-05-20T00:00:00.000Z',
+          total_amount: '12.34',
+          ocr_confidence: '0.9700',
+          status: 'parsed',
+          created_at: '2026-05-20T00:00:00.000Z',
+          updated_at: '2026-05-20T00:00:00.000Z'
+        }
+      ] as T[];
+    }
+    if (sql.includes('from receipt_items')) {
+      return [
+        {
+          id: 'postgres-probe-receipt-item-run-42',
+          receipt_id: 'postgres-probe-receipt-run-42',
+          raw_name: 'Postgres Probe Receipt Item',
+          product_id: 'postgres-probe-product-run-42',
+          canonical_name: 'Postgres Probe Product',
+          quantity: '1.000',
+          item_total: '12.34',
+          match_confidence: '0.9100'
+        }
+      ] as T[];
+    }
     return [] as T[];
   }
 }
@@ -190,6 +220,8 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_table:pantry_items',
       'missing_table:products',
       'missing_table:raw_records',
+      'missing_table:receipt_items',
+      'missing_table:receipt_uploads',
       'missing_table:source_runs',
       'missing_table:subscription_entitlements',
       'missing_table:user_preferences',
@@ -199,6 +231,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_migration:003_subscription_entitlements',
       'missing_migration:004_alert_rules',
       'missing_migration:005_pantry_inventory',
+      'missing_migration:007_receipt_uploads',
       'repository_check_fail:human_review_assignment_round_trip',
       'repository_check_not_run:notification_suppression_round_trip'
     ]);
@@ -244,6 +277,8 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'table:pantry_items',
         'table:products',
         'table:raw_records',
+        'table:receipt_items',
+        'table:receipt_uploads',
         'table:source_runs',
         'table:subscription_entitlements',
         'table:user_preferences',
@@ -254,6 +289,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'migration:003_subscription_entitlements',
         'migration:004_alert_rules',
         'migration:005_pantry_inventory',
+        'migration:007_receipt_uploads',
         'repository_check:favorite_store_round_trip',
         'repository_check:human_review_assignment_round_trip',
         'repository_check:notification_suppression_round_trip',
@@ -454,6 +490,7 @@ describe('buildPostgresRepositorySmokeProbes', () => {
       'notification_suppression_round_trip',
       'alert_rule_round_trip',
       'pantry_item_round_trip',
+      'receipt_upload_round_trip',
       'price_observation_pipeline_round_trip'
     ]);
 
@@ -467,6 +504,8 @@ describe('buildPostgresRepositorySmokeProbes', () => {
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-suppression-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-alert-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-pantry-run-42')), true);
+    assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-receipt-run-42')), true);
+    assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-receipt-item-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-chain-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-product-run-42')), true);
   });

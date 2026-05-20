@@ -57,12 +57,28 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-budget-summary-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setBillingStatusMetric = (metric, message) => {
+    const target = document.querySelector('[data-billing-status-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setMealPlansMetric = (metric, message) => {
     const target = document.querySelector('[data-meal-plans-' + metric + ']');
     if (target) target.textContent = message;
   };
   const setNutritionValueMetric = (metric, message) => {
     const target = document.querySelector('[data-nutrition-value-' + metric + ']');
+    if (target) target.textContent = message;
+  };
+  const setPantryMetric = (metric, message) => {
+    const target = document.querySelector('[data-pantry-' + metric + ']');
+    if (target) target.textContent = message;
+  };
+  const setLoyaltyOffersMetric = (metric, message) => {
+    const target = document.querySelector('[data-loyalty-offers-' + metric + ']');
+    if (target) target.textContent = message;
+  };
+  const setReceiptReviewMetric = (metric, message) => {
+    const target = document.querySelector('[data-receipt-review-' + metric + ']');
     if (target) target.textContent = message;
   };
   const setSavingsLedgerMetric = (metric, message) => {
@@ -220,6 +236,29 @@ window.GroceryViewFlowActions = (() => {
       setResult('account', 'Connected API: ' + (payload.summary || 'subscription access loaded') + ' Actions: ' + ((payload.accountActions || []).join(', ') || 'none') + '.');
     } catch (error) {
       setResult('account', 'Subscription access check failed: ' + error.message + '.');
+    }
+  };
+  const loadBillingStatusFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('billing-status', 'Local preview mode: connect the API session bridge before loading live billing status.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/account/subscription-access', config), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const actions = Array.isArray(payload.accountActions) ? payload.accountActions : [];
+      const adState = payload.hideAds ? 'Ads hidden for premium' : 'Ads eligible until premium is active';
+      const checkoutState = payload.requiresCheckout ? 'Checkout required' : 'Checkout not required';
+      setBillingStatusMetric('entitlement', (payload.summary || 'subscription access loaded') + ' · ' + checkoutState);
+      setBillingStatusMetric('ads', adState + ' · tier ' + (payload.tier || 'unknown') + ' · status ' + (payload.status || 'unknown'));
+      setBillingStatusMetric('actions', actions.length ? actions.join(', ') : 'No account actions returned');
+      setResult('billing-status', 'Connected billing status loaded: ' + (payload.summary || 'subscription access loaded') + '; ' + actions.length + ' account actions.');
+    } catch (error) {
+      setResult('billing-status', 'Billing status API load failed: ' + error.message + '. Static billing status remains visible.');
     }
   };
   const loadPrivacyExportFromApi = async () => {
@@ -829,6 +868,87 @@ window.GroceryViewFlowActions = (() => {
       setResult('nutrition-value', 'Nutrition value API load failed: ' + error.message + '. Static nutrition review remains visible.');
     }
   };
+  const loadPantryFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('pantry', 'Local preview mode: connect the API session bridge before loading live pantry replenishment.');
+      return;
+    }
+    try {
+      const asOf = new Date().toISOString();
+      const response = await fetch(apiUrl('/api/pantry/replenishment?asOf=' + encodeURIComponent(asOf), config), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const statuses = Array.isArray(payload.statuses) ? payload.statuses : [];
+      const replenishment = Array.isArray(payload.replenishment) ? payload.replenishment : [];
+      const expiringSoon = Array.isArray(payload.expiringSoonProductIds) ? payload.expiringSoonProductIds : [];
+      const lowOrExpired = statuses.filter((item) => item.status === 'low_stock' || item.status === 'expired');
+      const duplicateBlocks = replenishment.filter((item) => item.alreadyInBasket);
+      const dealBacked = replenishment.filter((item) => item.bestDeal);
+      const firstRestock = replenishment[0] || {};
+      setPantryMetric('summary', statuses.length + ' pantry rows · ' + lowOrExpired.length + ' low/expired · ' + expiringSoon.length + ' expiring soon');
+      setPantryMetric('restock', replenishment.length ? (firstRestock.name || firstRestock.productId || 'Restock') + ' x' + Number(firstRestock.quantityToBuy || 0) + ' ' + (firstRestock.unit || '') + ' · ' + (firstRestock.priority || 'unknown') + ' priority' : 'No live restock rows returned');
+      setPantryMetric('expiry', expiringSoon.length ? expiringSoon.join(', ') + ' expiring soon · ' + duplicateBlocks.length + ' already in basket · ' + dealBacked.length + ' deal-backed restocks' : 'No expiring rows · ' + duplicateBlocks.length + ' already in basket · ' + dealBacked.length + ' deal-backed restocks');
+      setResult('pantry', 'Connected pantry replenishment loaded: ' + statuses.length + ' inventory rows, ' + replenishment.length + ' restock actions, ' + expiringSoon.length + ' expiring soon.');
+    } catch (error) {
+      setResult('pantry', 'Pantry API load failed: ' + error.message + '. Static pantry inventory remains visible.');
+    }
+  };
+  const loadLoyaltyOffersFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('loyalty-offers', 'Local preview mode: connect the API session bridge before loading live loyalty offers.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/loyalty/offers', config), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const offers = Array.isArray(payload.offers) ? payload.offers : [];
+      const actionOffers = offers.filter((offer) => offer.actionRequired);
+      const eligibleOffers = offers.filter((offer) => offer.status === 'eligible');
+      const topOffer = offers[0] || {};
+      setLoyaltyOffersMetric('savings', formatSek(payload.totalEligibleSavings || 0) + ' eligible savings · ' + eligibleOffers.length + '/' + offers.length + ' offers ready');
+      setLoyaltyOffersMetric('actions', actionOffers.length + ' action-required offers · top ' + (topOffer.productName || topOffer.productId || 'n/a') + ' saves ' + formatSek(topOffer.savings || 0));
+      setLoyaltyOffersMetric('guardrails', Number(payload.membershipRequiredCount || 0) + ' membership confirmations · ' + (Array.isArray(payload.guardrails) ? payload.guardrails.length : 0) + ' loyalty guardrails');
+      setResult('loyalty-offers', 'Connected loyalty offers loaded: ' + offers.length + ' offers, ' + formatSek(payload.totalEligibleSavings || 0) + ' eligible savings, ' + actionOffers.length + ' actions required.');
+    } catch (error) {
+      setResult('loyalty-offers', 'Loyalty offers API load failed: ' + error.message + '. Static loyalty offer queue remains visible.');
+    }
+  };
+  const loadReceiptReviewFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('receipt-review', 'Local preview mode: connect the API session bridge before loading live receipt review.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/receipts/review', config), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const review = payload.review || {};
+      const budget = review.budget || {};
+      const items = Array.isArray(review.matchedItems) ? review.matchedItems : [];
+      const goodBuys = Array.isArray(review.goodBuys) ? review.goodBuys : [];
+      const overspend = Array.isArray(review.overspend) ? review.overspend : [];
+      const guardrails = Array.isArray(payload.guardrails) ? payload.guardrails : [];
+      const lineCount = Number(payload.lineCount || items.length);
+      const matchedCount = Number(payload.matchedCount || items.filter((item) => item.productId).length);
+      const needsReviewCount = Number(payload.needsReviewCount || items.filter((item) => !item.productId || Number(item.matchConfidence || 0) < 0.8).length);
+      setReceiptReviewMetric('budget', 'After receipt ' + formatSek(budget.afterReceiptSpend) + ' · remaining ' + formatSek(budget.remaining) + ' · ' + (budget.status || 'unknown'));
+      setReceiptReviewMetric('lines', matchedCount + '/' + lineCount + ' matched · ' + needsReviewCount + ' needs review · confidence ' + (review.confidenceLabel || 'unknown'));
+      setReceiptReviewMetric('guardrails', goodBuys.length + ' good buys · ' + overspend.length + ' overspend rows · ' + guardrails.length + ' guardrails');
+      setResult('receipt-review', 'Connected receipt review loaded: ' + matchedCount + '/' + lineCount + ' lines matched, budget remaining ' + formatSek(budget.remaining) + ', local median delta ' + formatSek(review.comparedWithLocalMedianDelta) + '.');
+    } catch (error) {
+      setResult('receipt-review', 'Receipt review API load failed: ' + error.message + '. Static receipt review remains visible.');
+    }
+  };
   const loadSavingsLedgerFromApi = async () => {
     const config = getApiConfig();
     if (!hasApiSession(config)) {
@@ -1094,12 +1214,28 @@ window.GroceryViewFlowActions = (() => {
         await loadBudgetSummaryFromApi();
         return;
       }
+      if (flow === 'billing-status' && action === 'load-billing-status') {
+        await loadBillingStatusFromApi();
+        return;
+      }
       if (flow === 'meal-plans' && action === 'load-meal-plans') {
         await loadMealPlansFromApi();
         return;
       }
       if (flow === 'nutrition-value' && action === 'load-nutrition-value') {
         await loadNutritionValueFromApi();
+        return;
+      }
+      if (flow === 'pantry' && action === 'load-pantry') {
+        await loadPantryFromApi();
+        return;
+      }
+      if (flow === 'loyalty-offers' && action === 'load-loyalty-offers') {
+        await loadLoyaltyOffersFromApi();
+        return;
+      }
+      if (flow === 'receipt-review' && action === 'load-receipt-review') {
+        await loadReceiptReviewFromApi();
         return;
       }
       if (flow === 'savings-ledger' && action === 'load-savings-ledger') {
@@ -1265,11 +1401,23 @@ const dailyDealsLivePanel = `
 const budgetSummaryLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="budget-summary" style="margin-top:16px"><div class="eyebrow">Connected budget API</div><h2>Pull live household budget summary</h2><p class="lede">Fetch <code>/api/budget/summary</code> through the protected API session bridge to refresh weekly budget, month-to-date spend, next-basket estimate, remaining buffers, and over/under status from account data.</p><div class="grid" aria-label="Live budget summary API metrics"><div class="metric"><strong data-budget-summary-weekly>Waiting for API pull</strong><span>weekly budget status</span></div><div class="metric"><strong data-budget-summary-monthly>Static monthly preview</strong><span>monthly budget status</span></div><div class="metric"><strong data-budget-summary-estimate>Static basket estimate preview</strong><span>next basket buffer</span></div></div><div class="flow-panel" aria-label="Connected budget summary actions"><button type="button" data-flow-action="load-budget-summary">Load live budget summary</button></div><p class="flow-result" data-flow-result="budget-summary" aria-live="polite">Local preview mode: connect the API session bridge before loading live budget summary.</p></section>`;
 
+const billingStatusLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="billing-status" style="margin-top:16px"><div class="eyebrow">Connected billing API</div><h2>Pull live billing status</h2><p class="lede">Fetch <code>/api/account/subscription-access</code> through the protected API session bridge to refresh entitlement status, checkout requirement, ad-removal state, and account actions before premium UI or billing prompts are shown.</p><div class="grid" aria-label="Live billing status API metrics"><div class="metric"><strong data-billing-status-entitlement>Waiting for API pull</strong><span>entitlement and checkout state</span></div><div class="metric"><strong data-billing-status-ads>Static ad-removal preview</strong><span>ad removal and plan status</span></div><div class="metric"><strong data-billing-status-actions>Static account action preview</strong><span>billing actions</span></div></div><div class="flow-panel" aria-label="Connected billing status actions"><button type="button" data-flow-action="load-billing-status">Load live billing status</button></div><p class="flow-result" data-flow-result="billing-status" aria-live="polite">Local preview mode: connect the API session bridge before loading live billing status.</p></section>`;
+
 const mealPlansLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="meal-plans" style="margin-top:16px"><div class="eyebrow">Connected meal plan API</div><h2>Pull live meal plan budget</h2><p class="lede">Fetch protected <code>/api/budget/summary</code> and <code>/api/basket/compare</code> plus public <code>/api/market/overview</code> to refresh weekly meal budget buffer, verified ingredient coverage, split-store savings, missing-product blockers, and meal-relevant deal signals from live API data.</p><div class="grid" aria-label="Live meal plan API metrics"><div class="metric"><strong data-meal-plans-budget>Waiting for API pull</strong><span>weekly budget buffer and next basket</span></div><div class="metric"><strong data-meal-plans-basket>Static ingredient coverage preview</strong><span>verified ingredient lines and blockers</span></div><div class="metric"><strong data-meal-plans-deals>Static meal deal preview</strong><span>meal-relevant deal signals</span></div></div><div class="flow-panel" aria-label="Connected meal plan actions"><button type="button" data-flow-action="load-meal-plans">Load live meal plan budget</button></div><p class="flow-result" data-flow-result="meal-plans" aria-live="polite">Local preview mode: connect the API session bridge and save a basket before loading live meal plan budget.</p></section>`;
 
 const nutritionValueLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="nutrition-value" style="margin-top:16px"><div class="eyebrow">Connected nutrition value API</div><h2>Pull live nutrition value</h2><p class="lede">Fetch <code>/api/nutrition/value?metric=protein</code> to compare protein per 10 SEK, sugar exposure, salt warnings, and guardrails before a cheap item is treated as a healthy grocery swap or meal-plan ingredient.</p><div class="grid" aria-label="Live nutrition value API metrics"><div class="metric"><strong data-nutrition-value-leader>Waiting for API pull</strong><span>best protein value per 10 SEK</span></div><div class="metric"><strong data-nutrition-value-ranking>Static nutrition ranking preview</strong><span>top value rows</span></div><div class="metric"><strong data-nutrition-value-warnings>Static warning preview</strong><span>sugar, salt, and allergen guardrails</span></div></div><div class="flow-panel" aria-label="Connected nutrition value actions"><button type="button" data-flow-action="load-nutrition-value">Load live nutrition value</button></div><p class="flow-result" data-flow-result="nutrition-value" aria-live="polite">Local preview mode: add an API base URL before loading live nutrition value rankings.</p></section>`;
+
+const pantryLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="pantry" style="margin-top:16px"><div class="eyebrow">Connected pantry API</div><h2>Pull live pantry replenishment</h2><p class="lede">Fetch <code>/api/pantry/replenishment</code> through the protected API session bridge to refresh live low-stock status, expiring-soon rows, restock quantities, duplicate basket blockers, and best-deal context before pantry suggestions modify a basket or meal plan.</p><div class="grid" aria-label="Live pantry replenishment API metrics"><div class="metric"><strong data-pantry-summary>Waiting for API pull</strong><span>inventory status mix</span></div><div class="metric"><strong data-pantry-restock>Static restock preview</strong><span>top restock action</span></div><div class="metric"><strong data-pantry-expiry>Static expiry preview</strong><span>expiry, duplicate, and deal context</span></div></div><div class="flow-panel" aria-label="Connected pantry actions"><button type="button" data-flow-action="load-pantry">Load live pantry replenishment</button></div><p class="flow-result" data-flow-result="pantry" aria-live="polite">Local preview mode: connect the API session bridge before loading live pantry replenishment.</p></section>`;
+
+const loyaltyOffersLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="loyalty-offers" style="margin-top:16px"><div class="eyebrow">Connected loyalty API</div><h2>Pull live loyalty offers</h2><p class="lede">Fetch <code>/api/loyalty/offers</code> through the protected API session bridge to refresh eligible member savings, coupon action counts, membership confirmations, and shelf-price separation guardrails before loyalty offers affect household savings.</p><div class="grid" aria-label="Live loyalty offer API metrics"><div class="metric"><strong data-loyalty-offers-savings>Waiting for API pull</strong><span>eligible savings and ready offers</span></div><div class="metric"><strong data-loyalty-offers-actions>Static action preview</strong><span>coupon and top-offer actions</span></div><div class="metric"><strong data-loyalty-offers-guardrails>Static guardrail preview</strong><span>membership and shelf-price guardrails</span></div></div><div class="flow-panel" aria-label="Connected loyalty offer actions"><button type="button" data-flow-action="load-loyalty-offers">Load live loyalty offers</button></div><p class="flow-result" data-flow-result="loyalty-offers" aria-live="polite">Local preview mode: connect the API session bridge before loading live loyalty offers.</p></section>`;
+
+const receiptReviewLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="receipt-review" style="margin-top:16px"><div class="eyebrow">Connected receipt review API</div><h2>Pull live receipt review</h2><p class="lede">Fetch <code>/api/receipts/review</code> through the protected API session bridge to refresh actual receipt spend, local median delta, confidence routing, and writeback guardrails before receipt rows update household actuals or price history.</p><div class="grid" aria-label="Live receipt review API metrics"><div class="metric"><strong data-receipt-review-budget>Waiting for API pull</strong><span>actual spend and budget buffer</span></div><div class="metric"><strong data-receipt-review-lines>Static line-review preview</strong><span>matched lines and review queue</span></div><div class="metric"><strong data-receipt-review-guardrails>Static writeback preview</strong><span>good buys, overspend, and guardrails</span></div></div><div class="flow-panel" aria-label="Connected receipt review actions"><button type="button" data-flow-action="load-receipt-review">Load live receipt review</button></div><p class="flow-result" data-flow-result="receipt-review" aria-live="polite">Local preview mode: connect the API session bridge before loading live receipt review.</p></section>`;
 
 const savingsLedgerLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="savings-ledger" style="margin-top:16px"><div class="eyebrow">Connected savings ledger API</div><h2>Pull live savings ledger</h2><p class="lede">Fetch protected <code>/api/budget/summary</code> and <code>/api/basket/compare</code> to reconcile budget remaining, next-basket estimate, split-basket forecast savings, verified assignment lines, and missing-product blockers before savings are treated as realized.</p><div class="grid" aria-label="Live savings ledger API metrics"><div class="metric"><strong data-savings-ledger-confirmed>Waiting for API pull</strong><span>budget actuals</span></div><div class="metric"><strong data-savings-ledger-forecast>Static forecast preview</strong><span>forecast savings and next basket</span></div><div class="metric"><strong data-savings-ledger-blockers>Static blocker preview</strong><span>assignment evidence and blockers</span></div></div><div class="flow-panel" aria-label="Connected savings ledger actions"><button type="button" data-flow-action="load-savings-ledger">Load live savings ledger</button></div><p class="flow-result" data-flow-result="savings-ledger" aria-live="polite">Local preview mode: connect the API session bridge and save a basket before loading live savings ledger.</p></section>`;
@@ -1312,13 +1460,13 @@ const pages = [
     path: 'billing/status/index.html',
     title: 'Billing status — GroceryView',
     description: 'Review GroceryView subscription entitlement, checkout requirement, ad removal state, billing issue actions, and provider webhook status.',
-    body: `<section class="card"><div class="eyebrow">Billing</div><h1>Billing status</h1><p class="lede">Audit subscription entitlement, checkout enforcement, ad removal, and provider webhook state before premium features are shown.</p><div class="grid"><div class="metric"><strong>Premium</strong><span>active entitlement</span></div><div class="metric"><strong>Ads off</strong><span>non-critical slots removed</span></div><div class="metric"><strong>0</strong><span>billing blockers</span></div></div></section><section class="card" style="margin-top:16px"><h2>Entitlement state</h2><table class="table"><thead><tr><th>Account</th><th>Plan</th><th>Status</th><th>Checkout</th><th>Action</th></tr></thead><tbody><tr><td>Household workspace</td><td>premium_monthly</td><td>Active</td><td>Not required</td><td>Show manage subscription</td></tr><tr><td>Solo price watch</td><td>free</td><td>No entitlement</td><td>Required</td><td>Show upgrade</td></tr><tr><td>Reviewer desk</td><td>premium_yearly</td><td>Past due</td><td>Required</td><td>Show billing issue</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Billing guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Fail closed</td><td>Missing or past-due entitlements keep checkout required.</td></tr><tr><td>Ads removed only for premium</td><td>Free and past-due accounts keep non-critical ad slots eligible.</td></tr><tr><td>Webhook freshness</td><td>Provider updates must be newer than stored entitlement state.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Billing</div><h1>Billing status</h1><p class="lede">Audit subscription entitlement, checkout enforcement, ad removal, and provider webhook state before premium features are shown.</p><div class="grid"><div class="metric"><strong>Premium</strong><span>active entitlement</span></div><div class="metric"><strong>Ads off</strong><span>non-critical slots removed</span></div><div class="metric"><strong>0</strong><span>billing blockers</span></div></div></section><section class="card" style="margin-top:16px"><h2>Entitlement state</h2><table class="table"><thead><tr><th>Account</th><th>Plan</th><th>Status</th><th>Checkout</th><th>Action</th></tr></thead><tbody><tr><td>Household workspace</td><td>premium_monthly</td><td>Active</td><td>Not required</td><td>Show manage subscription</td></tr><tr><td>Solo price watch</td><td>free</td><td>No entitlement</td><td>Required</td><td>Show upgrade</td></tr><tr><td>Reviewer desk</td><td>premium_yearly</td><td>Past due</td><td>Required</td><td>Show billing issue</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Billing guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Fail closed</td><td>Missing or past-due entitlements keep checkout required.</td></tr><tr><td>Ads removed only for premium</td><td>Free and past-due accounts keep non-critical ad slots eligible.</td></tr><tr><td>Webhook freshness</td><td>Provider updates must be newer than stored entitlement state.</td></tr></tbody></table></section>${billingStatusLivePanel}`
   },
   {
     path: 'loyalty/offers/index.html',
     title: 'Loyalty offer tracker — GroceryView',
     description: 'Track GroceryView member-only offers, coupon eligibility, membership requirements, basket impact, and loyalty-price guardrails.',
-    body: `<section class="card"><div class="eyebrow">Loyalty</div><h1>Loyalty offer tracker</h1><p class="lede">Review member-only prices, coupon eligibility, and basket impact before loyalty offers affect household savings decisions.</p><div class="grid"><div class="metric"><strong>3</strong><span>active member offers</span></div><div class="metric"><strong>38 SEK</strong><span>eligible savings</span></div><div class="metric"><strong>1</strong><span>needs membership confirmation</span></div></div></section><section class="card" style="margin-top:16px"><h2>Member offer queue</h2><table class="table"><thead><tr><th>Offer</th><th>Chain</th><th>Requirement</th><th>Savings</th><th>Status</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g Stammis price</td><td>ICA</td><td>ICA Stammis linked</td><td>7 SEK</td><td>Eligible</td></tr><tr><td>Coop Medmera dairy coupon</td><td>Coop</td><td>Clip coupon before checkout</td><td>12 SEK</td><td>Needs action</td></tr><tr><td>Willys Plus pantry bundle</td><td>Willys</td><td>Member account verified</td><td>19 SEK</td><td>Ready for basket</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Loyalty guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Separate public shelf price</td><td>Member-only savings never overwrite verified public shelf evidence.</td></tr><tr><td>Confirm membership</td><td>Unlinked programs stay out of basket savings until the household confirms access.</td></tr><tr><td>Coupon action required</td><td>Clip-required offers show an action before checkout routing.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Loyalty</div><h1>Loyalty offer tracker</h1><p class="lede">Review member-only prices, coupon eligibility, and basket impact before loyalty offers affect household savings decisions.</p><div class="grid"><div class="metric"><strong>3</strong><span>active member offers</span></div><div class="metric"><strong>38 SEK</strong><span>eligible savings</span></div><div class="metric"><strong>1</strong><span>needs membership confirmation</span></div></div></section><section class="card" style="margin-top:16px"><h2>Member offer queue</h2><table class="table"><thead><tr><th>Offer</th><th>Chain</th><th>Requirement</th><th>Savings</th><th>Status</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g Stammis price</td><td>ICA</td><td>ICA Stammis linked</td><td>7 SEK</td><td>Eligible</td></tr><tr><td>Coop Medmera dairy coupon</td><td>Coop</td><td>Clip coupon before checkout</td><td>12 SEK</td><td>Needs action</td></tr><tr><td>Willys Plus pantry bundle</td><td>Willys</td><td>Member account verified</td><td>19 SEK</td><td>Ready for basket</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Loyalty guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Separate public shelf price</td><td>Member-only savings never overwrite verified public shelf evidence.</td></tr><tr><td>Confirm membership</td><td>Unlinked programs stay out of basket savings until the household confirms access.</td></tr><tr><td>Coupon action required</td><td>Clip-required offers show an action before checkout routing.</td></tr></tbody></table></section>${loyaltyOffersLivePanel}`
   },
   {
     path: 'meal-plans/index.html',
@@ -1330,7 +1478,7 @@ const pages = [
     path: 'pantry/index.html',
     title: 'Pantry inventory — GroceryView',
     description: 'Track GroceryView pantry stock, expiry risk, reorder thresholds, substitution candidates, and budget-safe replenishment actions.',
-    body: `<section class="card"><div class="eyebrow">Pantry</div><h1>Pantry inventory</h1><p class="lede">Track household staples already on hand before GroceryView recommends basket additions, swaps, or meal-plan ingredients.</p><div class="grid"><div class="metric"><strong>18</strong><span>tracked pantry items</span></div><div class="metric"><strong>4</strong><span>low-stock staples</span></div><div class="metric"><strong>2</strong><span>expiry risks</span></div></div></section><section class="card" style="margin-top:16px"><h2>Inventory signals</h2><table class="table"><thead><tr><th>Item</th><th>On hand</th><th>Reorder rule</th><th>Basket action</th><th>Status</th></tr></thead><tbody><tr><td>Rice 1kg</td><td>0.3 kg</td><td>Reorder below 0.5 kg</td><td>Add Lidl private-label rice</td><td>Low stock</td></tr><tr><td>Eggs</td><td>4 left</td><td>Needed for meal plan</td><td>Add verified 12-pack deal</td><td>Reorder</td></tr><tr><td>Tomatoes</td><td>2 days fresh</td><td>Use before expiry</td><td>Hold new produce line</td><td>Use first</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Pantry guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Use-on-hand first</td><td>Meal plans consume expiring pantry items before adding duplicate basket lines.</td></tr><tr><td>Verified reorder cost</td><td>Only verified shelf or fresh retailer-page prices can update replenishment budgets.</td></tr><tr><td>Allergen lock</td><td>Substitutions cannot bypass household dietary restrictions.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Pantry</div><h1>Pantry inventory</h1><p class="lede">Track household staples already on hand before GroceryView recommends basket additions, swaps, or meal-plan ingredients.</p><div class="grid"><div class="metric"><strong>18</strong><span>tracked pantry items</span></div><div class="metric"><strong>4</strong><span>low-stock staples</span></div><div class="metric"><strong>2</strong><span>expiry risks</span></div></div></section><section class="card" style="margin-top:16px"><h2>Inventory signals</h2><table class="table"><thead><tr><th>Item</th><th>On hand</th><th>Reorder rule</th><th>Basket action</th><th>Status</th></tr></thead><tbody><tr><td>Rice 1kg</td><td>0.3 kg</td><td>Reorder below 0.5 kg</td><td>Add Lidl private-label rice</td><td>Low stock</td></tr><tr><td>Eggs</td><td>4 left</td><td>Needed for meal plan</td><td>Add verified 12-pack deal</td><td>Reorder</td></tr><tr><td>Tomatoes</td><td>2 days fresh</td><td>Use before expiry</td><td>Hold new produce line</td><td>Use first</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Pantry guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Use-on-hand first</td><td>Meal plans consume expiring pantry items before adding duplicate basket lines.</td></tr><tr><td>Verified reorder cost</td><td>Only verified shelf or fresh retailer-page prices can update replenishment budgets.</td></tr><tr><td>Allergen lock</td><td>Substitutions cannot bypass household dietary restrictions.</td></tr></tbody></table></section>${pantryLivePanel}`
   },
   {
     path: 'watchlist/index.html',
@@ -1384,7 +1532,7 @@ const pages = [
     path: 'receipts/review/index.html',
     title: 'Receipt review desk — GroceryView',
     description: 'Review GroceryView receipt line items by confidence, product match, loyalty discount, budget writeback, and catalog update eligibility.',
-    body: `<section class="card"><div class="eyebrow">Receipt review</div><h1>Receipt review desk</h1><p class="lede">Confirm line-item matches, loyalty discounts, and budget writebacks before receipt data updates household spend or catalog prices.</p><div class="grid"><div class="metric"><strong>3</strong><span>receipt lines</span></div><div class="metric"><strong>1</strong><span>needs moderator</span></div><div class="metric"><strong>501 SEK</strong><span>weekly actuals impact</span></div></div></section><section class="card" style="margin-top:16px"><h2>Line-item decisions</h2><table class="table"><thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget action</th><th>Catalog action</th></tr></thead><tbody><tr><td>Arla Milk 1L</td><td>ARLA-MILK-1L</td><td>98%</td><td>Post to weekly actuals</td><td>Update verified price</td></tr><tr><td>Coop loyalty discount</td><td>receipt discount</td><td>84%</td><td>Apply receipt total only</td><td>No product price update</td></tr><tr><td>Loose tomatoes</td><td>unknown produce</td><td>54%</td><td>Hold from forecast</td><td>Route to human review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Writeback guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Decision</th></tr></thead><tbody><tr><td>Low confidence below 80%</td><td>Cannot update catalog or Deal Score.</td></tr><tr><td>Loyalty discount line</td><td>Impacts receipt total without changing shelf price.</td></tr><tr><td>Verified product match</td><td>Can update household spend and product price history.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Receipt review</div><h1>Receipt review desk</h1><p class="lede">Confirm line-item matches, loyalty discounts, and budget writebacks before receipt data updates household spend or catalog prices.</p><div class="grid"><div class="metric"><strong>3</strong><span>receipt lines</span></div><div class="metric"><strong>1</strong><span>needs moderator</span></div><div class="metric"><strong>501 SEK</strong><span>weekly actuals impact</span></div></div></section><section class="card" style="margin-top:16px"><h2>Line-item decisions</h2><table class="table"><thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget action</th><th>Catalog action</th></tr></thead><tbody><tr><td>Arla Milk 1L</td><td>ARLA-MILK-1L</td><td>98%</td><td>Post to weekly actuals</td><td>Update verified price</td></tr><tr><td>Coop loyalty discount</td><td>receipt discount</td><td>84%</td><td>Apply receipt total only</td><td>No product price update</td></tr><tr><td>Loose tomatoes</td><td>unknown produce</td><td>54%</td><td>Hold from forecast</td><td>Route to human review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Writeback guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Decision</th></tr></thead><tbody><tr><td>Low confidence below 80%</td><td>Cannot update catalog or Deal Score.</td></tr><tr><td>Loyalty discount line</td><td>Impacts receipt total without changing shelf price.</td></tr><tr><td>Verified product match</td><td>Can update household spend and product price history.</td></tr></tbody></table></section>${receiptReviewLivePanel}`
   },
   {
     path: 'admin/human-review/index.html',
