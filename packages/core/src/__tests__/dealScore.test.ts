@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { calculateDealScore, calculateHistoricalDealScore, rankDealOpportunities, scoreBand } from '../index.js';
+import { calculateDealScore, calculateDealScoreV1, scoreBand } from '../index.js';
 
 describe('calculateDealScore', () => {
   it('uses the MVP weighted formula and never accepts sponsored boosts', () => {
@@ -28,6 +28,28 @@ describe('calculateDealScore', () => {
 
     assert.equal(score, 22);
     assert.deepEqual(scoreBand(score), { label: 'Not a real deal', verdict: 'Wait' });
+  });
+
+  it('returns Deal Score v1 fields and excludes distance from the default score', () => {
+    const baseInput = {
+      currentCityPercentile: 8,
+      knownPromoHistoryPercentile: 12,
+      equivalentUnitPricePercentile: 18,
+      discountDepthPercent: 25,
+      sourceConfidence: 0.9
+    };
+
+    const near = calculateDealScoreV1({ ...baseInput, distanceKm: 0.2 });
+    const far = calculateDealScoreV1({ ...baseInput, distanceKm: 18 });
+
+    assert.equal(near.score, 82);
+    assert.equal(far.score, near.score);
+    assert.equal(near.band, 'Good deal');
+    assert.equal(near.verdict, 'Buy');
+    assert.equal(near.discountVsMedianPercent, 25);
+    assert.equal(near.historicalPercentile, 12);
+    assert.equal(near.confidence, 0.9);
+    assert.ok(near.reasons.length >= 5);
   });
 });
 

@@ -84,6 +84,21 @@ describe('createGroceryViewApi', () => {
         bestPrice: 13.9,
         bestStoreId: 'lidl-sveavagen',
         dealScore: 73,
+        dealScoreV1: {
+          score: 73,
+          band: 'Fair deal',
+          verdict: 'Compare',
+          discountVsMedianPercent: 8,
+          historicalPercentile: 12,
+          confidence: 0.86,
+          reasons: [
+            '82% stronger than current city prices',
+            '88% stronger than known promotion history',
+            '65% stronger than equivalent unit prices',
+            '8% below median comparable price',
+            '86% source confidence'
+          ]
+        },
         band: { label: 'Fair deal', verdict: 'Compare' }
       }
     );
@@ -91,12 +106,24 @@ describe('createGroceryViewApi', () => {
     const search = api.searchProducts('coffee');
     assert.equal(search[0].ticker, 'ZOEGAS-COFFEE-450G');
 
-    const detail = api.getProduct('milk');
-    assert.deepEqual(
-      detail?.currentPrices.map((price) => price.storeId),
-      ['lidl-sveavagen', 'willys-odenplan']
-    );
-    assert.equal(detail?.dealScore, 73);
+    const detail = api.getProduct('coffee');
+    assert.equal(detail?.currentPrices[0].storeName, 'Willys Odenplan');
+    assert.equal(detail?.dealScore, 82);
+    assert.deepEqual(detail?.dealScoreV1, {
+      score: 82,
+      band: 'Good deal',
+      verdict: 'Buy',
+      discountVsMedianPercent: 25,
+      historicalPercentile: 12,
+      confidence: 0.9,
+      reasons: [
+        '92% stronger than current city prices',
+        '88% stronger than known promotion history',
+        '82% stronger than equivalent unit prices',
+        '25% below median comparable price',
+        '90% source confidence'
+      ]
+    });
   });
 
   it('returns cheapest product prices first and uses the cheapest quote for watchlist alerts', () => {
