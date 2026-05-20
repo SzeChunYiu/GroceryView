@@ -166,6 +166,7 @@ describe('local infrastructure compose', () => {
     assert.match(importOpenPricesArtifactScript, /createPgQueryExecutor/);
     assert.match(importOpenPricesArtifactScript, /new Pool/);
     assert.match(importOpenPricesArtifactScript, /Open Prices artifact import requires OPEN_PRICES_INPUT_PATH/);
+    assert.match(importOpenPricesArtifactScript, /OPEN_PRICES_INPUT_PATH to point to a readable artifact file/);
     assert.match(importOpenPricesArtifactScript, /Open Prices artifact import requires DATABASE_URL/);
   });
 
