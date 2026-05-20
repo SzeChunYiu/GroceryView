@@ -295,6 +295,7 @@ class DataPipelineQualityGateDigest:
     coverage_blockers: int
     duplicate_blockers: int
     volume_blockers: int
+    ingestion_blockers: int
     demo: bool = True
 
     def to_dict(self) -> dict[str, object]:
