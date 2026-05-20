@@ -108,6 +108,7 @@ describe('local infrastructure compose', () => {
     assert.match(infraReadme, /GROCERYVIEW_SERVER_URL/);
     assert.match(infraReadme, /GROCERYVIEW_WEB_URL/);
     assert.match(infraReadme, /GROCERYVIEW_TERMINAL_PRODUCT_ID/);
+    assert.match(infraReadme, /HOSTED_HTTP_SMOKE_OUTPUT_PATH/);
     assert.match(infraReadme, /METRICS_TOKEN/);
     assert.match(infraReadme, /\/api\/health/);
     assert.match(infraReadme, /\/api\/products\/\$\{GROCERYVIEW_TERMINAL_PRODUCT_ID:-coffee\}\/terminal/);
@@ -184,6 +185,7 @@ describe('local infrastructure compose', () => {
     assert.match(hostedHttpSmokeScript, /GROCERYVIEW_WEB_URL/);
     assert.match(hostedHttpSmokeScript, /GROCERYVIEW_TERMINAL_PRODUCT_ID/);
     assert.match(hostedHttpSmokeScript, /HTTP_SMOKE_TIMEOUT_SECONDS/);
+    assert.match(hostedHttpSmokeScript, /HOSTED_HTTP_SMOKE_OUTPUT_PATH/);
     assert.match(hostedHttpSmokeScript, /\/api\/health/);
     assert.match(hostedHttpSmokeScript, /\/api\/products\/\$\{GROCERYVIEW_TERMINAL_PRODUCT_ID\}\/terminal/);
     assert.match(hostedHttpSmokeScript, /curl -fsS/);
@@ -194,5 +196,8 @@ describe('local infrastructure compose', () => {
     assert.match(hostedHttpSmokeScript, /"distributions"\[\[:space:\]\]\*:/);
     assert.match(hostedHttpSmokeScript, /"chart"\[\[:space:\]\]\*:/);
     assert.match(hostedHttpSmokeScript, /Hosted product terminal smoke passed/);
+    assert.match(hostedHttpSmokeScript, /apiHealthUrl/);
+    assert.match(hostedHttpSmokeScript, /productTerminalUrl/);
+    assert.match(hostedHttpSmokeScript, /Hosted HTTP smoke evidence written/);
   });
 });
