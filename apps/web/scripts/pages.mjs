@@ -826,6 +826,39 @@ window.GroceryViewFlowActions = (() => {
       setResult('notification-inbox', 'Notification inbox API load failed: ' + error.message + '. Static notification inbox remains visible.');
     }
   };
+  const notificationMetricValue = (metricsText, status) => {
+    const match = metricsText.match(new RegExp('groceryview_notification_worker_events_total\\\\{[^}]*status="' + status + '"[^}]*\\\\}\\\\s+([0-9.]+)'));
+    return match ? Number(match[1]) : 0;
+  };
+  const loadNotificationMetricsFromApi = async (button) => {
+    const config = getApiConfig();
+    const panel = button.closest('[data-groceryview-flow="notification-inbox"]');
+    const metricsToken = String(panel?.querySelector('[name="metricsToken"]')?.value || '').trim();
+    if (!config.apiBase) {
+      setResult('notification-inbox', 'Local preview mode: add an API base before loading notification operations metrics.');
+      return;
+    }
+    if (!metricsToken) {
+      setResult('notification-inbox', 'Metrics token required before loading notification operations metrics.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/metrics/notifications', config, false), {
+        method: 'GET',
+        headers: { 'x-groceryview-metrics-token': metricsToken }
+      });
+      const metricsText = await response.text();
+      if (!response.ok) throw new Error(metricsText || 'HTTP ' + response.status);
+      const delivered = notificationMetricValue(metricsText, 'delivered');
+      const failed = notificationMetricValue(metricsText, 'failed');
+      const deadLetter = notificationMetricValue(metricsText, 'dead_letter');
+      const suppressed = notificationMetricValue(metricsText, 'suppressed');
+      setNotificationInboxMetric('ops', delivered + ' delivered · ' + failed + ' failed · ' + deadLetter + ' dead-lettered · ' + suppressed + ' suppressed');
+      setResult('notification-inbox', 'Connected notification metrics loaded: ' + delivered + ' delivered, ' + failed + ' failed, ' + deadLetter + ' dead-lettered, ' + suppressed + ' suppressed.');
+    } catch (error) {
+      setResult('notification-inbox', 'Notification metrics load failed: ' + error.message + '. Static notification inbox remains visible.');
+    }
+  };
   const loadDailyDealsFromApi = async () => {
     const config = getApiConfig();
     if (!config.apiBase) {
@@ -1307,6 +1340,10 @@ window.GroceryViewFlowActions = (() => {
         await loadCategoryMarketFromApi(button);
         return;
       }
+      if (flow === 'notification-inbox' && action === 'load-notification-metrics') {
+        await loadNotificationMetricsFromApi(button);
+        return;
+      }
       if (flow === 'market-indices' && action === 'load-market-indices') {
         await loadMarketIndicesFromApi();
         return;
@@ -1525,7 +1562,7 @@ const watchlistLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="watchlist" style="margin-top:16px"><div class="eyebrow">Connected watchlist API</div><h2>Pull live target and alert numbers</h2><p class="lede">Fetch <code>/api/watchlist</code> through the protected API session bridge to refresh tracked-item counts, target-price rules, active trigger values, favorite-store scope, and 52-week-low alert evidence from account data.</p><div class="grid" aria-label="Live watchlist API metrics"><div class="metric"><strong data-watchlist-summary>Waiting for API pull</strong><span>tracked items and alerts</span></div><div class="metric"><strong data-watchlist-target>Static target preview</strong><span>target price rules</span></div><div class="metric"><strong data-watchlist-trigger>Static trigger preview</strong><span>current trigger value</span></div><div class="metric"><strong data-watchlist-scope>Static scope preview</strong><span>favorite-store and 52W scope</span></div></div><div class="flow-panel" aria-label="Connected watchlist actions"><button type="button" data-flow-action="load-watchlist">Load live watchlist alerts</button></div><p class="flow-result" data-flow-result="watchlist" aria-live="polite">Local preview mode: connect the API session bridge before loading live watchlist alerts.</p></section>`;
 
 const notificationInboxLivePanel = `
-  <section class="card terminal-live-panel" data-groceryview-flow="notification-inbox" style="margin-top:16px"><div class="eyebrow">Connected notification inbox API</div><h2>Pull live notification inbox</h2><p class="lede">Fetch <code>/api/notifications/inbox</code> through the protected API session bridge to refresh active grocery alerts, delivered rows, quiet-hours holds, provider suppressions, and alert guardrails before households miss price drops or receive noisy notifications.</p><div class="grid" aria-label="Live notification inbox API metrics"><div class="metric"><strong data-notification-inbox-alerts>Waiting for API pull</strong><span>active alerts and tracked items</span></div><div class="metric"><strong data-notification-inbox-delivery>Static delivery preview</strong><span>delivered, held, suppressed</span></div><div class="metric"><strong data-notification-inbox-guardrails>Static guardrail preview</strong><span>quiet-hours and suppression rules</span></div></div><div class="flow-panel" aria-label="Connected notification inbox actions"><button type="button" data-flow-action="load-notification-inbox">Load live notification inbox</button></div><p class="flow-result" data-flow-result="notification-inbox" aria-live="polite">Local preview mode: connect the API session bridge before loading live notification inbox.</p></section>`;
+  <section class="card terminal-live-panel" data-groceryview-flow="notification-inbox" style="margin-top:16px"><div class="eyebrow">Connected notification inbox API</div><h2>Pull live notification inbox</h2><p class="lede">Fetch <code>/api/notifications/inbox</code> through the protected API session bridge to refresh active grocery alerts, delivered rows, quiet-hours holds, provider suppressions, and alert guardrails before households miss price drops or receive noisy notifications.</p><div class="grid" aria-label="Live notification inbox API metrics"><div class="metric"><strong data-notification-inbox-alerts>Waiting for API pull</strong><span>active alerts and tracked items</span></div><div class="metric"><strong data-notification-inbox-delivery>Static delivery preview</strong><span>delivered, held, suppressed</span></div><div class="metric"><strong data-notification-inbox-guardrails>Static guardrail preview</strong><span>quiet-hours and suppression rules</span></div><div class="metric"><strong data-notification-inbox-ops>Static worker metrics preview</strong><span>delivered, failed, dead-lettered, suppressed</span></div></div><div class="flow-panel" aria-label="Connected notification inbox actions"><button type="button" data-flow-action="load-notification-inbox">Load live notification inbox</button><label>Metrics token<input name="metricsToken" type="password" autocomplete="off" /></label><button type="button" data-flow-action="load-notification-metrics">Load worker metrics</button></div><p class="flow-result" data-flow-result="notification-inbox" aria-live="polite">Local preview mode: connect the API session bridge before loading live notification inbox.</p></section>`;
 
 const dailyDealsLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="daily-deals" style="margin-top:16px"><div class="eyebrow">Connected daily deals API</div><h2>Pull live ranked deal board</h2><p class="lede">Fetch <code>/api/market/overview</code> to refresh the daily shopper board with top deal ticker, best price, Deal Score, verdict mix, and store evidence from the public market API.</p><div class="grid" aria-label="Live daily deals API metrics"><div class="metric"><strong data-daily-deals-leader>Waiting for API pull</strong><span>top ranked deal</span></div><div class="metric"><strong data-daily-deals-price>Static best-price preview</strong><span>price and store</span></div><div class="metric"><strong data-daily-deals-count>Static deal-count preview</strong><span>ranked deal count</span></div></div><div class="flow-panel" aria-label="Connected daily deals actions"><button type="button" data-flow-action="load-daily-deals">Load live deal board</button></div><p class="flow-result" data-flow-result="daily-deals" aria-live="polite">Local preview mode: connect the API session bridge before loading live daily deals.</p></section>`;
