@@ -9,77 +9,161 @@ import {
   formatNotificationOperationsMetrics,
   planDeadLetterNotificationReplay,
   planHumanReviewSlaNotifications,
-  planMobileNotificationPreferences,
+  parseNotificationSuppressionWebhook,
   processNotificationSuppressionEvent,
   runRepositoryNotificationWorkerCycle,
   runNotificationWorkerTick,
   summarizeDeliveryResults
 } from '../index.js';
 
-describe('planMobileNotificationPreferences', () => {
-  it('builds a delivery-ready mobile preference plan with proposal notification topics', () => {
-    const plan = planMobileNotificationPreferences({
-      pushEnabled: true,
-      emailEnabled: true,
-      deviceToken: 'expo-device-token',
-      email: 'shopper@example.com',
-      topics: {
-        target_price_alerts: true,
-        favorite_store_deals: true,
-        watchlist_alerts: true,
-        budget_alerts: true,
-        weekly_report: true,
-        receipt_summary: true,
-        stock_up_opportunities: true
-      },
-      quietHours: { startHour: 22, endHour: 7, timezone: 'Europe/Stockholm' }
+const persistedTask = (overrides: Partial<Parameters<typeof planDeadLetterNotificationReplay>[0]['tasks'][number]> = {}) => ({
+  id: 'task-1',
+  channel: 'email' as const,
+  type: 'weekly_report',
+  title: 'Weekly report',
+  body: 'Summary',
+  priority: 'normal' as const,
+  sendAt: '2026-05-19T10:00:00.000Z',
+  recipient: 'user@example.com',
+  attemptCount: 3,
+  maxAttempts: 3,
+  status: 'dead_lettered' as const,
+  ...overrides
+});
+
+describe('buildNotificationProviderReadinessReport', () => {
+  it('fails closed when required provider credentials or health checks are missing', () => {
+    const report = buildNotificationProviderReadinessReport({
+      requiredChannels: ['push', 'email'],
+      providers: [
+        {
+          channel: 'push',
+          providerName: 'expo',
+          configured: true,
+          credentialsPresent: true,
+          healthStatus: 'pass'
+        },
+        {
+          channel: 'email',
+          providerName: 'sendgrid',
+          configured: false,
+          credentialsPresent: false,
+          healthStatus: 'not_run'
+        }
+      ]
     });
 
-    assert.equal(plan.readyForDelivery, true);
-    assert.deepEqual(plan.channels, ['push', 'email']);
-    assert.deepEqual(plan.recipients, [
-      { channel: 'push', recipient: 'expo-device-token' },
-      { channel: 'email', recipient: 'shopper@example.com' }
-    ]);
-    assert.deepEqual(plan.enabledTopics, [
-      'target_price_alerts',
-      'favorite_store_deals',
-      'watchlist_alerts',
-      'budget_alerts',
-      'weekly_report',
-      'receipt_summary',
-      'stock_up_opportunities'
-    ]);
-    assert.deepEqual(plan.disabledTopics, []);
-    assert.deepEqual(plan.blockers, []);
+    assert.deepEqual(report, {
+      status: 'blocked',
+      blockers: [
+        'notification_provider_not_configured:email',
+        'notification_provider_credentials_missing:email',
+        'notification_provider_health_not_run:email'
+      ],
+      evidence: [
+        'notification_provider_configured:push:expo',
+        'notification_provider_credentials_present:push',
+        'notification_provider_health_pass:push'
+      ],
+      warnings: [],
+      summary: 'Notification provider readiness is blocked.'
+    });
   });
 
-  it('fails closed when enabled channels lack recipients or no topics are enabled', () => {
-    const plan = planMobileNotificationPreferences({
-      pushEnabled: true,
-      emailEnabled: true,
-      topics: {},
-      quietHours: { startHour: 9, endHour: 9, timezone: '' }
+  it('passes only when every required provider is configured with credentials and passing health', () => {
+    const report = buildNotificationProviderReadinessReport({
+      requiredChannels: ['push', 'email'],
+      providers: [
+        {
+          channel: 'push',
+          providerName: 'expo',
+          configured: true,
+          credentialsPresent: true,
+          healthStatus: 'pass'
+        },
+        {
+          channel: 'email',
+          providerName: 'sendgrid',
+          configured: true,
+          credentialsPresent: true,
+          healthStatus: 'pass'
+        }
+      ]
     });
 
-    assert.equal(plan.readyForDelivery, false);
-    assert.deepEqual(plan.channels, ['push', 'email']);
-    assert.deepEqual(plan.recipients, []);
-    assert.deepEqual(plan.disabledTopics, [
-      'target_price_alerts',
-      'favorite_store_deals',
-      'watchlist_alerts',
-      'budget_alerts',
-      'weekly_report',
-      'receipt_summary',
-      'stock_up_opportunities'
-    ]);
-    assert.deepEqual(plan.blockers, [
-      'Push notifications are enabled but no device token is registered.',
-      'Email notifications are enabled but no email recipient is configured.',
-      'At least one notification topic must be enabled.',
-      'quietHours must define a non-empty quiet window.',
-      'quietHours.timezone is required.'
+    assert.deepEqual(report, {
+      status: 'ready',
+      blockers: [],
+      evidence: [
+        'notification_provider_configured:push:expo',
+        'notification_provider_credentials_present:push',
+        'notification_provider_health_pass:push',
+        'notification_provider_configured:email:sendgrid',
+        'notification_provider_credentials_present:email',
+        'notification_provider_health_pass:email'
+      ],
+      warnings: [],
+      summary: 'Notification providers are ready.'
+    });
+  });
+});
+
+describe('planDeadLetterNotificationReplay', () => {
+  it('requeues eligible dead-letter tasks at the requested replay time', () => {
+    const plan = planDeadLetterNotificationReplay({
+      now: '2026-05-20T08:00:00.000Z',
+      replayAt: '2026-05-20T08:15:00.000Z',
+      maxReplayAttempts: 5,
+      tasks: [
+        persistedTask({ id: 'dead-letter-a', attemptCount: 3 }),
+        persistedTask({ id: 'dead-letter-b', attemptCount: 4, channel: 'push', recipient: 'device-1' })
+      ]
+    });
+
+    assert.deepEqual(plan.skipped, []);
+    assert.deepEqual(
+      plan.replayable.map((task) => ({
+        id: task.id,
+        channel: task.channel,
+        status: task.status,
+        attemptCount: task.attemptCount,
+        sendAt: task.sendAt
+      })),
+      [
+        {
+          id: 'dead-letter-a',
+          channel: 'email',
+          status: 'queued',
+          attemptCount: 0,
+          sendAt: '2026-05-20T08:15:00.000Z'
+        },
+        {
+          id: 'dead-letter-b',
+          channel: 'push',
+          status: 'queued',
+          attemptCount: 0,
+          sendAt: '2026-05-20T08:15:00.000Z'
+        }
+      ]
+    );
+  });
+
+  it('skips non-dead-letter tasks, exhausted replay attempts, and invalid timestamps', () => {
+    const plan = planDeadLetterNotificationReplay({
+      now: '2026-05-20T08:00:00.000Z',
+      maxReplayAttempts: 5,
+      tasks: [
+        persistedTask({ id: 'queued-task', status: 'queued', attemptCount: 1 }),
+        persistedTask({ id: 'exhausted-task', attemptCount: 5 }),
+        persistedTask({ id: 'bad-time-task', attemptCount: 2, sendAt: 'not-a-date' })
+      ]
+    });
+
+    assert.deepEqual(plan.replayable, []);
+    assert.deepEqual(plan.skipped, [
+      { taskId: 'bad-time-task', reason: 'invalid_send_at' },
+      { taskId: 'exhausted-task', reason: 'attempt_limit_reached' },
+      { taskId: 'queued-task', reason: 'not_dead_lettered' }
     ]);
   });
 });
