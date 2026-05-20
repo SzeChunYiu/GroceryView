@@ -33,6 +33,8 @@ describe('buildStaticPages', () => {
         'products/coffee/index.html',
         'receipts/review/index.html',
         'retailers/freshness/index.html',
+        'routes/shopping/index.html',
+        'savings/ledger/index.html',
         'savings/smart-swaps/index.html',
         'scanner/index.html',
         'stores/compare/index.html',
@@ -70,18 +72,32 @@ describe('buildStaticPages', () => {
       assert.match(product, /Willys Odenplan/);
       assert.match(product, /Current best comparable price/);
       assert.match(product, /Official shelf price/);
+      assert.match(product, /Connected product terminal API/);
+      assert.match(product, /Load live terminal numbers/);
+      assert.match(product, /data-groceryview-flow="product-terminal"/);
+      assert.match(product, /data-flow-action="load-product-terminal"/);
+      assert.match(product, /data-flow-result="product-terminal"/);
+      assert.match(product, /data-api-session-panel/);
+      assert.match(product, /name="apiBase"/);
+      assert.match(product, /fetch\(apiUrl\('\/api\/products\/' \+ encodeURIComponent\(productId\) \+ '\/terminal'/);
+      assert.match(product, /Local preview mode: connect the API session bridge before loading live product terminal numbers/);
+      assert.match(product, /chart series/);
       assert.match(product, /Promo campaign/);
       assert.match(product, /Member-only/);
       assert.match(product, /Unverified \/ estimated/);
       assert.match(product, /Estimated fallback\. Never styled as an official shelf price/);
       assert.match(product, /2026-05-16 08:45 UTC/);
       assert.match(product, /Price evidence guardrails/);
+      const productScript = product.match(/<script>([\s\S]*)<\/script>/);
+      assert.ok(productScript);
+      assert.doesNotThrow(() => new Script(productScript[1]));
 
       const styles = await readFile(join(process.cwd(), 'public/styles.css'), 'utf8');
       assert.match(styles, /\.quote-strip/);
       assert.match(styles, /\.distribution-board/);
       assert.match(styles, /\.histogram/);
       assert.match(styles, /\.price-terminal/);
+      assert.match(styles, /\.terminal-live-panel/);
       assert.match(styles, /\.status\.verified/);
       assert.match(styles, /\.flow-panel/);
 
@@ -107,6 +123,13 @@ describe('buildStaticPages', () => {
       assert.match(retailerFreshness, /Pause new alerts/);
       assert.match(retailerFreshness, /Stale retailer-page rows cannot trigger household notifications/);
 
+      const shoppingRoute = await readFile(join(root, 'routes/shopping/index.html'), 'utf8');
+      assert.match(shoppingRoute, /Shopping route planner/);
+      assert.match(shoppingRoute, /Ordered stops/);
+      assert.match(shoppingRoute, /Lidl Sveavägen/);
+      assert.match(shoppingRoute, /Route time can reorder stops but cannot change product deal ranking/);
+      assert.match(shoppingRoute, /Unverified prices cannot justify an extra route stop/);
+
       const priceConfidence = await readFile(join(root, 'prices/confidence/index.html'), 'utf8');
       assert.match(priceConfidence, /Price confidence guide/);
       assert.match(priceConfidence, /Confidence labels/);
@@ -120,6 +143,13 @@ describe('buildStaticPages', () => {
       assert.match(deals, /Deal Score/);
       assert.match(deals, /Ads excluded from ranking/);
       assert.match(deals, /Estimated rows held back/);
+
+      const savingsLedger = await readFile(join(root, 'savings/ledger/index.html'), 'utf8');
+      assert.match(savingsLedger, /Savings ledger/);
+      assert.match(savingsLedger, /Ledger entries/);
+      assert.match(savingsLedger, /Willys coffee promo/);
+      assert.match(savingsLedger, /Only verified receipts can move forecast savings into realized savings/);
+      assert.match(savingsLedger, /Low-confidence prices cannot increase savings totals/);
 
       const smartSwapsPage = await readFile(join(root, 'savings/smart-swaps/index.html'), 'utf8');
       assert.match(smartSwapsPage, /Smart grocery swaps/);
@@ -306,7 +336,7 @@ describe('buildStaticPages', () => {
       assert.match(privacy, /fetch\(apiUrl\('\/api\/privacy\/export/);
       assert.match(privacy, /fetch\(apiUrl\('\/api\/privacy\/deletion-plan/);
 
-      for (const pagePath of ['login/index.html', 'account/index.html', 'basket/index.html', 'scanner/index.html', 'privacy/index.html']) {
+      for (const pagePath of ['login/index.html', 'account/index.html', 'basket/index.html', 'scanner/index.html', 'privacy/index.html', 'products/coffee/index.html']) {
         const html = await readFile(join(root, pagePath), 'utf8');
         assert.match(html, /window\.GroceryViewFlowActions/);
         assert.doesNotMatch(html, /innerHTML\s*=/);
