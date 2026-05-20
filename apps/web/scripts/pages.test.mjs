@@ -75,7 +75,15 @@ describe('buildStaticPages', () => {
       assert.match(login, /Passkey or magic link/);
       assert.match(login, /data-groceryview-flow="login"/);
       assert.match(login, /name="email"/);
+      assert.match(login, /data-api-session-panel/);
+      assert.match(login, /name="apiBase"/);
+      assert.match(login, /name="apiUserId"/);
+      assert.match(login, /name="apiBearerToken"/);
       assert.match(login, /data-flow-result="login"/);
+      assert.match(login, /sessionStorage\.setItem\('groceryview\.bearerToken'/);
+      assert.match(login, /sessionStorage\.getItem\('groceryview\.bearerToken'\)/);
+      assert.match(login, /localStorage\.getItem\('groceryview\.apiBase'\)/);
+      assert.doesNotMatch(login, /localStorage\.setItem\('groceryview\.bearerToken'/);
 
       const account = await readFile(join(root, 'account/index.html'), 'utf8');
       assert.match(account, /Alert preferences/);
@@ -88,6 +96,9 @@ describe('buildStaticPages', () => {
       assert.match(account, /data-groceryview-flow="account"/);
       assert.match(account, /data-flow-action="toggle-alert"/);
       assert.match(account, /data-flow-result="account"/);
+      assert.match(account, /fetch\(apiUrl\('\/api\/watchlist/);
+      assert.match(account, /fetch\(apiUrl\('\/api\/account\/subscription-access/);
+      assert.match(account, /authorization: 'Bearer '/);
 
       const watchlist = await readFile(join(root, 'watchlist/index.html'), 'utf8');
       assert.match(watchlist, /Price watchlist workbench/);
@@ -120,6 +131,10 @@ describe('buildStaticPages', () => {
       assert.match(basket, /data-groceryview-flow="basket"/);
       assert.match(basket, /name="coffeeQuantity"/);
       assert.match(basket, /data-flow-result="basket"/);
+      assert.match(basket, /Save basket to API/);
+      assert.match(basket, /\/api\/users\/' \+ encodeURIComponent\(config\.userId\) \+ '\/favorite-stores/);
+      assert.match(basket, /fetch\(apiUrl\('\/api\/basket\/items/);
+      assert.match(basket, /fetch\(apiUrl\('\/api\/basket\/compare/);
 
       const budgetForecast = await readFile(join(root, 'budget/forecast/index.html'), 'utf8');
       assert.match(budgetForecast, /Grocery budget forecast/);

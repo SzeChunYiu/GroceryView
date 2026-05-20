@@ -8,12 +8,143 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-flow-result="' + flow + '"]');
     if (target) target.textContent = message;
   };
+  const setApiSessionResult = (message) => {
+    const target = document.querySelector('[data-api-session-result]');
+    if (target) target.textContent = message;
+  };
+  const getApiConfig = () => ({
+    apiBase: localStorage.getItem('groceryview.apiBase') || '',
+    userId: localStorage.getItem('groceryview.userId') || 'user-1',
+    bearerToken: sessionStorage.getItem('groceryview.bearerToken') || ''
+  });
+  const hasApiSession = (config = getApiConfig()) => Boolean(config.apiBase && config.userId && config.bearerToken);
+  const apiUrl = (path, config = getApiConfig(), appendUserId = true) => {
+    const url = new URL(path, config.apiBase);
+    if (appendUserId && !url.searchParams.has('userId')) url.searchParams.set('userId', config.userId);
+    return url.toString();
+  };
+  const apiHeaders = (config) => ({
+    'content-type': 'application/json',
+    authorization: 'Bearer ' + config.bearerToken
+  });
+  const readJson = async (response) => {
+    try {
+      return await response.json();
+    } catch {
+      return {};
+    }
+  };
+  const requireApiSuccess = async (response) => {
+    const payload = await readJson(response);
+    if (!response.ok) {
+      const error = payload && typeof payload.error === 'string' ? payload.error : 'HTTP ' + response.status;
+      throw new Error(error);
+    }
+    return payload;
+  };
+  const configureApiSessionPanel = () => {
+    const panel = document.querySelector('[data-api-session-panel]');
+    if (!panel) return;
+    const form = panel.querySelector('form');
+    const config = getApiConfig();
+    const apiBase = form?.elements.namedItem('apiBase');
+    const apiUserId = form?.elements.namedItem('apiUserId');
+    const apiBearerToken = form?.elements.namedItem('apiBearerToken');
+    if (apiBase) apiBase.value = config.apiBase;
+    if (apiUserId) apiUserId.value = config.userId;
+    if (apiBearerToken) apiBearerToken.value = config.bearerToken;
+    setApiSessionResult(hasApiSession(config) ? 'Connected mode ready for authenticated API calls.' : 'Local preview mode. Add an API base, user id, and bearer token to save through protected routes.');
+    form?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      const nextApiBase = String(data.get('apiBase') || '').trim();
+      const nextUserId = String(data.get('apiUserId') || '').trim() || 'user-1';
+      const nextBearerToken = String(data.get('apiBearerToken') || '').trim();
+      if (nextApiBase) localStorage.setItem('groceryview.apiBase', nextApiBase);
+      if (nextUserId) localStorage.setItem('groceryview.userId', nextUserId);
+      if (nextBearerToken) sessionStorage.setItem('groceryview.bearerToken', nextBearerToken);
+      if (!nextApiBase) localStorage.removeItem('groceryview.apiBase');
+      if (!nextBearerToken) sessionStorage.removeItem('groceryview.bearerToken');
+      setApiSessionResult(nextApiBase && nextUserId && nextBearerToken ? 'Connected mode ready for authenticated API calls.' : 'Local preview mode. Add all session fields before API writes.');
+    });
+  };
   const summarizeBasket = (form) => {
     const data = new FormData(form);
     const coffee = Number(data.get('coffeeQuantity') || 0);
     const milk = Number(data.get('milkQuantity') || 0);
     const eggs = Number(data.get('eggsQuantity') || 0);
     return coffee * 49.9 + milk * 13.9 + eggs * 34.9;
+  };
+  const saveCoffeeAlertToApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('account', 'Local preview: connect the API session bridge before saving alert rules.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/watchlist', config), {
+        method: 'POST',
+        headers: apiHeaders(config),
+        body: JSON.stringify({ productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, favoriteStoresOnly: true })
+      });
+      const payload = await requireApiSuccess(response);
+      const alertCount = Array.isArray(payload.alerts) ? payload.alerts.length : 0;
+      setResult('account', 'Connected API: coffee alert saved; ' + alertCount + ' active alert signals returned.');
+    } catch (error) {
+      setResult('account', 'API save failed: ' + error.message + '. Local alert preview preserved.');
+    }
+  };
+  const loadSubscriptionAccessFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('account', 'Billing portal handoff prepared locally; connect the API session bridge for live subscription access.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/account/subscription-access', config), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      setResult('account', 'Connected API: ' + (payload.summary || 'subscription access loaded') + ' Actions: ' + ((payload.accountActions || []).join(', ') || 'none') + '.');
+    } catch (error) {
+      setResult('account', 'Subscription access check failed: ' + error.message + '.');
+    }
+  };
+  const saveBasketToApi = async (form) => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('basket', 'Local preview: connect the API session bridge before saving basket lines.');
+      return;
+    }
+    const data = new FormData(form);
+    const quantities = [
+      ['coffee', Number(data.get('coffeeQuantity') || 0)],
+      ['milk', Number(data.get('milkQuantity') || 0)],
+      ['eggs', Number(data.get('eggsQuantity') || 0)]
+    ].filter(([, quantity]) => Number.isFinite(quantity) && quantity > 0);
+    try {
+      await requireApiSuccess(await fetch(apiUrl('/api/users/' + encodeURIComponent(config.userId) + '/favorite-stores', config, false), {
+        method: 'POST',
+        headers: apiHeaders(config),
+        body: JSON.stringify({ storeId: 'willys-odenplan' })
+      }));
+      for (const [productId, quantity] of quantities) {
+        await requireApiSuccess(await fetch(apiUrl('/api/basket/items', config), {
+          method: 'POST',
+          headers: apiHeaders(config),
+          body: JSON.stringify({ productId, quantity })
+        }));
+      }
+      const comparison = await requireApiSuccess(await fetch(apiUrl('/api/basket/compare', config), {
+        method: 'POST',
+        headers: apiHeaders(config)
+      }));
+      const total = comparison && comparison.cheapestByProduct ? comparison.cheapestByProduct.total : summarizeBasket(form);
+      setResult('basket', 'Connected API: basket saved and compared at ' + formatSek(total) + '.');
+    } catch (error) {
+      setResult('basket', 'Basket API save failed: ' + error.message + '. Local preview remains ' + formatSek(summarizeBasket(form)) + '.');
+    }
   };
   const messages = {
     'toggle-alert': 'Alert rule updated locally; production save waits for authenticated account API.',
@@ -23,27 +154,43 @@ window.GroceryViewFlowActions = (() => {
     'route-review': 'Capture routed to manual review queue before it can update catalog prices.',
     'mark-matched': 'Matched capture previewed for basket and budget update.'
   };
+  configureApiSessionPanel();
   document.querySelectorAll('[data-groceryview-flow] form').forEach((form) => {
-    form.addEventListener('submit', (event) => {
+    form.addEventListener('submit', async (event) => {
       event.preventDefault();
       const flow = form.closest('[data-groceryview-flow]')?.dataset.groceryviewFlow;
       const data = new FormData(form);
       if (flow === 'login') setResult(flow, 'Sign-in link queued for ' + (data.get('email') || 'your email') + '. Demo mode does not send email.');
       if (flow === 'household') setResult(flow, 'Household approval limit preview updated to ' + (data.get('approvalLimit') || '400') + ' SEK.');
-      if (flow === 'basket') setResult(flow, 'Basket preview recalculated at ' + formatSek(summarizeBasket(form)) + ' before checkout.');
+      if (flow === 'basket' && event.submitter?.dataset.flowAction === 'save-basket-api') {
+        await saveBasketToApi(form);
+      } else if (flow === 'basket') {
+        setResult(flow, 'Basket preview recalculated at ' + formatSek(summarizeBasket(form)) + ' before checkout.');
+      }
       if (flow === 'scanner') setResult(flow, 'Upload preview staged; OCR provider stays gated until credentials are configured.');
     });
   });
   document.querySelectorAll('[data-flow-action]').forEach((button) => {
-    button.addEventListener('click', () => {
+    if (button.tagName === 'BUTTON' && button.type === 'submit') return;
+    button.addEventListener('click', async () => {
       const flow = button.closest('[data-groceryview-flow]')?.dataset.groceryviewFlow;
       const action = button.dataset.flowAction;
+      if (flow === 'account' && action === 'toggle-alert') {
+        await saveCoffeeAlertToApi();
+        return;
+      }
+      if (flow === 'account' && action === 'manage-subscription') {
+        await loadSubscriptionAccessFromApi();
+        return;
+      }
       if (flow && action) setResult(flow, messages[action] || 'Action preview recorded.');
     });
   });
-  return { setResult, summarizeBasket };
+  return { setResult, summarizeBasket, getApiConfig, hasApiSession };
 })();
 </script>`;
+
+const apiSessionPanel = `<section class="card api-session" data-api-session-panel><div class="eyebrow">API session bridge</div><h2>Save through protected routes</h2><p class="lede">Provider-safe local previews stay available, but staging or production sessions can connect these controls to the authenticated GroceryView API without putting bearer tokens in localStorage.</p><form class="flow-panel" aria-label="Authenticated API session bridge"><label>API base URL<input name="apiBase" type="url" placeholder="http://localhost:3000" autocomplete="off" /></label><label>User ID<input name="apiUserId" type="text" value="user-1" autocomplete="username" /></label><label>Bearer session token<input name="apiBearerToken" type="password" autocomplete="off" /></label><button type="submit">Save API session</button></form><p class="flow-result" data-api-session-result aria-live="polite">Local preview mode until an API session is configured.</p></section>`;
 
 const layout = ({ title, description, body }) => `<!doctype html>
 <html lang="en">
@@ -58,6 +205,7 @@ const layout = ({ title, description, body }) => `<!doctype html>
     <main class="shell">
       <a class="pill" href="/">← GroceryView</a>
       ${body}
+      ${body.includes('data-groceryview-flow') ? apiSessionPanel : ''}
     </main>
     ${flowScript}
   </body>
@@ -104,7 +252,7 @@ const pages = [
     path: 'basket/index.html',
     title: 'Weekly basket — GroceryView',
     description: 'GroceryView basket page scaffold for favorite-store comparison, smart swaps, and budget review.',
-    body: `<section class="card" data-groceryview-flow="basket"><div class="eyebrow">Basket</div><h1>Weekly basket planner</h1><p class="lede">Compare favorite-store totals, review smart swaps, and keep the weekly grocery plan under budget.</p><div class="grid"><div class="metric"><strong>742 SEK</strong><span>estimated basket total</span></div><div class="metric"><strong>58 SEK</strong><span>weekly budget left</span></div><div class="metric"><strong>3 swaps</strong><span>private-label opportunities</span></div></div><form class="flow-panel" aria-label="Basket quantity preview"><label>Coffee<input name="coffeeQuantity" type="number" min="0" value="1" /></label><label>Milk<input name="milkQuantity" type="number" min="0" value="2" /></label><label>Eggs<input name="eggsQuantity" type="number" min="0" value="1" /></label><button type="submit">Recalculate basket</button></form><p class="flow-result" data-flow-result="basket" aria-live="polite">Basket preview uses current favorite-store prices before saving.</p></section><section class="card" style="margin-top:16px"><h2>Basket lines</h2><table class="table"><thead><tr><th>Product</th><th>Best store</th><th>Line total</th></tr></thead><tbody><tr><td>coffee</td><td>Willys Odenplan</td><td>49.90 SEK</td></tr><tr><td>milk</td><td>Lidl Sveavägen</td><td>27.80 SEK</td></tr><tr><td>eggs</td><td>Lidl Sveavägen</td><td>34.90 SEK</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Smart swaps</h2><table class="table"><thead><tr><th>Swap</th><th>Saves</th><th>Rule</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g → Garant Bryggkaffe 450g</td><td>12 SEK</td><td>Same category, verified shelf price</td></tr><tr><td>Arla Milk 1L → ICA Milk 1L</td><td>2 SEK</td><td>Household accepts private label dairy</td></tr></tbody></table></section>`
+    body: `<section class="card" data-groceryview-flow="basket"><div class="eyebrow">Basket</div><h1>Weekly basket planner</h1><p class="lede">Compare favorite-store totals, review smart swaps, and keep the weekly grocery plan under budget.</p><div class="grid"><div class="metric"><strong>742 SEK</strong><span>estimated basket total</span></div><div class="metric"><strong>58 SEK</strong><span>weekly budget left</span></div><div class="metric"><strong>3 swaps</strong><span>private-label opportunities</span></div></div><form class="flow-panel" aria-label="Basket quantity preview"><label>Coffee<input name="coffeeQuantity" type="number" min="0" value="1" /></label><label>Milk<input name="milkQuantity" type="number" min="0" value="2" /></label><label>Eggs<input name="eggsQuantity" type="number" min="0" value="1" /></label><button type="submit">Recalculate basket</button><button type="submit" data-flow-action="save-basket-api">Save basket to API</button></form><p class="flow-result" data-flow-result="basket" aria-live="polite">Basket preview uses current favorite-store prices before saving.</p></section><section class="card" style="margin-top:16px"><h2>Basket lines</h2><table class="table"><thead><tr><th>Product</th><th>Best store</th><th>Line total</th></tr></thead><tbody><tr><td>coffee</td><td>Willys Odenplan</td><td>49.90 SEK</td></tr><tr><td>milk</td><td>Lidl Sveavägen</td><td>27.80 SEK</td></tr><tr><td>eggs</td><td>Lidl Sveavägen</td><td>34.90 SEK</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Smart swaps</h2><table class="table"><thead><tr><th>Swap</th><th>Saves</th><th>Rule</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g → Garant Bryggkaffe 450g</td><td>12 SEK</td><td>Same category, verified shelf price</td></tr><tr><td>Arla Milk 1L → ICA Milk 1L</td><td>2 SEK</td><td>Household accepts private label dairy</td></tr></tbody></table></section>`
   },
   {
     path: 'budget/forecast/index.html',
