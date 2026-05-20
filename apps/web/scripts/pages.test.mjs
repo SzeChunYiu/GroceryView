@@ -250,9 +250,13 @@ describe('buildStaticPages', () => {
       const watchlist = await readFile(join(root, 'watchlist/index.html'), 'utf8');
       assert.match(watchlist, /Price watchlist workbench/);
       assert.match(watchlist, /Tracked items/);
+      assert.match(watchlist, /Allowed price types/);
+      assert.match(watchlist, /Shelf, promotion/);
+      assert.match(watchlist, /Shelf only/);
       assert.match(watchlist, /Ready for push/);
       assert.match(watchlist, /Held for review/);
       assert.match(watchlist, /Estimated prices cannot trigger household notifications/);
+      assert.match(watchlist, /Alerts evaluate only the allowed shelf, member, promotion, or estimated price types/);
 
       const watchlistAlerts = await readFile(join(root, 'watchlist/alerts/index.html'), 'utf8');
       assert.match(watchlistAlerts, /Watchlist alert rules/);

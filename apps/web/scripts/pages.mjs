@@ -224,7 +224,13 @@ window.GroceryViewFlowActions = (() => {
       const response = await fetch(apiUrl('/api/watchlist', config), {
         method: 'POST',
         headers: apiHeaders(config),
-        body: JSON.stringify({ productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, favoriteStoresOnly: true })
+        body: JSON.stringify({
+          productId: 'coffee',
+          targetPrice: 50,
+          alertDealScoreAt: 80,
+          favoriteStoresOnly: true,
+          allowedPriceTypes: ['shelf', 'promotion']
+        })
       });
       const payload = await requireApiSuccess(response);
       const alertCount = Array.isArray(payload.alerts) ? payload.alerts.length : 0;
@@ -1671,7 +1677,7 @@ const pages = [
     path: 'watchlist/index.html',
     title: 'Price watchlist workbench — GroceryView',
     description: 'GroceryView watchlist workbench for target prices, Deal Score triggers, notification channels, and confidence-safe alert status.',
-    body: `<section class="card"><div class="eyebrow">Watchlist</div><h1>Price watchlist workbench</h1><p class="lede">Review target prices, Deal Score triggers, source confidence, and notification readiness before alerts reach a household.</p><div class="grid"><div class="metric"><strong>4</strong><span>tracked staples</span></div><div class="metric"><strong>2</strong><span>alerts ready</span></div><div class="metric"><strong>1</strong><span>held for review</span></div></div></section><section class="card" style="margin-top:16px"><h2>Tracked items</h2><table class="table"><thead><tr><th>Product</th><th>Target</th><th>Current</th><th>Trigger</th><th>Status</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>50 SEK</td><td>49.90 SEK</td><td>Deal Score ≥ 80</td><td>Ready for push</td></tr><tr><td>Butter 600g</td><td>45 SEK</td><td>54.90 SEK</td><td>52-week low</td><td>Watching</td></tr><tr><td>Eggs 12-pack</td><td>35 SEK</td><td>34.90 SEK</td><td>Favorite stores only</td><td>Ready for email</td></tr><tr><td>Loose tomatoes</td><td>29 SEK/kg</td><td>Estimated</td><td>Confidence ≥ 80%</td><td>Held for review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Notification guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied behavior</th></tr></thead><tbody><tr><td>Quiet hours</td><td>Push alerts pause from 21:00 to 07:00.</td></tr><tr><td>Confidence floor</td><td>Estimated prices cannot trigger household notifications.</td></tr><tr><td>Favorite-store scope</td><td>Scoped rules ignore stores outside the household basket set.</td></tr></tbody></table></section>${watchlistLivePanel}`
+    body: `<section class="card"><div class="eyebrow">Watchlist</div><h1>Price watchlist workbench</h1><p class="lede">Review target prices, Deal Score triggers, source confidence, and notification readiness before alerts reach a household.</p><div class="grid"><div class="metric"><strong>4</strong><span>tracked staples</span></div><div class="metric"><strong>2</strong><span>alerts ready</span></div><div class="metric"><strong>1</strong><span>held for review</span></div></div></section><section class="card" style="margin-top:16px"><h2>Tracked items</h2><table class="table"><thead><tr><th>Product</th><th>Target</th><th>Current</th><th>Trigger</th><th>Allowed price types</th><th>Status</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>50 SEK</td><td>49.90 SEK</td><td>Deal Score ≥ 80</td><td>Shelf, promotion</td><td>Ready for push</td></tr><tr><td>Butter 600g</td><td>45 SEK</td><td>54.90 SEK</td><td>52-week low</td><td>Shelf only</td><td>Watching</td></tr><tr><td>Eggs 12-pack</td><td>35 SEK</td><td>34.90 SEK</td><td>Favorite stores only</td><td>Shelf, retailer page</td><td>Ready for email</td></tr><tr><td>Loose tomatoes</td><td>29 SEK/kg</td><td>Estimated</td><td>Confidence ≥ 80%</td><td>Estimated blocked</td><td>Held for review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Notification guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied behavior</th></tr></thead><tbody><tr><td>Quiet hours</td><td>Push alerts pause from 21:00 to 07:00.</td></tr><tr><td>Confidence floor</td><td>Estimated prices cannot trigger household notifications.</td></tr><tr><td>Price-type filter</td><td>Alerts evaluate only the allowed shelf, member, promotion, or estimated price types stored on the watchlist rule.</td></tr><tr><td>Favorite-store scope</td><td>Scoped rules ignore stores outside the household basket set.</td></tr></tbody></table></section>${watchlistLivePanel}`
   },
   {
     path: 'watchlist/alerts/index.html',
