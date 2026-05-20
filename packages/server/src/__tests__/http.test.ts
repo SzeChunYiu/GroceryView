@@ -106,6 +106,20 @@ describe('createHttpHandler', () => {
       ]
     });
 
+    const equivalents = await handle(new Request('http://localhost/api/products/milk/equivalents'));
+    assert.equal(equivalents.status, 200);
+    assert.deepEqual(await json(equivalents), [
+      {
+        productId: 'butter',
+        productName: 'Butter 600g',
+        category: 'dairy',
+        bestPrice: 54.9,
+        bestStoreId: 'coop-odenplan',
+        dealScore: 40,
+        reason: 'Same dairy category with comparable current price evidence.'
+      }
+    ]);
+
     const index = await handle(new Request('http://localhost/api/indices/stockholm-grocery-index'));
     assert.equal(index.status, 200);
     assert.equal((await json(index) as { label: string }).label, 'Stockholm Grocery Index');
@@ -129,6 +143,10 @@ describe('createHttpHandler', () => {
     const dealScore = await handle(new Request('http://localhost/api/products/missing-product/deal-score'));
     assert.equal(dealScore.status, 404);
     assert.deepEqual(await json(dealScore), { error: 'Product not found.' });
+
+    const equivalents = await handle(new Request('http://localhost/api/products/missing-product/equivalents'));
+    assert.equal(equivalents.status, 404);
+    assert.deepEqual(await json(equivalents), { error: 'Product not found.' });
   });
 
   it('mutates favorite stores, watchlist, basket, and budget through proposal routes', async () => {

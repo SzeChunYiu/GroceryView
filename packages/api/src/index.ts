@@ -62,6 +62,16 @@ export type DealScoreReport = {
   reasons: string[];
 };
 
+export type ProductEquivalent = {
+  productId: string;
+  productName: string;
+  category: string;
+  bestPrice: number | null;
+  bestStoreId: string | null;
+  dealScore: number;
+  reason: string;
+};
+
 export type StoreDeal = {
   productId: string;
   ticker: string;
@@ -326,6 +336,19 @@ function buildDealScoreReasons(product: ProductDetail, bestPrice: StorePrice | n
   return reasons;
 }
 
+function productEquivalentFor(product: ProductDetail): ProductEquivalent {
+  const bestPrice = bestPriceFor(product);
+  return {
+    productId: product.id,
+    productName: product.name,
+    category: product.category,
+    bestPrice: bestPrice?.price ?? null,
+    bestStoreId: bestPrice?.storeId ?? null,
+    dealScore: product.dealScore,
+    reason: `Same ${product.category} category with comparable current price evidence.`
+  };
+}
+
 function cheapestPriceByProductId(productIds: string[]): Record<string, number> {
   const priceByProductId: Record<string, number> = {};
   for (const productId of new Set(productIds)) {
@@ -513,6 +536,15 @@ export function createGroceryViewApi() {
         confidence: product.dealSignals.sourceConfidence,
         reasons: buildDealScoreReasons(product, bestPrice, band)
       };
+    },
+
+    getProductEquivalents(id: string): ProductEquivalent[] {
+      const product = this.getProduct(id);
+      if (!product) return [];
+      return products
+        .filter((candidate) => candidate.id !== product.id && candidate.category === product.category)
+        .map(productEquivalentFor)
+        .sort((left, right) => right.dealScore - left.dealScore || left.productName.localeCompare(right.productName));
     },
 
     addFavoriteStore(userId: string, storeId: string) {
