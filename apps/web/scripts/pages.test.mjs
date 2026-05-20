@@ -304,6 +304,16 @@ describe('buildStaticPages', () => {
       assert.match(watchlist, /Ready for push/);
       assert.match(watchlist, /Held for review/);
       assert.match(watchlist, /Estimated prices cannot trigger household notifications/);
+      assert.match(watchlist, /Connected watchlist API/);
+      assert.match(watchlist, /Load live watchlist alerts/);
+      assert.match(watchlist, /data-groceryview-flow="watchlist"/);
+      assert.match(watchlist, /data-flow-action="load-watchlist"/);
+      assert.match(watchlist, /data-watchlist-summary/);
+      assert.match(watchlist, /data-watchlist-target/);
+      assert.match(watchlist, /data-watchlist-trigger/);
+      assert.match(watchlist, /data-watchlist-scope/);
+      assert.match(watchlist, /fetch\(apiUrl\('\/api\/watchlist'/);
+      assert.match(watchlist, /Connected watchlist loaded/);
 
       const notificationInbox = await readFile(join(root, 'notifications/inbox/index.html'), 'utf8');
       assert.match(notificationInbox, /Grocery alert inbox/);
