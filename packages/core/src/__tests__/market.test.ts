@@ -113,9 +113,30 @@ describe('buildWatchlistAlerts', () => {
     });
 
     assert.deepEqual(alerts, [
-      { productId: 'coffee', productName: 'Zoégas Coffee 450g', type: 'target_price', message: 'Zoégas Coffee 450g is 49.90 SEK at Willys Odenplan, below your 50.00 SEK target.' },
-      { productId: 'coffee', productName: 'Zoégas Coffee 450g', type: 'deal_score', message: 'Zoégas Coffee 450g has Deal Score 82, meeting your 80+ alert.' },
-      { productId: 'coffee', productName: 'Zoégas Coffee 450g', type: 'new_52_week_low', message: 'Zoégas Coffee 450g is at a new 52-week low.' }
+      {
+        productId: 'coffee',
+        productName: 'Zoégas Coffee 450g',
+        type: 'target_price',
+        severity: 'opportunity',
+        trigger: { metric: 'price', value: 49.9, threshold: 50, storeId: 'willys-odenplan', storeName: 'Willys Odenplan' },
+        message: 'Zoégas Coffee 450g is 49.90 SEK at Willys Odenplan, below your 50.00 SEK target.'
+      },
+      {
+        productId: 'coffee',
+        productName: 'Zoégas Coffee 450g',
+        type: 'deal_score',
+        severity: 'opportunity',
+        trigger: { metric: 'deal_score', value: 82, threshold: 80, storeId: 'willys-odenplan', storeName: 'Willys Odenplan' },
+        message: 'Zoégas Coffee 450g has Deal Score 82, meeting your 80+ alert.'
+      },
+      {
+        productId: 'coffee',
+        productName: 'Zoégas Coffee 450g',
+        type: 'new_52_week_low',
+        severity: 'urgent',
+        trigger: { metric: 'price_history', value: 'new_52_week_low', storeId: 'willys-odenplan', storeName: 'Willys Odenplan' },
+        message: 'Zoégas Coffee 450g is at a new 52-week low.'
+      }
     ]);
   });
 });

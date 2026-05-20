@@ -471,6 +471,14 @@ export type WatchlistAlert = {
   productId: string;
   productName: string;
   type: 'target_price' | 'deal_score' | 'new_52_week_low';
+  severity: 'info' | 'opportunity' | 'urgent';
+  trigger: {
+    metric: 'price' | 'deal_score' | 'price_history';
+    value: number | string;
+    threshold?: number;
+    storeId?: string;
+    storeName?: string;
+  };
   message: string;
 };
 
@@ -489,11 +497,20 @@ export function buildWatchlistAlerts(input: {
     if (item.favoriteStoresOnly && !favoriteStoreSet.has(product.bestStoreId)) continue;
 
     if (item.targetPrice !== undefined && product.bestPrice <= item.targetPrice) {
+      const storeName = storeNameFromId(product.bestStoreId);
       alerts.push({
         productId: product.productId,
         productName: product.productName,
         type: 'target_price',
-        message: `${product.productName} is ${formatSek(product.bestPrice)} at ${storeNameFromId(product.bestStoreId)}, below your ${formatSek(item.targetPrice)} target.`
+        severity: product.bestPrice <= item.targetPrice * 0.9 ? 'urgent' : 'opportunity',
+        trigger: {
+          metric: 'price',
+          value: product.bestPrice,
+          threshold: item.targetPrice,
+          storeId: product.bestStoreId,
+          storeName
+        },
+        message: `${product.productName} is ${formatSek(product.bestPrice)} at ${storeName}, below your ${formatSek(item.targetPrice)} target.`
       });
     }
 
@@ -502,6 +519,14 @@ export function buildWatchlistAlerts(input: {
         productId: product.productId,
         productName: product.productName,
         type: 'deal_score',
+        severity: product.dealScore >= 90 ? 'urgent' : 'opportunity',
+        trigger: {
+          metric: 'deal_score',
+          value: product.dealScore,
+          threshold: item.alertDealScoreAt,
+          storeId: product.bestStoreId,
+          storeName: storeNameFromId(product.bestStoreId)
+        },
         message: `${product.productName} has Deal Score ${product.dealScore}, meeting your ${item.alertDealScoreAt}+ alert.`
       });
     }
@@ -511,6 +536,13 @@ export function buildWatchlistAlerts(input: {
         productId: product.productId,
         productName: product.productName,
         type: 'new_52_week_low',
+        severity: 'urgent',
+        trigger: {
+          metric: 'price_history',
+          value: 'new_52_week_low',
+          storeId: product.bestStoreId,
+          storeName: storeNameFromId(product.bestStoreId)
+        },
         message: `${product.productName} is at a new 52-week low.`
       });
     }
