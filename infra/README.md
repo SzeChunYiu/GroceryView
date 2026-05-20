@@ -53,7 +53,7 @@ OPEN_PRICES_OUTPUT_PATH=/tmp/groceryview-open-prices-preview.json \
 
 The artifact includes the same provenance summary plus `acceptedObservations` with normalized products, aliases, price observations, and promotion observations. It intentionally excludes the raw response body; use `rawSnapshotRef` and `contentHash` to bind the artifact back to the pulled source snapshot.
 
-To persist a saved artifact into PostgreSQL, build the database package and run the import script with `DATABASE_URL` and `OPEN_PRICES_INPUT_PATH`:
+To persist a saved, readable artifact into PostgreSQL, build the database package and run the import script with `DATABASE_URL` and `OPEN_PRICES_INPUT_PATH`:
 
 ```bash
 npm run build --workspace @groceryview/db

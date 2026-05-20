@@ -8,6 +8,11 @@ if [ -z "${OPEN_PRICES_INPUT_PATH:-}" ]; then
   exit 2
 fi
 
+if [ ! -f "$OPEN_PRICES_INPUT_PATH" ] || [ ! -r "$OPEN_PRICES_INPUT_PATH" ]; then
+  echo "Open Prices artifact import requires OPEN_PRICES_INPUT_PATH to point to a readable artifact file." >&2
+  exit 2
+fi
+
 OPEN_PRICES_IMPORT_DRY_RUN="${OPEN_PRICES_IMPORT_DRY_RUN:-false}"
 
 if [ "$OPEN_PRICES_IMPORT_DRY_RUN" != "true" ] && [ -z "${DATABASE_URL:-}" ]; then
