@@ -1082,8 +1082,6 @@ export function searchProducts(products: SearchableProduct[], query: string): Se
 export type WatchlistItem = {
   productId: string;
   targetPrice?: number;
-  referencePrice?: number;
-  alertPercentDrop?: number;
   alertDealScoreAt?: number;
   favoriteStoresOnly: boolean;
 };
@@ -1109,7 +1107,6 @@ export type WatchlistAlert = {
     storeId?: string;
     storeName?: string;
   };
-  type: 'target_price' | 'percent_drop' | 'deal_score' | 'new_52_week_low';
   message: string;
 };
 
@@ -1143,18 +1140,6 @@ export function buildWatchlistAlerts(input: {
         },
         message: `${product.productName} is ${formatSek(product.bestPrice)} at ${storeName}, below your ${formatSek(item.targetPrice)} target.`
       });
-    }
-
-    if (item.referencePrice !== undefined && item.referencePrice > 0 && item.alertPercentDrop !== undefined) {
-      const dropPercent = ((item.referencePrice - product.bestPrice) / item.referencePrice) * 100;
-      if (dropPercent >= item.alertPercentDrop) {
-        alerts.push({
-          productId: product.productId,
-          productName: product.productName,
-          type: 'percent_drop',
-          message: `${product.productName} is ${Math.round(dropPercent)}% below your ${formatSek(item.referencePrice)} reference price.`
-        });
-      }
     }
 
     if (item.alertDealScoreAt !== undefined && product.dealScore >= item.alertDealScoreAt) {
