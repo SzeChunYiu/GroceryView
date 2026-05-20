@@ -11,6 +11,7 @@ describe('runtime config', () => {
       DATABASE_URL: 'postgres://example',
       PUBLIC_WEB_URL: 'https://groceryview.example',
       NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
       METRICS_TOKEN: 'metrics-token'
     });
 
@@ -21,6 +22,7 @@ describe('runtime config', () => {
       databaseUrl: 'postgres://example',
       publicWebUrl: 'https://groceryview.example',
       notificationWebhookSecret: 'webhook-secret',
+      billingWebhookSecret: 'billing-webhook-secret',
       metricsToken: 'metrics-token'
     });
   });
@@ -41,6 +43,15 @@ describe('runtime config', () => {
       DATABASE_URL: 'postgres://example',
       PUBLIC_WEB_URL: 'https://groceryview.example',
       NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret'
+    }), /BILLING_WEBHOOK_SECRET is required/);
+    assert.throws(() => loadRuntimeConfig({
+      NODE_ENV: 'production',
+      PORT: '8080',
+      AUTH_SECRET: 'super-secret',
+      DATABASE_URL: 'postgres://example',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      BILLING_WEBHOOK_SECRET: 'billing-webhook-secret'
     }), /METRICS_TOKEN is required/);
   });
 
@@ -54,6 +65,7 @@ describe('runtime config', () => {
       hasDatabase: false,
       hasAuthSecret: false,
       hasNotificationWebhookSecret: false,
+      hasBillingWebhookSecret: false,
       hasMetricsToken: false
     });
   });

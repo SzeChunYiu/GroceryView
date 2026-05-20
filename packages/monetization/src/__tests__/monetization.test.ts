@@ -4,7 +4,8 @@ import {
   buildAdPlacementPlan,
   buildMonetizationProviderReadinessReport,
   buildSubscriptionAccessPolicy,
-  buildSubscriptionCheckoutPlan
+  buildSubscriptionCheckoutPlan,
+  processBillingSubscriptionEvent
 } from '../index.js';
 
 describe('monetization foundation', () => {
@@ -125,6 +126,76 @@ describe('monetization foundation', () => {
       status: 'blocked_missing_provider',
       reason: 'Subscription checkout requires configured billing provider and price id.'
     });
+  });
+
+  it('normalizes active billing subscription events into entitlement mutations', () => {
+    const entitlement = processBillingSubscriptionEvent({
+      provider: 'stripe_compatible',
+      providerEventId: 'evt_subscription_active_1',
+      type: 'subscription.active',
+      userId: 'user-1',
+      plan: 'premium_yearly',
+      currentPeriodEndsAt: '2027-05-20T00:00:00.000Z',
+      providerCustomerId: 'cus_123',
+      providerSubscriptionId: 'sub_123',
+      occurredAt: '2026-05-20T00:00:00.000Z'
+    });
+
+    assert.deepEqual(entitlement, {
+      userId: 'user-1',
+      tier: 'premium',
+      plan: 'premium_yearly',
+      status: 'active',
+      currentPeriodEndsAt: '2027-05-20T00:00:00.000Z',
+      provider: 'stripe_compatible',
+      providerCustomerId: 'cus_123',
+      providerSubscriptionId: 'sub_123',
+      updatedAt: '2026-05-20T00:00:00.000Z'
+    });
+  });
+
+  it('normalizes past-due and canceled billing subscription events into fail-closed entitlements', () => {
+    const pastDue = processBillingSubscriptionEvent({
+      provider: 'stripe_compatible',
+      providerEventId: 'evt_subscription_past_due_1',
+      type: 'subscription.past_due',
+      userId: 'user-1',
+      plan: 'premium_monthly',
+      currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
+      occurredAt: '2026-05-21T00:00:00.000Z'
+    });
+    const canceled = processBillingSubscriptionEvent({
+      provider: 'stripe_compatible',
+      providerEventId: 'evt_subscription_canceled_1',
+      type: 'subscription.canceled',
+      userId: 'user-1',
+      plan: 'premium_monthly',
+      providerSubscriptionId: 'sub_123',
+      occurredAt: '2026-05-22T00:00:00.000Z'
+    });
+
+    assert.deepEqual(pastDue, {
+      userId: 'user-1',
+      tier: 'premium',
+      plan: 'premium_monthly',
+      status: 'past_due',
+      currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
+      provider: 'stripe_compatible',
+      updatedAt: '2026-05-21T00:00:00.000Z'
+    });
+    assert.deepEqual(canceled, {
+      userId: 'user-1',
+      tier: 'premium',
+      plan: 'premium_monthly',
+      status: 'canceled',
+      provider: 'stripe_compatible',
+      providerSubscriptionId: 'sub_123',
+      updatedAt: '2026-05-22T00:00:00.000Z'
+    });
+    assert.deepEqual(buildSubscriptionAccessPolicy({
+      now: '2026-05-22T00:00:00.000Z',
+      entitlement: canceled
+    }).accountActions, ['show_renew']);
   });
 
   it('builds a billing-provider checkout request when configured', () => {
