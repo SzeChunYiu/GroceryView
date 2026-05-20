@@ -111,6 +111,30 @@ export type RetailerSourceAccessPlan = {
   requiredActions: string[];
 };
 
+export type RetailerConnectorHealthStatus = 'pass' | 'fail' | 'not_run';
+
+export type RetailerConnectorReadinessInput = {
+  requiredChains: RetailerChainId[];
+  connectors: Array<{
+    chainId: RetailerChainId;
+    sourceType: RetailerSourceAccessInput['sourceType'];
+    configured: boolean;
+    credentialsPresent: boolean;
+    healthStatus: RetailerConnectorHealthStatus;
+    robotsTxtStatus: RobotsTxtStatus;
+    legalReviewStatus: LegalReviewStatus;
+    hasDataAgreement: boolean;
+  }>;
+};
+
+export type RetailerConnectorReadinessReport = {
+  status: 'ready' | 'blocked';
+  blockers: string[];
+  evidence: string[];
+  warnings: string[];
+  summary: string;
+};
+
 export function planRetailerSourceAccess(input: RetailerSourceAccessInput): RetailerSourceAccessPlan {
   if (!input.chainId.trim()) throw new Error('chainId is required.');
 
@@ -172,6 +196,45 @@ export function planRetailerSourceAccess(input: RetailerSourceAccessInput): Reta
         reason: 'Flyer campaign ingestion requires approved legal review.',
         requiredActions
       };
+}
+
+export function buildRetailerConnectorReadinessReport(input: RetailerConnectorReadinessInput): RetailerConnectorReadinessReport {
+  const blockers: string[] = [];
+  const evidence: string[] = [];
+  const connectorsByChain = new Map(input.connectors.map((connector) => [connector.chainId, connector]));
+
+  for (const chainId of input.requiredChains) {
+    const connector = connectorsByChain.get(chainId);
+    if (!connector) {
+      blockers.push(`retailer_connector_missing:${chainId}`);
+      continue;
+    }
+
+    if (!connector.configured) blockers.push(`retailer_connector_not_configured:${chainId}`);
+    else evidence.push(`retailer_connector_configured:${chainId}:${connector.sourceType}`);
+
+    if (!connector.credentialsPresent) blockers.push(`retailer_connector_credentials_missing:${chainId}`);
+    else evidence.push(`retailer_connector_credentials_present:${chainId}`);
+
+    if (connector.healthStatus === 'pass') evidence.push(`retailer_connector_health_pass:${chainId}`);
+    else if (connector.healthStatus === 'fail') blockers.push(`retailer_connector_health_failed:${chainId}`);
+    else blockers.push(`retailer_connector_health_not_run:${chainId}`);
+
+    const access = planRetailerSourceAccess(connector);
+    if (access.status === 'allowed') {
+      evidence.push(`retailer_source_access_allowed:${chainId}:${connector.sourceType}`);
+    } else {
+      blockers.push(...access.requiredActions.map((action) => `retailer_source_access_blocked:${chainId}:${action}`));
+    }
+  }
+
+  return {
+    status: blockers.length === 0 ? 'ready' : 'blocked',
+    blockers,
+    evidence,
+    warnings: [],
+    summary: blockers.length === 0 ? 'Retailer connectors are ready.' : 'Retailer connector readiness is blocked.'
+  };
 }
 
 const DEFAULT_ROBOTS_CHECKED_AT = '2026-05-20T00:00:00.000Z';
