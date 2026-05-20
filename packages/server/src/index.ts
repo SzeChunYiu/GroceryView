@@ -28,11 +28,13 @@ import {
   authorizeHumanReviewAction,
   buildPrivacyExport,
   planAccountDeletion,
+  planPantryReplenishment,
   planPrivacyRequestFulfillment,
   summarizeHumanReviewSla,
   type HumanReviewAssignment,
   type HumanReviewDecision,
   type HumanReviewOperator,
+  type PantryInventoryItem,
   type PrivacyRequest,
   type PrivacyRequestStatus,
   type PrivacyRequestType
@@ -175,6 +177,11 @@ function requiredString(value: unknown, field: string): string {
 function requiredScanKind(value: unknown): ScanUpload['kind'] {
   if (value === 'barcode' || value === 'receipt') return value;
   throw new Error('kind must be barcode or receipt.');
+}
+
+function requiredPantryUnit(value: unknown): PantryInventoryItem['unit'] {
+  if (value === 'each' || value === 'kg' || value === 'g' || value === 'l' || value === 'ml' || value === 'pack') return value;
+  throw new Error('pantry unit must be each, kg, g, l, ml, or pack.');
 }
 
 function requiredAuthProvider(value: unknown): AuthProvider {
@@ -355,6 +362,44 @@ function categoryBudgetPatchesFromBody(body: JsonRecord): CategoryBudgetPatch[] 
     category: requiredString(category.category, 'categories.category'),
     weeklyBudget: requiredNumber(category.weeklyBudget, 'categories.weeklyBudget')
   }));
+}
+
+function pantryPlanRequestFromBody(body: JsonRecord, now: string) {
+  return {
+    now: optionalIsoTimestamp(body.now, 'now') ?? now,
+    expiringSoonDays: optionalNonNegativeNumber(body.expiringSoonDays, 'expiringSoonDays', 3),
+    pantry: requiredRecordArray(body.pantry, 'pantry').map((item, index) => {
+      const targetQuantity = optionalNumber(item.targetQuantity, `pantry[${index}].targetQuantity`);
+      const expiresAt = optionalIsoTimestamp(item.expiresAt, `pantry[${index}].expiresAt`);
+      const lastPurchasedAt = optionalIsoTimestamp(item.lastPurchasedAt, `pantry[${index}].lastPurchasedAt`);
+      return {
+        productId: requiredString(item.productId, `pantry[${index}].productId`),
+        name: requiredString(item.name, `pantry[${index}].name`),
+        category: requiredString(item.category, `pantry[${index}].category`),
+        quantity: requiredNumber(item.quantity, `pantry[${index}].quantity`),
+        unit: requiredPantryUnit(item.unit),
+        minimumQuantity: requiredNumber(item.minimumQuantity, `pantry[${index}].minimumQuantity`),
+        ...(targetQuantity === undefined ? {} : { targetQuantity }),
+        ...(expiresAt === undefined ? {} : { expiresAt }),
+        ...(lastPurchasedAt === undefined ? {} : { lastPurchasedAt })
+      };
+    }),
+    usage: (optionalRecordArray(body.usage, 'usage') ?? []).map((event, index) => ({
+      productId: requiredString(event.productId, `usage[${index}].productId`),
+      quantityUsed: requiredNumber(event.quantityUsed, `usage[${index}].quantityUsed`),
+      usedAt: requiredIsoTimestamp(event.usedAt, `usage[${index}].usedAt`)
+    })),
+    deals: (optionalRecordArray(body.deals, 'deals') ?? []).map((deal, index) => {
+      const dealScore = optionalNumber(deal.dealScore, `deals[${index}].dealScore`);
+      return {
+        productId: requiredString(deal.productId, `deals[${index}].productId`),
+        storeId: requiredString(deal.storeId, `deals[${index}].storeId`),
+        storeName: requiredString(deal.storeName, `deals[${index}].storeName`),
+        price: requiredNumber(deal.price, `deals[${index}].price`),
+        ...(dealScore === undefined ? {} : { dealScore })
+      };
+    })
+  };
 }
 
 function userIdFrom(url: URL): string | Response {
@@ -604,6 +649,13 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
         if (method === 'GET') return jsonResponse(api.getPantryReplenishment(user, url.searchParams.get('asOf') ?? undefined));
+        if (method === 'POST') {
+          const body = await readJson(request);
+          return jsonResponse({
+            userId: user,
+            ...planPantryReplenishment(pantryPlanRequestFromBody(body, (authOptions.now ?? new Date()).toISOString()))
+          });
+        }
       }
       if (path === '/api/loyalty/offers') {
         const user = userIdFrom(url);
@@ -1234,7 +1286,10 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/auth/session': { post: publicOperation('Exchange a verified auth provider assertion for a short-lived bearer session.') },
       '/api/market/overview': { get: publicOperation('Get Stockholm grocery market overview.') },
       '/api/nutrition/value': { get: publicOperation('Get nutrition per krona rankings with sugar and salt warning guardrails.') },
-      '/api/pantry/replenishment': { get: protectedOperation('Get pantry replenishment status with expiry, basket duplicate, and best-deal context.') },
+      '/api/pantry/replenishment': {
+        get: protectedOperation('Get pantry replenishment status with expiry, basket duplicate, and best-deal context.'),
+        post: protectedOperation('Plan pantry replenishment from current stock, usage, expiry, and verified deal candidates.')
+      },
       '/api/loyalty/offers': { get: protectedOperation('Get account-scoped loyalty offers with savings, coupon actions, and membership guardrails.') },
       '/api/ads/disclosure': { get: protectedOperation('Get ad disclosure status with placement labels, premium removal, and ranking separation guardrails.') },
       '/api/notifications/inbox': { get: protectedOperation('Get notification inbox delivery status, holds, suppressions, and alert guardrails.') },

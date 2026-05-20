@@ -564,6 +564,48 @@ describe('createHttpHandler', () => {
     assert.equal(crossUser.status, 400);
   });
 
+  it('plans pantry replenishment from stock, usage, expiry, and deal candidates', async () => {
+    const handle = createHttpHandler(undefined, { now: new Date('2026-05-20T12:00:00.000Z') });
+
+    const response = await handle(new Request('http://localhost/api/pantry/replenishment?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({
+        pantry: [
+          { productId: 'coffee', name: 'Coffee', category: 'pantry', quantity: 1, unit: 'pack', minimumQuantity: 1, targetQuantity: 3 },
+          { productId: 'tomatoes', name: 'Tomatoes', category: 'vegetables', quantity: 1, unit: 'kg', minimumQuantity: 0.2, expiresAt: '2026-05-21T12:00:00.000Z' },
+          { productId: 'yogurt', name: 'Yogurt', category: 'dairy', quantity: 1, unit: 'each', minimumQuantity: 1, expiresAt: '2026-05-18T12:00:00.000Z' }
+        ],
+        usage: [{ productId: 'coffee', quantityUsed: 0.25, usedAt: '2026-05-20T08:00:00.000Z' }],
+        deals: [{ productId: 'coffee', storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 49.9, dealScore: 82 }]
+      })
+    }));
+
+    assert.equal(response.status, 200);
+    const body = await json(response) as {
+      userId: string;
+      statuses: Array<{ productId: string; remainingQuantity: number; status: string; daysUntilExpiry?: number }>;
+      replenishment: Array<{ productId: string; quantityToBuy: number; priority: string; bestDeal?: { storeName: string } }>;
+      expiringSoonProductIds: string[];
+    };
+    assert.equal(body.userId, 'user-1');
+    assert.deepEqual(body.statuses.map((item) => [item.productId, item.remainingQuantity, item.status, item.daysUntilExpiry]), [
+      ['coffee', 0.75, 'low_stock', undefined],
+      ['tomatoes', 1, 'expiring_soon', 1],
+      ['yogurt', 1, 'expired', -2]
+    ]);
+    assert.deepEqual(body.replenishment.map((item) => [item.productId, item.quantityToBuy, item.priority, item.bestDeal?.storeName]), [
+      ['yogurt', 1, 'high', undefined],
+      ['coffee', 2.25, 'medium', 'Willys Odenplan']
+    ]);
+    assert.deepEqual(body.expiringSoonProductIds, ['tomatoes']);
+
+    const invalid = await handle(new Request('http://localhost/api/pantry/replenishment?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ pantry: [{ productId: 'coffee', name: 'Coffee', category: 'pantry', quantity: -1, unit: 'pack', minimumQuantity: 1 }] })
+    }));
+    assert.equal(invalid.status, 400);
+  });
+
   it('writes and reads user-scoped household plans through protected proposal routes', async () => {
     const handle = createHttpHandler();
     const payload = {
