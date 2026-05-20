@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildWatchlistAlerts, searchProducts, summarizeBudget, summarizeCategoryDealLeaders } from '../index.js';
+import { buildWatchlistAlerts, planMobileBudgetTracker, searchProducts, summarizeBudget } from '../index.js';
 
 describe('searchProducts', () => {
   it('finds products by ticker, name, category, or chain availability', () => {
@@ -163,5 +163,44 @@ describe('summarizeBudget', () => {
       weeklyStatus: 'under',
       monthlyStatus: 'under'
     });
+  });
+});
+
+describe('planMobileBudgetTracker', () => {
+  it('tracks in-store running totals and budget-mode guidance while under budget', () => {
+    const plan = planMobileBudgetTracker({
+      mode: 'student',
+      weeklyBudget: 800,
+      monthlyBudget: 3200,
+      estimatedBasketTotal: 742,
+      runningCartTotal: 436,
+      receiptTotalsThisWeek: [120],
+      receiptTotalsThisMonth: [120, 240]
+    });
+
+    assert.equal(plan.runningRemaining, 364);
+    assert.equal(plan.runningStatus, 'under');
+    assert.equal(plan.weeklyRemainingAfterEstimate, 58);
+    assert.equal(plan.guidance, 'Prioritize private-label swaps and lowest unit prices.');
+    assert.deepEqual(plan.actions, ['continue_shopping', 'compare_favorite_stores', 'scan_receipt']);
+  });
+
+  it('flags over-budget carts with reduction and substitution actions', () => {
+    const plan = planMobileBudgetTracker({
+      mode: 'strict',
+      weeklyBudget: 800,
+      monthlyBudget: 3200,
+      estimatedBasketTotal: 812,
+      runningCartTotal: 824.5,
+      receiptTotalsThisWeek: [812],
+      receiptTotalsThisMonth: [812, 900]
+    });
+
+    assert.equal(plan.runningRemaining, -24.5);
+    assert.equal(plan.runningStatus, 'over');
+    assert.equal(plan.weeklyRemainingAfterEstimate, -12);
+    assert.equal(plan.weeklyStatus, 'over');
+    assert.equal(plan.guidance, 'Stay under the weekly limit before checkout.');
+    assert.deepEqual(plan.actions, ['reduce_cart', 'review_substitutions', 'compare_favorite_stores', 'scan_receipt']);
   });
 });
