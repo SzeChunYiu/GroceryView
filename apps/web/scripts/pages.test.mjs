@@ -256,8 +256,15 @@ describe('buildStaticPages', () => {
       assert.match(notificationInbox, /data-notification-inbox-alerts/);
       assert.match(notificationInbox, /data-notification-inbox-delivery/);
       assert.match(notificationInbox, /data-notification-inbox-guardrails/);
+      assert.match(notificationInbox, /data-notification-inbox-ops/);
+      assert.match(notificationInbox, /name="metricsToken"/);
+      assert.match(notificationInbox, /data-flow-action="load-notification-metrics"/);
       assert.match(notificationInbox, /fetch\(apiUrl\('\/api\/notifications\/inbox'/);
+      assert.match(notificationInbox, /fetch\(apiUrl\('\/api\/metrics\/notifications'/);
+      assert.match(notificationInbox, /x-groceryview-metrics-token/);
+      assert.match(notificationInbox, /groceryview_notification_worker_events_total/);
       assert.match(notificationInbox, /Connected notification inbox loaded/);
+      assert.match(notificationInbox, /Connected notification metrics loaded/);
 
       const nutritionAllergens = await readFile(join(root, 'nutrition/allergens/index.html'), 'utf8');
       assert.match(nutritionAllergens, /Nutrition and allergen review/);
