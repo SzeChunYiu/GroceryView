@@ -93,6 +93,102 @@ describe('notification suppression webhook route', () => {
     assert.deepEqual(persisted, []);
   });
 
+  it('accepts signed provider suppression payloads and persists each normalized event', async () => {
+    const persisted: Array<Record<string, unknown>> = [];
+    const handle = createHttpHandler(undefined, {
+      now: new Date('2026-05-20T12:00:00.000Z'),
+      notificationWebhookSecret: 'webhook-secret',
+      notificationSuppressionSink: {
+        upsertNotificationSuppression: async (suppression) => {
+          persisted.push(suppression);
+        }
+      }
+    });
+    const body = JSON.stringify([
+      {
+        email: 'bounce@example.com',
+        event: 'bounce',
+        timestamp: 1779278340,
+        sg_event_id: 'sg-bounce-1'
+      },
+      {
+        email: 'complaint@example.com',
+        event: 'spam report',
+        timestamp: 1779278400,
+        sg_event_id: 'sg-complaint-1'
+      },
+      {
+        email: 'delivered@example.com',
+        event: 'delivered',
+        timestamp: 1779278460
+      }
+    ]);
+
+    const response = await handle(new Request('http://localhost/api/notifications/provider-suppression-events?provider=sendgrid', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-groceryview-signature': signBody(body, 'webhook-secret')
+      },
+      body
+    }));
+
+    assert.equal(response.status, 202);
+    assert.deepEqual(await json(response), {
+      accepted: true,
+      persisted: 2,
+      suppressionIds: ['suppression-sendgrid-sg-bounce-1', 'suppression-sendgrid-sg-complaint-1']
+    });
+    assert.deepEqual(persisted.map((suppression) => ({
+      id: suppression.id,
+      recipient: suppression.recipient,
+      reason: suppression.reason,
+      active: suppression.active,
+      source: suppression.source
+    })), [
+      {
+        id: 'suppression-sendgrid-sg-bounce-1',
+        recipient: 'bounce@example.com',
+        reason: 'bounce',
+        active: true,
+        source: { provider: 'sendgrid', providerEventId: 'sg-bounce-1', eventType: 'bounce' }
+      },
+      {
+        id: 'suppression-sendgrid-sg-complaint-1',
+        recipient: 'complaint@example.com',
+        reason: 'complaint',
+        active: true,
+        source: { provider: 'sendgrid', providerEventId: 'sg-complaint-1', eventType: 'complaint' }
+      }
+    ]);
+  });
+
+  it('rejects provider suppression payloads without a supported provider', async () => {
+    const persisted: Array<Record<string, unknown>> = [];
+    const handle = createHttpHandler(undefined, {
+      notificationWebhookSecret: 'webhook-secret',
+      notificationSuppressionSink: {
+        upsertNotificationSuppression: async (suppression) => {
+          persisted.push(suppression);
+        }
+      }
+    });
+    const body = JSON.stringify({ email: 'bounce@example.com', event: 'bounce' });
+
+    const response = await handle(new Request('http://localhost/api/notifications/provider-suppression-events?provider=unknown', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-groceryview-signature': signBody(body, 'webhook-secret')
+      },
+      body
+    }));
+
+    assert.equal(response.status, 400);
+    assert.match((await json(response) as { error: string }).error, /provider must be sendgrid or ses/i);
+    assert.deepEqual(persisted, []);
+  });
+
   it('fails closed when the webhook secret is not configured', async () => {
     const handle = createHttpHandler();
     const response = await handle(new Request('http://localhost/api/notifications/suppression-events', {

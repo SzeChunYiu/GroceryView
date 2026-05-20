@@ -1,11 +1,21 @@
 import { createHmac, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
+import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createGroceryViewApi } from '@groceryview/api';
 import { parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
 import {
+  checkPostgresIntegrationReadiness,
+  createPgQueryExecutor,
+  createPostgresRepository,
+  type PgLikeClient,
+  type PostgresIntegrationReadinessReport,
+  type QueryExecutor
+} from '@groceryview/db';
+import {
   buildSubscriptionAccessPolicy,
+  parseStripeCompatibleSubscriptionEvent,
   processBillingSubscriptionEvent,
   type BillingSubscriptionEntitlementMutation,
   type BillingSubscriptionEvent,
@@ -16,6 +26,8 @@ import {
 import {
   applyHumanReviewDecision,
   authorizeHumanReviewAction,
+  buildPrivacyExport,
+  planAccountDeletion,
   summarizeHumanReviewSla,
   type HumanReviewAssignment,
   type HumanReviewDecision,
@@ -23,9 +35,11 @@ import {
 } from '@groceryview/core';
 import {
   formatNotificationOperationsMetrics,
+  parseNotificationSuppressionWebhook,
   processNotificationSuppressionEvent,
   type DeliveryChannel,
   type NotificationOperationsReport,
+  type NotificationSuppressionWebhookProvider,
   type NotificationSuppressionEventType,
   type NotificationSuppressionMutation
 } from '@groceryview/notifications';
@@ -49,11 +63,13 @@ export type AuthOptions = {
     upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
   };
   billingWebhookSecret?: string;
+  billingPriceIdPlanMap?: Partial<Record<string, SubscriptionPlan>>;
   billingSubscriptionSink?: {
     upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
   };
   notificationMetricsToken?: string;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
+  postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
 };
 
 export type SubscriptionEntitlementLookupRecord = SubscriptionEntitlementSnapshot & {
@@ -71,14 +87,23 @@ export type RuntimePersistenceRepository = {
   upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
 };
 
+export type RuntimePgPool = PgLikeClient & {
+  end(): Promise<void> | void;
+};
+
+export type RuntimePgPoolFactory = (databaseUrl: string) => RuntimePgPool;
+
 export type RuntimeHandlerOptions = {
   now?: Date;
   repository?: RuntimePersistenceRepository;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
+  postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
+  pgPoolFactory?: RuntimePgPoolFactory;
 };
 
 type JsonRecord = Record<string, unknown>;
 
+const require = createRequire(import.meta.url);
 const jsonHeaders = { 'content-type': 'application/json; charset=utf-8' };
 
 function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
@@ -123,6 +148,11 @@ function optionalDeliveryChannel(value: unknown): DeliveryChannel | undefined {
 function requiredSuppressionEventType(value: unknown): NotificationSuppressionEventType {
   if (value === 'unsubscribe' || value === 'bounce' || value === 'complaint' || value === 'resubscribe') return value;
   throw new Error('eventType must be unsubscribe, bounce, complaint, or resubscribe.');
+}
+
+function requiredSuppressionWebhookProvider(value: unknown): NotificationSuppressionWebhookProvider {
+  if (value === 'sendgrid' || value === 'ses') return value;
+  throw new Error('provider must be sendgrid or ses.');
 }
 
 function optionalNumber(value: unknown, field: string): number | undefined {
@@ -270,6 +300,20 @@ function parseBillingSubscriptionEvent(body: JsonRecord): BillingSubscriptionEve
   };
 }
 
+function parseBillingSubscriptionWebhookBody(body: JsonRecord, authOptions: AuthOptions): BillingSubscriptionEvent {
+  rejectSensitiveBillingEventFields(body);
+  if (body.provider !== undefined) return parseBillingSubscriptionEvent(body);
+
+  const receivedAt = (authOptions.now ?? new Date()).toISOString();
+  const event = parseStripeCompatibleSubscriptionEvent({
+    payload: body,
+    receivedAt,
+    priceIdPlanMap: authOptions.billingPriceIdPlanMap
+  });
+  if (!event) throw new Error('Unsupported billing subscription webhook event.');
+  return event;
+}
+
 export function createHttpHandler(api = createGroceryViewApi(), authOptions: AuthOptions = {}): HttpHandler {
   const requireSession = async (request: Request): Promise<SessionPayload | Response> => {
     if (!authOptions.authSecret) return errorResponse(503, 'Auth secret is not configured.');
@@ -351,6 +395,29 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         );
       }
 
+      if (method === 'GET' && path === '/api/readiness/postgres') {
+        if (!authOptions.notificationMetricsToken) return errorResponse(503, 'PostgreSQL readiness token is not configured.');
+        if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
+          return errorResponse(401, 'A valid PostgreSQL readiness token is required.');
+        }
+        if (!authOptions.postgresReadinessProvider) return errorResponse(503, 'PostgreSQL readiness provider is not configured.');
+
+        try {
+          const report = await authOptions.postgresReadinessProvider();
+          return jsonResponse(report, { status: report.status === 'ready' ? 200 : 503 });
+        } catch {
+          return jsonResponse(
+            {
+              status: 'blocked',
+              blockers: ['postgres_readiness_probe_failed'],
+              evidence: [],
+              summary: 'PostgreSQL integration contract is blocked.'
+            },
+            { status: 503 }
+          );
+        }
+      }
+
       if (method === 'GET' && path === '/api/human-review/assignments') {
         const result = await requireHumanReviewer(request);
         if (result instanceof Response) return result;
@@ -430,6 +497,37 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         );
       }
 
+      if (method === 'POST' && path === '/api/notifications/provider-suppression-events') {
+        if (!authOptions.notificationWebhookSecret) return errorResponse(503, 'Notification webhook secret is not configured.');
+
+        const rawBody = request.body ? await request.text() : '';
+        if (!hasValidNotificationWebhookSignature(request, rawBody, authOptions.notificationWebhookSecret)) {
+          return errorResponse(401, 'A valid notification webhook signature is required.');
+        }
+
+        const sink = authOptions.notificationSuppressionSink;
+        if (!sink) return errorResponse(503, 'Notification suppression sink is not configured.');
+
+        const provider = requiredSuppressionWebhookProvider(url.searchParams.get('provider'));
+        const events = parseNotificationSuppressionWebhook({
+          provider,
+          payload: JSON.parse(rawBody) as unknown,
+          receivedAt: (authOptions.now ?? new Date()).toISOString()
+        });
+        const suppressions = events.map((event) => processNotificationSuppressionEvent(event));
+        for (const suppression of suppressions) {
+          await sink.upsertNotificationSuppression(suppression);
+        }
+        return jsonResponse(
+          {
+            accepted: true,
+            persisted: suppressions.length,
+            suppressionIds: suppressions.map((suppression) => suppression.id)
+          },
+          { status: 202 }
+        );
+      }
+
       if (method === 'POST' && path === '/api/billing/subscription-events') {
         if (!authOptions.billingWebhookSecret) return errorResponse(503, 'Billing webhook secret is not configured.');
 
@@ -441,7 +539,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         const sink = authOptions.billingSubscriptionSink;
         if (!sink) return errorResponse(503, 'Billing subscription sink is not configured.');
 
-        const entitlement = processBillingSubscriptionEvent(parseBillingSubscriptionEvent(parseJsonObject(rawBody)));
+        const entitlement = processBillingSubscriptionEvent(parseBillingSubscriptionWebhookBody(parseJsonObject(rawBody), authOptions));
         await sink.upsertSubscriptionEntitlement(entitlement);
         return jsonResponse(
           { accepted: true, persisted: true, userId: entitlement.userId, status: entitlement.status },
@@ -556,6 +654,35 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(api.getBudgetSummary(user));
       }
 
+      if (path === '/api/privacy/export') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') {
+          return jsonResponse(
+            buildPrivacyExport(
+              {
+                userId: user,
+                favoriteStoreIds: api.getFavoriteStores(user).map((store) => store.id),
+                watchlistProductIds: api.getWatchlist(user).items.map((item) => item.productId),
+                receiptIds: [],
+                householdIds: []
+              },
+              (authOptions.now ?? new Date()).toISOString()
+            )
+          );
+        }
+      }
+
+      if (path === '/api/privacy/deletion-plan') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'POST') return jsonResponse({ ...planAccountDeletion(user), destructiveAction: false, requiresReauthentication: true });
+      }
+
       if (method === 'GET' && path === '/api/indices') return jsonResponse(api.getIndices());
       const indexMatch = path.match(/^\/api\/indices\/([^/]+)$/);
       if (method === 'GET' && indexMatch) {
@@ -644,6 +771,8 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/products/{id}': { get: publicOperation('Get product detail.') },
       '/api/products/{id}/prices': { get: publicOperation('Get product prices by store.') },
       '/api/products/{id}/history': { get: publicOperation('Get product price history.') },
+      '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
+      '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
       '/api/users/{userId}/favorite-stores': {
         get: protectedOperation('List favorite stores.'),
         post: protectedOperation('Add favorite store.')
@@ -662,7 +791,9 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/human-review/assignments': { get: protectedOperation('List open human-review assignments and SLA status.') },
       '/api/human-review/assignments/{id}/decisions': { post: protectedOperation('Record a human-review decision.') },
       '/api/metrics/notifications': { get: metricsOperation('Export notification operations metrics.') },
-      '/api/notifications/suppression-events': { post: webhookOperation('Accept signed notification suppression provider events.') }
+      '/api/readiness/postgres': { get: metricsOperation('Check PostgreSQL schema and migration readiness without exposing database secrets.') },
+      '/api/notifications/suppression-events': { post: webhookOperation('Accept signed normalized notification suppression events.') },
+      '/api/notifications/provider-suppression-events': { post: webhookOperation('Accept signed SendGrid or SES suppression payloads.') }
     }
   };
 }
@@ -711,8 +842,19 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     notificationWebhookSecret: config.notificationWebhookSecret,
     billingWebhookSecret: config.billingWebhookSecret,
     notificationMetricsToken: config.metricsToken,
-    notificationMetricsProvider: options.notificationMetricsProvider
+    notificationMetricsProvider: options.notificationMetricsProvider,
+    postgresReadinessProvider: options.postgresReadinessProvider
   };
+}
+
+function createDefaultPgPool(databaseUrl: string): RuntimePgPool {
+  const pg = require('pg') as { Pool?: new (config: { connectionString: string }) => RuntimePgPool };
+  if (!pg.Pool) throw new Error('pg Pool export is not available.');
+  return new pg.Pool({ connectionString: databaseUrl });
+}
+
+function noopClose(): Promise<void> {
+  return Promise.resolve();
 }
 
 export function buildRepositoryBackedAuthOptions(
@@ -743,20 +885,73 @@ export function buildRuntimeRequestAuthOptions(config: RuntimeConfig, options: R
   return options.repository ? buildRepositoryBackedAuthOptions(config, options.repository, options) : buildRuntimeAuthOptions(config, options);
 }
 
+function createRuntimeRepositoryResource(config: RuntimeConfig, options: RuntimeHandlerOptions): {
+  repository?: RuntimePersistenceRepository;
+  postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
+  close(): Promise<void>;
+} {
+  if (options.repository || !config.databaseUrl) return { close: noopClose };
+
+  const pool = (options.pgPoolFactory ?? createDefaultPgPool)(config.databaseUrl);
+  const executor: QueryExecutor = createPgQueryExecutor(pool);
+  return {
+    repository: createPostgresRepository(executor),
+    postgresReadinessProvider: () => checkPostgresIntegrationReadiness({ executor, repositoryProbes: [] }),
+    async close() {
+      await pool.end();
+    }
+  };
+}
+
+function createRuntimeHttpServiceFromConfig(config: RuntimeConfig, options: RuntimeHandlerOptions = {}): RuntimeHttpService {
+  const resource = createRuntimeRepositoryResource(config, options);
+  const runtimeOptions: RuntimeHandlerOptions = {
+    ...options,
+    ...(resource.repository ? { repository: resource.repository } : {}),
+    postgresReadinessProvider: options.postgresReadinessProvider ?? resource.postgresReadinessProvider
+  };
+  const authOptions = buildRuntimeRequestAuthOptions(config, runtimeOptions);
+  return {
+    handler: createHttpHandler(undefined, authOptions),
+    close: resource.close
+  };
+}
+
+export type RuntimeHttpService = {
+  handler: HttpHandler;
+  close(): Promise<void>;
+};
+
+export function createRuntimeHttpService(
+  env: Record<string, string | undefined> = process.env,
+  options: RuntimeHandlerOptions = {}
+): RuntimeHttpService {
+  return createRuntimeHttpServiceFromConfig(loadRuntimeConfig(env), options);
+}
+
 export function createRuntimeHttpHandler(
   env: Record<string, string | undefined> = process.env,
   options: RuntimeHandlerOptions = {}
 ): HttpHandler {
-  return createHttpHandler(undefined, buildRuntimeRequestAuthOptions(loadRuntimeConfig(env), options));
+  return createRuntimeHttpService(env, options).handler;
 }
 
 export function createRuntimeNodeServer(env: Record<string, string | undefined> = process.env, options: RuntimeHandlerOptions = {}) {
-  return createNodeServer(createRuntimeHttpHandler(env, options));
+  const service = createRuntimeHttpService(env, options);
+  const server = createNodeServer(service.handler);
+  server.on('close', () => {
+    void service.close();
+  });
+  return server;
 }
 
 export function startNodeServerFromEnv(env: Record<string, string | undefined> = process.env, options: RuntimeHandlerOptions = {}) {
   const config = loadRuntimeConfig(env);
-  const server = createNodeServer(createHttpHandler(undefined, buildRuntimeRequestAuthOptions(config, options)));
+  const service = createRuntimeHttpServiceFromConfig(config, options);
+  const server = createNodeServer(service.handler);
+  server.on('close', () => {
+    void service.close();
+  });
   server.listen(config.port);
   return server;
 }

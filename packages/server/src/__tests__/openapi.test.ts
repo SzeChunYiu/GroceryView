@@ -22,11 +22,15 @@ describe('buildOpenApiDocument', () => {
       '/api/indices/{id}',
       '/api/market/overview',
       '/api/metrics/notifications',
+      '/api/notifications/provider-suppression-events',
       '/api/notifications/suppression-events',
+      '/api/privacy/deletion-plan',
+      '/api/privacy/export',
       '/api/products/search',
       '/api/products/{id}',
       '/api/products/{id}/history',
       '/api/products/{id}/prices',
+      '/api/readiness/postgres',
       '/api/stores',
       '/api/stores/{id}',
       '/api/users/{userId}/favorite-stores',
@@ -42,8 +46,12 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/watchlist'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/human-review/assignments'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/human-review/assignments/{id}/decisions'].post?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/privacy/export'].get?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/privacy/deletion-plan'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/metrics/notifications'].get?.security, [{ metricsToken: [] }]);
+    assert.deepEqual(doc.paths['/api/readiness/postgres'].get?.security, [{ metricsToken: [] }]);
     assert.deepEqual(doc.paths['/api/notifications/suppression-events'].post?.security, [{ webhookSignature: [] }]);
+    assert.deepEqual(doc.paths['/api/notifications/provider-suppression-events'].post?.security, [{ webhookSignature: [] }]);
     assert.match(doc.paths['/api/health'].get?.summary ?? '', /without exposing secrets/i);
     assert.equal(doc.paths['/api/market/overview'].get?.security, undefined);
   });
