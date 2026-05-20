@@ -50,6 +50,12 @@ const basket = compareBasketStrategies({
   ]
 });
 
+const smartSwaps = [
+  { from: 'Zoégas Coffee 450g', to: 'Garant Bryggkaffe 450g', savings: 12, rule: 'Same category, verified shelf price' },
+  { from: 'Arla Milk 1L', to: 'ICA Milk 1L', savings: 2, rule: 'Household accepts private label dairy' },
+  { from: 'Eggs 12-pack', to: 'Lidl Eggs 12-pack', savings: 4, rule: 'Favorite-store match, same pack size' }
+];
+
 
 const alerts = buildWatchlistAlerts({
   watchlist: [
@@ -190,6 +196,13 @@ app.innerHTML = `
           <thead><tr><th>Product</th><th>Store</th><th>Total</th></tr></thead>
           <tbody>
             ${basket.cheapestByProduct.assignments.map((item) => `<tr><td>${item.productId}</td><td>${item.storeName}</td><td>${item.lineTotal.toFixed(2)} SEK</td></tr>`).join('')}
+          </tbody>
+        </table>
+        <h2 style="margin-top:24px">Smart swaps</h2>
+        <table class="table">
+          <thead><tr><th>Swap</th><th>Saves</th><th>Rule</th></tr></thead>
+          <tbody>
+            ${smartSwaps.map((swap) => `<tr><td>${swap.from} → ${swap.to}</td><td>${swap.savings} SEK</td><td>${swap.rule}</td></tr>`).join('')}
           </tbody>
         </table>
       </div>
