@@ -12,7 +12,8 @@ import {
   parseNotificationSuppressionWebhook,
   processNotificationSuppressionEvent,
   runRepositoryNotificationWorkerCycle,
-  runNotificationWorkerTick
+  runNotificationWorkerTick,
+  summarizeDeliveryResults
 } from '../index.js';
 
 const persistedTask = (overrides: Partial<Parameters<typeof planDeadLetterNotificationReplay>[0]['tasks'][number]> = {}) => ({
@@ -203,6 +204,20 @@ describe('deliverDueNotifications', () => {
     assert.deepEqual(results, [
       { status: 'failed_no_provider', channel: 'email', recipient: 'user@example.com', reason: 'No email provider configured.' }
     ]);
+  });
+});
+
+describe('summarizeDeliveryResults', () => {
+  it('counts sent, skipped, and failed delivery outcomes for operations metrics', () => {
+    assert.deepEqual(
+      summarizeDeliveryResults([
+        { status: 'sent', channel: 'push', recipient: 'device-1', providerMessageId: 'push-provider-id' },
+        { status: 'skipped_not_due', channel: 'email', recipient: 'user@example.com' },
+        { status: 'failed_no_provider', channel: 'email', recipient: 'user-2@example.com', reason: 'No email provider configured.' },
+        { status: 'failed_provider_error', channel: 'push', recipient: 'device-3', reason: 'provider timeout' }
+      ]),
+      { total: 4, sent: 1, skipped: 1, failedNoProvider: 1, failedProviderError: 1, failed: 2 }
+    );
   });
 });
 

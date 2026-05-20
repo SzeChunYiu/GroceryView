@@ -27,6 +27,80 @@ export type DeploymentReadinessReport = {
   summary: string;
 };
 
+export type GateBlockerSummary = {
+  total: number;
+  missingSecrets: number;
+  missingArtifacts: number;
+  releaseValidation: number;
+  smokeTests: number;
+  healthChecks: number;
+  scheduledJobs: number;
+  rollbackPlan: number;
+  deploymentPrerequisites: number;
+};
+
+export type GateWarningSummary = {
+  total: number;
+  missingHealthCheckDefinitions: number;
+  missingSmokeTestDefinitions: number;
+};
+
+export type DeploymentReadinessReportSummary = {
+  status: DeploymentReadinessReport['status'];
+  blockers: GateBlockerSummary;
+  warnings: GateWarningSummary;
+};
+
+export function summarizeGateBlockers(blockers: string[]): GateBlockerSummary {
+  return blockers.reduce<GateBlockerSummary>(
+    (summary, blocker) => {
+      summary.total += 1;
+      if (blocker.startsWith('missing_secret:')) summary.missingSecrets += 1;
+      if (blocker.startsWith('missing_artifact:')) summary.missingArtifacts += 1;
+      if (blocker.startsWith('release_validation_')) summary.releaseValidation += 1;
+      if (blocker.startsWith('smoke_test_') || blocker === 'no_smoke_tests_defined') summary.smokeTests += 1;
+      if (blocker.startsWith('health_check_')) summary.healthChecks += 1;
+      if (blocker.startsWith('scheduled_job_')) summary.scheduledJobs += 1;
+      if (blocker === 'rollback_plan_not_approved') summary.rollbackPlan += 1;
+      if (blocker === 'hosting_provider_not_selected' || blocker === 'dns_not_configured' || blocker === 'observability_not_configured') {
+        summary.deploymentPrerequisites += 1;
+      }
+      return summary;
+    },
+    {
+      total: 0,
+      missingSecrets: 0,
+      missingArtifacts: 0,
+      releaseValidation: 0,
+      smokeTests: 0,
+      healthChecks: 0,
+      scheduledJobs: 0,
+      rollbackPlan: 0,
+      deploymentPrerequisites: 0
+    }
+  );
+}
+
+export function summarizeGateWarnings(warnings: string[]): GateWarningSummary {
+  return warnings.reduce<GateWarningSummary>(
+    (summary, warning) => {
+      summary.total += 1;
+      if (warning === 'no_health_checks_defined') summary.missingHealthCheckDefinitions += 1;
+      if (warning === 'no_smoke_tests_defined') summary.missingSmokeTestDefinitions += 1;
+      return summary;
+    },
+    { total: 0, missingHealthCheckDefinitions: 0, missingSmokeTestDefinitions: 0 }
+  );
+}
+
+export function summarizeDeploymentReadinessReport(report: DeploymentReadinessReport): DeploymentReadinessReportSummary {
+  return {
+    status: report.status,
+    blockers: summarizeGateBlockers(report.blockers),
+    warnings: summarizeGateWarnings(report.warnings)
+  };
+}
+
 export function buildDeploymentReadinessReport(input: DeploymentReadinessInput): DeploymentReadinessReport {
   const blockers: string[] = [];
   const warnings: string[] = [];

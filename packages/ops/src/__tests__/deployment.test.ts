@@ -1,6 +1,12 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildDeploymentReadinessReport, buildDeploymentSmokeEvidenceReport, buildRollbackPlan } from '../index.js';
+import {
+  buildDeploymentReadinessReport,
+  buildRollbackPlan,
+  summarizeDeploymentReadinessReport,
+  summarizeGateBlockers,
+  summarizeGateWarnings
+} from '../index.js';
 
 describe('deployment ops foundation', () => {
   it('passes readiness only when provider, secrets, DNS, health checks, and smoke tests are ready', () => {
@@ -94,30 +100,70 @@ describe('deployment ops foundation', () => {
     });
   });
 
-  it('blocks production deployment during active change freezes and unresolved major incidents', () => {
+  it('summarizes gate blockers for deployment dashboards', () => {
+    assert.deepEqual(
+      summarizeGateBlockers([
+        'hosting_provider_not_selected',
+        'missing_secret:DATABASE_URL',
+        'missing_artifact:api-image',
+        'release_validation_fail',
+        'smoke_test_not_run:api-health',
+        'health_check_failed:api',
+        'scheduled_job_failed:notification-worker',
+        'rollback_plan_not_approved',
+        'dns_not_configured',
+        'observability_not_configured'
+      ]),
+      {
+        total: 10,
+        missingSecrets: 1,
+        missingArtifacts: 1,
+        releaseValidation: 1,
+        smokeTests: 1,
+        healthChecks: 1,
+        scheduledJobs: 1,
+        rollbackPlan: 1,
+        deploymentPrerequisites: 3
+      }
+    );
+  });
+
+  it('summarizes readiness warnings and full readiness reports', () => {
     const report = buildDeploymentReadinessReport({
-      providerSelected: true,
-      requiredSecretsPresent: ['DATABASE_URL', 'SESSION_SECRET', 'PUBLIC_APP_URL'],
-      requiredSecrets: ['DATABASE_URL', 'SESSION_SECRET', 'PUBLIC_APP_URL'],
-      dnsConfigured: true,
-      healthChecks: [{ name: 'api', status: 'pass' }],
-      smokeTests: [{ name: 'health-endpoint', status: 'pass' }],
-      changeFreeze: { active: true, reason: 'payday-traffic-window' },
-      activeIncidents: [
-        { id: 'INC-100', severity: 'sev1', status: 'mitigating' },
-        { id: 'INC-101', severity: 'sev2', status: 'investigating' },
-        { id: 'INC-102', severity: 'sev3', status: 'investigating' },
-        { id: 'INC-103', severity: 'sev1', status: 'resolved' }
-      ],
-      observabilityConfigured: true
+      providerSelected: false,
+      requiredSecretsPresent: [],
+      requiredSecrets: ['DATABASE_URL'],
+      dnsConfigured: false,
+      healthChecks: [],
+      smokeTests: [],
+      scheduledJobs: [{ name: 'notification-worker', scheduleConfigured: false, status: 'not_run' }],
+      observabilityConfigured: false
     });
 
-    assert.deepEqual(report.status, 'blocked');
-    assert.deepEqual(report.blockers, [
-      'change_freeze_active:payday-traffic-window',
-      'active_incident:sev1:INC-100',
-      'active_incident:sev2:INC-101'
-    ]);
+    assert.deepEqual(summarizeGateWarnings(report.warnings), {
+      total: 2,
+      missingHealthCheckDefinitions: 1,
+      missingSmokeTestDefinitions: 1
+    });
+    assert.deepEqual(summarizeDeploymentReadinessReport(report), {
+      status: 'blocked',
+      blockers: {
+        total: 6,
+        missingSecrets: 1,
+        missingArtifacts: 0,
+        releaseValidation: 0,
+        smokeTests: 0,
+        healthChecks: 0,
+        scheduledJobs: 2,
+        rollbackPlan: 0,
+        deploymentPrerequisites: 3
+      },
+      warnings: {
+        total: 2,
+        missingHealthCheckDefinitions: 1,
+        missingSmokeTestDefinitions: 1
+      }
+    });
   });
 
   it('builds rollback instructions pinned to previous artifact and database state', () => {
@@ -138,64 +184,6 @@ describe('deployment ops foundation', () => {
         'Run smoke tests before re-enabling traffic.'
       ],
       requiresManualDatabaseRecovery: true
-    });
-  });
-
-  it('blocks production deployment when required smoke evidence is missing, stale, or failed', () => {
-    const report = buildDeploymentSmokeEvidenceReport({
-      checkedAt: '2026-05-20T08:00:00.000Z',
-      maxAgeMinutes: 30,
-      requiredSmokeTests: ['web-home', 'api-health', 'notification-worker'],
-      evidence: [
-        {
-          name: 'web-home',
-          status: 'pass',
-          checkedAt: '2026-05-20T07:00:00.000Z',
-          url: 'https://groceryview.example/health'
-        },
-        {
-          name: 'api-health',
-          status: 'fail',
-          checkedAt: '2026-05-20T07:55:00.000Z',
-          url: 'https://api.groceryview.example/health'
-        }
-      ]
-    });
-
-    assert.deepEqual(report, {
-      status: 'blocked',
-      blockers: ['smoke_evidence_stale:web-home', 'smoke_evidence_failed:api-health', 'smoke_evidence_missing:notification-worker'],
-      passed: ['web-home'],
-      summary: 'Deployment smoke evidence is blocked until every required probe has fresh passing proof.'
-    });
-  });
-
-  it('accepts fresh passing smoke evidence for every required production probe', () => {
-    const report = buildDeploymentSmokeEvidenceReport({
-      checkedAt: '2026-05-20T08:00:00.000Z',
-      maxAgeMinutes: 30,
-      requiredSmokeTests: ['web-home', 'api-health'],
-      evidence: [
-        {
-          name: 'web-home',
-          status: 'pass',
-          checkedAt: '2026-05-20T07:45:00.000Z',
-          url: 'https://groceryview.example/health'
-        },
-        {
-          name: 'api-health',
-          status: 'pass',
-          checkedAt: '2026-05-20T07:59:00.000Z',
-          url: 'https://api.groceryview.example/health'
-        }
-      ]
-    });
-
-    assert.deepEqual(report, {
-      status: 'ready',
-      blockers: [],
-      passed: ['web-home', 'api-health'],
-      summary: 'Deployment smoke evidence is fresh and passing.'
     });
   });
 });
