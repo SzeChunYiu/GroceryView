@@ -355,6 +355,12 @@ const nutritionDeals = rankNutritionPerKrona([
   { productId: 'yogurt', name: 'Greek yogurt', price: 34.9, nutritionPerPackage: { proteinGrams: 55, calories: 380, fiberGrams: 0, sugarGrams: 16, saltGrams: 0.5 } }
 ], 'protein');
 
+const communityReports = [
+  { product: 'Zoégas Coffee 450g', report: 'Wrong price', evidence: 'Shelf photo', status: 'Needs review', trust: 'trusted reporter' },
+  { product: 'Arla Milk 1L', report: 'Out of stock', evidence: 'Receipt mismatch', status: 'Queued', trust: 'new reporter' },
+  { product: 'Butter 600g', report: 'Promo expired', evidence: 'Retailer page', status: 'Accepted', trust: 'verified history' }
+];
+
 const app = document.querySelector<HTMLDivElement>('#app');
 if (!app) throw new Error('Missing #app root');
 
@@ -828,6 +834,19 @@ app.innerHTML = `
               <td>${deal.price.toFixed(2)} SEK</td>
               <td>${deal.saltWarning ? 'Salt warning' : `${deal.sugarPerPackage}g sugar/package`}</td>
             </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Community price reports</h2>
+        <p class="lede">User-submitted price reports flow through a trust-ranked queue. Trusted reporters accelerate verification; new reporters require manual review before any price update.</p>
+        <table class="table">
+          <thead><tr><th>Product</th><th>Report type</th><th>Evidence</th><th>Status</th><th>Trust</th></tr></thead>
+          <tbody>
+            ${communityReports.map((r) => `<tr><td>${r.product}</td><td>${r.report}</td><td>${r.evidence}</td><td><span class="status">${r.status}</span></td><td>${r.trust}</td></tr>`).join('')}
           </tbody>
         </table>
       </div>
