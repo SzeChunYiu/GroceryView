@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { applyMigrations, parseSqlStatements, type SqlExecutor } from '../index.js';
+import { applyMigrations, createMigrationPlan, migrationVersionFromPath, parseSqlStatements, type SqlExecutor } from '../index.js';
 
 class RecordingExecutor implements SqlExecutor {
   appliedVersions = new Set<string>();
@@ -25,6 +25,45 @@ describe('parseSqlStatements', () => {
       'create table a(id text)',
       'create index a_idx on a(id)'
     ]);
+  });
+});
+
+describe('migrationVersionFromPath', () => {
+  it('derives the migration version from a SQL basename', () => {
+    assert.equal(migrationVersionFromPath('infra/db/migrations/001_extensions.sql'), '001_extensions');
+    assert.equal(migrationVersionFromPath('infra\\db\\migrations\\002_init.sql'), '002_init');
+  });
+
+  it('rejects non-SQL migration paths', () => {
+    assert.throws(() => migrationVersionFromPath('infra/db/migrations/README.md'), /must end in \.sql/);
+  });
+});
+
+describe('createMigrationPlan', () => {
+  it('filters SQL files, sorts lexically by path, and preserves SQL contents', () => {
+    const plan = createMigrationPlan([
+      { path: 'infra/db/migrations/010_indexes.sql', sql: 'create index products_name_idx on products(name);' },
+      { path: 'infra/db/migrations/README.md', sql: 'ignore me' },
+      { path: 'infra/db/migrations/001_extensions.sql', sql: 'create extension if not exists postgis;' },
+      { path: 'infra/db/migrations/002_init.sql', sql: 'create table chains(id uuid primary key);' }
+    ]);
+
+    assert.deepEqual(plan, [
+      { version: '001_extensions', sql: 'create extension if not exists postgis;' },
+      { version: '002_init', sql: 'create table chains(id uuid primary key);' },
+      { version: '010_indexes', sql: 'create index products_name_idx on products(name);' }
+    ]);
+  });
+
+  it('rejects duplicate derived migration versions', () => {
+    assert.throws(
+      () =>
+        createMigrationPlan([
+          { path: 'infra/db/migrations/001_init.sql', sql: 'create table chains(id uuid primary key);' },
+          { path: 'db/migrations/001_init.sql', sql: 'create table stores(id uuid primary key);' }
+        ]),
+      /Duplicate migration version: 001_init/
+    );
   });
 });
 

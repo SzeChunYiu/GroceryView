@@ -3,11 +3,40 @@ export type Migration = {
   sql: string;
 };
 
+export type SqlMigrationFile = {
+  path: string;
+  sql: string;
+};
+
 export type SqlExecutor = {
   getAppliedMigrationVersions(): Promise<string[]>;
   execute(sql: string): Promise<void>;
   recordMigration(version: string): Promise<void>;
 };
+
+export function migrationVersionFromPath(path: string): string {
+  const filename = path.split(/[\\/]/).filter(Boolean).at(-1);
+  if (!filename || !filename.endsWith('.sql')) throw new Error(`Migration path must end in .sql: ${path}`);
+  return filename.slice(0, -'.sql'.length);
+}
+
+export function createMigrationPlan(files: SqlMigrationFile[]): Migration[] {
+  const migrations = files
+    .filter((file) => file.path.endsWith('.sql'))
+    .sort((a, b) => a.path.localeCompare(b.path))
+    .map((file) => ({
+      version: migrationVersionFromPath(file.path),
+      sql: file.sql
+    }));
+
+  const seenVersions = new Set<string>();
+  for (const migration of migrations) {
+    if (seenVersions.has(migration.version)) throw new Error(`Duplicate migration version: ${migration.version}`);
+    seenVersions.add(migration.version);
+  }
+
+  return migrations;
+}
 
 export function parseSqlStatements(sql: string): string[] {
   return sql
@@ -710,12 +739,81 @@ export type PostgresIntegrationProbe = {
   }>;
 };
 
+export type PostgresRepositoryProbe = {
+  name: string;
+  run(executor: QueryExecutor): Promise<void>;
+};
+
+export type CollectPostgresIntegrationProbeInput = {
+  executor: QueryExecutor;
+  requiredTables?: readonly string[];
+  requiredMigrationVersions?: readonly string[];
+  repositoryProbes: PostgresRepositoryProbe[];
+};
+
+export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
+  'app_users',
+  'favorite_stores',
+  'human_review_assignments',
+  'human_reviewers',
+  'community_reporter_trust',
+  'notification_tasks',
+  'notification_suppressions'
+] as const;
+
+export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
+  '001_initial_schema',
+  '003_human_review_assignments',
+  '004_human_reviewers',
+  '005_community_reporter_trust',
+  '006_notification_tasks',
+  '007_notification_suppressions',
+  '008_notification_task_suppressed_status'
+] as const;
+
 export type PostgresIntegrationReadinessReport = {
   status: 'ready' | 'blocked';
   blockers: string[];
   evidence: string[];
   summary: string;
 };
+
+type TableNameRow = { table_name: string };
+type MigrationVersionRow = { version: string };
+
+export async function collectPostgresIntegrationProbe(input: CollectPostgresIntegrationProbeInput): Promise<PostgresIntegrationProbe> {
+  const requiredTables = [...(input.requiredTables ?? POSTGRES_INTEGRATION_REQUIRED_TABLES)];
+  const requiredMigrationVersions = [...(input.requiredMigrationVersions ?? POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS)];
+
+  const [tableRows, migrationRows] = await Promise.all([
+    input.executor.query<TableNameRow>(
+      `select table_name
+       from information_schema.tables
+       where table_schema = 'public' and table_name = any($1::text[])
+       order by table_name`,
+      [requiredTables]
+    ),
+    input.executor.query<MigrationVersionRow>('select version from schema_migrations order by version')
+  ]);
+
+  const repositoryChecks: PostgresIntegrationProbe['repositoryChecks'] = [];
+  for (const probe of input.repositoryProbes) {
+    try {
+      await probe.run(input.executor);
+      repositoryChecks.push({ name: probe.name, status: 'pass' });
+    } catch {
+      repositoryChecks.push({ name: probe.name, status: 'fail' });
+    }
+  }
+
+  return {
+    requiredTables,
+    existingTables: tableRows.map((row) => row.table_name),
+    requiredMigrationVersions,
+    appliedMigrationVersions: migrationRows.map((row) => row.version),
+    repositoryChecks
+  };
+}
 
 export function buildPostgresIntegrationReadinessReport(input: PostgresIntegrationProbe): PostgresIntegrationReadinessReport {
   const existingTables = new Set(input.existingTables);
