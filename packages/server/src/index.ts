@@ -26,6 +26,8 @@ import {
 import {
   applyHumanReviewDecision,
   authorizeHumanReviewAction,
+  buildPrivacyExport,
+  planAccountDeletion,
   summarizeHumanReviewSla,
   type HumanReviewAssignment,
   type HumanReviewDecision,
@@ -652,6 +654,35 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(api.getBudgetSummary(user));
       }
 
+      if (path === '/api/privacy/export') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') {
+          return jsonResponse(
+            buildPrivacyExport(
+              {
+                userId: user,
+                favoriteStoreIds: api.getFavoriteStores(user).map((store) => store.id),
+                watchlistProductIds: api.getWatchlist(user).items.map((item) => item.productId),
+                receiptIds: [],
+                householdIds: []
+              },
+              (authOptions.now ?? new Date()).toISOString()
+            )
+          );
+        }
+      }
+
+      if (path === '/api/privacy/deletion-plan') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'POST') return jsonResponse({ ...planAccountDeletion(user), destructiveAction: false, requiresReauthentication: true });
+      }
+
       if (method === 'GET' && path === '/api/indices') return jsonResponse(api.getIndices());
       const indexMatch = path.match(/^\/api\/indices\/([^/]+)$/);
       if (method === 'GET' && indexMatch) {
@@ -740,6 +771,8 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/products/{id}': { get: publicOperation('Get product detail.') },
       '/api/products/{id}/prices': { get: publicOperation('Get product prices by store.') },
       '/api/products/{id}/history': { get: publicOperation('Get product price history.') },
+      '/api/privacy/export': { get: protectedOperation('Export signed-in user profile, favorite-store, watchlist, receipt, and household data.') },
+      '/api/privacy/deletion-plan': { post: protectedOperation('Plan account deletion without performing a destructive delete.') },
       '/api/users/{userId}/favorite-stores': {
         get: protectedOperation('List favorite stores.'),
         post: protectedOperation('Add favorite store.')

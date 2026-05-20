@@ -13,6 +13,9 @@ describe('authenticated HTTP routes', () => {
     const unauthenticatedAccountAccess = await handle(new Request('http://localhost/api/account/subscription-access?userId=user-1'));
     assert.equal(unauthenticatedAccountAccess.status, 401);
 
+    const unauthenticatedPrivacyExport = await handle(new Request('http://localhost/api/privacy/export?userId=user-1'));
+    assert.equal(unauthenticatedPrivacyExport.status, 401);
+
     const wrongUserToken = await createSessionToken({ userId: 'user-2', expiresAt: '2099-01-01T00:00:00.000Z' }, 'secret');
     const forbidden = await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
       headers: { authorization: `Bearer ${wrongUserToken}` }
@@ -22,6 +25,11 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${wrongUserToken}` }
     }));
     assert.equal(forbiddenAccountAccess.status, 403);
+    const forbiddenPrivacyPlan = await handle(new Request('http://localhost/api/privacy/deletion-plan?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${wrongUserToken}` }
+    }));
+    assert.equal(forbiddenPrivacyPlan.status, 403);
 
     const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'secret');
     const authorized = await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
@@ -32,5 +40,9 @@ describe('authenticated HTTP routes', () => {
       headers: { authorization: `Bearer ${token}` }
     }));
     assert.equal(authorizedAccountAccess.status, 200);
+    const authorizedPrivacyExport = await handle(new Request('http://localhost/api/privacy/export?userId=user-1', {
+      headers: { authorization: `Bearer ${token}` }
+    }));
+    assert.equal(authorizedPrivacyExport.status, 200);
   });
 });

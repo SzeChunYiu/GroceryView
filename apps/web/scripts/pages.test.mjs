@@ -187,6 +187,8 @@ describe('buildStaticPages', () => {
       assert.match(privacy, /data-groceryview-flow="privacy"/);
       assert.match(privacy, /data-flow-action="download-export"/);
       assert.match(privacy, /data-flow-result="privacy"/);
+      assert.match(privacy, /fetch\(apiUrl\('\/api\/privacy\/export/);
+      assert.match(privacy, /fetch\(apiUrl\('\/api\/privacy\/deletion-plan/);
 
       for (const pagePath of ['login/index.html', 'account/index.html', 'basket/index.html', 'scanner/index.html', 'privacy/index.html']) {
         const html = await readFile(join(root, pagePath), 'utf8');
