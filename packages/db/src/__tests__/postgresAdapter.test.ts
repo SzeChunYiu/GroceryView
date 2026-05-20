@@ -1,6 +1,12 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { createPostgresPriceObservationWriter, createPostgresRepository, createPostgresSourceRecordWriter, type QueryExecutor } from '../index.js';
+import {
+  createPostgresPriceObservationWriter,
+  createPostgresPriceReader,
+  createPostgresRepository,
+  createPostgresSourceRecordWriter,
+  type QueryExecutor
+} from '../index.js';
 
 class RecordingQueryExecutor implements QueryExecutor {
   calls: Array<{ sql: string; params: unknown[] }> = [];
@@ -8,12 +14,43 @@ class RecordingQueryExecutor implements QueryExecutor {
   observationId: string | undefined = 'observation-1';
   sourceRunId: string | undefined = 'source-run-1';
   rawRecordId: string | undefined = 'raw-record-1';
+  latestPriceRows: unknown[] = [
+    {
+      product_id: 'product-1',
+      chain_id: 'chain-1',
+      store_id: null,
+      price_type: 'online',
+      observation_id: 'observation-1',
+      price: '49.90',
+      regular_price: null,
+      unit_price: '110.8889',
+      currency: 'SEK',
+      observed_at: new Date('2026-05-20T08:00:00.000Z'),
+      confidence: '0.9100',
+      provenance: '{"sourceType":"retailer_api","sourceName":"Willys"}'
+    },
+    {
+      product_id: 'product-1',
+      chain_id: 'chain-1',
+      store_id: 'store-1',
+      price_type: 'promotion',
+      observation_id: 'observation-2',
+      price: 44.9,
+      regular_price: '59.90',
+      unit_price: 99.7778,
+      currency: 'SEK',
+      observed_at: '2026-05-20T09:00:00.000Z',
+      confidence: 0.88,
+      provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
+    }
+  ];
 
   async query<T>(sql: string, params: unknown[] = []) {
     this.calls.push({ sql, params });
     if (sql.includes('insert into source_runs')) return this.sourceRunId === undefined ? ([] as T[]) : ([{ id: this.sourceRunId }] as T[]);
     if (sql.includes('insert into raw_records')) return this.rawRecordId === undefined ? ([] as T[]) : ([{ id: this.rawRecordId }] as T[]);
     if (sql.includes('insert into observations')) return this.observationId === undefined ? ([] as T[]) : ([{ id: this.observationId }] as T[]);
+    if (sql.includes('from latest_prices')) return this.latestPriceRows as T[];
     if (sql.includes('select store_id')) return [{ store_id: 'willys-odenplan' }] as T[];
     if (sql.includes('select weekly_budget')) return [{ weekly_budget: '800', monthly_budget: '3200' }] as T[];
     if (sql.includes('insert into weekly_baskets')) return this.basketId === undefined ? ([] as T[]) : ([{ id: this.basketId }] as T[]);
@@ -477,5 +514,46 @@ describe('createPostgresPriceObservationWriter', () => {
       /Price observation insert did not return an id/
     );
     assert.equal(executor.calls.some((call) => call.sql.includes('insert into latest_prices')), false);
+  });
+});
+
+describe('createPostgresPriceReader', () => {
+  it('lists latest prices for a product with numeric, date, and provenance mapping', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresPriceReader(executor);
+
+    assert.deepEqual(await reader.listLatestPricesForProduct('product-1'), [
+      {
+        productId: 'product-1',
+        chainId: 'chain-1',
+        priceType: 'online',
+        observationId: 'observation-1',
+        price: 49.9,
+        unitPrice: 110.8889,
+        currency: 'SEK',
+        observedAt: '2026-05-20T08:00:00.000Z',
+        confidence: 0.91,
+        provenance: { sourceType: 'retailer_api', sourceName: 'Willys' }
+      },
+      {
+        productId: 'product-1',
+        chainId: 'chain-1',
+        storeId: 'store-1',
+        priceType: 'promotion',
+        observationId: 'observation-2',
+        price: 44.9,
+        regularPrice: 59.9,
+        unitPrice: 99.7778,
+        currency: 'SEK',
+        observedAt: '2026-05-20T09:00:00.000Z',
+        confidence: 0.88,
+        provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
+      }
+    ]);
+
+    assert.match(executor.calls[0]!.sql, /from latest_prices/);
+    assert.match(executor.calls[0]!.sql, /where product_id = \$1/);
+    assert.match(executor.calls[0]!.sql, /order by observed_at desc, chain_id, store_id, price_type/);
+    assert.deepEqual(executor.calls[0]!.params, ['product-1']);
   });
 });

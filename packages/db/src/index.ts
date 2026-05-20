@@ -217,6 +217,25 @@ export type PostgresPriceObservationWriter = {
   recordPriceObservation(observation: PriceObservationRecord): Promise<PriceObservationWriteResult>;
 };
 
+export type LatestPriceRecord = {
+  productId: string;
+  chainId: string;
+  storeId?: string;
+  priceType: PriceType;
+  observationId: string;
+  price: number;
+  regularPrice?: number;
+  unitPrice: number;
+  currency: string;
+  observedAt: string;
+  confidence: number;
+  provenance: Record<string, unknown>;
+};
+
+export type PostgresPriceReader = {
+  listLatestPricesForProduct(productId: string): Promise<LatestPriceRecord[]>;
+};
+
 export type SourceRunRecord = {
   sourceType: 'retailer_api' | 'retailer_page' | 'weekly_leaflet' | 'receipt_ocr' | 'community_report' | 'manual_seed';
   sourceName: string;
@@ -559,9 +578,46 @@ type HumanReviewAssignmentRow = {
   due_at: string | Date;
   status: HumanReviewAssignmentRecord['status'];
 };
+type LatestPriceRow = {
+  product_id: string;
+  chain_id: string;
+  store_id: string | null;
+  price_type: PriceType;
+  observation_id: string;
+  price: string | number;
+  regular_price: string | number | null;
+  unit_price: string | number;
+  currency: string;
+  observed_at: string | Date;
+  confidence: string | number;
+  provenance: Record<string, unknown> | string | null;
+};
 
 function asIso(value: string | Date): string {
   return value instanceof Date ? value.toISOString() : value;
+}
+
+function asRecord(value: Record<string, unknown> | string | null): Record<string, unknown> {
+  if (!value) return {};
+  if (typeof value === 'string') return JSON.parse(value) as Record<string, unknown>;
+  return value;
+}
+
+function mapLatestPrice(row: LatestPriceRow): LatestPriceRecord {
+  return {
+    productId: row.product_id,
+    chainId: row.chain_id,
+    ...(row.store_id ? { storeId: row.store_id } : {}),
+    priceType: row.price_type,
+    observationId: row.observation_id,
+    price: Number(row.price),
+    ...(row.regular_price === null ? {} : { regularPrice: Number(row.regular_price) }),
+    unitPrice: Number(row.unit_price),
+    currency: row.currency,
+    observedAt: asIso(row.observed_at),
+    confidence: Number(row.confidence),
+    provenance: asRecord(row.provenance)
+  };
 }
 
 function mapHumanReviewAssignment(row: HumanReviewAssignmentRow): HumanReviewAssignmentRecord {
@@ -1262,6 +1318,32 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
       );
 
       return { observationId };
+    }
+  };
+}
+
+export function createPostgresPriceReader(executor: QueryExecutor): PostgresPriceReader {
+  return {
+    async listLatestPricesForProduct(productId) {
+      const rows = await executor.query<LatestPriceRow>(
+        `select product_id,
+                chain_id,
+                store_id,
+                price_type,
+                observation_id,
+                price,
+                regular_price,
+                unit_price,
+                currency,
+                observed_at,
+                confidence,
+                provenance
+         from latest_prices
+         where product_id = $1
+         order by observed_at desc, chain_id, store_id, price_type`,
+        [productId]
+      );
+      return rows.map(mapLatestPrice);
     }
   };
 }
