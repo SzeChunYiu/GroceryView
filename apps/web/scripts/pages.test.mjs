@@ -29,6 +29,7 @@ describe('buildStaticPages', () => {
         'nutrition/allergens/index.html',
         'pantry/index.html',
         'prices/confidence/index.html',
+        'price-confidence/index.html',
         'privacy/index.html',
         'products/coffee/index.html',
         'receipts/review/index.html',
@@ -341,6 +342,13 @@ describe('buildStaticPages', () => {
         assert.match(html, /window\.GroceryViewFlowActions/);
         assert.doesNotMatch(html, /innerHTML\s*=/);
       }
+
+      const priceConfidence = await readFile(join(root, 'price-confidence/index.html'), 'utf8');
+      assert.match(priceConfidence, /Price confidence/);
+      assert.match(priceConfidence, /Source rules/);
+      assert.match(priceConfidence, /Claim guardrails/);
+      assert.match(priceConfidence, /Needs confirmation/);
+      assert.match(priceConfidence, /never as a guaranteed saving/);
     } finally {
       await rm(root, { recursive: true, force: true });
     }
