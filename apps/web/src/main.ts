@@ -107,6 +107,12 @@ const scannerReviews = [
   }
 ];
 
+const privacyControls = [
+  { setting: 'Receipt images', state: 'Auto-delete after review', detail: '7 day retention window' },
+  { setting: 'Location precision', state: 'District only', detail: 'Street address hidden from exports' },
+  { setting: 'Price contribution', state: 'Anonymous', detail: 'No account identifier in catalog backfill' }
+];
+
 const index = calculateFixedBasketIndex({
   id: 'stockholm-grocery-index',
   label: 'Stockholm Grocery Index',
@@ -232,6 +238,19 @@ app.innerHTML = `
           </tbody>
         </table>
       </div>
+      <div class="card">
+        <h2>Privacy controls</h2>
+        <p class="lede">Sensitive receipt, location, and contribution settings stay visible before data is shared with household or catalog workflows.</p>
+        <table class="table">
+          <thead><tr><th>Setting</th><th>State</th><th>Detail</th></tr></thead>
+          <tbody>
+            ${privacyControls.map((control) => `<tr><td>${control.setting}</td><td><span class="status">${control.state}</span></td><td>${control.detail}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Search and budget readiness</h2>
         <p class="lede">Query <strong>willys coffee</strong> returns ${searchHits.length} product ticker match. Weekly actual spend is ${budget.weeklyActualSpend} SEK, with ${budget.weeklyRemainingActual} SEK remaining.</p>
