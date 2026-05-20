@@ -33,6 +33,18 @@ describe('buildStaticPages', () => {
       const product = await readFile(join(root, 'products/coffee/index.html'), 'utf8');
       assert.match(product, /ZOEGAS-COFFEE-450G/);
       assert.match(product, /Deal Score/);
+      assert.match(product, /Price chart/);
+      assert.match(product, /7D/);
+      assert.match(product, /30D/);
+      assert.match(product, /90D/);
+      assert.match(product, /1Y/);
+      assert.match(product, /Multi-store coffee price history/);
+      assert.match(product, /promo marker/);
+      assert.match(product, /stroke-dasharray="8 8"/);
+      assert.match(product, /Willys Odenplan/);
+      assert.match(product, /ICA Kvantum Torsplan/);
+      assert.match(product, /Coop Medborgarplatsen/);
+      assert.match(product, /Estimated observations need review/);
 
       const market = await readFile(join(root, 'market/index.html'), 'utf8');
       assert.match(market, /Stockholm Grocery Market/);
