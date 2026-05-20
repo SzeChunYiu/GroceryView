@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
+  buildAdDeliveryComplianceReport,
   buildAdPlacementPlan,
   buildMonetizationProviderReadinessReport,
   buildSubscriptionAccessPolicy,
@@ -114,6 +115,58 @@ describe('monetization foundation', () => {
 
     assert.deepEqual(plan.slots, []);
     assert.equal(plan.reason, 'Premium subscription removes ads.');
+  });
+
+  it('blocks ad delivery candidates that violate trust policy', () => {
+    const report = buildAdDeliveryComplianceReport([
+      {
+        surface: 'web_market_sidebar',
+        provider: 'adsense',
+        userTier: 'free',
+        label: 'Sponsored',
+        organicRankingSeparated: true,
+        affectsDealScore: false
+      },
+      {
+        surface: 'deal_score',
+        provider: 'adsense',
+        userTier: 'free',
+        label: 'Sponsored',
+        organicRankingSeparated: true,
+        affectsDealScore: true
+      },
+      {
+        surface: 'mobile_deals_feed',
+        provider: 'admob',
+        userTier: 'premium',
+        organicRankingSeparated: false,
+        affectsDealScore: false
+      }
+    ]);
+
+    assert.equal(report.status, 'blocked');
+    assert.deepEqual(report.allowed.map((candidate) => candidate.surface), ['web_market_sidebar']);
+    assert.deepEqual(report.blocked.map((entry) => entry.reasons), [
+      ['ad_surface_blocked:deal_score', 'deal_score_must_not_be_affected'],
+      ['premium_users_must_not_receive_ads', 'sponsored_label_required', 'organic_ranking_separation_required']
+    ]);
+  });
+
+  it('marks labeled non-critical free-tier ad delivery candidates compliant', () => {
+    const report = buildAdDeliveryComplianceReport([
+      {
+        surface: 'mobile_deals_feed',
+        provider: 'admob',
+        userTier: 'free',
+        label: 'Sponsored',
+        organicRankingSeparated: true,
+        affectsDealScore: false
+      }
+    ]);
+
+    assert.equal(report.status, 'compliant');
+    assert.deepEqual(report.blocked, []);
+    assert.equal(report.summary, 'Ad delivery candidates comply with GroceryView trust policy.');
   });
 
   it('fails closed when checkout provider or price id is missing', () => {
