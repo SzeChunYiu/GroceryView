@@ -281,6 +281,12 @@ const retailerFreshnessRows = [
   { retailer: 'Coop', lastScrape: '2026-05-19 18:20', health: 'Stale feed', eligibleRows: '73%', action: 'Pause new alerts' }
 ];
 
+const shoppingRouteRows = [
+  { stop: 1, store: 'Willys Odenplan', role: 'Coffee and pantry', note: 'Primary weekly basket', action: 'Buy verified coffee promo' },
+  { stop: 2, store: 'Lidl Sveavägen', role: 'Eggs and dairy', note: 'Split basket stop', action: 'Pick up eggs and milk' },
+  { stop: 3, store: 'Hemköp T-Centralen', role: 'Convenience top-up', note: 'Small-basket only', action: 'Skip unless pantry rice is out' }
+];
+
 const index = calculateFixedBasketIndex({
   id: 'stockholm-grocery-index',
   label: 'Stockholm Grocery Index',
@@ -636,6 +642,16 @@ app.innerHTML = `
           <thead><tr><th>Store</th><th>District</th><th>Fit</th><th>Coverage</th><th>Note</th></tr></thead>
           <tbody>
             ${storeMapRows.map((row) => `<tr><td>${row.store}</td><td>${row.district}</td><td>${row.fit}</td><td>${row.coverage}</td><td>${row.note}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Shopping route</h2>
+        <p class="lede"><a href="/routes/shopping/">Open shopping route</a> to order store stops without changing deal rankings.</p>
+        <table class="table">
+          <thead><tr><th>Stop</th><th>Store</th><th>Role</th><th>Note</th><th>Action</th></tr></thead>
+          <tbody>
+            ${shoppingRouteRows.map((row) => `<tr><td>${row.stop}</td><td>${row.store}</td><td>${row.role}</td><td>${row.note}</td><td>${row.action}</td></tr>`).join('')}
           </tbody>
         </table>
       </div>
