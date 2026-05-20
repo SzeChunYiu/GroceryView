@@ -1,6 +1,77 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { planNotifications } from '../index.js';
+import { groceryAlertChannelDefaults, planGroceryAlertChannelDefault, planNotifications } from '../index.js';
+
+describe('planGroceryAlertChannelDefault', () => {
+  it('defines every grocery alert type with a stable channel default and reason', () => {
+    const expected = [
+      'target_price',
+      'new_low',
+      'weekly_watchlist_digest',
+      'back_in_stock',
+      'member_only',
+      'rss_feed',
+      'basket_digest'
+    ] as const;
+
+    assert.deepEqual(groceryAlertChannelDefaults.map((plan) => plan.alertType), [...expected]);
+    for (const alertType of expected) {
+      const plan = planGroceryAlertChannelDefault(alertType);
+
+      assert.equal(plan.alertType, alertType);
+      assert.ok(plan.eligibleChannels.includes(plan.defaultChannel));
+      assert.ok(plan.reason.length > 30);
+      assert.ok(plan.dedupeWindowHours >= 0);
+      assert.ok(['immediate_24h_dedupe', 'daily_digest', 'weekly_digest', 'pull_only'].includes(plan.maxFrequency));
+    }
+  });
+
+  it('sets expected defaults for direct watches, grocery digests, and RSS feeds', () => {
+    assert.deepEqual(planGroceryAlertChannelDefault('target_price'), {
+      alertType: 'target_price',
+      defaultChannel: 'email',
+      eligibleChannels: ['email', 'push', 'in_app', 'rss'],
+      requiresExplicitOptIn: true,
+      isPromotionalEmail: false,
+      requiresOneClickUnsubscribe: false,
+      requiresPreferenceLink: true,
+      maxFrequency: 'immediate_24h_dedupe',
+      quietHoursRespect: true,
+      dedupeWindowHours: 24,
+      rssEligible: true,
+      reason: 'A user-set threshold is expected to produce a direct alert, while push still requires explicit platform opt-in.'
+    });
+    assert.equal(planGroceryAlertChannelDefault('weekly_watchlist_digest').defaultChannel, 'in_app_digest');
+    assert.equal(planGroceryAlertChannelDefault('weekly_watchlist_digest').maxFrequency, 'weekly_digest');
+    assert.equal(planGroceryAlertChannelDefault('rss_feed').defaultChannel, 'rss');
+    assert.equal(planGroceryAlertChannelDefault('rss_feed').requiresExplicitOptIn, false);
+    assert.equal(planGroceryAlertChannelDefault('rss_feed').quietHoursRespect, false);
+  });
+
+  it('requires explicit opt-in for push-capable defaults', () => {
+    for (const plan of groceryAlertChannelDefaults.filter((candidate) => candidate.eligibleChannels.includes('push'))) {
+      assert.equal(plan.requiresExplicitOptIn, true, `${plan.alertType} push opt-in missing`);
+      assert.equal(plan.quietHoursRespect, true, `${plan.alertType} should respect quiet hours`);
+    }
+  });
+
+  it('marks promotional email defaults with unsubscribe posture', () => {
+    for (const plan of groceryAlertChannelDefaults.filter((candidate) => candidate.isPromotionalEmail)) {
+      assert.ok(plan.eligibleChannels.includes('email'));
+      assert.equal(plan.requiresOneClickUnsubscribe, true, `${plan.alertType} one-click unsubscribe missing`);
+      assert.equal(plan.requiresPreferenceLink, true, `${plan.alertType} preference link missing`);
+    }
+  });
+
+  it('keeps member-only alerts out of push, email, and RSS defaults', () => {
+    const plan = planGroceryAlertChannelDefault('member_only');
+
+    assert.equal(plan.defaultChannel, 'in_app_digest');
+    assert.deepEqual(plan.eligibleChannels, ['in_app_digest', 'in_app']);
+    assert.equal(plan.rssEligible, false);
+    assert.equal(plan.isPromotionalEmail, false);
+  });
+});
 
 describe('planNotifications', () => {
   it('filters alert events through notification preferences and quiet hours', () => {

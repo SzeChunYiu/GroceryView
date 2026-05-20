@@ -1407,6 +1407,143 @@ export type NotificationType =
 
 export type NotificationChannel = 'push' | 'email';
 
+export type GroceryAlertType =
+  | 'target_price'
+  | 'new_low'
+  | 'weekly_watchlist_digest'
+  | 'back_in_stock'
+  | 'member_only'
+  | 'rss_feed'
+  | 'basket_digest';
+
+export type GroceryAlertChannel = 'push' | 'email' | 'in_app' | 'in_app_digest' | 'rss';
+export type GroceryAlertFrequency = 'immediate_24h_dedupe' | 'daily_digest' | 'weekly_digest' | 'pull_only';
+
+export type GroceryAlertChannelDefault = {
+  alertType: GroceryAlertType;
+  defaultChannel: GroceryAlertChannel;
+  eligibleChannels: GroceryAlertChannel[];
+  requiresExplicitOptIn: boolean;
+  isPromotionalEmail: boolean;
+  requiresOneClickUnsubscribe: boolean;
+  requiresPreferenceLink: boolean;
+  maxFrequency: GroceryAlertFrequency;
+  quietHoursRespect: boolean;
+  dedupeWindowHours: number;
+  rssEligible: boolean;
+  reason: string;
+};
+
+export const groceryAlertChannelDefaults: GroceryAlertChannelDefault[] = [
+  {
+    alertType: 'target_price',
+    defaultChannel: 'email',
+    eligibleChannels: ['email', 'push', 'in_app', 'rss'],
+    requiresExplicitOptIn: true,
+    isPromotionalEmail: false,
+    requiresOneClickUnsubscribe: false,
+    requiresPreferenceLink: true,
+    maxFrequency: 'immediate_24h_dedupe',
+    quietHoursRespect: true,
+    dedupeWindowHours: 24,
+    rssEligible: true,
+    reason: 'A user-set threshold is expected to produce a direct alert, while push still requires explicit platform opt-in.'
+  },
+  {
+    alertType: 'new_low',
+    defaultChannel: 'in_app',
+    eligibleChannels: ['in_app', 'email', 'push', 'rss'],
+    requiresExplicitOptIn: true,
+    isPromotionalEmail: true,
+    requiresOneClickUnsubscribe: true,
+    requiresPreferenceLink: true,
+    maxFrequency: 'daily_digest',
+    quietHoursRespect: true,
+    dedupeWindowHours: 24,
+    rssEligible: true,
+    reason: 'New lows can be noisy in sparse grocery data, so the default stays in-app unless the user opts into direct channels.'
+  },
+  {
+    alertType: 'weekly_watchlist_digest',
+    defaultChannel: 'in_app_digest',
+    eligibleChannels: ['in_app_digest', 'email', 'push'],
+    requiresExplicitOptIn: true,
+    isPromotionalEmail: true,
+    requiresOneClickUnsubscribe: true,
+    requiresPreferenceLink: true,
+    maxFrequency: 'weekly_digest',
+    quietHoursRespect: true,
+    dedupeWindowHours: 168,
+    rssEligible: false,
+    reason: 'Weekly grocery planning belongs in a digest by default, aligned with flyer cadence instead of immediate interruption.'
+  },
+  {
+    alertType: 'back_in_stock',
+    defaultChannel: 'email',
+    eligibleChannels: ['email', 'push', 'in_app'],
+    requiresExplicitOptIn: true,
+    isPromotionalEmail: false,
+    requiresOneClickUnsubscribe: false,
+    requiresPreferenceLink: true,
+    maxFrequency: 'immediate_24h_dedupe',
+    quietHoursRespect: true,
+    dedupeWindowHours: 24,
+    rssEligible: false,
+    reason: 'Restock and observed-again alerts are user-watch events, but they should dedupe by product and source.'
+  },
+  {
+    alertType: 'member_only',
+    defaultChannel: 'in_app_digest',
+    eligibleChannels: ['in_app_digest', 'in_app'],
+    requiresExplicitOptIn: true,
+    isPromotionalEmail: false,
+    requiresOneClickUnsubscribe: false,
+    requiresPreferenceLink: true,
+    maxFrequency: 'daily_digest',
+    quietHoursRespect: true,
+    dedupeWindowHours: 24,
+    rssEligible: false,
+    reason: 'Member-only and personalized offers remain user-scoped and are not eligible for public RSS or default push/email.'
+  },
+  {
+    alertType: 'rss_feed',
+    defaultChannel: 'rss',
+    eligibleChannels: ['rss'],
+    requiresExplicitOptIn: false,
+    isPromotionalEmail: false,
+    requiresOneClickUnsubscribe: false,
+    requiresPreferenceLink: false,
+    maxFrequency: 'pull_only',
+    quietHoursRespect: false,
+    dedupeWindowHours: 0,
+    rssEligible: true,
+    reason: 'RSS is pull-based and public, so it must exclude private or member-only alert content.'
+  },
+  {
+    alertType: 'basket_digest',
+    defaultChannel: 'email',
+    eligibleChannels: ['email', 'in_app_digest'],
+    requiresExplicitOptIn: true,
+    isPromotionalEmail: true,
+    requiresOneClickUnsubscribe: true,
+    requiresPreferenceLink: true,
+    maxFrequency: 'weekly_digest',
+    quietHoursRespect: true,
+    dedupeWindowHours: 168,
+    rssEligible: false,
+    reason: 'Basket savings summaries are promotional digest content by default and need unsubscribe and preference controls.'
+  }
+];
+
+export function planGroceryAlertChannelDefault(alertType: GroceryAlertType): GroceryAlertChannelDefault {
+  const plan = groceryAlertChannelDefaults.find((candidate) => candidate.alertType === alertType);
+  if (!plan) throw new Error(`No grocery alert channel default for ${alertType}.`);
+  return {
+    ...plan,
+    eligibleChannels: [...plan.eligibleChannels]
+  };
+}
+
 export type NotificationPreferences = {
   channels: NotificationChannel[];
   enabledTypes: NotificationType[];
