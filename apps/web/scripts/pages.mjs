@@ -427,77 +427,92 @@ const layout = ({ title, description, body }) => `<!doctype html>
   </body>
 </html>`;
 
-const basketAssignments = [
+const productPriceRows = [
   {
-    product: 'Zoegas Coffee 450g',
     store: 'Willys Odenplan',
-    chosenPrice: '49.90 SEK',
-    fallbackPrice: '59.90 SEK at Lidl Sveavagen',
-    savings: '10.00 SEK',
-    confidence: 'High'
+    price: '49.90 SEK',
+    unitPrice: '110.89 SEK/kg',
+    priceType: 'Promo',
+    confidence: 'High confidence',
+    sourceTime: '2026-05-16 09:30 UTC',
+    sourceType: 'retailer_page',
+    label: 'Promo campaign',
+    note: 'Temporary promotion. Not presented as an official shelf price.',
+    tone: 'promo'
   },
   {
-    product: 'Arla Milk 1L x2',
-    store: 'Lidl Sveavägen',
-    chosenPrice: '27.80 SEK',
-    fallbackPrice: '29.80 SEK at Willys Odenplan',
-    savings: '2.00 SEK',
-    confidence: 'High'
+    store: 'ICA Kvantum Liljeholmen',
+    price: '54.90 SEK',
+    unitPrice: '122.00 SEK/kg',
+    priceType: 'Shelf',
+    confidence: 'High confidence',
+    sourceTime: '2026-05-16 08:45 UTC',
+    sourceType: 'retailer_page',
+    label: 'Official shelf price',
+    note: 'Verified retailer source with current shelf treatment.',
+    tone: 'verified'
   },
   {
-    product: 'Eggs 12-pack',
-    store: 'Lidl Sveavägen',
-    chosenPrice: '34.90 SEK',
-    fallbackPrice: '36.90 SEK at Willys Odenplan',
-    savings: '2.00 SEK',
-    confidence: 'Medium'
+    store: 'Coop Farsta',
+    price: '57.90 SEK',
+    unitPrice: '128.67 SEK/kg',
+    priceType: 'Estimated',
+    confidence: 'Low confidence',
+    sourceTime: '2026-05-15 17:20 UTC',
+    sourceType: 'estimated',
+    label: 'Unverified / estimated',
+    note: 'Estimated fallback. Never styled as an official shelf price.',
+    tone: 'estimated'
+  },
+  {
+    store: 'Hemkop T-Centralen',
+    price: '46.90 SEK',
+    unitPrice: '104.11 SEK/kg',
+    priceType: 'Member',
+    confidence: 'Medium confidence',
+    sourceTime: '2026-05-14 12:18 UTC',
+    sourceType: 'manual_admin',
+    label: 'Member-only',
+    note: 'Requires loyalty context and cannot be treated as a public shelf price.',
+    tone: 'member'
   }
 ];
 
-const smartSwaps = [
-  { item: 'Butter 600g', swap: 'Private label butter 500g', impact: 'Save 11.40 SEK', guardrail: 'Same category, no diet conflict' },
-  { item: 'Pasta 1kg', swap: 'Store brand penne 1kg', impact: 'Save 6.20 SEK', guardrail: 'Unit size matched' },
-  { item: 'Greek yogurt', swap: 'Coop plain yogurt 1kg', impact: 'Review', guardrail: 'Lower confidence, needs confirmation' }
-];
-
-const basketPlanner = `
-  <section class="card" style="margin-top:16px">
-    <div class="eyebrow">Favorite-store comparison</div>
-    <h2>Basket lines</h2>
-    <p class="lede"><strong>Cheapest by product across selected stores.</strong> Assignments compare only the stores the shopper selected. Distance is informational only and never reduces the ranked savings.</p>
-    <table class="table">
-      <thead><tr><th>Item</th><th>Assigned store</th><th>Chosen price</th><th>Fallback</th><th>Savings</th><th>Confidence</th></tr></thead>
+const productPriceTable = `
+  <div class="price-terminal">
+    <div class="price-summary">
+      <div>
+        <div class="eyebrow">Current best comparable price</div>
+        <h2>ICA Kvantum Liljeholmen - 54.90 SEK</h2>
+        <p class="lede">Best verified shelf source. Promo, member-only, estimated, and low-confidence observations are separated before comparison.</p>
+      </div>
+      <span class="status verified">Official shelf price</span>
+    </div>
+    <table class="table price-table">
+      <thead><tr><th>Store</th><th>Price</th><th>Unit</th><th>Type</th><th>Confidence</th><th>Source timestamp</th></tr></thead>
       <tbody>
-        ${basketAssignments.map((item) => `<tr>
-          <td><strong>${item.product}</strong></td>
-          <td>${item.store}</td>
-          <td>${item.chosenPrice}</td>
-          <td>${item.fallbackPrice}</td>
-          <td class="negative">${item.savings}</td>
-          <td><span class="status">${item.confidence}</span></td>
+        ${productPriceRows.map((row) => `<tr class="${row.tone}">
+          <td><strong>${row.store}</strong><br><span class="footer-note">${row.note}</span></td>
+          <td>${row.price}</td>
+          <td>${row.unitPrice}</td>
+          <td><span class="status ${row.tone}">${row.priceType}</span><br><span class="footer-note">${row.label}</span></td>
+          <td>${row.confidence}</td>
+          <td>${row.sourceTime}<br><span class="footer-note">${row.sourceType}</span></td>
         </tr>`).join('')}
       </tbody>
     </table>
-  </section>
-  <section class="market" style="margin-top:16px">
-    <div class="card">
-      <h2>Budget impact</h2>
-      <div class="grid">
-        <div class="metric"><strong>112.60 SEK</strong><span>assigned basket total</span></div>
-        <div class="metric"><strong>14.00 SEK</strong><span>favorite-store savings</span></div>
-        <div class="metric"><strong>687.40 SEK</strong><span>weekly budget remaining</span></div>
-      </div>
-    </div>
-    <div class="card">
-      <h2>Smart swaps</h2>
-      <table class="table">
-        <thead><tr><th>Item</th><th>Suggestion</th><th>Impact</th><th>Guardrail</th></tr></thead>
-        <tbody>
-          ${smartSwaps.map((swap) => `<tr><td>${swap.item}</td><td>${swap.swap}</td><td>${swap.impact}</td><td>${swap.guardrail}</td></tr>`).join('')}
-        </tbody>
-      </table>
-    </div>
-  </section>`;
+  </div>`;
+
+const productTerminalSections = `
+  <section class="card product-terminal"><div class="eyebrow">Product price terminal</div><h1>ZOEGAS-COFFEE-450G</h1><p class="lede">A stock-style grocery quote view for Zoégas Coffee 450g. Current best verified shelf price: 54.90 SEK at ICA Kvantum Liljeholmen, while lower promo, member-only, and estimated observations remain visible but separated from official shelf-price claims.</p><div class="quote-strip" aria-label="Quote summary"><div><span>Best verified shelf</span><strong>54.90 SEK</strong><em>ICA Kvantum Liljeholmen · 2026-05-16 08:45 UTC</em></div><div><span>Lowest visible promo</span><strong>49.90 SEK</strong><em>Willys Odenplan · not official shelf price</em></div><div><span>52W range</span><strong>49.90–72.90</strong><em>promo low separated from shelf rank</em></div><div><span>Evidence volume</span><strong>42 obs</strong><em>31 verified · 8 retailer · 3 review</em></div></div><div class="grid"><div class="metric"><strong>82</strong><span>Deal Score</span></div><div class="metric"><strong>25th</strong><span>Stockholm shelf percentile</span></div><div class="metric"><strong>4th</strong><span>visible local promo percentile</span></div></div></section>
+  <section class="card" style="margin-top:16px"><h2>Stockholm vs local price distribution</h2><p class="lede">The verified 54.90 SEK shelf quote sits near the Stockholm P25 for the same package size. The 49.90 SEK local promo is shown as the visible low, but it is not treated as an official shelf-price comparison.</p><div class="distribution-board" aria-label="Same product price distribution across Stockholm and Odenplan"><div class="distribution-row"><div class="distribution-label"><strong>Stockholm</strong><span>P05 48.90 · P25 54.90 · Median 59.90 · P75 64.90 · P95 72.90</span></div><div class="histogram" aria-label="Stockholm histogram"><span style="--h:38%"></span><span style="--h:64%"></span><span style="--h:92%"></span><span style="--h:74%"></span><span style="--h:45%"></span><i style="left:25%">54.90</i></div></div><div class="distribution-row"><div class="distribution-label"><strong>Odenplan local area</strong><span>P05 49.90 · P25 52.90 · Median 57.90 · P75 62.90 · P95 69.90</span></div><div class="histogram local" aria-label="Odenplan histogram"><span style="--h:46%"></span><span style="--h:72%"></span><span style="--h:86%"></span><span style="--h:58%"></span><span style="--h:28%"></span><i style="left:4%">49.90</i></div></div></div><table class="table"><thead><tr><th>Scope</th><th>Best visible</th><th>Median</th><th>Current rank</th><th>Customer read</th></tr></thead><tbody><tr><td>Whole Stockholm</td><td>54.90 SEK verified shelf</td><td>59.90 SEK</td><td>25th percentile</td><td>Below the Stockholm median without relying on promo-only evidence.</td></tr><tr><td>Odenplan local area</td><td>49.90 SEK promo</td><td>57.90 SEK</td><td>4th visible percentile</td><td>Cheaper than 96% of local observations, but explicitly marked as promotion evidence.</td></tr></tbody></table></section>
+  <section class="card" style="margin-top:16px"><h2>Trading-style price chart</h2><div class="toolbar" aria-label="Chart range"><span class="pill">7D</span><span class="pill">30D</span><span class="pill">90D</span><span class="pill">1Y</span><span class="pill">All verified</span></div><svg class="price-chart" viewBox="0 0 720 300" role="img" aria-label="Trading-style coffee price history with candlesticks, moving median, promo markers, and confidence styling"><line x1="44" y1="42" x2="44" y2="248" stroke="#37524b"/><line x1="44" y1="248" x2="690" y2="248" stroke="#37524b"/><text x="54" y="58" fill="#88a49c" font-size="12">72.90</text><text x="54" y="238" fill="#88a49c" font-size="12">49.90</text><g stroke="#20d9a6" stroke-width="3"><line x1="110" y1="92" x2="110" y2="172"/><rect x="96" y="112" width="28" height="48" rx="4" fill="#0d6f5d"/><line x1="208" y1="110" x2="208" y2="190"/><rect x="194" y="132" width="28" height="44" rx="4" fill="#0d6f5d"/><line x1="306" y1="128" x2="306" y2="206"/><rect x="292" y="146" width="28" height="48" rx="4" fill="#0d6f5d"/><line x1="404" y1="150" x2="404" y2="220"/><rect x="390" y="170" width="28" height="36" rx="4" fill="#0d6f5d"/><line x1="502" y1="164" x2="502" y2="230"/><rect x="488" y="188" width="28" height="28" rx="4" fill="#0d6f5d"/></g><g stroke="#ffca66" stroke-width="3"><line x1="600" y1="152" x2="600" y2="238"/><rect x="586" y="196" width="28" height="30" rx="4" fill="#6a4711"/></g><polyline points="110,120 208,132 306,148 404,166 502,184 600,196" fill="none" stroke="#7cf2ce" stroke-width="3" stroke-dasharray="10 7"/><circle cx="600" cy="226" r="8" fill="#ffca66"/><text x="610" y="214" fill="#ccfff0" font-size="13">weekly promo</text><text x="94" y="272" fill="#88a49c" font-size="12">Apr 01</text><text x="292" y="272" fill="#88a49c" font-size="12">May 01</text><text x="558" y="272" fill="#88a49c" font-size="12">May 20</text></svg><table class="table"><thead><tr><th>Stock-style signal</th><th>Value</th><th>Meaning</th></tr></thead><tbody><tr><td>30D moving median</td><td>59.90 SEK</td><td>Verified shelf quote is 8.3% under median.</td></tr><tr><td>52-week low touch</td><td>Promo-only</td><td>The visible 49.90 low is tracked, but official shelf claims stay at verified shelf evidence.</td></tr><tr><td>Freshness</td><td>4 days old shelf</td><td>Local promo evidence is newer but remains promo-labeled.</td></tr></tbody></table></section>`;
+
+const productTerminalLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="product-terminal" data-product-id="coffee" style="margin-top:16px"><div class="eyebrow">Connected product terminal API</div><h2>Pull current API terminal numbers</h2><p class="lede">Use the API session bridge to fetch <code>/api/products/coffee/terminal</code> and refresh the customer-facing quote, Stockholm/local distribution, history evidence, and chart-series counts from the live API response.</p><div class="grid" aria-label="Live product terminal API metrics"><div class="metric"><strong data-product-terminal-quote>Waiting for API pull</strong><span>best API quote</span></div><div class="metric"><strong data-product-terminal-stockholm>Static Stockholm preview</strong><span>whole-city distribution</span></div><div class="metric"><strong data-product-terminal-chart>Static chart preview</strong><span>chart series and history</span></div></div><p class="footer-note" data-product-terminal-local>Local area distribution updates after the API pull.</p><div class="flow-panel" aria-label="Connected product terminal actions"><button type="button" data-flow-action="load-product-terminal">Load live terminal numbers</button></div><p class="flow-result" data-flow-result="product-terminal" aria-live="polite">Local preview mode: connect the API session bridge before loading live product terminal numbers.</p></section>`;
+
+const productPriceGuardrails = `
+  <section class="card" style="margin-top:16px"><h2>Price evidence guardrails</h2><table class="table"><thead><tr><th>Signal</th><th>Displayed behavior</th></tr></thead><tbody><tr><td>Verified shelf or retailer page</td><td>Can contribute to current price, Deal Score, and basket totals.</td></tr><tr><td>Member or promotion price</td><td>Shown with explicit loyalty or campaign label before shoppers act.</td></tr><tr><td>Estimated or low-confidence row</td><td>Marked unverified and excluded from official shelf-price claims.</td></tr></tbody></table></section>`;
 
 const pages = [
   {
@@ -577,7 +592,6 @@ const pages = [
     title: 'Grocery budget forecast — GroceryView',
     description: 'Forecast GroceryView household grocery spend with weekly basket totals, month-end projection, receipt actuals, and over-budget prevention actions.',
     body: `<section class="card"><div class="eyebrow">Budget forecast</div><h1>Grocery budget forecast</h1><p class="lede">Compare planned baskets with receipt actuals, project month-end spend, and choose corrective actions before the household goes over budget.</p><div class="grid"><div class="metric"><strong>742 SEK</strong><span>next basket forecast</span></div><div class="metric"><strong>501 SEK</strong><span>spent this week</span></div><div class="metric"><strong>3 084 SEK</strong><span>month-end projection</span></div></div></section><section class="card" style="margin-top:16px"><h2>Forecast ledger</h2><table class="table"><thead><tr><th>Period</th><th>Budget</th><th>Actual / forecast</th><th>Variance</th><th>Status</th></tr></thead><tbody><tr><td>This week actuals</td><td>800 SEK</td><td>501 SEK</td><td>+299 SEK</td><td>On track</td></tr><tr><td>Next planned basket</td><td>800 SEK</td><td>742 SEK</td><td>+58 SEK</td><td>Needs review</td></tr><tr><td>Month-end projection</td><td>3 200 SEK</td><td>3 084 SEK</td><td>+116 SEK</td><td>On track</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Correction plan</h2><table class="table"><thead><tr><th>Action</th><th>Impact</th><th>Guardrail</th></tr></thead><tbody><tr><td>Apply coffee private-label swap</td><td>Saves 12 SEK</td><td>Requires verified shelf price</td></tr><tr><td>Move eggs to Lidl split basket</td><td>Saves 4 SEK</td><td>Favorite-store only route</td></tr><tr><td>Hold estimated tomato price</td><td>Avoids false saving</td><td>Needs review before forecast credit</td></tr></tbody></table></section>`
-    body: `<section class="card"><div class="eyebrow">Basket</div><h1>Weekly basket planner</h1><p class="lede">Compare favorite-store totals, review smart swaps, and keep the weekly grocery plan under budget.</p><div class="grid"><div class="metric"><strong>112.60 SEK</strong><span>assigned basket total</span></div><div class="metric"><strong>14.00 SEK</strong><span>favorite-store savings</span></div><div class="metric"><strong>3 swaps</strong><span>private-label opportunities</span></div></div></section>${basketPlanner}`
   },
   {
     path: 'scanner/index.html',
