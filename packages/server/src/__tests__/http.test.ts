@@ -1,10 +1,15 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { createHmac } from 'node:crypto';
 import { createGroceryViewApi } from '@groceryview/api';
 import { createHttpHandler } from '../index.js';
 
 async function json(response: Response) {
   return response.json() as Promise<unknown>;
+}
+
+function signBillingWebhookBody(body: string, secret: string): string {
+  return `sha256=${createHmac('sha256', secret).update(body).digest('hex')}`;
 }
 
 describe('createHttpHandler', () => {
@@ -18,6 +23,7 @@ describe('createHttpHandler', () => {
       const handle = createHttpHandler(undefined, {
         authSecret: 'session-secret',
         notificationWebhookSecret: 'webhook-secret',
+        billingWebhookSecret: 'billing-webhook-secret',
         notificationMetricsToken: 'metrics-secret'
       });
 
@@ -30,6 +36,7 @@ describe('createHttpHandler', () => {
         hasDatabase: true,
         hasAuthSecret: true,
         hasNotificationWebhookSecret: true,
+        hasBillingWebhookSecret: true,
         hasMetricsToken: true
       });
     } finally {
@@ -134,6 +141,235 @@ describe('createHttpHandler', () => {
     const missing = await handle(new Request('http://localhost/api/account/subscription-access?userId=user-2'));
     assert.equal(missing.status, 200);
     assert.deepEqual((await json(missing) as { enforcementReasons: string[] }).enforcementReasons, ['missing_subscription_entitlement']);
+  });
+
+  it('prefers repository-backed subscription entitlements for account access when configured', async () => {
+    const api = createGroceryViewApi();
+    api.upsertSubscriptionEntitlement('user-1', {
+      tier: 'premium',
+      plan: 'premium_monthly',
+      status: 'past_due',
+      currentPeriodEndsAt: '2026-06-20T00:00:00.000Z',
+      provider: 'stripe_compatible',
+      updatedAt: '2026-05-20T00:00:00.000Z'
+    });
+    const requestedUserIds: string[] = [];
+    const handle = createHttpHandler(api, {
+      now: new Date('2026-05-20T00:00:00.000Z'),
+      subscriptionEntitlementRepository: {
+        async getSubscriptionEntitlement(userId) {
+          requestedUserIds.push(userId);
+          if (userId !== 'user-1') return null;
+          return {
+            userId,
+            tier: 'premium',
+            plan: 'premium_yearly',
+            status: 'active',
+            currentPeriodEndsAt: '2027-05-20T00:00:00.000Z',
+            provider: 'stripe_compatible',
+            providerCustomerId: 'cus_internal_only',
+            providerSubscriptionId: 'sub_internal_only',
+            updatedAt: '2026-05-20T00:00:00.000Z'
+          };
+        }
+      }
+    });
+
+    const premium = await json(await handle(new Request('http://localhost/api/account/subscription-access?userId=user-1'))) as {
+      enforcementReasons: string[];
+      accountActions: string[];
+      checkoutRequired: boolean;
+    };
+    assert.deepEqual(requestedUserIds, ['user-1']);
+    assert.deepEqual(premium.enforcementReasons, ['active_subscription_entitlement:premium_yearly']);
+    assert.deepEqual(premium.accountActions, ['show_manage_subscription']);
+    assert.equal(premium.checkoutRequired, false);
+    assert.equal(JSON.stringify(premium).includes('cus_internal_only'), false);
+
+    const missing = await json(await handle(new Request('http://localhost/api/account/subscription-access?userId=user-2'))) as {
+      enforcementReasons: string[];
+    };
+    assert.deepEqual(missing.enforcementReasons, ['missing_subscription_entitlement']);
+  });
+
+  it('accepts signed billing subscription events and persists entitlement mutations', async () => {
+    const persisted: unknown[] = [];
+    const secret = 'billing-webhook-secret';
+    const body = JSON.stringify({
+      provider: 'stripe_compatible',
+      providerEventId: 'evt_subscription_active_1',
+      type: 'subscription.active',
+      userId: 'user-1',
+      plan: 'premium_yearly',
+      currentPeriodEndsAt: '2027-05-20T00:00:00.000Z',
+      providerCustomerId: 'cus_internal_only',
+      providerSubscriptionId: 'sub_internal_only',
+      occurredAt: '2026-05-20T00:00:00.000Z'
+    });
+    const handle = createHttpHandler(undefined, {
+      billingWebhookSecret: secret,
+      billingSubscriptionSink: {
+        async upsertSubscriptionEntitlement(entitlement) {
+          persisted.push(entitlement);
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/subscription-events', {
+      method: 'POST',
+      headers: { 'x-groceryview-billing-signature': signBillingWebhookBody(body, secret) },
+      body
+    }));
+
+    assert.equal(response.status, 202);
+    const accepted = await json(response);
+    assert.deepEqual(accepted, {
+      accepted: true,
+      persisted: true,
+      userId: 'user-1',
+      status: 'active'
+    });
+    assert.equal(JSON.stringify(accepted).includes('cus_internal_only'), false);
+    assert.deepEqual(persisted, [
+      {
+        userId: 'user-1',
+        tier: 'premium',
+        plan: 'premium_yearly',
+        status: 'active',
+        currentPeriodEndsAt: '2027-05-20T00:00:00.000Z',
+        provider: 'stripe_compatible',
+        providerCustomerId: 'cus_internal_only',
+        providerSubscriptionId: 'sub_internal_only',
+        updatedAt: '2026-05-20T00:00:00.000Z'
+      }
+    ]);
+  });
+
+  it('accepts signed Stripe-compatible subscription webhooks and persists entitlement mutations', async () => {
+    const persisted: unknown[] = [];
+    const secret = 'billing-webhook-secret';
+    const body = JSON.stringify({
+      id: 'evt_stripe_subscription_active_1',
+      type: 'customer.subscription.updated',
+      created: 1779278400,
+      data: {
+        object: {
+          id: 'sub_provider_1',
+          customer: 'cus_provider_1',
+          status: 'active',
+          current_period_end: 1810771200,
+          metadata: { userId: 'user-1' },
+          items: { data: [{ price: { id: 'price_yearly_123' } }] }
+        }
+      }
+    });
+    const handle = createHttpHandler(undefined, {
+      billingWebhookSecret: secret,
+      billingPriceIdPlanMap: { price_yearly_123: 'premium_yearly' },
+      now: new Date('2026-05-20T12:00:00.000Z'),
+      billingSubscriptionSink: {
+        async upsertSubscriptionEntitlement(entitlement) {
+          persisted.push(entitlement);
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/subscription-events', {
+      method: 'POST',
+      headers: { 'x-groceryview-billing-signature': signBillingWebhookBody(body, secret) },
+      body
+    }));
+
+    assert.equal(response.status, 202);
+    assert.deepEqual(await json(response), {
+      accepted: true,
+      persisted: true,
+      userId: 'user-1',
+      status: 'active'
+    });
+    assert.deepEqual(persisted, [
+      {
+        userId: 'user-1',
+        tier: 'premium',
+        plan: 'premium_yearly',
+        status: 'active',
+        currentPeriodEndsAt: '2027-05-20T00:00:00.000Z',
+        provider: 'stripe_compatible',
+        providerCustomerId: 'cus_provider_1',
+        providerSubscriptionId: 'sub_provider_1',
+        updatedAt: '2026-05-20T12:00:00.000Z'
+      }
+    ]);
+  });
+
+  it('fails billing subscription events closed without configured secret, valid signature, and sink', async () => {
+    const secret = 'billing-webhook-secret';
+    const body = JSON.stringify({
+      provider: 'stripe_compatible',
+      providerEventId: 'evt_subscription_active_1',
+      type: 'subscription.active',
+      userId: 'user-1',
+      plan: 'premium_monthly',
+      occurredAt: '2026-05-20T00:00:00.000Z'
+    });
+
+    const missingSecret = await createHttpHandler()(new Request('http://localhost/api/billing/subscription-events', {
+      method: 'POST',
+      body
+    }));
+    assert.equal(missingSecret.status, 503);
+
+    const invalidSignature = await createHttpHandler(undefined, {
+      billingWebhookSecret: secret,
+      billingSubscriptionSink: { async upsertSubscriptionEntitlement() {} }
+    })(new Request('http://localhost/api/billing/subscription-events', {
+      method: 'POST',
+      headers: { 'x-groceryview-billing-signature': 'sha256=bad' },
+      body
+    }));
+    assert.equal(invalidSignature.status, 401);
+
+    const missingSink = await createHttpHandler(undefined, {
+      billingWebhookSecret: secret
+    })(new Request('http://localhost/api/billing/subscription-events', {
+      method: 'POST',
+      headers: { 'x-groceryview-billing-signature': signBillingWebhookBody(body, secret) },
+      body
+    }));
+    assert.equal(missingSink.status, 503);
+  });
+
+  it('rejects sensitive payment fields in billing subscription events before persistence', async () => {
+    const persisted: unknown[] = [];
+    const secret = 'billing-webhook-secret';
+    const body = JSON.stringify({
+      provider: 'stripe_compatible',
+      providerEventId: 'evt_subscription_active_1',
+      type: 'subscription.active',
+      userId: 'user-1',
+      plan: 'premium_monthly',
+      occurredAt: '2026-05-20T00:00:00.000Z',
+      cardNumber: '4242424242424242',
+      clientSecret: 'pi_secret_should_not_be_sent'
+    });
+    const handle = createHttpHandler(undefined, {
+      billingWebhookSecret: secret,
+      billingSubscriptionSink: {
+        async upsertSubscriptionEntitlement(entitlement) {
+          persisted.push(entitlement);
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/subscription-events', {
+      method: 'POST',
+      headers: { 'x-groceryview-billing-signature': signBillingWebhookBody(body, secret) },
+      body
+    }));
+
+    assert.equal(response.status, 400);
+    assert.match((await json(response) as { error: string }).error, /sensitive payment fields/i);
+    assert.deepEqual(persisted, []);
   });
 
   it('returns explicit errors for invalid JSON, missing user id, and unknown routes', async () => {

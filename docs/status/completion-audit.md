@@ -36,6 +36,10 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Privacy controls | PR #18, privacy tests | Planning shipped |
 | API contract manifest | PR #19, `buildOpenApiDocument` | Foundation shipped |
 | Deployment runtime config | PR #20, deploy manifest/runtime tests | Foundation shipped |
+| Server runtime entrypoint | PR #272, `createRuntimeHttpHandler()`, direct `node packages/server/dist/index.js` execution guard, and env-backed health/auth option wiring make the deploy start command executable | Shipped after merge |
+| Runtime repository/sink wiring | PR #278, `RuntimePersistenceRepository`, `buildRepositoryBackedAuthOptions()`, and `createRuntimeHttpHandler(..., { repository })` connect runtime account subscription access, billing webhook persistence, notification suppression persistence, and human-review repository operations to one injected repository | Shipped by this PR merge |
+| PostgreSQL runtime bootstrap | PR #281, `createRuntimeHttpService()`, `pg`, `createPgQueryExecutor()`, and `createPostgresRepository()` let the runtime server build repository-backed account, billing, notification, and human-review paths from `DATABASE_URL` | Shipped by this PR merge |
+| PostgreSQL readiness endpoint | PR #283, `/api/readiness/postgres`, `postgresReadinessProvider`, and the runtime `DATABASE_URL` pool query executor expose token-protected schema/migration readiness evidence without leaking database secrets | Completed by this PR merge |
 | CI verification | PR #21, `.github/workflows/ci.yml` | Shipped |
 | Deploy workflow skeleton | PR #22, `.github/workflows/deploy.yml` | Provider-neutral skeleton shipped |
 | Completion audit | PR #23, `docs/status/completion-audit.md` | Shipped |
@@ -45,6 +49,7 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | PostgreSQL query executor | PR #26, `createPgQueryExecutor` | Client adapter shipped |
 | Static web flow scaffolds | PR #27, `apps/web/scripts/pages.mjs` | Static route scaffolds shipped |
 | Web scanner review desk | PR #135, `apps/web/src/main.ts`, `apps/web/scripts/pages.mjs` | Shipped after merge |
+| Web flow actions | PR #286, `apps/web/scripts/pages.mjs`, `apps/web/public/styles.css`, and `apps/web/scripts/pages.test.mjs` add tested login, account, household, privacy, basket, and scanner controls with safe client-side result updates | Completed by this PR merge |
 | Notification delivery foundation | PR #28, `packages/notifications` | Provider-neutral delivery shipped |
 | Notification provider readiness gates | PR #136, `buildNotificationProviderReadinessReport` | Shipped after merge |
 | Notification worker orchestration | PR #90, `runNotificationWorkerTick` | Shipped after merge |
@@ -73,11 +78,14 @@ This audit maps the objective and proposal requirements to concrete artifacts in
 | Scanning pipeline foundation | PR #30, `packages/scanning` | Provider-neutral scan pipeline shipped |
 | Completion audit refresh | PR #31, `docs/status/completion-audit.md` | Audit reconciled after scanning |
 | Mobile Expo readiness | PR #32, `apps/mobile/app.config.json`, `apps/mobile/eas.json` | Device-build metadata shipped |
+| Account subscription UI scaffold | PR #256, account page surfaces subscription access policy state and `/api/account/subscription-access` provenance | Shipped after merge |
 | Monetization foundation | PR #33, `packages/monetization` | Provider-neutral ad/billing contracts shipped |
 | Monetization provider readiness gates | PR #143, `buildMonetizationProviderReadinessReport` | Shipped after merge |
 | Subscription entitlement persistence | PR #231, `subscription_entitlements`, repository methods, migrations, and PostgreSQL readiness probes | Shipped after merge |
 | Subscription access policy | PR #234, `buildSubscriptionAccessPolicy` maps entitlements to premium/free enforcement decisions | Shipped after merge |
 | Subscription access account API | PR #244, `createGroceryViewApi().getSubscriptionAccess()` and `/api/account/subscription-access` expose entitlement policy to account clients | Shipped after merge |
+| Repository-backed subscription access | PR #251, `/api/account/subscription-access` can load persisted entitlement rows via a configured repository before falling back to in-memory API state | Shipped after merge |
+| Billing subscription webhook contract | PR #264, `/api/billing/subscription-events` verifies `x-groceryview-billing-signature`, rejects sensitive payment fields, normalizes subscription events, and persists entitlement mutations through a configured sink | Shipped after merge |
 | Retailer compliance gate | PR #34, `planRetailerSourceAccess` | Source-access gate shipped |
 | Deployment ops foundation | PR #35, `packages/ops` | Readiness/rollback gates shipped |
 | Scheduled background worker deployment gates | PR #134, `buildDeploymentReadinessReport` scheduled job checks | Shipped after merge |
@@ -103,13 +111,13 @@ The full GroceryView proposal is not complete. Current shipped work is a broad t
 
 ## Remaining blocking gaps
 
-- PostgreSQL query-executor wiring, repository adapter skeleton, human-review assignment persistence, and a schema/migration/probe readiness contract exist; live database integration tests still need a provisioned PostgreSQL service and probe runner.
+- PostgreSQL query-executor wiring, repository adapter skeleton, human-review assignment persistence, a schema/migration/probe readiness contract, runtime pool bootstrap, and a token-protected PostgreSQL readiness endpoint exist; live database integration tests still need a provisioned PostgreSQL service, migrations applied, and an observed hosted smoke call against the readiness endpoint.
 - Real retailer/API/crawler connectors and legal/robots review. Retailer source access gates are being added; real retailer connectors and completed legal reviews still missing.
 - Real OCR/camera/upload pipeline for barcode and receipt scanning. Provider-neutral scan pipeline exists; real camera/OCR providers still missing.
 - Real Expo/React Native screens and device builds. Expo route/readiness config is being added; real React Native component screens and store builds still missing.
-- Real interactive web UI for login, account, household, privacy, basket, and scanner flows. Static page scaffolds and a scanner review desk exist; full interactivity remains incomplete.
+- Real interactive web UI for login, account, household, privacy, basket, and scanner flows. Static page scaffolds, an account subscription-access panel, a scanner review desk, and tested provider-safe client-side flow actions exist; live auth, authenticated API writes, durable UI state, and provider-backed upload/session flows remain incomplete.
 - Push/email provider adapters and production notification workers. Provider-neutral delivery, worker tick orchestration, persisted task schedules, acknowledgement application, suppression filtering, persisted suppression records, suppression event normalization, a signed suppression webhook route, worker-level suppression enforcement, delivery health reporting, Prometheus-style metric export, a token-protected metrics endpoint, blocked-report alert planning, and repository-backed worker cycle orchestration and provider-readiness gates exist; real provider credentials, configured worker/cron runtime, provider-specific signature adapters, production metrics scraping, and live alert delivery still missing.
-- AdMob/AdSense and subscription billing integration. Provider-neutral monetization contracts, provider-readiness gates, subscription entitlement persistence, entitlement access policy, and an account subscription-access API exist; real provider credentials, webhook endpoints, provider-specific adapters, live checkout/ad-serving proof, repository-backed account wiring, and interactive account UI enforcement still missing.
-- Hosting provider selection, real deployment, secrets, DNS, observability, smoke tests, and rollback. Deployment readiness/rollback gates and scheduled-worker checks are being added; real provider deployment, configured cron runtime, and live smoke proof still missing.
+- AdMob/AdSense and subscription billing integration. Provider-neutral monetization contracts, provider-readiness gates, subscription entitlement persistence, entitlement access policy, an account subscription-access API, repository-backed entitlement lookup, a signed billing subscription-event webhook contract, runtime repository/sink injection hooks, and PostgreSQL-backed runtime repository bootstrap exist; real provider credentials, provider-specific webhook adapters, live checkout/ad-serving proof, a migrated hosted database, live billing-provider webhook proof, and interactive account UI enforcement still missing.
+- Hosting provider selection, real deployment, secrets, DNS, observability, smoke tests, and rollback. Deployment readiness/rollback gates, scheduled-worker checks, a server runtime entrypoint for the manifest start command, runtime repository/sink wiring hooks, PostgreSQL pool bootstrap from `DATABASE_URL`, and a token-protected PostgreSQL readiness endpoint exist; real provider deployment, configured cron runtime, a provisioned migrated PostgreSQL service, and live smoke proof still missing.
 - Full catalog/data coverage beyond seed products/stores. Catalog coverage reporting exists; real retailer/feed backfill data still missing.
 - Human review queue UI and operations for low-confidence product matching and community reports. Core queue planning, auditable decision writeback primitives, reviewer assignment/SLA planning, SLA summary primitives, community reporter abuse-control planning, assignment persistence, reviewer permission checks, persisted reviewer roles, reporter trust-state persistence, provider-neutral SLA alert planning, and persisted notification task schedules exist; admin UI enforcement, real provider credentials, session-to-reviewer mapping, account enforcement, and live PostgreSQL proof still missing.
