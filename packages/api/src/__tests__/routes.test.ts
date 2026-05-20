@@ -277,24 +277,26 @@ describe('createGroceryViewApi', () => {
     const api = createGroceryViewApi();
 
     api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.removeFavoriteStore('user-1', 'lidl-sveavagen');
     api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, favoriteStoresOnly: true });
+    api.updateWatchlistItem('user-1', 'coffee', { targetPrice: 48, favoriteStoresOnly: false });
     api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
     api.addBasketItem('user-1', { productId: 'coffee', quantity: 2 });
-    api.updateWatchlistItem('user-1', 'coffee', { targetPrice: 48 });
-    api.updateBasketItem('user-1', 'coffee', 2);
+    api.updateBasketItem('user-1', 'coffee', 4);
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.removeBasketItem('user-1', 'milk');
     api.updateBudget('user-1', { weeklyBudget: 800, monthlyBudget: 3200 });
 
     assert.deepEqual(api.getFavoriteStores('user-1').map((store) => store.id), ['willys-odenplan']);
+    assert.deepEqual(api.getWatchlist('user-1').items, [{ productId: 'coffee', targetPrice: 48, alertDealScoreAt: 80, favoriteStoresOnly: false }]);
     assert.equal(api.getWatchlist('user-1').alerts.length, 2);
-    assert.deepEqual(api.getBasket('user-1').items[0], { productId: 'coffee', quantity: 2 });
-    assert.equal(api.compareBasket('user-1').cheapestByProduct.total, 99.8);
+    assert.deepEqual(api.getBasket('user-1').items, [{ productId: 'coffee', quantity: 4 }]);
+    assert.equal(api.compareBasket('user-1').cheapestByProduct.total, 199.6);
     assert.equal(api.getBudgetSummary('user-1').weeklyBudget, 800);
     assert.equal(api.getIndex('stockholm-grocery-index')?.label, 'Stockholm Grocery Index');
-
-    api.removeWatchlistItem('user-1', 'coffee');
-    api.removeBasketItem('user-1', 'coffee');
-    assert.deepEqual(api.getWatchlist('user-1').items, []);
-    assert.deepEqual(api.getBasket('user-1').items, []);
+    assert.throws(() => api.updateWatchlistItem('user-1', 'milk', { targetPrice: 12 }), /Watchlist item not found/);
+    assert.throws(() => api.removeBasketItem('user-1', 'milk'), /Basket item not found/);
   });
 
   it('removes watched products and recomputes alerts from remaining items', () => {

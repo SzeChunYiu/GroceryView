@@ -267,11 +267,22 @@ describe('createHttpHandler', () => {
       method: 'POST',
       body: JSON.stringify({ storeId: 'willys-odenplan' })
     }))).status, 201);
+    assert.equal((await handle(new Request('http://localhost/api/users/user-1/favorite-stores', {
+      method: 'POST',
+      body: JSON.stringify({ storeId: 'lidl-sveavagen' })
+    }))).status, 201);
+    assert.equal((await handle(new Request('http://localhost/api/users/user-1/favorite-stores/lidl-sveavagen', {
+      method: 'DELETE'
+    }))).status, 200);
 
     assert.equal((await handle(new Request('http://localhost/api/watchlist?userId=user-1', {
       method: 'POST',
       body: JSON.stringify({ productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, favoriteStoresOnly: true })
     }))).status, 201);
+    assert.equal((await handle(new Request('http://localhost/api/watchlist/coffee?userId=user-1', {
+      method: 'PATCH',
+      body: JSON.stringify({ targetPrice: 48, favoriteStoresOnly: false })
+    }))).status, 200);
 
     assert.equal((await handle(new Request('http://localhost/api/basket/items?userId=user-1', {
       method: 'POST',
@@ -284,6 +295,17 @@ describe('createHttpHandler', () => {
     }));
     assert.equal(mergedBasket.status, 201);
     assert.deepEqual((await json(mergedBasket) as { items: unknown[] }).items, [{ productId: 'coffee', quantity: 3 }]);
+    assert.equal((await handle(new Request('http://localhost/api/basket/items/coffee?userId=user-1', {
+      method: 'PATCH',
+      body: JSON.stringify({ quantity: 4 })
+    }))).status, 200);
+    assert.equal((await handle(new Request('http://localhost/api/basket/items?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ productId: 'milk', quantity: 2 })
+    }))).status, 201);
+    assert.equal((await handle(new Request('http://localhost/api/basket/items/milk?userId=user-1', {
+      method: 'DELETE'
+    }))).status, 200);
 
     assert.equal((await handle(new Request('http://localhost/api/watchlist/items/coffee?userId=user-1', {
       method: 'PATCH',
@@ -304,17 +326,15 @@ describe('createHttpHandler', () => {
     assert.equal(watchlist.alerts.length, 2);
 
     const comparison = await json(await handle(new Request('http://localhost/api/basket/compare?userId=user-1', { method: 'POST' }))) as { cheapestByProduct: { total: number } };
-    assert.equal(comparison.cheapestByProduct.total, 99.8);
+    assert.equal(comparison.cheapestByProduct.total, 199.6);
 
     const budget = await json(await handle(new Request('http://localhost/api/budget/summary?userId=user-1'))) as { weeklyRemainingAfterEstimate: number };
-    assert.equal(budget.weeklyRemainingAfterEstimate, 700.2);
+    assert.equal(budget.weeklyRemainingAfterEstimate, 600.4);
 
-    assert.equal((await handle(new Request('http://localhost/api/watchlist/items/coffee?userId=user-1', { method: 'DELETE' }))).status, 200);
-    assert.equal((await handle(new Request('http://localhost/api/basket/items/coffee?userId=user-1', { method: 'DELETE' }))).status, 200);
-    const emptyWatchlist = await json(await handle(new Request('http://localhost/api/watchlist?userId=user-1'))) as { items: unknown[] };
-    assert.equal(emptyWatchlist.items.length, 0);
-    const emptyBasket = await json(await handle(new Request('http://localhost/api/basket/current?userId=user-1'))) as { items: unknown[] };
-    assert.equal(emptyBasket.items.length, 0);
+    const removedWatchlist = await json(await handle(new Request('http://localhost/api/watchlist/coffee?userId=user-1', {
+      method: 'DELETE'
+    }))) as { items: unknown[] };
+    assert.deepEqual(removedWatchlist.items, []);
   });
 
   it('serves user-scoped privacy export and deletion plans from protected account data', async () => {
