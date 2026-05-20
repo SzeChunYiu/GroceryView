@@ -136,6 +136,12 @@ const notificationInboxRows = [
   { alert: 'Butter target price', channel: 'Push', status: 'Suppressed', reason: 'Provider token invalid' }
 ];
 
+const nutritionRows = [
+  { item: 'Peanut granola', signal: 'Contains peanuts', rule: 'Nut alert', decision: 'Blocked', action: 'Suggest oat granola' },
+  { item: 'ICA Milk 1L', signal: 'Lactose', rule: 'Lactose ok', decision: 'Allowed', action: 'Keep dairy swap' },
+  { item: 'Private-label cheese', signal: 'Vegetarian label', rule: 'Vegetarian household meal', decision: 'Needs label check', action: 'Hold meal-plan writeback' }
+];
+
 const budget = summarizeBudget({
   weeklyBudget: 800,
   monthlyBudget: 3200,
@@ -573,6 +579,16 @@ app.innerHTML = `
           <thead><tr><th>Alert</th><th>Channel</th><th>Status</th><th>Reason</th></tr></thead>
           <tbody>
             ${notificationInboxRows.map((row) => `<tr><td>${row.alert}</td><td>${row.channel}</td><td><span class="status">${row.status}</span></td><td>${row.reason}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Nutrition review</h2>
+        <p class="lede"><a href="/nutrition/allergens/">Open nutrition review</a> to block allergen conflicts before swaps or meal plans update baskets.</p>
+        <table class="table">
+          <thead><tr><th>Item</th><th>Signal</th><th>Rule</th><th>Decision</th><th>Action</th></tr></thead>
+          <tbody>
+            ${nutritionRows.map((row) => `<tr><td>${row.item}</td><td>${row.signal}</td><td>${row.rule}</td><td><span class="status">${row.decision}</span></td><td>${row.action}</td></tr>`).join('')}
           </tbody>
         </table>
       </div>
