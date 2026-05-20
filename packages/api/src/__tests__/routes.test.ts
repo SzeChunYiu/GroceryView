@@ -25,9 +25,12 @@ describe('createGroceryViewApi', () => {
     const search = api.searchProducts('coffee');
     assert.equal(search[0].ticker, 'ZOEGAS-COFFEE-450G');
 
-    const detail = api.getProduct('coffee');
-    assert.equal(detail?.currentPrices[0].storeName, 'Willys Odenplan');
-    assert.equal(detail?.dealScore, 82);
+    const detail = api.getProduct('milk');
+    assert.deepEqual(
+      detail?.currentPrices.map((price) => price.storeId),
+      ['lidl-sveavagen', 'willys-odenplan']
+    );
+    assert.equal(detail?.dealScore, 73);
   });
 
   it('returns cheapest product prices first and uses the cheapest quote for watchlist alerts', () => {
