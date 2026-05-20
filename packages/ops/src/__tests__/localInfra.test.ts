@@ -18,6 +18,8 @@ describe('local infrastructure compose', () => {
     assert.match(compose, /"6379:6379"/);
     assert.match(compose, /"5050:80"/);
     assert.match(compose, /"9000:9000"/);
+    assert.match(compose, /postgres-data:\/var\/lib\/postgresql/);
+    assert.doesNotMatch(compose, /postgres-data:\/var\/lib\/postgresql\/data/);
     assert.match(compose, /http:\/\/localhost:9000\/minio\/health\/live/);
   });
 
