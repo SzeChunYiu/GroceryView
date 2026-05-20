@@ -103,10 +103,14 @@ describe('buildPostgresIntegrationReadinessReport', () => {
 
     assert.equal(report.status, 'blocked');
     assert.deepEqual(report.blockers, [
+      'missing_table:basket_items',
       'missing_table:community_reporter_trust',
       'missing_table:human_review_assignments',
       'missing_table:human_reviewers',
       'missing_table:notification_suppressions',
+      'missing_table:user_preferences',
+      'missing_table:watchlist_items',
+      'missing_table:weekly_baskets',
       'missing_migration:002_repository_support_schema',
       'repository_check_fail:human_review_assignment_round_trip',
       'repository_check_not_run:notification_suppression_round_trip'
@@ -139,12 +143,16 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       blockers: [],
       evidence: [
         'table:app_users',
+        'table:basket_items',
         'table:community_reporter_trust',
         'table:favorite_stores',
         'table:human_review_assignments',
         'table:human_reviewers',
         'table:notification_suppressions',
         'table:notification_tasks',
+        'table:user_preferences',
+        'table:watchlist_items',
+        'table:weekly_baskets',
         'migration:001_groceryview_schema',
         'migration:002_repository_support_schema',
         'repository_check:favorite_store_round_trip',

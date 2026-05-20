@@ -858,6 +858,10 @@ export type CheckPostgresIntegrationReadinessInput = CollectPostgresIntegrationP
 export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'app_users',
   'favorite_stores',
+  'user_preferences',
+  'watchlist_items',
+  'weekly_baskets',
+  'basket_items',
   'human_review_assignments',
   'human_reviewers',
   'community_reporter_trust',
