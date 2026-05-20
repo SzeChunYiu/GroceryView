@@ -7,6 +7,7 @@ import {
   createHouseholdState,
   rankNutritionPerKrona,
   planPantryReplenishment,
+  reviewReceiptScan,
   scoreBand,
   searchProducts,
   summarizeBudget,
@@ -17,6 +18,7 @@ import {
   type PriceChartAdapterResult,
   type PriceChartObservation,
   type PriceHistorySummary,
+  type ReceiptReview,
   type HouseholdBasketItem,
   type HouseholdMember,
   type HouseholdSnapshot,
@@ -464,6 +466,15 @@ export type LoyaltyOfferReport = {
   totalEligibleSavings: number;
   requiresActionCount: number;
   membershipRequiredCount: number;
+  guardrails: string[];
+};
+
+export type ReceiptReviewReport = {
+  userId: string;
+  review: ReceiptReview;
+  lineCount: number;
+  matchedCount: number;
+  needsReviewCount: number;
   guardrails: string[];
 };
 
@@ -1367,6 +1378,44 @@ export function createGroceryViewApi() {
           'Member-only savings never overwrite verified public shelf evidence.',
           'Coupon-required offers need explicit action before checkout routing.',
           'Unlinked loyalty programs stay out of realized savings until the household confirms access.'
+        ]
+      };
+    },
+
+    getReceiptReviewReport(userId: string): ReceiptReviewReport {
+      requireNonEmptyId(userId, 'userId');
+      const review = reviewReceiptScan({
+        receipt: {
+          storeId: 'willys-odenplan',
+          purchasedAt: '2026-05-19T16:00:00.000Z',
+          totalAmount: 642,
+          ocrConfidence: 0.82,
+          rows: [
+            { rawName: 'ZOEGA SKANEROST', quantity: 1, itemTotal: 49.9 },
+            { rawName: 'CHEESE 500G', quantity: 1, itemTotal: 78 },
+            { rawName: 'SMUDGED ITEM', quantity: 1, itemTotal: 18 }
+          ]
+        },
+        aliases: [
+          { rawName: 'ZOEGA SKANEROST', productId: 'coffee', canonicalName: 'Zoégas Coffee 450g', matchConfidence: 0.9 },
+          { rawName: 'CHEESE 500G', productId: 'cheese', canonicalName: 'Cheese 500g', matchConfidence: 0.7 }
+        ],
+        localMedians: { coffee: 64.9, cheese: 60 },
+        weeklyBudget: 800,
+        weekSpendBeforeReceipt: 120
+      });
+      const matchedCount = review.matchedItems.filter((item) => item.productId !== null).length;
+      const needsReviewCount = review.matchedItems.filter((item) => item.productId === null || item.matchConfidence < 0.8).length;
+      return {
+        userId,
+        review,
+        lineCount: review.matchedItems.length,
+        matchedCount,
+        needsReviewCount,
+        guardrails: [
+          'Low confidence receipt rows cannot update catalog or Deal Score.',
+          'Loyalty discount lines affect receipt totals without overwriting public shelf prices.',
+          'Only verified product matches can update household spend and product price history.'
         ]
       };
     },

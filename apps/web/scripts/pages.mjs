@@ -77,6 +77,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-loyalty-offers-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setReceiptReviewMetric = (metric, message) => {
+    const target = document.querySelector('[data-receipt-review-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setSavingsLedgerMetric = (metric, message) => {
     const target = document.querySelector('[data-savings-ledger-' + metric + ']');
     if (target) target.textContent = message;
@@ -916,6 +920,35 @@ window.GroceryViewFlowActions = (() => {
       setResult('loyalty-offers', 'Loyalty offers API load failed: ' + error.message + '. Static loyalty offer queue remains visible.');
     }
   };
+  const loadReceiptReviewFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('receipt-review', 'Local preview mode: connect the API session bridge before loading live receipt review.');
+      return;
+    }
+    try {
+      const response = await fetch(apiUrl('/api/receipts/review', config), {
+        method: 'GET',
+        headers: apiHeaders(config)
+      });
+      const payload = await requireApiSuccess(response);
+      const review = payload.review || {};
+      const budget = review.budget || {};
+      const items = Array.isArray(review.matchedItems) ? review.matchedItems : [];
+      const goodBuys = Array.isArray(review.goodBuys) ? review.goodBuys : [];
+      const overspend = Array.isArray(review.overspend) ? review.overspend : [];
+      const guardrails = Array.isArray(payload.guardrails) ? payload.guardrails : [];
+      const lineCount = Number(payload.lineCount || items.length);
+      const matchedCount = Number(payload.matchedCount || items.filter((item) => item.productId).length);
+      const needsReviewCount = Number(payload.needsReviewCount || items.filter((item) => !item.productId || Number(item.matchConfidence || 0) < 0.8).length);
+      setReceiptReviewMetric('budget', 'After receipt ' + formatSek(budget.afterReceiptSpend) + ' · remaining ' + formatSek(budget.remaining) + ' · ' + (budget.status || 'unknown'));
+      setReceiptReviewMetric('lines', matchedCount + '/' + lineCount + ' matched · ' + needsReviewCount + ' needs review · confidence ' + (review.confidenceLabel || 'unknown'));
+      setReceiptReviewMetric('guardrails', goodBuys.length + ' good buys · ' + overspend.length + ' overspend rows · ' + guardrails.length + ' guardrails');
+      setResult('receipt-review', 'Connected receipt review loaded: ' + matchedCount + '/' + lineCount + ' lines matched, budget remaining ' + formatSek(budget.remaining) + ', local median delta ' + formatSek(review.comparedWithLocalMedianDelta) + '.');
+    } catch (error) {
+      setResult('receipt-review', 'Receipt review API load failed: ' + error.message + '. Static receipt review remains visible.');
+    }
+  };
   const loadSavingsLedgerFromApi = async () => {
     const config = getApiConfig();
     if (!hasApiSession(config)) {
@@ -1201,6 +1234,10 @@ window.GroceryViewFlowActions = (() => {
         await loadLoyaltyOffersFromApi();
         return;
       }
+      if (flow === 'receipt-review' && action === 'load-receipt-review') {
+        await loadReceiptReviewFromApi();
+        return;
+      }
       if (flow === 'savings-ledger' && action === 'load-savings-ledger') {
         await loadSavingsLedgerFromApi();
         return;
@@ -1379,6 +1416,9 @@ const pantryLivePanel = `
 const loyaltyOffersLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="loyalty-offers" style="margin-top:16px"><div class="eyebrow">Connected loyalty API</div><h2>Pull live loyalty offers</h2><p class="lede">Fetch <code>/api/loyalty/offers</code> through the protected API session bridge to refresh eligible member savings, coupon action counts, membership confirmations, and shelf-price separation guardrails before loyalty offers affect household savings.</p><div class="grid" aria-label="Live loyalty offer API metrics"><div class="metric"><strong data-loyalty-offers-savings>Waiting for API pull</strong><span>eligible savings and ready offers</span></div><div class="metric"><strong data-loyalty-offers-actions>Static action preview</strong><span>coupon and top-offer actions</span></div><div class="metric"><strong data-loyalty-offers-guardrails>Static guardrail preview</strong><span>membership and shelf-price guardrails</span></div></div><div class="flow-panel" aria-label="Connected loyalty offer actions"><button type="button" data-flow-action="load-loyalty-offers">Load live loyalty offers</button></div><p class="flow-result" data-flow-result="loyalty-offers" aria-live="polite">Local preview mode: connect the API session bridge before loading live loyalty offers.</p></section>`;
 
+const receiptReviewLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="receipt-review" style="margin-top:16px"><div class="eyebrow">Connected receipt review API</div><h2>Pull live receipt review</h2><p class="lede">Fetch <code>/api/receipts/review</code> through the protected API session bridge to refresh actual receipt spend, local median delta, confidence routing, and writeback guardrails before receipt rows update household actuals or price history.</p><div class="grid" aria-label="Live receipt review API metrics"><div class="metric"><strong data-receipt-review-budget>Waiting for API pull</strong><span>actual spend and budget buffer</span></div><div class="metric"><strong data-receipt-review-lines>Static line-review preview</strong><span>matched lines and review queue</span></div><div class="metric"><strong data-receipt-review-guardrails>Static writeback preview</strong><span>good buys, overspend, and guardrails</span></div></div><div class="flow-panel" aria-label="Connected receipt review actions"><button type="button" data-flow-action="load-receipt-review">Load live receipt review</button></div><p class="flow-result" data-flow-result="receipt-review" aria-live="polite">Local preview mode: connect the API session bridge before loading live receipt review.</p></section>`;
+
 const savingsLedgerLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="savings-ledger" style="margin-top:16px"><div class="eyebrow">Connected savings ledger API</div><h2>Pull live savings ledger</h2><p class="lede">Fetch protected <code>/api/budget/summary</code> and <code>/api/basket/compare</code> to reconcile budget remaining, next-basket estimate, split-basket forecast savings, verified assignment lines, and missing-product blockers before savings are treated as realized.</p><div class="grid" aria-label="Live savings ledger API metrics"><div class="metric"><strong data-savings-ledger-confirmed>Waiting for API pull</strong><span>budget actuals</span></div><div class="metric"><strong data-savings-ledger-forecast>Static forecast preview</strong><span>forecast savings and next basket</span></div><div class="metric"><strong data-savings-ledger-blockers>Static blocker preview</strong><span>assignment evidence and blockers</span></div></div><div class="flow-panel" aria-label="Connected savings ledger actions"><button type="button" data-flow-action="load-savings-ledger">Load live savings ledger</button></div><p class="flow-result" data-flow-result="savings-ledger" aria-live="polite">Local preview mode: connect the API session bridge and save a basket before loading live savings ledger.</p></section>`;
 
@@ -1492,7 +1532,7 @@ const pages = [
     path: 'receipts/review/index.html',
     title: 'Receipt review desk — GroceryView',
     description: 'Review GroceryView receipt line items by confidence, product match, loyalty discount, budget writeback, and catalog update eligibility.',
-    body: `<section class="card"><div class="eyebrow">Receipt review</div><h1>Receipt review desk</h1><p class="lede">Confirm line-item matches, loyalty discounts, and budget writebacks before receipt data updates household spend or catalog prices.</p><div class="grid"><div class="metric"><strong>3</strong><span>receipt lines</span></div><div class="metric"><strong>1</strong><span>needs moderator</span></div><div class="metric"><strong>501 SEK</strong><span>weekly actuals impact</span></div></div></section><section class="card" style="margin-top:16px"><h2>Line-item decisions</h2><table class="table"><thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget action</th><th>Catalog action</th></tr></thead><tbody><tr><td>Arla Milk 1L</td><td>ARLA-MILK-1L</td><td>98%</td><td>Post to weekly actuals</td><td>Update verified price</td></tr><tr><td>Coop loyalty discount</td><td>receipt discount</td><td>84%</td><td>Apply receipt total only</td><td>No product price update</td></tr><tr><td>Loose tomatoes</td><td>unknown produce</td><td>54%</td><td>Hold from forecast</td><td>Route to human review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Writeback guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Decision</th></tr></thead><tbody><tr><td>Low confidence below 80%</td><td>Cannot update catalog or Deal Score.</td></tr><tr><td>Loyalty discount line</td><td>Impacts receipt total without changing shelf price.</td></tr><tr><td>Verified product match</td><td>Can update household spend and product price history.</td></tr></tbody></table></section>`
+    body: `<section class="card"><div class="eyebrow">Receipt review</div><h1>Receipt review desk</h1><p class="lede">Confirm line-item matches, loyalty discounts, and budget writebacks before receipt data updates household spend or catalog prices.</p><div class="grid"><div class="metric"><strong>3</strong><span>receipt lines</span></div><div class="metric"><strong>1</strong><span>needs moderator</span></div><div class="metric"><strong>501 SEK</strong><span>weekly actuals impact</span></div></div></section><section class="card" style="margin-top:16px"><h2>Line-item decisions</h2><table class="table"><thead><tr><th>Line</th><th>Match</th><th>Confidence</th><th>Budget action</th><th>Catalog action</th></tr></thead><tbody><tr><td>Arla Milk 1L</td><td>ARLA-MILK-1L</td><td>98%</td><td>Post to weekly actuals</td><td>Update verified price</td></tr><tr><td>Coop loyalty discount</td><td>receipt discount</td><td>84%</td><td>Apply receipt total only</td><td>No product price update</td></tr><tr><td>Loose tomatoes</td><td>unknown produce</td><td>54%</td><td>Hold from forecast</td><td>Route to human review</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Writeback guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Decision</th></tr></thead><tbody><tr><td>Low confidence below 80%</td><td>Cannot update catalog or Deal Score.</td></tr><tr><td>Loyalty discount line</td><td>Impacts receipt total without changing shelf price.</td></tr><tr><td>Verified product match</td><td>Can update household spend and product price history.</td></tr></tbody></table></section>${receiptReviewLivePanel}`
   },
   {
     path: 'admin/human-review/index.html',

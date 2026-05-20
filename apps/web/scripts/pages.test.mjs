@@ -538,6 +538,15 @@ describe('buildStaticPages', () => {
       assert.match(receiptReview, /Post to weekly actuals/);
       assert.match(receiptReview, /Route to human review/);
       assert.match(receiptReview, /Cannot update catalog or Deal Score/);
+      assert.match(receiptReview, /Connected receipt review API/);
+      assert.match(receiptReview, /Load live receipt review/);
+      assert.match(receiptReview, /data-groceryview-flow="receipt-review"/);
+      assert.match(receiptReview, /data-flow-action="load-receipt-review"/);
+      assert.match(receiptReview, /data-receipt-review-budget/);
+      assert.match(receiptReview, /data-receipt-review-lines/);
+      assert.match(receiptReview, /data-receipt-review-guardrails/);
+      assert.match(receiptReview, /fetch\(apiUrl\('\/api\/receipts\/review'/);
+      assert.match(receiptReview, /Connected receipt review loaded/);
 
       const humanReview = await readFile(join(root, 'admin/human-review/index.html'), 'utf8');
       assert.match(humanReview, /Human review operations/);
