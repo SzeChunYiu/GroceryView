@@ -5,6 +5,7 @@ import {
   fetchRetailerConnectorSnapshot,
   ingestRetailerProduct,
   normalizeUnitPrice,
+  parseRetailerProductJsonSnapshot,
   planIngestionBatch,
   planRetailerConnectorRun,
   planRetailerSourceAccess,
@@ -362,5 +363,75 @@ describe('fetchRetailerConnectorSnapshot', () => {
     assert.equal(snapshot.sourceUrl, 'https://api.example.test/willys/products');
     assert.equal(snapshot.contentHash?.startsWith('sha256:'), true);
     assert.match(snapshot.rawSnapshotRef, /^raw:\/\/test-snapshots\/source-run-willys-official-api-willys-api-v1-2026-05-19\/sha256-/);
+  });
+});
+
+
+describe('parseRetailerProductJsonSnapshot', () => {
+  it('parses provider-neutral product JSON and works as a connector runner parser', async () => {
+    const result = await runRetailerConnector({
+      connectorId: 'Willys normalized JSON',
+      requestedAt: '2026-05-20T08:40:00.000Z',
+      chainId: 'willys',
+      sourceType: 'official_api',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true,
+      endpointUrl: 'https://api.example.test/willys/normalized-products',
+      parserVersion: 'normalized-json-v1',
+      fetcher: (plan) => ({
+        statusCode: 200,
+        body: JSON.stringify({
+          items: [{
+            storeId: 'willys-odenplan',
+            retailerProductId: 'wil-zoegas-450',
+            rawName: 'Zoégas Skånerost 450g',
+            canonicalName: 'Zoégas Coffee 450g',
+            productId: 'coffee-zoegas-450g',
+            categoryId: 'coffee',
+            brand: 'Zoégas',
+            packageSize: '450',
+            packageUnit: 'g',
+            price: '49.90',
+            regularPrice: 69.9,
+            promoText: 'Veckans erbjudande',
+            memberOnly: 'false'
+          }]
+        }),
+        contentType: 'application/json',
+        retrievedAt: plan.provenance.capturedAt,
+        sourceUrl: plan.provenance.sourceUrl,
+        rawSnapshotRef: `raw://normalized/${plan.runKey}.json`
+      }),
+      parser: parseRetailerProductJsonSnapshot
+    });
+
+    assert.equal(result.status, 'completed');
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.ingestion.accepted[0].priceObservation.unitPrice, 110.8889);
+    assert.equal(result.ingestion.accepted[0].priceObservation.parserVersion, 'normalized-json-v1');
+    assert.equal(result.ingestion.accepted[0].priceObservation.rawSnapshotRef, 'raw://normalized/willys:official-api:willys-normalized-json:2026-05-20.json');
+  });
+
+  it('rejects malformed or incomplete normalized JSON before ingestion', () => {
+    assert.throws(() => parseRetailerProductJsonSnapshot({
+      statusCode: 200,
+      body: '{bad json',
+      contentType: 'application/json',
+      retrievedAt: '2026-05-20T08:40:00.000Z',
+      sourceUrl: 'https://api.example.test/bad',
+      rawSnapshotRef: 'raw://bad',
+      contentHash: 'sha256:bad'
+    }), /valid JSON/);
+
+    assert.throws(() => parseRetailerProductJsonSnapshot({
+      statusCode: 200,
+      body: JSON.stringify({ items: [{ rawName: 'Missing fields' }] }),
+      contentType: 'application/json',
+      retrievedAt: '2026-05-20T08:40:00.000Z',
+      sourceUrl: 'https://api.example.test/bad',
+      rawSnapshotRef: 'raw://bad',
+      contentHash: 'sha256:bad'
+    }), /items\[0\]\.canonicalName/);
   });
 });
