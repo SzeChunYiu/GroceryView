@@ -44,6 +44,7 @@ describe('buildOpenApiDocument', () => {
       '/api/stores/{id}',
       '/api/stores/{id}/deals',
       '/api/users/{userId}/favorite-stores',
+      '/api/users/{userId}/favorite-stores/{storeId}',
       '/api/watchlist',
       '/api/watchlist/items/{productId}'
     ]);
@@ -58,6 +59,7 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/watchlist'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/households/current'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/households/current'].put?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/users/{userId}/favorite-stores/{storeId}'].delete?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/watchlist/items/{productId}'].delete?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/basket/items/{productId}'].patch?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/human-review/assignments'].get?.security, [{ bearerAuth: [] }]);
