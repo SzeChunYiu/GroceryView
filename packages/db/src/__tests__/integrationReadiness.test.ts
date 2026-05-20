@@ -4,6 +4,7 @@ import {
   POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS,
   POSTGRES_INTEGRATION_REQUIRED_TABLES,
   buildPostgresIntegrationReadinessReport,
+  checkPostgresIntegrationReadiness,
   collectPostgresIntegrationProbe,
   type QueryExecutor
 } from '../index.js';
@@ -140,5 +141,39 @@ describe('collectPostgresIntegrationProbe', () => {
     assert.deepEqual(executor.calls[0].params[0], [...POSTGRES_INTEGRATION_REQUIRED_TABLES]);
     assert.match(executor.calls[0].sql, /information_schema\.tables/);
     assert.match(executor.calls[1].sql, /schema_migrations/);
+  });
+});
+
+describe('checkPostgresIntegrationReadiness', () => {
+  it('collects live evidence and returns a readiness report in one call', async () => {
+    const report = await checkPostgresIntegrationReadiness({
+      executor: new ProbeQueryExecutor(),
+      repositoryProbes: [
+        {
+          name: 'user_read_probe',
+          async run(queryExecutor) {
+            await queryExecutor.query('select 1 as ok');
+          }
+        },
+        {
+          name: 'suppression_read_probe',
+          async run(queryExecutor) {
+            await queryExecutor.query('select * from notification_suppressions limit 1');
+          }
+        }
+      ]
+    });
+
+    assert.equal(report.status, 'blocked');
+    assert.match(report.summary, /blocked/);
+    assert.deepEqual(report.evidence, [
+      'table:app_users',
+      'table:notification_tasks',
+      'migration:001_initial_schema',
+      'migration:006_notification_tasks',
+      'repository_check:user_read_probe'
+    ]);
+    assert.match(report.blockers.join('\n'), /missing_table:notification_suppressions/);
+    assert.match(report.blockers.join('\n'), /repository_check_fail:suppression_read_probe/);
   });
 });
