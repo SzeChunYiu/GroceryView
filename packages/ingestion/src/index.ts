@@ -155,6 +155,30 @@ export type OfferSelectorReviewFlag =
   | 'third_party_or_search_snippet'
   | 'skeleton_or_error_state';
 
+export type OfferVisibilityBoundary =
+  | 'public_weekly'
+  | 'public_member_price'
+  | 'authenticated_member'
+  | 'personalized_coupon'
+  | 'private_wallet';
+
+export type OfferEligibilityLabel =
+  | 'none'
+  | 'requires_loyalty_membership'
+  | 'requires_login'
+  | 'personalized'
+  | 'user_private';
+
+export type OfferVisibilityBoundaryPlan = {
+  visibility: OfferVisibilityBoundary;
+  defaultPolicy: RetailerSourcePolicyLabel;
+  canFetch: boolean;
+  canEmitPublicCoverage: boolean;
+  canAffectDefaultDealScore: boolean;
+  requiredEligibilityLabel: OfferEligibilityLabel;
+  requiredActions: string[];
+};
+
 export type OfferSelectorEvidence = {
   evidenceId: string;
   selector: string;
@@ -386,6 +410,63 @@ export function planRetailerSurfacePolicy(input: RetailerSurfacePolicyInput): Re
     ...entry,
     disallowedPathMatches: [...entry.disallowedPathMatches],
     requiredActions: [...entry.requiredActions]
+  };
+}
+
+export const offerVisibilityBoundaryPlans: OfferVisibilityBoundaryPlan[] = [
+  {
+    visibility: 'public_weekly',
+    defaultPolicy: 'fixture_review',
+    canFetch: false,
+    canEmitPublicCoverage: true,
+    canAffectDefaultDealScore: true,
+    requiredEligibilityLabel: 'none',
+    requiredActions: ['fixture_review_required']
+  },
+  {
+    visibility: 'public_member_price',
+    defaultPolicy: 'fixture_review',
+    canFetch: false,
+    canEmitPublicCoverage: true,
+    canAffectDefaultDealScore: true,
+    requiredEligibilityLabel: 'requires_loyalty_membership',
+    requiredActions: ['fixture_review_required', 'loyalty_eligibility_label_required']
+  },
+  {
+    visibility: 'authenticated_member',
+    defaultPolicy: 'stub_only',
+    canFetch: false,
+    canEmitPublicCoverage: false,
+    canAffectDefaultDealScore: false,
+    requiredEligibilityLabel: 'requires_login',
+    requiredActions: ['stub_only_no_network_fetch', 'login_surface_permission_required']
+  },
+  {
+    visibility: 'personalized_coupon',
+    defaultPolicy: 'stub_only',
+    canFetch: false,
+    canEmitPublicCoverage: false,
+    canAffectDefaultDealScore: false,
+    requiredEligibilityLabel: 'personalized',
+    requiredActions: ['stub_only_no_network_fetch', 'personalized_offer_permission_required']
+  },
+  {
+    visibility: 'private_wallet',
+    defaultPolicy: 'stub_only',
+    canFetch: false,
+    canEmitPublicCoverage: false,
+    canAffectDefaultDealScore: false,
+    requiredEligibilityLabel: 'user_private',
+    requiredActions: ['stub_only_no_network_fetch', 'private_wallet_consent_required']
+  }
+];
+
+export function planOfferVisibilityBoundary(visibility: OfferVisibilityBoundary): OfferVisibilityBoundaryPlan {
+  const plan = offerVisibilityBoundaryPlans.find((candidate) => candidate.visibility === visibility);
+  if (!plan) throw new Error(`No offer visibility boundary for ${visibility}.`);
+  return {
+    ...plan,
+    requiredActions: [...plan.requiredActions]
   };
 }
 

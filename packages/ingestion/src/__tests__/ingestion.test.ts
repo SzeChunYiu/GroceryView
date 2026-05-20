@@ -12,9 +12,11 @@ import {
   parseOpenPricesSnapshot,
   parseRetailerProductJsonSnapshot,
   planIngestionBatch,
+  planOfferVisibilityBoundary,
   planRetailerConnectorRun,
   planRetailerSourceAccess,
   planRetailerSurfacePolicy,
+  offerVisibilityBoundaryPlans,
   retailerRobotsPolicyMatrix,
   runRetailerConnector,
   stockholmStoreLocatorFixtures,
@@ -216,6 +218,45 @@ describe('planRetailerSurfacePolicy', () => {
       assert.equal(plan.canFetch, false);
       assert.deepEqual(plan.disallowedPathMatches, []);
       assert.ok(plan.requiredActions.includes('stub_only_no_network_fetch'));
+    }
+  });
+});
+
+describe('planOfferVisibilityBoundary', () => {
+  it('defines every offer visibility boundary with a default source-policy decision', () => {
+    const expected = ['public_weekly', 'public_member_price', 'authenticated_member', 'personalized_coupon', 'private_wallet'] as const;
+
+    assert.deepEqual(offerVisibilityBoundaryPlans.map((plan) => plan.visibility), [...expected]);
+    for (const visibility of expected) {
+      const plan = planOfferVisibilityBoundary(visibility);
+      assert.equal(plan.visibility, visibility);
+      assert.ok(['fixture_review', 'stub_only'].includes(plan.defaultPolicy));
+      assert.equal(plan.canFetch, false);
+    }
+  });
+
+  it('requires loyalty eligibility labels for public member prices', () => {
+    const weekly = planOfferVisibilityBoundary('public_weekly');
+    const memberPrice = planOfferVisibilityBoundary('public_member_price');
+
+    assert.equal(weekly.requiredEligibilityLabel, 'none');
+    assert.equal(weekly.canEmitPublicCoverage, true);
+    assert.equal(weekly.canAffectDefaultDealScore, true);
+    assert.equal(memberPrice.requiredEligibilityLabel, 'requires_loyalty_membership');
+    assert.equal(memberPrice.canEmitPublicCoverage, true);
+    assert.equal(memberPrice.canAffectDefaultDealScore, true);
+    assert.ok(memberPrice.requiredActions.includes('loyalty_eligibility_label_required'));
+  });
+
+  it('keeps authenticated, personalized, and private wallet offers stub-only', () => {
+    for (const visibility of ['authenticated_member', 'personalized_coupon', 'private_wallet'] as const) {
+      const plan = planOfferVisibilityBoundary(visibility);
+      assert.equal(plan.defaultPolicy, 'stub_only');
+      assert.equal(plan.canFetch, false);
+      assert.equal(plan.canEmitPublicCoverage, false);
+      assert.equal(plan.canAffectDefaultDealScore, false);
+      assert.ok(plan.requiredActions.includes('stub_only_no_network_fetch'));
+      assert.notEqual(plan.requiredEligibilityLabel, 'none');
     }
   });
 });
