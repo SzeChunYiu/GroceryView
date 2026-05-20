@@ -14,6 +14,7 @@ describe('buildStaticPages', () => {
         'account/index.html',
         'account/sync/index.html',
         'admin/human-review/index.html',
+        'ads/disclosure/index.html',
         'basket/index.html',
         'billing/status/index.html',
         'budget/forecast/index.html',
@@ -33,6 +34,8 @@ describe('buildStaticPages', () => {
         'products/coffee/index.html',
         'receipts/review/index.html',
         'retailers/freshness/index.html',
+        'routes/shopping/index.html',
+        'savings/ledger/index.html',
         'savings/smart-swaps/index.html',
         'scanner/index.html',
         'stores/compare/index.html',
@@ -238,6 +241,15 @@ describe('buildStaticPages', () => {
       assert.match(notificationInbox, /Quiet hours 21:00-07:00/);
       assert.match(notificationInbox, /Provider token invalid/);
       assert.match(notificationInbox, /Invalid tokens stop future sends/);
+      assert.match(notificationInbox, /Connected notification inbox API/);
+      assert.match(notificationInbox, /Load live notification inbox/);
+      assert.match(notificationInbox, /data-groceryview-flow="notification-inbox"/);
+      assert.match(notificationInbox, /data-flow-action="load-notification-inbox"/);
+      assert.match(notificationInbox, /data-notification-inbox-alerts/);
+      assert.match(notificationInbox, /data-notification-inbox-delivery/);
+      assert.match(notificationInbox, /data-notification-inbox-guardrails/);
+      assert.match(notificationInbox, /fetch\(apiUrl\('\/api\/notifications\/inbox'/);
+      assert.match(notificationInbox, /Connected notification inbox loaded/);
 
       const nutritionAllergens = await readFile(join(root, 'nutrition/allergens/index.html'), 'utf8');
       assert.match(nutritionAllergens, /Nutrition and allergen review/);
