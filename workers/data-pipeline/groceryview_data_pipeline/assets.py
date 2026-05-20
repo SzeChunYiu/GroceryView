@@ -18,6 +18,7 @@ from .models import (
     LatestPriceRow,
     ObservationCoverageSummary,
     ObservationFreshnessSummary,
+    OpenPricesIngestionRunPlan,
     OpenPricesPullPlan,
     PriceObservationRow,
     PriceObservationMixSummary,
@@ -314,6 +315,69 @@ def build_open_prices_pull_plan(open_prices_user_agent_present: bool = False) ->
     )
 
 
+def build_open_prices_ingestion_run_plan(
+    *,
+    open_prices_user_agent_present: bool = False,
+    database_url_present: bool = False,
+    raw_snapshot_storage_present: bool = False,
+    schedule_enabled: bool = False,
+) -> OpenPricesIngestionRunPlan:
+    required_actions: list[str] = []
+    if not open_prices_user_agent_present:
+        required_actions.append("set_open_prices_user_agent")
+    if not database_url_present:
+        required_actions.append("set_database_url")
+    if not raw_snapshot_storage_present:
+        required_actions.append("configure_raw_snapshot_storage")
+    if not schedule_enabled:
+        required_actions.append("enable_open_prices_schedule")
+
+    return OpenPricesIngestionRunPlan(
+        status="ready" if not required_actions else "blocked",
+        source_asset="open_prices_real_pull_plan",
+        schedule_cron="17 */6 * * *",
+        freshness_sla_hours=8,
+        required_env=[
+            "OPEN_PRICES_USER_AGENT",
+            "DATABASE_URL",
+            "GROCERYVIEW_RAW_SNAPSHOT_BUCKET",
+            "OPEN_PRICES_SCHEDULE_ENABLED",
+        ],
+        required_actions=required_actions,
+        materialization_assets=[
+            "open_prices_real_pull_plan",
+            "price_observations",
+            "latest_price_rollup",
+            "price_observation_freshness",
+            "price_observation_coverage",
+        ],
+        persistence_targets=[
+            "raw_snapshots",
+            "source_runs",
+            "raw_price_records",
+            "price_observations",
+            "latest_prices",
+        ],
+        idempotency_key_fields=[
+            "source_type",
+            "source_url",
+            "content_hash",
+            "parser_version",
+            "observed_at",
+        ],
+        evidence_fields=[
+            "runKey",
+            "sourceUrl",
+            "contentHash",
+            "rawSnapshotRef",
+            "acceptedCount",
+            "persistedObservationCount",
+            "latestRollupCount",
+            "freshnessStatus",
+        ],
+    )
+
+
 def build_observation_coverage_summary(
     observations: Iterable[PriceObservationRow],
     stores: Iterable[StoreSeed],
@@ -469,6 +533,16 @@ def price_observation_freshness(price_observations: list[dict[str, object]]) -> 
 @asset(group_name=ASSET_GROUP)
 def open_prices_real_pull_plan() -> dict[str, object]:
     return build_open_prices_pull_plan(open_prices_user_agent_present=False).to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
+def open_prices_ingestion_run_plan(open_prices_real_pull_plan: dict[str, object]) -> dict[str, object]:
+    return build_open_prices_ingestion_run_plan(
+        open_prices_user_agent_present=open_prices_real_pull_plan.get("status") == "ready",
+        database_url_present=False,
+        raw_snapshot_storage_present=False,
+        schedule_enabled=False,
+    ).to_dict()
 
 
 @asset(group_name=ASSET_GROUP)

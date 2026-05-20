@@ -2,6 +2,7 @@ from dagster import Definitions
 
 from .assets import (
     latest_price_rollup,
+    open_prices_ingestion_run_plan,
     normalized_products,
     open_prices_real_pull_plan,
     price_observation_coverage,
@@ -25,6 +26,7 @@ defs = Definitions(
         quality_checks,
         price_observation_freshness,
         open_prices_real_pull_plan,
+        open_prices_ingestion_run_plan,
         price_observation_coverage,
         price_observation_mix,
     ]
