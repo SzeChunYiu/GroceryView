@@ -426,6 +426,11 @@ def test_open_prices_launch_readiness_rolls_up_all_open_prices_plans() -> None:
     assert "postgresReadinessStatus" in summary.evidence_fields
     assert "persistedObservationCount" in summary.evidence_fields
     assert "sourceRunId" in summary.evidence_fields
+    assert summary.evidence_artifacts == [
+        "/tmp/groceryview-hosted-http-smoke.json",
+        "/tmp/groceryview-open-prices-schedule-health.json",
+        "hosted-readiness-console-output",
+    ]
     assert summary.to_dict()["demo"] is False
 
     ready = build_open_prices_launch_readiness_summary(
@@ -474,6 +479,7 @@ def test_open_prices_launch_readiness_digest_counts_operator_signals() -> None:
         "blocked_plan_count": 4,
         "next_action_count": 11,
         "evidence_field_count": 28,
+        "evidence_artifact_count": 3,
         "hosted_smoke_blocker_count": 3,
         "persistence_blocker_count": 5,
         "schedule_health_blocker_count": 4,
@@ -508,6 +514,7 @@ def test_open_prices_launch_readiness_digest_counts_operator_signals() -> None:
     ready_digest = summarize_open_prices_launch_readiness(ready_summary)
     assert ready_digest.status == "ready"
     assert ready_digest.next_action_count == 0
+    assert ready_digest.evidence_artifact_count == 3
     assert ready_digest.hosted_smoke_blocker_count == 0
     assert ready_digest.persistence_blocker_count == 0
     assert ready_digest.schedule_health_blocker_count == 0

@@ -623,6 +623,13 @@ def build_open_prices_launch_readiness_summary(
             for field in plan.evidence_fields
         }
     )
+    evidence_artifacts = sorted(
+        {
+            artifact
+            for plan in plans.values()
+            for artifact in getattr(plan, "evidence_artifacts", [])
+        }
+    )
 
     return OpenPricesLaunchReadinessSummary(
         status="ready" if not blockers_by_plan else "blocked",
@@ -632,6 +639,7 @@ def build_open_prices_launch_readiness_summary(
         blockers_by_plan=blockers_by_plan,
         next_actions=next_actions,
         evidence_fields=evidence_fields,
+        evidence_artifacts=evidence_artifacts,
     )
 
 
@@ -657,6 +665,7 @@ def summarize_open_prices_launch_readiness(
         blocked_plan_count=summary.blocked_plan_count,
         next_action_count=len(summary.next_actions),
         evidence_field_count=len(summary.evidence_fields),
+        evidence_artifact_count=len(summary.evidence_artifacts),
         hosted_smoke_blocker_count=len(hosted_smoke_blockers),
         persistence_blocker_count=persistence_blocker_count,
         schedule_health_blocker_count=len(schedule_health_blockers),
@@ -958,6 +967,7 @@ def open_prices_launch_readiness_digest(open_prices_launch_readiness: dict[str, 
         blockers_by_plan=blockers_by_plan,
         next_actions=[str(action) for action in open_prices_launch_readiness["next_actions"]],
         evidence_fields=[str(field) for field in open_prices_launch_readiness["evidence_fields"]],
+        evidence_artifacts=[str(artifact) for artifact in open_prices_launch_readiness["evidence_artifacts"]],
         demo=bool(open_prices_launch_readiness.get("demo", False)),
     )
     return summarize_open_prices_launch_readiness(summary).to_dict()

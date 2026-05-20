@@ -326,6 +326,7 @@ class OpenPricesLaunchReadinessSummary:
     blockers_by_plan: dict[str, list[str]]
     next_actions: list[str]
     evidence_fields: list[str]
+    evidence_artifacts: list[str]
     demo: bool = False
 
     def to_dict(self) -> dict[str, object]:
@@ -340,6 +341,7 @@ class OpenPricesLaunchReadinessDigest:
     blocked_plan_count: int
     next_action_count: int
     evidence_field_count: int
+    evidence_artifact_count: int
     hosted_smoke_blocker_count: int
     persistence_blocker_count: int
     schedule_health_blocker_count: int
