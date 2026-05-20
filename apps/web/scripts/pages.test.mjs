@@ -136,6 +136,16 @@ describe('buildStaticPages', () => {
       assert.match(market, /Private Label Index/);
       assert.match(market, /Premium Brand Index/);
       assert.match(market, /private-label savings vs national brands/);
+      assert.match(market, /Connected grocery indices API/);
+      assert.match(market, /Load live grocery indices/);
+      assert.match(market, /data-groceryview-flow="market-indices"/);
+      assert.match(market, /data-flow-action="load-market-indices"/);
+      assert.match(market, /data-market-index-value/);
+      assert.match(market, /data-market-index-movement/);
+      assert.match(market, /data-market-index-confidence/);
+      assert.match(market, /fetch\(apiUrl\('\/api\/indices'/);
+      assert.match(market, /movementPercent/);
+      assert.match(market, /components/);
 
       const catalogCoverage = await readFile(join(root, 'catalog/coverage/index.html'), 'utf8');
       assert.match(catalogCoverage, /Catalog coverage dashboard/);

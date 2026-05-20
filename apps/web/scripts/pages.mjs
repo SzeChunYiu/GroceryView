@@ -29,6 +29,10 @@ window.GroceryViewFlowActions = (() => {
     const target = document.querySelector('[data-category-market-' + metric + ']');
     if (target) target.textContent = message;
   };
+  const setMarketIndexMetric = (metric, message) => {
+    const target = document.querySelector('[data-market-index-' + metric + ']');
+    if (target) target.textContent = message;
+  };
   const setPriceFreshnessMetric = (metric, message) => {
     const target = document.querySelector('[data-price-freshness-' + metric + ']');
     if (target) target.textContent = message;
@@ -527,6 +531,28 @@ window.GroceryViewFlowActions = (() => {
       setResult('category-market', 'Category market API load failed: ' + error.message + '. Static category board remains visible.');
     }
   };
+  const loadMarketIndicesFromApi = async () => {
+    const config = getApiConfig();
+    if (!config.apiBase) {
+      setResult('market-indices', 'Local preview mode: add an API base URL before loading live grocery indices.');
+      return;
+    }
+    try {
+      const payload = await requireApiSuccess(await fetch(apiUrl('/api/indices', config, false), {
+        method: 'GET',
+        headers: config.bearerToken ? apiHeaders(config) : { 'content-type': 'application/json' }
+      }));
+      const indices = Array.isArray(payload) ? payload : [];
+      const primary = indices[0] || {};
+      const components = Array.isArray(primary.components) ? primary.components : [];
+      setMarketIndexMetric('value', primary.label ? primary.label + ' ' + (primary.value ?? 'n/a') : 'No index returned');
+      setMarketIndexMetric('movement', (primary.movementPercent ?? 'n/a') + '% from ' + (primary.baseDate || 'base date'));
+      setMarketIndexMetric('confidence', (primary.confidence || 'unknown') + ' confidence · ' + components.length + ' components');
+      setResult('market-indices', 'Connected grocery indices loaded: ' + indices.length + ' index reports from /api/indices.');
+    } catch (error) {
+      setResult('market-indices', 'Grocery indices API load failed: ' + error.message + '. Static index copy remains visible.');
+    }
+  };
   const loadPriceFreshnessFromApi = async (button) => {
     const config = getApiConfig();
     const panel = button.closest('[data-groceryview-flow="price-freshness"]');
@@ -751,6 +777,10 @@ window.GroceryViewFlowActions = (() => {
         await loadCategoryMarketFromApi(button);
         return;
       }
+      if (flow === 'market-indices' && action === 'load-market-indices') {
+        await loadMarketIndicesFromApi();
+        return;
+      }
       if (flow === 'price-freshness' && action === 'load-price-freshness') {
         await loadPriceFreshnessFromApi(button);
         return;
@@ -893,6 +923,9 @@ const productPriceGuardrails = `
 const categoryMarketLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="category-market" data-category="coffee" style="margin-top:16px"><div class="eyebrow">Connected category market API</div><h2>Pull current coffee category numbers</h2><p class="lede">Fetch <code>/api/categories/coffee/market</code> to refresh category rows with current price, Deal Score, 1M move, 52-week position, Stockholm median gap, and verified-history evidence from the API instead of static copy.</p><div class="grid" aria-label="Live category market API metrics"><div class="metric"><strong data-category-market-leader>Waiting for API pull</strong><span>category leader</span></div><div class="metric"><strong data-category-market-range>Static 52W range preview</strong><span>52W position</span></div><div class="metric"><strong data-category-market-median>Static Stockholm median preview</strong><span>same-product median gap</span></div><div class="metric"><strong data-category-market-evidence>Static verified history preview</strong><span>verified category evidence</span></div></div><div class="flow-panel" aria-label="Connected category market actions"><button type="button" data-flow-action="load-category-market">Load live category market</button></div><p class="flow-result" data-flow-result="category-market" aria-live="polite">Local preview mode: connect the API session bridge before loading live category market numbers.</p></section>`;
 
+const marketIndicesLivePanel = `
+  <section class="card terminal-live-panel" data-groceryview-flow="market-indices" style="margin-top:16px"><div class="eyebrow">Connected grocery indices API</div><h2>Pull live fixed-basket index</h2><p class="lede">Fetch <code>/api/indices</code> to refresh the Stockholm Grocery Index value, movement, confidence, and component count from the API behind the market surface.</p><div class="grid" aria-label="Live grocery index API metrics"><div class="metric"><strong data-market-index-value>Waiting for API pull</strong><span>index value</span></div><div class="metric"><strong data-market-index-movement>Static movement preview</strong><span>movement from base</span></div><div class="metric"><strong data-market-index-confidence>Static confidence preview</strong><span>confidence and components</span></div></div><div class="flow-panel" aria-label="Connected grocery index actions"><button type="button" data-flow-action="load-market-indices">Load live grocery indices</button></div><p class="flow-result" data-flow-result="market-indices" aria-live="polite">Local preview mode: add an API base URL before loading live grocery indices.</p></section>`;
+
 const priceFreshnessLivePanel = `
   <section class="card terminal-live-panel" data-groceryview-flow="price-freshness" data-as-of="2026-05-20T00:00:00.000Z" style="margin-top:16px"><div class="eyebrow">Connected price freshness API</div><h2>Pull live freshness and backfill status</h2><p class="lede">Fetch <code>/api/prices/freshness</code> to replace static freshness copy with API counts for fresh, aging, stale, and backfill-needed product rows before those rows power deal boards or alerts.</p><div class="grid" aria-label="Live price freshness API metrics"><div class="metric"><strong data-price-freshness-summary>Waiting for API pull</strong><span>fresh/aging/stale</span></div><div class="metric"><strong data-price-freshness-backfill>Static backfill preview</strong><span>backfill queue</span></div><div class="metric"><strong data-price-freshness-thresholds>Static freshness thresholds</strong><span>aging and stale windows</span></div><div class="metric"><strong data-price-freshness-stale>Static stale-product preview</strong><span>stale products</span></div></div><div class="flow-panel" aria-label="Connected price freshness actions"><button type="button" data-flow-action="load-price-freshness">Load live freshness report</button></div><p class="flow-result" data-flow-result="price-freshness" aria-live="polite">Local preview mode: connect the API session bridge before loading live price freshness.</p></section>`;
 
@@ -1018,7 +1051,7 @@ const pages = [
     path: 'market/index.html',
     title: 'Stockholm Grocery Market — GroceryView',
     description: 'Stockholm grocery market overview with indices, top movers, and true deals.',
-    body: `<section class="card"><div class="eyebrow">Market</div><h1>Stockholm Grocery Market</h1><p class="lede">Top movers, best true deals, and grocery indices for Stockholm.</p><div class="grid"><div class="metric"><strong>101.6</strong><span>Stockholm Grocery Index</span></div><div class="metric"><strong>91.6</strong><span>Coffee Index</span></div><div class="metric"><strong>108.4</strong><span>Dairy Index</span></div></div></section><section class="card" style="margin-top:16px"><div class="eyebrow">Grocery mover board</div><h2>Biggest verified movers</h2><p class="lede">Seeking Alpha-style market tape for staples: current quote, 1M move, 52W position, same-product gap vs Stockholm median, and evidence volume before a shopper acts.</p><table class="table"><thead><tr><th>Product</th><th>Current price</th><th>1M move</th><th>52W position</th><th>Same-product read</th><th>Evidence</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>54.90 SEK verified shelf</td><td>-8.3%</td><td>near 52W low</td><td>5.00 SEK below vs Stockholm median</td><td>31/42 verified observations</td></tr><tr><td>Eggs 12-pack</td><td>34.90 SEK retailer page</td><td>-5.7%</td><td>bottom quartile</td><td>3.10 SEK below vs Stockholm median</td><td>18/23 verified observations</td></tr><tr><td>Butter 600g</td><td>54.90 SEK watchlist</td><td>+4.1%</td><td>middle of 52W range</td><td>2.40 SEK above vs Stockholm median</td><td>12/18 verified observations</td></tr></tbody></table><p class="footer-note">Estimated rows cannot top the mover board; low-confidence prices remain visible only in review surfaces.</p></section><section class="card terminal-live-panel" data-groceryview-flow="market-movers" style="margin-top:16px"><div class="eyebrow">Connected market movers API</div><h2>Pull live grocery mover tape</h2><p class="lede">Fetch <code>/api/market/overview</code> and refresh the market-board leader, 52W position, Stockholm median gap, and verified-history evidence from the live API response.</p><div class="grid" aria-label="Live market mover API metrics"><div class="metric"><strong data-market-movers-leader>Waiting for API pull</strong><span>leader, price, 1M move, median gap</span></div><div class="metric"><strong data-market-movers-range>Static 52W position preview</strong><span>52W range and position</span></div><div class="metric"><strong data-market-movers-evidence>Static evidence preview</strong><span>verified history evidence</span></div></div><div class="flow-panel" aria-label="Connected market mover actions"><button type="button" data-flow-action="load-market-movers">Load live market movers</button></div><p class="flow-result" data-flow-result="market-movers" aria-live="polite">Local preview mode: connect the API session bridge before loading live market movers.</p></section><section class="card" style="margin-top:16px"><h2>Brand-tier indices</h2><p class="lede">Private Label Index, Budget Private Label Index, Premium Brand Index, Organic Brand Index, and National Brand Index separate price pressure by brand tier.</p><div class="grid"><div class="metric"><strong>23.7%</strong><span>private-label savings vs national brands</span></div><div class="metric"><strong>58.8%</strong><span>premium gap vs private label</span></div><div class="metric"><strong>Cleaning</strong><span>highest private-label savings category</span></div></div></section>`
+    body: `<section class="card"><div class="eyebrow">Market</div><h1>Stockholm Grocery Market</h1><p class="lede">Top movers, best true deals, and grocery indices for Stockholm.</p><div class="grid"><div class="metric"><strong>101.6</strong><span>Stockholm Grocery Index</span></div><div class="metric"><strong>91.6</strong><span>Coffee Index</span></div><div class="metric"><strong>108.4</strong><span>Dairy Index</span></div></div></section><section class="card" style="margin-top:16px"><div class="eyebrow">Grocery mover board</div><h2>Biggest verified movers</h2><p class="lede">Seeking Alpha-style market tape for staples: current quote, 1M move, 52W position, same-product gap vs Stockholm median, and evidence volume before a shopper acts.</p><table class="table"><thead><tr><th>Product</th><th>Current price</th><th>1M move</th><th>52W position</th><th>Same-product read</th><th>Evidence</th></tr></thead><tbody><tr><td>Zoégas Coffee 450g</td><td>54.90 SEK verified shelf</td><td>-8.3%</td><td>near 52W low</td><td>5.00 SEK below vs Stockholm median</td><td>31/42 verified observations</td></tr><tr><td>Eggs 12-pack</td><td>34.90 SEK retailer page</td><td>-5.7%</td><td>bottom quartile</td><td>3.10 SEK below vs Stockholm median</td><td>18/23 verified observations</td></tr><tr><td>Butter 600g</td><td>54.90 SEK watchlist</td><td>+4.1%</td><td>middle of 52W range</td><td>2.40 SEK above vs Stockholm median</td><td>12/18 verified observations</td></tr></tbody></table><p class="footer-note">Estimated rows cannot top the mover board; low-confidence prices remain visible only in review surfaces.</p></section><section class="card terminal-live-panel" data-groceryview-flow="market-movers" style="margin-top:16px"><div class="eyebrow">Connected market movers API</div><h2>Pull live grocery mover tape</h2><p class="lede">Fetch <code>/api/market/overview</code> and refresh the market-board leader, 52W position, Stockholm median gap, and verified-history evidence from the live API response.</p><div class="grid" aria-label="Live market mover API metrics"><div class="metric"><strong data-market-movers-leader>Waiting for API pull</strong><span>leader, price, 1M move, median gap</span></div><div class="metric"><strong data-market-movers-range>Static 52W position preview</strong><span>52W range and position</span></div><div class="metric"><strong data-market-movers-evidence>Static evidence preview</strong><span>verified history evidence</span></div></div><div class="flow-panel" aria-label="Connected market mover actions"><button type="button" data-flow-action="load-market-movers">Load live market movers</button></div><p class="flow-result" data-flow-result="market-movers" aria-live="polite">Local preview mode: connect the API session bridge before loading live market movers.</p></section><section class="card" style="margin-top:16px"><h2>Brand-tier indices</h2><p class="lede">Private Label Index, Budget Private Label Index, Premium Brand Index, Organic Brand Index, and National Brand Index separate price pressure by brand tier.</p><div class="grid"><div class="metric"><strong>23.7%</strong><span>private-label savings vs national brands</span></div><div class="metric"><strong>58.8%</strong><span>premium gap vs private label</span></div><div class="metric"><strong>Cleaning</strong><span>highest private-label savings category</span></div></div></section>${marketIndicesLivePanel}`
   },
   {
     path: 'catalog/coverage/index.html',
