@@ -181,6 +181,12 @@ const storeHighlights = [
   { store: 'Coop Farsta', category: 'Butter', signal: 'Above usual price', confidence: 'Estimated' }
 ];
 
+const storeComparisons = [
+  { store: 'Willys Odenplan', basketTotal: 742, verifiedCoverage: 82, lowConfidenceRows: 2, bestCategory: 'Coffee', shopperFit: 'Primary weekly basket' },
+  { store: 'Lidl Sveavägen', basketTotal: 729, verifiedCoverage: 76, lowConfidenceRows: 3, bestCategory: 'Eggs and dairy', shopperFit: 'Cheapest split basket' },
+  { store: 'Coop Farsta', basketTotal: 781, verifiedCoverage: 68, lowConfidenceRows: 5, bestCategory: 'Member promos', shopperFit: 'Review before checkout' }
+];
+
 const categorySignals = [
   { category: 'Coffee', product: 'Zoégas Coffee 450g', store: 'Willys Odenplan', price: '49.90 SEK', signal: '12th historical percentile' },
   { category: 'Dairy', product: 'Arla Milk 1L', store: 'Lidl Sveavägen', price: '13.90 SEK', signal: 'Best favorite-store line' },
@@ -376,6 +382,20 @@ app.innerHTML = `
           </tbody>
         </table>
       </div>
+      <div class="card">
+        <h2>Store comparison</h2>
+        <p class="lede">The comparison view ranks favorite stores by basket cost, verified coverage, low-confidence risk, and category fit.</p>
+        <table class="table">
+          <thead><tr><th>Store</th><th>Basket</th><th>Coverage</th><th>Risk</th><th>Fit</th></tr></thead>
+          <tbody>
+            ${storeComparisons.map((store) => `<tr><td><strong>${store.store}</strong><br><span class="footer-note">${store.bestCategory}</span></td><td>${store.basketTotal} SEK</td><td>${store.verifiedCoverage}%</td><td>${store.lowConfidenceRows} low-confidence</td><td>${store.shopperFit}</td></tr>`).join('')}
+          </tbody>
+        </table>
+        <p class="footer-note"><a href="/stores/compare/">Open full store comparison</a></p>
+      </div>
+    </section>
+
+    <section class="market" style="margin-top:16px">
       <div class="card">
         <h2>Search and budget readiness</h2>
         <p class="lede">Query <strong>willys coffee</strong> returns ${searchHits.length} product ticker match. Weekly actual spend is ${budget.weeklyActualSpend} SEK, with ${budget.weeklyRemainingActual} SEK remaining.</p>
