@@ -192,6 +192,12 @@ const receiptReviewRows = [
   { line: 'Loose tomatoes', match: 'unknown produce', confidence: 54, budgetAction: 'Hold from forecast', catalogAction: 'Route to human review' }
 ];
 
+const communityReportRows = [
+  { report: 'report-coffee-1', store: 'Willys Odenplan', claim: '49.90 SEK coffee promo', evidence: 'Shelf photo', status: 'Ready for moderator' },
+  { report: 'report-eggs-2', store: 'Lidl Sveavägen', claim: '34.90 SEK eggs', evidence: 'Receipt line', status: 'Needs match check' },
+  { report: 'report-tomatoes-3', store: 'Coop Farsta', claim: '29 SEK/kg tomatoes', evidence: 'Blurry shelf photo', status: 'Low confidence' }
+];
+
 const humanReviewAssignments = [
   {
     id: 'assignment-review-match-1-moderator-1',
@@ -430,6 +436,16 @@ app.innerHTML = `
           <thead><tr><th>Label</th><th>Source</th><th>Deal Score</th><th>Decision</th></tr></thead>
           <tbody>
             ${priceConfidenceRows.map((row) => `<tr><td>${row.label}</td><td>${row.source}</td><td>${row.dealScore}</td><td>${row.decision}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Community reports</h2>
+        <p class="lede"><a href="/community/reports/">Open community reports</a> to review shopper-submitted corrections before catalog writeback.</p>
+        <table class="table">
+          <thead><tr><th>Report</th><th>Store</th><th>Claim</th><th>Evidence</th><th>Status</th></tr></thead>
+          <tbody>
+            ${communityReportRows.map((row) => `<tr><td>${row.report}</td><td>${row.store}</td><td>${row.claim}</td><td>${row.evidence}</td><td><span class="status">${row.status}</span></td></tr>`).join('')}
           </tbody>
         </table>
       </div>
