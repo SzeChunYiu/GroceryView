@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
+    "build": "npm run build -w @groceryview/core && npm run build -w @groceryview/monetization && tsc -p tsconfig.build.json",
     "test": "npm run build -w @groceryview/core && npm run build -w @groceryview/monetization && tsc -p tsconfig.test.json && node --test dist-test/__tests__/*.test.js"
   },
   "dependencies": {

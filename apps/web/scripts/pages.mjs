@@ -198,6 +198,30 @@ window.GroceryViewFlowActions = (() => {
       setResult('account', 'Subscription access check failed: ' + error.message + '.');
     }
   };
+  const checkSavedDataSyncFromApi = async () => {
+    const config = getApiConfig();
+    if (!hasApiSession(config)) {
+      setResult('sync', 'Local preview: connect the API session bridge before checking server-backed saved data.');
+      return;
+    }
+    const checks = [
+      ['account subscription', '/api/account/subscription-access', 'GET'],
+      ['household plan', '/api/households/current', 'GET'],
+      ['weekly basket', '/api/basket/current', 'GET'],
+      ['budget summary', '/api/budget/summary', 'GET'],
+      ['privacy export', '/api/privacy/export', 'GET']
+    ];
+    const results = [];
+    for (const [label, path, method] of checks) {
+      try {
+        await requireApiSuccess(await fetch(apiUrl(path, config), { method, headers: apiHeaders(config) }));
+        results.push(label + ': reachable');
+      } catch (error) {
+        results.push(label + ': ' + error.message);
+      }
+    }
+    setResult('sync', 'Connected API sync check: ' + results.join(' | ') + '.');
+  };
   const loadPrivacyExportFromApi = async () => {
     const config = getApiConfig();
     if (!hasApiSession(config)) {
@@ -812,6 +836,10 @@ window.GroceryViewFlowActions = (() => {
         await loadSubscriptionAccessFromApi();
         return;
       }
+      if (flow === 'sync' && action === 'check-sync') {
+        await checkSavedDataSyncFromApi();
+        return;
+      }
       if (flow === 'privacy' && action === 'download-export') {
         await loadPrivacyExportFromApi();
         return;
@@ -1039,6 +1067,12 @@ const pages = [
     title: 'Ad disclosure center — GroceryView',
     description: 'Review GroceryView sponsored placement labels, ad eligibility, premium ad removal, and ranking separation guardrails.',
     body: `<section class="card"><div class="eyebrow">Ads</div><h1>Ad disclosure center</h1><p class="lede">Audit sponsored placements, premium ad removal, and ranking separation so ads never look like organic grocery deal recommendations.</p><div class="grid"><div class="metric"><strong>3</strong><span>labeled placements</span></div><div class="metric"><strong>0</strong><span>ranking influence</span></div><div class="metric"><strong>Premium</strong><span>non-critical ads removed</span></div></div></section><section class="card" style="margin-top:16px"><h2>Disclosure states</h2><table class="table"><thead><tr><th>Surface</th><th>Placement</th><th>Label</th><th>Premium state</th><th>Rule</th></tr></thead><tbody><tr><td>Daily deals</td><td>Sponsored banner</td><td>Sponsored</td><td>Hidden for premium</td><td>Never affects Deal Score</td></tr><tr><td>Product page</td><td>Brand offer card</td><td>Ad</td><td>Hidden for premium</td><td>Separated from price rows</td></tr><tr><td>Store map</td><td>Promoted pickup note</td><td>Sponsored</td><td>Visible only when useful</td><td>No route ranking boost</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Ad guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>Ranking separation</td><td>Sponsored placements cannot change Deal Score, basket totals, or store ordering.</td></tr><tr><td>Premium removal</td><td>Premium entitlements hide non-critical ad slots while preserving disclosure history.</td></tr><tr><td>Privacy boundary</td><td>Advertiser payloads stay aggregated and never include raw receipts.</td></tr></tbody></table></section>`
+  },
+  {
+    path: 'account/sync/index.html',
+    title: 'Saved data sync — GroceryView',
+    description: 'Check whether GroceryView account, household, basket, budget, and privacy state can be loaded through protected server-backed APIs.',
+    body: `<section class="card" data-groceryview-flow="sync"><div class="eyebrow">Saved data</div><h1>Saved data sync</h1><p class="lede">Check that signed-in account state is reachable from protected APIs before relying on local previews for household planning, weekly baskets, budgets, or privacy controls.</p><div class="grid"><div class="metric"><strong>5</strong><span>protected API checks</span></div><div class="metric"><strong>Bearer</strong><span>session required</span></div><div class="metric"><strong>Fail closed</strong><span>missing server state is visible</span></div></div><div class="flow-panel" aria-label="Saved data sync actions"><button type="button" data-flow-action="check-sync">Check saved data</button></div><p class="flow-result" data-flow-result="sync" aria-live="polite">Connect an API session to verify server-backed saved state.</p></section><section class="card" style="margin-top:16px"><h2>Server-backed state</h2><table class="table"><thead><tr><th>Area</th><th>Protected route</th><th>Use in UI</th><th>Fail-closed behavior</th></tr></thead><tbody><tr><td>Subscription</td><td>/api/account/subscription-access</td><td>Premium access and ad removal</td><td>Show checkout required when unavailable</td></tr><tr><td>Household</td><td>/api/households/current</td><td>Members, shared stores, approval policy</td><td>Keep local preview until a plan exists</td></tr><tr><td>Basket</td><td>/api/basket/current</td><td>Weekly saved basket lines</td><td>Do not claim basket persistence</td></tr><tr><td>Budget</td><td>/api/budget/summary</td><td>Weekly and monthly spend status</td><td>Hold budget decisions locally</td></tr><tr><td>Privacy</td><td>/api/privacy/export</td><td>Export coverage and account data proof</td><td>Require authenticated export before deletion planning</td></tr></tbody></table></section><section class="card" style="margin-top:16px"><h2>Durable UI guardrails</h2><table class="table"><thead><tr><th>Guardrail</th><th>Applied rule</th></tr></thead><tbody><tr><td>No silent local-only state</td><td>Connected screens show whether protected saved-data APIs are reachable.</td></tr><tr><td>Bearer token stays session-scoped</td><td>The sync check reuses the API session bridge and does not persist tokens in localStorage.</td></tr><tr><td>Partial outages stay visible</td><td>Each saved-data area reports its own API status instead of hiding failed reads.</td></tr></tbody></table></section>`
   },
   {
     path: 'billing/status/index.html',

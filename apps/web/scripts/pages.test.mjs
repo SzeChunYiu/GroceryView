@@ -13,6 +13,7 @@ describe('buildStaticPages', () => {
       const pages = await buildStaticPages(root);
       assert.deepEqual(pages.sort(), [
         'account/index.html',
+        'account/sync/index.html',
         'admin/human-review/index.html',
         'ads/disclosure/index.html',
         'basket/index.html',
@@ -325,6 +326,19 @@ describe('buildStaticPages', () => {
       assert.match(adDisclosure, /Sponsored placements cannot change Deal Score/);
       assert.match(adDisclosure, /Advertiser payloads stay aggregated and never include raw receipts/);
 
+      const sync = await readFile(join(root, 'account/sync/index.html'), 'utf8');
+      assert.match(sync, /Saved data sync/);
+      assert.match(sync, /data-groceryview-flow="sync"/);
+      assert.match(sync, /data-flow-action="check-sync"/);
+      assert.match(sync, /Server-backed state/);
+      assert.match(sync, /\/api\/account\/subscription-access/);
+      assert.match(sync, /\/api\/households\/current/);
+      assert.match(sync, /\/api\/basket\/current/);
+      assert.match(sync, /\/api\/budget\/summary/);
+      assert.match(sync, /\/api\/privacy\/export/);
+      assert.match(sync, /checkSavedDataSyncFromApi/);
+      assert.match(sync, /Partial outages stay visible/);
+
       const billingStatus = await readFile(join(root, 'billing/status/index.html'), 'utf8');
       assert.match(billingStatus, /Billing status/);
       assert.match(billingStatus, /Entitlement state/);
@@ -476,7 +490,7 @@ describe('buildStaticPages', () => {
       assert.match(privacy, /overdueRequestIds/);
       assert.match(privacy, /dueSoonRequestIds/);
 
-      for (const pagePath of ['login/index.html', 'account/index.html', 'basket/index.html', 'scanner/index.html', 'privacy/index.html', 'products/coffee/index.html']) {
+      for (const pagePath of ['login/index.html', 'account/index.html', 'account/sync/index.html', 'basket/index.html', 'scanner/index.html', 'privacy/index.html', 'products/coffee/index.html']) {
         const html = await readFile(join(root, pagePath), 'utf8');
         assert.match(html, /window\.GroceryViewFlowActions/);
         assert.doesNotMatch(html, /innerHTML\s*=/);
