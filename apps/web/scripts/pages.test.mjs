@@ -176,6 +176,15 @@ describe('buildStaticPages', () => {
       assert.match(shoppingRoute, /Lidl Sveavägen/);
       assert.match(shoppingRoute, /Route time can reorder stops but cannot change product deal ranking/);
       assert.match(shoppingRoute, /Unverified prices cannot justify an extra route stop/);
+      assert.match(shoppingRoute, /Connected route planner API/);
+      assert.match(shoppingRoute, /Load live route plan/);
+      assert.match(shoppingRoute, /data-groceryview-flow="route-planner"/);
+      assert.match(shoppingRoute, /data-flow-action="load-route-plan"/);
+      assert.match(shoppingRoute, /data-route-plan-stops/);
+      assert.match(shoppingRoute, /data-route-plan-total/);
+      assert.match(shoppingRoute, /data-route-plan-assignments/);
+      assert.match(shoppingRoute, /fetch\(apiUrl\('\/api\/basket\/compare'/);
+      assert.match(shoppingRoute, /Connected route plan loaded/);
 
       const priceConfidence = await readFile(join(root, 'prices/confidence/index.html'), 'utf8');
       assert.match(priceConfidence, /Price confidence guide/);
