@@ -79,6 +79,33 @@ describe('createGroceryViewApi', () => {
     assert.throws(() => api.getStoreDeals('missing-store'), /Unknown storeId/);
   });
 
+  it('returns Deal Score v1 reports without using distance in the default score', () => {
+    const api = createGroceryViewApi();
+
+    const nearby = api.getDealScore('coffee', { distanceKm: 0.3 });
+    const farAway = api.getDealScore('coffee', { distanceKm: 12.5 });
+
+    assert.deepEqual(nearby, farAway);
+    assert.deepEqual(nearby, {
+      productId: 'coffee',
+      score: 82,
+      band: { label: 'Good deal', verdict: 'Buy' },
+      verdict: 'Buy',
+      discountVsMedianPercent: 16.7,
+      historicalPercentile: 12,
+      confidence: 0.9,
+      reasons: [
+        'Best current quote is 49.90 SEK at Willys Odenplan.',
+        'Zoégas Coffee 450g is in the 8th city price percentile.',
+        'Historical promo percentile is 12.',
+        'Equivalent unit-price percentile is 18.',
+        'Source confidence is 90%.',
+        'Default verdict is Buy.'
+      ]
+    });
+    assert.equal(api.getDealScore('missing-product'), null);
+  });
+
   it('supports favorite stores, watchlist, basket, budget, and index endpoints', () => {
     const api = createGroceryViewApi();
 

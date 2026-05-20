@@ -86,6 +86,26 @@ describe('createHttpHandler', () => {
     assert.equal(product.status, 200);
     assert.equal((await json(product) as { ticker: string }).ticker, 'ZOEGAS-COFFEE-450G');
 
+    const dealScore = await handle(new Request('http://localhost/api/products/coffee/deal-score?distanceKm=12.5'));
+    assert.equal(dealScore.status, 200);
+    assert.deepEqual(await json(dealScore), {
+      productId: 'coffee',
+      score: 82,
+      band: { label: 'Good deal', verdict: 'Buy' },
+      verdict: 'Buy',
+      discountVsMedianPercent: 16.7,
+      historicalPercentile: 12,
+      confidence: 0.9,
+      reasons: [
+        'Best current quote is 49.90 SEK at Willys Odenplan.',
+        'Zoégas Coffee 450g is in the 8th city price percentile.',
+        'Historical promo percentile is 12.',
+        'Equivalent unit-price percentile is 18.',
+        'Source confidence is 90%.',
+        'Default verdict is Buy.'
+      ]
+    });
+
     const index = await handle(new Request('http://localhost/api/indices/stockholm-grocery-index'));
     assert.equal(index.status, 200);
     assert.equal((await json(index) as { label: string }).label, 'Stockholm Grocery Index');
@@ -105,6 +125,10 @@ describe('createHttpHandler', () => {
     const history = await handle(new Request('http://localhost/api/products/missing-product/history'));
     assert.equal(history.status, 404);
     assert.deepEqual(await json(history), { error: 'Product not found.' });
+
+    const dealScore = await handle(new Request('http://localhost/api/products/missing-product/deal-score'));
+    assert.equal(dealScore.status, 404);
+    assert.deepEqual(await json(dealScore), { error: 'Product not found.' });
   });
 
   it('mutates favorite stores, watchlist, basket, and budget through proposal routes', async () => {
