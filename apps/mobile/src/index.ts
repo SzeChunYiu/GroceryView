@@ -1,4 +1,4 @@
-import { createGroceryViewApi } from '@groceryview/api';
+import { createGroceryViewApi, type ProductDetail, type ProductPriceTerminalReport } from '@groceryview/api';
 export {
   applyMobileMutationSyncResult,
   planMobileOfflineMutation,
