@@ -64,6 +64,16 @@ OPEN_PRICES_INPUT_PATH=/tmp/groceryview-open-prices-preview.json \
 
 The import script creates an `official_api` source run, upserts Open Prices chains/products/aliases, stores each accepted row as a raw price record without a raw response body, writes immutable observations, and lets the database adapter roll them into `latest_prices`.
 
+To preflight the saved artifact before a database connection or built DB package is available, run the import script in dry-run mode:
+
+```bash
+OPEN_PRICES_IMPORT_DRY_RUN=true \
+OPEN_PRICES_INPUT_PATH=/tmp/groceryview-open-prices-preview.json \
+  infra/scripts/import-open-prices-artifact.sh
+```
+
+The dry run validates that the artifact is readable JSON and prints accepted observation, source URL, content hash, and raw snapshot reference evidence without opening PostgreSQL.
+
 ## Hosted deployment smoke
 
 After deploying a server, run the hosted HTTP smoke before promoting traffic:
