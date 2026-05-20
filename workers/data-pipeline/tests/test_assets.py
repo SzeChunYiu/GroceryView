@@ -159,7 +159,13 @@ def test_open_prices_artifact_import_plan_exposes_database_import_contract() -> 
 
     assert plan.status == "blocked"
     assert plan.source_asset == "open_prices_real_pull_plan"
-    assert plan.import_command == "npm run build --workspace @groceryview/db && DATABASE_URL=<postgres-url> OPEN_PRICES_INPUT_PATH=<artifact.json> infra/scripts/import-open-prices-artifact.sh"
+    assert plan.import_command == (
+        "npm run build --workspace @groceryview/db && "
+        "DATABASE_URL=<postgres-url> "
+        "OPEN_PRICES_INPUT_PATH=<artifact.json> "
+        "OPEN_PRICES_IMPORT_RESULT_PATH=/tmp/groceryview-open-prices-import-result.json "
+        "infra/scripts/import-open-prices-artifact.sh"
+    )
     assert plan.required_env == ["DATABASE_URL", "OPEN_PRICES_INPUT_PATH"]
     assert plan.required_actions == ["set_database_url", "build_groceryview_db_package"]
     assert plan.required_packages == ["@groceryview/db", "pg"]
@@ -180,6 +186,7 @@ def test_open_prices_artifact_import_plan_exposes_database_import_contract() -> 
         "productCount",
         "chainCount",
     ]
+    assert plan.evidence_artifacts == ["/tmp/groceryview-open-prices-import-result.json"]
     assert plan.to_dict()["demo"] is False
 
     ready = build_open_prices_artifact_import_plan(
@@ -277,6 +284,7 @@ def test_open_prices_artifact_import_plan_summary_counts_database_import_require
         "required_package_count": 2,
         "database_target_count": 6,
         "evidence_field_count": 7,
+        "evidence_artifact_count": 1,
         "demo": False,
     }
 
@@ -435,6 +443,7 @@ def test_open_prices_launch_readiness_rolls_up_all_open_prices_plans() -> None:
     assert summary.evidence_artifacts == [
         "/tmp/groceryview-hosted-http-smoke.json",
         "/tmp/groceryview-hosted-readiness-smoke.json",
+        "/tmp/groceryview-open-prices-import-result.json",
         "/tmp/groceryview-open-prices-preview.json",
         "/tmp/groceryview-open-prices-schedule-health.json",
     ]
@@ -486,7 +495,7 @@ def test_open_prices_launch_readiness_digest_counts_operator_signals() -> None:
         "blocked_plan_count": 4,
         "next_action_count": 11,
         "evidence_field_count": 28,
-        "evidence_artifact_count": 4,
+        "evidence_artifact_count": 5,
         "hosted_smoke_blocker_count": 3,
         "persistence_blocker_count": 5,
         "schedule_health_blocker_count": 4,
@@ -521,7 +530,7 @@ def test_open_prices_launch_readiness_digest_counts_operator_signals() -> None:
     ready_digest = summarize_open_prices_launch_readiness(ready_summary)
     assert ready_digest.status == "ready"
     assert ready_digest.next_action_count == 0
-    assert ready_digest.evidence_artifact_count == 4
+    assert ready_digest.evidence_artifact_count == 5
     assert ready_digest.hosted_smoke_blocker_count == 0
     assert ready_digest.persistence_blocker_count == 0
     assert ready_digest.schedule_health_blocker_count == 0

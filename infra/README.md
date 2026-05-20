@@ -59,20 +59,22 @@ To persist a saved, readable artifact into PostgreSQL, build the database packag
 npm run build --workspace @groceryview/db
 DATABASE_URL=postgresql://groceryview:groceryview@localhost:5432/groceryview \
 OPEN_PRICES_INPUT_PATH=/tmp/groceryview-open-prices-preview.json \
+OPEN_PRICES_IMPORT_RESULT_PATH=/tmp/groceryview-open-prices-import-result.json \
   infra/scripts/import-open-prices-artifact.sh
 ```
 
-The import script creates an `official_api` source run, upserts Open Prices chains/products/aliases, stores each accepted row as a raw price record without a raw response body, writes immutable observations, and lets the database adapter roll them into `latest_prices`.
+The import script creates an `official_api` source run, upserts Open Prices chains/products/aliases, stores each accepted row as a raw price record without a raw response body, writes immutable observations, lets the database adapter roll them into `latest_prices`, and optionally writes the persisted result summary to `OPEN_PRICES_IMPORT_RESULT_PATH`.
 
 To preflight the saved artifact before a database connection or built DB package is available, run the import script in dry-run mode:
 
 ```bash
 OPEN_PRICES_IMPORT_DRY_RUN=true \
 OPEN_PRICES_INPUT_PATH=/tmp/groceryview-open-prices-preview.json \
+OPEN_PRICES_IMPORT_RESULT_PATH=/tmp/groceryview-open-prices-import-result.json \
   infra/scripts/import-open-prices-artifact.sh
 ```
 
-The dry run validates that the artifact is readable JSON and prints accepted observation, source URL, content hash, and raw snapshot reference evidence without opening PostgreSQL.
+The dry run validates that the artifact is readable JSON and prints or writes accepted observation, source URL, content hash, and raw snapshot reference evidence without opening PostgreSQL.
 
 ## Hosted deployment smoke
 

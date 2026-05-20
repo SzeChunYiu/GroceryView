@@ -83,7 +83,7 @@ When those gates are ready, the planned run materializes the Open Prices pull, p
 
 ## Open Prices artifact import plan
 
-`open_prices_artifact_import_plan` exposes the PostgreSQL handoff for a saved Open Prices artifact. It remains blocked until `DATABASE_URL`, `OPEN_PRICES_INPUT_PATH`, and a built `@groceryview/db` package are available. The command plan uses `infra/scripts/import-open-prices-artifact.sh` and expects persisted evidence for source run, accepted rows, raw records, observations, products, and chains.
+`open_prices_artifact_import_plan` exposes the PostgreSQL handoff for a saved Open Prices artifact. It remains blocked until `DATABASE_URL`, `OPEN_PRICES_INPUT_PATH`, and a built `@groceryview/db` package are available. The command plan uses `infra/scripts/import-open-prices-artifact.sh` with `OPEN_PRICES_IMPORT_RESULT_PATH=/tmp/groceryview-open-prices-import-result.json` and expects persisted evidence for source run, accepted rows, raw records, observations, products, and chains.
 
 `open_prices_hosted_smoke_plan` exposes the hosted proof gate for imported Open Prices data. It remains blocked until `GROCERYVIEW_SERVER_URL`, `GROCERYVIEW_TERMINAL_PRODUCT_ID`, and `METRICS_TOKEN` are configured, then points operators at `infra/scripts/smoke-hosted-http.sh` with `HOSTED_HTTP_SMOKE_OUTPUT_PATH` plus `infra/scripts/smoke-hosted-readiness.sh` with `HOSTED_READINESS_SMOKE_OUTPUT_PATH` to prove API health, product-terminal output for an imported product, PostgreSQL readiness, and the hosted smoke JSON artifacts.
 

@@ -23,12 +23,14 @@ fi
 cd "$ROOT_DIR"
 
 node --input-type=module <<'NODE'
-import { readFile } from 'node:fs/promises';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
+import { dirname } from 'node:path';
 
 const inputPath = process.env.OPEN_PRICES_INPUT_PATH;
 const databaseUrl = process.env.DATABASE_URL;
 const dryRun = process.env.OPEN_PRICES_IMPORT_DRY_RUN === 'true';
+const resultPath = process.env.OPEN_PRICES_IMPORT_RESULT_PATH;
 
 if (!inputPath) throw new Error('Open Prices artifact import requires OPEN_PRICES_INPUT_PATH.');
 if (!dryRun && !databaseUrl) throw new Error('Open Prices artifact import requires DATABASE_URL.');
@@ -36,8 +38,17 @@ if (!dryRun && !databaseUrl) throw new Error('Open Prices artifact import requir
 const artifact = JSON.parse(await readFile(inputPath, 'utf8'));
 const acceptedObservations = Array.isArray(artifact.acceptedObservations) ? artifact.acceptedObservations : [];
 
+async function emitResult(result) {
+  if (resultPath) {
+    await mkdir(dirname(resultPath), { recursive: true });
+    await writeFile(resultPath, `${JSON.stringify(result, null, 2)}\n`);
+    console.error(`Open Prices import result artifact written: ${resultPath}`);
+  }
+  console.log(JSON.stringify(result, null, 2));
+}
+
 if (dryRun) {
-  console.log(JSON.stringify({
+  await emitResult({
     status: 'dry_run',
     inputPath,
     acceptedCount: Number(artifact.acceptedCount ?? acceptedObservations.length),
@@ -45,7 +56,7 @@ if (dryRun) {
     hasSourceUrl: typeof artifact.sourceUrl === 'string' && artifact.sourceUrl.length > 0,
     hasContentHash: typeof artifact.contentHash === 'string' && artifact.contentHash.length > 0,
     hasRawSnapshotRef: typeof artifact.rawSnapshotRef === 'string' && artifact.rawSnapshotRef.length > 0
-  }, null, 2));
+  });
   process.exit(0);
 }
 
@@ -59,7 +70,7 @@ const pool = new Pool({ connectionString: databaseUrl });
 
 try {
   const result = await persistOpenPricesArtifact(createPgQueryExecutor(pool), artifact);
-  console.log(JSON.stringify({
+  await emitResult({
     status: 'persisted',
     inputPath,
     sourceRunId: result.sourceRunId,
@@ -68,7 +79,7 @@ try {
     observationCount: result.observationIds.length,
     productCount: result.productIds.length,
     chainCount: result.chainIds.length
-  }, null, 2));
+  });
 } finally {
   await pool.end();
 }

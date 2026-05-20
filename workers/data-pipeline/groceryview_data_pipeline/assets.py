@@ -422,7 +422,13 @@ def build_open_prices_artifact_import_plan(
     return OpenPricesArtifactImportPlan(
         status="ready" if not required_actions else "blocked",
         source_asset="open_prices_real_pull_plan",
-        import_command="npm run build --workspace @groceryview/db && DATABASE_URL=<postgres-url> OPEN_PRICES_INPUT_PATH=<artifact.json> infra/scripts/import-open-prices-artifact.sh",
+        import_command=(
+            "npm run build --workspace @groceryview/db && "
+            "DATABASE_URL=<postgres-url> "
+            "OPEN_PRICES_INPUT_PATH=<artifact.json> "
+            "OPEN_PRICES_IMPORT_RESULT_PATH=/tmp/groceryview-open-prices-import-result.json "
+            "infra/scripts/import-open-prices-artifact.sh"
+        ),
         required_env=["DATABASE_URL", "OPEN_PRICES_INPUT_PATH"],
         required_actions=required_actions,
         required_packages=["@groceryview/db", "pg"],
@@ -442,6 +448,9 @@ def build_open_prices_artifact_import_plan(
             "observationCount",
             "productCount",
             "chainCount",
+        ],
+        evidence_artifacts=[
+            "/tmp/groceryview-open-prices-import-result.json",
         ],
     )
 
@@ -577,6 +586,7 @@ def summarize_open_prices_artifact_import_plan(plan: OpenPricesArtifactImportPla
         required_package_count=len(plan.required_packages),
         database_target_count=len(plan.database_targets),
         evidence_field_count=len(plan.evidence_fields),
+        evidence_artifact_count=len(plan.evidence_artifacts),
     )
 
 

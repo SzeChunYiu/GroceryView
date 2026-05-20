@@ -223,6 +223,7 @@ class OpenPricesArtifactImportPlan:
     required_packages: list[str]
     database_targets: list[str]
     evidence_fields: list[str]
+    evidence_artifacts: list[str]
     demo: bool = False
 
     def to_dict(self) -> dict[str, object]:
@@ -283,6 +284,7 @@ class OpenPricesArtifactImportPlanSummary:
     required_package_count: int
     database_target_count: int
     evidence_field_count: int
+    evidence_artifact_count: int
     demo: bool = False
 
     def to_dict(self) -> dict[str, object]:
