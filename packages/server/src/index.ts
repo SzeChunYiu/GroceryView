@@ -1099,6 +1099,19 @@ export type RuntimeConfig = {
   metricsToken?: string;
 };
 
+function validatePublicWebUrl(publicWebUrl: string | undefined): void {
+  if (!publicWebUrl) return;
+  let parsed: URL;
+  try {
+    parsed = new URL(publicWebUrl);
+  } catch {
+    throw new Error('PUBLIC_WEB_URL must be a valid absolute URL.');
+  }
+  if (!['http:', 'https:'].includes(parsed.protocol)) {
+    throw new Error('PUBLIC_WEB_URL must use http or https.');
+  }
+}
+
 export function loadRuntimeConfig(env: Record<string, string | undefined>): RuntimeConfig {
   const nodeEnv = (env.NODE_ENV ?? 'development') as RuntimeConfig['nodeEnv'];
   if (!['development', 'test', 'production'].includes(nodeEnv)) throw new Error(`Unsupported NODE_ENV: ${nodeEnv}`);
@@ -1112,6 +1125,7 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     if (!env.BILLING_WEBHOOK_SECRET) throw new Error('BILLING_WEBHOOK_SECRET is required in production.');
     if (!env.METRICS_TOKEN) throw new Error('METRICS_TOKEN is required in production.');
   }
+  validatePublicWebUrl(env.PUBLIC_WEB_URL);
   return {
     nodeEnv,
     port,
