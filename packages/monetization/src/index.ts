@@ -177,6 +177,47 @@ export type SubscriptionEntitlementSnapshot = {
   updatedAt: string;
 };
 
+export type BillingSubscriptionEventType = 'subscription.active' | 'subscription.past_due' | 'subscription.canceled';
+
+export type BillingSubscriptionEvent = {
+  provider: 'stripe_compatible';
+  providerEventId: string;
+  type: BillingSubscriptionEventType;
+  userId: string;
+  plan?: SubscriptionPlan;
+  currentPeriodEndsAt?: string;
+  providerCustomerId?: string;
+  providerSubscriptionId?: string;
+  occurredAt: string;
+};
+
+export type BillingSubscriptionEntitlementMutation = SubscriptionEntitlementSnapshot & {
+  userId: string;
+  providerCustomerId?: string;
+  providerSubscriptionId?: string;
+};
+
+export function processBillingSubscriptionEvent(event: BillingSubscriptionEvent): BillingSubscriptionEntitlementMutation {
+  const statusByEventType: Record<BillingSubscriptionEventType, SubscriptionEntitlementSnapshot['status']> = {
+    'subscription.active': 'active',
+    'subscription.past_due': 'past_due',
+    'subscription.canceled': 'canceled'
+  };
+  const status = statusByEventType[event.type];
+
+  return {
+    userId: event.userId,
+    tier: 'premium',
+    ...(event.plan ? { plan: event.plan } : {}),
+    status,
+    ...(event.currentPeriodEndsAt ? { currentPeriodEndsAt: event.currentPeriodEndsAt } : {}),
+    provider: event.provider,
+    ...(event.providerCustomerId ? { providerCustomerId: event.providerCustomerId } : {}),
+    ...(event.providerSubscriptionId ? { providerSubscriptionId: event.providerSubscriptionId } : {}),
+    updatedAt: event.occurredAt
+  };
+}
+
 export type SubscriptionAccessPolicy = {
   userTier: UserTier;
   premiumFeaturesEnabled: boolean;

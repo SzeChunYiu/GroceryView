@@ -2,7 +2,15 @@ import { createHmac, timingSafeEqual } from 'node:crypto';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
 import { createGroceryViewApi } from '@groceryview/api';
 import { parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
-import { buildSubscriptionAccessPolicy, type SubscriptionEntitlementSnapshot } from '@groceryview/monetization';
+import {
+  buildSubscriptionAccessPolicy,
+  processBillingSubscriptionEvent,
+  type BillingSubscriptionEntitlementMutation,
+  type BillingSubscriptionEvent,
+  type BillingSubscriptionEventType,
+  type SubscriptionEntitlementSnapshot,
+  type SubscriptionPlan
+} from '@groceryview/monetization';
 import {
   applyHumanReviewDecision,
   authorizeHumanReviewAction,
@@ -36,6 +44,10 @@ export type AuthOptions = {
   notificationWebhookSecret?: string;
   notificationSuppressionSink?: {
     upsertNotificationSuppression(suppression: NotificationSuppressionMutation): Promise<void>;
+  };
+  billingWebhookSecret?: string;
+  billingSubscriptionSink?: {
+    upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
   };
   notificationMetricsToken?: string;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
@@ -126,6 +138,21 @@ function optionalString(value: unknown, field: string): string | undefined {
   return trimmed ? trimmed : undefined;
 }
 
+const isoTimestampPattern = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{1,3})?(?:Z|[+-]\d{2}:\d{2})$/;
+
+function requiredIsoTimestamp(value: unknown, field: string): string {
+  const text = requiredString(value, field);
+  if (text.trim() !== text || !isoTimestampPattern.test(text) || !Number.isFinite(Date.parse(text))) {
+    throw new Error(`${field} must be an ISO timestamp.`);
+  }
+  return text;
+}
+
+function optionalIsoTimestamp(value: unknown, field: string): string | undefined {
+  if (value === undefined) return undefined;
+  return requiredIsoTimestamp(value, field);
+}
+
 function userIdFrom(url: URL): string | Response {
   const userId = url.searchParams.get('userId');
   if (!userId) return errorResponse(400, 'userId query parameter is required.');
@@ -146,12 +173,83 @@ function hasValidNotificationWebhookSignature(request: Request, body: string, se
   return providedBuffer.length === expectedBuffer.length && timingSafeEqual(providedBuffer, expectedBuffer);
 }
 
+function signBillingWebhookBody(body: string, secret: string): string {
+  return `sha256=${createHmac('sha256', secret).update(body).digest('hex')}`;
+}
+
+function hasValidBillingWebhookSignature(request: Request, body: string, secret: string): boolean {
+  const provided = request.headers.get('x-groceryview-billing-signature');
+  if (!provided) return false;
+
+  const expected = signBillingWebhookBody(body, secret);
+  const providedBuffer = Buffer.from(provided);
+  const expectedBuffer = Buffer.from(expected);
+  return providedBuffer.length === expectedBuffer.length && timingSafeEqual(providedBuffer, expectedBuffer);
+}
+
 function hasValidMetricsToken(request: Request, token: string): boolean {
   const provided = request.headers.get('x-groceryview-metrics-token');
   if (!provided) return false;
   const providedBuffer = Buffer.from(provided);
   const expectedBuffer = Buffer.from(token);
   return providedBuffer.length === expectedBuffer.length && timingSafeEqual(providedBuffer, expectedBuffer);
+}
+
+const sensitiveBillingEventFields = new Set([
+  'cardnumber',
+  'card',
+  'cvc',
+  'cvv',
+  'clientsecret',
+  'paymentintentclientsecret',
+  'setupintentclientsecret',
+  'rawcard',
+  'paymentmethod'
+]);
+
+function rejectSensitiveBillingEventFields(body: JsonRecord): void {
+  const blocked = Object.keys(body).filter((field) => sensitiveBillingEventFields.has(field.toLowerCase()));
+  if (blocked.length > 0) throw new Error('Billing subscription events must not include sensitive payment fields.');
+}
+
+function requiredBillingEventType(value: unknown): BillingSubscriptionEventType {
+  if (value === 'subscription.active' || value === 'subscription.past_due' || value === 'subscription.canceled') return value;
+  throw new Error('type must be subscription.active, subscription.past_due, or subscription.canceled.');
+}
+
+function requiredBillingProvider(value: unknown): BillingSubscriptionEvent['provider'] {
+  if (value === 'stripe_compatible') return value;
+  throw new Error('provider must be stripe_compatible.');
+}
+
+function optionalSubscriptionPlan(value: unknown): SubscriptionPlan | undefined {
+  if (value === undefined) return undefined;
+  if (value === 'premium_monthly' || value === 'premium_yearly') return value;
+  throw new Error('plan must be premium_monthly or premium_yearly.');
+}
+
+function parseBillingSubscriptionEvent(body: JsonRecord): BillingSubscriptionEvent {
+  rejectSensitiveBillingEventFields(body);
+  const type = requiredBillingEventType(body.type);
+  const plan = optionalSubscriptionPlan(body.plan);
+  const currentPeriodEndsAt = optionalIsoTimestamp(body.currentPeriodEndsAt, 'currentPeriodEndsAt');
+  const providerCustomerId = optionalString(body.providerCustomerId, 'providerCustomerId');
+  const providerSubscriptionId = optionalString(body.providerSubscriptionId, 'providerSubscriptionId');
+  if (type !== 'subscription.canceled' && !plan) {
+    throw new Error('plan is required for active or past_due billing subscription events.');
+  }
+
+  return {
+    provider: requiredBillingProvider(body.provider),
+    providerEventId: requiredString(body.providerEventId, 'providerEventId'),
+    type,
+    userId: requiredString(body.userId, 'userId'),
+    ...(plan ? { plan } : {}),
+    ...(currentPeriodEndsAt ? { currentPeriodEndsAt } : {}),
+    ...(providerCustomerId ? { providerCustomerId } : {}),
+    ...(providerSubscriptionId ? { providerSubscriptionId } : {}),
+    occurredAt: requiredIsoTimestamp(body.occurredAt, 'occurredAt')
+  };
 }
 
 export function createHttpHandler(api = createGroceryViewApi(), authOptions: AuthOptions = {}): HttpHandler {
@@ -195,6 +293,7 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
             databaseUrl: process.env.DATABASE_URL,
             publicWebUrl: process.env.PUBLIC_WEB_URL,
             notificationWebhookSecret: authOptions.notificationWebhookSecret ?? process.env.NOTIFICATION_WEBHOOK_SECRET,
+            billingWebhookSecret: authOptions.billingWebhookSecret ?? process.env.BILLING_WEBHOOK_SECRET,
             metricsToken: authOptions.notificationMetricsToken ?? process.env.METRICS_TOKEN
           })
         );
@@ -307,6 +406,25 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         await sink.upsertNotificationSuppression(suppression);
         return jsonResponse(
           { accepted: true, persisted: true, suppressionId: suppression.id, active: suppression.active },
+          { status: 202 }
+        );
+      }
+
+      if (method === 'POST' && path === '/api/billing/subscription-events') {
+        if (!authOptions.billingWebhookSecret) return errorResponse(503, 'Billing webhook secret is not configured.');
+
+        const rawBody = request.body ? await request.text() : '';
+        if (!hasValidBillingWebhookSignature(request, rawBody, authOptions.billingWebhookSecret)) {
+          return errorResponse(401, 'A valid billing webhook signature is required.');
+        }
+
+        const sink = authOptions.billingSubscriptionSink;
+        if (!sink) return errorResponse(503, 'Billing subscription sink is not configured.');
+
+        const entitlement = processBillingSubscriptionEvent(parseBillingSubscriptionEvent(parseJsonObject(rawBody)));
+        await sink.upsertSubscriptionEntitlement(entitlement);
+        return jsonResponse(
+          { accepted: true, persisted: true, userId: entitlement.userId, status: entitlement.status },
           { status: 202 }
         );
       }
@@ -458,6 +576,7 @@ export type OpenApiSecurityRequirement = {
   bearerAuth?: never[];
   metricsToken?: never[];
   webhookSignature?: never[];
+  billingWebhookSignature?: never[];
 };
 
 export type OpenApiPathItem = Partial<Record<'get' | 'post' | 'patch' | 'delete', OpenApiOperation>>;
@@ -471,6 +590,7 @@ export type OpenApiDocument = {
       bearerAuth: { type: 'http'; scheme: 'bearer' };
       metricsToken: { type: 'apiKey'; in: 'header'; name: 'x-groceryview-metrics-token' };
       webhookSignature: { type: 'apiKey'; in: 'header'; name: 'x-groceryview-signature' };
+      billingWebhookSignature: { type: 'apiKey'; in: 'header'; name: 'x-groceryview-billing-signature' };
     };
   };
 };
@@ -479,6 +599,7 @@ const protectedOperation = (summary: string): OpenApiOperation => ({ summary, se
 const publicOperation = (summary: string): OpenApiOperation => ({ summary });
 const metricsOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ metricsToken: [] }] });
 const webhookOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ webhookSignature: [] }] });
+const billingWebhookOperation = (summary: string): OpenApiOperation => ({ summary, security: [{ billingWebhookSignature: [] }] });
 
 export function buildOpenApiDocument(): OpenApiDocument {
   return {
@@ -488,7 +609,8 @@ export function buildOpenApiDocument(): OpenApiDocument {
       securitySchemes: {
         bearerAuth: { type: 'http', scheme: 'bearer' },
         metricsToken: { type: 'apiKey', in: 'header', name: 'x-groceryview-metrics-token' },
-        webhookSignature: { type: 'apiKey', in: 'header', name: 'x-groceryview-signature' }
+        webhookSignature: { type: 'apiKey', in: 'header', name: 'x-groceryview-signature' },
+        billingWebhookSignature: { type: 'apiKey', in: 'header', name: 'x-groceryview-billing-signature' }
       }
     },
     paths: {
@@ -496,6 +618,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/market/overview': { get: publicOperation('Get Stockholm grocery market overview.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
+      '/api/billing/subscription-events': { post: billingWebhookOperation('Accept signed billing subscription events and persist entitlement updates.') },
       '/api/stores/{id}': { get: publicOperation('Get store profile.') },
       '/api/products/search': { get: publicOperation('Search products.') },
       '/api/products/{id}': { get: publicOperation('Get product detail.') },
@@ -531,6 +654,7 @@ export type RuntimeConfig = {
   databaseUrl?: string;
   publicWebUrl?: string;
   notificationWebhookSecret?: string;
+  billingWebhookSecret?: string;
   metricsToken?: string;
 };
 
@@ -544,6 +668,7 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     if (!env.DATABASE_URL) throw new Error('DATABASE_URL is required in production.');
     if (!env.PUBLIC_WEB_URL) throw new Error('PUBLIC_WEB_URL is required in production.');
     if (!env.NOTIFICATION_WEBHOOK_SECRET) throw new Error('NOTIFICATION_WEBHOOK_SECRET is required in production.');
+    if (!env.BILLING_WEBHOOK_SECRET) throw new Error('BILLING_WEBHOOK_SECRET is required in production.');
     if (!env.METRICS_TOKEN) throw new Error('METRICS_TOKEN is required in production.');
   }
   return {
@@ -553,6 +678,7 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     databaseUrl: env.DATABASE_URL,
     publicWebUrl: env.PUBLIC_WEB_URL,
     notificationWebhookSecret: env.NOTIFICATION_WEBHOOK_SECRET,
+    billingWebhookSecret: env.BILLING_WEBHOOK_SECRET,
     metricsToken: env.METRICS_TOKEN
   };
 }
@@ -564,6 +690,7 @@ export type HealthReport = {
   hasDatabase: boolean;
   hasAuthSecret: boolean;
   hasNotificationWebhookSecret: boolean;
+  hasBillingWebhookSecret: boolean;
   hasMetricsToken: boolean;
 };
 
@@ -575,6 +702,7 @@ export function buildHealthReport(config: RuntimeConfig): HealthReport {
     hasDatabase: Boolean(config.databaseUrl),
     hasAuthSecret: Boolean(config.authSecret),
     hasNotificationWebhookSecret: Boolean(config.notificationWebhookSecret),
+    hasBillingWebhookSecret: Boolean(config.billingWebhookSecret),
     hasMetricsToken: Boolean(config.metricsToken)
   };
 }
