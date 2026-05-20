@@ -21,6 +21,7 @@ describe('buildStaticPages', () => {
         'deals/today/index.html',
         'household/index.html',
         'login/index.html',
+        'loyalty/offers/index.html',
         'market/index.html',
         'notifications/inbox/index.html',
         'prices/confidence/index.html',
@@ -157,6 +158,13 @@ describe('buildStaticPages', () => {
       assert.match(billingStatus, /premium_monthly/);
       assert.match(billingStatus, /Missing or past-due entitlements keep checkout required/);
       assert.match(billingStatus, /Provider updates must be newer than stored entitlement state/);
+
+      const loyaltyOffers = await readFile(join(root, 'loyalty/offers/index.html'), 'utf8');
+      assert.match(loyaltyOffers, /Loyalty offer tracker/);
+      assert.match(loyaltyOffers, /Member offer queue/);
+      assert.match(loyaltyOffers, /ICA Stammis linked/);
+      assert.match(loyaltyOffers, /Clip coupon before checkout/);
+      assert.match(loyaltyOffers, /Member-only savings never overwrite verified public shelf evidence/);
 
       const watchlist = await readFile(join(root, 'watchlist/index.html'), 'utf8');
       assert.match(watchlist, /Price watchlist workbench/);

@@ -104,6 +104,12 @@ const billingStatusRows = [
   { account: 'Reviewer desk', plan: 'premium_yearly', status: 'Past due', checkout: 'Required', action: 'Show billing issue' }
 ];
 
+const loyaltyOfferRows = [
+  { offer: 'Zoégas Coffee 450g Stammis price', chain: 'ICA', requirement: 'ICA Stammis linked', savings: '7 SEK', status: 'Eligible' },
+  { offer: 'Coop Medmera dairy coupon', chain: 'Coop', requirement: 'Clip coupon before checkout', savings: '12 SEK', status: 'Needs action' },
+  { offer: 'Willys Plus pantry bundle', chain: 'Willys', requirement: 'Member account verified', savings: '19 SEK', status: 'Ready for basket' }
+];
+
 const watchlistRows = [
   { product: 'Zoégas Coffee 450g', target: '50 SEK', current: '49.90 SEK', trigger: 'Deal Score >= 80', status: 'Ready for push' },
   { product: 'Butter 600g', target: '45 SEK', current: '54.90 SEK', trigger: '52-week low', status: 'Watching' },
@@ -486,6 +492,16 @@ app.innerHTML = `
           <thead><tr><th>Account</th><th>Plan</th><th>Status</th><th>Checkout</th><th>Action</th></tr></thead>
           <tbody>
             ${billingStatusRows.map((row) => `<tr><td>${row.account}</td><td>${row.plan}</td><td><span class="status">${row.status}</span></td><td>${row.checkout}</td><td>${row.action}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h2>Loyalty offers</h2>
+        <p class="lede"><a href="/loyalty/offers/">Open loyalty offers</a> to separate member-only savings from public shelf prices.</p>
+        <table class="table">
+          <thead><tr><th>Offer</th><th>Chain</th><th>Requirement</th><th>Savings</th><th>Status</th></tr></thead>
+          <tbody>
+            ${loyaltyOfferRows.map((row) => `<tr><td>${row.offer}</td><td>${row.chain}</td><td>${row.requirement}</td><td>${row.savings}</td><td><span class="status">${row.status}</span></td></tr>`).join('')}
           </tbody>
         </table>
       </div>
