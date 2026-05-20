@@ -2398,6 +2398,85 @@ export function planAccountDeletion(userId: string): AccountDeletionPlan {
   };
 }
 
+export type PrivacyRequestType = 'data_export' | 'account_deletion' | 'ad_data_opt_out';
+export type PrivacyRequestStatus = 'received' | 'in_progress' | 'fulfilled' | 'rejected';
+
+export type PrivacyRequest = {
+  id: string;
+  userId: string;
+  type: PrivacyRequestType;
+  receivedAt: string;
+  status: PrivacyRequestStatus;
+};
+
+export type PrivacyRequestFulfillmentPlanInput = {
+  now: string;
+  slaDays: number;
+  alertBeforeDays: number;
+  requests: PrivacyRequest[];
+};
+
+export type PrivacyRequestFulfillmentItem = PrivacyRequest & {
+  dueAt: string;
+  daysUntilDue: number;
+  requiredAction: 'fulfill_export' | 'fulfill_deletion' | 'apply_ad_opt_out' | 'none';
+  risk: 'overdue' | 'due_soon' | 'on_track' | 'closed';
+};
+
+export type PrivacyRequestFulfillmentPlan = {
+  status: 'healthy' | 'attention_required';
+  items: PrivacyRequestFulfillmentItem[];
+  overdueRequestIds: string[];
+  dueSoonRequestIds: string[];
+};
+
+function privacyRequestAction(type: PrivacyRequestType): PrivacyRequestFulfillmentItem['requiredAction'] {
+  if (type === 'data_export') return 'fulfill_export';
+  if (type === 'account_deletion') return 'fulfill_deletion';
+  return 'apply_ad_opt_out';
+}
+
+function wholeDaysBetween(fromMs: number, toMs: number): number {
+  return Math.ceil((toMs - fromMs) / 86_400_000);
+}
+
+export function planPrivacyRequestFulfillment(input: PrivacyRequestFulfillmentPlanInput): PrivacyRequestFulfillmentPlan {
+  const nowMs = Date.parse(input.now);
+  if (Number.isNaN(nowMs)) throw new Error('now must be an ISO date.');
+  if (!Number.isFinite(input.slaDays) || input.slaDays <= 0) throw new Error('slaDays must be positive.');
+  if (!Number.isFinite(input.alertBeforeDays) || input.alertBeforeDays < 0) throw new Error('alertBeforeDays must be non-negative.');
+
+  const overdueRequestIds: string[] = [];
+  const dueSoonRequestIds: string[] = [];
+  const items = input.requests.map<PrivacyRequestFulfillmentItem>((request) => {
+    const receivedAtMs = Date.parse(request.receivedAt);
+    if (Number.isNaN(receivedAtMs)) throw new Error(`receivedAt must be an ISO date for ${request.id}.`);
+
+    const dueAtMs = receivedAtMs + input.slaDays * 86_400_000;
+    const daysUntilDue = wholeDaysBetween(nowMs, dueAtMs);
+    const closed = request.status === 'fulfilled' || request.status === 'rejected';
+    const risk = closed ? 'closed' : dueAtMs < nowMs ? 'overdue' : daysUntilDue <= input.alertBeforeDays ? 'due_soon' : 'on_track';
+
+    if (risk === 'overdue') overdueRequestIds.push(request.id);
+    if (risk === 'due_soon') dueSoonRequestIds.push(request.id);
+
+    return {
+      ...request,
+      dueAt: new Date(dueAtMs).toISOString(),
+      daysUntilDue,
+      requiredAction: closed ? 'none' : privacyRequestAction(request.type),
+      risk
+    };
+  });
+
+  return {
+    status: overdueRequestIds.length > 0 || dueSoonRequestIds.length > 0 ? 'attention_required' : 'healthy',
+    items,
+    overdueRequestIds,
+    dueSoonRequestIds
+  };
+}
+
 export type AdvertiserInput = {
   userId: string;
   district?: string;

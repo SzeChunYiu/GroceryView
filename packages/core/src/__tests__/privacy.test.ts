@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildPrivacyExport, planAccountDeletion, redactForAdvertisers } from '../index.js';
+import { buildPrivacyExport, planAccountDeletion, planPrivacyRequestFulfillment, redactForAdvertisers } from '../index.js';
 
 describe('privacy controls', () => {
   it('builds user data export without leaking internal trust metadata', () => {
@@ -33,5 +33,104 @@ describe('privacy controls', () => {
     });
 
     assert.deepEqual(payload, { district: 'Odenplan', categoryInterest: 'coffee' });
+  });
+
+  it('tracks privacy export, deletion, and ad opt-out fulfillment deadlines', () => {
+    const plan = planPrivacyRequestFulfillment({
+      now: '2026-05-20T12:00:00.000Z',
+      slaDays: 30,
+      alertBeforeDays: 5,
+      requests: [
+        {
+          id: 'request-overdue',
+          userId: 'user-1',
+          type: 'data_export',
+          receivedAt: '2026-04-19T12:00:00.000Z',
+          status: 'in_progress'
+        },
+        {
+          id: 'request-due-soon',
+          userId: 'user-2',
+          type: 'account_deletion',
+          receivedAt: '2026-04-25T12:00:00.000Z',
+          status: 'received'
+        },
+        {
+          id: 'request-open',
+          userId: 'user-3',
+          type: 'ad_data_opt_out',
+          receivedAt: '2026-05-10T12:00:00.000Z',
+          status: 'received'
+        },
+        {
+          id: 'request-closed',
+          userId: 'user-4',
+          type: 'data_export',
+          receivedAt: '2026-04-10T12:00:00.000Z',
+          status: 'fulfilled'
+        }
+      ]
+    });
+
+    assert.equal(plan.status, 'attention_required');
+    assert.deepEqual(plan.overdueRequestIds, ['request-overdue']);
+    assert.deepEqual(plan.dueSoonRequestIds, ['request-due-soon']);
+    assert.deepEqual(plan.items.map((item) => ({
+      id: item.id,
+      dueAt: item.dueAt,
+      daysUntilDue: item.daysUntilDue,
+      requiredAction: item.requiredAction,
+      risk: item.risk
+    })), [
+      {
+        id: 'request-overdue',
+        dueAt: '2026-05-19T12:00:00.000Z',
+        daysUntilDue: -1,
+        requiredAction: 'fulfill_export',
+        risk: 'overdue'
+      },
+      {
+        id: 'request-due-soon',
+        dueAt: '2026-05-25T12:00:00.000Z',
+        daysUntilDue: 5,
+        requiredAction: 'fulfill_deletion',
+        risk: 'due_soon'
+      },
+      {
+        id: 'request-open',
+        dueAt: '2026-06-09T12:00:00.000Z',
+        daysUntilDue: 20,
+        requiredAction: 'apply_ad_opt_out',
+        risk: 'on_track'
+      },
+      {
+        id: 'request-closed',
+        dueAt: '2026-05-10T12:00:00.000Z',
+        daysUntilDue: -10,
+        requiredAction: 'none',
+        risk: 'closed'
+      }
+    ]);
+  });
+
+  it('keeps privacy request fulfillment healthy when open requests are outside the alert window', () => {
+    const plan = planPrivacyRequestFulfillment({
+      now: '2026-05-20T12:00:00.000Z',
+      slaDays: 30,
+      alertBeforeDays: 5,
+      requests: [
+        {
+          id: 'request-open',
+          userId: 'user-1',
+          type: 'data_export',
+          receivedAt: '2026-05-10T12:00:00.000Z',
+          status: 'received'
+        }
+      ]
+    });
+
+    assert.equal(plan.status, 'healthy');
+    assert.deepEqual(plan.overdueRequestIds, []);
+    assert.deepEqual(plan.dueSoonRequestIds, []);
   });
 });
