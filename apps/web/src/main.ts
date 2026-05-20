@@ -219,6 +219,12 @@ const storeComparisons = [
   { store: 'Coop Farsta', basketTotal: 781, verifiedCoverage: 68, lowConfidenceRows: 5, bestCategory: 'Member promos', shopperFit: 'Review before checkout' }
 ];
 
+const storeMapRows = [
+  { store: 'Willys Odenplan', district: 'Vasastan', fit: 'Coffee and pantry', coverage: '82%', note: 'Primary weekly basket' },
+  { store: 'Lidl Sveavägen', district: 'Norrmalm', fit: 'Eggs and dairy', coverage: '76%', note: 'Split basket stop' },
+  { store: 'ICA Kvantum Liljeholmen', district: 'Liljeholmen', fit: 'Milk and produce', coverage: '74%', note: 'Transit-friendly backup' }
+];
+
 const categorySignals = [
   { category: 'Coffee', product: 'Zoégas Coffee 450g', store: 'Willys Odenplan', price: '49.90 SEK', signal: '12th historical percentile' },
   { category: 'Dairy', product: 'Arla Milk 1L', store: 'Lidl Sveavägen', price: '13.90 SEK', signal: 'Best favorite-store line' },
@@ -478,7 +484,7 @@ app.innerHTML = `
       </div>
       <div class="card">
         <h2>Store comparison</h2>
-        <p class="lede">The comparison view ranks favorite stores by basket cost, verified coverage, low-confidence risk, and category fit.</p>
+        <p class="lede">The comparison view ranks favorite stores by basket cost, verified coverage, low-confidence risk, and category fit. <a href="/stores/map/">Open store map</a>.</p>
         <table class="table">
           <thead><tr><th>Store</th><th>Basket</th><th>Coverage</th><th>Risk</th><th>Fit</th></tr></thead>
           <tbody>
@@ -490,6 +496,16 @@ app.innerHTML = `
     </section>
 
     <section class="market" style="margin-top:16px">
+      <div class="card">
+        <h2>Store map</h2>
+        <p class="lede">Mapped stores show district, basket fit, coverage, and pickup notes without changing Deal Score rankings.</p>
+        <table class="table">
+          <thead><tr><th>Store</th><th>District</th><th>Fit</th><th>Coverage</th><th>Note</th></tr></thead>
+          <tbody>
+            ${storeMapRows.map((row) => `<tr><td>${row.store}</td><td>${row.district}</td><td>${row.fit}</td><td>${row.coverage}</td><td>${row.note}</td></tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
       <div class="card">
         <h2>Search and budget readiness</h2>
         <p class="lede">Query <strong>willys coffee</strong> returns ${searchHits.length} product ticker match. Weekly actual spend is ${budget.weeklyActualSpend} SEK, with ${budget.weeklyRemainingActual} SEK remaining.</p>
