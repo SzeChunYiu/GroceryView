@@ -23,6 +23,27 @@ export function confidenceForSource(sourceType: SourceType): number {
 
 export type RobotsTxtStatus = 'allow' | 'disallow' | 'unknown' | 'not_applicable';
 export type LegalReviewStatus = 'approved' | 'pending' | 'rejected';
+export type RetailerChainId = 'ica' | 'willys' | 'coop' | 'hemkop' | 'lidl' | 'city_gross';
+export type RetailerSourceSurface = 'store_locator' | 'online_product' | 'weekly_offer' | 'flyer' | 'member_offer';
+export type RobotsPolicy = {
+  robotsUrl: string;
+  status: RobotsTxtStatus;
+  crawlDelaySeconds?: number;
+  visitTimeUtc?: string;
+  disallowedPaths: string[];
+  checkedAt: string;
+};
+
+export type RetailerSourceRegistryEntry = {
+  chainId: RetailerChainId;
+  displayName: string;
+  ownerGroup?: string;
+  surfaces: RetailerSourceSurface[];
+  sourceUrls: string[];
+  robotsPolicy: RobotsPolicy;
+  legalReviewStatus: LegalReviewStatus;
+  stubOnly: boolean;
+};
 
 export type RetailerSourceAccessInput = {
   chainId: string;
@@ -101,6 +122,120 @@ export function planRetailerSourceAccess(input: RetailerSourceAccessInput): Reta
         reason: 'Flyer campaign ingestion requires approved legal review.',
         requiredActions
       };
+}
+
+const DEFAULT_ROBOTS_CHECKED_AT = '2026-05-20T00:00:00.000Z';
+
+const RETAILER_SOURCE_REGISTRY: RetailerSourceRegistryEntry[] = [
+  {
+    chainId: 'ica',
+    displayName: 'ICA',
+    surfaces: ['store_locator', 'online_product', 'weekly_offer'],
+    sourceUrls: ['https://www.ica.se/butiker/', 'https://www.ica.se/handla/', 'https://www.ica.se/erbjudanden/'],
+    robotsPolicy: {
+      robotsUrl: 'https://www.ica.se/robots.txt',
+      status: 'unknown',
+      disallowedPaths: [],
+      checkedAt: DEFAULT_ROBOTS_CHECKED_AT
+    },
+    legalReviewStatus: 'pending',
+    stubOnly: true
+  },
+  {
+    chainId: 'willys',
+    displayName: 'Willys',
+    ownerGroup: 'Axfood',
+    surfaces: ['store_locator', 'online_product', 'weekly_offer', 'flyer', 'member_offer'],
+    sourceUrls: ['https://www.willys.se/artikel/om-willys-appen', 'https://www.willys.se/artikel/hemleverans', 'https://www.willys.se/erbjudanden/butik'],
+    robotsPolicy: {
+      robotsUrl: 'https://www.willys.se/robots.txt',
+      status: 'allow',
+      crawlDelaySeconds: 10,
+      visitTimeUtc: '0400-0845',
+      disallowedPaths: ['/kassa/', '/varukorg', '/mitt-konto/', '/mina-kop/', '/mina-listor/', '/delad-lista/', '/minavanligastevaror', '/o/', '/sok'],
+      checkedAt: DEFAULT_ROBOTS_CHECKED_AT
+    },
+    legalReviewStatus: 'pending',
+    stubOnly: true
+  },
+  {
+    chainId: 'coop',
+    displayName: 'Coop',
+    surfaces: ['store_locator', 'online_product', 'weekly_offer'],
+    sourceUrls: ['https://www.coop.se/butiker-erbjudanden/', 'https://www.coop.se/handla/'],
+    robotsPolicy: {
+      robotsUrl: 'https://www.coop.se/robots.txt',
+      status: 'unknown',
+      disallowedPaths: [],
+      checkedAt: DEFAULT_ROBOTS_CHECKED_AT
+    },
+    legalReviewStatus: 'pending',
+    stubOnly: true
+  },
+  {
+    chainId: 'hemkop',
+    displayName: 'Hemkop',
+    ownerGroup: 'Axfood',
+    surfaces: ['store_locator', 'online_product', 'weekly_offer', 'flyer'],
+    sourceUrls: ['https://www.hemkop.se/handla', 'https://www.hemkop.se/artikel/anvandarvillkor'],
+    robotsPolicy: {
+      robotsUrl: 'https://www.hemkop.se/robots.txt',
+      status: 'allow',
+      crawlDelaySeconds: 10,
+      visitTimeUtc: '0400-0845',
+      disallowedPaths: ['/kassa/', '/varukorg/', '/mina-sidor/', '/min-order/', '/o/', '/*?sort=', '/*?q=', '/dev-info', '/beta/'],
+      checkedAt: DEFAULT_ROBOTS_CHECKED_AT
+    },
+    legalReviewStatus: 'pending',
+    stubOnly: true
+  },
+  {
+    chainId: 'lidl',
+    displayName: 'Lidl Sweden',
+    surfaces: ['store_locator', 'weekly_offer', 'flyer', 'member_offer'],
+    sourceUrls: ['https://www.lidl.se/', 'https://www.lidl.se/c/'],
+    robotsPolicy: {
+      robotsUrl: 'https://www.lidl.se/robots.txt',
+      status: 'unknown',
+      disallowedPaths: [],
+      checkedAt: DEFAULT_ROBOTS_CHECKED_AT
+    },
+    legalReviewStatus: 'pending',
+    stubOnly: true
+  },
+  {
+    chainId: 'city_gross',
+    displayName: 'City Gross',
+    ownerGroup: 'Axfood',
+    surfaces: ['store_locator', 'online_product', 'weekly_offer'],
+    sourceUrls: ['https://www.citygross.se/', 'https://www.citygross.se/butiker'],
+    robotsPolicy: {
+      robotsUrl: 'https://www.citygross.se/robots.txt',
+      status: 'allow',
+      disallowedPaths: ['/mina-sidor/', '/loop54/'],
+      checkedAt: DEFAULT_ROBOTS_CHECKED_AT
+    },
+    legalReviewStatus: 'pending',
+    stubOnly: true
+  }
+];
+
+export function buildRetailerSourceRegistry(): RetailerSourceRegistryEntry[] {
+  return RETAILER_SOURCE_REGISTRY.map((entry) => ({
+    ...entry,
+    surfaces: [...entry.surfaces],
+    sourceUrls: [...entry.sourceUrls],
+    robotsPolicy: {
+      ...entry.robotsPolicy,
+      disallowedPaths: [...entry.robotsPolicy.disallowedPaths]
+    }
+  }));
+}
+
+export function findRetailerSourceRegistryEntry(chainId: RetailerChainId): RetailerSourceRegistryEntry {
+  const entry = RETAILER_SOURCE_REGISTRY.find((candidate) => candidate.chainId === chainId);
+  if (!entry) throw new Error(`Retailer source registry entry not found: ${chainId}`);
+  return buildRetailerSourceRegistry().find((candidate) => candidate.chainId === chainId)!;
 }
 
 export type UnitInput = {

@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { confidenceForSource, ingestRetailerProduct, normalizeUnitPrice, planIngestionBatch, planRetailerSourceAccess } from '../index.js';
+import { buildRetailerSourceRegistry, confidenceForSource, findRetailerSourceRegistryEntry, ingestRetailerProduct, normalizeUnitPrice, planIngestionBatch, planRetailerSourceAccess } from '../index.js';
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
@@ -104,5 +104,45 @@ describe('planRetailerSourceAccess', () => {
       reason: 'Retailer page ingestion requires robots.txt allow and approved legal review.',
       requiredActions: ['robots_txt_allow_required', 'legal_review_approval_required']
     });
+  });
+});
+
+describe('buildRetailerSourceRegistry', () => {
+  it('defines stub-only source policy for each researched Stockholm grocery chain', () => {
+    const registry = buildRetailerSourceRegistry();
+
+    assert.deepEqual(registry.map((entry) => entry.chainId), ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']);
+    for (const entry of registry) {
+      assert.equal(entry.stubOnly, true);
+      assert.equal(entry.legalReviewStatus, 'pending');
+      assert.ok(entry.surfaces.includes('store_locator'), `${entry.chainId} should define a store locator surface`);
+      assert.ok(entry.sourceUrls.length > 0, `${entry.chainId} should include source URLs`);
+      assert.match(entry.robotsPolicy.robotsUrl, /^https:\/\/www\./);
+      assert.equal(entry.robotsPolicy.checkedAt, '2026-05-20T00:00:00.000Z');
+    }
+  });
+
+  it('captures robots constraints for Axfood retailer pages without enabling live fetches', () => {
+    const willys = findRetailerSourceRegistryEntry('willys');
+    const hemkop = findRetailerSourceRegistryEntry('hemkop');
+    const cityGross = findRetailerSourceRegistryEntry('city_gross');
+
+    assert.equal(willys.robotsPolicy.crawlDelaySeconds, 10);
+    assert.equal(willys.robotsPolicy.visitTimeUtc, '0400-0845');
+    assert.ok(willys.robotsPolicy.disallowedPaths.includes('/varukorg'));
+    assert.ok(hemkop.robotsPolicy.disallowedPaths.includes('/mina-sidor/'));
+    assert.ok(cityGross.robotsPolicy.disallowedPaths.includes('/loop54/'));
+    assert.equal(willys.stubOnly && hemkop.stubOnly && cityGross.stubOnly, true);
+  });
+
+  it('returns defensive copies so callers cannot mutate the source registry singleton', () => {
+    const registry = buildRetailerSourceRegistry();
+    registry[0].surfaces.length = 0;
+    registry[0].robotsPolicy.disallowedPaths.push('/mutated');
+
+    const ica = findRetailerSourceRegistryEntry('ica');
+
+    assert.ok(ica.surfaces.includes('store_locator'));
+    assert.equal(ica.robotsPolicy.disallowedPaths.includes('/mutated'), false);
   });
 });
