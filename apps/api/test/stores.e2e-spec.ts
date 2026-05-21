@@ -26,6 +26,7 @@ describe('GroceryView API store deals', () => {
   it('serves ranked in-store deals from store profiles', async () => {
     const docs = await request(app.getHttpServer()).get('/api-json').expect(200);
     assert.ok(docs.body.paths['/stores/{id}/deals']);
+    assert.ok(docs.body.paths['/stores/{id}/deal-summary']);
     assert.ok(docs.body.paths['/stores/{id}/coverage']);
     assert.ok(docs.body.paths['/stores/{id}/category-coverage']);
 
@@ -45,6 +46,49 @@ describe('GroceryView API store deals', () => {
 
   it('returns 404 for missing store deal feeds', async () => {
     await request(app.getHttpServer()).get('/stores/missing-store/deals').expect(404);
+  });
+
+  it('serves store deal summaries with category leaders', async () => {
+    const response = await request(app.getHttpServer()).get('/stores/willys-odenplan/deal-summary').expect(200);
+
+    assert.equal(response.body.storeId, 'willys-odenplan');
+    assert.equal(response.body.storeName, 'Willys Odenplan');
+    assert.equal(response.body.dealCount, 4);
+    assert.equal(response.body.buyVerdictCount, 1);
+    assert.equal(response.body.averageDealScore, 67);
+    assert.deepEqual(response.body.topDeal, {
+      productId: 'coffee',
+      ticker: 'ZOEGAS-COFFEE-450G',
+      productName: 'Zoégas Coffee 450g',
+      category: 'coffee',
+      storeId: 'willys-odenplan',
+      storeName: 'Willys Odenplan',
+      price: 49.9,
+      dealScore: 82,
+      band: { label: 'Good deal', verdict: 'Buy' },
+      unitPrice: '110.89 SEK/kg'
+    });
+    assert.deepEqual(
+      response.body.categories.map(
+        (category: { category: string; dealCount: number; averageDealScore: number; topProductId: string; topDealScore: number }) => ({
+          category: category.category,
+          dealCount: category.dealCount,
+          averageDealScore: category.averageDealScore,
+          topProductId: category.topProductId,
+          topDealScore: category.topDealScore
+        })
+      ),
+      [
+        { category: 'coffee', dealCount: 1, averageDealScore: 82, topProductId: 'coffee', topDealScore: 82 },
+        { category: 'dairy', dealCount: 3, averageDealScore: 62, topProductId: 'private-label-milk', topDealScore: 73 }
+      ]
+    );
+    assert.equal(response.body.guardrails.length, 3);
+    assert.equal(response.body.demo, true);
+  });
+
+  it('returns 404 for missing store deal summaries', async () => {
+    await request(app.getHttpServer()).get('/stores/missing-store/deal-summary').expect(404);
   });
 
   it('serves verified shelf price coverage from store profiles', async () => {
