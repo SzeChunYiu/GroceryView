@@ -522,6 +522,7 @@ export type SourceRunHealthInput = {
   maxRunningMinutes: number;
   staleAfterMinutes: number;
   requiredFreshChainIds?: readonly string[];
+  requiredAcceptedCountByChain?: Readonly<Record<string, number>>;
   runs: SourceRunReadRecord[];
 };
 
@@ -558,6 +559,7 @@ export type SourceRunHealthSummary = {
     finishedInFuture: number;
     noFreshRuns: number;
     missingFreshChains: number;
+    insufficientAcceptedRows: number;
   };
   evidence: {
     total: number;
@@ -851,6 +853,7 @@ export function buildSourceRunHealthReport(input: SourceRunHealthInput): SourceR
   const runningRunIds: string[] = [];
   const staleRunIds: string[] = [];
   const freshSuccessfulChainIds = new Set<string>();
+  const freshSuccessfulAcceptedCountByChain = new Map<string, number>();
   let latestSuccessfulRunId: string | undefined;
   let latestSuccessfulFinishedAt: string | undefined;
   let latestSuccessfulFinishedAtMs = Number.NEGATIVE_INFINITY;
@@ -897,7 +900,16 @@ export function buildSourceRunHealthReport(input: SourceRunHealthInput): SourceR
     if (run.status === 'succeeded' && ageMinutes <= input.staleAfterMinutes) {
       evidence.push(`source_run_succeeded:${run.sourceRunId}`);
       const chainId = run.provenance.chainId;
-      if (typeof chainId === 'string' && chainId.trim()) freshSuccessfulChainIds.add(chainId);
+      if (typeof chainId === 'string' && chainId.trim()) {
+        freshSuccessfulChainIds.add(chainId);
+        const acceptedCount = run.provenance.acceptedCount;
+        if (typeof acceptedCount === 'number' && Number.isFinite(acceptedCount)) {
+          freshSuccessfulAcceptedCountByChain.set(
+            chainId,
+            Math.max(freshSuccessfulAcceptedCountByChain.get(chainId) ?? 0, acceptedCount)
+          );
+        }
+      }
     }
   }
 
@@ -905,6 +917,13 @@ export function buildSourceRunHealthReport(input: SourceRunHealthInput): SourceR
 
   for (const chainId of [...(input.requiredFreshChainIds ?? [])].sort()) {
     if (!freshSuccessfulChainIds.has(chainId)) blockers.push(`source_run_missing_fresh_chain:${chainId}`);
+  }
+
+  for (const [chainId, minimumAcceptedCount] of Object.entries(input.requiredAcceptedCountByChain ?? {}).sort(([a], [b]) => a.localeCompare(b))) {
+    if (!Number.isFinite(minimumAcceptedCount) || minimumAcceptedCount < 1) throw new Error(`requiredAcceptedCountByChain.${chainId} must be positive.`);
+    if (!freshSuccessfulChainIds.has(chainId)) continue;
+    const acceptedCount = freshSuccessfulAcceptedCountByChain.get(chainId) ?? 0;
+    if (acceptedCount < minimumAcceptedCount) blockers.push(`source_run_insufficient_accepted_rows:${chainId}:${acceptedCount}/${minimumAcceptedCount}`);
   }
 
   return {
@@ -928,9 +947,10 @@ export function summarizeSourceRunHealthReport(report: SourceRunHealthReport): S
       stuckRunning: 0,
       missingFinishedAt: 0,
       startedInFuture: 0,
-      finishedInFuture: 0,
-      noFreshRuns: 0,
-      missingFreshChains: 0
+        finishedInFuture: 0,
+        noFreshRuns: 0,
+        missingFreshChains: 0,
+        insufficientAcceptedRows: 0
     },
     evidence: {
       total: report.evidence.length,
@@ -952,6 +972,7 @@ export function summarizeSourceRunHealthReport(report: SourceRunHealthReport): S
     if (blocker.startsWith('source_run_finished_in_future:')) summary.blockers.finishedInFuture += 1;
     if (blocker === 'source_run_no_fresh_success') summary.blockers.noFreshRuns += 1;
     if (blocker.startsWith('source_run_missing_fresh_chain:')) summary.blockers.missingFreshChains += 1;
+    if (blocker.startsWith('source_run_insufficient_accepted_rows:')) summary.blockers.insufficientAcceptedRows += 1;
   }
 
   for (const evidence of report.evidence) {
@@ -972,6 +993,7 @@ export async function checkSourceRunHealth(input: CheckSourceRunHealthInput): Pr
     maxRunningMinutes: input.maxRunningMinutes,
     staleAfterMinutes: input.staleAfterMinutes,
     requiredFreshChainIds: input.requiredFreshChainIds,
+    requiredAcceptedCountByChain: input.requiredAcceptedCountByChain,
     runs
   });
   return {
