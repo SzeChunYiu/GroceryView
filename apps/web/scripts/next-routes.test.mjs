@@ -166,6 +166,20 @@ describe('Next.js web scaffold', () => {
     assert.match(marketShell, /\/products\/\$\{line\.productSlug\}/);
   });
 
+  it('surfaces a dedicated pantry planner route from pantry driver data', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+    const pantryPlannerPage = await readFile(new URL('../src/app/pantry-planner/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(demoData, /export const pantryPlanner = /);
+    assert.match(demoData, /projectedSpend: '207\.90 SEK'/);
+    assert.match(demoData, /Matmissionen Hägersten/);
+    assert.match(marketShell, /\/pantry-planner/);
+    assert.match(marketShell, /pantryPlanner\.projectedSavings/);
+    assert.match(pantryPlannerPage, /pantryPlanner\.staples\.map/);
+    assert.match(pantryPlannerPage, /Decision rules/);
+  });
+
   it('surfaces source coverage rows on the homepage', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
