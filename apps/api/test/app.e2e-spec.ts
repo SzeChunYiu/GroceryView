@@ -39,6 +39,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/products/{id}/equivalents']);
     assert.ok(docs.body.paths['/stores']);
     assert.ok(docs.body.paths['/stores/{id}/deals']);
+    assert.ok(docs.body.paths['/users/demo/alerts/inbox']);
     assert.ok(docs.body.paths['/users/demo/basket/local-offers']);
     assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
   });
@@ -175,6 +176,25 @@ describe('GroceryView API app', () => {
     assert.equal(storeQuote.body.demo, true);
 
     await request(app.getHttpServer()).get('/users/demo/alerts').expect(200);
+    const inbox = await request(app.getHttpServer()).get('/users/demo/alerts/inbox').expect(200);
+    assert.equal(inbox.body.userId, 'demo');
+    assert.equal(inbox.body.demo, true);
+    assert.equal(inbox.body.quietHoursWindow, '21:00-07:00');
+    assert.equal(inbox.body.heldCount, 1);
+    assert.equal(inbox.body.suppressedCount, 1);
+    assert.deepEqual(
+      inbox.body.queue
+        .filter((item: { status: string }) => item.status !== 'delivered')
+        .map((item: { id: string; status: string; channel: string }) => ({
+          id: item.id,
+          status: item.status,
+          channel: item.channel
+        })),
+      [
+        { id: 'receipt-review-quiet-hours', status: 'held', channel: 'push' },
+        { id: 'butter-provider-suppression', status: 'suppressed', channel: 'push' }
+      ]
+    );
   });
 
   it('rejects invalid request DTOs through the global ValidationPipe', async () => {
