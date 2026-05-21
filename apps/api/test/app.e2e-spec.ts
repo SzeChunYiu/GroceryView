@@ -32,6 +32,7 @@ describe('GroceryView API app', () => {
     const docs = await request(app.getHttpServer()).get('/api-json').expect(200);
     assert.equal(docs.body.info.title, 'GroceryView API');
     assert.ok(docs.body.paths['/categories/{category}/market']);
+    assert.ok(docs.body.paths['/users/demo/ads/disclosure']);
     assert.ok(docs.body.paths['/health']);
     assert.ok(docs.body.paths['/indices']);
     assert.ok(docs.body.paths['/indices/{id}']);
@@ -255,6 +256,18 @@ describe('GroceryView API app', () => {
     );
     assert.match(loyalty.body.guardrails[0], /member-only savings never overwrite verified public shelf evidence/i);
     assert.equal(loyalty.body.demo, true);
+
+    const disclosure = await request(app.getHttpServer()).get('/users/demo/ads/disclosure').expect(200);
+    assert.equal(disclosure.body.userId, 'demo');
+    assert.equal(disclosure.body.userTier, 'free');
+    assert.equal(disclosure.body.placementPlan.slots.length, 2);
+    assert.equal(disclosure.body.premiumAdsRemoved, false);
+    assert.equal(disclosure.body.affectsDealScore, false);
+    assert.equal(disclosure.body.allowedCount, 2);
+    assert.equal(disclosure.body.blockedCount, 2);
+    assert.deepEqual(disclosure.body.excludedSurfaces, ['deal_score', 'checkout_decision', 'basket_optimizer']);
+    assert.match(disclosure.body.guardrails[0], /Sponsored placements cannot change Deal Score/i);
+    assert.equal(disclosure.body.demo, true);
 
     const comparison = await request(app.getHttpServer()).get('/users/demo/basket/comparison').expect(200);
     assert.deepEqual(comparison.body.strategies.map((strategy: { id: string }) => strategy.id), [
