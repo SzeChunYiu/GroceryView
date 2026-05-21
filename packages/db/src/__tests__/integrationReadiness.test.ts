@@ -81,6 +81,25 @@ class RepositorySmokeQueryExecutor implements QueryExecutor {
     if (sql.includes('select weekly_budget')) {
       return [{ weekly_budget: '1000', monthly_budget: '4000' }] as T[];
     }
+    if (sql.includes('select store_id from favorite_stores')) {
+      return [{ store_id: 'postgres-probe-store-run-42' }] as T[];
+    }
+    if (sql.includes('from watchlist_items')) {
+      return [
+        {
+          product_id: 'postgres-probe-grocery-run-42',
+          target_price: '49.90',
+          alert_deal_score_at: 80,
+          favorite_stores_only: true
+        }
+      ] as T[];
+    }
+    if (sql.includes('insert into weekly_baskets')) {
+      return [{ id: 'weekly-basket-1' }] as T[];
+    }
+    if (sql.includes('from basket_items')) {
+      return [{ product_id: 'postgres-probe-grocery-run-42', quantity: '2' }] as T[];
+    }
     if (sql.includes('from subscription_entitlements')) {
       return [
         {
@@ -557,6 +576,7 @@ describe('buildPostgresRepositorySmokeProbes', () => {
     assert.deepEqual(probes.map((probe) => probe.name), [
       'user_budget_round_trip',
       'user_subscription_entitlement_round_trip',
+      'grocery_user_state_round_trip',
       'human_review_assignment_round_trip',
       'notification_suppression_round_trip',
       'alert_rule_round_trip',
@@ -572,6 +592,8 @@ describe('buildPostgresRepositorySmokeProbes', () => {
 
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-user-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-subscription-run-42')), true);
+    assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-store-run-42')), true);
+    assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-grocery-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-assignment-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-suppression-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-alert-run-42')), true);

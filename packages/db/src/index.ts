@@ -2899,6 +2899,8 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
   const receiptItemId = `postgres-probe-receipt-item-${safeId}`;
   const householdId = `postgres-probe-household-${safeId}`;
   const providerSubscriptionId = `postgres-probe-subscription-${safeId}`;
+  const storeId = `postgres-probe-store-${safeId}`;
+  const groceryProductId = `postgres-probe-grocery-${safeId}`;
   const chainSlug = `postgres-probe-chain-${safeId}`;
   const productSlug = `postgres-probe-product-${safeId}`;
 
@@ -2934,6 +2936,27 @@ export function buildPostgresRepositorySmokeProbes(input: BuildPostgresRepositor
           entitlement?.tier === 'premium' && entitlement.providerSubscriptionId === providerSubscriptionId,
           'subscription entitlement round trip did not return the written values'
         );
+      }
+    },
+    {
+      name: 'grocery_user_state_round_trip',
+      async run(executor) {
+        const repository = createPostgresRepository(executor);
+        await repository.upsertUser({ id: userId, email: `${userId}@example.invalid` });
+        await repository.addFavoriteStore(userId, storeId);
+        await repository.addWatchlistItem(userId, {
+          productId: groceryProductId,
+          targetPrice: 49.9,
+          alertDealScoreAt: 80,
+          favoriteStoresOnly: true
+        });
+        await repository.addBasketItem(userId, { productId: groceryProductId, quantity: 2 });
+        const favoriteStoreIds = await repository.getFavoriteStoreIds(userId);
+        const watchlist = await repository.getWatchlist(userId);
+        const basket = await repository.getBasket(userId);
+        assertProbe(favoriteStoreIds.includes(storeId), 'favorite store probe row was not readable');
+        assertProbe(watchlist.some((item) => item.productId === groceryProductId), 'watchlist probe row was not readable');
+        assertProbe(basket.some((item) => item.productId === groceryProductId && item.quantity === 2), 'basket probe row was not readable');
       }
     },
     {
