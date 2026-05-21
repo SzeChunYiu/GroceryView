@@ -448,6 +448,42 @@ export const products = [
     confidence: 'high',
     observedAt: '2026-05-21 15:18 CET',
     source: 'in-store shelf observation'
+  },
+  {
+    slug: 'loka-naturell-150cl',
+    ticker: 'LOKA-NATURELL-150CL',
+    name: 'Loka Naturell 1.5L',
+    store: 'ICA Nära Mariatorget',
+    price: '14.90 SEK',
+    unitPrice: '9.93 SEK/l',
+    priceType: 'member promo',
+    confidence: 'high',
+    observedAt: '2026-05-21 16:05 CET',
+    source: 'retailer flyer observation'
+  },
+  {
+    slug: 'festis-paron-10p',
+    ticker: 'FESTIS-PARON-10P',
+    name: 'Festis Päron 10-pack',
+    store: 'ICA Nära Mariatorget',
+    price: '39.90 SEK',
+    unitPrice: '7.98 SEK/l',
+    priceType: 'weekly deal',
+    confidence: 'medium',
+    observedAt: '2026-05-21 16:12 CET',
+    source: 'retailer flyer observation'
+  },
+  {
+    slug: 'proviva-blabar-1l',
+    ticker: 'PROVIVA-BLABAR-1L',
+    name: 'Proviva Blåbär 1L',
+    store: 'ICA Nära Mariatorget',
+    price: '24.90 SEK',
+    unitPrice: '24.90 SEK/l',
+    priceType: 'shelf',
+    confidence: 'high',
+    observedAt: '2026-05-21 16:20 CET',
+    source: 'in-store shelf observation'
   }
 ];
 
@@ -602,6 +638,15 @@ export const stores = [
     format: 'mid-size supermarket',
     bestCategory: 'Lunchbox value',
     distanceLabel: '3.4 km from saved area'
+  },
+  {
+    slug: 'ica-nara-mariatorget',
+    name: 'ICA Nära Mariatorget',
+    ingestionFixture: 'ICA Nara Mariatorget',
+    district: 'Södermalm',
+    format: 'convenience supermarket',
+    bestCategory: 'Beverages',
+    distanceLabel: '3.0 km from saved area'
   }
 ];
 
@@ -672,9 +717,9 @@ export const categories = [
   {
     slug: 'beverages',
     name: 'Beverages',
-    index: '96.8',
-    movement: '-3.2%',
-    topDeal: 'BRAVO-APELSINJUICE-1L'
+    index: '94.6',
+    movement: '-5.4%',
+    topDeal: 'FESTIS-PARON-10P'
   },
   {
     slug: 'produce',
@@ -806,6 +851,16 @@ export const dealOpportunityRail = rankDealOpportunities({
       sourceConfidence: 0.9
     },
     {
+      productId: 'festis-paron-10p',
+      productName: 'Festis Päron 10-pack',
+      storeId: 'ica-nara-mariatorget',
+      storeName: 'ICA Nära Mariatorget',
+      currentPrice: 39.9,
+      regularPrice: 49.9,
+      dealScore: 80,
+      sourceConfidence: 0.76
+    },
+    {
       productId: 'felix-ketchup-1kg',
       productName: 'Felix Tomatketchup 1kg',
       storeId: 'hemkop-stockholm',
@@ -901,9 +956,12 @@ const dealCategoryByProductId: Record<string, string> = {
   'eldorado-basmati-rice-1kg': 'Rice',
   'garant-havregryn-1kg': 'Breakfast',
   'bravo-apelsinjuice-1l': 'Beverages',
+  'festis-paron-10p': 'Beverages',
   'garant-korsbarstomater-250g': 'Produce',
   'libresse-bindor-normal-14p': 'Personal care',
   'anamma-formbar-fars-850g': 'Plant-based',
+  'felix-pyttipanna-720g': 'Frozen',
+  'pagen-lingongrova-500g': 'Bread',
   'felix-ketchup-1kg': 'Pantry'
 };
 
@@ -1047,12 +1105,26 @@ export const basketSubstitutionRadar = [
     basketImpact: '-10.80 SEK lunchbox basket',
     sourceConfidence: 0.9,
     reason: 'Bread, cheese, and cucumber rows are all high-confidence at one Södermalm stop, so lunchbox prep can be bundled.'
+  },
+  {
+    anchorSlug: 'bravo-apelsinjuice-1l',
+    anchorName: 'Bravo Apelsinjuice 1L',
+    anchorStoreSlug: 'hemkop-hornstull',
+    anchorStoreName: 'Hemköp Hornstull',
+    substituteSlug: 'loka-naturell-150cl',
+    substituteName: 'Loka Naturell 1.5L',
+    substituteStoreSlug: 'ica-nara-mariatorget',
+    substituteStoreName: 'ICA Nära Mariatorget',
+    verdict: 'compare',
+    basketImpact: '-8.50 SEK hydration top-up',
+    sourceConfidence: 0.76,
+    reason: 'Hydration rows now span juice, water, and kids drinks, so beverage trips should compare Mariatorget against Hornstull before routing.'
   }
 ];
 
 export const stockholmAreas = [
   { slug: 'norrmalm',   name: 'Norrmalm',   storeCount: 2, topSavings: 'Snacks' },
-  { slug: 'sodermalm',  name: 'Södermalm',  storeCount: 5, topSavings: 'Lunchbox value' },
+  { slug: 'sodermalm',  name: 'Södermalm',  storeCount: 6, topSavings: 'Beverages' },
   { slug: 'vasastan',   name: 'Vasastan',   storeCount: 3, topSavings: 'Plant-based' },
   { slug: 'hagersten',  name: 'Hägersten',  storeCount: 1, topSavings: 'Rice' },
   { slug: 'liljeholmen', name: 'Liljeholmen', storeCount: 1, topSavings: 'Pantry' },
@@ -1068,8 +1140,8 @@ export const sourceCoverage = [
     fixture: 'Store locator',
     surface: 'public locator',
     status: 'ready',
-    visibleRows: 4,
-    newestSignal: 'Sergels Torg, Liljeholmen, and Lindhagen rows cover snacks, egg, dinner, and hygiene staples'
+    visibleRows: 7,
+    newestSignal: 'Sergels Torg, Liljeholmen, Lindhagen, and Mariatorget rows cover snacks, egg, dinner, hygiene staples, and hydration top-ups'
   },
   {
     chain: 'Willys',
@@ -1229,6 +1301,18 @@ export const storeComparisonBoard = [
     leadSignal: 'Lingongrova, hushållsost, and cucumber rows keep lunchbox prep visible without adding another store stop.',
     visibleItems: 3,
     basketImpact: '-10.80 SEK'
+  },
+  {
+    slug: 'sodermalm-hydration-topup',
+    area: 'Södermalm',
+    primaryStoreSlug: 'ica-nara-mariatorget',
+    primaryStoreName: 'ICA Nära Mariatorget',
+    comparisonStoreSlug: 'hemkop-hornstull',
+    comparisonStoreName: 'Hemköp Hornstull',
+    basketFocus: 'Hydration top-up',
+    leadSignal: 'Loka, Festis, and Proviva rows make beverage restocks visible before the Hornstull juice run.',
+    visibleItems: 3,
+    basketImpact: '-8.50 SEK'
   }
 ];
 
@@ -1309,6 +1393,17 @@ export const shoppingTripSwitchboard = [
     saving: '-10.80 SEK',
     decision: 'Use when weekday lunches need one high-confidence stop near the saved route.',
     href: '/categories/bread'
+  },
+  {
+    title: 'Hydration top-up',
+    area: 'Södermalm',
+    store: 'ICA Nära Mariatorget',
+    category: 'Beverages',
+    basket: 'Loka, Festis, Proviva',
+    spend: '79.70 SEK',
+    saving: '-8.50 SEK',
+    decision: 'Use when school drinks and sparkling water can be added without a second beverage stop.',
+    href: '/categories/beverages'
   }
 ];
 
@@ -1322,7 +1417,7 @@ export const indexHistory = [
   { date: '2026-05-18', coffee:  91.8, dairy: 102.3, bread:  98.7, pantry:  95.5, snacks: 103.8, frozen:  97.5 },
   { date: '2026-05-19', coffee:  91.6, dairy: 102.3, bread:  98.7, pantry:  95.2, snacks: 104.1, frozen:  97.4 },
   { date: '2026-05-20', coffee:  91.5, dairy: 102.1, bread:  98.8, pantry:  95.0, snacks: 103.4, frozen:  94.9 },
-  { date: '2026-05-21', coffee:  91.4, dairy: 101.8, bread:  96.5, pantry:  94.9, snacks: 103.1, frozen:  94.7 }
+  { date: '2026-05-21', coffee:  91.4, dairy: 101.8, bread:  96.5, pantry:  94.9, snacks: 103.1, frozen:  94.7, beverages: 94.6 }
 ];
 
 export const weeklyBasket = [
@@ -1350,7 +1445,10 @@ export const weeklyBasket = [
   { slug: 'gb-graddglass-2l',               qty: 1, total: '36.90 SEK', vsLastWeek: '-2.8%' },
   { slug: 'pagen-lingongrova-500g',         qty: 1, total: '33.90 SEK', vsLastWeek: '-3.5%' },
   { slug: 'arla-hushallsost-500g',          qty: 1, total: '54.90 SEK', vsLastWeek: '-1.1%' },
-  { slug: 'garant-gurka-300g',              qty: 1, total: '16.90 SEK', vsLastWeek: '-2.6%' }
+  { slug: 'garant-gurka-300g',              qty: 1, total: '16.90 SEK', vsLastWeek: '-2.6%' },
+  { slug: 'loka-naturell-150cl',            qty: 2, total: '29.80 SEK', vsLastWeek: '-5.4%' },
+  { slug: 'festis-paron-10p',               qty: 1, total: '39.90 SEK', vsLastWeek: '-4.0%' },
+  { slug: 'proviva-blabar-1l',              qty: 1, total: '24.90 SEK', vsLastWeek: '-1.8%' }
 ];
 
 export const savingsPlaybook = [
@@ -1423,6 +1521,13 @@ export const savingsPlaybook = [
     action: 'Bundle Lingongrova, hushållsost, and cucumber when weekday lunches need a single stop',
     impact: '-10.80 SEK lunchbox basket',
     href: '/products/pagen-lingongrova-500g'
+  },
+  {
+    title: 'Hydration top-up check',
+    trigger: 'Beverages index is 5.4% under baseline with Mariatorget drink rows',
+    action: 'Bundle Loka, Festis, and Proviva when the route already crosses Mariatorget',
+    impact: '-8.50 SEK beverage basket',
+    href: '/categories/beverages'
   }
 ];
 
@@ -1510,13 +1615,25 @@ export const watchlistAlerts = [
     confidence: 'high',
     allowedPriceTypes: ['member promo', 'shelf'],
     nextAction: 'Use the Medborgarplatsen bread row as the anchor for weekday lunchbox prep.'
+  },
+  {
+    productSlug: 'festis-paron-10p',
+    storeSlug: 'ica-nara-mariatorget',
+    targetPrice: 42,
+    currentPrice: 39.9,
+    usualPrice: 49.9,
+    trigger: 'target met',
+    channel: 'push',
+    confidence: 'medium',
+    allowedPriceTypes: ['weekly deal', 'member promo'],
+    nextAction: 'Add the kids drink pack only when the Mariatorget route is already planned.'
   }
 ];
 
 export const householdSavings = {
-  weeklyTotal: '616.00 SEK',
-  vsLastWeek: '-57.40 SEK',
-  vsLastMonth: '-105.70 SEK',
+  weeklyTotal: '710.60 SEK',
+  vsLastWeek: '-65.90 SEK',
+  vsLastMonth: '-114.20 SEK',
   topSaving: { product: 'Felix Pyttipanna 720g', amount: '-16.50 SEK', driver: 'Skanstull freezer stock-up' }
 };
 
@@ -1552,7 +1669,7 @@ export const personalGroceryInflation = calculatePersonalGroceryInflation({
 export const savingsDashboard = {
   monthToDate: {
     plannedSpend: '1,756.00 SEK',
-    avoidedSpend: '93.40 SEK',
+    avoidedSpend: '101.90 SEK',
     basketCount: 4,
     bestDistrict: 'Vasastan'
   },
@@ -1612,11 +1729,19 @@ export const savingsDashboard = {
       signal: '3.5% under bread baseline',
       action: 'Bundle with cheese and cucumber while all three rows stay high confidence',
       href: '/products/pagen-lingongrova-500g'
+    },
+    {
+      label: 'Hydration top-up',
+      product: 'Festis Päron 10-pack',
+      store: 'ICA Nära Mariatorget',
+      signal: '5.4% under beverages baseline',
+      action: 'Bundle with Loka and Proviva before the weekend drink shelf runs low',
+      href: '/products/festis-paron-10p'
     }
   ],
   districtSavings: [
     { district: 'Vasastan', planned: '612.40 SEK', avoided: '39.80 SEK', driver: 'Coffee, dairy, and plant-based promos' },
-    { district: 'Södermalm', planned: '673.80 SEK', avoided: '50.80 SEK', driver: 'Breakfast, chicken, frozen, and lunchbox promos' },
+    { district: 'Södermalm', planned: '753.50 SEK', avoided: '59.30 SEK', driver: 'Breakfast, chicken, frozen, lunchbox, and beverage promos' },
     { district: 'Norrmalm', planned: '391.20 SEK', avoided: '13.90 SEK', driver: 'Snacks and eggs' },
     { district: 'Hägersten', planned: '264.10 SEK', avoided: '9.90 SEK', driver: 'Rice and pantry clearance' },
     { district: 'Kungsholmen', planned: '198.70 SEK', avoided: '16.00 SEK', driver: 'Produce shelf drop' },
@@ -1638,8 +1763,8 @@ export const accountProfile = {
     { label: 'Alert timing', value: 'Push before weekly route planning', status: 'Active' }
   ],
   routeLinks: [
-    { label: 'Saved weekly basket', href: '/weekly-basket', detail: '25 visible driver rows' },
-    { label: 'Savings dashboard', href: '/savings-dashboard', detail: '93.40 SEK avoided month-to-date' },
+    { label: 'Saved weekly basket', href: '/weekly-basket', detail: '28 visible driver rows' },
+    { label: 'Savings dashboard', href: '/savings-dashboard', detail: '101.90 SEK avoided month-to-date' },
     { label: 'Home store profile', href: '/stores/willys-odenplan', detail: 'Coffee and dairy anchor store' }
   ]
 };
@@ -1693,6 +1818,16 @@ export const receiptReviewQueue = [
     confidence: '91%',
     issue: 'Bundle savings need line-total confirmation before weekly basket update',
     impact: '-10.80 SEK',
+    href: '/scanner'
+  },
+  {
+    receipt: 'ICA Nära Mariatorget hydration top-up',
+    store: 'ICA Nära Mariatorget',
+    area: 'Södermalm',
+    items: 'Loka, Festis, Proviva',
+    confidence: '78%',
+    issue: 'Weekly drink deal needs receipt confirmation before basket totals update',
+    impact: '-8.50 SEK',
     href: '/scanner'
   }
 ];
@@ -1773,6 +1908,22 @@ export const receiptReviewDesk = [
       { productSlug: 'garant-gurka-300g', label: 'Produce unit price confirmed' }
     ],
     nextAction: 'Publish the lunchbox bundle to weekly basket and unit-price review.'
+  },
+  {
+    receiptId: 'R-2026-05-21-ICA-MARIATORGET',
+    storeName: 'ICA Nära Mariatorget',
+    storeSlug: 'ica-nara-mariatorget',
+    capturedAt: '2026-05-21 16:42 CET',
+    total: '79.70 SEK',
+    status: 'Needs review',
+    owner: 'Sam',
+    confidence: 0.78,
+    flaggedLines: [
+      { productSlug: 'loka-naturell-150cl', label: 'Sparkling water member price matched' },
+      { productSlug: 'festis-paron-10p', label: 'Weekly drink deal needs line-total check' },
+      { productSlug: 'proviva-blabar-1l', label: 'Shelf price accepted' }
+    ],
+    nextAction: 'Hold the beverage watchlist update until the Festis line total is confirmed.'
   }
 ];
 
@@ -1869,6 +2020,20 @@ export const couponStackPlanner = [
     stackState: 'Queued',
     basketImpact: '-4.50 SEK',
     nextAction: 'Publish after the receipt review row confirms the bonus.'
+  },
+  {
+    title: 'Hydration drink stack',
+    productSlug: 'festis-paron-10p',
+    productName: 'Festis Päron 10-pack',
+    storeSlug: 'ica-nara-mariatorget',
+    storeName: 'ICA Nära Mariatorget',
+    basePrice: '49.90 SEK',
+    coupon: '-5.00 SEK app coupon',
+    memberPrice: '-5.00 SEK weekly deal',
+    finalPrice: '39.90 SEK',
+    stackState: 'Review',
+    basketImpact: '-10.00 SEK',
+    nextAction: 'Confirm receipt line before sending the beverage push alert.'
   }
 ];
 
