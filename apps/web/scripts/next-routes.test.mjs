@@ -157,6 +157,23 @@ describe('verified-data UI', () => {
     assert.match(shell, /\/categories\/\$\{category\.slug\}/);
   });
 
+  it('surfaces verified catalogue savings on the compare route', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/compare/page.tsx');
+
+    assert.match(verified, /export const chainSavingsLedger = /);
+    assert.match(verified, /matchedChainProducts\.reduce/);
+    assert.match(verified, /totalSavings/);
+    assert.match(verified, /topProductSlug/);
+    assert.match(route, /chainSavingsLedger\.map/);
+    assert.match(route, /Catalogue savings ledger/);
+    assert.match(route, /Listed savings are aggregated only from matched Willys\/Hemkop catalogue rows/);
+    assert.match(route, /Check source caveats/);
+    assert.match(route, /chain\.topProductSlug/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
   it('surfaces verified OpenPrices observation depth on the homepage', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const shell = await read('src/components/market-shell.tsx');
