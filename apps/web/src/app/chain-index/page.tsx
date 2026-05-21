@@ -1,6 +1,10 @@
 import Link from 'next/link';
 import { calculateBrandTierIndices, calculateChainPriceIndex } from '@groceryview/core';
-import { buildBrandTierPriceObservations, buildChainPriceObservations } from '@/lib/chain-index-data';
+import {
+  buildBrandTierPriceObservations,
+  buildChainPriceObservations,
+  buildMatchedBasketChainPriceObservations
+} from '@/lib/chain-index-data';
 
 export const dynamic = 'force-static';
 
@@ -16,7 +20,10 @@ function confidenceDot(confidence: 'high' | 'medium' | 'low'): string {
 }
 
 export default function ChainIndexPage() {
-  const summary = calculateChainPriceIndex(buildChainPriceObservations());
+  const baseObservations = buildChainPriceObservations();
+  const matchedBasketObservations = buildMatchedBasketChainPriceObservations();
+  const matchedBasketObservationCount = matchedBasketObservations.length;
+  const summary = calculateChainPriceIndex([...baseObservations, ...matchedBasketObservations]);
   const brandTierSummary = calculateBrandTierIndices(buildBrandTierPriceObservations());
 
   // Pick the categories covered by the most chains (then by market size) for the matrix.
@@ -97,6 +104,16 @@ export default function ChainIndexPage() {
                 </div>
               );
             })}
+          </section>
+
+          <section className="mb-10 rounded-lg border border-market-ink/10 bg-market-mint/10 p-4">
+            <div className="text-xs font-bold uppercase tracking-wide text-market-mint">Matched-basket refinement</div>
+            <h2 className="mt-1 text-2xl font-black">Willys↔Hemköp EAN matches raise index confidence</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-market-ink/65">
+              Added {matchedBasketObservationCount.toLocaleString()} product-level matched-basket observations from the Axfood
+              Willys/Hemköp EAN surface into calculateChainPriceIndex, while keeping the 100-centred category index and
+              shrinkage rules unchanged.
+            </p>
           </section>
 
 

@@ -352,11 +352,16 @@ describe('Next.js web scaffold', () => {
     assert.match(chainIndexPage, /calculateChainPriceIndex/);
     assert.match(chainIndexPage, /calculateBrandTierIndices/);
     assert.match(chainIndexPage, /buildChainPriceObservations/);
+    assert.match(chainIndexPage, /buildMatchedBasketChainPriceObservations/);
+    assert.match(chainIndexPage, /matchedBasketObservationCount/);
     assert.match(chainIndexPage, /buildBrandTierPriceObservations/);
     assert.match(chainIndexPage, /Brand-tier index/);
+    assert.match(chainIndexPage, /Matched-basket refinement/);
     assert.match(chainIndexPage, /Private label savings/);
     assert.match(chainIndexData, /coopProducts/);
     assert.match(chainIndexData, /matpriskollenOffers/);
+    assert.match(chainIndexData, /axfoodProducts/);
+    assert.match(chainIndexData, /buildMatchedBasketChainPriceObservations/);
     assert.match(chainIndexData, /BrandTierPriceObservation/);
   });
 
