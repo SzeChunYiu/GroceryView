@@ -35,6 +35,14 @@ export class ProductsController {
     return { ...savings, demo: true };
   }
 
+  @Get(':id/history-summary')
+  @ApiOkResponse({ description: 'Product price history summary and movement guardrails' })
+  historySummary(@Param('id') id: string) {
+    const summary = groceryApi.getProductHistorySummary(id);
+    if (!summary) throw new NotFoundException('Product not found');
+    return { ...summary, demo: true };
+  }
+
   @Get(':id/deal-score')
   @ApiOkResponse({ description: 'Deal Score v1 report with customer-facing reasons' })
   dealScore(@Param('id') id: string, @Query('distanceKm') distanceKm?: string) {

@@ -50,6 +50,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/products/{id}/spread']);
     assert.ok(docs.body.paths['/products/{id}/store-savings']);
+    assert.ok(docs.body.paths['/products/{id}/history-summary']);
     assert.ok(docs.body.paths['/products/{id}/deal-score']);
     assert.ok(docs.body.paths['/products/{id}/equivalents']);
     assert.ok(docs.body.paths['/users/demo/receipts/review']);
@@ -211,6 +212,23 @@ describe('GroceryView API app', () => {
     );
     assert.match(storeSavings.body.guardrails[0], /verified quotes/i);
     assert.equal(storeSavings.body.demo, true);
+
+    const historySummary = await request(app.getHttpServer()).get('/products/coffee/history-summary').expect(200);
+    assert.equal(historySummary.body.productId, 'coffee');
+    assert.equal(historySummary.body.ticker, 'ZOEGAS-COFFEE-450G');
+    assert.equal(historySummary.body.trend, 'new_low');
+    assert.deepEqual(historySummary.body.summary, {
+      latestPrice: 49.9,
+      previousPrice: 59.9,
+      changeFromPrevious: -10,
+      lowestPrice: 49.9,
+      highestPrice: 69.9,
+      isNewLow: true,
+      observedCount: 3,
+      latestObservedAt: '2026-05-19T00:00:00.000Z'
+    });
+    assert.match(historySummary.body.guardrails[0], /recorded product history/i);
+    assert.equal(historySummary.body.demo, true);
 
     const dealScore = await request(app.getHttpServer()).get('/products/coffee/deal-score?distanceKm=12.5').expect(200);
     assert.equal(dealScore.body.productId, 'coffee');
@@ -449,6 +467,7 @@ describe('GroceryView API app', () => {
     await request(app.getHttpServer()).get('/products/missing-product/terminal').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/spread').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/store-savings').expect(404);
+    await request(app.getHttpServer()).get('/products/missing-product/history-summary').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/deal-score').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/equivalents').expect(404);
   });
