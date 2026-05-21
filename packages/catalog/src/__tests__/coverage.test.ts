@@ -5,6 +5,7 @@ import { buildCatalogCoverageReport, buildMyStoresCoverageReport } from '../inde
 describe('buildCatalogCoverageReport', () => {
   it('quantifies category, chain, and store coverage gaps against launch targets', () => {
     const report = buildCatalogCoverageReport({
+      targetProducts: ['coffee', 'milk', 'eggs'],
       targetCategories: ['coffee', 'dairy', 'eggs', 'bread'],
       targetChains: ['willys', 'ica', 'coop'],
       targetStores: ['willys-odenplan', 'ica-odenplan', 'coop-odenplan'],
@@ -18,11 +19,13 @@ describe('buildCatalogCoverageReport', () => {
       status: 'incomplete',
       productCount: 2,
       coverage: {
+        products: { covered: 2, target: 3, percent: 66.67, missing: ['eggs'] },
         categories: { covered: 2, target: 4, percent: 50, missing: ['bread', 'eggs'] },
         chains: { covered: 2, target: 3, percent: 66.67, missing: ['ica'] },
         stores: { covered: 2, target: 3, percent: 66.67, missing: ['ica-odenplan'] }
       },
-      requiredActions: ['backfill_categories:bread,eggs', 'backfill_chains:ica', 'backfill_stores:ica-odenplan']
+      missingProductStorePairs: [],
+      requiredActions: ['backfill_products:eggs', 'backfill_categories:bread,eggs', 'backfill_chains:ica', 'backfill_stores:ica-odenplan']
     });
   });
 
@@ -35,7 +38,26 @@ describe('buildCatalogCoverageReport', () => {
     });
 
     assert.equal(report.status, 'complete');
+    assert.deepEqual(report.missingProductStorePairs, []);
     assert.deepEqual(report.requiredActions, []);
+  });
+
+  it('can require every target product to have every target store price', () => {
+    const report = buildCatalogCoverageReport({
+      targetProducts: ['coffee', 'milk'],
+      targetCategories: ['coffee', 'dairy'],
+      targetChains: ['willys', 'coop'],
+      targetStores: ['willys-odenplan', 'coop-odenplan'],
+      requireEveryProductInEveryStore: true,
+      products: [
+        { id: 'coffee', categoryId: 'coffee', observedChainIds: ['willys', 'coop'], observedStoreIds: ['willys-odenplan', 'coop-odenplan'] },
+        { id: 'milk', categoryId: 'dairy', observedChainIds: ['willys'], observedStoreIds: ['willys-odenplan'] }
+      ]
+    });
+
+    assert.equal(report.status, 'incomplete');
+    assert.deepEqual(report.missingProductStorePairs, [{ productId: 'milk', storeId: 'coop-odenplan' }]);
+    assert.deepEqual(report.requiredActions, ['backfill_product_store_pairs:1']);
   });
 });
 
