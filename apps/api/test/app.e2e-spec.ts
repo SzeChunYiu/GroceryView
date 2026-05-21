@@ -40,6 +40,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/stores']);
     assert.ok(docs.body.paths['/stores/{id}/deals']);
     assert.ok(docs.body.paths['/users/demo/basket/local-offers']);
+    assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
   });
 
   it('serves products, stores, prices, watchlists, baskets, and alerts', async () => {
@@ -165,6 +166,14 @@ describe('GroceryView API app', () => {
     assert.equal(localOffers.body.bestStore.matchedProductIds[0], 'coffee');
     assert.equal(localOffers.body.guardrails.length, 3);
 
+    const storeQuote = await request(app.getHttpServer()).get('/users/demo/basket/stores/willys-odenplan/quote').expect(200);
+    assert.equal(storeQuote.body.storeId, 'willys-odenplan');
+    assert.equal(storeQuote.body.storeName, 'Willys Odenplan');
+    assert.equal(storeQuote.body.total, 99.8);
+    assert.equal(storeQuote.body.priceGapVsCheapestComplete, 0);
+    assert.deepEqual(storeQuote.body.missingProductIds, []);
+    assert.equal(storeQuote.body.demo, true);
+
     await request(app.getHttpServer()).get('/users/demo/alerts').expect(200);
   });
 
@@ -184,5 +193,6 @@ describe('GroceryView API app', () => {
 
   it('returns 404 for missing store deals', async () => {
     await request(app.getHttpServer()).get('/stores/missing-store/deals').expect(404);
+    await request(app.getHttpServer()).get('/users/demo/basket/stores/missing-store/quote').expect(404);
   });
 });
