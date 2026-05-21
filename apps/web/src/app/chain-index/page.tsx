@@ -1,6 +1,6 @@
 import Link from 'next/link';
-import { calculateChainPriceIndex } from '@groceryview/core';
-import { buildChainPriceObservations } from '@/lib/chain-index-data';
+import { calculateBrandTierIndices, calculateChainPriceIndex } from '@groceryview/core';
+import { buildBrandTierPriceObservations, buildChainPriceObservations } from '@/lib/chain-index-data';
 
 export const dynamic = 'force-static';
 
@@ -17,6 +17,7 @@ function confidenceDot(confidence: 'high' | 'medium' | 'low'): string {
 
 export default function ChainIndexPage() {
   const summary = calculateChainPriceIndex(buildChainPriceObservations());
+  const brandTierSummary = calculateBrandTierIndices(buildBrandTierPriceObservations());
 
   // Pick the categories covered by the most chains (then by market size) for the matrix.
   const coverageByCategory = new Map<string, number>();
@@ -96,6 +97,57 @@ export default function ChainIndexPage() {
                 </div>
               );
             })}
+          </section>
+
+
+
+          {/* Brand tier index */}
+          <section className="mb-10 rounded-lg border border-market-ink/10 bg-white p-4">
+            <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <div className="text-xs font-bold uppercase tracking-wide text-market-mint">Brand-tier index</div>
+                <h2 className="text-2xl font-black">Private label versus national brands</h2>
+              </div>
+              <div className="text-sm font-bold text-market-mint">
+                Private label savings: {brandTierSummary.privateLabelSavingsPercent.toFixed(1)}%
+              </div>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              {brandTierSummary.indices.map((tier) => {
+                const cheaper = tier.value < 100;
+                return (
+                  <div key={tier.brandTier} className="rounded-lg border border-market-ink/10 bg-market-oat/20 p-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <div className="font-black">{tier.label}</div>
+                        <div className="text-xs text-market-ink/50">
+                          {tier.categoryCount} categories · {tier.movementPercent.toFixed(1)}% basket move
+                        </div>
+                      </div>
+                      <div className={`text-2xl font-black ${cheaper ? 'text-market-mint' : 'text-market-tomato'}`}>
+                        {tier.value.toFixed(1)}
+                      </div>
+                    </div>
+                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-white">
+                      <div
+                        className={cheaper ? 'h-full bg-market-mint' : 'h-full bg-market-tomato'}
+                        style={{ width: `${Math.max(6, Math.min(100, tier.value / 1.4))}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-4 grid gap-3 text-sm text-market-ink/65 md:grid-cols-2">
+              <div className="rounded-lg bg-market-mint/10 p-3">
+                <div className="font-bold text-market-ink">Highest savings categories</div>
+                <div>{brandTierSummary.highestSavingsCategories.join(' · ')}</div>
+              </div>
+              <div className="rounded-lg bg-market-tomato/10 p-3">
+                <div className="font-bold text-market-ink">Premium gap</div>
+                <div>{brandTierSummary.premiumGapPercent.toFixed(1)}% versus private-label basket average.</div>
+              </div>
+            </div>
           </section>
 
           {/* Category matrix */}
