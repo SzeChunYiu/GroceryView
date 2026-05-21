@@ -27,6 +27,7 @@ const homepageClaimLedger = sourceClaimLedger.slice(0, 3);
 const homepageSourceReadiness = sourceReadinessMatrix.slice(0, 3);
 const homepageChainSavings = chainSavingsLedger.slice(0, 2);
 const homepageRouteMap = sourceRouteMap.slice(0, 3);
+const homepageFreshOpenPrices = freshestOpenPrices.slice(3, 9);
 
 export function MarketShell() {
   return (
@@ -98,6 +99,34 @@ export function MarketShell() {
               </Link>
             );
           })}
+        </div>
+      </Card>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Fresh OpenPrices arrivals</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Recent community observations ready for product browsing</h2>
+          </div>
+          <Link className="text-sm font-bold text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/products">
+            Browse verified products
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {homepageFreshOpenPrices.map((product) => (
+            <Link
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
+              href={`/products/${product.slug}`}
+              key={product.slug}
+            >
+              <p className="font-black text-slate-950">{product.name}</p>
+              <p className="mt-1 text-sm text-slate-600">{product.brands || 'Brand not reported'}</p>
+              <p className="mt-3 text-2xl font-black text-emerald-800">{formatSek(product.priceMedian)}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">
+                {product.observationCount.toLocaleString('sv-SE')} observations · latest {product.lastObservedAt}
+              </p>
+            </Link>
+          ))}
         </div>
       </Card>
 
