@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { gzipSync } from 'node:zlib';
 import {
   buildCoopSearchUrl,
+  buildDailyConnectorConfigsFromEnv,
   buildHemkopSearchUrl,
   buildEmaginPdfUrl,
   buildIcaHandlaUrl,
@@ -50,6 +51,7 @@ import {
   parseOverpassGroceryStores,
   retailerRobotsPolicyMatrix,
   runRetailerConnector,
+  runDailyIngestion,
   stockholmStoreLocatorFixtures,
   validateOfferSelectorFixtures,
   validateGroceryCategoryCoicopMappings,
@@ -58,6 +60,7 @@ import {
   validateScbPxWebQueryFixtures,
   validateStoreLocatorFixtures
 } from '../index.js';
+import type { QueryExecutor } from '@groceryview/db';
 
 describe('confidenceForSource', () => {
   it('uses proposal confidence values by source type', () => {
@@ -1680,5 +1683,158 @@ describe('Open Prices real-data connector', () => {
       rawSnapshotRef: 'raw://open-prices/empty',
       contentHash: 'sha256:empty'
     }), /no usable SEK product price rows/);
+  });
+});
+
+class DailyIngestionExecutor implements QueryExecutor {
+  calls: Array<{ sql: string; params: unknown[] }> = [];
+  private sequence = 0;
+
+  async query<T>(sql: string, params: unknown[] = []) {
+    this.calls.push({ sql, params });
+    if (sql.includes('insert into source_runs')) return [{ id: 'source-run-db-1' }] as T[];
+    if (sql.includes('update source_runs')) return [{ id: params[0] }] as T[];
+    if (sql.includes('insert into chains')) return [{ id: `chain-db-${++this.sequence}` }] as T[];
+    if (sql.includes('insert into products')) return [{ id: `product-db-${++this.sequence}` }] as T[];
+    if (sql.includes('insert into aliases')) {
+      return [{
+        id: `alias-db-${++this.sequence}`,
+        product_id: params[0],
+        alias: params[1],
+        normalized_alias: params[2],
+        source_type: params[3],
+        source_ref: params[4],
+        match_confidence: params[5],
+        reviewed_at: params[6],
+        created_at: '2026-05-21T00:00:00.000Z'
+      }] as T[];
+    }
+    if (sql.includes('insert into raw_records')) return [{ id: `raw-db-${++this.sequence}` }] as T[];
+    if (sql.includes('insert into observations')) return [{ id: `observation-db-${++this.sequence}` }] as T[];
+    if (sql.includes('insert into latest_prices')) return [] as T[];
+    throw new Error(`Unexpected SQL in daily ingestion test: ${sql}`);
+  }
+}
+
+function dailyConnectorFixture(chainId: string) {
+  return {
+    connectorId: `${chainId}-normalized-json`,
+    chainId,
+    sourceType: 'official_api' as const,
+    endpointUrl: `https://sources.example.test/${chainId}/products.json`,
+    parserVersion: 'normalized-json-v1',
+    robotsTxtStatus: 'not_applicable' as const,
+    legalReviewStatus: 'approved' as const,
+    hasDataAgreement: true
+  };
+}
+
+describe('daily ingestion runner', () => {
+  it('loads connector config from environment without exposing secrets', () => {
+    const configs = buildDailyConnectorConfigsFromEnv({
+      DATABASE_URL: 'postgres://user:secret@example/groceryview',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
+        dailyConnectorFixture('ica'),
+        dailyConnectorFixture('willys'),
+        dailyConnectorFixture('coop'),
+        dailyConnectorFixture('hemkop'),
+        dailyConnectorFixture('lidl'),
+        dailyConnectorFixture('city_gross')
+      ])
+    });
+
+    assert.equal(configs.databaseUrl, 'postgres://user:secret@example/groceryview');
+    assert.equal(configs.connectors.length, 6);
+    assert.equal(configs.connectors[0].chainId, 'ica');
+  });
+
+  it('fails closed when daily connector config omits any required chain', () => {
+    assert.throws(() => buildDailyConnectorConfigsFromEnv({
+      DATABASE_URL: 'postgres://user:secret@example/groceryview',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON: JSON.stringify([
+        dailyConnectorFixture('ica'),
+        dailyConnectorFixture('willys')
+      ])
+    }), /missing required daily chain connectors: coop, hemkop, lidl, city_gross/);
+  });
+
+  it('persists successful daily connector runs as source runs, raw records, and observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'willys-normalized-json',
+          chainId: 'willys',
+          sourceType: 'official_api',
+          endpointUrl: 'https://sources.example.test/willys/products.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true
+        }
+      ],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [{
+          storeId: 'willys-odenplan',
+          retailerProductId: 'wil-zoegas-450',
+          rawName: 'Zoégas Skånerost 450g',
+          canonicalName: 'Zoégas Coffee 450g',
+          productId: 'zoegas-coffee-450g',
+          categoryId: 'coffee',
+          brand: 'Zoégas',
+          packageSize: 450,
+          packageUnit: 'g',
+          price: 49.9,
+          regularPrice: 69.9,
+          promoText: 'Veckans erbjudande'
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.persistedRuns, 1);
+    assert.equal(result.acceptedCount, 1);
+    assert.equal(result.observationIds.length, 1);
+    const sourceRunInsert = executor.calls.find((call) => call.sql.includes('insert into source_runs'));
+    assert.equal(sourceRunInsert?.params[0], 'official_api');
+    assert.equal(sourceRunInsert?.params[1], 'willys-normalized-json');
+    assert.deepEqual(JSON.parse(String(sourceRunInsert?.params[6])), {
+      chainId: 'willys',
+      cadence: 'daily',
+      connectorId: 'willys-normalized-json',
+      runKey: 'willys:official-api:willys-normalized-json:2026-05-21',
+      parserVersion: 'normalized-json-v1',
+      acceptedCount: 1,
+      rejectedCount: 0
+    });
+    assert.equal(executor.calls.some((call) => call.sql.includes('insert into raw_records')), true);
+    assert.equal(executor.calls.some((call) => call.sql.includes('insert into observations')), true);
+  });
+
+  it('fails closed before persistence when a required daily connector is blocked', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'ica-page',
+          chainId: 'ica',
+          sourceType: 'retailer_online_page',
+          endpointUrl: 'https://sources.example.test/ica/products.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'unknown',
+          legalReviewStatus: 'pending',
+          hasDataAgreement: false
+        }
+      ],
+      fetchImpl: async () => { throw new Error('fetch should not run for blocked connector'); }
+    });
+
+    assert.equal(result.status, 'blocked');
+    assert.deepEqual(result.blockers, ['ica:robots_txt_allow_required', 'ica:legal_review_approval_required']);
+    assert.equal(executor.calls.length, 0);
   });
 });

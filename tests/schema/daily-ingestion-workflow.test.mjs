@@ -12,13 +12,17 @@ describe('daily ingestion workflow', () => {
 
     for (const command of [
       'npm ci',
-      'npm run test -w @groceryview/ingestion',
       'npm run test -w @groceryview/db',
+      'npm run test -w @groceryview/ingestion',
+      'node packages/ingestion/dist/index.js',
       '/api/readiness/postgres',
       '/api/readiness/source-runs'
     ]) {
       assert.match(workflow, new RegExp(command.replaceAll(' ', '\\s+').replaceAll('/', '\\/')));
     }
+
+    assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTORS_JSON/);
+    assert.match(workflow, /body\.status !== 'succeeded'/);
 
     for (const chain of ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']) {
       assert.match(workflow, new RegExp(`source_run_missing_fresh_chain:${chain}`));
