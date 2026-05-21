@@ -590,6 +590,9 @@ export type MobileScreenComponentAction =
   | 'open_product'
   | 'compare_basket'
   | 'scan_barcode'
+  | 'set_weekly_budget'
+  | 'review_category_budgets'
+  | 'review_receipts'
   | 'configure_notifications'
   | 'update_privacy'
   | 'invite_household_member'
@@ -633,7 +636,7 @@ export type MobileScreenComponent =
       type: 'empty';
       key: string;
       message: string;
-      action: 'search_product' | 'scan_barcode' | 'invite_household_member';
+      action: 'search_product' | 'scan_barcode' | 'invite_household_member' | 'set_weekly_budget';
     };
 
 function actionLabel(action: MobileProductPriceTerminalViewModel['actions'][number]): string {
@@ -660,6 +663,12 @@ function watchlistActionLabel(action: MobileWatchlistViewModel['actions'][number
   if (action === 'compare_stores') return 'Compare stores';
   if (action === 'add_to_weekly_basket') return 'Add to basket';
   return 'Scan barcode';
+}
+
+function budgetActionLabel(action: Extract<MobileScreenComponentAction, 'set_weekly_budget' | 'review_category_budgets' | 'review_receipts'>): string {
+  if (action === 'set_weekly_budget') return 'Set budget';
+  if (action === 'review_category_budgets') return 'Review categories';
+  return 'Review receipts';
 }
 
 function profileActionLabel(action: Extract<MobileScreenComponentAction, 'configure_notifications' | 'update_privacy' | 'invite_household_member'>): string {
@@ -723,6 +732,85 @@ function formatMobileMoney(value: number): string {
   return `${value.toFixed(2)} SEK`;
 }
 
+export type MobileBudgetRouteViewModel = {
+  userId: string;
+  summary: {
+    weeklyBudgetLabel: string;
+    plannedBasketLabel: string;
+    remainingLabel: string;
+    utilizationPercentLabel: string;
+    status: 'under' | 'over';
+  };
+  basket: {
+    itemCount: number;
+    cheapestTotalLabel: string;
+    bestSingleStoreLabel: string;
+    splitStoreCount: number;
+    missingProductCount: number;
+  };
+  categoryBudgets: Array<{
+    category: string;
+    weeklyBudgetLabel: string;
+    estimatedSpendLabel: string;
+    remainingLabel: string;
+    status: 'under' | 'over';
+    productCount: number;
+  }>;
+  unbudgetedCategories: Array<{
+    category: string;
+    estimatedSpendLabel: string;
+    productCount: number;
+  }>;
+  actions: Array<'set_weekly_budget' | 'review_category_budgets' | 'review_receipts'>;
+};
+
+function formatMobilePercent(value: number): string {
+  return `${value.toFixed(1)}%`;
+}
+
+export function createMobileBudgetRouteViewModel(
+  userId: string,
+  api: MobileApi = createGroceryViewApi()
+): MobileBudgetRouteViewModel {
+  const budget = api.getBudgetSummary(userId);
+  const categoryBudget = api.getCategoryBudgetSummary(userId);
+  const basket = api.getBasket(userId);
+  const comparison = api.compareBasket(userId);
+  const utilizationPercent = budget.weeklyBudget === 0 ? 0 : (budget.estimatedBasketTotal / budget.weeklyBudget) * 100;
+
+  return {
+    userId,
+    summary: {
+      weeklyBudgetLabel: formatMobileMoney(budget.weeklyBudget),
+      plannedBasketLabel: formatMobileMoney(budget.estimatedBasketTotal),
+      remainingLabel: formatMobileMoney(budget.weeklyRemainingAfterEstimate),
+      utilizationPercentLabel: formatMobilePercent(utilizationPercent),
+      status: budget.weeklyStatus
+    },
+    basket: {
+      itemCount: basket.items.reduce((total, item) => total + item.quantity, 0),
+      cheapestTotalLabel: formatMobileMoney(comparison.cheapestByProduct.total),
+      bestSingleStoreLabel: comparison.bestSingleStore ? `${comparison.bestSingleStore.storeName}, ${formatMobileMoney(comparison.bestSingleStore.total)}` : 'No complete store yet',
+      splitStoreCount: comparison.splitStoreCount,
+      missingProductCount: comparison.missingProductIds.length
+    },
+    categoryBudgets: categoryBudget.categories.map((category) => ({
+      category: category.category,
+      weeklyBudgetLabel: formatMobileMoney(category.weeklyBudget),
+      estimatedSpendLabel: formatMobileMoney(category.estimatedSpend),
+      remainingLabel: formatMobileMoney(category.remaining),
+      status: category.status,
+      productCount: category.productIds.length
+    })),
+    unbudgetedCategories: categoryBudget.unbudgetedCategories.map((category) => ({
+      category: category.category,
+      estimatedSpendLabel: formatMobileMoney(category.estimatedSpend),
+      productCount: category.productIds.length
+    })),
+    actions: ['set_weekly_budget', 'review_category_budgets', 'review_receipts']
+  };
+}
+
 export function createMobileProfileHubViewModel(
   userId: string,
   api: MobileApi = createGroceryViewApi()
@@ -763,6 +851,83 @@ export function createMobileProfileHubViewModel(
         }
       : null,
     privacyControls: mobilePrivacyControls.map((control) => ({ ...control }))
+  };
+}
+
+export function composeMobileBudgetScreen(
+  userId: string,
+  api: MobileApi = createGroceryViewApi()
+): MobileScreenComponent {
+  const viewModel = createMobileBudgetRouteViewModel(userId, api);
+  const actions: Array<Extract<MobileScreenComponentAction, 'set_weekly_budget' | 'review_category_budgets' | 'review_receipts'>> = viewModel.actions;
+
+  return {
+    type: 'screen',
+    key: `budget:${userId}`,
+    title: 'Budget',
+    state: 'ready',
+    children: [
+      {
+        type: 'section',
+        key: 'budget-summary',
+        title: 'Budget summary',
+        children: [
+          { type: 'metric', key: 'weekly-budget', label: 'Weekly budget', value: viewModel.summary.weeklyBudgetLabel, tone: 'neutral' },
+          { type: 'metric', key: 'planned-basket', label: 'Planned basket', value: viewModel.summary.plannedBasketLabel, tone: viewModel.summary.status === 'under' ? 'positive' : 'warning' },
+          { type: 'metric', key: 'remaining', label: 'Remaining', value: viewModel.summary.remainingLabel, tone: viewModel.summary.status === 'under' ? 'positive' : 'warning' },
+          { type: 'metric', key: 'utilization', label: 'Utilization', value: viewModel.summary.utilizationPercentLabel, tone: viewModel.summary.status === 'under' ? 'neutral' : 'warning' }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'basket-impact',
+        title: 'Basket impact',
+        children: [
+          { type: 'row', key: 'basket-items', label: 'Basket items', value: `${viewModel.basket.itemCount} planned` },
+          { type: 'row', key: 'cheapest-total', label: 'Cheapest total', value: viewModel.basket.cheapestTotalLabel },
+          { type: 'row', key: 'best-single-store', label: 'Best store', value: viewModel.basket.bestSingleStoreLabel },
+          { type: 'row', key: 'split-store-count', label: 'Split stores', value: `${viewModel.basket.splitStoreCount} stores, ${viewModel.basket.missingProductCount} missing` }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'category-budgets',
+        title: 'Category budgets',
+        children: viewModel.categoryBudgets.length > 0
+          ? viewModel.categoryBudgets.map((category) => ({
+              type: 'row',
+              key: `category-budget:${category.category}`,
+              label: category.category,
+              value: `${category.estimatedSpendLabel} of ${category.weeklyBudgetLabel}, ${category.remainingLabel} remaining, ${category.productCount} products`
+            }))
+          : [{ type: 'empty', key: 'no-category-budgets', message: 'Set category budgets to catch basket drift before checkout.', action: 'set_weekly_budget' }]
+      },
+      {
+        type: 'section',
+        key: 'unbudgeted-categories',
+        title: 'Unbudgeted categories',
+        children: viewModel.unbudgetedCategories.length > 0
+          ? viewModel.unbudgetedCategories.map((category) => ({
+              type: 'row',
+              key: `unbudgeted:${category.category}`,
+              label: category.category,
+              value: `${category.estimatedSpendLabel}, ${category.productCount} products`
+            }))
+          : [{ type: 'empty', key: 'no-unbudgeted-categories', message: 'All planned basket categories have a weekly budget.', action: 'set_weekly_budget' }]
+      },
+      {
+        type: 'section',
+        key: 'actions',
+        title: 'Actions',
+        children: actions.map((action, index) => ({
+          type: 'action',
+          key: action,
+          action,
+          label: budgetActionLabel(action),
+          primary: index === 0
+        }))
+      }
+    ]
   };
 }
 
@@ -1205,6 +1370,7 @@ export type ExpoRoute = {
     | '/watchlist'
     | '/products/[id]/terminal'
     | '/basket'
+    | '/budget'
     | '/scan/barcode'
     | '/scan/receipt'
     | '/profile'
@@ -1231,6 +1397,9 @@ export type MobileScreenAction =
   | 'compare_basket'
   | 'compare_stores'
   | 'add_to_weekly_basket'
+  | 'set_weekly_budget'
+  | 'review_category_budgets'
+  | 'review_receipts'
   | 'scan_barcode'
   | 'scan_receipt'
   | 'review_assignment'
@@ -1308,6 +1477,7 @@ export function buildExpoReadinessPlan(): ExpoReadinessPlan {
       { path: '/watchlist', screen: 'WatchlistScreen', purpose: 'Tracked products, alert thresholds, and price opportunities', requiresAuth: true },
       { path: '/products/[id]/terminal', screen: 'ProductPriceTerminalScreen', purpose: 'Stock-style product quote, distribution, and history terminal', requiresAuth: true },
       { path: '/basket', screen: 'BasketScreen', purpose: 'Weekly basket planning and smart swaps', requiresAuth: true },
+      { path: '/budget', screen: 'BudgetScreen', purpose: 'Weekly budget, category budgets, and planned basket impact', requiresAuth: true },
       { path: '/scan/barcode', screen: 'BarcodeScanScreen', purpose: 'Barcode lookup and product comparison', requiresAuth: true },
       { path: '/scan/receipt', screen: 'ReceiptScanScreen', purpose: 'Receipt OCR review and budget impact', requiresAuth: true },
       { path: '/profile', screen: 'ProfileScreen', purpose: 'Account, budget, notification, and favorite-store settings', requiresAuth: true },
@@ -1365,6 +1535,16 @@ export function buildMobileScreenBlueprints(): MobileScreenBlueprintPlan {
       actions: ['compare_basket', 'open_product', 'scan_barcode'],
       providerRequirements: ['secure-session'],
       offlineBehavior: 'Allow local quantity edits and require sync before checkout decisions.'
+    },
+    {
+      route: '/budget',
+      screen: 'BudgetScreen',
+      primaryState: 'ready',
+      emptyState: 'Set a weekly budget to track planned basket and category spend.',
+      dataDependencies: ['budget_summary', 'category_budgets', 'weekly_basket', 'basket_comparison'],
+      actions: ['set_weekly_budget', 'review_category_budgets', 'review_receipts'],
+      providerRequirements: ['secure-session'],
+      offlineBehavior: 'Show cached budget totals and queue budget edits until sync is available.'
     },
     {
       route: '/scan/barcode',
