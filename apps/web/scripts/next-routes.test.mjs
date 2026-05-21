@@ -238,6 +238,10 @@ describe('Next.js web scaffold', () => {
     assert.match(demoData, /Garant Havregryn 1kg/);
     assert.match(marketShell, /\/nutrition-value/);
     assert.match(marketShell, /nutritionValueBoard\.weeklySignal/);
+    assert.match(nutritionPage, /rankNutritionPerKrona/);
+    assert.match(nutritionPage, /buildNutritionProducts/);
+    assert.match(nutritionPage, /nutritionRanks\.map/);
+    assert.match(nutritionPage, /Protein per 10 SEK/);
     assert.match(nutritionPage, /nutritionValueBoard\.cards\.map/);
     assert.match(nutritionPage, /Nutrition ranking rules/);
   });
