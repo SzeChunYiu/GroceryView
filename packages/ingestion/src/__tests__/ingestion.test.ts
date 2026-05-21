@@ -4,6 +4,8 @@ import { gzipSync } from 'node:zlib';
 import {
   buildHemkopSearchUrl,
   buildIcaHandlaUrl,
+  buildMatpriskollenStoreOffersUrl,
+  buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
   buildMatsparSearchUrl,
   buildOpenFoodFactsProductUrl,
@@ -19,6 +21,7 @@ import {
   fetchHemkopProducts,
   fetchIcaProducts,
   fetchMathemProducts,
+  fetchMatpriskollenOffers,
   fetchMatsparProducts,
   fetchWillysProducts,
   groceryCategoryCoicopMappings,
@@ -416,6 +419,109 @@ describe('fetchMathemProducts', () => {
       queries: ['a', 'b'],
       fetchImpl,
       retrievedAt: '2026-05-21T01:00:00.000Z'
+    });
+
+    assert.equal(rows.length, 1);
+  });
+});
+
+describe('fetchMatpriskollenOffers', () => {
+  it('fetches public store-scoped offer rows with price provenance', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/api/v1/stores?')) {
+        return new Response(JSON.stringify([{
+          id: 47,
+          key: 'd20e31b2-2c0e-4e87-8f8e-280d41b1bb16',
+          name: 'Willys Falkenberg',
+          offerCount: 82
+        }]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+
+      return new Response(JSON.stringify({
+        storeName: 'Willys Falkenberg',
+        offers: [{
+          id: 2337026,
+          key: '036e04e6-99fa-4621-8321-dea0b65279f1',
+          price: '29,90/frp',
+          comprice: '59,80/kg',
+          regular: '',
+          volume: '500 g',
+          condition: '',
+          requiresMembershipCard: false,
+          requiresCoupon: true,
+          validFrom: 1779055200,
+          validTo: 1779659999,
+          store_id: 47,
+          store_key: 'd20e31b2-2c0e-4e87-8f8e-280d41b1bb16',
+          product: {
+            name: 'Nektarin i ask',
+            origin: 'Egypten/Italien/Spanien',
+            brand: null,
+            categories: [{
+              name: 'Frukt',
+              parent_category: { name: 'Frukt & bär' }
+            }]
+          },
+          produkt_bild_urls: { bildUrl: 'https://mpk-product-images.example/nektarin.jpg' }
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchMatpriskollenOffers({
+      fetchImpl,
+      storeNamePattern: null,
+      retrievedAt: '2026-05-21T01:20:00.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildMatpriskollenStoresUrl());
+    assert.equal(requestedUrls[1], buildMatpriskollenStoreOffersUrl('d20e31b2-2c0e-4e87-8f8e-280d41b1bb16'));
+    assert.deepEqual(rows, [{
+      code: '036e04e6-99fa-4621-8321-dea0b65279f1',
+      name: 'Nektarin i ask',
+      brand: '',
+      store: 'Willys Falkenberg',
+      storeKey: 'd20e31b2-2c0e-4e87-8f8e-280d41b1bb16',
+      storeId: '47',
+      category: 'Frukt & bär',
+      priceText: '29,90/frp',
+      comparePriceText: '59,80/kg',
+      regularPriceText: '',
+      packageText: '500 g',
+      condition: '',
+      origin: 'Egypten/Italien/Spanien',
+      requiresMembershipCard: false,
+      requiresCoupon: true,
+      validFrom: '2026-05-17T22:00:00.000Z',
+      validTo: '2026-05-24T21:59:59.000Z',
+      sourceUrl: buildMatpriskollenStoreOffersUrl('d20e31b2-2c0e-4e87-8f8e-280d41b1bb16'),
+      productUrl: 'https://matpriskollen.se/deal/036e04e6-99fa-4621-8321-dea0b65279f1',
+      imageUrl: 'https://mpk-product-images.example/nektarin.jpg',
+      retrievedAt: '2026-05-21T01:20:00.000Z'
+    }]);
+  });
+
+  it('deduplicates offers across Matpriskollen stores', async () => {
+    const offer = {
+      key: 'same-offer-key',
+      price: '10,00/st',
+      product: { name: 'Same offer' }
+    };
+    const fetchImpl: typeof fetch = async (url) => {
+      if (String(url).includes('/api/v1/stores?')) {
+        return new Response(JSON.stringify([
+          { id: 1, key: 'store-a', name: 'Store A', offerCount: 1 },
+          { id: 2, key: 'store-b', name: 'Store B', offerCount: 1 }
+        ]), { status: 200 });
+      }
+      return new Response(JSON.stringify({ storeName: 'Store', offers: [offer] }), { status: 200 });
+    };
+
+    const rows = await fetchMatpriskollenOffers({
+      fetchImpl,
+      storeNamePattern: null,
+      retrievedAt: '2026-05-21T01:20:00.000Z'
     });
 
     assert.equal(rows.length, 1);
