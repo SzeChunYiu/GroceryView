@@ -137,7 +137,9 @@ describe('source run readiness endpoint', () => {
           stuckRunning: 0,
           missingFinishedAt: 0,
           startedInFuture: 0,
-          finishedInFuture: 0
+          finishedInFuture: 0,
+          noFreshRuns: 0,
+          missingFreshChains: 0
         },
         evidence: { total: 1, succeeded: 1 },
         running: 0,
@@ -182,7 +184,9 @@ describe('source run readiness endpoint', () => {
           stuckRunning: 0,
           missingFinishedAt: 0,
           startedInFuture: 0,
-          finishedInFuture: 0
+          finishedInFuture: 0,
+          noFreshRuns: 0,
+          missingFreshChains: 0
         },
         evidence: { total: 0, succeeded: 0 },
         running: 0,

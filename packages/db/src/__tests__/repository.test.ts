@@ -605,7 +605,9 @@ describe('buildSourceRunHealthReport', () => {
         stuckRunning: 0,
         missingFinishedAt: 0,
         startedInFuture: 0,
-        finishedInFuture: 0
+        finishedInFuture: 0,
+        noFreshRuns: 0,
+        missingFreshChains: 0
       },
       evidence: {
         total: 1,
@@ -668,7 +670,8 @@ describe('buildSourceRunHealthReport', () => {
       'source_run_failed:failed-run',
       'source_run_partial:partial-run',
       'source_run_stuck_running:running-run',
-      'source_run_stale:stale-run'
+      'source_run_stale:stale-run',
+      'source_run_no_fresh_success'
     ]);
     assert.deepEqual(report.runningRunIds, ['running-run']);
     assert.deepEqual(report.staleRunIds, ['stale-run']);
@@ -677,14 +680,16 @@ describe('buildSourceRunHealthReport', () => {
     assert.deepEqual(summarizeSourceRunHealthReport(report), {
       status: 'blocked',
       blockers: {
-        total: 4,
+        total: 5,
         failed: 1,
         partial: 1,
         stale: 1,
         stuckRunning: 1,
         missingFinishedAt: 0,
         startedInFuture: 0,
-        finishedInFuture: 0
+        finishedInFuture: 0,
+        noFreshRuns: 1,
+        missingFreshChains: 0
       },
       evidence: {
         total: 0,
@@ -734,14 +739,16 @@ describe('buildSourceRunHealthReport', () => {
     assert.deepEqual(summarizeSourceRunHealthReport(report), {
       status: 'blocked',
       blockers: {
-        total: 3,
+        total: 4,
         failed: 0,
         partial: 0,
         stale: 0,
         stuckRunning: 0,
         missingFinishedAt: 1,
         startedInFuture: 1,
-        finishedInFuture: 1
+        finishedInFuture: 1,
+        noFreshRuns: 1,
+        missingFreshChains: 0
       },
       evidence: {
         total: 0,
@@ -801,7 +808,9 @@ describe('buildSourceRunHealthReport', () => {
         stuckRunning: 0,
         missingFinishedAt: 0,
         startedInFuture: 0,
-        finishedInFuture: 0
+        finishedInFuture: 0,
+        noFreshRuns: 0,
+        missingFreshChains: 0
       },
       evidence: {
         total: 1,
@@ -832,16 +841,18 @@ describe('buildSourceRunHealthReport', () => {
     assert.equal(result.runCount, 0);
     assert.deepEqual(result.filter, { limit: 100 });
     assert.deepEqual(result.summary, {
-      status: 'healthy',
+      status: 'blocked',
       blockers: {
-        total: 0,
+        total: 1,
         failed: 0,
         partial: 0,
         stale: 0,
         stuckRunning: 0,
         missingFinishedAt: 0,
         startedInFuture: 0,
-        finishedInFuture: 0
+        finishedInFuture: 0,
+        noFreshRuns: 1,
+        missingFreshChains: 0
       },
       evidence: {
         total: 0,
@@ -849,6 +860,52 @@ describe('buildSourceRunHealthReport', () => {
       },
       running: 0,
       stale: 0
+    });
+    assert.deepEqual(result.report.blockers, ['source_run_no_fresh_success']);
+  });
+
+  it('blocks daily ingestion readiness until every required chain has a fresh successful source run', () => {
+    const report = buildSourceRunHealthReport({
+      now: '2026-05-20T08:30:00.000Z',
+      maxRunningMinutes: 30,
+      staleAfterMinutes: 24 * 60,
+      requiredFreshChainIds: ['ica', 'willys', 'coop'],
+      runs: [
+        {
+          sourceRunId: 'fresh-willys',
+          sourceType: 'official_api',
+          sourceName: 'Willys normalized products',
+          startedAt: '2026-05-20T08:00:00.000Z',
+          finishedAt: '2026-05-20T08:05:00.000Z',
+          status: 'succeeded',
+          provenance: { chainId: 'willys', cadence: 'daily' }
+        },
+        {
+          sourceRunId: 'fresh-ica',
+          sourceType: 'retailer_page',
+          sourceName: 'ICA products',
+          startedAt: '2026-05-20T08:00:00.000Z',
+          finishedAt: '2026-05-20T08:06:00.000Z',
+          status: 'succeeded',
+          provenance: { chainId: 'ica', cadence: 'daily' }
+        }
+      ]
+    });
+
+    assert.equal(report.status, 'blocked');
+    assert.deepEqual(report.evidence, ['source_run_succeeded:fresh-ica', 'source_run_succeeded:fresh-willys']);
+    assert.deepEqual(report.blockers, ['source_run_missing_fresh_chain:coop']);
+    assert.deepEqual(summarizeSourceRunHealthReport(report).blockers, {
+      total: 1,
+      failed: 0,
+      partial: 0,
+      stale: 0,
+      stuckRunning: 0,
+      missingFinishedAt: 0,
+      startedInFuture: 0,
+      finishedInFuture: 0,
+      noFreshRuns: 0,
+      missingFreshChains: 1
     });
   });
 });

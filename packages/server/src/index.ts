@@ -546,7 +546,9 @@ function sourceRunHealthFailureResponse(): SourceRunHealthCheckResult {
         stuckRunning: 0,
         missingFinishedAt: 0,
         startedInFuture: 0,
-        finishedInFuture: 0
+        finishedInFuture: 0,
+        noFreshRuns: 0,
+        missingFreshChains: 0
       },
       evidence: {
         total: 0,
@@ -1707,6 +1709,7 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
         now: new Date().toISOString(),
         maxRunningMinutes: 120,
         staleAfterMinutes: 24 * 60,
+        requiredFreshChainIds: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
         filter: { limit: 100 }
       }),
     async close() {

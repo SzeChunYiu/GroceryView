@@ -521,6 +521,7 @@ export type SourceRunHealthInput = {
   now: string;
   maxRunningMinutes: number;
   staleAfterMinutes: number;
+  requiredFreshChainIds?: readonly string[];
   runs: SourceRunReadRecord[];
 };
 
@@ -555,6 +556,8 @@ export type SourceRunHealthSummary = {
     missingFinishedAt: number;
     startedInFuture: number;
     finishedInFuture: number;
+    noFreshRuns: number;
+    missingFreshChains: number;
   };
   evidence: {
     total: number;
@@ -847,6 +850,7 @@ export function buildSourceRunHealthReport(input: SourceRunHealthInput): SourceR
   const evidence: string[] = [];
   const runningRunIds: string[] = [];
   const staleRunIds: string[] = [];
+  const freshSuccessfulChainIds = new Set<string>();
   let latestSuccessfulRunId: string | undefined;
   let latestSuccessfulFinishedAt: string | undefined;
   let latestSuccessfulFinishedAtMs = Number.NEGATIVE_INFINITY;
@@ -890,7 +894,17 @@ export function buildSourceRunHealthReport(input: SourceRunHealthInput): SourceR
 
     if (run.status === 'failed') blockers.push(`source_run_failed:${run.sourceRunId}`);
     if (run.status === 'partial') blockers.push(`source_run_partial:${run.sourceRunId}`);
-    if (run.status === 'succeeded' && ageMinutes <= input.staleAfterMinutes) evidence.push(`source_run_succeeded:${run.sourceRunId}`);
+    if (run.status === 'succeeded' && ageMinutes <= input.staleAfterMinutes) {
+      evidence.push(`source_run_succeeded:${run.sourceRunId}`);
+      const chainId = run.provenance.chainId;
+      if (typeof chainId === 'string' && chainId.trim()) freshSuccessfulChainIds.add(chainId);
+    }
+  }
+
+  if (evidence.length === 0) blockers.push('source_run_no_fresh_success');
+
+  for (const chainId of [...(input.requiredFreshChainIds ?? [])].sort()) {
+    if (!freshSuccessfulChainIds.has(chainId)) blockers.push(`source_run_missing_fresh_chain:${chainId}`);
   }
 
   return {
@@ -914,7 +928,9 @@ export function summarizeSourceRunHealthReport(report: SourceRunHealthReport): S
       stuckRunning: 0,
       missingFinishedAt: 0,
       startedInFuture: 0,
-      finishedInFuture: 0
+      finishedInFuture: 0,
+      noFreshRuns: 0,
+      missingFreshChains: 0
     },
     evidence: {
       total: report.evidence.length,
@@ -934,6 +950,8 @@ export function summarizeSourceRunHealthReport(report: SourceRunHealthReport): S
     if (blocker.startsWith('source_run_missing_finished_at:')) summary.blockers.missingFinishedAt += 1;
     if (blocker.startsWith('source_run_started_in_future:')) summary.blockers.startedInFuture += 1;
     if (blocker.startsWith('source_run_finished_in_future:')) summary.blockers.finishedInFuture += 1;
+    if (blocker === 'source_run_no_fresh_success') summary.blockers.noFreshRuns += 1;
+    if (blocker.startsWith('source_run_missing_fresh_chain:')) summary.blockers.missingFreshChains += 1;
   }
 
   for (const evidence of report.evidence) {
@@ -953,6 +971,7 @@ export async function checkSourceRunHealth(input: CheckSourceRunHealthInput): Pr
     now: input.now,
     maxRunningMinutes: input.maxRunningMinutes,
     staleAfterMinutes: input.staleAfterMinutes,
+    requiredFreshChainIds: input.requiredFreshChainIds,
     runs
   });
   return {
