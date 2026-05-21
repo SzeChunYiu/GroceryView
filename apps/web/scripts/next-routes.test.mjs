@@ -53,6 +53,9 @@ describe('verified-data UI', () => {
       assert.match(source, /route=\{route\}/);
       assert.match(source, /static snapshot/);
     }
+    const profile = await read('src/app/account/profile/page.tsx');
+    assert.match(profile, /route="account-profile"/);
+    assert.match(verified, /'account-profile'/);
     const login = await read('src/app/login/page.tsx');
     assert.doesNotMatch(login, /placeholder=/);
     assert.match(login, /No test account/);
