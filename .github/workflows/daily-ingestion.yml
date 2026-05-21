@@ -27,8 +27,22 @@ jobs:
 
       - name: Verify ingestion and DB contracts
         run: |
-          npm run test -w @groceryview/ingestion
           npm run test -w @groceryview/db
+          npm run test -w @groceryview/ingestion
+
+      - name: Run configured daily ingestion
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          GROCERYVIEW_DAILY_CONNECTORS_JSON: ${{ secrets.GROCERYVIEW_DAILY_CONNECTORS_JSON }}
+        run: |
+          set -euo pipefail
+          test -n "${DATABASE_URL:-}"
+          test -n "${GROCERYVIEW_DAILY_CONNECTORS_JSON:-}"
+          npm run build -w @groceryview/db
+          npm run build -w @groceryview/ingestion
+          node packages/ingestion/dist/index.js \
+            >/tmp/daily-ingestion-result.json
+          node -e "const body=require('/tmp/daily-ingestion-result.json'); if (body.status !== 'succeeded') { console.error(JSON.stringify(body)); process.exit(1); }"
 
       - name: Check deployed PostgreSQL readiness
         env:

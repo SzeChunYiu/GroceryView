@@ -1,4 +1,14 @@
 import { createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
+import {
+  createPgQueryExecutor,
+  createPostgresPriceObservationWriter,
+  createPostgresProductAliasRepository,
+  createPostgresSourceRecordWriter,
+  type PriceType as DbPriceType,
+  type QueryExecutor,
+  type SourceRunRecord
+} from '@groceryview/db';
 
 export * from './connectors/openfoodfacts.js';
 export * from './connectors/overpass.js';
@@ -2024,4 +2034,372 @@ export function planIngestionBatch(inputs: RetailerProductInput[]): IngestionBat
     }
   }
   return { accepted, rejected };
+}
+
+export type DailyIngestionConnectorConfig = Omit<RetailerConnectorPlanInput, 'requestedAt'> & {
+  requestedAt?: string;
+};
+
+export type DailyIngestionEnv = Partial<Record<'DATABASE_URL' | 'GROCERYVIEW_DAILY_CONNECTORS_JSON', string>>;
+
+export type DailyIngestionEnvConfig = {
+  databaseUrl: string;
+  connectors: DailyIngestionConnectorConfig[];
+};
+
+export type DailyIngestionRunInput = {
+  executor: QueryExecutor;
+  requestedAt: string;
+  connectors: DailyIngestionConnectorConfig[];
+  fetchImpl?: typeof fetch;
+};
+
+export type DailyIngestionRunResult = {
+  status: 'succeeded' | 'partial' | 'blocked';
+  blockers: string[];
+  persistedRuns: number;
+  acceptedCount: number;
+  rejectedCount: number;
+  sourceRunIds: string[];
+  rawRecordIds: string[];
+  observationIds: string[];
+};
+
+type IdRow = { id: string };
+
+const dailyRequiredConnectorFields = [
+  'connectorId',
+  'chainId',
+  'sourceType',
+  'endpointUrl',
+  'parserVersion',
+  'robotsTxtStatus',
+  'legalReviewStatus',
+  'hasDataAgreement'
+] as const;
+
+export const requiredDailyIngestionChainIds = [
+  'ica',
+  'willys',
+  'coop',
+  'hemkop',
+  'lidl',
+  'city_gross'
+] as const;
+
+const requireForDailyIngestion = createRequire(import.meta.url);
+
+function parseDailyConnectorsJson(value: string): DailyIngestionConnectorConfig[] {
+  const parsed = JSON.parse(value) as unknown;
+  if (!Array.isArray(parsed) || parsed.length === 0) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON must be a non-empty JSON array.');
+  const connectors = parsed.map((entry, index) => {
+    if (entry === null || typeof entry !== 'object' || Array.isArray(entry)) {
+      throw new Error(`GROCERYVIEW_DAILY_CONNECTORS_JSON[${index}] must be an object.`);
+    }
+    const record = entry as Record<string, unknown>;
+    for (const field of dailyRequiredConnectorFields) {
+      if (record[field] === undefined || record[field] === null || record[field] === '') {
+        throw new Error(`GROCERYVIEW_DAILY_CONNECTORS_JSON[${index}].${field} is required.`);
+      }
+    }
+    return {
+      connectorId: String(record.connectorId),
+      requestedAt: typeof record.requestedAt === 'string' ? record.requestedAt : new Date().toISOString(),
+      chainId: String(record.chainId),
+      sourceType: record.sourceType as RetailerConnectorKind,
+      robotsTxtStatus: record.robotsTxtStatus as RobotsTxtStatus,
+      legalReviewStatus: record.legalReviewStatus as LegalReviewStatus,
+      hasDataAgreement: Boolean(record.hasDataAgreement),
+      endpointUrl: String(record.endpointUrl),
+      parserVersion: String(record.parserVersion)
+    };
+  });
+  const configuredChains = new Set(connectors.map((connector) => normalizeDailySlug(connector.chainId)));
+  const missingChains = requiredDailyIngestionChainIds.filter((chainId) => !configuredChains.has(normalizeDailySlug(chainId)));
+  if (missingChains.length > 0) {
+    throw new Error(`GROCERYVIEW_DAILY_CONNECTORS_JSON is missing required daily chain connectors: ${missingChains.join(', ')}.`);
+  }
+  return connectors;
+}
+
+export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): DailyIngestionEnvConfig {
+  const databaseUrl = env.DATABASE_URL?.trim();
+  if (!databaseUrl) throw new Error('DATABASE_URL is required for daily ingestion.');
+  const connectorsJson = env.GROCERYVIEW_DAILY_CONNECTORS_JSON?.trim();
+  if (!connectorsJson) throw new Error('GROCERYVIEW_DAILY_CONNECTORS_JSON is required for daily ingestion.');
+  return {
+    databaseUrl,
+    connectors: parseDailyConnectorsJson(connectorsJson)
+  };
+}
+
+function dbSourceTypeForConnector(sourceType: RetailerConnectorKind): SourceRunRecord['sourceType'] {
+  if (sourceType === 'official_api') return 'official_api';
+  if (sourceType === 'retailer_online_page') return 'retailer_page';
+  return 'weekly_leaflet';
+}
+
+function dbPriceTypeForIngested(priceType: PriceType): DbPriceType {
+  if (priceType === 'online' || priceType === 'member' || priceType === 'receipt' || priceType === 'estimated') return priceType;
+  if (priceType === 'flyer') return 'promotion';
+  if (priceType === 'in_store' || priceType === 'shelf_photo') return 'shelf';
+  return 'community';
+}
+
+function normalizeDailySlug(value: string): string {
+  const slug = value.trim().toLowerCase().replace(/_/g, '-').replace(/[^a-z0-9-]+/g, '-').replace(/^-|-$/g, '');
+  if (!slug) throw new Error('Daily ingestion slug must be non-empty.');
+  return slug;
+}
+
+function dailyPayloadHash(payload: unknown): string {
+  return `sha256:${createHash('sha256').update(JSON.stringify(payload)).digest('hex')}`;
+}
+
+async function upsertDailyChain(executor: QueryExecutor, chainId: string): Promise<string> {
+  const slug = normalizeDailySlug(chainId);
+  const rows = await executor.query<IdRow>(
+    `insert into chains(slug, name, country_code)
+     values ($1, $2, 'SE')
+     on conflict (slug) do update set name = excluded.name, updated_at = now()
+     returning id`,
+    [slug, slug]
+  );
+  const id = rows[0]?.id;
+  if (!id) throw new Error(`Daily ingestion chain upsert did not return an id: ${chainId}`);
+  return id;
+}
+
+async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProduct): Promise<string> {
+  const rows = await executor.query<IdRow>(
+    `insert into products(
+       slug,
+       canonical_name,
+       brand,
+       category_path,
+       package_size,
+       package_unit,
+       comparable_unit
+     ) values ($1, $2, $3, $4, $5, $6, $7)
+     on conflict (slug) do update set
+       canonical_name = excluded.canonical_name,
+       brand = excluded.brand,
+       category_path = excluded.category_path,
+       package_size = excluded.package_size,
+       package_unit = excluded.package_unit,
+       comparable_unit = excluded.comparable_unit,
+       updated_at = now()
+     returning id`,
+    [
+      normalizeDailySlug(product.id),
+      product.canonicalName,
+      product.brand ?? null,
+      product.categoryId ? [product.categoryId] : [],
+      product.packageSize,
+      product.packageUnit,
+      product.comparableUnit
+    ]
+  );
+  const id = rows[0]?.id;
+  if (!id) throw new Error(`Daily ingestion product upsert did not return an id: ${product.id}`);
+  return id;
+}
+
+async function persistDailyConnectorOutput(input: {
+  executor: QueryExecutor;
+  config: DailyIngestionConnectorConfig;
+  result: RetailerConnectorRunResult;
+}): Promise<Pick<DailyIngestionRunResult, 'sourceRunIds' | 'rawRecordIds' | 'observationIds' | 'acceptedCount' | 'rejectedCount'>> {
+  const { executor, config, result } = input;
+  const sourceWriter = createPostgresSourceRecordWriter(executor);
+  const aliasRepository = createPostgresProductAliasRepository(executor);
+  const priceWriter = createPostgresPriceObservationWriter(executor);
+  const sourceRun = await sourceWriter.createSourceRun({
+    sourceType: dbSourceTypeForConnector(config.sourceType),
+    sourceName: config.connectorId,
+    sourceUrl: config.endpointUrl,
+    startedAt: config.requestedAt,
+    finishedAt: config.requestedAt,
+    status: 'running',
+    provenance: {
+      chainId: config.chainId,
+      cadence: 'daily',
+      connectorId: config.connectorId,
+      runKey: result.plan.runKey,
+      parserVersion: config.parserVersion,
+      acceptedCount: result.acceptedCount,
+      rejectedCount: result.rejectedCount
+    }
+  });
+
+  const rawRecordIds: string[] = [];
+  const observationIds: string[] = [];
+
+  for (const accepted of result.ingestion.accepted) {
+    const chainId = await upsertDailyChain(executor, accepted.priceObservation.chainId);
+    const productId = await upsertDailyProduct(executor, accepted.product);
+    await aliasRepository.upsertProductAlias({
+      productId,
+      alias: accepted.alias.rawName,
+      normalizedAlias: accepted.alias.rawName.trim().toLowerCase().replace(/\s+/g, ' '),
+      sourceType: 'retailer',
+      sourceRef: result.plan.runKey,
+      matchConfidence: accepted.alias.matchConfidence
+    });
+
+    const payload = {
+      product: accepted.product,
+      alias: accepted.alias,
+      priceObservation: accepted.priceObservation,
+      promotionObservation: accepted.promotionObservation
+    };
+    const rawRecord = await sourceWriter.upsertRawRecord({
+      sourceRunId: sourceRun.sourceRunId,
+      recordType: 'price',
+      externalRef: accepted.priceObservation.retailerProductId ?? accepted.product.id,
+      observedAt: accepted.priceObservation.observedAt,
+      payload,
+      payloadHash: dailyPayloadHash({
+        runKey: result.plan.runKey,
+        productId: accepted.product.id,
+        retailerProductId: accepted.priceObservation.retailerProductId ?? null,
+        observedAt: accepted.priceObservation.observedAt,
+        price: accepted.priceObservation.price
+      }),
+      provenance: {
+        ...accepted.priceObservation.provenance,
+        chainId: config.chainId,
+        cadence: 'daily',
+        connectorId: config.connectorId,
+        runKey: result.plan.runKey
+      }
+    });
+    rawRecordIds.push(rawRecord.rawRecordId);
+
+    const observation = await priceWriter.recordPriceObservation({
+      productId,
+      chainId,
+      sourceRunId: sourceRun.sourceRunId,
+      rawRecordId: rawRecord.rawRecordId,
+      retailerProductRef: accepted.priceObservation.retailerProductId,
+      priceType: dbPriceTypeForIngested(accepted.priceObservation.priceType),
+      price: accepted.priceObservation.price,
+      regularPrice: accepted.priceObservation.regularPrice,
+      unitPrice: accepted.priceObservation.unitPrice,
+      currency: accepted.priceObservation.currency,
+      quantity: accepted.product.packageSize,
+      quantityUnit: accepted.product.packageUnit,
+      promotionText: accepted.promotionObservation?.promoText,
+      memberRequired: accepted.promotionObservation?.memberOnly ?? false,
+      observedAt: accepted.priceObservation.observedAt,
+      confidence: accepted.priceObservation.confidenceScore,
+      provenance: {
+        ...accepted.priceObservation.provenance,
+        chainId: config.chainId,
+        cadence: 'daily',
+        connectorId: config.connectorId,
+        runKey: result.plan.runKey
+      }
+    });
+    observationIds.push(observation.observationId);
+  }
+
+  await sourceWriter.finishSourceRun({
+    sourceRunId: sourceRun.sourceRunId,
+    finishedAt: config.requestedAt,
+    status: result.rejectedCount > 0 ? 'partial' : 'succeeded'
+  });
+
+  return {
+    sourceRunIds: [sourceRun.sourceRunId],
+    rawRecordIds,
+    observationIds,
+    acceptedCount: result.acceptedCount,
+    rejectedCount: result.rejectedCount
+  };
+}
+
+export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<DailyIngestionRunResult> {
+  const blockers: string[] = [];
+  const sourceRunIds: string[] = [];
+  const rawRecordIds: string[] = [];
+  const observationIds: string[] = [];
+  let persistedRuns = 0;
+  let acceptedCount = 0;
+  let rejectedCount = 0;
+
+  for (const config of input.connectors) {
+    const runConfig = { ...config, requestedAt: input.requestedAt };
+    const result = await runRetailerConnector({
+      ...runConfig,
+      fetcher: (plan) => fetchRetailerConnectorSnapshot(plan, {
+        retrievedAt: input.requestedAt,
+        rawSnapshotRefPrefix: 'raw://daily-ingestion',
+        fetchImpl: input.fetchImpl,
+        headers: { accept: 'application/json' }
+      }),
+      parser: parseRetailerProductJsonSnapshot
+    });
+
+    if (result.status === 'blocked') {
+      blockers.push(...result.requiredActions.map((action) => `${config.chainId}:${action}`));
+      continue;
+    }
+    if (result.status !== 'completed') {
+      blockers.push(`${config.chainId}:connector_${result.status}`);
+      continue;
+    }
+    if (result.acceptedCount === 0) {
+      blockers.push(`${config.chainId}:no_accepted_products`);
+      continue;
+    }
+
+    const persisted = await persistDailyConnectorOutput({ executor: input.executor, config: runConfig, result });
+    persistedRuns += 1;
+    acceptedCount += persisted.acceptedCount;
+    rejectedCount += persisted.rejectedCount;
+    sourceRunIds.push(...persisted.sourceRunIds);
+    rawRecordIds.push(...persisted.rawRecordIds);
+    observationIds.push(...persisted.observationIds);
+    if (persisted.rejectedCount > 0) blockers.push(`${config.chainId}:rejected_products:${persisted.rejectedCount}`);
+  }
+
+  return {
+    status: blockers.length === 0 ? 'succeeded' : persistedRuns > 0 ? 'partial' : 'blocked',
+    blockers,
+    persistedRuns,
+    acceptedCount,
+    rejectedCount,
+    sourceRunIds,
+    rawRecordIds,
+    observationIds
+  };
+}
+
+export async function runDailyIngestionFromEnv(env: DailyIngestionEnv = process.env): Promise<DailyIngestionRunResult> {
+  const { databaseUrl, connectors } = buildDailyConnectorConfigsFromEnv(env);
+  const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string }) => { query(text: string, values: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void> } };
+  if (!pg.Pool) throw new Error('pg Pool export is not available.');
+  const pool = new pg.Pool({ connectionString: databaseUrl });
+  try {
+    return await runDailyIngestion({
+      executor: createPgQueryExecutor(pool),
+      requestedAt: new Date().toISOString(),
+      connectors
+    });
+  } finally {
+    await pool.end();
+  }
+}
+
+if (process.argv[1] && import.meta.url === new URL(process.argv[1], 'file:').href) {
+  runDailyIngestionFromEnv()
+    .then((result) => {
+      process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
+      if (result.status !== 'succeeded') process.exitCode = 1;
+    })
+    .catch((error) => {
+      process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+      process.exitCode = 1;
+    });
 }
