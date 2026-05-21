@@ -55,6 +55,7 @@ describe('verified-data UI', () => {
       assert.match(source, /route=\{route\}/);
       assert.match(source, /static snapshot/);
       assert.doesNotMatch(source, /@\/lib\/demo-data/);
+      assert.doesNotMatch(source, /@\/components\/sample-data/);
       assert.doesNotMatch(source, /receiptReviewDesk|receiptReviewQueue/);
     }
     const profile = await read('src/app/account/profile/page.tsx');
