@@ -355,6 +355,20 @@ class OpenPricesLaunchReadinessDigest:
 
 
 @dataclass(frozen=True)
+class OpenPricesEvidenceManifest:
+    status: Literal["ready", "blocked"]
+    checked_plans: list[str]
+    evidence_artifacts: list[str]
+    evidence_artifact_count: int
+    next_actions: list[str]
+    next_action_count: int
+    demo: bool = False
+
+    def to_dict(self) -> dict[str, object]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
 class ObservationCoverageSummary:
     status: Literal["ready", "partial"]
     observation_count: int

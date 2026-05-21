@@ -23,6 +23,7 @@ from .models import (
     ObservationFreshnessSummary,
     OpenPricesArtifactImportPlan,
     OpenPricesArtifactImportPlanSummary,
+    OpenPricesEvidenceManifest,
     OpenPricesHostedSmokePlan,
     OpenPricesHostedSmokePlanSummary,
     OpenPricesIngestionRunPlan,
@@ -694,6 +695,20 @@ def summarize_open_prices_launch_readiness(
     )
 
 
+def build_open_prices_evidence_manifest(
+    summary: OpenPricesLaunchReadinessSummary,
+) -> OpenPricesEvidenceManifest:
+    return OpenPricesEvidenceManifest(
+        status=summary.status,
+        checked_plans=list(summary.checked_plans),
+        evidence_artifacts=list(summary.evidence_artifacts),
+        evidence_artifact_count=len(summary.evidence_artifacts),
+        next_actions=list(summary.next_actions),
+        next_action_count=len(summary.next_actions),
+        demo=summary.demo,
+    )
+
+
 def build_observation_coverage_summary(
     observations: Iterable[PriceObservationRow],
     stores: Iterable[StoreSeed],
@@ -975,13 +990,14 @@ def open_prices_launch_readiness(
     return summary.to_dict()
 
 
-@asset(group_name=ASSET_GROUP)
-def open_prices_launch_readiness_digest(open_prices_launch_readiness: dict[str, object]) -> dict[str, object]:
+def _open_prices_launch_readiness_summary_from_dict(
+    open_prices_launch_readiness: dict[str, object],
+) -> OpenPricesLaunchReadinessSummary:
     blockers_by_plan = {
         str(plan_name): [str(action) for action in actions]
         for plan_name, actions in dict(open_prices_launch_readiness["blockers_by_plan"]).items()
     }
-    summary = OpenPricesLaunchReadinessSummary(
+    return OpenPricesLaunchReadinessSummary(
         status=open_prices_launch_readiness["status"],
         ready_plan_count=int(open_prices_launch_readiness["ready_plan_count"]),
         blocked_plan_count=int(open_prices_launch_readiness["blocked_plan_count"]),
@@ -992,7 +1008,18 @@ def open_prices_launch_readiness_digest(open_prices_launch_readiness: dict[str, 
         evidence_artifacts=[str(artifact) for artifact in open_prices_launch_readiness["evidence_artifacts"]],
         demo=bool(open_prices_launch_readiness.get("demo", False)),
     )
+
+
+@asset(group_name=ASSET_GROUP)
+def open_prices_launch_readiness_digest(open_prices_launch_readiness: dict[str, object]) -> dict[str, object]:
+    summary = _open_prices_launch_readiness_summary_from_dict(open_prices_launch_readiness)
     return summarize_open_prices_launch_readiness(summary).to_dict()
+
+
+@asset(group_name=ASSET_GROUP)
+def open_prices_evidence_manifest(open_prices_launch_readiness: dict[str, object]) -> dict[str, object]:
+    summary = _open_prices_launch_readiness_summary_from_dict(open_prices_launch_readiness)
+    return build_open_prices_evidence_manifest(summary).to_dict()
 
 
 @asset(group_name=ASSET_GROUP)

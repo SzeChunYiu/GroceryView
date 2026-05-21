@@ -22,6 +22,7 @@ Dagster scaffold for the GroceryView data-worker lane.
 - Open Prices hosted smoke plan asset with the hosted API, imported product-terminal, and PostgreSQL readiness smoke commands.
 - Open Prices launch readiness summary that rolls the pull, scheduled ingestion, artifact import, hosted smoke, and schedule health plans into one blocker list for operators.
 - Open Prices launch readiness digest with dashboard-friendly counts for checked plans, remaining actions, evidence fields, evidence artifacts, hosted-smoke blockers, persistence blockers, and schedule-health blockers.
+- Open Prices evidence manifest asset that lists readiness artifact paths and remaining actions for operator handoff.
 - Open Prices schedule health plan asset with the Dagster deployment URL, schedule enablement flags, and last-run evidence needed before hosted scheduled-worker proof can pass.
 - An `open_prices_ingestion_schedule` Dagster schedule contract that targets the Open Prices pull, ingestion plan, observations, latest-price rollup, freshness, and coverage assets every six hours.
 - An `open_prices_import_readiness_schedule` Dagster schedule contract that targets the Open Prices import plan, launch readiness summary, and data-pipeline quality gate every six hours after the ingestion plan window.
@@ -56,6 +57,7 @@ Example Dagster assets in this lane:
 - `open_prices_ingestion_run_plan`
 - `open_prices_launch_readiness`
 - `open_prices_launch_readiness_digest`
+- `open_prices_evidence_manifest`
 - `open_prices_schedule_health_plan`
 
 Example Dagster schedules in this lane:
@@ -77,7 +79,7 @@ When those gates are ready, the planned run materializes the Open Prices pull, p
 
 `open_prices_ingestion_schedule` is defined with cron `17 */6 * * *` in UTC and targets the same assets listed in the run plan. The schedule contract is included in the Dagster smoke verifier so accidental removal blocks release validation once Dagster is installed in the worker environment.
 
-`open_prices_launch_readiness` combines the pull plan, scheduled ingestion plan, artifact import plan, hosted smoke plan, and schedule health plan into one readiness summary. It reports ready/blocked plan counts, blockers grouped by plan, deduplicated next actions, and the full evidence-field and evidence-artifact sets needed before Open Prices data can safely power product prices. `open_prices_launch_readiness_digest` emits compact counts from the same summary for dashboards and alert routing.
+`open_prices_launch_readiness` combines the pull plan, scheduled ingestion plan, artifact import plan, hosted smoke plan, and schedule health plan into one readiness summary. It reports ready/blocked plan counts, blockers grouped by plan, deduplicated next actions, and the full evidence-field and evidence-artifact sets needed before Open Prices data can safely power product prices. `open_prices_launch_readiness_digest` emits compact counts from the same summary for dashboards and alert routing. `open_prices_evidence_manifest` exposes the same artifact list and remaining actions as a handoff manifest.
 
 `open_prices_schedule_health_plan` blocks hosted scheduled-worker proof until the Dagster deployment URL, both Open Prices schedules, the maximum accepted schedule-health age, and a health probe for last tick/run age are configured. Its summary counts required actions, environment variables, source assets, schedules, evidence fields, and the `/tmp/groceryview-open-prices-schedule-health.json` evidence artifact for operator dashboards.
 

@@ -5,6 +5,7 @@ from groceryview_data_pipeline.assets import (
     build_observation_coverage_summary,
     build_observation_freshness_summary,
     build_open_prices_artifact_import_plan,
+    build_open_prices_evidence_manifest,
     build_open_prices_hosted_smoke_plan,
     build_open_prices_ingestion_run_plan,
     build_open_prices_launch_readiness_summary,
@@ -541,6 +542,82 @@ def test_open_prices_launch_readiness_digest_counts_operator_signals() -> None:
     assert ready_digest.hosted_smoke_blocker_count == 0
     assert ready_digest.persistence_blocker_count == 0
     assert ready_digest.schedule_health_blocker_count == 0
+
+
+def test_open_prices_evidence_manifest_collects_operator_handoff() -> None:
+    summary = build_open_prices_launch_readiness_summary(
+        build_open_prices_pull_plan(open_prices_user_agent_present=True),
+        build_open_prices_ingestion_run_plan(open_prices_user_agent_present=True),
+        build_open_prices_artifact_import_plan(input_artifact_present=True),
+        build_open_prices_hosted_smoke_plan(),
+        build_open_prices_schedule_health_plan(),
+    )
+
+    assert build_open_prices_evidence_manifest(summary).to_dict() == {
+        "status": "blocked",
+        "checked_plans": [
+            "open_prices_real_pull_plan",
+            "open_prices_ingestion_run_plan",
+            "open_prices_artifact_import_plan",
+            "open_prices_hosted_smoke_plan",
+            "open_prices_schedule_health_plan",
+        ],
+        "evidence_artifacts": [
+            "/tmp/groceryview-hosted-http-smoke.json",
+            "/tmp/groceryview-hosted-readiness-smoke.json",
+            "/tmp/groceryview-open-prices-import-result.json",
+            "/tmp/groceryview-open-prices-preview.json",
+            "/tmp/groceryview-open-prices-schedule-health.json",
+        ],
+        "evidence_artifact_count": 5,
+        "next_actions": [
+            "build_groceryview_db_package",
+            "configure_dagster_deployment_url",
+            "configure_open_prices_schedule_health_max_age",
+            "configure_raw_snapshot_storage",
+            "enable_open_prices_import_readiness_schedule",
+            "enable_open_prices_ingestion_schedule",
+            "enable_open_prices_schedule",
+            "publish_open_prices_schedule_health_probe",
+            "set_database_url",
+            "set_groceryview_server_url",
+            "set_imported_terminal_product_id",
+            "set_metrics_token",
+        ],
+        "next_action_count": 12,
+        "demo": False,
+    }
+
+    ready_summary = build_open_prices_launch_readiness_summary(
+        build_open_prices_pull_plan(open_prices_user_agent_present=True),
+        build_open_prices_ingestion_run_plan(
+            open_prices_user_agent_present=True,
+            database_url_present=True,
+            raw_snapshot_storage_present=True,
+            schedule_enabled=True,
+        ),
+        build_open_prices_artifact_import_plan(
+            database_url_present=True,
+            input_artifact_present=True,
+            db_package_built=True,
+        ),
+        build_open_prices_hosted_smoke_plan(
+            deployment_url_present=True,
+            metrics_token_present=True,
+            imported_terminal_product_id_present=True,
+        ),
+        build_open_prices_schedule_health_plan(
+            dagster_deployment_url_present=True,
+            ingestion_schedule_enabled=True,
+            import_readiness_schedule_enabled=True,
+            schedule_health_max_age_configured=True,
+            schedule_health_probe_configured=True,
+        ),
+    )
+    ready_manifest = build_open_prices_evidence_manifest(ready_summary)
+    assert ready_manifest.status == "ready"
+    assert ready_manifest.evidence_artifact_count == 5
+    assert ready_manifest.next_action_count == 0
 
 
 def test_latest_price_rollup_picks_latest_observation() -> None:
