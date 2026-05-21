@@ -16,6 +16,7 @@ import {
   sourceClaimLedger,
   sourceCoverage,
   sourceReadinessMatrix,
+  sourceRouteMap,
   storeBrandLedger,
   storeFormatCoverage
 } from '@/lib/verified-data';
@@ -25,6 +26,7 @@ const productUniverseRail = productUniverse.slice(0, 6);
 const homepageClaimLedger = sourceClaimLedger.slice(0, 3);
 const homepageSourceReadiness = sourceReadinessMatrix.slice(0, 3);
 const homepageChainSavings = chainSavingsLedger.slice(0, 2);
+const homepageRouteMap = sourceRouteMap.slice(0, 3);
 
 export function MarketShell() {
   return (
@@ -96,6 +98,32 @@ export function MarketShell() {
               </Link>
             );
           })}
+        </div>
+      </Card>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Evidence route map</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Public routes grouped by verified source</h2>
+          </div>
+          <Link className="text-sm font-bold text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/data-sources">
+            Review all source routes
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {homepageRouteMap.map((source) => (
+            <Link
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
+              href={source.primaryRoute}
+              key={source.name}
+            >
+              <p className="font-black text-slate-950">{source.name}</p>
+              <p className="mt-2 text-3xl font-black text-emerald-800">{source.routeCount}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">verified public routes</p>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{source.supportingRoutes.join(' · ')}</p>
+            </Link>
+          ))}
         </div>
       </Card>
 
