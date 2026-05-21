@@ -1,5 +1,10 @@
-import { Camera, CheckCircle2, CircleAlert, ScanLine } from "lucide-react";
+import Link from "next/link";
+import { Camera, CheckCircle2, CircleAlert, MapPin, ScanLine, Store } from "lucide-react";
 import { scannerQueue } from "@/components/sample-data";
+import { products, stores } from "@/lib/demo-data";
+
+const matchCandidates = products.slice(0, 6);
+const routingStores = stores.slice(0, 4);
 
 export default function ScannerPage() {
   return (
@@ -42,6 +47,58 @@ export default function ScannerPage() {
             </button>
           </article>
         ))}
+      </section>
+
+      <section className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
+          <div className="grid gap-3 border-b border-zinc-200 bg-zinc-50 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-zinc-500 md:grid-cols-[1fr_0.55fr_0.5fr_0.5fr]">
+            <span>Matched product</span>
+            <span>Store</span>
+            <span>Price</span>
+            <span>Confidence</span>
+          </div>
+          {matchCandidates.map((product) => (
+            <Link
+              className="grid gap-3 border-b border-zinc-200 px-5 py-4 text-sm transition last:border-b-0 hover:bg-emerald-50/40 md:grid-cols-[1fr_0.55fr_0.5fr_0.5fr]"
+              href={`/products/${product.slug}`}
+              key={product.slug}
+            >
+              <span>
+                <span className="block font-semibold text-zinc-950">{product.name}</span>
+                <span className="mt-1 block text-xs font-semibold uppercase tracking-wide text-zinc-500">{product.ticker}</span>
+              </span>
+              <span className="text-zinc-700">{product.store}</span>
+              <span className="font-semibold tabular-nums text-zinc-950">{product.price}</span>
+              <span className="capitalize text-zinc-700">{product.confidence}</span>
+            </Link>
+          ))}
+        </div>
+
+        <div className="rounded-lg border border-zinc-200 bg-white shadow-sm">
+          <div className="border-b border-zinc-200 px-5 py-4">
+            <Store className="h-5 w-5 text-emerald-700" aria-hidden="true" />
+            <h2 className="mt-3 text-lg font-semibold text-zinc-950">Capture routing</h2>
+            <p className="mt-2 text-sm leading-6 text-zinc-600">
+              Scanner review assigns receipt lines to the same Stockholm store profiles used by product and store pages.
+            </p>
+          </div>
+          {routingStores.map((store) => (
+            <Link
+              className="grid grid-cols-[1fr_auto] gap-3 border-b border-zinc-200 px-5 py-4 text-sm transition last:border-b-0 hover:bg-zinc-50"
+              href={`/stores/${store.slug}`}
+              key={store.slug}
+            >
+              <span>
+                <span className="block font-semibold text-zinc-950">{store.name}</span>
+                <span className="mt-1 block text-zinc-500">{store.format}</span>
+              </span>
+              <span className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                <MapPin className="h-4 w-4" aria-hidden="true" />
+                {store.district}
+              </span>
+            </Link>
+          ))}
+        </div>
       </section>
     </main>
   );

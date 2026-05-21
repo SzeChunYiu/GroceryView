@@ -96,6 +96,17 @@ describe('Next.js web scaffold', () => {
     assert.match(marketShell, /href="\/watchlist"/);
   });
 
+  it('surfaces scanner product matches and store routing from driver data', async () => {
+    const scannerPage = await readFile(new URL('../src/app/scanner/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(scannerPage, /import \{ products, stores \} from "@\/lib\/demo-data"/);
+    assert.match(scannerPage, /matchCandidates\.map/);
+    assert.match(scannerPage, /routingStores\.map/);
+    assert.match(scannerPage, /\/products\/\$\{product\.slug\}/);
+    assert.match(scannerPage, /\/stores\/\$\{store\.slug\}/);
+    assert.match(scannerPage, /Capture routing/);
+  });
+
   it('surfaces savings playbook actions on the homepage', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
