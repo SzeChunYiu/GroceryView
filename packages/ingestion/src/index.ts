@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 export * from './connectors/openfoodfacts.js';
 export * from './connectors/overpass.js';
 export * from './connectors/hemkop.js';
+export * from './connectors/ica.js';
 export * from './connectors/mathem.js';
 export * from './connectors/willys.js';
 
