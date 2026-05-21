@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { BarChart3, Database, MapPin, ScanSearch, ShoppingBasket, Store } from 'lucide-react';
+import { BarChart3, Database, MapPin, ScanSearch, ShoppingBasket, Store, UserRound } from 'lucide-react';
 import {
+  accountProfile,
   basketSubstitutionRadar,
   categories,
   dealOpportunityRail,
@@ -77,7 +78,7 @@ export function MarketShell() {
         </div>
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <FeatureCard icon={<BarChart3 size={20} />} title="Product terminal" href="/products/zoegas-coffee-450g">
           Current price, unit price, source timestamp, and confidence labels are first-class page content.
         </FeatureCard>
@@ -87,6 +88,40 @@ export function MarketShell() {
         <FeatureCard icon={<ShoppingBasket size={20} />} title="Basket planner" href="/weekly-basket">
           Weekly basket work can build on the same App Router shell and TanStack Query provider.
         </FeatureCard>
+        <FeatureCard icon={<UserRound size={20} />} title="Profile hub" href="/account/profile">
+          Profile preferences connect saved baskets, privacy choices, and the shopper's home store.
+        </FeatureCard>
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto_auto_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">Profile readiness</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Shopper preferences now have a dedicated route linked to baskets, stores, and privacy settings.
+            </p>
+          </div>
+          <LightMetric label="Complete" value={accountProfile.profileCompleteness} />
+          <LightMetric label="Home" value={accountProfile.homeDistrict} />
+          <Link
+            href="/account/profile"
+            className="rounded-md bg-market-ink px-3 py-2 text-center text-sm font-black text-white hover:bg-market-mint hover:text-market-ink"
+          >
+            Open
+          </Link>
+        </div>
+        <div className="grid gap-0 md:grid-cols-3">
+          {accountProfile.routeLinks.map((route) => (
+            <Link
+              key={route.label}
+              href={route.href}
+              className="border-b border-market-ink/10 px-4 py-4 text-sm hover:bg-market-oat/45 md:border-r"
+            >
+              <span className="block font-black">{route.label}</span>
+              <span className="mt-2 block text-market-ink/60">{route.detail}</span>
+            </Link>
+          ))}
+        </div>
       </section>
 
       <section className="rounded-lg border border-market-ink/10 bg-white">
