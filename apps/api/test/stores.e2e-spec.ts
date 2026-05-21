@@ -26,6 +26,7 @@ describe('GroceryView API store deals', () => {
   it('serves ranked in-store deals from store profiles', async () => {
     const docs = await request(app.getHttpServer()).get('/api-json').expect(200);
     assert.ok(docs.body.paths['/stores/{id}/deals']);
+    assert.ok(docs.body.paths['/stores/{id}/coverage']);
 
     const response = await request(app.getHttpServer()).get('/stores/willys-odenplan/deals').expect(200);
 
@@ -43,5 +44,34 @@ describe('GroceryView API store deals', () => {
 
   it('returns 404 for missing store deal feeds', async () => {
     await request(app.getHttpServer()).get('/stores/missing-store/deals').expect(404);
+  });
+
+  it('serves verified shelf price coverage from store profiles', async () => {
+    const response = await request(app.getHttpServer()).get('/stores/willys-odenplan/coverage').expect(200);
+
+    assert.equal(response.body.storeId, 'willys-odenplan');
+    assert.equal(response.body.storeName, 'Willys Odenplan');
+    assert.equal(response.body.currency, 'SEK');
+    assert.equal(response.body.demo, true);
+    assert.equal(response.body.productCount, response.body.lines.length);
+    assert.equal(response.body.pricedProductCount, 4);
+    assert.equal(response.body.coveragePercent, 100);
+    assert.deepEqual(
+      response.body.lines
+        .filter((line: { priceLabel: string }) => line.priceLabel === 'verified_shelf')
+        .map((line: { productId: string; price: number }) => ({ productId: line.productId, price: line.price })),
+      [
+        { productId: 'coffee', price: 49.9 },
+        { productId: 'milk', price: 14.9 },
+        { productId: 'private-label-milk', price: 12.9 },
+        { productId: 'butter', price: 56.9 }
+      ]
+    );
+    assert.deepEqual(response.body.missingProductIds, []);
+    assert.equal(response.body.guardrails.length, 3);
+  });
+
+  it('returns 404 for missing store coverage feeds', async () => {
+    await request(app.getHttpServer()).get('/stores/missing-store/coverage').expect(404);
   });
 });
