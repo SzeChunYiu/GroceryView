@@ -61,6 +61,8 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/stores/{id}/coverage']);
     assert.ok(docs.body.paths['/stores/{id}/deal-summary']);
     assert.ok(docs.body.paths['/stores/{id}/deals']);
+    assert.ok(docs.body.paths['/users/demo/favorite-stores']);
+    assert.ok(docs.body.paths['/users/demo/favorite-stores/{storeId}']);
     assert.ok(docs.body.paths['/users/demo/alerts/inbox']);
     assert.ok(docs.body.paths['/users/demo/basket/local-offers']);
     assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
@@ -512,6 +514,31 @@ describe('GroceryView API app', () => {
         { id: 'butter-provider-suppression', status: 'suppressed', channel: 'push' }
       ]
     );
+
+    const initialFavorites = await request(app.getHttpServer()).get('/users/demo/favorite-stores').expect(200);
+    assert.deepEqual(initialFavorites.body, []);
+
+    const addedFavorite = await request(app.getHttpServer())
+      .post('/users/demo/favorite-stores')
+      .send({ storeId: 'willys-odenplan' })
+      .expect(201);
+    assert.deepEqual(
+      addedFavorite.body.map((store: { id: string; demo: boolean }) => ({ id: store.id, demo: store.demo })),
+      [{ id: 'willys-odenplan', demo: true }]
+    );
+
+    await request(app.getHttpServer())
+      .post('/users/demo/favorite-stores')
+      .send({ storeId: 'lidl-sveavagen' })
+      .expect(201);
+
+    const removedFavorite = await request(app.getHttpServer())
+      .delete('/users/demo/favorite-stores/lidl-sveavagen')
+      .expect(200);
+    assert.deepEqual(
+      removedFavorite.body.map((store: { id: string; demo: boolean }) => ({ id: store.id, demo: store.demo })),
+      [{ id: 'willys-odenplan', demo: true }]
+    );
   });
 
   it('rejects invalid request DTOs through the global ValidationPipe', async () => {
@@ -534,6 +561,8 @@ describe('GroceryView API app', () => {
   it('returns 404 for missing store deals', async () => {
     await request(app.getHttpServer()).get('/stores/missing-store/deals').expect(404);
     await request(app.getHttpServer()).get('/users/demo/basket/stores/missing-store/quote').expect(404);
+    await request(app.getHttpServer()).post('/users/demo/favorite-stores').send({ storeId: 'missing-store' }).expect(404);
+    await request(app.getHttpServer()).delete('/users/demo/favorite-stores/missing-store').expect(404);
   });
 
   it('rejects invalid nutrition metrics', async () => {
