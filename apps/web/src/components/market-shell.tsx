@@ -7,6 +7,7 @@ import {
   householdSavings,
   products,
   savingsPlaybook,
+  savingsDashboard,
   sourceCoverage,
   stockholmAreas,
   storeComparisonBoard,
@@ -85,6 +86,39 @@ export function MarketShell() {
         <FeatureCard icon={<ShoppingBasket size={20} />} title="Basket planner" href="/weekly-basket">
           Weekly basket work can build on the same App Router shell and TanStack Query provider.
         </FeatureCard>
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto_auto_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">Savings dashboard</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Month-to-date savings, watchpoints, and district drivers now have a dedicated route.
+            </p>
+          </div>
+          <LightMetric label="Avoided" value={savingsDashboard.monthToDate.avoidedSpend} />
+          <LightMetric label="Baskets" value={String(savingsDashboard.monthToDate.basketCount)} />
+          <Link
+            href="/savings-dashboard"
+            className="rounded-md bg-market-ink px-3 py-2 text-center text-sm font-black text-white hover:bg-market-mint hover:text-market-ink"
+          >
+            Open
+          </Link>
+        </div>
+        <div className="grid gap-0 md:grid-cols-3">
+          {savingsDashboard.watchpoints.map((point) => (
+            <Link
+              key={point.label}
+              href={point.href}
+              className="border-b border-market-ink/10 px-4 py-4 text-sm hover:bg-market-oat/45 md:border-r"
+            >
+              <span className="block text-xs font-bold uppercase text-market-ink/50">{point.label}</span>
+              <span className="mt-2 block font-black">{point.product}</span>
+              <span className="mt-1 block text-market-ink/60">{point.store}</span>
+              <span className="mt-3 block font-bold text-market-mint">{point.signal}</span>
+            </Link>
+          ))}
+        </div>
       </section>
 
       <section className="rounded-lg border border-market-ink/10 bg-white">

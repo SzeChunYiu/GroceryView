@@ -643,3 +643,44 @@ export const householdSavings = {
   vsLastMonth: '-66.10 SEK',
   topSaving: { product: 'Garant Havregryn 1kg', amount: '-3.90 SEK', driver: 'breakfast staple shelf drop' }
 };
+
+export const savingsDashboard = {
+  monthToDate: {
+    plannedSpend: '1,756.00 SEK',
+    avoidedSpend: '66.10 SEK',
+    basketCount: 4,
+    bestDistrict: 'Vasastan'
+  },
+  watchpoints: [
+    {
+      label: 'Coffee promo capture',
+      product: 'Zoegas Coffee 450g',
+      store: 'Willys Odenplan',
+      signal: '8.4% under baseline',
+      action: 'Buy one backup pack before the flyer expires',
+      href: '/products/zoegas-coffee-450g'
+    },
+    {
+      label: 'Butter price drag',
+      product: 'Bregott Normalsaltat 600g',
+      store: 'Willys Odenplan',
+      signal: '6.9% over baseline',
+      action: 'Hold unless the household stock is below one pack',
+      href: '/categories/butter'
+    },
+    {
+      label: 'Pantry split saver',
+      product: 'Eldorado Basmati Rice 1kg',
+      store: 'Matmissionen Hägersten',
+      signal: '32% below regular big-box shelf',
+      action: 'Route pantry top-ups separately from dairy trips',
+      href: '/products/eldorado-basmati-rice-1kg'
+    }
+  ],
+  districtSavings: [
+    { district: 'Vasastan', planned: '612.40 SEK', avoided: '24.80 SEK', driver: 'Coffee and dairy promos' },
+    { district: 'Södermalm', planned: '488.30 SEK', avoided: '17.50 SEK', driver: 'Breakfast staples' },
+    { district: 'Norrmalm', planned: '391.20 SEK', avoided: '13.90 SEK', driver: 'Snacks and eggs' },
+    { district: 'Hägersten', planned: '264.10 SEK', avoided: '9.90 SEK', driver: 'Rice and pantry clearance' }
+  ]
+};
