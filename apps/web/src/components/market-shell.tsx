@@ -7,10 +7,13 @@ import {
   formatPct,
   formatSek,
   freshestOpenPrices,
+  privateFeatureCopy,
   snapshot,
   sourceCoverage,
   storeBrandLedger
 } from '@/lib/verified-data';
+
+const featureReadinessQueue = Object.entries(privateFeatureCopy).slice(0, 6);
 
 export function MarketShell() {
   return (
@@ -147,6 +150,31 @@ export function MarketShell() {
               <p className="font-black text-emerald-800">{category.verifiedRows.toLocaleString('sv-SE')} rows</p>
               <p className="font-semibold text-slate-700">{category.chainMatches.toLocaleString('sv-SE')} chain matches</p>
               <p className="text-sm font-semibold text-slate-600">{formatPct(category.spreadSignal)} max spread</p>
+            </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Feature readiness queue</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Private surfaces stay gated until verified records exist</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-slate-600">
+            Each route shows the public data it can support today and the record gate required before personalized rows render.
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          {featureReadinessQueue.map(([route, copy]) => (
+            <Link
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
+              href={`/${route === 'account-profile' ? 'account/profile' : route}`}
+              key={route}
+            >
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">{route.replace('-', ' ')}</p>
+              <p className="mt-3 text-sm leading-6 text-slate-700">{copy.verifiedSurface}</p>
+              <p className="mt-3 rounded-xl bg-white p-3 text-sm font-semibold text-slate-700">{copy.gatedBy}</p>
             </Link>
           ))}
         </div>
