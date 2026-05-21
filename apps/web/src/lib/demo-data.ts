@@ -412,6 +412,42 @@ export const products = [
     confidence: 'high',
     observedAt: '2026-05-21 14:32 CET',
     source: 'in-store shelf observation'
+  },
+  {
+    slug: 'pagen-lingongrova-500g',
+    ticker: 'PAGEN-LINGONGROVA-500G',
+    name: 'Pågen Lingongrova 500g',
+    store: 'Coop Medborgarplatsen',
+    price: '33.90 SEK',
+    unitPrice: '67.80 SEK/kg',
+    priceType: 'member promo',
+    confidence: 'high',
+    observedAt: '2026-05-21 15:05 CET',
+    source: 'retailer flyer observation'
+  },
+  {
+    slug: 'arla-hushallsost-500g',
+    ticker: 'ARLA-HUSHALLSOST-500G',
+    name: 'Arla Hushållsost 500g',
+    store: 'Coop Medborgarplatsen',
+    price: '54.90 SEK',
+    unitPrice: '109.80 SEK/kg',
+    priceType: 'shelf',
+    confidence: 'high',
+    observedAt: '2026-05-21 15:12 CET',
+    source: 'in-store shelf observation'
+  },
+  {
+    slug: 'garant-gurka-300g',
+    ticker: 'GARANT-GURKA-300G',
+    name: 'Garant Gurka 300g',
+    store: 'Coop Medborgarplatsen',
+    price: '16.90 SEK',
+    unitPrice: '56.33 SEK/kg',
+    priceType: 'shelf',
+    confidence: 'high',
+    observedAt: '2026-05-21 15:18 CET',
+    source: 'in-store shelf observation'
   }
 ];
 
@@ -557,6 +593,15 @@ export const stores = [
     format: 'discount supermarket',
     bestCategory: 'Frozen snacks',
     distanceLabel: '4.2 km from saved area'
+  },
+  {
+    slug: 'coop-medborgarplatsen',
+    name: 'Coop Medborgarplatsen',
+    ingestionFixture: 'Coop Medborgarplatsen',
+    district: 'Södermalm',
+    format: 'mid-size supermarket',
+    bestCategory: 'Lunchbox value',
+    distanceLabel: '3.4 km from saved area'
   }
 ];
 
@@ -578,9 +623,9 @@ export const categories = [
   {
     slug: 'bread',
     name: 'Bread',
-    index: '98.7',
-    movement: '-1.3%',
-    topDeal: 'PAGEN-JATTEFRALLA-500G'
+    index: '96.5',
+    movement: '-3.5%',
+    topDeal: 'PAGEN-LINGONGROVA-500G'
   },
   {
     slug: 'pantry',
@@ -749,6 +794,16 @@ export const dealOpportunityRail = rankDealOpportunities({
       regularPrice: 45.9,
       dealScore: 86,
       sourceConfidence: 0.89
+    },
+    {
+      productId: 'pagen-lingongrova-500g',
+      productName: 'Pågen Lingongrova 500g',
+      storeId: 'coop-medborgarplatsen',
+      storeName: 'Coop Medborgarplatsen',
+      currentPrice: 33.9,
+      regularPrice: 42.9,
+      dealScore: 78,
+      sourceConfidence: 0.9
     },
     {
       productId: 'felix-ketchup-1kg',
@@ -953,12 +1008,26 @@ export const basketSubstitutionRadar = [
     basketImpact: '-11.00 SEK freezer stock-up',
     sourceConfidence: 0.89,
     reason: 'Two frozen dinner rows are visible at the same Skanstull stop, making the freezer top-up worth bundling before weekend snacks.'
+  },
+  {
+    anchorSlug: 'pagen-lingongrova-500g',
+    anchorName: 'Pågen Lingongrova 500g',
+    anchorStoreSlug: 'coop-medborgarplatsen',
+    anchorStoreName: 'Coop Medborgarplatsen',
+    substituteSlug: 'arla-hushallsost-500g',
+    substituteName: 'Arla Hushållsost 500g',
+    substituteStoreSlug: 'coop-medborgarplatsen',
+    substituteStoreName: 'Coop Medborgarplatsen',
+    verdict: 'bundle',
+    basketImpact: '-10.80 SEK lunchbox basket',
+    sourceConfidence: 0.9,
+    reason: 'Bread, cheese, and cucumber rows are all high-confidence at one Södermalm stop, so lunchbox prep can be bundled.'
   }
 ];
 
 export const stockholmAreas = [
   { slug: 'norrmalm',   name: 'Norrmalm',   storeCount: 2, topSavings: 'Snacks' },
-  { slug: 'sodermalm',  name: 'Södermalm',  storeCount: 4, topSavings: 'Frozen' },
+  { slug: 'sodermalm',  name: 'Södermalm',  storeCount: 5, topSavings: 'Lunchbox value' },
   { slug: 'vasastan',   name: 'Vasastan',   storeCount: 3, topSavings: 'Plant-based' },
   { slug: 'hagersten',  name: 'Hägersten',  storeCount: 1, topSavings: 'Rice' },
   { slug: 'liljeholmen', name: 'Liljeholmen', storeCount: 1, topSavings: 'Pantry' },
@@ -990,8 +1059,8 @@ export const sourceCoverage = [
     fixture: 'Store profile',
     surface: 'district store',
     status: 'ready',
-    visibleRows: 5,
-    newestSignal: 'Swedenborgsgatan, Daglivs, and Norra Stationsgatan rows now cover dairy, bread, produce, toothpaste, and plant-based protein'
+    visibleRows: 8,
+    newestSignal: 'Swedenborgsgatan, Daglivs, Norra Stationsgatan, and Medborgarplatsen rows now cover dairy, bread, produce, toothpaste, plant-based protein, and lunchbox value'
   },
   {
     chain: 'Hemköp',
@@ -1123,6 +1192,18 @@ export const storeComparisonBoard = [
     leadSignal: 'Pyttipanna and kåldolmar are below baseline while Lidl ice cream keeps the snack top-up visible.',
     visibleItems: 3,
     basketImpact: '-16.50 SEK'
+  },
+  {
+    slug: 'sodermalm-lunchbox-value',
+    area: 'Södermalm',
+    primaryStoreSlug: 'coop-medborgarplatsen',
+    primaryStoreName: 'Coop Medborgarplatsen',
+    comparisonStoreSlug: 'tempo-hornstull',
+    comparisonStoreName: 'Tempo Hornstull',
+    basketFocus: 'Lunchbox prep',
+    leadSignal: 'Lingongrova, hushållsost, and cucumber rows keep lunchbox prep visible without adding another store stop.',
+    visibleItems: 3,
+    basketImpact: '-10.80 SEK'
   }
 ];
 
@@ -1192,6 +1273,17 @@ export const shoppingTripSwitchboard = [
     saving: '-16.50 SEK',
     decision: 'Use when freezer space is available and weekend snack stock is low.',
     href: '/categories/frozen'
+  },
+  {
+    title: 'Lunchbox value stop',
+    area: 'Södermalm',
+    store: 'Coop Medborgarplatsen',
+    category: 'Bread',
+    basket: 'Lingongrova, cheese, cucumber',
+    spend: '105.70 SEK',
+    saving: '-10.80 SEK',
+    decision: 'Use when weekday lunches need one high-confidence stop near the saved route.',
+    href: '/categories/bread'
   }
 ];
 
@@ -1204,7 +1296,8 @@ export const indexHistory = [
   { date: '2026-05-17', coffee:  92.2, dairy: 102.2, bread:  98.7, pantry:  96.0, snacks: 103.5, frozen:  97.6 },
   { date: '2026-05-18', coffee:  91.8, dairy: 102.3, bread:  98.7, pantry:  95.5, snacks: 103.8, frozen:  97.5 },
   { date: '2026-05-19', coffee:  91.6, dairy: 102.3, bread:  98.7, pantry:  95.2, snacks: 104.1, frozen:  97.4 },
-  { date: '2026-05-20', coffee:  91.5, dairy: 102.1, bread:  98.8, pantry:  95.0, snacks: 103.4, frozen:  94.9 }
+  { date: '2026-05-20', coffee:  91.5, dairy: 102.1, bread:  98.8, pantry:  95.0, snacks: 103.4, frozen:  94.9 },
+  { date: '2026-05-21', coffee:  91.4, dairy: 101.8, bread:  96.5, pantry:  94.9, snacks: 103.1, frozen:  94.7 }
 ];
 
 export const weeklyBasket = [
@@ -1229,7 +1322,10 @@ export const weeklyBasket = [
   { slug: 'anamma-formbar-fars-850g',       qty: 1, total: '64.90 SEK', vsLastWeek: '-6.2%' },
   { slug: 'zeta-kikartor-380g',             qty: 2, total: '29.80 SEK', vsLastWeek: '-2.4%' },
   { slug: 'felix-pyttipanna-720g',          qty: 1, total: '34.90 SEK', vsLastWeek: '-5.1%' },
-  { slug: 'gb-graddglass-2l',               qty: 1, total: '36.90 SEK', vsLastWeek: '-2.8%' }
+  { slug: 'gb-graddglass-2l',               qty: 1, total: '36.90 SEK', vsLastWeek: '-2.8%' },
+  { slug: 'pagen-lingongrova-500g',         qty: 1, total: '33.90 SEK', vsLastWeek: '-3.5%' },
+  { slug: 'arla-hushallsost-500g',          qty: 1, total: '54.90 SEK', vsLastWeek: '-1.1%' },
+  { slug: 'garant-gurka-300g',              qty: 1, total: '16.90 SEK', vsLastWeek: '-2.6%' }
 ];
 
 export const savingsPlaybook = [
@@ -1295,6 +1391,13 @@ export const savingsPlaybook = [
     action: 'Bundle Felix pyttipanna with Dafgårds kåldolmar before adding Lidl ice cream',
     impact: '-16.50 SEK freezer basket',
     href: '/categories/frozen'
+  },
+  {
+    title: 'Lunchbox value bundle',
+    trigger: 'Bread index is 3.5% under baseline with a high-confidence Medborgarplatsen row',
+    action: 'Bundle Lingongrova, hushållsost, and cucumber when weekday lunches need a single stop',
+    impact: '-10.80 SEK lunchbox basket',
+    href: '/products/pagen-lingongrova-500g'
   }
 ];
 
@@ -1370,13 +1473,25 @@ export const watchlistAlerts = [
     confidence: 'high',
     allowedPriceTypes: ['member promo', 'weekly deal'],
     nextAction: 'Add the freezer dinner row when the Skanstull route is already planned.'
+  },
+  {
+    productSlug: 'pagen-lingongrova-500g',
+    storeSlug: 'coop-medborgarplatsen',
+    targetPrice: 35,
+    currentPrice: 33.9,
+    usualPrice: 42.9,
+    trigger: 'target met',
+    channel: 'email',
+    confidence: 'high',
+    allowedPriceTypes: ['member promo', 'shelf'],
+    nextAction: 'Use the Medborgarplatsen bread row as the anchor for weekday lunchbox prep.'
   }
 ];
 
 export const householdSavings = {
-  weeklyTotal: '510.30 SEK',
-  vsLastWeek: '-46.60 SEK',
-  vsLastMonth: '-94.90 SEK',
+  weeklyTotal: '616.00 SEK',
+  vsLastWeek: '-57.40 SEK',
+  vsLastMonth: '-105.70 SEK',
   topSaving: { product: 'Felix Pyttipanna 720g', amount: '-16.50 SEK', driver: 'Skanstull freezer stock-up' }
 };
 
@@ -1412,7 +1527,7 @@ export const personalGroceryInflation = calculatePersonalGroceryInflation({
 export const savingsDashboard = {
   monthToDate: {
     plannedSpend: '1,756.00 SEK',
-    avoidedSpend: '82.60 SEK',
+    avoidedSpend: '93.40 SEK',
     basketCount: 4,
     bestDistrict: 'Vasastan'
   },
@@ -1464,11 +1579,19 @@ export const savingsDashboard = {
       signal: '5.1% under frozen baseline',
       action: 'Bundle with kåldolmar before topping up snacks at Lidl Hammarby Sjöstad',
       href: '/products/felix-pyttipanna-720g'
+    },
+    {
+      label: 'Lunchbox value',
+      product: 'Pågen Lingongrova 500g',
+      store: 'Coop Medborgarplatsen',
+      signal: '3.5% under bread baseline',
+      action: 'Bundle with cheese and cucumber while all three rows stay high confidence',
+      href: '/products/pagen-lingongrova-500g'
     }
   ],
   districtSavings: [
     { district: 'Vasastan', planned: '612.40 SEK', avoided: '39.80 SEK', driver: 'Coffee, dairy, and plant-based promos' },
-    { district: 'Södermalm', planned: '568.10 SEK', avoided: '40.00 SEK', driver: 'Breakfast, chicken, and frozen promos' },
+    { district: 'Södermalm', planned: '673.80 SEK', avoided: '50.80 SEK', driver: 'Breakfast, chicken, frozen, and lunchbox promos' },
     { district: 'Norrmalm', planned: '391.20 SEK', avoided: '13.90 SEK', driver: 'Snacks and eggs' },
     { district: 'Hägersten', planned: '264.10 SEK', avoided: '9.90 SEK', driver: 'Rice and pantry clearance' },
     { district: 'Kungsholmen', planned: '198.70 SEK', avoided: '16.00 SEK', driver: 'Produce shelf drop' },
@@ -1490,8 +1613,8 @@ export const accountProfile = {
     { label: 'Alert timing', value: 'Push before weekly route planning', status: 'Active' }
   ],
   routeLinks: [
-    { label: 'Saved weekly basket', href: '/weekly-basket', detail: '22 visible driver rows' },
-    { label: 'Savings dashboard', href: '/savings-dashboard', detail: '82.60 SEK avoided month-to-date' },
+    { label: 'Saved weekly basket', href: '/weekly-basket', detail: '25 visible driver rows' },
+    { label: 'Savings dashboard', href: '/savings-dashboard', detail: '93.40 SEK avoided month-to-date' },
     { label: 'Home store profile', href: '/stores/willys-odenplan', detail: 'Coffee and dairy anchor store' }
   ]
 };
@@ -1535,6 +1658,16 @@ export const receiptReviewQueue = [
     confidence: '86%',
     issue: 'Member promo and weekly deal lines need same-receipt confirmation',
     impact: '-16.50 SEK',
+    href: '/scanner'
+  },
+  {
+    receipt: 'Coop Medborgarplatsen lunchbox stop',
+    store: 'Coop Medborgarplatsen',
+    area: 'Södermalm',
+    items: 'Bread, cheese, cucumber',
+    confidence: '91%',
+    issue: 'Bundle savings need line-total confirmation before weekly basket update',
+    impact: '-10.80 SEK',
     href: '/scanner'
   }
 ];
@@ -1599,6 +1732,22 @@ export const receiptReviewDesk = [
       { productSlug: 'dafgard-kaldolmar-600g', label: 'Weekly deal needs line-total check' }
     ],
     nextAction: 'Publish the Skanstull freezer rows after receipt review confirms the bundle.'
+  },
+  {
+    receiptId: 'R-2026-05-21-COOP-MEDBORGARPLATSEN',
+    storeName: 'Coop Medborgarplatsen',
+    storeSlug: 'coop-medborgarplatsen',
+    capturedAt: '2026-05-21 15:34 CET',
+    total: '105.70 SEK',
+    status: 'Matched',
+    owner: 'Mira',
+    confidence: 0.91,
+    flaggedLines: [
+      { productSlug: 'pagen-lingongrova-500g', label: 'Bread member promo matched' },
+      { productSlug: 'arla-hushallsost-500g', label: 'Cheese shelf row accepted' },
+      { productSlug: 'garant-gurka-300g', label: 'Produce unit price confirmed' }
+    ],
+    nextAction: 'Publish the lunchbox bundle to weekly basket and unit-price review.'
   }
 ];
 
@@ -1638,6 +1787,18 @@ export const unitPriceAlertDesk = [
     benchmark: 'Dinner protein median 199.00 SEK/kg',
     severity: 'Review',
     reason: 'Protein promo needs comparison against chicken before a dinner basket locks.'
+  },
+  {
+    productSlug: 'arla-hushallsost-500g',
+    productName: 'Arla Hushållsost 500g',
+    storeSlug: 'coop-medborgarplatsen',
+    storeName: 'Coop Medborgarplatsen',
+    packageSize: '500g',
+    unitPrice: '109.80 SEK/kg',
+    shelfPrice: '54.90 SEK',
+    benchmark: 'Lunch cheese median 118.00 SEK/kg',
+    severity: 'Low',
+    reason: 'Cheese unit price sits below the lunchbox benchmark and can travel with bread and produce.'
   }
 ];
 
@@ -1726,6 +1887,14 @@ export const mealBasketIdeas = [
     savings: '-16.50 SEK',
     route: 'Bundle Willys Skanstull frozen dinners before adding Lidl ice cream for the weekend',
     products: ['felix-pyttipanna-720g', 'dafgard-kaldolmar-600g', 'gb-graddglass-2l']
+  },
+  {
+    title: 'weekday lunchbox bundle',
+    area: 'Södermalm',
+    total: '105.70 SEK',
+    savings: '-10.80 SEK',
+    route: 'Use Coop Medborgarplatsen for bread, cheese, and cucumber when school lunches need one stop',
+    products: ['pagen-lingongrova-500g', 'arla-hushallsost-500g', 'garant-gurka-300g']
   }
 ];
 
@@ -1863,6 +2032,15 @@ export const nutritionValueBoard = {
       nutritionSignal: 'Fiber and protein pantry add-on',
       score: 84,
       basketRole: 'pantry protein'
+    },
+    {
+      product: 'Pågen Lingongrova 500g',
+      slug: 'pagen-lingongrova-500g',
+      store: 'Coop Medborgarplatsen',
+      unitCost: '67.80 SEK/kg',
+      nutritionSignal: 'Wholegrain lunchbox bread',
+      score: 86,
+      basketRole: 'weekday lunch base'
     }
   ],
   rules: [
