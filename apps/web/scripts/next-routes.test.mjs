@@ -59,6 +59,9 @@ describe('verified-data UI', () => {
     const login = await read('src/app/login/page.tsx');
     assert.doesNotMatch(login, /placeholder=/);
     assert.match(login, /No test account/);
+    assert.match(login, /Session source/);
+    assert.match(login, /production auth provider returns a verified session/);
+    assert.match(login, /source timestamps from authenticated storage/);
   });
 
   it('uses a readable global shell and provenance surfaces across the app', async () => {
