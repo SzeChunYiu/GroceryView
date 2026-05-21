@@ -1566,6 +1566,51 @@ export const unitPriceAlertDesk = [
   }
 ];
 
+export const couponStackPlanner = [
+  {
+    title: 'Coffee member match',
+    productSlug: 'zoegas-coffee-450g',
+    productName: 'Zoegas Coffee 450g',
+    storeSlug: 'willys-odenplan',
+    storeName: 'Willys Odenplan',
+    basePrice: '59.90 SEK',
+    coupon: '-10.00 SEK app coupon',
+    memberPrice: '-5.00 SEK member price',
+    finalPrice: '44.90 SEK',
+    stackState: 'Ready',
+    basketImpact: '-15.00 SEK',
+    nextAction: 'Apply before the weekly coffee row is locked.'
+  },
+  {
+    title: 'Butter caution stack',
+    productSlug: 'bregott-normalsaltat-600g',
+    productName: 'Bregott Normalsaltat 600g',
+    storeSlug: 'coop-swedenborgsgatan',
+    storeName: 'Coop Swedenborgsgatan',
+    basePrice: '67.90 SEK',
+    coupon: '-7.00 SEK digital coupon',
+    memberPrice: 'No member cut',
+    finalPrice: '60.90 SEK',
+    stackState: 'Watch',
+    basketImpact: '-7.00 SEK',
+    nextAction: 'Keep visible because the final price still sits above the butter target.'
+  },
+  {
+    title: 'Breakfast receipt bonus',
+    productSlug: 'garant-havregryn-1kg',
+    productName: 'Garant Havregryn 1kg',
+    storeSlug: 'tempo-hornstull',
+    storeName: 'Tempo Hornstull',
+    basePrice: '16.90 SEK',
+    coupon: '-3.00 SEK receipt bonus',
+    memberPrice: '-1.50 SEK loyalty shelf tag',
+    finalPrice: '12.40 SEK',
+    stackState: 'Queued',
+    basketImpact: '-4.50 SEK',
+    nextAction: 'Publish after the receipt review row confirms the bonus.'
+  }
+];
+
 export const mealBasketIdeas = [
   {
     title: 'weekday breakfast top-up',
