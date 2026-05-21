@@ -10,11 +10,13 @@ import {
   buildMobileScreenBlueprints,
   buildMobileShell,
   buildScanResult,
+  composeMobileBudgetScreen,
   composeMobileProfileScreen,
   composeMobileStoresScreen,
   composeMobileTodayScreen,
   composeMobileWatchlistScreen,
   composeMobileProductTerminalScreen,
+  createMobileBudgetRouteViewModel,
   createMobileProfileHubViewModel,
   createMobileProductPriceTerminalViewModel,
   createMobileDiscoveryViewModel,
@@ -384,6 +386,80 @@ describe('mobile app foundation', () => {
     ]);
   });
 
+  it('builds mobile Budget state from budget, category, basket, and comparison data', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.updateBudget('user-1', { weeklyBudget: 150, monthlyBudget: 600 });
+    api.updateCategoryBudgets('user-1', [
+      { category: 'coffee', weeklyBudget: 70 },
+      { category: 'dairy', weeklyBudget: 20 }
+    ]);
+
+    const viewModel = createMobileBudgetRouteViewModel('user-1', api);
+
+    assert.deepEqual(viewModel.summary, {
+      weeklyBudgetLabel: '150.00 SEK',
+      plannedBasketLabel: '77.70 SEK',
+      remainingLabel: '72.30 SEK',
+      utilizationPercentLabel: '51.8%',
+      status: 'under'
+    });
+    assert.deepEqual(viewModel.basket, {
+      itemCount: 3,
+      cheapestTotalLabel: '77.70 SEK',
+      bestSingleStoreLabel: 'Willys Odenplan, 79.70 SEK',
+      splitStoreCount: 2,
+      missingProductCount: 0
+    });
+    assert.deepEqual(viewModel.categoryBudgets.map((category) => `${category.category}:${category.estimatedSpendLabel}:${category.remainingLabel}`), [
+      'coffee:49.90 SEK:20.10 SEK',
+      'dairy:27.80 SEK:-7.80 SEK'
+    ]);
+    assert.deepEqual(viewModel.unbudgetedCategories, []);
+    assert.deepEqual(viewModel.actions, ['set_weekly_budget', 'review_category_budgets', 'review_receipts']);
+  });
+
+  it('composes a renderable mobile Budget screen with summary, basket impact, categories, and actions', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.updateBudget('user-1', { weeklyBudget: 150, monthlyBudget: 600 });
+    api.updateCategoryBudgets('user-1', [{ category: 'coffee', weeklyBudget: 70 }]);
+
+    const screen = composeMobileBudgetScreen('user-1', api);
+
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.title, 'Budget');
+    assert.equal(screen.state, 'ready');
+    assert.deepEqual(screen.children.map((section) => section.key), ['budget-summary', 'basket-impact', 'category-budgets', 'unbudgeted-categories', 'actions']);
+
+    const summary = screen.children.find((section) => section.key === 'budget-summary');
+    assert.equal(summary?.type, 'section');
+    assert.deepEqual(summary?.children.map((metric) => 'value' in metric ? metric.value : null), ['150.00 SEK', '77.70 SEK', '72.30 SEK', '51.8%']);
+
+    const basket = screen.children.find((section) => section.key === 'basket-impact');
+    if (!basket || basket.type !== 'section') throw new Error('basket impact section missing');
+    assert.deepEqual(basket.children.map((row) => 'value' in row ? row.value : null), ['3 planned', '77.70 SEK', 'Willys Odenplan, 79.70 SEK', '2 stores, 0 missing']);
+
+    const categories = screen.children.find((section) => section.key === 'category-budgets');
+    if (!categories || categories.type !== 'section') throw new Error('category budget section missing');
+    assert.equal(categories.children[0]?.key, 'category-budget:coffee');
+    assert.equal('value' in categories.children[0]! ? categories.children[0]!.value : null, '49.90 SEK of 70.00 SEK, 20.10 SEK remaining, 1 products');
+
+    const unbudgeted = screen.children.find((section) => section.key === 'unbudgeted-categories');
+    if (!unbudgeted || unbudgeted.type !== 'section') throw new Error('unbudgeted categories section missing');
+    assert.deepEqual(unbudgeted.children.map((row) => row.key), ['unbudgeted:dairy']);
+
+    const actions = screen.children.find((section) => section.key === 'actions');
+    assert.equal(actions?.type, 'section');
+    assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Set budget', 'Review categories', 'Review receipts']);
+  });
+
   it('builds mobile Profile hub state from budget, household, notification, and privacy data', () => {
     const api = createGroceryViewApi();
     api.addFavoriteStore('user-1', 'willys-odenplan');
@@ -555,6 +631,7 @@ describe('mobile app foundation', () => {
       '/watchlist',
       '/products/[id]/terminal',
       '/basket',
+      '/budget',
       '/scan/barcode',
       '/scan/receipt',
       '/profile',
@@ -587,6 +664,7 @@ describe('mobile app foundation', () => {
       '/watchlist',
       '/products/[id]/terminal',
       '/basket',
+      '/budget',
       '/scan/barcode',
       '/scan/receipt',
       '/review-queue',
@@ -614,6 +692,11 @@ describe('mobile app foundation', () => {
     assert.equal(reviewQueue?.screen, 'HumanReviewQueueScreen');
     assert.deepEqual(reviewQueue?.actions, ['review_assignment', 'submit_review_decision']);
     assert.match(reviewQueue?.dataDependencies.join(','), /reviewer_permissions/);
+
+    const budget = plan.screens.find((screen) => screen.route === '/budget');
+    assert.equal(budget?.screen, 'BudgetScreen');
+    assert.deepEqual(budget?.actions, ['set_weekly_budget', 'review_category_budgets', 'review_receipts']);
+    assert.match(budget?.dataDependencies.join(','), /category_budgets/);
 
     assert.deepEqual(plan.blockedWithoutProviders.map((screen) => screen.route), [
       '/scan/barcode',
