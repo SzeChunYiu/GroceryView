@@ -376,6 +376,42 @@ export const products = [
     confidence: 'high',
     observedAt: '2026-05-20 20:25 CET',
     source: 'in-store shelf observation'
+  },
+  {
+    slug: 'dafgard-kaldolmar-600g',
+    ticker: 'DAFGARD-KALDOLMAR-600G',
+    name: 'Dafgårds Kåldolmar 600g',
+    store: 'Willys Skanstull',
+    price: '44.90 SEK',
+    unitPrice: '74.83 SEK/kg',
+    priceType: 'weekly deal',
+    confidence: 'medium',
+    observedAt: '2026-05-21 14:10 CET',
+    source: 'retailer flyer observation'
+  },
+  {
+    slug: 'felix-pyttipanna-720g',
+    ticker: 'FELIX-PYTTIPANNA-720G',
+    name: 'Felix Pyttipanna 720g',
+    store: 'Willys Skanstull',
+    price: '34.90 SEK',
+    unitPrice: '48.47 SEK/kg',
+    priceType: 'member promo',
+    confidence: 'high',
+    observedAt: '2026-05-21 14:18 CET',
+    source: 'retailer flyer observation'
+  },
+  {
+    slug: 'gb-graddglass-2l',
+    ticker: 'GB-GRADDGLASS-2L',
+    name: 'GB Gräddglass Vanilj 2L',
+    store: 'Lidl Hammarby Sjöstad',
+    price: '36.90 SEK',
+    unitPrice: '18.45 SEK/l',
+    priceType: 'shelf',
+    confidence: 'high',
+    observedAt: '2026-05-21 14:32 CET',
+    source: 'in-store shelf observation'
   }
 ];
 
@@ -503,6 +539,24 @@ export const stores = [
     format: 'mid-size supermarket',
     bestCategory: 'Plant-based',
     distanceLabel: '1.9 km from saved area'
+  },
+  {
+    slug: 'willys-skanstull',
+    name: 'Willys Skanstull',
+    ingestionFixture: 'Willys Skanstull',
+    district: 'Södermalm',
+    format: 'discount supermarket',
+    bestCategory: 'Frozen',
+    distanceLabel: '3.6 km from saved area'
+  },
+  {
+    slug: 'lidl-hammarby-sjostad',
+    name: 'Lidl Hammarby Sjöstad',
+    ingestionFixture: 'Lidl Hammarby Sjostad',
+    district: 'Hammarby Sjöstad',
+    format: 'discount supermarket',
+    bestCategory: 'Frozen snacks',
+    distanceLabel: '4.2 km from saved area'
   }
 ];
 
@@ -545,9 +599,9 @@ export const categories = [
   {
     slug: 'frozen',
     name: 'Frozen',
-    index: '97.4',
-    movement: '-2.6%',
-    topDeal: 'FINDUS-ARTER-650G'
+    index: '94.9',
+    movement: '-5.1%',
+    topDeal: 'FELIX-PYTTIPANNA-720G'
   },
   {
     slug: 'rice',
@@ -685,6 +739,16 @@ export const dealOpportunityRail = rankDealOpportunities({
       regularPrice: 79.9,
       dealScore: 83,
       sourceConfidence: 0.8
+    },
+    {
+      productId: 'felix-pyttipanna-720g',
+      productName: 'Felix Pyttipanna 720g',
+      storeId: 'willys-skanstull',
+      storeName: 'Willys Skanstull',
+      currentPrice: 34.9,
+      regularPrice: 45.9,
+      dealScore: 86,
+      sourceConfidence: 0.89
     },
     {
       productId: 'felix-ketchup-1kg',
@@ -829,17 +893,32 @@ export const basketSubstitutionRadar = [
     basketImpact: '-15.00 SEK meal-prep check',
     sourceConfidence: 0.8,
     reason: 'Plant-based protein rows are below baseline and should be compared before locking meal-prep baskets.'
+  },
+  {
+    anchorSlug: 'dafgard-kaldolmar-600g',
+    anchorName: 'Dafgårds Kåldolmar 600g',
+    anchorStoreSlug: 'willys-skanstull',
+    anchorStoreName: 'Willys Skanstull',
+    substituteSlug: 'felix-pyttipanna-720g',
+    substituteName: 'Felix Pyttipanna 720g',
+    substituteStoreSlug: 'willys-skanstull',
+    substituteStoreName: 'Willys Skanstull',
+    verdict: 'bundle',
+    basketImpact: '-11.00 SEK freezer stock-up',
+    sourceConfidence: 0.89,
+    reason: 'Two frozen dinner rows are visible at the same Skanstull stop, making the freezer top-up worth bundling before weekend snacks.'
   }
 ];
 
 export const stockholmAreas = [
   { slug: 'norrmalm',   name: 'Norrmalm',   storeCount: 2, topSavings: 'Snacks' },
-  { slug: 'sodermalm',  name: 'Södermalm',  storeCount: 3, topSavings: 'Meat' },
+  { slug: 'sodermalm',  name: 'Södermalm',  storeCount: 4, topSavings: 'Frozen' },
   { slug: 'vasastan',   name: 'Vasastan',   storeCount: 3, topSavings: 'Plant-based' },
   { slug: 'hagersten',  name: 'Hägersten',  storeCount: 1, topSavings: 'Rice' },
   { slug: 'liljeholmen', name: 'Liljeholmen', storeCount: 1, topSavings: 'Pantry' },
   { slug: 'stockholm-county', name: 'Stockholm County', storeCount: 1, topSavings: 'Pasta' },
   { slug: 'kungsholmen',name: 'Kungsholmen',storeCount: 2, topSavings: 'Personal care' },
+  { slug: 'hammarby-sjostad', name: 'Hammarby Sjöstad', storeCount: 1, topSavings: 'Frozen snacks' },
   { slug: 'ostermalm',  name: 'Östermalm',  storeCount: 0, topSavings: '—' }
 ];
 
@@ -857,8 +936,8 @@ export const sourceCoverage = [
     fixture: 'Weekly offers',
     surface: 'public flyer',
     status: 'ready',
-    visibleRows: 4,
-    newestSignal: 'Coffee, peas, fil, and butter prices anchor basket planning'
+    visibleRows: 6,
+    newestSignal: 'Coffee, peas, fil, butter, kåldolmar, and pyttipanna rows anchor basket planning'
   },
   {
     chain: 'Coop',
@@ -881,8 +960,8 @@ export const sourceCoverage = [
     fixture: 'Online shelf',
     surface: 'product page',
     status: 'ready',
-    visibleRows: 2,
-    newestSignal: 'Milk and chocolate rows provide cross-store comparisons'
+    visibleRows: 3,
+    newestSignal: 'Milk, chocolate, and Hammarby Sjöstad ice cream rows provide cross-store comparisons'
   },
   {
     chain: 'City Gross',
@@ -986,6 +1065,18 @@ export const storeComparisonBoard = [
     leadSignal: 'Anamma färs and Garant tofu rows expose whether to split plant-based protein across nearby stores.',
     visibleItems: 2,
     basketImpact: '-15.00 SEK'
+  },
+  {
+    slug: 'sodermalm-freezer-stockup',
+    area: 'Södermalm + Hammarby Sjöstad',
+    primaryStoreSlug: 'willys-skanstull',
+    primaryStoreName: 'Willys Skanstull',
+    comparisonStoreSlug: 'lidl-hammarby-sjostad',
+    comparisonStoreName: 'Lidl Hammarby Sjöstad',
+    basketFocus: 'Frozen dinner and snacks',
+    leadSignal: 'Pyttipanna and kåldolmar are below baseline while Lidl ice cream keeps the snack top-up visible.',
+    visibleItems: 3,
+    basketImpact: '-16.50 SEK'
   }
 ];
 
@@ -1044,6 +1135,17 @@ export const shoppingTripSwitchboard = [
     saving: '-15.00 SEK',
     decision: 'Split protein rows across Coop and Willys when weekday meal prep is planned.',
     href: '/categories/plant-based'
+  },
+  {
+    title: 'Freezer stock-up',
+    area: 'Södermalm + Hammarby Sjöstad',
+    store: 'Willys Skanstull',
+    category: 'Frozen',
+    basket: 'Pyttipanna, kåldolmar, ice cream',
+    spend: '116.70 SEK',
+    saving: '-16.50 SEK',
+    decision: 'Use when freezer space is available and weekend snack stock is low.',
+    href: '/categories/frozen'
   }
 ];
 
@@ -1055,7 +1157,8 @@ export const indexHistory = [
   { date: '2026-05-16', coffee:  93.0, dairy: 102.0, bread:  98.7, pantry:  96.8, snacks: 102.9, frozen:  97.9 },
   { date: '2026-05-17', coffee:  92.2, dairy: 102.2, bread:  98.7, pantry:  96.0, snacks: 103.5, frozen:  97.6 },
   { date: '2026-05-18', coffee:  91.8, dairy: 102.3, bread:  98.7, pantry:  95.5, snacks: 103.8, frozen:  97.5 },
-  { date: '2026-05-19', coffee:  91.6, dairy: 102.3, bread:  98.7, pantry:  95.2, snacks: 104.1, frozen:  97.4 }
+  { date: '2026-05-19', coffee:  91.6, dairy: 102.3, bread:  98.7, pantry:  95.2, snacks: 104.1, frozen:  97.4 },
+  { date: '2026-05-20', coffee:  91.5, dairy: 102.1, bread:  98.8, pantry:  95.0, snacks: 103.4, frozen:  94.9 }
 ];
 
 export const weeklyBasket = [
@@ -1078,7 +1181,9 @@ export const weeklyBasket = [
   { slug: 'libresse-bindor-normal-14p',     qty: 1, total: '29.90 SEK', vsLastWeek: '-4.1%' },
   { slug: 'grumme-handdisk-original-500ml', qty: 1, total: '24.90 SEK', vsLastWeek: '-1.7%' },
   { slug: 'anamma-formbar-fars-850g',       qty: 1, total: '64.90 SEK', vsLastWeek: '-6.2%' },
-  { slug: 'zeta-kikartor-380g',             qty: 2, total: '29.80 SEK', vsLastWeek: '-2.4%' }
+  { slug: 'zeta-kikartor-380g',             qty: 2, total: '29.80 SEK', vsLastWeek: '-2.4%' },
+  { slug: 'felix-pyttipanna-720g',          qty: 1, total: '34.90 SEK', vsLastWeek: '-5.1%' },
+  { slug: 'gb-graddglass-2l',               qty: 1, total: '36.90 SEK', vsLastWeek: '-2.8%' }
 ];
 
 export const savingsPlaybook = [
@@ -1137,6 +1242,13 @@ export const savingsPlaybook = [
     action: 'Compare Coop Anamma with Willys tofu before building weekday bowls',
     impact: '-15.00 SEK prep basket',
     href: '/categories/plant-based'
+  },
+  {
+    title: 'Freezer stock-up window',
+    trigger: 'Frozen index is 5.1% under baseline with two Skanstull deal rows',
+    action: 'Bundle Felix pyttipanna with Dafgårds kåldolmar before adding Lidl ice cream',
+    impact: '-16.50 SEK freezer basket',
+    href: '/categories/frozen'
   }
 ];
 
@@ -1200,20 +1312,32 @@ export const watchlistAlerts = [
     confidence: 'medium',
     allowedPriceTypes: ['member promo', 'shelf'],
     nextAction: 'Add plant-based protein to the meal-prep route while the Coop promo is active.'
+  },
+  {
+    productSlug: 'felix-pyttipanna-720g',
+    storeSlug: 'willys-skanstull',
+    targetPrice: 38,
+    currentPrice: 34.9,
+    usualPrice: 45.9,
+    trigger: 'target met',
+    channel: 'push',
+    confidence: 'high',
+    allowedPriceTypes: ['member promo', 'weekly deal'],
+    nextAction: 'Add the freezer dinner row when the Skanstull route is already planned.'
   }
 ];
 
 export const householdSavings = {
-  weeklyTotal: '438.50 SEK',
-  vsLastWeek: '-30.10 SEK',
-  vsLastMonth: '-78.40 SEK',
-  topSaving: { product: 'Anamma Formbar Färs 850g', amount: '-15.00 SEK', driver: 'Norra Stationsgatan plant-based promo' }
+  weeklyTotal: '510.30 SEK',
+  vsLastWeek: '-46.60 SEK',
+  vsLastMonth: '-94.90 SEK',
+  topSaving: { product: 'Felix Pyttipanna 720g', amount: '-16.50 SEK', driver: 'Skanstull freezer stock-up' }
 };
 
 export const savingsDashboard = {
   monthToDate: {
     plannedSpend: '1,756.00 SEK',
-    avoidedSpend: '66.10 SEK',
+    avoidedSpend: '82.60 SEK',
     basketCount: 4,
     bestDistrict: 'Vasastan'
   },
@@ -1257,14 +1381,23 @@ export const savingsDashboard = {
       signal: '6.2% under plant-based baseline',
       action: 'Split with Willys tofu when weekday bowls are planned',
       href: '/products/anamma-formbar-fars-850g'
+    },
+    {
+      label: 'Freezer stock-up',
+      product: 'Felix Pyttipanna 720g',
+      store: 'Willys Skanstull',
+      signal: '5.1% under frozen baseline',
+      action: 'Bundle with kåldolmar before topping up snacks at Lidl Hammarby Sjöstad',
+      href: '/products/felix-pyttipanna-720g'
     }
   ],
   districtSavings: [
     { district: 'Vasastan', planned: '612.40 SEK', avoided: '39.80 SEK', driver: 'Coffee, dairy, and plant-based promos' },
-    { district: 'Södermalm', planned: '488.30 SEK', avoided: '23.50 SEK', driver: 'Breakfast and chicken promos' },
+    { district: 'Södermalm', planned: '568.10 SEK', avoided: '40.00 SEK', driver: 'Breakfast, chicken, and frozen promos' },
     { district: 'Norrmalm', planned: '391.20 SEK', avoided: '13.90 SEK', driver: 'Snacks and eggs' },
     { district: 'Hägersten', planned: '264.10 SEK', avoided: '9.90 SEK', driver: 'Rice and pantry clearance' },
-    { district: 'Kungsholmen', planned: '198.70 SEK', avoided: '16.00 SEK', driver: 'Produce shelf drop' }
+    { district: 'Kungsholmen', planned: '198.70 SEK', avoided: '16.00 SEK', driver: 'Produce shelf drop' },
+    { district: 'Hammarby Sjöstad', planned: '116.70 SEK', avoided: '16.50 SEK', driver: 'Frozen snack add-on' }
   ]
 };
 
@@ -1282,8 +1415,8 @@ export const accountProfile = {
     { label: 'Alert timing', value: 'Push before weekly route planning', status: 'Active' }
   ],
   routeLinks: [
-    { label: 'Saved weekly basket', href: '/weekly-basket', detail: '12 visible driver rows' },
-    { label: 'Savings dashboard', href: '/savings-dashboard', detail: '66.10 SEK avoided month-to-date' },
+    { label: 'Saved weekly basket', href: '/weekly-basket', detail: '22 visible driver rows' },
+    { label: 'Savings dashboard', href: '/savings-dashboard', detail: '82.60 SEK avoided month-to-date' },
     { label: 'Home store profile', href: '/stores/willys-odenplan', detail: 'Coffee and dairy anchor store' }
   ]
 };
@@ -1317,6 +1450,16 @@ export const receiptReviewQueue = [
     confidence: '69%',
     issue: 'Community shelf observation needs reviewer approval',
     impact: '-14.20 SEK',
+    href: '/scanner'
+  },
+  {
+    receipt: 'Willys Skanstull freezer stock-up',
+    store: 'Willys Skanstull',
+    area: 'Södermalm',
+    items: 'Pyttipanna, kåldolmar, frozen dinner rows',
+    confidence: '86%',
+    issue: 'Member promo and weekly deal lines need same-receipt confirmation',
+    impact: '-16.50 SEK',
     href: '/scanner'
   }
 ];
@@ -1366,6 +1509,21 @@ export const receiptReviewDesk = [
       { productSlug: 'bravo-apelsinjuice-1l', label: 'Beverage promo row accepted' }
     ],
     nextAction: 'Publish high-confidence breakfast and beverage rows to the savings dashboard.'
+  },
+  {
+    receiptId: 'R-2026-05-21-WILLYS-SKANSTULL',
+    storeName: 'Willys Skanstull',
+    storeSlug: 'willys-skanstull',
+    capturedAt: '2026-05-21 14:45 CET',
+    total: '154.60 SEK',
+    status: 'Ready',
+    owner: 'Alex',
+    confidence: 0.86,
+    flaggedLines: [
+      { productSlug: 'felix-pyttipanna-720g', label: 'Member promo matched freezer row' },
+      { productSlug: 'dafgard-kaldolmar-600g', label: 'Weekly deal needs line-total check' }
+    ],
+    nextAction: 'Publish the Skanstull freezer rows after receipt review confirms the bundle.'
   }
 ];
 
@@ -1440,17 +1598,25 @@ export const mealBasketIdeas = [
     savings: '-17.40 SEK',
     route: 'Start at Coop Norra Stationsgatan for Anamma and finish with Hemköp chickpeas when passing Hornstull',
     products: ['anamma-formbar-fars-850g', 'garant-ekologisk-tofu-270g', 'zeta-kikartor-380g']
+  },
+  {
+    title: 'freezer dinner backup',
+    area: 'Södermalm + Hammarby Sjöstad',
+    total: '116.70 SEK',
+    savings: '-16.50 SEK',
+    route: 'Bundle Willys Skanstull frozen dinners before adding Lidl ice cream for the weekend',
+    products: ['felix-pyttipanna-720g', 'dafgard-kaldolmar-600g', 'gb-graddglass-2l']
   }
 ];
 
 export const mealPlanner = {
   weekLabel: 'May 21-27 dinner plan',
-  targetSpend: '525.00 SEK',
-  plannedMeals: 5,
-  projectedSavings: '-41.80 SEK',
+  targetSpend: '600.00 SEK',
+  plannedMeals: 6,
+  projectedSavings: '-58.30 SEK',
   constraints: [
     { label: 'Protein rotation', value: 'Fish, chicken, and pantry vegetarian nights' },
-    { label: 'Store limit', value: 'Two planned stops plus one pantry split only if nearby' },
+    { label: 'Store limit', value: 'Two planned stops plus one pantry or freezer split only if nearby' },
     { label: 'Confidence rule', value: 'Skip low-confidence dinner rows until receipt review clears them' }
   ],
   days: [
@@ -1489,6 +1655,15 @@ export const mealPlanner = {
       total: '126.80 SEK',
       savings: '-7.70 SEK',
       href: '/weekly-basket'
+    },
+    {
+      day: 'Sunday',
+      meal: 'Freezer backup dinner',
+      basket: 'Pyttipanna, kåldolmar, ice cream',
+      store: 'Willys Skanstull + Lidl Hammarby Sjöstad',
+      total: '116.70 SEK',
+      savings: '-16.50 SEK',
+      href: '/categories/frozen'
     }
   ]
 };
