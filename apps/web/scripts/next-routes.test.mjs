@@ -144,4 +144,16 @@ describe('verified-data UI', () => {
     assert.match(shell, /Top product:/);
     assert.match(shell, /\/categories\/\$\{category\.slug\}/);
   });
+
+  it('surfaces household planning with verified market context only', async () => {
+    const householdPage = await read('src/app/household/page.tsx');
+
+    assert.match(householdPage, /NoVerifiedData/);
+    assert.match(householdPage, /static snapshot/);
+    assert.match(householdPage, /sourceCoverage\.length/);
+    assert.match(householdPage, /topChainSpreads\.slice/);
+    assert.match(householdPage, /Household planning evidence/);
+    assert.doesNotMatch(householdPage, /@\/lib\/demo-data/);
+    assert.doesNotMatch(householdPage, /@\/components\/sample-data/);
+  });
 });
