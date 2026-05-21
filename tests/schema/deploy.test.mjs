@@ -15,7 +15,8 @@ describe('deployment manifest', () => {
       'PUBLIC_WEB_URL',
       'NOTIFICATION_WEBHOOK_SECRET',
       'BILLING_WEBHOOK_SECRET',
-      'METRICS_TOKEN'
+      'METRICS_TOKEN',
+      'CATALOG_COVERAGE_TARGETS_JSON'
     ]);
   });
 });
