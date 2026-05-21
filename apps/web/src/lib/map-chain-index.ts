@@ -1,5 +1,5 @@
 import { calculateChainPriceIndex } from '@groceryview/core';
-import { buildChainPriceObservations } from './chain-index-data';
+import { buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from './chain-index-data';
 
 export type MapChainIndexScore = {
   chainId: string;
@@ -8,7 +8,10 @@ export type MapChainIndexScore = {
   observations: number;
 };
 
-export const mapChainIndexScores: MapChainIndexScore[] = calculateChainPriceIndex(buildChainPriceObservations()).chains.map((chain) => ({
+export const mapChainIndexScores: MapChainIndexScore[] = calculateChainPriceIndex([
+  ...buildChainPriceObservations(),
+  ...buildMatchedBasketChainPriceObservations()
+]).chains.map((chain) => ({
   chainId: chain.chainId,
   overallIndex: chain.overallIndex,
   confidence: chain.confidence,

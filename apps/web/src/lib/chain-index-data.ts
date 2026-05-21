@@ -12,6 +12,7 @@ import { coopProducts } from './ingested/coop';
 import { willysProducts } from './ingested/willys';
 import { hemkopProducts } from './ingested/hemkop';
 import { matpriskollenOffers } from './ingested/matpriskollen';
+import { axfoodProducts } from './axfood-products';
 import type { BrandTierPriceObservation, ChainPriceObservation } from '@groceryview/core';
 
 // ── unit canonicalisation ────────────────────────────────────────────────────
@@ -116,6 +117,20 @@ export function buildChainPriceObservations(): ChainPriceObservation[] {
     if (v != null && unit) push(out, chain, o.category, o.name, v, unit);
   }
 
+  return out;
+}
+
+export function buildMatchedBasketChainPriceObservations(): ChainPriceObservation[] {
+  const out: ChainPriceObservation[] = [];
+  for (const product of axfoodProducts) {
+    const category = `${normaliseCategory(product.category, product.name, product.brand)} · st`;
+    if (product.chains.willys?.price != null) {
+      out.push({ chainId: 'Willys', category, unitPrice: product.chains.willys.price });
+    }
+    if (product.chains.hemkop?.price != null) {
+      out.push({ chainId: 'Hemköp', category, unitPrice: product.chains.hemkop.price });
+    }
+  }
   return out;
 }
 
