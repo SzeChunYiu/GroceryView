@@ -3,6 +3,7 @@ import { pricedProducts, categoryLabels } from '@/lib/openprices-products';
 import { hemkopProducts, hemkopSource } from '@/lib/ingested/hemkop';
 import { icaProducts, icaSource } from '@/lib/ingested/ica';
 import { mathemProducts, mathemSource } from '@/lib/ingested/mathem';
+import { matpriskollenOffers, matpriskollenSource } from '@/lib/ingested/matpriskollen';
 import { matsparProducts, matsparSource } from '@/lib/ingested/matspar';
 import { openFoodFactsProducts, openFoodFactsSource } from '@/lib/ingested/openfoodfacts';
 import { willysProducts, willysSource } from '@/lib/ingested/willys';
@@ -56,6 +57,9 @@ export default function ProductsIndexPage() {
         </p>
         <p className="mt-1 text-sm font-semibold text-market-ink/55">
           Matspar search ingest: {matsparSource.rowCount} live SEK comparison rows retrieved {matsparSource.retrievedAt.slice(0, 10)}.
+        </p>
+        <p className="mt-1 text-sm font-semibold text-market-ink/55">
+          Matpriskollen offers ingest: {matpriskollenSource.rowCount} public offer rows retrieved {matpriskollenSource.retrievedAt.slice(0, 10)}.
         </p>
       </header>
 
@@ -183,6 +187,25 @@ export default function ProductsIndexPage() {
               <a href={p.productUrl} className="truncate font-semibold text-market-ink hover:text-market-mint" title={p.name}>{p.name}</a>
               <span className="truncate text-market-ink/65">{p.brand || 'unknown'}</span>
               <span className="truncate text-market-ink/65">{p.packageText || 'unknown'}</span>
+              <span className="font-bold">{p.priceText}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mb-8 rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid grid-cols-[2fr_1fr_1fr_0.8fr] border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
+          <span>Matpriskollen offer</span>
+          <span>Store</span>
+          <span>Package</span>
+          <span>Price</span>
+        </div>
+        <ul className="divide-y divide-market-ink/5">
+          {matpriskollenOffers.slice(0, 12).map((p) => (
+            <li key={p.code} className="grid grid-cols-[2fr_1fr_1fr_0.8fr] gap-3 px-4 py-2 text-sm hover:bg-market-oat/40">
+              <a href={p.productUrl} className="truncate font-semibold text-market-ink hover:text-market-mint" title={p.name}>{p.name}</a>
+              <span className="truncate text-market-ink/65">{p.store}</span>
+              <span className="truncate text-market-ink/65">{p.packageText || p.category || 'offer'}</span>
               <span className="font-bold">{p.priceText}</span>
             </li>
           ))}
