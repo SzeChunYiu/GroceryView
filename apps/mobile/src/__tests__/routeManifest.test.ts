@@ -47,6 +47,7 @@ describe('mobile route manifest', () => {
   it('builds stable deep links and requires product ids for product links', () => {
     assert.equal(buildMobileDeepLink('/today'), 'groceryview://today');
     assert.equal(buildMobileDeepLink('/stores'), 'groceryview://stores');
+    assert.equal(buildMobileDeepLink('/stores', { selectedStoreId: 'willys-odenplan' }), 'groceryview://stores?selectedStoreId=willys-odenplan');
     assert.equal(buildMobileDeepLink('/watchlist'), 'groceryview://watchlist');
     assert.equal(buildMobileDeepLink('/profile'), 'groceryview://profile');
     assert.equal(buildMobileDeepLink('/privacy'), 'groceryview://privacy');

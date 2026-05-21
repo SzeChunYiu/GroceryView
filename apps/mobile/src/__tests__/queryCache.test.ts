@@ -18,6 +18,7 @@ describe('mobile query cache plan', () => {
     assert.equal(registry.every((definition) => definition.networkMode === 'offlineFirst'), true);
     assert.equal(registry.find((definition) => definition.id === 'basket')?.invalidatesOn.includes('receipt_synced'), true);
     assert.equal(registry.find((definition) => definition.id === 'stores')?.invalidatesOn.includes('favorite_store_changed'), true);
+    assert.equal(registry.find((definition) => definition.id === 'stores')?.invalidatesOn.includes('watchlist_changed'), true);
     assert.equal(registry.find((definition) => definition.id === 'budget')?.invalidatesOn.includes('budget_changed'), true);
   });
 

@@ -56,7 +56,7 @@ const definitions: MobileQueryDefinition[] = [
     gcTimeMs: 12 * hour,
     persist: true,
     networkMode: 'offlineFirst',
-    invalidatesOn: ['favorite_store_changed', 'basket_changed', 'receipt_synced']
+    invalidatesOn: ['favorite_store_changed', 'basket_changed', 'watchlist_changed', 'receipt_synced']
   },
   {
     id: 'watchlist',
