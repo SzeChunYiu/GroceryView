@@ -1,6 +1,7 @@
 export type MobileMvpRouteId =
   | 'today'
   | 'stores'
+  | 'watchlist'
   | 'search'
   | 'product'
   | 'basket'
@@ -14,6 +15,7 @@ export type MobileMvpRouteId =
 export type MobileMvpRoutePath =
   | '/today'
   | '/stores'
+  | '/watchlist'
   | '/search'
   | '/products/[id]'
   | '/basket'
@@ -38,7 +40,7 @@ export type MobileMvpRoute = {
   tab: 'today' | 'stores' | 'basket' | 'scan' | 'profile';
   params: MobileRouteParam[];
   requiresAuth: boolean;
-  preloadQueryIds: Array<'today' | 'stores' | 'search' | 'product' | 'basket' | 'budget'>;
+  preloadQueryIds: Array<'today' | 'stores' | 'watchlist' | 'search' | 'product' | 'basket' | 'budget'>;
   placeholderFor?: 'camera' | 'notifications';
 };
 
@@ -70,6 +72,16 @@ const routes: MobileMvpRoute[] = [
     params: [],
     requiresAuth: true,
     preloadQueryIds: ['stores', 'basket']
+  },
+  {
+    id: 'watchlist',
+    path: '/watchlist',
+    screen: 'WatchlistScreen',
+    title: 'Watchlist',
+    tab: 'today',
+    params: [],
+    requiresAuth: true,
+    preloadQueryIds: ['watchlist', 'product']
   },
   {
     id: 'search',

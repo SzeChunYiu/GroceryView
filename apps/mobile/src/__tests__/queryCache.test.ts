@@ -3,16 +3,16 @@ import assert from 'node:assert/strict';
 import { buildMobilePersistedCachePlan, buildMobileQueryKey, buildMobileQueryRegistry } from '../queryCache.js';
 
 describe('mobile query cache plan', () => {
-  it('defines TanStack Query-compatible cache policies for Today, Stores, Search, Product, Basket, and Budget routes', () => {
+  it('defines TanStack Query-compatible cache policies for Today, Stores, Watchlist, Search, Product, Basket, and Budget routes', () => {
     const registry = buildMobileQueryRegistry();
 
     assert.deepEqual(
       registry.map((definition) => definition.id),
-      ['today', 'stores', 'search', 'product', 'productTerminal', 'basket', 'budget']
+      ['today', 'stores', 'watchlist', 'search', 'product', 'productTerminal', 'basket', 'budget']
     );
     assert.deepEqual(
       registry.map((definition) => definition.route),
-      ['/today', '/stores', '/search', '/products/[id]', '/products/[id]/terminal', '/basket', '/budget']
+      ['/today', '/stores', '/watchlist', '/search', '/products/[id]', '/products/[id]/terminal', '/basket', '/budget']
     );
     assert.equal(registry.every((definition) => definition.persist), true);
     assert.equal(registry.every((definition) => definition.networkMode === 'offlineFirst'), true);
@@ -23,6 +23,7 @@ describe('mobile query cache plan', () => {
   it('builds stable user-partitioned query keys for mobile screens', () => {
     assert.deepEqual(buildMobileQueryKey({ id: 'today', userId: 'User-1' }), ['mobile', 'user-1', 'today']);
     assert.deepEqual(buildMobileQueryKey({ id: 'stores', userId: 'User-1' }), ['mobile', 'user-1', 'stores']);
+    assert.deepEqual(buildMobileQueryKey({ id: 'watchlist', userId: 'User-1' }), ['mobile', 'user-1', 'watchlist']);
     assert.deepEqual(buildMobileQueryKey({ id: 'search', userId: 'User-1', query: ' Coffee ' }), ['mobile', 'user-1', 'search', 'coffee']);
     assert.deepEqual(buildMobileQueryKey({ id: 'product', userId: 'User-1', productId: ' ZOEGAS-COFFEE-450G ' }), [
       'mobile',
@@ -46,8 +47,8 @@ describe('mobile query cache plan', () => {
 
     assert.equal(plan.storageKey, 'groceryview.mobile.query-cache.v1');
     assert.equal(plan.userPartitionKey, 'user:user-1');
-    assert.deepEqual(plan.hydrateOrder, ['today', 'stores', 'basket', 'budget', 'search', 'product', 'productTerminal']);
-    assert.deepEqual(plan.persistedQueryIds, ['today', 'stores', 'search', 'product', 'productTerminal', 'basket', 'budget']);
+    assert.deepEqual(plan.hydrateOrder, ['today', 'stores', 'watchlist', 'basket', 'budget', 'search', 'product', 'productTerminal']);
+    assert.deepEqual(plan.persistedQueryIds, ['today', 'stores', 'watchlist', 'search', 'product', 'productTerminal', 'basket', 'budget']);
     assert.equal(plan.maxPersistedAgeMs, 86_400_000);
     assert.equal(plan.purgeOnSignOut, true);
     assert.deepEqual(plan.redactBeforePersist, ['receipt_images', 'auth_tokens', 'precise_location']);

@@ -286,6 +286,35 @@ export type MobileStoresViewModel = {
   actions: Array<'open_store' | 'compare_basket' | 'scan_barcode'>;
 };
 
+export type MobileWatchlistViewModel = {
+  userId: string;
+  itemCount: number;
+  alertCount: number;
+  urgentAlertCount: number;
+  trackedProducts: Array<{
+    productId: string;
+    ticker: string;
+    productName: string;
+    targetPriceLabel: string;
+    alertDealScoreAt: number | null;
+    favoriteStoresOnly: boolean;
+    allowedPriceTypes: string[];
+    bestPriceLabel: string;
+    bestStoreName: string | null;
+    dealScore: number;
+    alertTypes: string[];
+  }>;
+  alerts: Array<{
+    productId: string;
+    productName: string;
+    type: 'target_price' | 'deal_score' | 'new_52_week_low';
+    severity: 'info' | 'opportunity' | 'urgent';
+    message: string;
+    triggerLabel: string;
+  }>;
+  actions: Array<'open_product' | 'compare_stores' | 'add_to_weekly_basket' | 'scan_barcode'>;
+};
+
 export function createMobileDiscoveryViewModel(
   input: { userId: string; query: string; selectedProductId?: string },
   api: MobileApi = createGroceryViewApi()
@@ -398,6 +427,56 @@ export function createMobileStoresViewModel(userId: string, api: MobileApi = cre
   };
 }
 
+function watchlistTriggerLabel(alert: ReturnType<MobileApi['getWatchlist']>['alerts'][number]): string {
+  if (alert.trigger.metric === 'price') {
+    const threshold = typeof alert.trigger.threshold === 'number' ? ` target ${formatMobileMoney(alert.trigger.threshold)}` : ' target';
+    return `${formatMobileMoney(Number(alert.trigger.value))}${threshold}`;
+  }
+  if (alert.trigger.metric === 'deal_score') return `Score ${alert.trigger.value} / ${alert.trigger.threshold}`;
+  return String(alert.trigger.value).replaceAll('_', ' ');
+}
+
+export function createMobileWatchlistViewModel(userId: string, api: MobileApi = createGroceryViewApi()): MobileWatchlistViewModel {
+  const watchlist = api.getWatchlist(userId);
+  const alertsByProduct = new Map<string, typeof watchlist.alerts>();
+  for (const alert of watchlist.alerts) {
+    alertsByProduct.set(alert.productId, [...(alertsByProduct.get(alert.productId) ?? []), alert]);
+  }
+
+  return {
+    userId,
+    itemCount: watchlist.items.length,
+    alertCount: watchlist.alerts.length,
+    urgentAlertCount: watchlist.alerts.filter((alert) => alert.severity === 'urgent').length,
+    trackedProducts: watchlist.items.map((item) => {
+      const product = api.getProduct(item.productId);
+      const productAlerts = alertsByProduct.get(item.productId) ?? [];
+      return {
+        productId: item.productId,
+        ticker: product?.ticker ?? item.productId,
+        productName: product?.name ?? item.productId,
+        targetPriceLabel: item.targetPrice === undefined ? 'No target' : formatMobileMoney(item.targetPrice),
+        alertDealScoreAt: item.alertDealScoreAt ?? null,
+        favoriteStoresOnly: item.favoriteStoresOnly,
+        allowedPriceTypes: item.allowedPriceTypes ?? ['shelf', 'member', 'promotion', 'estimated'],
+        bestPriceLabel: product ? formatPriceLabel(product.currentPrices[0]?.price ?? null) : 'No verified price',
+        bestStoreName: product?.currentPrices[0]?.storeName ?? null,
+        dealScore: product?.dealScore ?? 0,
+        alertTypes: [...new Set(productAlerts.map((alert) => alert.type))].sort()
+      };
+    }),
+    alerts: watchlist.alerts.map((alert) => ({
+      productId: alert.productId,
+      productName: alert.productName,
+      type: alert.type,
+      severity: alert.severity,
+      message: alert.message,
+      triggerLabel: watchlistTriggerLabel(alert)
+    })),
+    actions: ['open_product', 'compare_stores', 'add_to_weekly_basket', 'scan_barcode']
+  };
+}
+
 export type MobileProductPriceTerminalViewModel = {
   productId: string;
   ticker: string;
@@ -507,6 +586,7 @@ export function createMobileProductPriceTerminalViewModel(
 export type MobileScreenComponentAction =
   | MobileProductPriceTerminalViewModel['actions'][number]
   | MobileStoresViewModel['actions'][number]
+  | MobileWatchlistViewModel['actions'][number]
   | 'open_product'
   | 'compare_basket'
   | 'scan_barcode'
@@ -572,6 +652,13 @@ function todayActionLabel(action: Extract<MobileScreenComponentAction, 'open_pro
 function storesActionLabel(action: MobileStoresViewModel['actions'][number]): string {
   if (action === 'open_store') return 'Open store';
   if (action === 'compare_basket') return 'Compare basket';
+  return 'Scan barcode';
+}
+
+function watchlistActionLabel(action: MobileWatchlistViewModel['actions'][number]): string {
+  if (action === 'open_product') return 'Open product';
+  if (action === 'compare_stores') return 'Compare stores';
+  if (action === 'add_to_weekly_basket') return 'Add to basket';
   return 'Scan barcode';
 }
 
@@ -831,6 +918,74 @@ export function composeMobileStoresScreen(
   };
 }
 
+export function composeMobileWatchlistScreen(
+  userId: string,
+  api: MobileApi = createGroceryViewApi()
+): MobileScreenComponent {
+  const viewModel = createMobileWatchlistViewModel(userId, api);
+  const highestPriorityAlerts = [...viewModel.alerts].sort((left, right) => {
+    const severityRank = { urgent: 2, opportunity: 1, info: 0 } as const;
+    return severityRank[right.severity] - severityRank[left.severity] || left.productName.localeCompare(right.productName);
+  });
+
+  return {
+    type: 'screen',
+    key: `watchlist:${userId}`,
+    title: 'Watchlist',
+    state: viewModel.itemCount > 0 ? 'ready' : 'empty',
+    children: [
+      {
+        type: 'section',
+        key: 'summary',
+        title: 'Summary',
+        children: [
+          { type: 'metric', key: 'tracked-products', label: 'Tracked products', value: String(viewModel.itemCount), tone: viewModel.itemCount > 0 ? 'positive' : 'neutral' },
+          { type: 'metric', key: 'active-alerts', label: 'Active alerts', value: String(viewModel.alertCount), tone: viewModel.alertCount > 0 ? 'positive' : 'neutral' },
+          { type: 'metric', key: 'urgent-alerts', label: 'Urgent alerts', value: String(viewModel.urgentAlertCount), tone: viewModel.urgentAlertCount > 0 ? 'warning' : 'neutral' }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'tracked-products',
+        title: 'Tracked products',
+        children: viewModel.trackedProducts.length > 0
+          ? viewModel.trackedProducts.map((product) => ({
+              type: 'row',
+              key: `watch:${product.productId}`,
+              label: product.ticker,
+              value: `${product.bestPriceLabel} at ${product.bestStoreName ?? 'unknown store'}, target ${product.targetPriceLabel}, ${product.alertTypes.length} alerts`
+            }))
+          : [{ type: 'empty', key: 'no-watchlist-items', message: 'Watch products to get price, Deal Score, and new-low alerts.', action: 'search_product' }]
+      },
+      {
+        type: 'section',
+        key: 'active-alerts',
+        title: 'Active alerts',
+        children: highestPriorityAlerts.length > 0
+          ? highestPriorityAlerts.map((alert) => ({
+              type: 'row',
+              key: `alert:${alert.productId}:${alert.type}`,
+              label: alert.productName,
+              value: `${alert.severity}: ${alert.triggerLabel}`
+            }))
+          : [{ type: 'empty', key: 'no-watchlist-alerts', message: 'No watched products are crossing alert thresholds yet.', action: 'scan_barcode' }]
+      },
+      {
+        type: 'section',
+        key: 'actions',
+        title: 'Actions',
+        children: viewModel.actions.map((action, index) => ({
+          type: 'action',
+          key: action,
+          action,
+          label: watchlistActionLabel(action),
+          primary: index === 0
+        }))
+      }
+    ]
+  };
+}
+
 export function composeMobileProfileScreen(
   userId: string,
   api: MobileApi = createGroceryViewApi()
@@ -1047,6 +1202,7 @@ export type ExpoRoute = {
   path:
     | '/today'
     | '/stores'
+    | '/watchlist'
     | '/products/[id]/terminal'
     | '/basket'
     | '/scan/barcode'
@@ -1073,6 +1229,8 @@ export type MobileScreenAction =
   | 'open_price_terminal'
   | 'open_product'
   | 'compare_basket'
+  | 'compare_stores'
+  | 'add_to_weekly_basket'
   | 'scan_barcode'
   | 'scan_receipt'
   | 'review_assignment'
@@ -1147,6 +1305,7 @@ export function buildExpoReadinessPlan(): ExpoReadinessPlan {
     routes: [
       { path: '/today', screen: 'TodayScreen', purpose: 'Daily market overview, deals, budget, alerts, and recommendations', requiresAuth: true },
       { path: '/stores', screen: 'StoresScreen', purpose: 'Favorite and selected supermarket profiles', requiresAuth: true },
+      { path: '/watchlist', screen: 'WatchlistScreen', purpose: 'Tracked products, alert thresholds, and price opportunities', requiresAuth: true },
       { path: '/products/[id]/terminal', screen: 'ProductPriceTerminalScreen', purpose: 'Stock-style product quote, distribution, and history terminal', requiresAuth: true },
       { path: '/basket', screen: 'BasketScreen', purpose: 'Weekly basket planning and smart swaps', requiresAuth: true },
       { path: '/scan/barcode', screen: 'BarcodeScanScreen', purpose: 'Barcode lookup and product comparison', requiresAuth: true },
@@ -1176,6 +1335,16 @@ export function buildMobileScreenBlueprints(): MobileScreenBlueprintPlan {
       actions: ['open_product', 'compare_basket', 'scan_barcode'],
       providerRequirements: ['secure-session'],
       offlineBehavior: 'Show cached market snapshot with stale-data label.'
+    },
+    {
+      route: '/watchlist',
+      screen: 'WatchlistScreen',
+      primaryState: 'ready',
+      emptyState: 'Watch products to get price, Deal Score, and new-low alerts.',
+      dataDependencies: ['watchlist_items', 'watchlist_alerts', 'product_prices'],
+      actions: ['open_product', 'compare_stores', 'add_to_weekly_basket'],
+      providerRequirements: ['secure-session'],
+      offlineBehavior: 'Show cached watchlist alerts and queue threshold changes until sync.'
     },
     {
       route: '/products/[id]/terminal',

@@ -13,11 +13,13 @@ import {
   composeMobileProfileScreen,
   composeMobileStoresScreen,
   composeMobileTodayScreen,
+  composeMobileWatchlistScreen,
   composeMobileProductTerminalScreen,
   createMobileProfileHubViewModel,
   createMobileProductPriceTerminalViewModel,
   createMobileDiscoveryViewModel,
   createMobileStoresViewModel,
+  createMobileWatchlistViewModel,
   createMobileViewModel,
   loadMobileProductTerminal
 } from '../index.js';
@@ -289,6 +291,99 @@ describe('mobile app foundation', () => {
     ]);
   });
 
+  it('builds mobile Watchlist state from tracked products, alerts, and best price data', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 55, alertDealScoreAt: 80, favoriteStoresOnly: true });
+    api.addWatchlistItem('user-1', { productId: 'milk', targetPrice: 14, favoriteStoresOnly: false, allowedPriceTypes: ['shelf'] });
+
+    const viewModel = createMobileWatchlistViewModel('user-1', api);
+
+    assert.equal(viewModel.itemCount, 2);
+    assert.equal(viewModel.alertCount, 4);
+    assert.equal(viewModel.urgentAlertCount, 1);
+    assert.deepEqual(viewModel.actions, ['open_product', 'compare_stores', 'add_to_weekly_basket', 'scan_barcode']);
+    assert.deepEqual(viewModel.trackedProducts.map((product) => product.ticker), ['ZOEGAS-COFFEE-450G', 'ARLA-MILK-1L']);
+    assert.deepEqual(viewModel.trackedProducts[0], {
+      productId: 'coffee',
+      ticker: 'ZOEGAS-COFFEE-450G',
+      productName: 'Zoégas Coffee 450g',
+      targetPriceLabel: '55.00 SEK',
+      alertDealScoreAt: 80,
+      favoriteStoresOnly: true,
+      allowedPriceTypes: ['shelf', 'member', 'promotion', 'estimated'],
+      bestPriceLabel: '49.90 SEK',
+      bestStoreName: 'Willys Odenplan',
+      dealScore: 82,
+      alertTypes: ['deal_score', 'new_52_week_low', 'target_price']
+    });
+    assert.deepEqual(viewModel.alerts.map((alert) => `${alert.type}:${alert.severity}`), [
+      'target_price:opportunity',
+      'deal_score:opportunity',
+      'new_52_week_low:urgent',
+      'target_price:opportunity'
+    ]);
+  });
+
+  it('composes a renderable mobile Watchlist screen with tracked product rows, alerts, and actions', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 55, alertDealScoreAt: 80, favoriteStoresOnly: true });
+    api.addWatchlistItem('user-1', { productId: 'milk', targetPrice: 14, favoriteStoresOnly: false, allowedPriceTypes: ['shelf'] });
+
+    const screen = composeMobileWatchlistScreen('user-1', api);
+
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.title, 'Watchlist');
+    assert.equal(screen.state, 'ready');
+    assert.deepEqual(screen.children.map((section) => section.key), ['summary', 'tracked-products', 'active-alerts', 'actions']);
+
+    const summary = screen.children.find((section) => section.key === 'summary');
+    assert.equal(summary?.type, 'section');
+    assert.deepEqual(summary?.children.map((metric) => 'value' in metric ? metric.value : null), ['2', '4', '1']);
+
+    const tracked = screen.children.find((section) => section.key === 'tracked-products');
+    if (!tracked || tracked.type !== 'section') throw new Error('tracked products section missing');
+    assert.deepEqual(tracked.children.map((row) => row.key), ['watch:coffee', 'watch:milk']);
+    assert.equal('value' in tracked.children[0]! ? tracked.children[0]!.value : null, '49.90 SEK at Willys Odenplan, target 55.00 SEK, 3 alerts');
+
+    const alerts = screen.children.find((section) => section.key === 'active-alerts');
+    if (!alerts || alerts.type !== 'section') throw new Error('alerts section missing');
+    assert.equal(alerts.children[0]?.key, 'alert:coffee:new_52_week_low');
+    assert.equal('value' in alerts.children[0]! ? alerts.children[0]!.value : null, 'urgent: new 52 week low');
+
+    const actions = screen.children.find((section) => section.key === 'actions');
+    assert.equal(actions?.type, 'section');
+    assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Open product', 'Compare stores', 'Add to basket', 'Scan barcode']);
+  });
+
+  it('composes a Watchlist empty state when no products are tracked', () => {
+    const screen = composeMobileWatchlistScreen('new-user');
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.state, 'empty');
+    const tracked = screen.children.find((section) => section.key === 'tracked-products');
+    const alerts = screen.children.find((section) => section.key === 'active-alerts');
+
+    if (!tracked || tracked.type !== 'section') throw new Error('tracked products section missing');
+    if (!alerts || alerts.type !== 'section') throw new Error('alerts section missing');
+    assert.deepEqual(tracked.children, [
+      {
+        type: 'empty',
+        key: 'no-watchlist-items',
+        message: 'Watch products to get price, Deal Score, and new-low alerts.',
+        action: 'search_product'
+      }
+    ]);
+    assert.deepEqual(alerts.children, [
+      {
+        type: 'empty',
+        key: 'no-watchlist-alerts',
+        message: 'No watched products are crossing alert thresholds yet.',
+        action: 'scan_barcode'
+      }
+    ]);
+  });
+
   it('builds mobile Profile hub state from budget, household, notification, and privacy data', () => {
     const api = createGroceryViewApi();
     api.addFavoriteStore('user-1', 'willys-odenplan');
@@ -457,6 +552,7 @@ describe('mobile app foundation', () => {
     assert.deepEqual(plan.routes.map((route) => route.path), [
       '/today',
       '/stores',
+      '/watchlist',
       '/products/[id]/terminal',
       '/basket',
       '/scan/barcode',
@@ -488,6 +584,7 @@ describe('mobile app foundation', () => {
     assert.equal(plan.authRequiredByDefault, true);
     assert.deepEqual(plan.screens.map((screen) => screen.route), [
       '/today',
+      '/watchlist',
       '/products/[id]/terminal',
       '/basket',
       '/scan/barcode',
@@ -495,6 +592,12 @@ describe('mobile app foundation', () => {
       '/review-queue',
       '/profile'
     ]);
+
+    const watchlist = plan.screens.find((screen) => screen.route === '/watchlist');
+    assert.equal(watchlist?.screen, 'WatchlistScreen');
+    assert.match(watchlist?.dataDependencies.join(','), /watchlist_alerts/);
+    assert.deepEqual(watchlist?.actions, ['open_product', 'compare_stores', 'add_to_weekly_basket']);
+    assert.match(watchlist?.offlineBehavior ?? '', /cached watchlist alerts/i);
 
     const terminal = plan.screens.find((screen) => screen.route === '/products/[id]/terminal');
     assert.equal(terminal?.screen, 'ProductPriceTerminalScreen');
