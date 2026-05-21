@@ -19,6 +19,14 @@ export class ProductsController {
     return { ...terminal, demo: true };
   }
 
+  @Get(':id/spread')
+  @ApiOkResponse({ description: 'Current verified store price spread for a product' })
+  spread(@Param('id') id: string) {
+    const spread = groceryApi.getProductPriceSpread(id);
+    if (!spread) throw new NotFoundException('Product not found');
+    return { ...spread, demo: true };
+  }
+
   @Get(':id')
   @ApiOkResponse({ description: 'Product detail data' })
   detail(@Param('id') id: string) {
