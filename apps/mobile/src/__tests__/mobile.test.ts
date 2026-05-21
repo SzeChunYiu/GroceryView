@@ -10,6 +10,7 @@ import {
   buildMobileScreenBlueprints,
   buildMobileShell,
   buildScanResult,
+  composeMobileBarcodeScanScreen,
   composeMobileBasketScreen,
   composeMobileBudgetScreen,
   composeMobileHouseholdScreen,
@@ -19,6 +20,7 @@ import {
   composeMobileTodayScreen,
   composeMobileWatchlistScreen,
   composeMobileProductTerminalScreen,
+  createMobileBarcodeScanViewModel,
   createMobileBudgetRouteViewModel,
   createMobileHouseholdViewModel,
   createMobilePrivacyViewModel,
@@ -840,6 +842,73 @@ describe('mobile app foundation', () => {
     assert.equal(result.product?.ticker, 'ZOEGAS-COFFEE-450G');
     assert.equal(result.verdict, 'Buy');
     assert.deepEqual(result.actions, ['add_to_weekly_basket', 'add_to_watchlist', 'compare_stores']);
+  });
+
+  it('builds mobile Barcode Scan state from verified product matches and unknown barcodes', () => {
+    const matched = createMobileBarcodeScanViewModel({ code: '7310000000000', productId: 'coffee' });
+    assert.deepEqual(matched.product, {
+      productId: 'coffee',
+      ticker: 'ZOEGAS-COFFEE-450G',
+      productName: 'Zoégas Coffee 450g',
+      bestPriceLabel: '49.90 SEK',
+      dealScore: 82
+    });
+    assert.equal(matched.verdict, 'Buy');
+    assert.equal(matched.confidenceLabel, 'verified observed price');
+    assert.deepEqual(matched.equivalentProducts, ['same_category_equivalents', 'private_label_swaps']);
+    assert.deepEqual(matched.actions, ['add_to_weekly_basket', 'add_to_watchlist', 'compare_stores']);
+
+    const unknown = createMobileBarcodeScanViewModel({ code: 'unknown-code' });
+    assert.equal(unknown.product, null);
+    assert.equal(unknown.verdict, 'Compare');
+    assert.equal(unknown.confidenceLabel, 'unknown barcode');
+    assert.deepEqual(unknown.actions, ['search_product', 'report_unknown_barcode']);
+  });
+
+  it('composes a renderable mobile Barcode Scan screen with product, equivalents, and actions', () => {
+    const screen = composeMobileBarcodeScanScreen({ code: '7310000000000', productId: 'coffee' });
+
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.title, 'Barcode scan');
+    assert.equal(screen.state, 'ready');
+    assert.deepEqual(screen.children.map((section) => section.key), ['summary', 'product', 'equivalents', 'actions']);
+
+    const summary = screen.children.find((section) => section.key === 'summary');
+    assert.equal(summary?.type, 'section');
+    assert.deepEqual(summary?.children.map((metric) => 'value' in metric ? metric.value : null), ['verified observed price', 'Buy', '2']);
+
+    const product = screen.children.find((section) => section.key === 'product');
+    if (!product || product.type !== 'section') throw new Error('product section missing');
+    assert.equal(product.children[0]?.key, 'product:coffee');
+    assert.equal('value' in product.children[0]! ? product.children[0]!.value : null, '49.90 SEK, score 82');
+
+    const equivalents = screen.children.find((section) => section.key === 'equivalents');
+    if (!equivalents || equivalents.type !== 'section') throw new Error('equivalents section missing');
+    assert.deepEqual(equivalents.children.map((row) => row.key), ['equivalent:same_category_equivalents', 'equivalent:private_label_swaps']);
+
+    const actions = screen.children.find((section) => section.key === 'actions');
+    assert.equal(actions?.type, 'section');
+    assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Add to basket', 'Watch price', 'Compare stores']);
+  });
+
+  it('composes a Barcode Scan empty state for unknown barcodes', () => {
+    const screen = composeMobileBarcodeScanScreen({ code: 'unknown-code' });
+
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.state, 'empty');
+    const product = screen.children.find((section) => section.key === 'product');
+    const actions = screen.children.find((section) => section.key === 'actions');
+    if (!product || product.type !== 'section') throw new Error('product section missing');
+    assert.deepEqual(product.children, [
+      {
+        type: 'empty',
+        key: 'unknown-barcode',
+        message: 'No verified product is linked to this barcode yet.',
+        action: 'search_product'
+      }
+    ]);
+    assert.equal(actions?.type, 'section');
+    assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Search product', 'Report barcode']);
   });
 
   it('builds receipt scan placeholder with confidence and budget review action', () => {

@@ -716,6 +716,7 @@ export type MobileScreenComponentAction =
   | MobileWatchlistViewModel['actions'][number]
   | MobileBasketViewModel['actions'][number]
   | 'open_product'
+  | 'search_product'
   | 'compare_basket'
   | 'scan_barcode'
   | 'set_weekly_budget'
@@ -726,6 +727,7 @@ export type MobileScreenComponentAction =
   | 'invite_household_member'
   | 'review_household_basket'
   | 'review_household_watchlist'
+  | 'report_unknown_barcode'
   | 'reauthenticate'
   | 'retry_online'
   | 'download_export'
@@ -779,6 +781,14 @@ function actionLabel(action: MobileProductPriceTerminalViewModel['actions'][numb
   if (action === 'add_to_weekly_basket') return 'Add to basket';
   if (action === 'compare_stores') return 'Compare stores';
   return 'Verify with receipt';
+}
+
+function scanActionLabel(action: Extract<MobileScreenComponentAction, 'add_to_weekly_basket' | 'add_to_watchlist' | 'compare_stores' | 'search_product' | 'report_unknown_barcode'>): string {
+  if (action === 'add_to_weekly_basket') return 'Add to basket';
+  if (action === 'add_to_watchlist') return 'Watch price';
+  if (action === 'compare_stores') return 'Compare stores';
+  if (action === 'search_product') return 'Search product';
+  return 'Report barcode';
 }
 
 function todayActionLabel(action: Extract<MobileScreenComponentAction, 'open_product' | 'compare_basket' | 'scan_barcode'>): string {
@@ -1771,6 +1781,21 @@ export type ScanResult = {
   actions: string[];
 };
 
+export type MobileBarcodeScanViewModel = {
+  code: string;
+  product: {
+    productId: string;
+    ticker: string;
+    productName: string;
+    bestPriceLabel: string;
+    dealScore: number;
+  } | null;
+  verdict: string;
+  confidenceLabel: string;
+  equivalentProducts: string[];
+  actions: Array<'add_to_weekly_basket' | 'add_to_watchlist' | 'compare_stores' | 'search_product' | 'report_unknown_barcode'>;
+};
+
 export function buildScanResult(request: ScanRequest, api: MobileApi = createGroceryViewApi()): ScanResult {
   if (request.mode === 'receipt') {
     return {
@@ -1801,6 +1826,87 @@ export function buildScanResult(request: ScanRequest, api: MobileApi = createGro
     confidenceLabel: product ? 'verified observed price' : 'unknown barcode',
     equivalentProducts: product ? ['same_category_equivalents', 'private_label_swaps'] : [],
     actions: product ? ['add_to_weekly_basket', 'add_to_watchlist', 'compare_stores'] : ['search_product', 'report_unknown_barcode']
+  };
+}
+
+export function createMobileBarcodeScanViewModel(
+  input: { code: string; productId?: string },
+  api: MobileApi = createGroceryViewApi()
+): MobileBarcodeScanViewModel {
+  const result = buildScanResult({ mode: 'barcode', code: input.code, productId: input.productId }, api);
+
+  return {
+    code: result.code,
+    product: result.product
+      ? {
+          productId: result.product.id,
+          ticker: result.product.ticker,
+          productName: result.product.name,
+          bestPriceLabel: formatPriceLabel(result.product.currentBestPrice),
+          dealScore: result.product.dealScore
+        }
+      : null,
+    verdict: result.verdict,
+    confidenceLabel: result.confidenceLabel,
+    equivalentProducts: [...result.equivalentProducts],
+    actions: result.actions as MobileBarcodeScanViewModel['actions']
+  };
+}
+
+export function composeMobileBarcodeScanScreen(
+  input: { code: string; productId?: string },
+  api: MobileApi = createGroceryViewApi()
+): MobileScreenComponent {
+  const viewModel = createMobileBarcodeScanViewModel(input, api);
+
+  return {
+    type: 'screen',
+    key: `barcode-scan:${viewModel.code}`,
+    title: 'Barcode scan',
+    state: viewModel.product ? 'ready' : 'empty',
+    children: [
+      {
+        type: 'section',
+        key: 'summary',
+        title: 'Summary',
+        children: [
+          { type: 'metric', key: 'confidence', label: 'Confidence', value: viewModel.confidenceLabel, tone: viewModel.product ? 'positive' : 'warning' },
+          { type: 'metric', key: 'verdict', label: 'Verdict', value: viewModel.verdict, tone: viewModel.product ? 'positive' : 'neutral' },
+          { type: 'metric', key: 'equivalents', label: 'Equivalents', value: String(viewModel.equivalentProducts.length), tone: viewModel.equivalentProducts.length > 0 ? 'positive' : 'neutral' }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'product',
+        title: 'Product',
+        children: viewModel.product
+          ? [
+              { type: 'row', key: `product:${viewModel.product.productId}`, label: viewModel.product.ticker, value: `${viewModel.product.bestPriceLabel}, score ${viewModel.product.dealScore}` },
+              { type: 'row', key: 'product-name', label: 'Name', value: viewModel.product.productName }
+            ]
+          : [{ type: 'empty', key: 'unknown-barcode', message: 'No verified product is linked to this barcode yet.', action: 'search_product' }]
+      },
+      {
+        type: 'section',
+        key: 'equivalents',
+        title: 'Equivalents',
+        children: viewModel.equivalentProducts.length > 0
+          ? viewModel.equivalentProducts.map((equivalent) => ({ type: 'row', key: `equivalent:${equivalent}`, label: equivalent, value: 'Available for comparison' }))
+          : [{ type: 'empty', key: 'no-equivalents', message: 'Scan or search to find equivalent products.', action: 'search_product' }]
+      },
+      {
+        type: 'section',
+        key: 'actions',
+        title: 'Actions',
+        children: viewModel.actions.map((action, index) => ({
+          type: 'action',
+          key: action,
+          action,
+          label: scanActionLabel(action),
+          primary: index === 0
+        }))
+      }
+    ]
   };
 }
 
