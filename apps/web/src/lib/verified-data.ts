@@ -314,6 +314,37 @@ export const sourceRouteMap = sourceReadinessMatrix.map((source) => {
   };
 });
 
+export const sourceClaimLedger = sourceCoverage.map((source) => {
+  const route =
+    source.name === 'Stockholm store directory'
+      ? '/stores'
+      : source.name === 'OpenPrices SEK observations'
+        ? '/products'
+        : '/compare';
+  const allowedClaim =
+    source.name === 'Stockholm store directory'
+      ? 'Verified Stockholm store locations, brands, formats, districts, and address coverage.'
+      : source.name === 'OpenPrices SEK observations'
+        ? 'Observed community price medians, observation counts, product codes, and latest sighting dates.'
+        : 'Chain-wide Willys and Hemkop catalogue prices and same-product spread comparisons.';
+  const blockedClaim =
+    source.name === 'Stockholm store directory'
+      ? 'Branch-level prices, inventory, opening hours, or promotion availability.'
+      : source.name === 'OpenPrices SEK observations'
+        ? 'Guaranteed current shelf price, store-specific availability, or member-only offer state.'
+        : 'Per-branch shelf prices, stock status, authenticated loyalty prices, or checkout totals.';
+
+  return {
+    name: source.name,
+    evidenceRoute: route,
+    source: source.source,
+    allowedClaim,
+    blockedClaim,
+    evidence: `${source.rows.toLocaleString('sv-SE')} rows · ${source.coverage}`,
+    freshness: source.freshness
+  };
+});
+
 export const keyMetrics = [
   { label: 'Verified price rows', value: (axfoodProducts.length + pricedProducts.length).toLocaleString('sv-SE'), detail: 'Axfood products plus OpenPrices observations rendered from generated modules.' },
   { label: 'Matched Willys/Hemköp products', value: matchedChainProducts.length.toLocaleString('sv-SE'), detail: 'Only products present in both chain catalogues are compared.' },
