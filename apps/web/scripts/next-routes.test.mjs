@@ -435,6 +435,18 @@ describe('Next.js web scaffold', () => {
     assert.match(profilePage, /Connected routes/);
   });
 
+  it('surfaces household planning from shared driver data', async () => {
+    const householdPage = await readFile(new URL('../src/app/household/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(householdPage, /accountProfile/);
+    assert.match(householdPage, /receiptReviewQueue/);
+    assert.match(householdPage, /accountProfile\.shopperName/);
+    assert.match(householdPage, /accountProfile\.preferredStore/);
+    assert.match(householdPage, /receiptReviewQueue\.map/);
+    assert.match(householdPage, /Receipt queue/);
+    assert.match(householdPage, /href=\{receipt\.href\}/);
+  });
+
 
   it('surfaces personal grocery inflation on the savings dashboard', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
