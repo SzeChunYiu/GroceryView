@@ -33,6 +33,8 @@ describe('GroceryView API app', () => {
     assert.equal(docs.body.info.title, 'GroceryView API');
     assert.ok(docs.body.paths['/health']);
     assert.ok(docs.body.paths['/products']);
+    assert.ok(docs.body.paths['/products/{id}/deal-score']);
+    assert.ok(docs.body.paths['/products/{id}/equivalents']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/products/{id}/spread']);
     assert.ok(docs.body.paths['/stores']);
@@ -102,6 +104,30 @@ describe('GroceryView API app', () => {
     assert.match(spread.body.customerRead, /ranges 15.00 SEK/);
     assert.equal(spread.body.guardrails.length, 3);
 
+    const dealScore = await request(app.getHttpServer()).get('/products/coffee/deal-score?distanceKm=12.5').expect(200);
+    assert.equal(dealScore.body.productId, 'coffee');
+    assert.equal(dealScore.body.score, 82);
+    assert.deepEqual(dealScore.body.band, { label: 'Good deal', verdict: 'Buy' });
+    assert.equal(dealScore.body.verdict, 'Buy');
+    assert.equal(dealScore.body.discountVsMedianPercent, 16.7);
+    assert.equal(dealScore.body.confidence, 0.9);
+    assert.match(dealScore.body.reasons[0], /Willys Odenplan/);
+    assert.equal(dealScore.body.demo, true);
+
+    const equivalents = await request(app.getHttpServer()).get('/products/milk/equivalents').expect(200);
+    assert.deepEqual(
+      equivalents.body.map((equivalent: { productId: string; bestStoreId: string; dealScore: number; demo: boolean }) => ({
+        productId: equivalent.productId,
+        bestStoreId: equivalent.bestStoreId,
+        dealScore: equivalent.dealScore,
+        demo: equivalent.demo
+      })),
+      [
+        { productId: 'private-label-milk', bestStoreId: 'willys-odenplan', dealScore: 73, demo: true },
+        { productId: 'butter', bestStoreId: 'coop-odenplan', dealScore: 40, demo: true }
+      ]
+    );
+
     await request(app.getHttpServer())
       .post('/users/demo/watchlist')
       .send({ productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, allowedPriceTypes: ['shelf'] })
@@ -151,6 +177,8 @@ describe('GroceryView API app', () => {
   it('returns 404 for missing product terminal data', async () => {
     await request(app.getHttpServer()).get('/products/missing-product/terminal').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/spread').expect(404);
+    await request(app.getHttpServer()).get('/products/missing-product/deal-score').expect(404);
+    await request(app.getHttpServer()).get('/products/missing-product/equivalents').expect(404);
   });
 
   it('returns 404 for missing store deals', async () => {

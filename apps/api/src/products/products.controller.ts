@@ -27,6 +27,22 @@ export class ProductsController {
     return { ...spread, demo: true };
   }
 
+  @Get(':id/deal-score')
+  @ApiOkResponse({ description: 'Deal Score v1 report with customer-facing reasons' })
+  dealScore(@Param('id') id: string, @Query('distanceKm') distanceKm?: string) {
+    const parsedDistanceKm = distanceKm === undefined ? undefined : Number(distanceKm);
+    const report = groceryApi.getDealScore(id, { distanceKm: parsedDistanceKm });
+    if (!report) throw new NotFoundException('Product not found');
+    return { ...report, demo: true };
+  }
+
+  @Get(':id/equivalents')
+  @ApiOkResponse({ description: 'Comparable products in the same category' })
+  equivalents(@Param('id') id: string) {
+    if (!groceryApi.getProduct(id)) throw new NotFoundException('Product not found');
+    return groceryApi.getProductEquivalents(id).map((equivalent) => ({ ...equivalent, demo: true }));
+  }
+
   @Get(':id')
   @ApiOkResponse({ description: 'Product detail data' })
   detail(@Param('id') id: string) {
