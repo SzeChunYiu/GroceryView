@@ -340,6 +340,42 @@ export const products = [
     confidence: 'medium',
     observedAt: '2026-05-20 19:25 CET',
     source: 'retailer flyer observation'
+  },
+  {
+    slug: 'anamma-formbar-fars-850g',
+    ticker: 'ANAMMA-FORMBAR-FARS-850G',
+    name: 'Anamma Formbar Färs 850g',
+    store: 'Coop Norra Stationsgatan',
+    price: '64.90 SEK',
+    unitPrice: '76.35 SEK/kg',
+    priceType: 'member promo',
+    confidence: 'medium',
+    observedAt: '2026-05-20 20:05 CET',
+    source: 'retailer flyer observation'
+  },
+  {
+    slug: 'garant-ekologisk-tofu-270g',
+    ticker: 'GARANT-EKO-TOFU-270G',
+    name: 'Garant Ekologisk Tofu 270g',
+    store: 'Willys Odenplan',
+    price: '21.90 SEK',
+    unitPrice: '81.11 SEK/kg',
+    priceType: 'shelf',
+    confidence: 'high',
+    observedAt: '2026-05-20 20:15 CET',
+    source: 'in-store shelf observation'
+  },
+  {
+    slug: 'zeta-kikartor-380g',
+    ticker: 'ZETA-KIKARTOR-380G',
+    name: 'Zeta Kikärtor 380g',
+    store: 'Hemköp Hornstull',
+    price: '14.90 SEK',
+    unitPrice: '39.21 SEK/kg',
+    priceType: 'shelf',
+    confidence: 'high',
+    observedAt: '2026-05-20 20:25 CET',
+    source: 'in-store shelf observation'
   }
 ];
 
@@ -458,6 +494,15 @@ export const stores = [
     format: 'hypermarket',
     bestCategory: 'Personal care',
     distanceLabel: '2.9 km from saved area'
+  },
+  {
+    slug: 'coop-norra-stationsgatan',
+    name: 'Coop Norra Stationsgatan',
+    ingestionFixture: 'Coop Norra Stationsgatan',
+    district: 'Vasastan',
+    format: 'mid-size supermarket',
+    bestCategory: 'Plant-based',
+    distanceLabel: '1.9 km from saved area'
   }
 ];
 
@@ -559,6 +604,13 @@ export const categories = [
     index: '95.9',
     movement: '-4.1%',
     topDeal: 'LIBRESSE-BINDOR-NORMAL-14P'
+  },
+  {
+    slug: 'plant-based',
+    name: 'Plant-based',
+    index: '93.8',
+    movement: '-6.2%',
+    topDeal: 'ANAMMA-FORMBAR-FARS-850G'
   }
 ];
 
@@ -623,6 +675,16 @@ export const dealOpportunityRail = rankDealOpportunities({
       regularPrice: 39.9,
       dealScore: 82,
       sourceConfidence: 0.87
+    },
+    {
+      productId: 'anamma-formbar-fars-850g',
+      productName: 'Anamma Formbar Färs 850g',
+      storeId: 'coop-norra-stationsgatan',
+      storeName: 'Coop Norra Stationsgatan',
+      currentPrice: 64.9,
+      regularPrice: 79.9,
+      dealScore: 83,
+      sourceConfidence: 0.8
     },
     {
       productId: 'felix-ketchup-1kg',
@@ -723,13 +785,27 @@ export const basketSubstitutionRadar = [
     basketImpact: '-13.00 SEK hygiene restock',
     sourceConfidence: 0.87,
     reason: 'Personal-care staples are under baseline and should be bundled before household items run out.'
+  },
+  {
+    anchorSlug: 'anamma-formbar-fars-850g',
+    anchorName: 'Anamma Formbar Färs 850g',
+    anchorStoreSlug: 'coop-norra-stationsgatan',
+    anchorStoreName: 'Coop Norra Stationsgatan',
+    substituteSlug: 'garant-ekologisk-tofu-270g',
+    substituteName: 'Garant Ekologisk Tofu 270g',
+    substituteStoreSlug: 'willys-odenplan',
+    substituteStoreName: 'Willys Odenplan',
+    verdict: 'compare',
+    basketImpact: '-15.00 SEK meal-prep check',
+    sourceConfidence: 0.8,
+    reason: 'Plant-based protein rows are below baseline and should be compared before locking meal-prep baskets.'
   }
 ];
 
 export const stockholmAreas = [
   { slug: 'norrmalm',   name: 'Norrmalm',   storeCount: 2, topSavings: 'Snacks' },
   { slug: 'sodermalm',  name: 'Södermalm',  storeCount: 3, topSavings: 'Meat' },
-  { slug: 'vasastan',   name: 'Vasastan',   storeCount: 2, topSavings: 'Coffee' },
+  { slug: 'vasastan',   name: 'Vasastan',   storeCount: 3, topSavings: 'Plant-based' },
   { slug: 'hagersten',  name: 'Hägersten',  storeCount: 1, topSavings: 'Rice' },
   { slug: 'liljeholmen', name: 'Liljeholmen', storeCount: 1, topSavings: 'Pantry' },
   { slug: 'stockholm-county', name: 'Stockholm County', storeCount: 1, topSavings: 'Pasta' },
@@ -759,8 +835,8 @@ export const sourceCoverage = [
     fixture: 'Store profile',
     surface: 'district store',
     status: 'ready',
-    visibleRows: 4,
-    newestSignal: 'Swedenborgsgatan and Daglivs rows now cover dairy, bread, produce, and toothpaste'
+    visibleRows: 5,
+    newestSignal: 'Swedenborgsgatan, Daglivs, and Norra Stationsgatan rows now cover dairy, bread, produce, toothpaste, and plant-based protein'
   },
   {
     chain: 'Hemköp',
@@ -868,6 +944,18 @@ export const storeComparisonBoard = [
     leadSignal: 'Libresse and Pepsodent rows make hygiene restocks visible before the weekly food trip.',
     visibleItems: 2,
     basketImpact: '-13.00 SEK'
+  },
+  {
+    slug: 'vasastan-plant-based-prep',
+    area: 'Vasastan',
+    primaryStoreSlug: 'coop-norra-stationsgatan',
+    primaryStoreName: 'Coop Norra Stationsgatan',
+    comparisonStoreSlug: 'willys-odenplan',
+    comparisonStoreName: 'Willys Odenplan',
+    basketFocus: 'Plant-based meal prep',
+    leadSignal: 'Anamma färs and Garant tofu rows expose whether to split plant-based protein across nearby stores.',
+    visibleItems: 2,
+    basketImpact: '-15.00 SEK'
   }
 ];
 
@@ -915,6 +1003,17 @@ export const shoppingTripSwitchboard = [
     saving: '-13.00 SEK',
     decision: 'Add to the route when personal-care stock falls below one week.',
     href: '/categories/personal-care'
+  },
+  {
+    title: 'Plant-based meal prep',
+    area: 'Vasastan',
+    store: 'Coop Norra Stationsgatan',
+    category: 'Plant-based',
+    basket: 'Anamma färs, tofu, chickpeas',
+    spend: '101.70 SEK',
+    saving: '-15.00 SEK',
+    decision: 'Split protein rows across Coop and Willys when weekday meal prep is planned.',
+    href: '/categories/plant-based'
   }
 ];
 
@@ -947,7 +1046,9 @@ export const weeklyBasket = [
   { slug: 'garant-korsbarstomater-250g',   qty: 2, total: '39.80 SEK', vsLastWeek: '-5.4%' },
   { slug: 'kronfagel-kycklingfile-1kg',    qty: 1, total: '109.00 SEK', vsLastWeek: '-2.2%' },
   { slug: 'libresse-bindor-normal-14p',     qty: 1, total: '29.90 SEK', vsLastWeek: '-4.1%' },
-  { slug: 'grumme-handdisk-original-500ml', qty: 1, total: '24.90 SEK', vsLastWeek: '-1.7%' }
+  { slug: 'grumme-handdisk-original-500ml', qty: 1, total: '24.90 SEK', vsLastWeek: '-1.7%' },
+  { slug: 'anamma-formbar-fars-850g',       qty: 1, total: '64.90 SEK', vsLastWeek: '-6.2%' },
+  { slug: 'zeta-kikartor-380g',             qty: 2, total: '29.80 SEK', vsLastWeek: '-2.4%' }
 ];
 
 export const savingsPlaybook = [
@@ -999,6 +1100,13 @@ export const savingsPlaybook = [
     action: 'Bundle Libresse and Pepsodent before household staples hit low-stock status',
     impact: '-13.00 SEK restock basket',
     href: '/categories/personal-care'
+  },
+  {
+    title: 'Plant-based meal-prep split',
+    trigger: 'Plant-based index is 6.2% under baseline across Vasastan protein rows',
+    action: 'Compare Coop Anamma with Willys tofu before building weekday bowls',
+    impact: '-15.00 SEK prep basket',
+    href: '/categories/plant-based'
   }
 ];
 
@@ -1050,6 +1158,18 @@ export const watchlistAlerts = [
     confidence: 'high',
     allowedPriceTypes: ['shelf'],
     nextAction: 'Move breakfast staples to Hornstull this week.'
+  },
+  {
+    productSlug: 'anamma-formbar-fars-850g',
+    storeSlug: 'coop-norra-stationsgatan',
+    targetPrice: 68,
+    currentPrice: 64.9,
+    usualPrice: 79.9,
+    trigger: 'target met',
+    channel: 'push',
+    confidence: 'medium',
+    allowedPriceTypes: ['member promo', 'shelf'],
+    nextAction: 'Add plant-based protein to the meal-prep route while the Coop promo is active.'
   }
 ];
 
@@ -1057,7 +1177,7 @@ export const householdSavings = {
   weeklyTotal: '438.50 SEK',
   vsLastWeek: '-30.10 SEK',
   vsLastMonth: '-78.40 SEK',
-  topSaving: { product: 'Libresse Bindor Normal 14-pack', amount: '-10.00 SEK', driver: 'Lindhagen personal-care promo' }
+  topSaving: { product: 'Anamma Formbar Färs 850g', amount: '-15.00 SEK', driver: 'Norra Stationsgatan plant-based promo' }
 };
 
 export const savingsDashboard = {
@@ -1099,10 +1219,18 @@ export const savingsDashboard = {
       signal: '2.2% under meat baseline',
       action: 'Compare against the Liljeholmen salmon promo before shopping',
       href: '/products/kronfagel-kycklingfile-1kg'
+    },
+    {
+      label: 'Plant-based meal prep',
+      product: 'Anamma Formbar Färs 850g',
+      store: 'Coop Norra Stationsgatan',
+      signal: '6.2% under plant-based baseline',
+      action: 'Split with Willys tofu when weekday bowls are planned',
+      href: '/products/anamma-formbar-fars-850g'
     }
   ],
   districtSavings: [
-    { district: 'Vasastan', planned: '612.40 SEK', avoided: '24.80 SEK', driver: 'Coffee and dairy promos' },
+    { district: 'Vasastan', planned: '612.40 SEK', avoided: '39.80 SEK', driver: 'Coffee, dairy, and plant-based promos' },
     { district: 'Södermalm', planned: '488.30 SEK', avoided: '23.50 SEK', driver: 'Breakfast and chicken promos' },
     { district: 'Norrmalm', planned: '391.20 SEK', avoided: '13.90 SEK', driver: 'Snacks and eggs' },
     { district: 'Hägersten', planned: '264.10 SEK', avoided: '9.90 SEK', driver: 'Rice and pantry clearance' },
@@ -1235,6 +1363,14 @@ export const mealBasketIdeas = [
     savings: '-10.50 SEK',
     route: 'Take the Zoegas member promo and skip chocolate stock-up while snacks trend high',
     products: ['zoegas-coffee-450g', 'marabou-mjolkchoklad-200g', 'skogaholm-rostbrod-500g']
+  },
+  {
+    title: 'plant-based prep bowls',
+    area: 'Vasastan + Hornstull',
+    total: '116.60 SEK',
+    savings: '-17.40 SEK',
+    route: 'Start at Coop Norra Stationsgatan for Anamma and finish with Hemköp chickpeas when passing Hornstull',
+    products: ['anamma-formbar-fars-850g', 'garant-ekologisk-tofu-270g', 'zeta-kikartor-380g']
   }
 ];
 
@@ -1256,7 +1392,7 @@ export const mealPlanner = {
       store: 'ICA Kvantum Liljeholmen',
       total: '154.70 SEK',
       savings: '-10.00 SEK',
-      href: '/products/ica-laxfile-500g'
+      href: '/products/fiskeriet-laxfile-500g'
     },
     {
       day: 'Tuesday',
