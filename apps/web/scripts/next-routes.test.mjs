@@ -129,4 +129,18 @@ describe('Next.js web scaffold', () => {
     assert.match(marketShell, /stockholmAreas\.map/);
     assert.match(marketShell, /Area coverage tape/);
   });
+
+  it('surfaces a dedicated savings dashboard route from homepage driver data', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+    const savingsPage = await readFile(new URL('../src/app/savings-dashboard/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(demoData, /export const savingsDashboard = /);
+    assert.match(demoData, /monthToDate/);
+    assert.match(demoData, /districtSavings/);
+    assert.match(marketShell, /\/savings-dashboard/);
+    assert.match(marketShell, /savingsDashboard\.watchpoints\.map/);
+    assert.match(savingsPage, /savingsDashboard\.districtSavings\.map/);
+    assert.match(savingsPage, /Priority watchpoints/);
+  });
 });
