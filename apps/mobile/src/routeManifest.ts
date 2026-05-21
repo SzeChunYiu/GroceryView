@@ -67,7 +67,7 @@ const routes: MobileMvpRoute[] = [
     screen: 'StoresScreen',
     title: 'Stores',
     tab: 'stores',
-    params: [],
+    params: [{ name: 'selectedStoreId', required: false, source: 'query' }],
     requiresAuth: true,
     preloadQueryIds: ['stores', 'basket']
   },

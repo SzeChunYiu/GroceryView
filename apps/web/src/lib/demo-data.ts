@@ -351,7 +351,8 @@ export const stores = [
     district: 'Vasastan',
     format: 'discount supermarket',
     bestCategory: 'Coffee',
-    distanceLabel: '1.2 km from saved area'
+    distanceLabel: '1.2 km from saved area',
+    mobileRoute: '/stores?selectedStoreId=willys-odenplan'
   },
   {
     slug: 'ica-nara-sergels-torg',
@@ -360,7 +361,8 @@ export const stores = [
     district: 'Norrmalm',
     format: 'convenience supermarket',
     bestCategory: 'Snacks',
-    distanceLabel: '0.6 km from saved area'
+    distanceLabel: '0.6 km from saved area',
+    mobileRoute: '/stores?selectedStoreId=ica-nara-sergels-torg'
   },
   {
     slug: 'coop-swedenborgsgatan',
@@ -369,7 +371,8 @@ export const stores = [
     district: 'Södermalm',
     format: 'mid-size supermarket',
     bestCategory: 'Dairy',
-    distanceLabel: '2.4 km from saved area'
+    distanceLabel: '2.4 km from saved area',
+    mobileRoute: '/stores?selectedStoreId=coop-swedenborgsgatan'
   },
   {
     slug: 'lidl-sveavagen',
@@ -378,7 +381,8 @@ export const stores = [
     district: 'Vasastan',
     format: 'discount supermarket',
     bestCategory: 'Dairy',
-    distanceLabel: '1.6 km from saved area'
+    distanceLabel: '1.6 km from saved area',
+    mobileRoute: '/stores?selectedStoreId=lidl-sveavagen'
   },
   {
     slug: 'hemkop-stockholm',
@@ -387,7 +391,8 @@ export const stores = [
     district: 'Norrmalm',
     format: 'mid-size supermarket',
     bestCategory: 'Pantry',
-    distanceLabel: '1.1 km from saved area'
+    distanceLabel: '1.1 km from saved area',
+    mobileRoute: '/stores?selectedStoreId=hemkop-stockholm'
   },
   {
     slug: 'city-gross-stockholm',
@@ -396,7 +401,8 @@ export const stores = [
     district: 'Stockholm County',
     format: 'big-box supermarket',
     bestCategory: 'Frozen',
-    distanceLabel: '8.7 km from saved area'
+    distanceLabel: '8.7 km from saved area',
+    mobileRoute: '/stores?selectedStoreId=city-gross-stockholm'
   },
   {
     slug: 'matmissionen-hagersten',
@@ -404,7 +410,8 @@ export const stores = [
     district: 'Hägersten',
     format: 'social supermarket',
     bestCategory: 'Pantry',
-    distanceLabel: '5.8 km from saved area'
+    distanceLabel: '5.8 km from saved area',
+    mobileRoute: '/stores?selectedStoreId=matmissionen-hagersten'
   },
   {
     slug: 'tempo-hornstull',
@@ -412,7 +419,8 @@ export const stores = [
     district: 'Södermalm',
     format: 'neighborhood supermarket',
     bestCategory: 'Breakfast',
-    distanceLabel: '3.1 km from saved area'
+    distanceLabel: '3.1 km from saved area',
+    mobileRoute: '/stores?selectedStoreId=tempo-hornstull'
   },
   {
     slug: 'ica-kvantum-liljeholmen',
@@ -421,7 +429,8 @@ export const stores = [
     district: 'Liljeholmen',
     format: 'large supermarket',
     bestCategory: 'Dinner staples',
-    distanceLabel: '4.4 km from saved area'
+    distanceLabel: '4.4 km from saved area',
+    mobileRoute: '/stores?selectedStoreId=ica-kvantum-liljeholmen'
   },
   {
     slug: 'hemkop-hornstull',
@@ -430,7 +439,8 @@ export const stores = [
     district: 'Södermalm',
     format: 'mid-size supermarket',
     bestCategory: 'Beverages',
-    distanceLabel: '3.3 km from saved area'
+    distanceLabel: '3.3 km from saved area',
+    mobileRoute: '/stores?selectedStoreId=hemkop-hornstull'
   },
   {
     slug: 'coop-daglivs-fridhemsplan',
@@ -439,7 +449,8 @@ export const stores = [
     district: 'Kungsholmen',
     format: 'large supermarket',
     bestCategory: 'Produce',
-    distanceLabel: '2.8 km from saved area'
+    distanceLabel: '2.8 km from saved area',
+    mobileRoute: '/stores?selectedStoreId=coop-daglivs-fridhemsplan'
   },
   {
     slug: 'hemkop-skanstull',
@@ -448,7 +459,8 @@ export const stores = [
     district: 'Södermalm',
     format: 'mid-size supermarket',
     bestCategory: 'Meat',
-    distanceLabel: '3.7 km from saved area'
+    distanceLabel: '3.7 km from saved area',
+    mobileRoute: '/stores?selectedStoreId=hemkop-skanstull'
   },
   {
     slug: 'ica-maxi-lindhagen',
@@ -457,7 +469,8 @@ export const stores = [
     district: 'Kungsholmen',
     format: 'hypermarket',
     bestCategory: 'Personal care',
-    distanceLabel: '2.9 km from saved area'
+    distanceLabel: '2.9 km from saved area',
+    mobileRoute: '/stores?selectedStoreId=ica-maxi-lindhagen'
   }
 ];
 

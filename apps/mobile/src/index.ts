@@ -257,6 +257,7 @@ export type MobileDiscoveryViewModel = {
 
 export type MobileStoresViewModel = {
   userId: string;
+  selectedStoreId: string | null;
   favoriteStoreCount: number;
   basketItemCount: number;
   stores: Array<{
@@ -283,6 +284,19 @@ export type MobileStoresViewModel = {
       freshnessLabel: 'fresh' | 'mixed' | 'stale';
     } | null;
   }>;
+  selectedStore: {
+    id: string;
+    name: string;
+    district: string;
+    deals: Array<{
+      productId: string;
+      ticker: string;
+      productName: string;
+      price: number;
+      dealScore: number;
+      verdict: string;
+    }>;
+  } | null;
   actions: Array<'open_store' | 'compare_basket' | 'scan_barcode'>;
 };
 
@@ -353,47 +367,75 @@ export function createMobileDiscoveryViewModel(
   };
 }
 
-export function createMobileStoresViewModel(userId: string, api: MobileApi = createGroceryViewApi()): MobileStoresViewModel {
+export type MobileStoresInput = string | { userId: string; selectedStoreId?: string };
+
+function normalizeMobileStoresInput(input: MobileStoresInput): { userId: string; selectedStoreId?: string } {
+  return typeof input === 'string' ? { userId: input } : input;
+}
+
+export function createMobileStoresViewModel(input: MobileStoresInput, api: MobileApi = createGroceryViewApi()): MobileStoresViewModel {
+  const { userId, selectedStoreId } = normalizeMobileStoresInput(input);
   const favoriteStoreIds = new Set(api.getFavoriteStores(userId).map((store) => store.id));
   const offerBasket = api.getLocalOfferBasketReport(userId);
+  const stores = api.getStores().map((store) => {
+    const deals = api.getStoreDeals(store.id);
+    const topDeal = deals[0] ?? null;
+    const basketQuote = offerBasket.stores.find((candidate) => candidate.storeId === store.id) ?? null;
+    return {
+      id: store.id,
+      name: store.name,
+      chain: store.chain,
+      district: store.district,
+      address: store.address,
+      confidence: store.confidence,
+      isFavorite: favoriteStoreIds.has(store.id),
+      dealCount: deals.length,
+      topDeal: topDeal
+        ? {
+            productId: topDeal.productId,
+            ticker: topDeal.ticker,
+            productName: topDeal.productName,
+            price: topDeal.price,
+            dealScore: topDeal.dealScore,
+            verdict: topDeal.band.verdict
+          }
+        : null,
+      basketQuote: basketQuote
+        ? {
+            subtotal: basketQuote.subtotal,
+            coveragePercent: basketQuote.coveragePercent,
+            savingsVsBaseline: basketQuote.savingsVsBaseline ?? 0,
+            freshnessLabel: basketQuote.freshnessLabel
+          }
+        : null
+    };
+  });
+  const selectedStore = selectedStoreId ? stores.find((store) => store.id === selectedStoreId) ?? null : null;
+  const selectedDeals = selectedStore
+    ? api.getStoreDeals(selectedStore.id).map((deal) => ({
+        productId: deal.productId,
+        ticker: deal.ticker,
+        productName: deal.productName,
+        price: deal.price,
+        dealScore: deal.dealScore,
+        verdict: deal.band.verdict
+      }))
+    : [];
 
   return {
     userId,
+    selectedStoreId: selectedStore?.id ?? null,
     favoriteStoreCount: favoriteStoreIds.size,
     basketItemCount: offerBasket.basketItemCount,
-    stores: api.getStores().map((store) => {
-      const deals = api.getStoreDeals(store.id);
-      const topDeal = deals[0] ?? null;
-      const basketQuote = offerBasket.stores.find((candidate) => candidate.storeId === store.id) ?? null;
-      return {
-        id: store.id,
-        name: store.name,
-        chain: store.chain,
-        district: store.district,
-        address: store.address,
-        confidence: store.confidence,
-        isFavorite: favoriteStoreIds.has(store.id),
-        dealCount: deals.length,
-        topDeal: topDeal
-          ? {
-              productId: topDeal.productId,
-              ticker: topDeal.ticker,
-              productName: topDeal.productName,
-              price: topDeal.price,
-              dealScore: topDeal.dealScore,
-              verdict: topDeal.band.verdict
-            }
-          : null,
-        basketQuote: basketQuote
-          ? {
-              subtotal: basketQuote.subtotal,
-              coveragePercent: basketQuote.coveragePercent,
-              savingsVsBaseline: basketQuote.savingsVsBaseline ?? 0,
-              freshnessLabel: basketQuote.freshnessLabel
-            }
-          : null
-      };
-    }),
+    stores,
+    selectedStore: selectedStore
+      ? {
+          id: selectedStore.id,
+          name: selectedStore.name,
+          district: selectedStore.district,
+          deals: selectedDeals
+        }
+      : null,
     actions: ['open_store', 'compare_basket', 'scan_barcode']
   };
 }
@@ -750,10 +792,10 @@ export function composeMobileTodayScreen(
 }
 
 export function composeMobileStoresScreen(
-  userId: string,
+  input: MobileStoresInput,
   api: MobileApi = createGroceryViewApi()
 ): MobileScreenComponent {
-  const viewModel = createMobileStoresViewModel(userId, api);
+  const viewModel = createMobileStoresViewModel(input, api);
   const favoriteStores = viewModel.stores.filter((store) => store.isFavorite);
   const rankedStores = [...viewModel.stores].sort((left, right) => {
     if (left.isFavorite !== right.isFavorite) return left.isFavorite ? -1 : 1;
@@ -765,7 +807,7 @@ export function composeMobileStoresScreen(
 
   return {
     type: 'screen',
-    key: `stores:${userId}`,
+    key: `stores:${viewModel.userId}`,
     title: 'Stores',
     state: 'ready',
     children: [
@@ -815,6 +857,22 @@ export function composeMobileStoresScreen(
           value: `${deal.price.toFixed(2)} SEK, score ${deal.dealScore}, ${deal.verdict}`
         }))
       },
+      ...(viewModel.selectedStore
+        ? [{
+            type: 'section' as const,
+            key: 'selected-store',
+            title: 'Selected store',
+            children: [
+              { type: 'row' as const, key: 'selected-store-name', label: viewModel.selectedStore.name, value: viewModel.selectedStore.district },
+              ...viewModel.selectedStore.deals.slice(0, 3).map((deal) => ({
+                type: 'row' as const,
+                key: `selected-deal:${deal.productId}`,
+                label: deal.productName,
+                value: `${deal.price.toFixed(2)} SEK, score ${deal.dealScore}, ${deal.verdict}`
+              }))
+            ]
+          }]
+        : []),
       {
         type: 'section',
         key: 'actions',

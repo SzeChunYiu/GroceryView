@@ -231,6 +231,11 @@ describe('mobile app foundation', () => {
     assert.equal(willys?.basketQuote?.coveragePercent, 100);
     assert.equal(willys?.basketQuote?.subtotal, 79.7);
 
+    const selected = createMobileStoresViewModel({ userId: 'user-1', selectedStoreId: 'willys-odenplan' }, api);
+    assert.equal(selected.selectedStoreId, 'willys-odenplan');
+    assert.equal(selected.selectedStore?.name, 'Willys Odenplan');
+    assert.deepEqual(selected.selectedStore?.deals.slice(0, 3).map((deal) => deal.productId), ['coffee', 'private-label-milk', 'milk']);
+
     const coop = viewModel.stores.find((store) => store.id === 'coop-odenplan');
     assert.equal(coop?.isFavorite, false);
     assert.equal(coop?.basketQuote, null);
@@ -271,6 +276,13 @@ describe('mobile app foundation', () => {
     const actions = screen.children.find((section) => section.key === 'actions');
     assert.equal(actions?.type, 'section');
     assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Open store', 'Compare basket', 'Scan barcode']);
+
+    const selectedScreen = composeMobileStoresScreen({ userId: 'user-1', selectedStoreId: 'willys-odenplan' }, api);
+    assert.equal(selectedScreen.type, 'screen');
+    assert.deepEqual(selectedScreen.children.map((section) => section.key), ['summary', 'favorite-stores', 'ranked-stores', 'top-store-deals', 'selected-store', 'actions']);
+    const selectedStore = selectedScreen.children.find((section) => section.key === 'selected-store');
+    if (!selectedStore || selectedStore.type !== 'section') throw new Error('selected store section missing');
+    assert.deepEqual(selectedStore.children.map((row) => row.key), ['selected-store-name', 'selected-deal:coffee', 'selected-deal:private-label-milk', 'selected-deal:milk']);
   });
 
   it('composes a Stores empty state when favorites have not been selected', () => {
