@@ -32,6 +32,7 @@ describe('GroceryView API app', () => {
     const docs = await request(app.getHttpServer()).get('/api-json').expect(200);
     assert.equal(docs.body.info.title, 'GroceryView API');
     assert.ok(docs.body.paths['/categories/{category}/market']);
+    assert.ok(docs.body.paths['/users/demo/account/subscription-access']);
     assert.ok(docs.body.paths['/users/demo/budget/summary']);
     assert.ok(docs.body.paths['/users/demo/budget/categories']);
     assert.ok(docs.body.paths['/users/demo/ads/disclosure']);
@@ -75,6 +76,18 @@ describe('GroceryView API app', () => {
     assert.equal(nutrition.body.leader.productId, 'chicken');
     assert.equal(nutrition.body.rows[0].valuePer10Sek, 22.89);
     assert.equal(nutrition.body.guardrails.length, 3);
+
+    const subscriptionAccess = await request(app.getHttpServer())
+      .get('/users/demo/account/subscription-access?now=2026-05-20T00:00:00.000Z')
+      .expect(200);
+    assert.equal(subscriptionAccess.body.userTier, 'free');
+    assert.equal(subscriptionAccess.body.premiumFeaturesEnabled, false);
+    assert.equal(subscriptionAccess.body.adsRemoved, false);
+    assert.equal(subscriptionAccess.body.checkoutRequired, true);
+    assert.deepEqual(subscriptionAccess.body.enforcementReasons, ['missing_subscription_entitlement']);
+    assert.deepEqual(subscriptionAccess.body.accountActions, ['show_upgrade']);
+    assert.equal(subscriptionAccess.body.summary, 'Free tier: no active subscription entitlement.');
+    assert.equal(subscriptionAccess.body.demo, true);
 
     const mealPlan = await request(app.getHttpServer())
       .get('/users/demo/meal-plans/suggestions?maxMealCost=120&servings=4')
