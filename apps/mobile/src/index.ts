@@ -684,7 +684,12 @@ export type MobileScreenComponentAction =
   | 'invite_household_member'
   | 'review_household_basket'
   | 'review_household_watchlist'
-  | 'download_export';
+  | 'reauthenticate'
+  | 'retry_online'
+  | 'download_export'
+  | 'confirm_account_deletion'
+  | 'open_ad_privacy_controls'
+  | 'schedule_receipt_image_cleanup';
 
 export type MobileScreenComponent =
   | {
@@ -2038,6 +2043,129 @@ export function buildMobilePrivacyRequestPlan(input: MobilePrivacyRequestInput):
     exportSections,
     blockers,
     actions
+  };
+}
+
+export type MobilePrivacyScreenInput = {
+  userId: string;
+  authenticated: boolean;
+  networkOnline: boolean;
+  confirmedDestructiveAction?: boolean;
+  receiptImageRetentionDays?: number;
+};
+
+export type MobilePrivacyViewModel = {
+  userId: string;
+  controlCount: number;
+  blockerCount: number;
+  exportSectionCount: number;
+  controls: Array<{ label: string; detail: string; state: string }>;
+  requests: Array<{
+    requestType: MobilePrivacyRequestType;
+    label: string;
+    status: 'ready' | 'blocked';
+    confirmationRequired: boolean;
+    blockerCount: number;
+    actionLabels: string[];
+    exportSectionCount: number;
+  }>;
+  actions: MobilePrivacyRequestPlan['actions'];
+};
+
+function privacyRequestLabel(requestType: MobilePrivacyRequestType): string {
+  if (requestType === 'export_data') return 'Data export';
+  if (requestType === 'delete_account') return 'Delete account';
+  if (requestType === 'ad_privacy') return 'Ad privacy';
+  return 'Receipt retention';
+}
+
+function privacyActionLabel(action: MobilePrivacyRequestPlan['actions'][number]): string {
+  if (action === 'reauthenticate') return 'Reauthenticate';
+  if (action === 'retry_online') return 'Retry online';
+  if (action === 'download_export') return 'Download export';
+  if (action === 'confirm_account_deletion') return 'Confirm deletion';
+  if (action === 'open_ad_privacy_controls') return 'Open ad controls';
+  return 'Schedule cleanup';
+}
+
+export function createMobilePrivacyViewModel(input: MobilePrivacyScreenInput): MobilePrivacyViewModel {
+  const requestTypes: MobilePrivacyRequestType[] = ['export_data', 'delete_account', 'ad_privacy', 'receipt_retention'];
+  const plans = requestTypes.map((requestType) => buildMobilePrivacyRequestPlan({ ...input, requestType }));
+  const actions = [...new Set(plans.flatMap((plan) => plan.actions))];
+
+  return {
+    userId: input.userId,
+    controlCount: mobilePrivacyControls.length,
+    blockerCount: plans.reduce((total, plan) => total + plan.blockers.length, 0),
+    exportSectionCount: plans.reduce((total, plan) => total + plan.exportSections.length, 0),
+    controls: mobilePrivacyControls.map((control) => ({ ...control })),
+    requests: plans.map((plan) => ({
+      requestType: plan.requestType,
+      label: privacyRequestLabel(plan.requestType),
+      status: plan.blockers.length > 0 ? 'blocked' : 'ready',
+      confirmationRequired: plan.confirmationRequired,
+      blockerCount: plan.blockers.length,
+      actionLabels: plan.actions.map(privacyActionLabel),
+      exportSectionCount: plan.exportSections.length
+    })),
+    actions
+  };
+}
+
+export function composeMobilePrivacyScreen(input: MobilePrivacyScreenInput): MobileScreenComponent {
+  const viewModel = createMobilePrivacyViewModel(input);
+
+  return {
+    type: 'screen',
+    key: `privacy:${viewModel.userId}`,
+    title: 'Privacy',
+    state: 'ready',
+    children: [
+      {
+        type: 'section',
+        key: 'summary',
+        title: 'Summary',
+        children: [
+          { type: 'metric', key: 'controls', label: 'Controls', value: String(viewModel.controlCount), tone: 'neutral' },
+          { type: 'metric', key: 'blockers', label: 'Blockers', value: String(viewModel.blockerCount), tone: viewModel.blockerCount > 0 ? 'warning' : 'positive' },
+          { type: 'metric', key: 'export-sections', label: 'Export sections', value: String(viewModel.exportSectionCount), tone: viewModel.exportSectionCount > 0 ? 'positive' : 'neutral' }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'controls',
+        title: 'Controls',
+        children: viewModel.controls.map((control) => ({
+          type: 'row',
+          key: `privacy-control:${control.label.toLowerCase().replaceAll(' ', '-')}`,
+          label: control.label,
+          value: `${control.state}: ${control.detail}`
+        }))
+      },
+      {
+        type: 'section',
+        key: 'requests',
+        title: 'Requests',
+        children: viewModel.requests.map((request) => ({
+          type: 'row',
+          key: `privacy-request:${request.requestType}`,
+          label: request.label,
+          value: `${request.status}, ${request.blockerCount} blockers, ${request.exportSectionCount} export sections`
+        }))
+      },
+      {
+        type: 'section',
+        key: 'actions',
+        title: 'Actions',
+        children: viewModel.actions.map((action, index) => ({
+          type: 'action',
+          key: action,
+          action,
+          label: privacyActionLabel(action),
+          primary: index === 0
+        }))
+      }
+    ]
   };
 }
 
