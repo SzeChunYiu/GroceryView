@@ -11,6 +11,7 @@ import {
   mealPlanner,
   nutritionValueBoard,
   pantryPlanner,
+  personalGroceryInflation,
   priceReportCenter,
   priceReportDigest,
   products,
@@ -133,6 +134,31 @@ export function MarketShell() {
               <span className="block font-black">{route.label}</span>
               <span className="mt-2 block text-market-ink/60">{route.detail}</span>
             </Link>
+          ))}
+        </div>
+      </section>
+
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">Personal grocery inflation</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Weekly basket inflation is calculated from visible basket quantities, item totals, and week-over-week rows.
+            </p>
+          </div>
+          <LightMetric label="Basket CPI" value={`${personalGroceryInflation.inflationPercent.toFixed(1)}%`} />
+          <LightMetric label="Change" value={formatSek(personalGroceryInflation.changeAmount)} />
+        </div>
+        <div className="grid gap-0 md:grid-cols-3">
+          {personalGroceryInflation.categoryContributions.slice(0, 6).map((category) => (
+            <div key={category.category} className="border-b border-market-ink/10 px-4 py-4 text-sm md:border-r">
+              <span className="block font-black">{category.category}</span>
+              <span className="mt-2 block text-market-ink/60">Base spend {formatSek(category.spend)}</span>
+              <span className={category.changePercent > 0 ? 'mt-3 block font-bold text-market-tomato' : 'mt-3 block font-bold text-market-mint'}>
+                {category.changePercent.toFixed(1)}%
+              </span>
+            </div>
           ))}
         </div>
       </section>

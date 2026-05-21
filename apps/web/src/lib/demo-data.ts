@@ -2,7 +2,7 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { rankDealOpportunities } from '@groceryview/core';
+import { calculatePersonalGroceryInflation, rankDealOpportunities } from '@groceryview/core';
 
 export const products = [
   {
@@ -1379,6 +1379,35 @@ export const householdSavings = {
   vsLastMonth: '-94.90 SEK',
   topSaving: { product: 'Felix Pyttipanna 720g', amount: '-16.50 SEK', driver: 'Skanstull freezer stock-up' }
 };
+
+
+const parseSekAmount = (value: string): number => Number(value.replace(',', '.').match(/\d+(\.\d+)?/)?.[0] ?? 0);
+const parsePercentChange = (value: string): number => Number(value.replace('%', '').replace('+', ''));
+const categoryByTopDeal = new Map(categories.map((category) => [category.topDeal, category.name]));
+
+export const personalGroceryInflation = calculatePersonalGroceryInflation({
+  baseDate: 'previous weekly basket',
+  currentDate: '2026-05-21 visible weekly basket',
+  items: weeklyBasket.map((row) => {
+    const product = products.find((candidate) => candidate.slug === row.slug);
+    if (!product) return null;
+    const currentUnitPrice = parseSekAmount(row.total) / row.qty;
+    const movement = parsePercentChange(row.vsLastWeek);
+    const baseUnitPrice = currentUnitPrice / (1 + movement / 100);
+    return {
+      productId: row.slug,
+      productName: product.name,
+      category: categoryByTopDeal.get(product.ticker) ?? 'Household staples',
+      quantity: row.qty,
+      baseUnitPrice,
+      currentUnitPrice,
+      confidence: product.confidence as 'high' | 'medium' | 'low'
+    };
+  }).filter((item): item is NonNullable<typeof item> => item !== null),
+  missingProductIds: weeklyBasket
+    .filter((row) => !products.some((product) => product.slug === row.slug))
+    .map((row) => row.slug)
+});
 
 export const savingsDashboard = {
   monthToDate: {
