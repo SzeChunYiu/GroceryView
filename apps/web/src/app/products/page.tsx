@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { pricedProducts, categoryLabels } from '@/lib/openprices-products';
 import { openFoodFactsProducts, openFoodFactsSource } from '@/lib/ingested/openfoodfacts';
+import { willysProducts, willysSource } from '@/lib/ingested/willys';
 
 export const dynamic = 'force-static';
 
@@ -37,6 +38,9 @@ export default function ProductsIndexPage() {
         <p className="mt-2 text-sm font-semibold text-market-ink/55">
           OpenFoodFacts export ingest: {openFoodFactsSource.rowCount} verified product rows retrieved {openFoodFactsSource.retrievedAt.slice(0, 10)}.
         </p>
+        <p className="mt-1 text-sm font-semibold text-market-ink/55">
+          Willys search ingest: {willysSource.rowCount} live SEK product rows retrieved {willysSource.retrievedAt.slice(0, 10)}.
+        </p>
       </header>
 
       <section className="mb-8 grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -69,6 +73,25 @@ export default function ProductsIndexPage() {
               <span className="truncate text-market-ink/65">{p.brands || 'unknown'}</span>
               <span className="truncate text-market-ink/65">{p.quantity || 'unknown'}</span>
               <span className="text-xs font-black uppercase text-market-ink/55">{p.nutriscoreGrade}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="mb-8 rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid grid-cols-[2fr_1fr_1fr_0.8fr] border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
+          <span>Willys product</span>
+          <span>Brand</span>
+          <span>Package</span>
+          <span>Price</span>
+        </div>
+        <ul className="divide-y divide-market-ink/5">
+          {willysProducts.slice(0, 12).map((p) => (
+            <li key={p.code} className="grid grid-cols-[2fr_1fr_1fr_0.8fr] gap-3 px-4 py-2 text-sm hover:bg-market-oat/40">
+              <span className="truncate font-semibold text-market-ink" title={p.name}>{p.name}</span>
+              <span className="truncate text-market-ink/65">{p.brand || 'unknown'}</span>
+              <span className="truncate text-market-ink/65">{p.packageText || 'unknown'}</span>
+              <span className="font-bold">{p.priceText}</span>
             </li>
           ))}
         </ul>

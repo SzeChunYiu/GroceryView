@@ -7,10 +7,12 @@ import {
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
   confidenceForSource,
+  buildWillysSearchUrl,
   fetchOpenFoodFactsExportProducts,
   fetchOpenFoodFactsProducts,
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
+  fetchWillysProducts,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
   ingestRetailerProduct,
@@ -186,6 +188,76 @@ describe('fetchOverpassGroceryStores', () => {
 
     assert.equal(rows.length, 1);
     assert.equal(rows[0].name, 'Valid');
+  });
+});
+
+describe('fetchWillysProducts', () => {
+  it('fetches public Willys search rows with price provenance', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify({
+        results: [{
+          code: '101205621_ST',
+          name: 'Idealmakaroner Gammaldags',
+          manufacturer: 'Kungsörnen',
+          productLine2: 'KUNGSÖRNEN, 750g',
+          googleAnalyticsCategory: 'skafferi|pasta',
+          priceValue: 12.2,
+          price: '12,20 kr',
+          comparePrice: '16,27 kr',
+          comparePriceUnit: 'kg',
+          image: { url: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03' },
+          labels: ['keyhole'],
+          online: true,
+          outOfStock: false
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysProducts({
+      queries: ['makaroner'],
+      fetchImpl,
+      retrievedAt: '2026-05-21T00:00:00.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildWillysSearchUrl('makaroner'));
+    assert.deepEqual(rows, [{
+      code: '101205621_ST',
+      name: 'Idealmakaroner Gammaldags',
+      brand: 'Kungsörnen',
+      packageText: 'KUNGSÖRNEN, 750g',
+      category: 'skafferi|pasta',
+      price: 12.2,
+      priceText: '12,20 kr',
+      unitPriceText: '16,27 kr',
+      unitPriceUnit: 'kg',
+      imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03',
+      labels: ['keyhole'],
+      online: true,
+      outOfStock: false,
+      sourceUrl: buildWillysSearchUrl('makaroner'),
+      retrievedAt: '2026-05-21T00:00:00.000Z'
+    }]);
+  });
+
+  it('deduplicates products across Willys search queries', async () => {
+    const fetchImpl: typeof fetch = async () => new Response(JSON.stringify({
+      results: [{
+        code: 'duplicate',
+        name: 'Same product',
+        priceValue: 10,
+        price: '10,00 kr'
+      }]
+    }), { status: 200 });
+
+    const rows = await fetchWillysProducts({
+      queries: ['a', 'b'],
+      fetchImpl,
+      retrievedAt: '2026-05-21T00:00:00.000Z'
+    });
+
+    assert.equal(rows.length, 1);
   });
 });
 
