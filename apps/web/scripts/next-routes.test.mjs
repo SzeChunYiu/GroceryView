@@ -57,9 +57,13 @@ describe('verified-data UI', () => {
     const globals = await read('src/app/globals.css');
     const nav = await read('src/components/app-nav.tsx');
     const shell = await read('src/components/market-shell.tsx');
+    const page = await read('src/app/page.tsx');
     assert.match(globals, /radial-gradient/);
     assert.match(nav, /Verified grocery intelligence/);
     assert.match(shell, /zero placeholder rows/);
     assert.match(shell, /Data provenance|SourceCoverage/);
+    assert.match(shell, /Freshness board/);
+    assert.match(shell, /sourceCoverage\.map/);
+    assert.match(page, /GroceryView verified grocery snapshot/);
   });
 });

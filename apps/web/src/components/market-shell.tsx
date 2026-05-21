@@ -1,6 +1,14 @@
 import Link from 'next/link';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
-import { categorySummaries, featuredStores, formatPct, formatSek, freshestOpenPrices, snapshot } from '@/lib/verified-data';
+import {
+  categorySummaries,
+  featuredStores,
+  formatPct,
+  formatSek,
+  freshestOpenPrices,
+  snapshot,
+  sourceCoverage
+} from '@/lib/verified-data';
 
 export function MarketShell() {
   return (
@@ -38,6 +46,29 @@ export function MarketShell() {
       </section>
 
       <div className="mt-6"><MetricGrid /></div>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Freshness board</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Snapshot ages that gate every homepage claim</h2>
+          </div>
+          <Link className="text-sm font-bold text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/data-sources">
+            Review source notes
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {sourceCoverage.map((source) => (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={source.name}>
+              <p className="text-sm font-black text-slate-950">{source.name}</p>
+              <p className="mt-2 text-2xl font-black text-emerald-800">{source.freshness}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{source.coverage}</p>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{source.caveat}</p>
+            </div>
+          ))}
+        </div>
+      </Card>
+
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_0.9fr]">
         <TopSpreads limit={8} />
         <Card>
