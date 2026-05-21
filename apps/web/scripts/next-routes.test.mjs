@@ -231,9 +231,14 @@ describe('Next.js web scaffold', () => {
 
     assert.match(marketShell, /\/chain-index/);
     assert.match(chainIndexPage, /calculateChainPriceIndex/);
+    assert.match(chainIndexPage, /calculateBrandTierIndices/);
     assert.match(chainIndexPage, /buildChainPriceObservations/);
+    assert.match(chainIndexPage, /buildBrandTierPriceObservations/);
+    assert.match(chainIndexPage, /Brand-tier index/);
+    assert.match(chainIndexPage, /Private label savings/);
     assert.match(chainIndexData, /coopProducts/);
     assert.match(chainIndexData, /matpriskollenOffers/);
+    assert.match(chainIndexData, /BrandTierPriceObservation/);
   });
 
   it('surfaces generated OpenPrices and OSM fixture counts on the homepage', async () => {

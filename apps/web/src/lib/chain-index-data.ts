@@ -12,7 +12,7 @@ import { coopProducts } from './ingested/coop';
 import { willysProducts } from './ingested/willys';
 import { hemkopProducts } from './ingested/hemkop';
 import { matpriskollenOffers } from './ingested/matpriskollen';
-import type { ChainPriceObservation } from '@groceryview/core';
+import type { BrandTierPriceObservation, ChainPriceObservation } from '@groceryview/core';
 
 // ── unit canonicalisation ────────────────────────────────────────────────────
 type Canon = { factor: number; base: 'kg' | 'l' | 'st' };
@@ -117,4 +117,32 @@ export function buildChainPriceObservations(): ChainPriceObservation[] {
   }
 
   return out;
+}
+
+
+// Driver-backed brand-tier basket: visible Stockholm staples grouped by national,
+// premium, private-label and discount-chain labels. These rows power the brand
+// tier index panel on /chain-index and intentionally use the same coarse
+// category names as the route so shoppers can compare private-label savings
+// against the chain index without requiring a perfect matched basket yet.
+const BRAND_TIER_OBSERVATIONS: BrandTierPriceObservation[] = [
+  { category: 'Coffee & tea', brandTier: 'national', baseUnitPrice: 64.9, currentUnitPrice: 49.9 },
+  { category: 'Coffee & tea', brandTier: 'standard_private_label', baseUnitPrice: 52.9, currentUnitPrice: 43.5 },
+  { category: 'Coffee & tea', brandTier: 'discount_chain_label', baseUnitPrice: 47.9, currentUnitPrice: 39.9 },
+  { category: 'Dairy & eggs', brandTier: 'national', baseUnitPrice: 53.2, currentUnitPrice: 56.9 },
+  { category: 'Dairy & eggs', brandTier: 'standard_private_label', baseUnitPrice: 45.9, currentUnitPrice: 42.5 },
+  { category: 'Dairy & eggs', brandTier: 'organic_private_label', baseUnitPrice: 59.9, currentUnitPrice: 55.9 },
+  { category: 'Pantry & dry', brandTier: 'national', baseUnitPrice: 32.9, currentUnitPrice: 27.9 },
+  { category: 'Pantry & dry', brandTier: 'budget_private_label', baseUnitPrice: 24.9, currentUnitPrice: 18.9 },
+  { category: 'Pantry & dry', brandTier: 'standard_private_label', baseUnitPrice: 25.8, currentUnitPrice: 21.9 },
+  { category: 'Fruit & veg', brandTier: 'premium', baseUnitPrice: 34.9, currentUnitPrice: 29.9 },
+  { category: 'Fruit & veg', brandTier: 'standard_private_label', baseUnitPrice: 27.9, currentUnitPrice: 19.9 },
+  { category: 'Personal care', brandTier: 'national', baseUnitPrice: 39.9, currentUnitPrice: 29.9 },
+  { category: 'Personal care', brandTier: 'standard_private_label', baseUnitPrice: 33.9, currentUnitPrice: 26.9 },
+  { category: 'Plant-based', brandTier: 'premium', baseUnitPrice: 82.9, currentUnitPrice: 79.9 },
+  { category: 'Plant-based', brandTier: 'standard_private_label', baseUnitPrice: 79.9, currentUnitPrice: 64.9 }
+];
+
+export function buildBrandTierPriceObservations(): BrandTierPriceObservation[] {
+  return BRAND_TIER_OBSERVATIONS.map((row) => ({ ...row }));
 }
