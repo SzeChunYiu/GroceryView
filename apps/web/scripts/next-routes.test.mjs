@@ -377,4 +377,21 @@ describe('Next.js web scaffold', () => {
     assert.match(productPage, /smartSwaps\.map/);
     assert.match(productPage, /qualityRisk/);
   });
+
+  it('surfaces cheapest-chain matched products on product and compare routes', async () => {
+    const productPage = await readFile(new URL('../src/app/products/[slug]/page.tsx', import.meta.url), 'utf8');
+    const comparePage = await readFile(new URL('../src/app/compare/page.tsx', import.meta.url), 'utf8');
+    const axfoodProducts = await readFile(new URL('../src/lib/axfood-products.ts', import.meta.url), 'utf8');
+
+    assert.match(axfoodProducts, /export const axfoodProducts/);
+    assert.match(productPage, /axfoodProducts/);
+    assert.match(productPage, /findCheapestChainMatch/);
+    assert.match(productPage, /Cheapest chain match/);
+    assert.match(productPage, /lowestChain/);
+    assert.match(productPage, /spreadPct/);
+    assert.match(comparePage, /Cheapest chain per product/);
+    assert.match(comparePage, /lowestChain/);
+    assert.match(comparePage, /chains\.willys/);
+    assert.match(comparePage, /chains\.hemkop/);
+  });
 });

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { calculateDealScore, recommendSmartSwaps, scoreBand, type BrandTier, type SmartSwapInput } from '@groceryview/core';
+import { axfoodProducts, type AxfoodProduct, type ChainPrice } from '@/lib/axfood-products';
 import { products } from '@/lib/demo-data';
 
 export function generateStaticParams() {
@@ -15,6 +16,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const dealScore = calculateDealScore(buildDealScoreInput(product));
   const verdict = scoreBand(dealScore);
   const smartSwaps = recommendSmartSwaps(buildSmartSwapInput(product));
+  const chainMatch = findCheapestChainMatch(product);
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
@@ -63,6 +65,34 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
             </div>
           </section>
         ) : null}
+
+        <section className="mt-4 rounded-md border border-market-ink/10 bg-white p-4">
+          <div className="text-xs font-bold uppercase tracking-widest text-market-mint">Cheapest chain match</div>
+          {chainMatch ? (
+            <>
+              <div className="mt-2 text-2xl font-black">
+                {CHAIN_LABEL[chainMatch.lowestChain] ?? chainMatch.lowestChain} is cheapest · {chainMatch.spreadPct.toFixed(1)}% spread
+              </div>
+              <p className="mt-2 text-sm leading-6 text-market-ink/65">
+                Matched Axfood EAN {chainMatch.code} ({chainMatch.name}, {chainMatch.subline}) against Willys and Hemköp live price rows.
+              </p>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                {CHAIN_ORDER.map((chain) => (
+                  <ChainPriceCard
+                    key={chain}
+                    chain={CHAIN_LABEL[chain] ?? chain}
+                    price={chainMatch.chains[chain]}
+                    isLowest={chainMatch.lowestChain === chain}
+                  />
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="mt-2 text-sm leading-6 text-market-ink/65">
+              No Willys↔Hemköp EAN match is available for this demo product yet, so GroceryView does not fabricate a cheapest-chain claim.
+            </p>
+          )}
+        </section>
         <dl className="mt-6 grid gap-3 text-sm sm:grid-cols-2">
           <Metadata label="Price type" value={product.priceType} />
           <Metadata label="Confidence" value={product.confidence} />
@@ -93,8 +123,41 @@ function Metadata({ label, value }: Readonly<{ label: string; value: string }>) 
   );
 }
 
+function ChainPriceCard({ chain, price, isLowest }: Readonly<{ chain: string; price: ChainPrice | undefined; isLowest: boolean }>) {
+  return (
+    <div className={`rounded-md border p-3 ${isLowest ? 'border-market-mint bg-market-mint/10' : 'border-market-ink/10'}`}>
+      <div className="flex items-center justify-between gap-3">
+        <span className="font-black">{chain}</span>
+        {isLowest ? <span className="text-xs font-bold uppercase tracking-widest text-market-mint">Cheapest</span> : null}
+      </div>
+      <div className="mt-2 text-2xl font-black tabular-nums">
+        {price?.price != null ? `${price.price.toFixed(2)} kr` : '—'}
+      </div>
+      <div className="mt-1 text-xs text-market-ink/55">{price?.priceUnit ?? 'No captured price'}</div>
+    </div>
+  );
+}
+
 
 type ProductDriver = (typeof products)[number];
+const CHAIN_LABEL: Record<string, string> = { willys: 'Willys', hemkop: 'Hemköp' };
+const CHAIN_ORDER = ['willys', 'hemkop'] as const;
+const PRODUCT_MATCH_TERMS: Record<string, string[]> = {
+  'zoegas-coffee-450g': ['zoegas', 'coffee', 'kaffe'],
+  'arla-milk-1l': ['arla', 'mjolk', 'mjölk'],
+  'pagen-jattefralla-500g': ['pagen', 'pågen', 'jattefralla', 'jättefralla'],
+  'felix-ketchup-1kg': ['felix', 'ketchup', 'tomatketchup'],
+  'barilla-spaghetti-1kg': ['barilla', 'spaghetti'],
+  'bregott-normalsaltat-600g': ['bregott', 'normalsaltat'],
+  'garant-havregryn-1kg': ['garant', 'havregryn'],
+  'zeta-olivolja-classico-500ml': ['zeta', 'olivolja', 'classico'],
+  'santa-maria-taco-spice-28g': ['santa', 'maria', 'taco', 'spice'],
+  'bravo-apelsinjuice-1l': ['bravo', 'apelsinjuice'],
+  'scan-falukorv-800g': ['scan', 'falukorv'],
+  'zeta-kikartor-380g': ['zeta', 'kikärtor', 'kikartor'],
+  'pagen-lingongrova-500g': ['pagen', 'pågen', 'lingongrova'],
+  'arla-hushallsost-500g': ['arla', 'hushållsost', 'hushallsost']
+};
 
 function parseSek(value: string): number {
   const parsed = Number(value.replace(',', '.').match(/\d+(\.\d+)?/)?.[0] ?? '0');
@@ -177,4 +240,28 @@ function buildSmartSwapInput(product: ProductDriver): SmartSwapInput {
       blockedCategories: ['baby_formula', 'medical_diet']
     }
   };
+}
+
+function findCheapestChainMatch(product: ProductDriver): AxfoodProduct | null {
+  const requiredTerms = tokenize((PRODUCT_MATCH_TERMS[product.slug] ?? tokenize(product.name)).join(' '));
+  const candidates = axfoodProducts.filter((candidate) => candidate.inChains.length >= 2);
+  let best: { product: AxfoodProduct; score: number } | null = null;
+
+  for (const candidate of candidates) {
+    const haystack = tokenize(`${candidate.name} ${candidate.brand} ${candidate.subline} ${candidate.category}`);
+    const score = requiredTerms.reduce((sum, term) => sum + (haystack.includes(term) ? 1 : 0), 0);
+    if (score > (best?.score ?? 0)) best = { product: candidate, score };
+  }
+
+  return best && best.score >= Math.min(2, requiredTerms.length) ? best.product : null;
+}
+
+function tokenize(value: string): string[] {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9åäö]+/g, ' ')
+    .split(/\s+/)
+    .filter((token) => token.length >= 3 && !/^\d+$/.test(token));
 }
