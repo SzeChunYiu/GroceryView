@@ -548,7 +548,8 @@ function sourceRunHealthFailureResponse(): SourceRunHealthCheckResult {
         startedInFuture: 0,
         finishedInFuture: 0,
         noFreshRuns: 0,
-        missingFreshChains: 0
+        missingFreshChains: 0,
+          insufficientAcceptedRows: 0
       },
       evidence: {
         total: 0,
@@ -1710,6 +1711,7 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
         maxRunningMinutes: 120,
         staleAfterMinutes: 24 * 60,
         requiredFreshChainIds: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
+        requiredAcceptedCountByChain: { ica: 1, willys: 1, coop: 1, hemkop: 1, lidl: 1, city_gross: 1 },
         filter: { limit: 100 }
       }),
     async close() {

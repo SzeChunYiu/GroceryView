@@ -607,7 +607,8 @@ describe('buildSourceRunHealthReport', () => {
         startedInFuture: 0,
         finishedInFuture: 0,
         noFreshRuns: 0,
-        missingFreshChains: 0
+        missingFreshChains: 0,
+        insufficientAcceptedRows: 0
       },
       evidence: {
         total: 1,
@@ -689,7 +690,8 @@ describe('buildSourceRunHealthReport', () => {
         startedInFuture: 0,
         finishedInFuture: 0,
         noFreshRuns: 1,
-        missingFreshChains: 0
+        missingFreshChains: 0,
+        insufficientAcceptedRows: 0
       },
       evidence: {
         total: 0,
@@ -748,7 +750,8 @@ describe('buildSourceRunHealthReport', () => {
         startedInFuture: 1,
         finishedInFuture: 1,
         noFreshRuns: 1,
-        missingFreshChains: 0
+        missingFreshChains: 0,
+        insufficientAcceptedRows: 0
       },
       evidence: {
         total: 0,
@@ -810,7 +813,8 @@ describe('buildSourceRunHealthReport', () => {
         startedInFuture: 0,
         finishedInFuture: 0,
         noFreshRuns: 0,
-        missingFreshChains: 0
+        missingFreshChains: 0,
+        insufficientAcceptedRows: 0
       },
       evidence: {
         total: 1,
@@ -852,7 +856,8 @@ describe('buildSourceRunHealthReport', () => {
         startedInFuture: 0,
         finishedInFuture: 0,
         noFreshRuns: 1,
-        missingFreshChains: 0
+        missingFreshChains: 0,
+        insufficientAcceptedRows: 0
       },
       evidence: {
         total: 0,
@@ -905,7 +910,54 @@ describe('buildSourceRunHealthReport', () => {
       startedInFuture: 0,
       finishedInFuture: 0,
       noFreshRuns: 0,
-      missingFreshChains: 1
+      missingFreshChains: 1,
+      insufficientAcceptedRows: 0
+    });
+  });
+
+  it('blocks daily ingestion readiness when a fresh chain run has too few accepted rows', () => {
+    const report = buildSourceRunHealthReport({
+      now: '2026-05-20T08:30:00.000Z',
+      maxRunningMinutes: 30,
+      staleAfterMinutes: 24 * 60,
+      requiredFreshChainIds: ['ica', 'willys'],
+      requiredAcceptedCountByChain: { ica: 10, willys: 10 },
+      runs: [
+        {
+          sourceRunId: 'fresh-willys',
+          sourceType: 'official_api',
+          sourceName: 'Willys normalized products',
+          startedAt: '2026-05-20T08:00:00.000Z',
+          finishedAt: '2026-05-20T08:05:00.000Z',
+          status: 'succeeded',
+          provenance: { chainId: 'willys', cadence: 'daily', acceptedCount: 25 }
+        },
+        {
+          sourceRunId: 'fresh-ica-empty',
+          sourceType: 'retailer_page',
+          sourceName: 'ICA products',
+          startedAt: '2026-05-20T08:00:00.000Z',
+          finishedAt: '2026-05-20T08:06:00.000Z',
+          status: 'succeeded',
+          provenance: { chainId: 'ica', cadence: 'daily', acceptedCount: 0 }
+        }
+      ]
+    });
+
+    assert.equal(report.status, 'blocked');
+    assert.deepEqual(report.blockers, ['source_run_insufficient_accepted_rows:ica:0/10']);
+    assert.deepEqual(summarizeSourceRunHealthReport(report).blockers, {
+      total: 1,
+      failed: 0,
+      partial: 0,
+      stale: 0,
+      stuckRunning: 0,
+      missingFinishedAt: 0,
+      startedInFuture: 0,
+      finishedInFuture: 0,
+      noFreshRuns: 0,
+      missingFreshChains: 0,
+      insufficientAcceptedRows: 1
     });
   });
 });
