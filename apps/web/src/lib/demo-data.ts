@@ -304,6 +304,42 @@ export const products = [
     confidence: 'medium',
     observedAt: '2026-05-20 18:45 CET',
     source: 'retailer flyer observation'
+  },
+  {
+    slug: 'libresse-bindor-normal-14p',
+    ticker: 'LIBRESSE-BINDOR-NORMAL-14P',
+    name: 'Libresse Bindor Normal 14-pack',
+    store: 'ICA Maxi Lindhagen',
+    price: '29.90 SEK',
+    unitPrice: '2.14 SEK/each',
+    priceType: 'member promo',
+    confidence: 'high',
+    observedAt: '2026-05-20 19:05 CET',
+    source: 'retailer flyer observation'
+  },
+  {
+    slug: 'pepsodent-super-fluor-75ml',
+    ticker: 'PEPSODENT-SUPER-FLUOR-75ML',
+    name: 'Pepsodent Super Fluor 75ml',
+    store: 'Coop Daglivs Fridhemsplan',
+    price: '18.90 SEK',
+    unitPrice: '252.00 SEK/l',
+    priceType: 'shelf',
+    confidence: 'high',
+    observedAt: '2026-05-20 19:15 CET',
+    source: 'in-store shelf observation'
+  },
+  {
+    slug: 'grumme-handdisk-original-500ml',
+    ticker: 'GRUMME-HANDDISK-ORIGINAL-500ML',
+    name: 'Grumme Handdisk Original 500ml',
+    store: 'Hemköp Skanstull',
+    price: '24.90 SEK',
+    unitPrice: '49.80 SEK/l',
+    priceType: 'weekly deal',
+    confidence: 'medium',
+    observedAt: '2026-05-20 19:25 CET',
+    source: 'retailer flyer observation'
   }
 ];
 
@@ -413,6 +449,15 @@ export const stores = [
     format: 'mid-size supermarket',
     bestCategory: 'Meat',
     distanceLabel: '3.7 km from saved area'
+  },
+  {
+    slug: 'ica-maxi-lindhagen',
+    name: 'ICA Maxi Lindhagen',
+    ingestionFixture: 'ICA Maxi Lindhagen',
+    district: 'Kungsholmen',
+    format: 'hypermarket',
+    bestCategory: 'Personal care',
+    distanceLabel: '2.9 km from saved area'
   }
 ];
 
@@ -507,6 +552,13 @@ export const categories = [
     index: '97.8',
     movement: '-2.2%',
     topDeal: 'KRONFAGEL-KYCKLINGFILE-1KG'
+  },
+  {
+    slug: 'personal-care',
+    name: 'Personal care',
+    index: '95.9',
+    movement: '-4.1%',
+    topDeal: 'LIBRESSE-BINDOR-NORMAL-14P'
   }
 ];
 
@@ -561,6 +613,16 @@ export const dealOpportunityRail = rankDealOpportunities({
       regularPrice: 27.9,
       dealScore: 84,
       sourceConfidence: 0.88
+    },
+    {
+      productId: 'libresse-bindor-normal-14p',
+      productName: 'Libresse Bindor Normal 14-pack',
+      storeId: 'ica-maxi-lindhagen',
+      storeName: 'ICA Maxi Lindhagen',
+      currentPrice: 29.9,
+      regularPrice: 39.9,
+      dealScore: 82,
+      sourceConfidence: 0.87
     },
     {
       productId: 'felix-ketchup-1kg',
@@ -647,6 +709,20 @@ export const basketSubstitutionRadar = [
     basketImpact: '-10.00 SEK dinner protein check',
     sourceConfidence: 0.78,
     reason: 'Fish and meat promos are close enough that dinner baskets should compare both before routing.'
+  },
+  {
+    anchorSlug: 'libresse-bindor-normal-14p',
+    anchorName: 'Libresse Bindor Normal 14-pack',
+    anchorStoreSlug: 'ica-maxi-lindhagen',
+    anchorStoreName: 'ICA Maxi Lindhagen',
+    substituteSlug: 'pepsodent-super-fluor-75ml',
+    substituteName: 'Pepsodent Super Fluor 75ml',
+    substituteStoreSlug: 'coop-daglivs-fridhemsplan',
+    substituteStoreName: 'Coop Daglivs Fridhemsplan',
+    verdict: 'bundle',
+    basketImpact: '-13.00 SEK hygiene restock',
+    sourceConfidence: 0.87,
+    reason: 'Personal-care staples are under baseline and should be bundled before household items run out.'
   }
 ];
 
@@ -657,7 +733,7 @@ export const stockholmAreas = [
   { slug: 'hagersten',  name: 'Hägersten',  storeCount: 1, topSavings: 'Rice' },
   { slug: 'liljeholmen', name: 'Liljeholmen', storeCount: 1, topSavings: 'Pantry' },
   { slug: 'stockholm-county', name: 'Stockholm County', storeCount: 1, topSavings: 'Pasta' },
-  { slug: 'kungsholmen',name: 'Kungsholmen',storeCount: 1, topSavings: 'Produce' },
+  { slug: 'kungsholmen',name: 'Kungsholmen',storeCount: 2, topSavings: 'Personal care' },
   { slug: 'ostermalm',  name: 'Östermalm',  storeCount: 0, topSavings: '—' }
 ];
 
@@ -667,8 +743,8 @@ export const sourceCoverage = [
     fixture: 'Store locator',
     surface: 'public locator',
     status: 'ready',
-    visibleRows: 3,
-    newestSignal: 'Sergels Torg and Liljeholmen rows cover snacks, egg, and dinner staples'
+    visibleRows: 4,
+    newestSignal: 'Sergels Torg, Liljeholmen, and Lindhagen rows cover snacks, egg, dinner, and hygiene staples'
   },
   {
     chain: 'Willys',
@@ -683,16 +759,16 @@ export const sourceCoverage = [
     fixture: 'Store profile',
     surface: 'district store',
     status: 'ready',
-    visibleRows: 3,
-    newestSignal: 'Swedenborgsgatan and Daglivs rows now cover dairy, bread, and produce'
+    visibleRows: 4,
+    newestSignal: 'Swedenborgsgatan and Daglivs rows now cover dairy, bread, produce, and toothpaste'
   },
   {
     chain: 'Hemköp',
     fixture: 'Offer review',
     surface: 'weekly deal',
     status: 'review',
-    visibleRows: 4,
-    newestSignal: 'Ketchup, soup, Hornstull juice, and Skanstull chicken rows keep offer review visible'
+    visibleRows: 5,
+    newestSignal: 'Ketchup, soup, Hornstull juice, Skanstull chicken, and dish soap rows keep offer review visible'
   },
   {
     chain: 'Lidl',
@@ -780,6 +856,18 @@ export const storeComparisonBoard = [
     leadSignal: 'Laxfilé and kycklingfilé promos are both visible, so dinner baskets can compare protein cost before routing.',
     visibleItems: 2,
     basketImpact: '-10.00 SEK'
+  },
+  {
+    slug: 'kungsholmen-hygiene-restock',
+    area: 'Kungsholmen',
+    primaryStoreSlug: 'ica-maxi-lindhagen',
+    primaryStoreName: 'ICA Maxi Lindhagen',
+    comparisonStoreSlug: 'coop-daglivs-fridhemsplan',
+    comparisonStoreName: 'Coop Daglivs Fridhemsplan',
+    basketFocus: 'Personal-care restock',
+    leadSignal: 'Libresse and Pepsodent rows make hygiene restocks visible before the weekly food trip.',
+    visibleItems: 2,
+    basketImpact: '-13.00 SEK'
   }
 ];
 
@@ -816,6 +904,17 @@ export const shoppingTripSwitchboard = [
     saving: '-14.20 SEK',
     decision: 'Split from the main weekly basket when travel cost is already covered.',
     href: '/categories/rice'
+  },
+  {
+    title: 'Hygiene restock add-on',
+    area: 'Kungsholmen',
+    store: 'ICA Maxi Lindhagen',
+    category: 'Personal care',
+    basket: 'Libresse, toothpaste, dish soap',
+    spend: '73.70 SEK',
+    saving: '-13.00 SEK',
+    decision: 'Add to the route when personal-care stock falls below one week.',
+    href: '/categories/personal-care'
   }
 ];
 
@@ -846,7 +945,9 @@ export const weeklyBasket = [
   { slug: 'bravo-apelsinjuice-1l',         qty: 2, total: '45.80 SEK', vsLastWeek: '-3.2%' },
   { slug: 'garant-svensk-potatis-2kg',     qty: 1, total: '24.90 SEK', vsLastWeek: '-0.9%' },
   { slug: 'garant-korsbarstomater-250g',   qty: 2, total: '39.80 SEK', vsLastWeek: '-5.4%' },
-  { slug: 'kronfagel-kycklingfile-1kg',    qty: 1, total: '109.00 SEK', vsLastWeek: '-2.2%' }
+  { slug: 'kronfagel-kycklingfile-1kg',    qty: 1, total: '109.00 SEK', vsLastWeek: '-2.2%' },
+  { slug: 'libresse-bindor-normal-14p',     qty: 1, total: '29.90 SEK', vsLastWeek: '-4.1%' },
+  { slug: 'grumme-handdisk-original-500ml', qty: 1, total: '24.90 SEK', vsLastWeek: '-1.7%' }
 ];
 
 export const savingsPlaybook = [
@@ -891,6 +992,13 @@ export const savingsPlaybook = [
     action: 'Compare Liljeholmen salmon against Skanstull chicken before locking the dinner route',
     impact: '-10.00 SEK route choice',
     href: '/products/kronfagel-kycklingfile-1kg'
+  },
+  {
+    title: 'Personal-care restock window',
+    trigger: 'Personal care index is 4.1% under baseline with a high-confidence Lindhagen row',
+    action: 'Bundle Libresse and Pepsodent before household staples hit low-stock status',
+    impact: '-13.00 SEK restock basket',
+    href: '/categories/personal-care'
   }
 ];
 
@@ -898,7 +1006,7 @@ export const householdSavings = {
   weeklyTotal: '438.50 SEK',
   vsLastWeek: '-30.10 SEK',
   vsLastMonth: '-78.40 SEK',
-  topSaving: { product: 'Garant Körsbärstomater 250g', amount: '-16.00 SEK', driver: 'Daglivs produce shelf drop' }
+  topSaving: { product: 'Libresse Bindor Normal 14-pack', amount: '-10.00 SEK', driver: 'Lindhagen personal-care promo' }
 };
 
 export const savingsDashboard = {
