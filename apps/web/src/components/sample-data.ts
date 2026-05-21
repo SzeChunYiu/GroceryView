@@ -27,6 +27,17 @@ export type ScannerQueueItem = {
   owner: string;
 };
 
+export type WatchlistItem = {
+  product: string;
+  slug: string;
+  store: string;
+  currentPrice: number;
+  usualPrice: number;
+  alertBelow: number;
+  status: string;
+  signal: string;
+};
+
 export const basketItems: BasketItem[] = [
   { name: 'Zoegas Coffee 450g', quantity: '2 packs', currentPrice: 49.9, usualPrice: 59.9, store: 'Willys Odenplan', confidence: 'Verified shelf' },
   { name: 'Arla Milk 1L', quantity: '6 bottles', currentPrice: 14.9, usualPrice: 16.4, store: 'ICA Kvantum Liljeholmen', confidence: 'High confidence' },
@@ -67,6 +78,49 @@ export const scannerQueue: ScannerQueueItem[] = [
   { item: 'Coop Farsta receipt', status: 'Needs review', confidence: 71, owner: 'Mina' },
   { item: 'Arla Milk barcode', status: 'Matched', confidence: 98, owner: 'Alex' },
   { item: 'Loose tomatoes label', status: 'Low confidence', confidence: 54, owner: 'Sam' }
+];
+
+export const watchlistItems: WatchlistItem[] = [
+  {
+    product: 'Zoegas Coffee 450g',
+    slug: 'zoegas-coffee-450g',
+    store: 'Willys Odenplan',
+    currentPrice: 49.9,
+    usualPrice: 59.9,
+    alertBelow: 52,
+    status: 'Triggered',
+    signal: 'Member promo is 16.7% below usual shelf'
+  },
+  {
+    product: 'Bregott Normalsaltat 600g',
+    slug: 'bregott-normalsaltat-600g',
+    store: 'Willys Odenplan',
+    currentPrice: 56.9,
+    usualPrice: 53.2,
+    alertBelow: 50,
+    status: 'Hold',
+    signal: 'Above usual price despite member label'
+  },
+  {
+    product: 'Garant Havregryn 1kg',
+    slug: 'garant-havregryn-1kg',
+    store: 'Tempo Hornstull',
+    currentPrice: 21.9,
+    usualPrice: 25.8,
+    alertBelow: 23,
+    status: 'Triggered',
+    signal: 'Breakfast staple is under trend'
+  },
+  {
+    product: 'Felix Tomatketchup 1kg',
+    slug: 'felix-ketchup-1kg',
+    store: 'Hemkop Stockholm',
+    currentPrice: 32,
+    usualPrice: 39.9,
+    alertBelow: 34,
+    status: 'Watch',
+    signal: 'Medium-confidence weekly deal needs receipt confirmation'
+  }
 ];
 
 export function formatSek(value: number) {
