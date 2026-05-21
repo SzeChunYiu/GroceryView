@@ -320,6 +320,51 @@ describe('createHttpHandler', () => {
     ]);
     assert.match(storeCoverageBody.guardrails[0] ?? '', /verified shelf prices/i);
 
+    const categoryCoverage = await handle(new Request('http://localhost/api/stores/lidl-sveavagen/category-coverage'));
+    assert.equal(categoryCoverage.status, 200);
+    const categoryCoverageBody = await json(categoryCoverage) as {
+      storeId: string;
+      categoryCount: number;
+      fullyPricedCategoryCount: number;
+      categories: Array<{
+        category: string;
+        productCount: number;
+        pricedProductCount: number;
+        coveragePercent: number;
+        totalKnownPrice: number;
+        missingProductIds: string[];
+        bestDealProductId: string | null;
+        bestDealScore: number | null;
+      }>;
+      guardrails: string[];
+    };
+    assert.equal(categoryCoverageBody.storeId, 'lidl-sveavagen');
+    assert.equal(categoryCoverageBody.categoryCount, 2);
+    assert.equal(categoryCoverageBody.fullyPricedCategoryCount, 1);
+    assert.deepEqual(categoryCoverageBody.categories, [
+      {
+        category: 'coffee',
+        productCount: 1,
+        pricedProductCount: 1,
+        coveragePercent: 100,
+        totalKnownPrice: 59.9,
+        missingProductIds: [],
+        bestDealProductId: 'coffee',
+        bestDealScore: 82
+      },
+      {
+        category: 'dairy',
+        productCount: 3,
+        pricedProductCount: 1,
+        coveragePercent: 33.3,
+        totalKnownPrice: 13.9,
+        missingProductIds: ['private-label-milk', 'butter'],
+        bestDealProductId: 'milk',
+        bestDealScore: 73
+      }
+    ]);
+    assert.match(categoryCoverageBody.guardrails[0] ?? '', /verified store-price rows/i);
+
     const product = await handle(new Request('http://localhost/api/products/coffee'));
     assert.equal(product.status, 200);
     assert.equal((await json(product) as { ticker: string }).ticker, 'ZOEGAS-COFFEE-450G');
@@ -497,6 +542,10 @@ describe('createHttpHandler', () => {
     const storeCoverage = await handle(new Request('http://localhost/api/stores/missing-store/price-coverage'));
     assert.equal(storeCoverage.status, 404);
     assert.deepEqual(await json(storeCoverage), { error: 'Store not found.' });
+
+    const categoryCoverage = await handle(new Request('http://localhost/api/stores/missing-store/category-coverage'));
+    assert.equal(categoryCoverage.status, 404);
+    assert.deepEqual(await json(categoryCoverage), { error: 'Store not found.' });
   });
 
   it('mutates favorite stores, watchlist, basket, and budget through proposal routes', async () => {

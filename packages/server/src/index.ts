@@ -1065,6 +1065,13 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return jsonResponse(api.getStorePriceCoverage(storeId));
       }
 
+      const storeCategoryCoverageMatch = path.match(/^\/api\/stores\/([^/]+)\/category-coverage$/);
+      if (method === 'GET' && storeCategoryCoverageMatch) {
+        const storeId = decodeURIComponent(storeCategoryCoverageMatch[1]);
+        if (!api.getStore(storeId)) return errorResponse(404, 'Store not found.');
+        return jsonResponse(api.getStoreCategoryCoverage(storeId));
+      }
+
       if (method === 'GET' && path === '/api/prices/freshness') {
         return jsonResponse(api.getPriceFreshnessReport(url.searchParams.get('asOf') ?? undefined));
       }
@@ -1507,6 +1514,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
       '/api/billing/subscription-events': { post: billingWebhookOperation('Accept signed billing subscription events and persist entitlement updates.') },
       '/api/stores/{id}': { get: publicOperation('Get store profile.') },
+      '/api/stores/{id}/category-coverage': { get: publicOperation('Get store price coverage grouped by product category.') },
       '/api/stores/{id}/deals': { get: publicOperation('Get ranked in-store deals for one store.') },
       '/api/stores/{id}/price-coverage': { get: publicOperation('Get store catalog price coverage with missing product guardrails.') },
       '/api/products/search': { get: publicOperation('Search products.') },
