@@ -369,6 +369,21 @@ describe('Next.js web scaffold', () => {
     assert.match(marketShell, /OpenPrices fixture radar/);
   });
 
+  it('colors map stores by chain index and exposes district heat', async () => {
+    const mapPage = await readFile(new URL('../src/app/map/page.tsx', import.meta.url), 'utf8');
+    const storeMap = await readFile(new URL('../src/components/store-map.tsx', import.meta.url), 'utf8');
+    const mapChainIndex = await readFile(new URL('../src/lib/map-chain-index.ts', import.meta.url), 'utf8');
+
+    assert.match(mapChainIndex, /calculateChainPriceIndex/);
+    assert.match(mapChainIndex, /buildChainPriceObservations/);
+    assert.match(storeMap, /mapChainIndexScores/);
+    assert.match(storeMap, /chainIndexColor/);
+    assert.match(storeMap, /districtHeatCollection/);
+    assert.match(storeMap, /district-heat/);
+    assert.match(storeMap, /Cheapest chain near me/);
+    assert.match(mapPage, /chain index score/);
+  });
+
   it('surfaces Stockholm area coverage on the homepage', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
