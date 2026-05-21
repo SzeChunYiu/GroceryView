@@ -32,6 +32,8 @@ describe('GroceryView API app', () => {
     const docs = await request(app.getHttpServer()).get('/api-json').expect(200);
     assert.equal(docs.body.info.title, 'GroceryView API');
     assert.ok(docs.body.paths['/health']);
+    assert.ok(docs.body.paths['/market/overview']);
+    assert.ok(docs.body.paths['/nutrition/value']);
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/products/{id}/spread']);
@@ -45,6 +47,21 @@ describe('GroceryView API app', () => {
   });
 
   it('serves products, stores, prices, watchlists, baskets, and alerts', async () => {
+    const market = await request(app.getHttpServer()).get('/market/overview').expect(200);
+    assert.equal(market.body.city, 'Stockholm');
+    assert.equal(market.body.demo, true);
+    assert.equal(market.body.movers[0].productId, 'coffee');
+    assert.equal(market.body.movers[0].oneMonthMovePercent, -16.7);
+    assert.equal(market.body.topDeals[0].productId, 'coffee');
+
+    const nutrition = await request(app.getHttpServer()).get('/nutrition/value?metric=protein').expect(200);
+    assert.equal(nutrition.body.metric, 'protein');
+    assert.equal(nutrition.body.currency, 'SEK');
+    assert.equal(nutrition.body.demo, true);
+    assert.equal(nutrition.body.leader.productId, 'chicken');
+    assert.equal(nutrition.body.rows[0].valuePer10Sek, 22.89);
+    assert.equal(nutrition.body.guardrails.length, 3);
+
     const products = await request(app.getHttpServer()).get('/products?q=coffee').expect(200);
     assert.equal(products.body[0].id, 'coffee');
     assert.equal(products.body[0].currentPrices[0].priceType, 'shelf');
@@ -214,5 +231,9 @@ describe('GroceryView API app', () => {
   it('returns 404 for missing store deals', async () => {
     await request(app.getHttpServer()).get('/stores/missing-store/deals').expect(404);
     await request(app.getHttpServer()).get('/users/demo/basket/stores/missing-store/quote').expect(404);
+  });
+
+  it('rejects invalid nutrition metrics', async () => {
+    await request(app.getHttpServer()).get('/nutrition/value?metric=sugar').expect(400);
   });
 });
