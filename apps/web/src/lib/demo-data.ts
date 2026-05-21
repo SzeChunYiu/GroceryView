@@ -1887,6 +1887,45 @@ export const couponStackCenter = {
   ]
 };
 
+export const priceFreshnessMonitor = [
+  {
+    productSlug: 'zoegas-coffee-450g',
+    productName: 'Zoegas Coffee 450g',
+    storeSlug: 'willys-odenplan',
+    storeName: 'Willys Odenplan',
+    observedAt: '2026-05-21 14:10 CET',
+    age: '2h fresh',
+    confidence: '94%',
+    status: 'Fresh',
+    nextRefresh: 'Recheck before 17:00 basket lock',
+    reason: 'Coffee drives the weekly basket and the member stack already has a same-day source row.'
+  },
+  {
+    productSlug: 'bregott-normalsaltat-600g',
+    productName: 'Bregott Normalsaltat 600g',
+    storeSlug: 'coop-swedenborgsgatan',
+    storeName: 'Coop Swedenborgsgatan',
+    observedAt: '2026-05-20 13:05 CET',
+    age: '27h review',
+    confidence: '76%',
+    status: 'Review',
+    nextRefresh: 'Refresh before publishing the butter caution flag',
+    reason: 'Butter is above target, but the older source row needs a confirmation pass before alerting.'
+  },
+  {
+    productSlug: 'fiskeriet-laxfile-500g',
+    productName: 'Fiskeriet Laxfile 500g',
+    storeSlug: 'ica-kvantum-liljeholmen',
+    storeName: 'ICA Kvantum Liljeholmen',
+    observedAt: '2026-05-20 18:05 CET',
+    age: '22h stale',
+    confidence: '68%',
+    status: 'Stale',
+    nextRefresh: 'Block dinner basket auto-approval until a fresh protein row lands',
+    reason: 'Fresh protein prices move quickly and this row is below the confidence floor.'
+  }
+];
+
 export const mealBasketIdeas = [
   {
     title: 'weekday breakfast top-up',
