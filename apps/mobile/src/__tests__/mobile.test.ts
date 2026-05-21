@@ -13,6 +13,7 @@ import {
   composeMobileBasketScreen,
   composeMobileBudgetScreen,
   composeMobileHouseholdScreen,
+  composeMobilePrivacyScreen,
   composeMobileProfileScreen,
   composeMobileStoresScreen,
   composeMobileTodayScreen,
@@ -20,6 +21,7 @@ import {
   composeMobileProductTerminalScreen,
   createMobileBudgetRouteViewModel,
   createMobileHouseholdViewModel,
+  createMobilePrivacyViewModel,
   createMobileProfileHubViewModel,
   createMobileProductPriceTerminalViewModel,
   createMobileBasketViewModel,
@@ -982,6 +984,67 @@ describe('mobile app foundation', () => {
 
     assert.deepEqual(plan.actions, ['schedule_receipt_image_cleanup']);
     assert.deepEqual(plan.blockers, []);
+  });
+
+  it('builds mobile Privacy state from controls and request prerequisites', () => {
+    const viewModel = createMobilePrivacyViewModel({
+      userId: 'user-1',
+      authenticated: true,
+      networkOnline: true,
+      confirmedDestructiveAction: true,
+      receiptImageRetentionDays: 7
+    });
+
+    assert.equal(viewModel.controlCount, 4);
+    assert.equal(viewModel.blockerCount, 0);
+    assert.equal(viewModel.exportSectionCount, 5);
+    assert.deepEqual(viewModel.controls.map((control) => control.label), [
+      'Raw receipt media',
+      'Location precision',
+      'Catalog contributions',
+      'Advertiser payloads'
+    ]);
+    assert.deepEqual(viewModel.requests.map((request) => `${request.label}:${request.status}:${request.blockerCount}:${request.exportSectionCount}`), [
+      'Data export:ready:0:5',
+      'Delete account:ready:0:0',
+      'Ad privacy:ready:0:0',
+      'Receipt retention:ready:0:0'
+    ]);
+    assert.deepEqual(viewModel.actions, ['download_export', 'open_ad_privacy_controls', 'schedule_receipt_image_cleanup']);
+  });
+
+  it('composes a renderable mobile Privacy screen with controls, request rows, blockers, and actions', () => {
+    const screen = composeMobilePrivacyScreen({
+      userId: 'user-1',
+      authenticated: false,
+      networkOnline: false
+    });
+
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.title, 'Privacy');
+    assert.equal(screen.state, 'ready');
+    assert.deepEqual(screen.children.map((section) => section.key), ['summary', 'controls', 'requests', 'actions']);
+
+    const summary = screen.children.find((section) => section.key === 'summary');
+    assert.equal(summary?.type, 'section');
+    assert.deepEqual(summary?.children.map((metric) => 'value' in metric ? metric.value : null), ['4', '9', '5']);
+
+    const controls = screen.children.find((section) => section.key === 'controls');
+    if (!controls || controls.type !== 'section') throw new Error('controls section missing');
+    assert.equal(controls.children[0]?.key, 'privacy-control:raw-receipt-media');
+
+    const requests = screen.children.find((section) => section.key === 'requests');
+    if (!requests || requests.type !== 'section') throw new Error('requests section missing');
+    assert.deepEqual(requests.children.map((row) => 'value' in row ? row.value : null), [
+      'blocked, 2 blockers, 5 export sections',
+      'blocked, 3 blockers, 0 export sections',
+      'blocked, 2 blockers, 0 export sections',
+      'blocked, 2 blockers, 0 export sections'
+    ]);
+
+    const actions = screen.children.find((section) => section.key === 'actions');
+    assert.equal(actions?.type, 'section');
+    assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Reauthenticate', 'Retry online', 'Confirm deletion']);
   });
 
 it('plans offline cache coverage and prioritized mobile sync queue', () => {
