@@ -710,6 +710,23 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           }));
         }
       }
+      if (path === '/api/expiry-deals/radar') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') {
+          const categoryFilter = url.searchParams.getAll('category').flatMap((category) =>
+            category.split(',').map((item) => item.trim()).filter(Boolean)
+          );
+          const maxDistanceKm = url.searchParams.get('maxDistanceKm');
+          return jsonResponse(api.getExpiryDealRadarReport(user, {
+            now: url.searchParams.get('now') ?? undefined,
+            categoryFilter,
+            ...(maxDistanceKm === null ? {} : { maxDistanceKm: optionalPositiveNumber(Number(maxDistanceKm), 'maxDistanceKm', 0) })
+          }));
+        }
+      }
       if (path === '/api/pantry/replenishment') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -1394,6 +1411,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/market/overview': { get: publicOperation('Get Stockholm grocery market overview.') },
       '/api/nutrition/value': { get: publicOperation('Get nutrition per krona rankings with sugar and salt warning guardrails.') },
       '/api/meal-plans/suggestions': { get: protectedOperation('Get deal-based meal suggestions with cost, serving, and household guardrails.') },
+      '/api/expiry-deals/radar': { get: protectedOperation('Get expiry markdown radar by favorite store, category, distance, urgency, and verification guardrails.') },
       '/api/pantry/replenishment': {
         get: protectedOperation('Get pantry replenishment status with expiry, basket duplicate, and best-deal context.'),
         post: protectedOperation('Plan pantry replenishment from current stock, usage, expiry, and verified deal candidates.')

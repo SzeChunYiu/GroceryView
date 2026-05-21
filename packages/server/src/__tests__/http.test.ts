@@ -150,6 +150,38 @@ describe('createHttpHandler', () => {
     assert.deepEqual(mealPlansBody.ingredientProductIds, ['chicken', 'pasta', 'tomatoes']);
     assert.match(mealPlansBody.guardrails[0] ?? '', /never update a basket/i);
 
+    const expiryRadar = await handle(new Request('http://localhost/api/expiry-deals/radar?userId=user-1&now=2026-05-20T10:00:00.000Z&category=protein&maxDistanceKm=3'));
+    assert.equal(expiryRadar.status, 200);
+    const expiryRadarBody = await json(expiryRadar) as {
+      stores: Array<{ storeId: string; items: Array<{ id: string; urgency: string; verification: string; savings: number; radarScore: number }> }>;
+      alerts: Array<{ reportId: string; message: string }>;
+      staleReportIds: string[];
+      guardrails: string[];
+    };
+    assert.deepEqual(expiryRadarBody.stores.map((store) => store.storeId), ['hemkop-fridhemsplan']);
+    assert.deepEqual(expiryRadarBody.stores[0]?.items.map((item) => ({
+      id: item.id,
+      urgency: item.urgency,
+      verification: item.verification,
+      savings: item.savings,
+      radarScore: item.radarScore
+    })), [{
+      id: 'expiry-chicken-hemkop',
+      urgency: 'expires_today',
+      verification: 'verified',
+      savings: 50,
+      radarScore: 100
+    }]);
+    assert.deepEqual(expiryRadarBody.alerts, [{
+      reportId: 'expiry-chicken-hemkop',
+      productId: 'chicken',
+      storeId: 'hemkop-fridhemsplan',
+      type: 'expiry_markdown',
+      message: 'Chicken breast is 50% off at Hemkop Fridhemsplan before expiry.'
+    }]);
+    assert.deepEqual(expiryRadarBody.staleReportIds, []);
+    assert.match(expiryRadarBody.guardrails[0] ?? '', /separate from public shelf-price history/i);
+
     const pantry = await handle(new Request('http://localhost/api/pantry/replenishment?userId=user-1&asOf=2026-05-20T08:00:00.000Z'));
     assert.equal(pantry.status, 200);
     const pantryBody = await json(pantry) as { statuses: Array<{ productId: string; status: string }>; replenishment: Array<{ productId: string; alreadyInBasket: boolean }>; expiringSoonProductIds: string[] };

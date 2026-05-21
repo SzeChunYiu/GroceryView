@@ -161,6 +161,40 @@ describe('createGroceryViewApi', () => {
     assert.throws(() => api.getMealPlanSuggestionsReport('user-1', { servings: 0 }), /servings must be positive/);
   });
 
+  it('serves expiry markdown radar scoped by favorite store and category filters', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'coop-odenplan');
+
+    const report = api.getExpiryDealRadarReport('user-1', {
+      now: '2026-05-20T10:00:00.000Z',
+      categoryFilter: ['vegetables'],
+      maxDistanceKm: 2
+    });
+
+    assert.equal(report.userId, 'user-1');
+    assert.deepEqual(report.favoriteStoreIds, ['coop-odenplan']);
+    assert.deepEqual(report.categoryFilter, ['vegetables']);
+    assert.equal(report.maxDistanceKm, 2);
+    assert.equal(report.reportCount, 3);
+    assert.deepEqual(report.stores.map((store) => store.storeId), ['coop-odenplan']);
+    assert.deepEqual(report.stores[0]?.items.map((item) => ({
+      id: item.id,
+      urgency: item.urgency,
+      verification: item.verification,
+      savings: item.savings,
+      radarScore: item.radarScore
+    })), [{
+      id: 'expiry-tomatoes-coop',
+      urgency: 'expires_soon',
+      verification: 'needs_confirmation',
+      savings: 15,
+      radarScore: 68
+    }]);
+    assert.deepEqual(report.alerts, []);
+    assert.match(report.guardrails[0], /separate from public shelf-price history/i);
+    assert.throws(() => api.getExpiryDealRadarReport('user-1', { maxDistanceKm: 0 }), /maxDistanceKm must be positive/);
+  });
+
   it('serves pantry replenishment plans with live deal and basket duplicate context', () => {
     const api = createGroceryViewApi();
     api.addFavoriteStore('user-1', 'willys-odenplan');
