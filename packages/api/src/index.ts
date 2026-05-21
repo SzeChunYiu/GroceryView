@@ -327,6 +327,27 @@ export type StorePriceCoverageReport = {
   guardrails: string[];
 };
 
+export type StoreCategoryCoverageRow = {
+  category: string;
+  productCount: number;
+  pricedProductCount: number;
+  coveragePercent: number;
+  totalKnownPrice: number;
+  missingProductIds: string[];
+  bestDealProductId: string | null;
+  bestDealScore: number | null;
+};
+
+export type StoreCategoryCoverageReport = {
+  storeId: string;
+  storeName: string;
+  currency: 'SEK';
+  categoryCount: number;
+  fullyPricedCategoryCount: number;
+  categories: StoreCategoryCoverageRow[];
+  guardrails: string[];
+};
+
 export type ProductEquivalent = {
   productId: string;
   productName: string;
@@ -1650,6 +1671,43 @@ function buildStorePriceCoverage(storeId: string): StorePriceCoverageReport {
   };
 }
 
+function buildStoreCategoryCoverage(storeId: string): StoreCategoryCoverageReport {
+  const coverage = buildStorePriceCoverage(storeId);
+  const grouped = new Map<string, StorePriceCoverageLine[]>();
+  for (const line of coverage.lines) {
+    grouped.set(line.category, [...(grouped.get(line.category) ?? []), line]);
+  }
+
+  const categories = [...grouped.entries()].map(([category, lines]): StoreCategoryCoverageRow => {
+    const pricedLines = lines.filter((line) => line.price !== null);
+    const bestDeal = [...pricedLines].sort((left, right) => right.dealScore - left.dealScore || left.productName.localeCompare(right.productName))[0];
+    return {
+      category,
+      productCount: lines.length,
+      pricedProductCount: pricedLines.length,
+      coveragePercent: roundPercent((pricedLines.length / lines.length) * 100),
+      totalKnownPrice: roundPrice(pricedLines.reduce((sum, line) => sum + (line.price ?? 0), 0)),
+      missingProductIds: lines.filter((line) => line.price === null).map((line) => line.productId),
+      bestDealProductId: bestDeal?.productId ?? null,
+      bestDealScore: bestDeal?.dealScore ?? null
+    };
+  }).sort((left, right) => left.category.localeCompare(right.category));
+
+  return {
+    storeId: coverage.storeId,
+    storeName: coverage.storeName,
+    currency: coverage.currency,
+    categoryCount: categories.length,
+    fullyPricedCategoryCount: categories.filter((category) => category.coveragePercent === 100).length,
+    categories,
+    guardrails: [
+      'Category coverage is grouped from the same verified store-price rows as product coverage.',
+      'Missing products remain listed by category so store pages do not imply complete coverage.',
+      'Category rollups can prioritize data collection but do not fill missing prices from other stores.'
+    ]
+  };
+}
+
 function storeDealsFor(storeId: string): StoreDeal[] {
   requireKnownStore(storeId);
   return products
@@ -2010,6 +2068,10 @@ export function createGroceryViewApi() {
 
     getStorePriceCoverage(storeId: string): StorePriceCoverageReport {
       return buildStorePriceCoverage(storeId);
+    },
+
+    getStoreCategoryCoverage(storeId: string): StoreCategoryCoverageReport {
+      return buildStoreCategoryCoverage(storeId);
     },
 
     searchProducts(query: string) {
