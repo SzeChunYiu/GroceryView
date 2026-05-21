@@ -108,9 +108,13 @@ describe('verified-data UI', () => {
     assert.match(shell, /homepageRouteMap\.map/);
     assert.match(shell, /sourceRouteMap\.slice/);
     assert.match(shell, /source\.supportingRoutes\.join/);
+    assert.match(shell, /Fresh OpenPrices arrivals/);
+    assert.match(shell, /homepageFreshOpenPrices\.map/);
+    assert.match(shell, /freshestOpenPrices\.slice\(3, 9\)/);
+    assert.match(shell, /product\.observationCount\.toLocaleString/);
     assert.match(page, /GroceryView verified grocery snapshot/);
     assert.match(page, /product browsing/);
-    assert.match(page, /category freshness/);
+    assert.match(page, /fresh OpenPrices observations/);
     assert.match(page, /source route mapping/);
     assert.match(page, /catalogue savings/);
     assert.match(page, /gated feature readiness/);
