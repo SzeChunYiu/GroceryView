@@ -88,3 +88,23 @@ jobs:
             process.exit(1);
           }
           NODE
+
+      - name: Check deployed catalog product-store coverage
+        env:
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${GROCERYVIEW_SERVER_URL:-}"
+          test -n "${METRICS_TOKEN:-}"
+          curl -fsS \
+            -H "x-groceryview-metrics-token: ${METRICS_TOKEN}" \
+            "${GROCERYVIEW_SERVER_URL%/}/api/readiness/catalog-coverage" \
+            >/tmp/catalog-coverage-readiness.json
+          node <<'NODE'
+          const body = require('/tmp/catalog-coverage-readiness.json');
+          if (body.status !== 'complete' || (body.missingProductStorePairs?.length ?? 0) > 0 || (body.requiredActions?.length ?? 0) > 0) {
+            console.error(JSON.stringify(body));
+            process.exit(1);
+          }
+          NODE
