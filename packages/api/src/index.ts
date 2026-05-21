@@ -451,6 +451,15 @@ export type ProductPriceSpreadReport = {
   guardrails: string[];
 };
 
+export type ProductHistorySummaryReport = {
+  productId: string;
+  ticker: string;
+  productName: string;
+  summary: PriceHistorySummary;
+  trend: 'new_low' | 'down' | 'up' | 'flat';
+  guardrails: string[];
+};
+
 export type ProductStoreSavingsRow = {
   storeId: string;
   storeName: string;
@@ -1239,6 +1248,31 @@ function productPriceSpreadFor(product: ProductDetail): ProductPriceSpreadReport
       'Price spread compares only current verified store quotes for the selected product.',
       'Spread rankings do not change Deal Score or basket routing without the product-specific price evidence.',
       'Missing stores stay out of the spread sample until a current quote is verified.'
+    ]
+  };
+}
+
+function productHistorySummaryFor(product: ProductDetail): ProductHistorySummaryReport | null {
+  if (product.history.length === 0) return null;
+  const summary = summarizePriceHistory(product.history.map((point) => ({ observedAt: toIsoObservedAt(point.date), price: point.price })));
+  const trend = summary.isNewLow
+    ? 'new_low'
+    : summary.changeFromPrevious < 0
+      ? 'down'
+      : summary.changeFromPrevious > 0
+        ? 'up'
+        : 'flat';
+
+  return {
+    productId: product.id,
+    ticker: product.ticker,
+    productName: product.name,
+    summary,
+    trend,
+    guardrails: [
+      'History summaries use recorded product history points only.',
+      'New-low signals compare the latest observation against earlier observed prices.',
+      'Missing history stays explicit instead of inferring movement from current store quotes.'
     ]
   };
 }
@@ -2229,6 +2263,12 @@ export function createGroceryViewApi() {
 
     getProductHistory(id: string) {
       return this.getProduct(id)?.history ?? [];
+    },
+
+    getProductHistorySummary(id: string): ProductHistorySummaryReport | null {
+      const product = this.getProduct(id);
+      if (!product) return null;
+      return productHistorySummaryFor(product);
     },
 
     getProductPriceTerminal(id: string, options: { asOf?: string } = {}): ProductPriceTerminalReport | null {

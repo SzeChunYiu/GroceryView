@@ -491,6 +491,28 @@ describe('createHttpHandler', () => {
     assert.deepEqual(terminalBody.chart.series[0].points.map((point) => point.value), [69.9, 59.9, 49.9]);
     assert.equal(terminalBody.historySummary.isNewLow, true);
 
+    const historySummary = await handle(new Request('http://localhost/api/products/coffee/history-summary'));
+    assert.equal(historySummary.status, 200);
+    const historySummaryBody = await json(historySummary) as {
+      productId: string;
+      trend: string;
+      summary: { latestPrice: number; previousPrice: number; changeFromPrevious: number; lowestPrice: number; highestPrice: number; isNewLow: boolean; observedCount: number; latestObservedAt: string };
+      guardrails: string[];
+    };
+    assert.equal(historySummaryBody.productId, 'coffee');
+    assert.equal(historySummaryBody.trend, 'new_low');
+    assert.deepEqual(historySummaryBody.summary, {
+      latestPrice: 49.9,
+      previousPrice: 59.9,
+      changeFromPrevious: -10,
+      lowestPrice: 49.9,
+      highestPrice: 69.9,
+      isNewLow: true,
+      observedCount: 3,
+      latestObservedAt: '2026-05-19T00:00:00.000Z'
+    });
+    assert.match(historySummaryBody.guardrails[0] ?? '', /recorded product history/i);
+
     const equivalents = await handle(new Request('http://localhost/api/products/milk/equivalents'));
     assert.equal(equivalents.status, 200);
     assert.deepEqual(await json(equivalents), [
@@ -580,6 +602,10 @@ describe('createHttpHandler', () => {
     const history = await handle(new Request('http://localhost/api/products/missing-product/history'));
     assert.equal(history.status, 404);
     assert.deepEqual(await json(history), { error: 'Product not found.' });
+
+    const historySummary = await handle(new Request('http://localhost/api/products/missing-product/history-summary'));
+    assert.equal(historySummary.status, 404);
+    assert.deepEqual(await json(historySummary), { error: 'Product not found.' });
 
     const terminal = await handle(new Request('http://localhost/api/products/missing-product/terminal'));
     assert.equal(terminal.status, 404);
