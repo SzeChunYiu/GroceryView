@@ -1,131 +1,32 @@
-import Link from 'next/link';
-import { ArrowDownRight, CircleDollarSign, MapPinned, ShoppingBasket } from 'lucide-react';
-import { personalGroceryInflation, savingsDashboard } from '@/lib/demo-data';
+import { NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 
-export const dynamic = 'force-static';
+const titles: Record<string, string> = {
+  'weekly-basket': 'Weekly basket planner',
+  watchlist: 'Watchlist alerts',
+  scanner: 'Receipt scanner',
+  household: 'Household profile',
+  account: 'Account and alerts',
+  'basket-ideas': 'Basket ideas',
+  'coupon-stacks': 'Coupon stacks',
+  deals: 'Deal radar',
+  'meal-planner': 'Meal planner',
+  'nutrition-value': 'Nutrition value',
+  'pantry-planner': 'Pantry planner',
+  'price-reports': 'Price reports',
+  'savings-dashboard': 'Savings dashboard',
+  'shopping-trips': 'Shopping trips',
+  privacy: 'Privacy controls'
+};
 
-export default function SavingsDashboardPage() {
+export default function FeaturePage() {
+  const route = 'savings-dashboard';
   return (
-    <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
-      <nav className="flex flex-wrap items-center justify-between gap-3 border-b border-market-ink/10 pb-4">
-        <Link href="/" className="text-lg font-black tracking-tight">
-          GroceryView
-        </Link>
-        <div className="flex gap-3 text-sm font-semibold text-market-ink/70">
-          <Link href="/weekly-basket">Basket</Link>
-          <Link href="/products">Products</Link>
-          <Link href="/stores">Stores</Link>
-        </div>
-      </nav>
-
-      <section className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
-        <div className="rounded-lg bg-market-ink p-6 text-white">
-          <div className="text-xs font-bold uppercase tracking-widest text-market-mint">Savings dashboard</div>
-          <h1 className="mt-3 max-w-3xl text-4xl font-black leading-tight sm:text-5xl">
-            Household savings by basket, district, and watchpoint.
-          </h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-white/75">
-            The page translates grocery observations into month-to-date avoided spend and next shopping moves.
-          </p>
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2">
-          <Metric icon={<CircleDollarSign size={20} />} label="Avoided spend" value={savingsDashboard.monthToDate.avoidedSpend} />
-          <Metric icon={<ShoppingBasket size={20} />} label="Baskets tracked" value={String(savingsDashboard.monthToDate.basketCount)} />
-          <Metric icon={<ArrowDownRight size={20} />} label="Planned spend" value={savingsDashboard.monthToDate.plannedSpend} />
-          <Metric icon={<MapPinned size={20} />} label="Best district" value={savingsDashboard.monthToDate.bestDistrict} />
-          <Metric icon={<ArrowDownRight size={20} />} label="Personal CPI" value={`${personalGroceryInflation.inflationPercent.toFixed(1)}%`} />
-          <Metric icon={<CircleDollarSign size={20} />} label="Basket change" value={`${personalGroceryInflation.changeAmount.toFixed(2)} SEK`} />
-        </div>
-      </section>
-
-
-      <section className="rounded-lg border border-market-ink/10 bg-white">
-        <div className="border-b border-market-ink/10 px-4 py-3">
-          <h2 className="text-lg font-black">Personal grocery inflation</h2>
-          <p className="mt-1 text-sm text-market-ink/60">
-            Calculated from the visible weekly basket: current line totals, quantities, and each row's week-over-week movement.
-            Confidence is inherited from the product observation, and missing products stay listed below.
-          </p>
-        </div>
-        <div className="grid gap-0 md:grid-cols-4">
-          <Metric icon={<ArrowDownRight size={20} />} label="Inflation" value={`${personalGroceryInflation.inflationPercent.toFixed(1)}%`} />
-          <Metric icon={<CircleDollarSign size={20} />} label="Base basket" value={`${personalGroceryInflation.baseSpend.toFixed(2)} SEK`} />
-          <Metric icon={<ShoppingBasket size={20} />} label="Current basket" value={`${personalGroceryInflation.currentSpend.toFixed(2)} SEK`} />
-          <Metric icon={<MapPinned size={20} />} label="Coverage" value={`${personalGroceryInflation.itemContributions.length} items`} />
-        </div>
-        <div className="grid gap-0 md:grid-cols-2">
-          {personalGroceryInflation.itemContributions.map((item) => (
-            <Link
-              key={item.productId}
-              href={`/products/${item.productId}`}
-              className="border-t border-market-ink/10 px-4 py-4 text-sm hover:bg-market-oat/45 md:border-r"
-            >
-              <span className="block font-black">{item.productName}</span>
-              <span className="mt-1 block text-market-ink/60">{item.category} · weight {(item.weight * 100).toFixed(0)}% · {item.confidence} confidence</span>
-              <span className={item.changePercent > 0 ? 'mt-3 block font-bold text-market-tomato' : 'mt-3 block font-bold text-market-mint'}>
-                {item.changePercent.toFixed(1)}% · {item.changeAmount.toFixed(2)} SEK
-              </span>
-            </Link>
-          )).slice(0, 8)}
-        </div>
-        {personalGroceryInflation.missingProductIds.length > 0 ? (
-          <p className="border-t border-market-ink/10 px-4 py-3 text-sm text-market-ink/55">
-            Missing from product driver: {personalGroceryInflation.missingProductIds.join(', ')}
-          </p>
-        ) : null}
-      </section>
-
-      <section className="rounded-lg border border-market-ink/10 bg-white">
-        <div className="border-b border-market-ink/10 px-4 py-3">
-          <h2 className="text-lg font-black">Priority watchpoints</h2>
-        </div>
-        <div className="grid gap-0 md:grid-cols-3">
-          {savingsDashboard.watchpoints.map((point) => (
-            <Link
-              key={point.label}
-              href={point.href}
-              className="border-b border-market-ink/10 px-4 py-4 text-sm hover:bg-market-oat/45 md:border-r"
-            >
-              <span className="block text-xs font-bold uppercase text-market-ink/50">{point.label}</span>
-              <span className="mt-2 block text-xl font-black">{point.product}</span>
-              <span className="mt-1 block font-semibold text-market-ink/60">{point.store}</span>
-              <span className="mt-3 block font-black text-market-mint">{point.signal}</span>
-              <span className="mt-3 block leading-6 text-market-ink/65">{point.action}</span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <section className="rounded-lg border border-market-ink/10 bg-white">
-        <div className="grid grid-cols-[1fr_auto_auto] gap-3 border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
-          <span>District</span>
-          <span>Planned</span>
-          <span>Avoided</span>
-        </div>
-        {savingsDashboard.districtSavings.map((row) => (
-          <div key={row.district} className="grid grid-cols-[1fr_auto_auto] gap-3 border-b border-market-ink/10 px-4 py-4 text-sm last:border-b-0">
-            <span>
-              <span className="block font-black">{row.district}</span>
-              <span className="mt-1 block text-market-ink/60">{row.driver}</span>
-            </span>
-            <span className="font-bold tabular-nums">{row.planned}</span>
-            <span className="font-black tabular-nums text-market-mint">{row.avoided}</span>
-          </div>
-        ))}
-      </section>
-    </main>
-  );
-}
-
-function Metric({ icon, label, value }: Readonly<{ icon: React.ReactNode; label: string; value: string }>) {
-  return (
-    <div className="rounded-lg border border-market-ink/10 bg-white p-4">
-      <div className="flex items-center justify-between gap-3 text-market-mint">
-        {icon}
-        <span className="text-xs font-bold uppercase text-market-ink/45">{label}</span>
+    <PageShell>
+      <NoVerifiedData title={`${titles[route]} has no private production records in this static snapshot`} />
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
+        <TopSpreads limit={5} />
+        <SourceCoverage />
       </div>
-      <strong className="mt-4 block text-2xl font-black">{value}</strong>
-    </div>
+    </PageShell>
   );
 }

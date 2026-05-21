@@ -1,60 +1,23 @@
 import Link from 'next/link';
-import { categoryDealLeaders } from '@/lib/demo-data';
-import { pricedProducts, categoryLabels } from '@/lib/openprices-products';
-
-export const dynamic = 'force-static';
+import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { categorySummaries, formatPct, formatSek } from '@/lib/verified-data';
 
 export default function CategoriesIndexPage() {
-  const byCat = new Map<string, typeof pricedProducts>();
-  for (const p of pricedProducts) {
-    const k = p.category || 'pantry';
-    if (!byCat.has(k)) byCat.set(k, []);
-    byCat.get(k)!.push(p);
-  }
-  const ordered = [...byCat.entries()].sort((a, b) => b[1].length - a[1].length);
-  const leadersByCategory = new Map(categoryDealLeaders.map((leader) => [leader.category.toLowerCase(), leader]));
-
   return (
-    <main className="mx-auto max-w-6xl px-4 py-8">
-      <nav className="mb-6 flex items-center justify-between border-b border-market-ink/10 pb-4">
-        <Link href="/" className="text-lg font-black tracking-tight">GroceryView</Link>
-        <div className="flex gap-3 text-sm font-semibold text-market-ink/70">
-          <Link href="/stores">Stores</Link>
-          <Link href="/products">Products</Link>
-        </div>
-      </nav>
-
-      <header className="mb-6">
-        <div className="text-xs font-bold uppercase tracking-widest text-market-mint">Categories</div>
-        <h1 className="mt-2 text-4xl font-black leading-tight sm:text-5xl">
-          {ordered.length} categories of grocery items.
-        </h1>
-        <p className="mt-3 max-w-3xl text-base leading-7 text-market-ink/65">
-          Mapped from OpenFoodFacts category tags. Each card shows count and SEK price range from observed data.
-        </p>
-      </header>
-
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {ordered.map(([cat, items]) => (
-          <Link key={cat} href={`/categories/${cat}`} className="rounded-lg border border-market-ink/10 bg-white p-5 hover:border-market-mint/70">
-            <div className="flex items-baseline justify-between">
-              <span className="text-xl font-black">{categoryLabels[cat] || cat}</span>
-              <span className="text-sm font-bold text-market-mint">{items.length}</span>
-            </div>
-            <p className="mt-2 text-sm text-market-ink/65">
-              SEK {Math.min(...items.map(i => i.priceMin)).toFixed(2)} – {Math.max(...items.map(i => i.priceMax)).toFixed(2)}
-            </p>
-            <p className="mt-2 text-xs text-market-ink/45">
-              Top: {items.slice(0, 3).map(i => i.name.split(' ').slice(0, 3).join(' ')).join(' · ')}
-            </p>
-            {leadersByCategory.get((categoryLabels[cat] || cat).toLowerCase()) ? (
-              <p className="mt-3 rounded-md bg-market-mint/10 px-2 py-1 text-xs font-bold text-market-ink/70">
-                Deal leader: {leadersByCategory.get((categoryLabels[cat] || cat).toLowerCase())?.signal}
-              </p>
-            ) : null}
+    <PageShell>
+      <Eyebrow>Categories</Eyebrow>
+      <h1 className="mt-2 text-4xl font-black tracking-tight">Category coverage from verified product rows</h1>
+      <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        {categorySummaries.map((category) => (
+          <Link href={`/categories/${category.slug}`} key={category.slug}>
+            <Card className="h-full transition hover:-translate-y-0.5 hover:border-emerald-700">
+              <h2 className="text-2xl font-black">{category.label}</h2>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{category.openPriceRows} OpenPrices rows and {category.chainRows} Axfood rows.</p>
+              <div className="mt-4 flex justify-between gap-3 text-sm font-black"><span>{formatSek(category.medianPrice)}</span><span>{formatPct(category.strongestSpread)} max spread</span></div>
+            </Card>
           </Link>
         ))}
-      </section>
-    </main>
+      </div>
+    </PageShell>
   );
 }

@@ -1,43 +1,23 @@
-import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { stores } from '@/lib/demo-data';
+import { Card, Eyebrow, PageShell } from '@/components/data-ui';
+import { osmStores } from '@/lib/osm-stores';
+import { findStore } from '@/lib/verified-data';
 
-export function generateStaticParams() {
-  return stores.map((store) => ({ slug: store.slug }));
-}
+export function generateStaticParams() { return osmStores.slice(0, 80).map((store) => ({ slug: store.slug })); }
 
 export default async function StorePage({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
   const { slug } = await params;
-  const store = stores.find((item) => item.slug === slug);
+  const store = findStore(slug);
   if (!store) notFound();
-
   return (
-    <main className="mx-auto max-w-4xl px-4 py-8">
-      <Link href="/" className="text-sm font-bold text-market-mint">
-        GroceryView
-      </Link>
-      <section className="mt-4 rounded-lg border border-market-ink/10 bg-white p-6">
-        <div className="text-xs font-bold uppercase tracking-widest text-market-ink/50">Store profile</div>
-        <h1 className="mt-3 text-4xl font-black">{store.name}</h1>
-        <p className="mt-2 text-market-ink/65">
-          {store.format} in {store.district}
-        </p>
-        <div className="mt-6 grid gap-3 sm:grid-cols-4">
-          <Metric label="Best category" value={store.bestCategory} />
-          <Metric label="Price coverage" value="Verified shelf rows" />
-          <Metric label="Distance metadata" value={store.distanceLabel} />
-          <Metric label="Deal Score policy" value="No distance penalty" />
-        </div>
-      </section>
-    </main>
-  );
-}
-
-function Metric({ label, value }: Readonly<{ label: string; value: string }>) {
-  return (
-    <div className="rounded-md bg-market-oat/45 p-4">
-      <strong className="block text-xl">{value}</strong>
-      <span className="text-xs font-semibold text-market-ink/55">{label}</span>
-    </div>
+    <PageShell>
+      <Eyebrow>OSM store record</Eyebrow>
+      <h1 className="mt-2 text-4xl font-black tracking-tight">{store.name}</h1>
+      <p className="mt-3 text-lg text-slate-700">{store.brand} · {store.format}</p>
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <Card><h2 className="text-2xl font-black">Location fields</h2><dl className="mt-4 grid gap-3"><div className="rounded-2xl bg-slate-50 p-4"><dt className="font-black">Address</dt><dd>{store.address || 'Not reported by OSM'}</dd></div><div className="rounded-2xl bg-slate-50 p-4"><dt className="font-black">City / district</dt><dd>{store.city || 'Not reported'} / {store.district || 'Not reported'}</dd></div><div className="rounded-2xl bg-slate-50 p-4"><dt className="font-black">Coordinates</dt><dd>{store.lat}, {store.lng}</dd></div></dl></Card>
+        <Card className="border-amber-200 bg-amber-50"><h2 className="text-2xl font-black text-amber-950">Price guardrail</h2><p className="mt-4 leading-7 text-amber-950">This store page does not list branch-specific prices because the current verified store source is OSM location data only. Chain catalogue prices remain on product and comparison pages.</p><p className="mt-4 text-sm font-black text-amber-900">Source: {store.source}; retrieved {store.retrievedDate}.</p></Card>
+      </div>
+    </PageShell>
   );
 }
