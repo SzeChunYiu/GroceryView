@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { AdsModule } from './ads/ads.module.js';
 import { AlertsModule } from './alerts/alerts.module.js';
 import { AppController } from './app.controller.js';
 import { BasketsModule } from './baskets/baskets.module.js';
@@ -20,6 +21,7 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, validate: validateEnvironment }),
+    AdsModule,
     DatabaseModule,
     HealthModule,
     LoyaltyModule,
