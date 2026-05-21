@@ -100,10 +100,14 @@ describe('verified-data UI', () => {
     assert.match(shell, /homepageSourceReadiness\.map/);
     assert.match(shell, /sourceReadinessMatrix\.slice/);
     assert.match(shell, /formatPct\(source\.rowShare \* 100\)/);
+    assert.match(shell, /Catalogue savings signals/);
+    assert.match(shell, /homepageChainSavings\.map/);
+    assert.match(shell, /chainSavingsLedger\.slice/);
+    assert.match(shell, /chain\.topProductSlug/);
     assert.match(page, /GroceryView verified grocery snapshot/);
     assert.match(page, /product browsing/);
     assert.match(page, /category freshness/);
-    assert.match(page, /source readiness/);
+    assert.match(page, /catalogue savings/);
     assert.match(page, /gated feature readiness/);
   });
 
