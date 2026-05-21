@@ -33,10 +33,10 @@ describe('GroceryView API app', () => {
     assert.equal(docs.body.info.title, 'GroceryView API');
     assert.ok(docs.body.paths['/health']);
     assert.ok(docs.body.paths['/products']);
-    assert.ok(docs.body.paths['/products/{id}/deal-score']);
-    assert.ok(docs.body.paths['/products/{id}/equivalents']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/products/{id}/spread']);
+    assert.ok(docs.body.paths['/products/{id}/deal-score']);
+    assert.ok(docs.body.paths['/products/{id}/equivalents']);
     assert.ok(docs.body.paths['/stores']);
     assert.ok(docs.body.paths['/stores/{id}/deals']);
     assert.ok(docs.body.paths['/users/demo/basket/local-offers']);
@@ -110,6 +110,7 @@ describe('GroceryView API app', () => {
     assert.deepEqual(dealScore.body.band, { label: 'Good deal', verdict: 'Buy' });
     assert.equal(dealScore.body.verdict, 'Buy');
     assert.equal(dealScore.body.discountVsMedianPercent, 16.7);
+    assert.equal(dealScore.body.historicalPercentile, 12);
     assert.equal(dealScore.body.confidence, 0.9);
     assert.match(dealScore.body.reasons[0], /Willys Odenplan/);
     assert.equal(dealScore.body.demo, true);

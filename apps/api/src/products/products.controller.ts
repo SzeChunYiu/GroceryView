@@ -37,7 +37,7 @@ export class ProductsController {
   }
 
   @Get(':id/equivalents')
-  @ApiOkResponse({ description: 'Comparable products in the same category' })
+  @ApiOkResponse({ description: 'Comparable same-category product alternatives' })
   equivalents(@Param('id') id: string) {
     if (!groceryApi.getProduct(id)) throw new NotFoundException('Product not found');
     return groceryApi.getProductEquivalents(id).map((equivalent) => ({ ...equivalent, demo: true }));
