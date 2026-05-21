@@ -1,5 +1,12 @@
 import Link from 'next/link';
 import { BellRing, CheckCircle2, Clock, Target, WalletCards } from 'lucide-react';
+import {
+  buildWatchlistAlerts,
+  planNotifications,
+  type NotificationChannel,
+  type NotificationEvent,
+  type WatchlistPriceType
+} from '@groceryview/core';
 import { products, stores, watchlistAlerts } from '@/lib/demo-data';
 
 export const dynamic = 'force-static';
@@ -16,7 +23,18 @@ function statusTone(targetMet: boolean) {
 }
 
 export default function WatchlistPage() {
-  const targetMetCount = watchlistAlerts.filter((alert) => alert.currentPrice <= alert.targetPrice).length;
+  const watchlistCoreInput = buildWatchlistCoreInput();
+  const coreAlerts = buildWatchlistAlerts(watchlistCoreInput);
+  const plannedNotifications = planNotifications({
+    now: '2026-05-21T09:00:00.000Z',
+    preferences: {
+      channels: notificationChannelsFromWatchlist(),
+      enabledTypes: ['target_price'],
+      quietHours: { startHour: 22, endHour: 7, timezone: 'Europe/Stockholm' }
+    },
+    events: coreAlerts.map(notificationEventFromAlert)
+  });
+  const targetMetCount = coreAlerts.filter((alert) => alert.type === 'target_price').length;
   const visibleUpside = watchlistAlerts.reduce(
     (sum, alert) => sum + Math.max(0, alert.usualPrice - alert.currentPrice),
     0
@@ -57,7 +75,7 @@ export default function WatchlistPage() {
           <Metric icon={BellRing} label="Tracked rules" value={String(watchlistAlerts.length)} />
           <Metric icon={CheckCircle2} label="Targets met" value={String(targetMetCount)} />
           <Metric icon={WalletCards} label="Visible upside" value={formatSek(visibleUpside)} />
-          <Metric icon={Clock} label="Inbox holds" value="2" />
+          <Metric icon={Clock} label="Planned sends" value={String(plannedNotifications.length)} />
         </div>
       </section>
 
@@ -123,6 +141,27 @@ export default function WatchlistPage() {
         })}
       </section>
 
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="border-b border-market-ink/10 px-4 py-3">
+          <h2 className="text-lg font-black">Notification plan</h2>
+          <p className="mt-1 text-sm text-market-ink/60">
+            Core watchlist alerts are routed through planNotifications before any push or email copy is shown.
+          </p>
+        </div>
+        <div className="divide-y divide-market-ink/10">
+          {plannedNotifications.map((notification) => (
+            <article key={`${notification.title}-${notification.channel}`} className="grid gap-3 px-4 py-4 text-sm md:grid-cols-[1fr_auto_auto]">
+              <span>
+                <span className="block font-black">{notification.title}</span>
+                <span className="mt-1 block text-market-ink/60">{notification.body}</span>
+              </span>
+              <span className="font-black uppercase text-market-mint">{notification.channel}</span>
+              <span className="text-right tabular-nums text-market-ink/65">{notification.sendAt}</span>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="grid gap-3 md:grid-cols-3">
         <Guardrail icon={Target} label="Target price" detail="Only current prices at or below target can move into ready state." />
         <Guardrail icon={CheckCircle2} label="Confidence floor" detail="Medium and high confidence rows stay visible before household notifications." />
@@ -130,6 +169,66 @@ export default function WatchlistPage() {
       </section>
     </main>
   );
+}
+
+function buildWatchlistCoreInput() {
+  return {
+    watchlist: watchlistAlerts.map((alert) => ({
+      productId: alert.productSlug,
+      targetPrice: alert.targetPrice,
+      favoriteStoresOnly: false,
+      allowedPriceTypes: alert.allowedPriceTypes.map(toWatchlistPriceType)
+    })),
+    products: watchlistAlerts.map((alert) => {
+      const product = productBySlug.get(alert.productSlug);
+      const priceType = toWatchlistPriceType(alert.allowedPriceTypes[0] ?? 'shelf');
+      const discountPercent = alert.usualPrice > 0
+        ? Math.max(0, ((alert.usualPrice - alert.currentPrice) / alert.usualPrice) * 100)
+        : 0;
+
+      return {
+        productId: alert.productSlug,
+        productName: product?.name ?? alert.productSlug,
+        bestPrice: alert.currentPrice,
+        bestStoreId: alert.storeSlug,
+        bestPriceType: priceType,
+        prices: [{
+          storeId: alert.storeSlug,
+          storeName: storeBySlug.get(alert.storeSlug)?.name ?? alert.storeSlug,
+          price: alert.currentPrice,
+          priceType
+        }],
+        dealScore: Math.round(discountPercent),
+        isNew52WeekLow: false
+      };
+    }),
+    favoriteStoreIds: []
+  };
+}
+
+function toWatchlistPriceType(value: string): WatchlistPriceType {
+  const normalized = value.toLowerCase();
+  if (normalized.includes('member')) return 'member';
+  if (normalized.includes('promo') || normalized.includes('deal') || normalized.includes('clearance')) return 'promotion';
+  if (normalized.includes('estimated')) return 'estimated';
+  return 'shelf';
+}
+
+function notificationChannelsFromWatchlist(): NotificationChannel[] {
+  const channels = new Set<NotificationChannel>();
+  for (const alert of watchlistAlerts) {
+    channels.add(alert.channel === 'push' ? 'push' : 'email');
+  }
+  return [...channels].sort();
+}
+
+function notificationEventFromAlert(alert: ReturnType<typeof buildWatchlistAlerts>[number]): NotificationEvent {
+  return {
+    type: 'target_price',
+    title: `${alert.productName} watchlist alert`,
+    body: alert.message,
+    priority: alert.severity === 'urgent' ? 'high' : 'normal'
+  };
 }
 
 function Metric({

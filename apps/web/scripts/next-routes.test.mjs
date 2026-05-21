@@ -91,6 +91,10 @@ describe('Next.js web scaffold', () => {
     assert.match(demoData, /bregott-normalsaltat-600g/);
     assert.match(demoData, /allowedPriceTypes/);
     assert.match(watchlistPage, /watchlistAlerts\.map/);
+    assert.match(watchlistPage, /buildWatchlistAlerts/);
+    assert.match(watchlistPage, /planNotifications/);
+    assert.match(watchlistPage, /plannedNotifications\.map/);
+    assert.match(watchlistPage, /buildWatchlistCoreInput/);
     assert.match(watchlistPage, /Target-price alerts tied to real Stockholm product rows/);
     assert.match(watchlistPage, /\/products\/\$\{alert\.productSlug\}/);
     assert.match(marketShell, /href="\/watchlist"/);
