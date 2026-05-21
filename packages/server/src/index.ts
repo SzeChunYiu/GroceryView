@@ -161,6 +161,7 @@ type JsonRecord = Record<string, unknown>;
 
 const require = createRequire(import.meta.url);
 const jsonHeaders = { 'content-type': 'application/json; charset=utf-8' };
+const requiredDailyChainIds = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'] as const;
 
 function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   return new Response(JSON.stringify(body), {
@@ -1643,10 +1644,15 @@ function parseCatalogCoverageTargets(value: string | undefined): Omit<CatalogCov
     }
     return fieldValue.map((entry) => String(entry).trim());
   };
+  const targetChains = readStringArray('targetChains');
+  const missingRequiredChains = requiredDailyChainIds.filter((chainId) => !targetChains.includes(chainId));
+  if (missingRequiredChains.length > 0) {
+    throw new Error(`CATALOG_COVERAGE_TARGETS_JSON.targetChains is missing required chains: ${missingRequiredChains.join(', ')}.`);
+  }
   return {
     targetProducts: readStringArray('targetProducts'),
     targetCategories: readStringArray('targetCategories'),
-    targetChains: readStringArray('targetChains'),
+    targetChains,
     targetStores: readStringArray('targetStores'),
     requireEveryProductInEveryStore: record.requireEveryProductInEveryStore !== false
   };
@@ -1774,7 +1780,7 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
         now: new Date().toISOString(),
         maxRunningMinutes: 120,
         staleAfterMinutes: 24 * 60,
-        requiredFreshChainIds: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
+        requiredFreshChainIds: requiredDailyChainIds,
         requiredAcceptedCountByChain: { ica: 1, willys: 1, coop: 1, hemkop: 1, lidl: 1, city_gross: 1 },
         filter: { limit: 100 }
       }),
