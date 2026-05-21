@@ -13,7 +13,8 @@ import {
   productUniverse,
   snapshot,
   sourceCoverage,
-  storeBrandLedger
+  storeBrandLedger,
+  storeFormatCoverage
 } from '@/lib/verified-data';
 
 const featureReadinessQueue = Object.entries(privateFeatureCopy).slice(0, 6);
@@ -297,6 +298,37 @@ export function MarketShell() {
         </Card>
         <SourceCoverage />
       </div>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>OSM format coverage</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Store formats with verified Stockholm coverage</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-slate-600">
+            Format counts, address coverage, brand diversity, and districts are derived directly from the OpenStreetMap store extract.
+          </p>
+        </div>
+        <div className="mt-5 divide-y divide-slate-200">
+          {storeFormatCoverage.map((format) => (
+            <Link
+              className="grid gap-3 py-4 transition hover:bg-emerald-50/70 md:grid-cols-[1fr_auto_auto_auto]"
+              href={`/stores/${format.sampleSlug}`}
+              key={format.format}
+            >
+              <div>
+                <p className="font-black text-slate-950">{format.format}</p>
+                <p className="text-sm text-slate-600">
+                  {format.brands.toLocaleString('sv-SE')} brands · {format.districts.toLocaleString('sv-SE')} districts
+                </p>
+              </div>
+              <p className="font-black text-emerald-800">{format.stores.toLocaleString('sv-SE')} stores</p>
+              <p className="font-semibold text-slate-700">{formatPct(format.addressCoverage * 100)} addressed</p>
+              <p className="text-sm font-semibold text-slate-600">OSM {format.latestRetrieved}</p>
+            </Link>
+          ))}
+        </div>
+      </Card>
 
       <Card className="mt-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">

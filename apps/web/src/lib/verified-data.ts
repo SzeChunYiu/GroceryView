@@ -77,6 +77,48 @@ export const storeBrandLedger = Object.values(
   .sort((a, b) => b.stores - a.stores || a.brand.localeCompare(b.brand, 'sv'))
   .slice(0, 8);
 
+export const storeFormatCoverage = Object.values(
+  osmStores.reduce<Record<string, {
+    format: string;
+    stores: number;
+    addressedStores: number;
+    brands: Set<string>;
+    districts: Set<string>;
+    latestRetrieved: string;
+    sampleSlug: string;
+  }>>((ledger, store) => {
+    const format = store.format || store.shop || 'format not reported';
+    const row = ledger[format] ?? {
+      format,
+      stores: 0,
+      addressedStores: 0,
+      brands: new Set<string>(),
+      districts: new Set<string>(),
+      latestRetrieved: '',
+      sampleSlug: store.slug
+    };
+
+    row.stores += 1;
+    if (store.address) row.addressedStores += 1;
+    if (store.brand) row.brands.add(store.brand);
+    if (store.district) row.districts.add(store.district);
+    if (store.retrievedDate > row.latestRetrieved) row.latestRetrieved = store.retrievedDate;
+    ledger[format] = row;
+    return ledger;
+  }, {})
+)
+  .map((row) => ({
+    format: row.format,
+    stores: row.stores,
+    addressCoverage: row.stores ? row.addressedStores / row.stores : 0,
+    brands: row.brands.size,
+    districts: row.districts.size,
+    latestRetrieved: row.latestRetrieved,
+    sampleSlug: row.sampleSlug
+  }))
+  .sort((a, b) => b.stores - a.stores || a.format.localeCompare(b.format, 'sv'))
+  .slice(0, 6);
+
 export const categorySummaries = Object.entries(categoryLabels)
   .map(([slug, label]) => {
     const openRows = pricedProducts.filter((product) => product.category === slug);

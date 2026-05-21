@@ -102,6 +102,20 @@ describe('verified-data UI', () => {
     assert.match(shell, /\/stores\/\$\{brand\.sampleSlug\}/);
   });
 
+  it('surfaces verified OSM store format coverage on the homepage', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(verified, /export const storeFormatCoverage = /);
+    assert.match(verified, /osmStores\.reduce/);
+    assert.match(verified, /addressCoverage/);
+    assert.match(verified, /districts: row\.districts\.size/);
+    assert.match(shell, /storeFormatCoverage\.map/);
+    assert.match(shell, /OSM format coverage/);
+    assert.match(shell, /Store formats with verified Stockholm coverage/);
+    assert.match(shell, /\/stores\/\$\{format\.sampleSlug\}/);
+  });
+
   it('surfaces verified category quality on the homepage', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const shell = await read('src/components/market-shell.tsx');
