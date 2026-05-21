@@ -38,6 +38,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/market/overview']);
     assert.ok(docs.body.paths['/users/demo/meal-plans/suggestions']);
     assert.ok(docs.body.paths['/nutrition/value']);
+    assert.ok(docs.body.paths['/users/demo/pantry/replenishment']);
     assert.ok(docs.body.paths['/prices/freshness']);
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
@@ -204,6 +205,33 @@ describe('GroceryView API app', () => {
       .expect(201);
     const basket = await request(app.getHttpServer()).get('/users/demo/basket').expect(200);
     assert.equal(basket.body.items[0].quantity, 2);
+
+    const pantry = await request(app.getHttpServer())
+      .get('/users/demo/pantry/replenishment?asOf=2026-05-20T08:00:00.000Z')
+      .expect(200);
+    assert.equal(pantry.body.householdId, 'demo');
+    assert.deepEqual(
+      pantry.body.statuses.map((item: { productId: string; status: string; remainingQuantity: number }) => ({
+        productId: item.productId,
+        status: item.status,
+        remainingQuantity: item.remainingQuantity
+      })),
+      [
+        { productId: 'coffee', status: 'low_stock', remainingQuantity: 0.5 },
+        { productId: 'milk', status: 'expiring_soon', remainingQuantity: 1 },
+        { productId: 'butter', status: 'in_stock', remainingQuantity: 1 }
+      ]
+    );
+    assert.deepEqual(pantry.body.expiringSoonProductIds, ['milk']);
+    assert.deepEqual(
+      pantry.body.replenishment.map((item: { productId: string; alreadyInBasket: boolean; bestDeal?: { storeId: string; price: number } }) => ({
+        productId: item.productId,
+        alreadyInBasket: item.alreadyInBasket,
+        bestDeal: item.bestDeal && { storeId: item.bestDeal.storeId, price: item.bestDeal.price }
+      })),
+      [{ productId: 'coffee', alreadyInBasket: true, bestDeal: { storeId: 'willys-odenplan', price: 49.9 } }]
+    );
+    assert.equal(pantry.body.demo, true);
 
     const comparison = await request(app.getHttpServer()).get('/users/demo/basket/comparison').expect(200);
     assert.deepEqual(comparison.body.strategies.map((strategy: { id: string }) => strategy.id), [
