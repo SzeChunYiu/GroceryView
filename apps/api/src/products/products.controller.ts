@@ -27,6 +27,14 @@ export class ProductsController {
     return { ...spread, demo: true };
   }
 
+  @Get(':id/store-savings')
+  @ApiOkResponse({ description: 'Product store savings against the highest current verified quote' })
+  storeSavings(@Param('id') id: string) {
+    const savings = groceryApi.getProductStoreSavings(id);
+    if (!savings) throw new NotFoundException('Product not found');
+    return { ...savings, demo: true };
+  }
+
   @Get(':id/deal-score')
   @ApiOkResponse({ description: 'Deal Score v1 report with customer-facing reasons' })
   dealScore(@Param('id') id: string, @Query('distanceKm') distanceKm?: string) {
