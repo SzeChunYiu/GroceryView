@@ -61,6 +61,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/products/{id}/history']);
     assert.ok(docs.body.paths['/users/demo/receipts/review']);
     assert.ok(docs.body.paths['/stores']);
+    assert.ok(docs.body.paths['/users/demo/basket/items/{productId}']);
     assert.ok(docs.body.paths['/stores/{id}/category-coverage']);
     assert.ok(docs.body.paths['/stores/{id}/coverage']);
     assert.ok(docs.body.paths['/stores/{id}/deal-summary']);
@@ -319,6 +320,22 @@ describe('GroceryView API app', () => {
       .expect(201);
     const basket = await request(app.getHttpServer()).get('/users/demo/basket').expect(200);
     assert.equal(basket.body.items[0].quantity, 2);
+
+    await request(app.getHttpServer()).post('/users/demo/basket/items').send({ productId: 'milk', quantity: 1 }).expect(201);
+    const updatedBasket = await request(app.getHttpServer())
+      .patch('/users/demo/basket/items/milk')
+      .send({ quantity: 2 })
+      .expect(200);
+    assert.deepEqual(
+      updatedBasket.body.items.map((item: { productId: string; quantity: number }) => [item.productId, item.quantity]),
+      [
+        ['coffee', 2],
+        ['milk', 2]
+      ]
+    );
+
+    const basketAfterRemoval = await request(app.getHttpServer()).delete('/users/demo/basket/items/milk').expect(200);
+    assert.deepEqual(basketAfterRemoval.body.items, [{ productId: 'coffee', quantity: 2 }]);
 
     const budget = await request(app.getHttpServer()).get('/users/demo/budget/summary').expect(200);
     assert.equal(budget.body.weeklyBudget, 0);
@@ -613,6 +630,8 @@ describe('GroceryView API app', () => {
     await request(app.getHttpServer()).get('/users/demo/basket/stores/missing-store/quote').expect(404);
     await request(app.getHttpServer()).post('/users/demo/favorite-stores').send({ storeId: 'missing-store' }).expect(404);
     await request(app.getHttpServer()).delete('/users/demo/favorite-stores/missing-store').expect(404);
+    await request(app.getHttpServer()).patch('/users/demo/basket/items/missing-product').send({ quantity: 2 }).expect(404);
+    await request(app.getHttpServer()).delete('/users/demo/basket/items/missing-product').expect(404);
   });
 
   it('rejects invalid nutrition metrics', async () => {

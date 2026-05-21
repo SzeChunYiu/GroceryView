@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { IsNumber, IsString, Min } from 'class-validator';
 import { groceryApi } from '../demo-data.js';
@@ -7,6 +7,12 @@ class BasketItemDto {
   @IsString()
   productId!: string;
 
+  @IsNumber()
+  @Min(1)
+  quantity!: number;
+}
+
+class BasketItemQuantityDto {
   @IsNumber()
   @Min(1)
   quantity!: number;
@@ -51,5 +57,33 @@ export class BasketsController {
   addItem(@Body() body: BasketItemDto) {
     groceryApi.addBasketItem('demo', body);
     return body;
+  }
+
+  @Patch('items/:productId')
+  @ApiOkResponse({ description: 'Basket item quantity updated' })
+  updateItem(@Param('productId') productId: string, @Body() body: BasketItemQuantityDto) {
+    try {
+      groceryApi.updateBasketItem('demo', productId, body.quantity);
+      return groceryApi.getBasket('demo');
+    } catch (error) {
+      if (error instanceof Error && /(Unknown productId|Basket item not found)/.test(error.message)) {
+        throw new NotFoundException('Basket item not found');
+      }
+      throw error;
+    }
+  }
+
+  @Delete('items/:productId')
+  @ApiOkResponse({ description: 'Basket item removed' })
+  removeItem(@Param('productId') productId: string) {
+    try {
+      groceryApi.removeBasketItem('demo', productId);
+      return groceryApi.getBasket('demo');
+    } catch (error) {
+      if (error instanceof Error && /(Unknown productId|Basket item not found)/.test(error.message)) {
+        throw new NotFoundException('Basket item not found');
+      }
+      throw error;
+    }
   }
 }
