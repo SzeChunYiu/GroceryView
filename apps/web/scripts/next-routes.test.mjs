@@ -15,6 +15,7 @@ const appFiles = [
   'src/app/map/page.tsx',
   'src/app/data-sources/page.tsx',
   'src/app/store-coverage/page.tsx',
+  'src/app/openprices-depth/page.tsx',
   'src/components/market-shell.tsx',
   'src/components/data-ui.tsx',
   'src/lib/verified-data.ts'
@@ -217,5 +218,19 @@ describe('verified-data UI', () => {
     assert.match(route, /OSM store coverage without inferred prices/);
     assert.match(route, /without turning coordinates into branch-level price claims/);
     assert.doesNotMatch(route, /@\/lib\/demo-data/);
+  });
+
+  it('surfaces verified OpenPrices observation depth on its own route', async () => {
+    const route = await read('src/app/openprices-depth/page.tsx');
+
+    assert.match(route, /openPriceObservationDepth\.map/);
+    assert.match(route, /freshestOpenPrices\.slice/);
+    assert.match(route, /SourceCoverage/);
+    assert.match(route, /Community SEK observation depth/);
+    assert.match(route, /Claim boundary/);
+    assert.match(route, /store-specific prices/);
+    assert.match(route, /@\/lib\/verified-data/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 });
