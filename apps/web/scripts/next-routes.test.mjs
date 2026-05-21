@@ -72,7 +72,7 @@ describe('Next.js web scaffold', () => {
     assert.match(demoData, /barilla-spaghetti-1kg/);
     assert.match(demoData, /bregott-normalsaltat-600g/);
     assert.match(demoData, /garant-havregryn-1kg/);
-    assert.match(demoData, /weeklyTotal: '710\.60 SEK'/);
+    assert.match(demoData, /weeklyTotal: '813\.20 SEK'/);
     assert.match(marketShell, /weeklyBasket\.map/);
     assert.match(marketShell, /householdSavings\.weeklyTotal/);
     assert.match(marketShell, /Weekly basket tape/);
