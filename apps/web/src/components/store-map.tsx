@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { osmStores, type OsmStore } from '@/lib/osm-stores';
+import { cheapestMapChain, mapChainIndexScores } from '@/lib/map-chain-index';
 
 // Free, no-API-key vector tiles (© OpenMapTiles / OpenFreeMap, data © OSM).
 const MAP_STYLE = 'https://tiles.openfreemap.org/styles/bright';
@@ -29,6 +30,29 @@ function chainColor(brand: string): string {
   return OTHER_COLOR;
 }
 
+function chainLabel(brand: string): string {
+  for (const c of CHAIN_COLORS) if (c.match.test(brand)) return c.label.split(' / ')[0];
+  return 'Other';
+}
+
+function chainIndexScore(brand: string): number | null {
+  const label = chainLabel(brand);
+  return mapChainIndexScores.find((score) => score.chainId.toLowerCase() === label.toLowerCase())?.overallIndex ?? null;
+}
+
+function chainIndexColor(score: number | null, fallback: string): string {
+  if (score == null) return fallback;
+  if (score < 96) return '#1D8649';
+  if (score <= 103) return '#F59E0B';
+  return '#D94F3D';
+}
+
+function districtHeatColor(score: number): string {
+  if (score < 96) return '#1D8649';
+  if (score <= 103) return '#F59E0B';
+  return '#D94F3D';
+}
+
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, '&amp;')
@@ -48,14 +72,52 @@ function toFeatureCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
         properties: {
           name: s.name,
           brand: s.brand || 'Other',
+          chainIndex: chainIndexScore(s.brand || ''),
           format: s.format || 'store',
           district: s.district || s.city || '',
           address: s.address || '',
-          color: chainColor(s.brand || ''),
+          color: chainIndexColor(chainIndexScore(s.brand || ''), chainColor(s.brand || '')),
           lat: s.lat,
           lng: s.lng,
         },
       })),
+  };
+}
+
+function districtHeatCollection(): GeoJSON.FeatureCollection<GeoJSON.Point> {
+  const byDistrict = new Map<string, { lng: number; lat: number; count: number; scoreSum: number; scored: number }>();
+  for (const store of osmStores) {
+    if (!Number.isFinite(store.lat) || !Number.isFinite(store.lng)) continue;
+    const district = store.district || store.city || 'Stockholm';
+    const score = chainIndexScore(store.brand || '');
+    const current = byDistrict.get(district) ?? { lng: 0, lat: 0, count: 0, scoreSum: 0, scored: 0 };
+    current.lng += store.lng;
+    current.lat += store.lat;
+    current.count += 1;
+    if (score != null) {
+      current.scoreSum += score;
+      current.scored += 1;
+    }
+    byDistrict.set(district, current);
+  }
+
+  return {
+    type: 'FeatureCollection',
+    features: [...byDistrict.entries()]
+      .filter(([, value]) => value.scored > 0)
+      .map(([district, value]) => {
+        const averageScore = value.scoreSum / value.scored;
+        return {
+          type: 'Feature',
+          geometry: { type: 'Point', coordinates: [value.lng / value.count, value.lat / value.count] },
+          properties: {
+            district,
+            storeCount: value.count,
+            averageScore,
+            heatColor: districtHeatColor(averageScore),
+          },
+        };
+      }),
   };
 }
 
@@ -94,6 +156,22 @@ export function StoreMap() {
     const popup = new maplibregl.Popup({ closeButton: true, closeOnClick: true, maxWidth: '280px' });
 
     map.on('load', () => {
+      map.addSource('district-heat', {
+        type: 'geojson',
+        data: districtHeatCollection(),
+      });
+      map.addLayer({
+        id: 'district-heat',
+        type: 'circle',
+        source: 'district-heat',
+        paint: {
+          'circle-color': ['get', 'heatColor'],
+          'circle-opacity': 0.16,
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 8, 24, 12, 72, 15, 130],
+          'circle-blur': 0.7,
+        },
+      });
+
       map.addSource('stores', {
         type: 'geojson',
         data,
@@ -173,7 +251,8 @@ export function StoreMap() {
                  <span style="width:10px;height:10px;border-radius:50%;background:${escapeHtml(p.color)};display:inline-block"></span>
                  <strong style="font-size:14px">${escapeHtml(p.name)}</strong>
                </div>
-               <div style="font-size:12px;color:#475569">${escapeHtml(p.brand)} · ${escapeHtml(p.format)}</div>
+              <div style="font-size:12px;color:#475569">${escapeHtml(p.brand)} · ${escapeHtml(p.format)}</div>
+               ${p.chainIndex ? `<div style="font-size:12px;color:#475569;margin-top:2px">Chain index ${Number(p.chainIndex).toFixed(1)} (100 = market)</div>` : ''}
                ${where ? `<div style="font-size:12px;color:#64748b;margin-top:2px">${where}</div>` : ''}
                <a href="${directions}" target="_blank" rel="noopener noreferrer"
                   style="display:inline-block;margin-top:8px;font-size:12px;font-weight:600;color:#1D8649">
@@ -213,6 +292,11 @@ export function StoreMap() {
             <span className="text-market-ink/70">Other</span>
           </li>
         </ul>
+        <div className="mt-2 border-t border-market-ink/10 pt-2 text-market-ink/70">
+          <div className="font-bold uppercase tracking-wide text-market-ink/55">Cheapest chain near me</div>
+          <div>{cheapestMapChain ? `${cheapestMapChain.chainId} · index ${cheapestMapChain.overallIndex.toFixed(1)}` : 'Awaiting index coverage'}</div>
+          <div className="mt-1">Green &lt; 96 · amber 96-103 · red &gt; 103</div>
+        </div>
       </div>
     </div>
   );

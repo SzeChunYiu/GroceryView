@@ -44,8 +44,9 @@ export default function MapPage() {
             Every grocery store on one map.
           </h1>
           <p className="mt-1 max-w-3xl text-sm leading-6 text-market-ink/60">
-            Pan and zoom to explore supermarkets across Stockholm county, coloured by chain. Click a
-            store for details and directions. Coverage © OpenStreetMap contributors.
+            Pan and zoom to explore supermarkets across Stockholm county, coloured by chain index score.
+            The heat layer highlights districts where nearby chains skew cheaper or pricier. Click a store
+            for details and directions. Coverage © OpenStreetMap contributors.
           </p>
         </div>
       </div>
