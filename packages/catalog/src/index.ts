@@ -6,9 +6,11 @@ export type CatalogProductCoverage = {
 };
 
 export type CatalogCoverageInput = {
+  targetProducts?: string[];
   targetCategories: string[];
   targetChains: string[];
   targetStores: string[];
+  requireEveryProductInEveryStore?: boolean;
   products: CatalogProductCoverage[];
 };
 
@@ -23,10 +25,12 @@ export type CatalogCoverageReport = {
   status: 'complete' | 'incomplete';
   productCount: number;
   coverage: {
+    products?: CoverageDimension;
     categories: CoverageDimension;
     chains: CoverageDimension;
     stores: CoverageDimension;
   };
+  missingProductStorePairs: Array<{ productId: string; storeId: string }>;
   requiredActions: string[];
 };
 
@@ -67,21 +71,43 @@ function actionFor(label: string, missing: string[]): string | null {
 }
 
 export function buildCatalogCoverageReport(input: CatalogCoverageInput): CatalogCoverageReport {
+  const observedProductIds = new Set(input.products.map((product) => product.id));
   const observedCategories = new Set(input.products.map((product) => product.categoryId));
   const observedChains = new Set(input.products.flatMap((product) => product.observedChainIds));
   const observedStores = new Set(input.products.flatMap((product) => product.observedStoreIds));
 
+  const products = input.targetProducts ? summarizeCoverage(input.targetProducts, observedProductIds) : undefined;
   const categories = summarizeCoverage(input.targetCategories, observedCategories);
   const chains = summarizeCoverage(input.targetChains, observedChains);
   const stores = summarizeCoverage(input.targetStores, observedStores);
-  const requiredActions = [actionFor('categories', categories.missing), actionFor('chains', chains.missing), actionFor('stores', stores.missing)].filter(
+
+  const targetProducts = [...new Set(input.targetProducts ?? [])].sort();
+  const targetStores = [...new Set(input.targetStores)].sort();
+  const productsById = new Map(input.products.map((product) => [product.id, product]));
+  const missingProductStorePairs = input.requireEveryProductInEveryStore
+    ? targetProducts.flatMap((productId) => {
+        const observedStoreIds = new Set(productsById.get(productId)?.observedStoreIds ?? []);
+        return targetStores
+          .filter((storeId) => !observedStoreIds.has(storeId))
+          .map((storeId) => ({ productId, storeId }));
+      })
+    : [];
+
+  const requiredActions = [
+    products ? actionFor('products', products.missing) : null,
+    actionFor('categories', categories.missing),
+    actionFor('chains', chains.missing),
+    actionFor('stores', stores.missing),
+    missingProductStorePairs.length > 0 ? `backfill_product_store_pairs:${missingProductStorePairs.length}` : null
+  ].filter(
     (action): action is string => action !== null
   );
 
   return {
     status: requiredActions.length === 0 ? 'complete' : 'incomplete',
     productCount: input.products.length,
-    coverage: { categories, chains, stores },
+    coverage: { ...(products ? { products } : {}), categories, chains, stores },
+    missingProductStorePairs,
     requiredActions
   };
 }
