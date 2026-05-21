@@ -107,4 +107,19 @@ describe('verified-data UI', () => {
     assert.match(shell, /Categories ranked by verified row depth/);
     assert.match(shell, /\/categories\/\$\{category\.slug\}/);
   });
+
+  it('surfaces verified chain category coverage on the homepage', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(verified, /export const chainCategoryCoverage = /);
+    assert.match(verified, /matchedChainProducts\.reduce/);
+    assert.match(verified, /averageSpread/);
+    assert.match(verified, /leadingLowestChain/);
+    assert.match(shell, /chainCategoryCoverage\.map/);
+    assert.match(shell, /Chain price coverage/);
+    assert.match(shell, /Categories with repeat Willys\/Hemkop matches/);
+    assert.match(shell, /matched chain products/);
+    assert.match(shell, /\/categories\/\$\{category\.slug\}/);
+  });
 });
