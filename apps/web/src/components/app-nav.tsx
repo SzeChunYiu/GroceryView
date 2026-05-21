@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Bell, Home, Map, ScanLine, ShieldCheck, ShoppingBasket, Users } from "lucide-react";
+import { Bell, Home, Map, ScanLine, ShieldCheck, ShoppingBasket, TrendingUp, Users } from "lucide-react";
 
 const navItems = [
   { href: "/", label: "Market", icon: Home },
   { href: "/map", label: "Map", icon: Map },
+  { href: "/chain-index", label: "Index", icon: TrendingUp },
   { href: "/weekly-basket", label: "Basket", icon: ShoppingBasket },
   { href: "/scanner", label: "Scanner", icon: ScanLine },
   { href: "/watchlist", label: "Watchlist", icon: Bell },
