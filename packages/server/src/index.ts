@@ -5,11 +5,12 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createGroceryViewApi, type CategoryBudgetPatch, type HouseholdPlanRequest } from '@groceryview/api';
 import { createSessionToken, parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
-import type { CatalogCoverageReport } from '@groceryview/catalog';
+import { buildCatalogCoverageReport, type CatalogCoverageInput, type CatalogCoverageReport } from '@groceryview/catalog';
 import {
   checkPostgresIntegrationReadiness,
   checkSourceRunHealth,
   createPgQueryExecutor,
+  createPostgresCatalogReader,
   createPostgresRepository,
   createPostgresSourceRecordReader,
   type BudgetRecord,
@@ -1625,7 +1626,31 @@ export type RuntimeConfig = {
   notificationWebhookSecret?: string;
   billingWebhookSecret?: string;
   metricsToken?: string;
+  catalogCoverageTargets?: Omit<CatalogCoverageInput, 'products'>;
 };
+
+function parseCatalogCoverageTargets(value: string | undefined): Omit<CatalogCoverageInput, 'products'> | undefined {
+  if (!value?.trim()) return undefined;
+  const parsed = JSON.parse(value) as unknown;
+  if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('CATALOG_COVERAGE_TARGETS_JSON must be a JSON object.');
+  }
+  const record = parsed as Record<string, unknown>;
+  const readStringArray = (field: string): string[] => {
+    const fieldValue = record[field];
+    if (!Array.isArray(fieldValue) || fieldValue.length === 0 || !fieldValue.every((entry) => typeof entry === 'string' && entry.trim())) {
+      throw new Error(`CATALOG_COVERAGE_TARGETS_JSON.${field} must be a non-empty string array.`);
+    }
+    return fieldValue.map((entry) => String(entry).trim());
+  };
+  return {
+    targetProducts: readStringArray('targetProducts'),
+    targetCategories: readStringArray('targetCategories'),
+    targetChains: readStringArray('targetChains'),
+    targetStores: readStringArray('targetStores'),
+    requireEveryProductInEveryStore: record.requireEveryProductInEveryStore !== false
+  };
+}
 
 function validatePublicWebUrl(publicWebUrl: string | undefined): void {
   if (!publicWebUrl) return;
@@ -1654,6 +1679,7 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     if (!env.METRICS_TOKEN) throw new Error('METRICS_TOKEN is required in production.');
   }
   validatePublicWebUrl(env.PUBLIC_WEB_URL);
+  const catalogCoverageTargets = parseCatalogCoverageTargets(env.CATALOG_COVERAGE_TARGETS_JSON);
   return {
     nodeEnv,
     port,
@@ -1662,7 +1688,8 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     publicWebUrl: env.PUBLIC_WEB_URL,
     notificationWebhookSecret: env.NOTIFICATION_WEBHOOK_SECRET,
     billingWebhookSecret: env.BILLING_WEBHOOK_SECRET,
-    metricsToken: env.METRICS_TOKEN
+    metricsToken: env.METRICS_TOKEN,
+    ...(catalogCoverageTargets ? { catalogCoverageTargets } : {})
   };
 }
 
@@ -1736,6 +1763,7 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
   const pool = (options.pgPoolFactory ?? createDefaultPgPool)(config.databaseUrl);
   const executor: QueryExecutor = createPgQueryExecutor(pool);
   const sourceRecordReader = createPostgresSourceRecordReader(executor);
+  const catalogReader = createPostgresCatalogReader(executor);
   return {
     repository: createPostgresRepository(executor),
     postgresReadinessProvider: () => checkPostgresIntegrationReadiness({ executor, repositoryProbes: [] }),
@@ -1749,6 +1777,15 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
         requiredAcceptedCountByChain: { ica: 1, willys: 1, coop: 1, hemkop: 1, lidl: 1, city_gross: 1 },
         filter: { limit: 100 }
       }),
+    ...(config.catalogCoverageTargets
+      ? {
+          catalogCoverageProvider: async () =>
+            buildCatalogCoverageReport({
+              ...config.catalogCoverageTargets!,
+              products: await catalogReader.listProductCoverageRows({ limit: 50_000 })
+            })
+        }
+      : {}),
     async close() {
       await pool.end();
     }
