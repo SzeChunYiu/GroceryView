@@ -17,7 +17,22 @@ describe('mobile app session plan', () => {
     assert.equal(plan.initialRoute, '/today');
     assert.equal(plan.cache.partitionKey, 'user:shopper-1');
     assert.deepEqual(plan.cache.hydrateOrder, ['today', 'stores', 'watchlist', 'basket', 'budget', 'search', 'product', 'productTerminal']);
-    assert.deepEqual(plan.routes.required, ['/today', '/stores', '/watchlist', '/search', '/products/[id]', '/basket', '/budget', '/profile', '/household', '/privacy']);
+    assert.deepEqual(plan.routes.required, [
+      '/today',
+      '/stores',
+      '/watchlist',
+      '/search',
+      '/products/[id]',
+      '/products/[id]/terminal',
+      '/basket',
+      '/budget',
+      '/scan/barcode',
+      '/scan/receipt',
+      '/profile',
+      '/household',
+      '/privacy',
+      '/review-queue'
+    ]);
     assert.deepEqual(plan.routes.placeholders, ['/scan/camera-placeholder', '/profile/notifications-placeholder']);
     assert.equal(plan.permissions.status, 'ready');
     assert.equal(plan.permissions.nextPromptSurface, null);

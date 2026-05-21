@@ -4,11 +4,15 @@ export type MobileMvpRouteId =
   | 'watchlist'
   | 'search'
   | 'product'
+  | 'product-terminal'
   | 'basket'
   | 'budget'
+  | 'barcode-scan'
+  | 'receipt-scan'
   | 'profile'
   | 'household'
   | 'privacy'
+  | 'review-queue'
   | 'camera-placeholder'
   | 'notifications-placeholder';
 
@@ -18,11 +22,15 @@ export type MobileMvpRoutePath =
   | '/watchlist'
   | '/search'
   | '/products/[id]'
+  | '/products/[id]/terminal'
   | '/basket'
   | '/budget'
+  | '/scan/barcode'
+  | '/scan/receipt'
   | '/profile'
   | '/household'
   | '/privacy'
+  | '/review-queue'
   | '/scan/camera-placeholder'
   | '/profile/notifications-placeholder';
 
@@ -40,7 +48,7 @@ export type MobileMvpRoute = {
   tab: 'today' | 'stores' | 'basket' | 'scan' | 'profile';
   params: MobileRouteParam[];
   requiresAuth: boolean;
-  preloadQueryIds: Array<'today' | 'stores' | 'watchlist' | 'search' | 'product' | 'basket' | 'budget'>;
+  preloadQueryIds: Array<'today' | 'stores' | 'watchlist' | 'search' | 'product' | 'productTerminal' | 'basket' | 'budget' | 'barcodeScan' | 'receiptReview' | 'reviewQueue'>;
   placeholderFor?: 'camera' | 'notifications';
 };
 
@@ -104,6 +112,16 @@ const routes: MobileMvpRoute[] = [
     preloadQueryIds: ['product']
   },
   {
+    id: 'product-terminal',
+    path: '/products/[id]/terminal',
+    screen: 'ProductPriceTerminalScreen',
+    title: 'Product terminal',
+    tab: 'today',
+    params: [{ name: 'id', required: true, source: 'path' }],
+    requiresAuth: true,
+    preloadQueryIds: ['product', 'productTerminal']
+  },
+  {
     id: 'basket',
     path: '/basket',
     screen: 'BasketScreen',
@@ -122,6 +140,26 @@ const routes: MobileMvpRoute[] = [
     params: [],
     requiresAuth: true,
     preloadQueryIds: ['budget', 'basket']
+  },
+  {
+    id: 'barcode-scan',
+    path: '/scan/barcode',
+    screen: 'BarcodeScanScreen',
+    title: 'Barcode scan',
+    tab: 'scan',
+    params: [{ name: 'code', required: false, source: 'query' }],
+    requiresAuth: true,
+    preloadQueryIds: ['barcodeScan', 'product']
+  },
+  {
+    id: 'receipt-scan',
+    path: '/scan/receipt',
+    screen: 'ReceiptScanScreen',
+    title: 'Receipt scan',
+    tab: 'scan',
+    params: [{ name: 'receiptId', required: false, source: 'query' }],
+    requiresAuth: true,
+    preloadQueryIds: ['receiptReview', 'budget', 'basket']
   },
   {
     id: 'profile',
@@ -152,6 +190,16 @@ const routes: MobileMvpRoute[] = [
     params: [],
     requiresAuth: true,
     preloadQueryIds: []
+  },
+  {
+    id: 'review-queue',
+    path: '/review-queue',
+    screen: 'HumanReviewQueueScreen',
+    title: 'Review queue',
+    tab: 'profile',
+    params: [],
+    requiresAuth: true,
+    preloadQueryIds: ['reviewQueue']
   },
   {
     id: 'camera-placeholder',
