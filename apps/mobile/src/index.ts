@@ -797,6 +797,13 @@ function todayActionLabel(action: Extract<MobileScreenComponentAction, 'open_pro
   return 'Scan barcode';
 }
 
+function searchActionLabel(action: Extract<MobileScreenComponentAction, 'open_product' | 'scan_barcode' | 'add_to_weekly_basket' | 'compare_stores'>): string {
+  if (action === 'open_product') return 'Open product';
+  if (action === 'add_to_weekly_basket') return 'Add to basket';
+  if (action === 'compare_stores') return 'Compare stores';
+  return 'Scan barcode';
+}
+
 function storesActionLabel(action: MobileStoresViewModel['actions'][number]): string {
   if (action === 'open_store') return 'Open store';
   if (action === 'compare_basket') return 'Compare basket';
@@ -1236,6 +1243,82 @@ export function composeMobileTodayScreen(
           key: action,
           action,
           label: todayActionLabel(action),
+          primary: index === 0
+        }))
+      }
+    ]
+  };
+}
+
+export function composeMobileSearchScreen(
+  input: { userId: string; query: string; selectedProductId?: string },
+  api: MobileApi = createGroceryViewApi()
+): MobileScreenComponent {
+  const viewModel = createMobileDiscoveryViewModel(input, api);
+  const actions: Array<Extract<MobileScreenComponentAction, 'open_product' | 'scan_barcode' | 'add_to_weekly_basket' | 'compare_stores'>> =
+    viewModel.selectedProduct ? ['open_product', 'add_to_weekly_basket', 'compare_stores', 'scan_barcode'] : ['scan_barcode'];
+
+  return {
+    type: 'screen',
+    key: `search:${viewModel.userId}:${viewModel.query || 'empty'}`,
+    title: 'Search',
+    state: viewModel.searchResults.length > 0 || viewModel.selectedProduct ? 'ready' : 'empty',
+    children: [
+      {
+        type: 'section',
+        key: 'summary',
+        title: 'Summary',
+        children: [
+          { type: 'metric', key: 'results', label: 'Results', value: String(viewModel.searchResults.length), tone: viewModel.searchResults.length > 0 ? 'positive' : 'neutral' },
+          { type: 'metric', key: 'favorite-stores', label: 'Favorite stores', value: String(viewModel.favoriteStores.length), tone: viewModel.favoriteStores.length > 0 ? 'positive' : 'neutral' },
+          { type: 'metric', key: 'basket-items', label: 'Basket items', value: String(viewModel.weeklyBasket.itemCount), tone: viewModel.weeklyBasket.itemCount > 0 ? 'positive' : 'neutral' },
+          { type: 'metric', key: 'watchlist-alerts', label: 'Alerts', value: String(viewModel.watchlist.alertCount), tone: viewModel.watchlist.alertCount > 0 ? 'warning' : 'neutral' }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'results',
+        title: 'Results',
+        children: viewModel.searchResults.length > 0
+          ? viewModel.searchResults.map((result) => ({
+              type: 'row',
+              key: `search-result:${result.id}`,
+              label: result.ticker,
+              value: `${result.name}, ${result.bestPrice === null ? 'no current price' : `${result.bestPrice.toFixed(2)} SEK`}, Deal Score ${result.dealScore}`
+            }))
+          : [{ type: 'empty', key: 'no-search-results', message: 'Search products by name or scan a barcode to match shelf prices.', action: 'scan_barcode' }]
+      },
+      {
+        type: 'section',
+        key: 'selected-product',
+        title: 'Selected product',
+        children: viewModel.selectedProduct
+          ? [
+              { type: 'row', key: 'selected-verdict', label: viewModel.selectedProduct.ticker, value: `${viewModel.selectedProduct.verdict}, Deal Score ${viewModel.selectedProduct.dealScore}` },
+              { type: 'row', key: 'selected-price', label: 'Best price', value: viewModel.selectedProduct.currentPrices[0] ? `${viewModel.selectedProduct.currentPrices[0].price.toFixed(2)} SEK at ${viewModel.selectedProduct.currentPrices[0].storeName}` : 'No current price' },
+              { type: 'row', key: 'selected-history', label: 'History', value: `${viewModel.selectedProduct.priceHistory.length} points, ${viewModel.selectedProduct.priceTerminal.chartSummary.isNewLow ? 'new low' : 'no new low'}` }
+            ]
+          : [{ type: 'empty', key: 'no-selected-product', message: 'Open a result to compare price history, store coverage, and basket impact.', action: 'search_product' }]
+      },
+      {
+        type: 'section',
+        key: 'basket-context',
+        title: 'Basket context',
+        children: [
+          { type: 'row', key: 'cheapest-total', label: 'Cheapest split', value: `${viewModel.weeklyBasket.cheapestTotal.toFixed(2)} SEK` },
+          { type: 'row', key: 'best-single-store', label: 'Best store', value: viewModel.weeklyBasket.bestSingleStore ? `${viewModel.weeklyBasket.bestSingleStore.storeName}, ${viewModel.weeklyBasket.bestSingleStore.total.toFixed(2)} SEK` : 'No complete store yet' },
+          { type: 'row', key: 'budget-remaining', label: 'Budget left', value: `${viewModel.budget.weeklyRemainingAfterEstimate.toFixed(2)} SEK` }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'actions',
+        title: 'Actions',
+        children: actions.map((action, index) => ({
+          type: 'action',
+          key: action,
+          action,
+          label: searchActionLabel(action),
           primary: index === 0
         }))
       }
@@ -1915,6 +1998,7 @@ export type ExpoRoute = {
     | '/today'
     | '/stores'
     | '/watchlist'
+    | '/search'
     | '/products/[id]/terminal'
     | '/basket'
     | '/budget'
@@ -2022,6 +2106,7 @@ export function buildExpoReadinessPlan(): ExpoReadinessPlan {
       { path: '/today', screen: 'TodayScreen', purpose: 'Daily market overview, deals, budget, alerts, and recommendations', requiresAuth: true },
       { path: '/stores', screen: 'StoresScreen', purpose: 'Favorite and selected supermarket profiles', requiresAuth: true },
       { path: '/watchlist', screen: 'WatchlistScreen', purpose: 'Tracked products, alert thresholds, and price opportunities', requiresAuth: true },
+      { path: '/search', screen: 'SearchScreen', purpose: 'Product search with price, basket, and watchlist context', requiresAuth: true },
       { path: '/products/[id]/terminal', screen: 'ProductPriceTerminalScreen', purpose: 'Stock-style product quote, distribution, and history terminal', requiresAuth: true },
       { path: '/basket', screen: 'BasketScreen', purpose: 'Weekly basket planning and smart swaps', requiresAuth: true },
       { path: '/budget', screen: 'BudgetScreen', purpose: 'Weekly budget, category budgets, and planned basket impact', requiresAuth: true },
@@ -2062,6 +2147,16 @@ export function buildMobileScreenBlueprints(): MobileScreenBlueprintPlan {
       actions: ['open_product', 'compare_stores', 'add_to_weekly_basket'],
       providerRequirements: ['secure-session'],
       offlineBehavior: 'Show cached watchlist alerts and queue threshold changes until sync.'
+    },
+    {
+      route: '/search',
+      screen: 'SearchScreen',
+      primaryState: 'ready',
+      emptyState: 'Search products by name or scan a barcode to match shelf prices.',
+      dataDependencies: ['product_search', 'favorite_stores', 'weekly_basket', 'watchlist_alerts'],
+      actions: ['open_product', 'add_to_weekly_basket', 'compare_stores', 'scan_barcode'],
+      providerRequirements: ['secure-session'],
+      offlineBehavior: 'Show cached search results and require sync before changing basket or watchlist state.'
     },
     {
       route: '/products/[id]/terminal',

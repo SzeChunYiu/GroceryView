@@ -16,6 +16,7 @@ import {
   composeMobileHouseholdScreen,
   composeMobilePrivacyScreen,
   composeMobileProfileScreen,
+  composeMobileSearchScreen,
   composeMobileStoresScreen,
   composeMobileTodayScreen,
   composeMobileWatchlistScreen,
@@ -85,6 +86,75 @@ describe('mobile app foundation', () => {
     assert.equal(viewModel.budget.weeklyRemainingAfterEstimate, 72.3);
     assert.equal(viewModel.budget.weeklyStatus, 'under');
     assert.deepEqual(viewModel.watchlist.alertTypes, ['deal_score', 'new_52_week_low', 'target_price']);
+  });
+
+  it('composes a renderable mobile Search screen with results, selected product context, basket, and actions', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 55, alertDealScoreAt: 80, favoriteStoresOnly: true });
+    api.updateBudget('user-1', { weeklyBudget: 150, monthlyBudget: 600 });
+
+    const screen = composeMobileSearchScreen({ userId: 'user-1', query: 'coffee', selectedProductId: 'coffee' }, api);
+
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.title, 'Search');
+    assert.equal(screen.state, 'ready');
+    assert.deepEqual(screen.children.map((section) => section.key), ['summary', 'results', 'selected-product', 'basket-context', 'actions']);
+
+    const summary = screen.children.find((section) => section.key === 'summary');
+    assert.equal(summary?.type, 'section');
+    assert.deepEqual(summary?.children.map((metric) => 'value' in metric ? metric.value : null), ['1', '2', '3', '3']);
+
+    const results = screen.children.find((section) => section.key === 'results');
+    if (!results || results.type !== 'section') throw new Error('search results section missing');
+    assert.equal(results.children[0]?.key, 'search-result:coffee');
+    assert.equal('value' in results.children[0]! ? results.children[0]!.value : null, 'Zoégas Coffee 450g, 49.90 SEK, Deal Score 82');
+
+    const selected = screen.children.find((section) => section.key === 'selected-product');
+    if (!selected || selected.type !== 'section') throw new Error('selected product section missing');
+    assert.deepEqual(selected.children.map((row) => 'value' in row ? row.value : null), [
+      'Buy, Deal Score 82',
+      '49.90 SEK at Willys Odenplan',
+      '3 points, new low'
+    ]);
+
+    const actions = screen.children.find((section) => section.key === 'actions');
+    assert.equal(actions?.type, 'section');
+    assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Open product', 'Add to basket', 'Compare stores', 'Scan barcode']);
+  });
+
+  it('composes a Search empty state when no products match', () => {
+    const screen = composeMobileSearchScreen({ userId: 'new-user', query: 'zzzz' });
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.state, 'empty');
+
+    const results = screen.children.find((section) => section.key === 'results');
+    const selected = screen.children.find((section) => section.key === 'selected-product');
+    const actions = screen.children.find((section) => section.key === 'actions');
+    if (!results || results.type !== 'section') throw new Error('search results section missing');
+    if (!selected || selected.type !== 'section') throw new Error('selected product section missing');
+    if (!actions || actions.type !== 'section') throw new Error('search actions section missing');
+
+    assert.deepEqual(results.children, [
+      {
+        type: 'empty',
+        key: 'no-search-results',
+        message: 'Search products by name or scan a barcode to match shelf prices.',
+        action: 'scan_barcode'
+      }
+    ]);
+    assert.deepEqual(selected.children, [
+      {
+        type: 'empty',
+        key: 'no-selected-product',
+        message: 'Open a result to compare price history, store coverage, and basket impact.',
+        action: 'search_product'
+      }
+    ]);
+    assert.deepEqual(actions.children.map((action) => 'label' in action ? action.label : null), ['Scan barcode']);
   });
 
   it('loads connected product terminal numbers from the public API route for mobile product detail', async () => {
@@ -926,6 +996,7 @@ describe('mobile app foundation', () => {
       '/today',
       '/stores',
       '/watchlist',
+      '/search',
       '/products/[id]/terminal',
       '/basket',
       '/budget',
@@ -959,6 +1030,7 @@ describe('mobile app foundation', () => {
     assert.deepEqual(plan.screens.map((screen) => screen.route), [
       '/today',
       '/watchlist',
+      '/search',
       '/products/[id]/terminal',
       '/basket',
       '/budget',
@@ -973,6 +1045,12 @@ describe('mobile app foundation', () => {
     assert.match(watchlist?.dataDependencies.join(','), /watchlist_alerts/);
     assert.deepEqual(watchlist?.actions, ['open_product', 'compare_stores', 'add_to_weekly_basket']);
     assert.match(watchlist?.offlineBehavior ?? '', /cached watchlist alerts/i);
+
+    const search = plan.screens.find((screen) => screen.route === '/search');
+    assert.equal(search?.screen, 'SearchScreen');
+    assert.deepEqual(search?.actions, ['open_product', 'add_to_weekly_basket', 'compare_stores', 'scan_barcode']);
+    assert.match(search?.dataDependencies.join(','), /product_search/);
+    assert.match(search?.offlineBehavior ?? '', /cached search results/i);
 
     const terminal = plan.screens.find((screen) => screen.route === '/products/[id]/terminal');
     assert.equal(terminal?.screen, 'ProductPriceTerminalScreen');
