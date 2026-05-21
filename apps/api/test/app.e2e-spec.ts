@@ -36,6 +36,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/indices']);
     assert.ok(docs.body.paths['/indices/{id}']);
     assert.ok(docs.body.paths['/market/overview']);
+    assert.ok(docs.body.paths['/users/demo/meal-plans/suggestions']);
     assert.ok(docs.body.paths['/nutrition/value']);
     assert.ok(docs.body.paths['/prices/freshness']);
     assert.ok(docs.body.paths['/products']);
@@ -66,6 +67,26 @@ describe('GroceryView API app', () => {
     assert.equal(nutrition.body.leader.productId, 'chicken');
     assert.equal(nutrition.body.rows[0].valuePer10Sek, 22.89);
     assert.equal(nutrition.body.guardrails.length, 3);
+
+    const mealPlan = await request(app.getHttpServer())
+      .get('/users/demo/meal-plans/suggestions?maxMealCost=120&servings=4')
+      .expect(200);
+    assert.equal(mealPlan.body.userId, 'demo');
+    assert.equal(mealPlan.body.currency, 'SEK');
+    assert.equal(mealPlan.body.maxMealCost, 120);
+    assert.equal(mealPlan.body.servings, 4);
+    assert.equal(mealPlan.body.dealCount, 4);
+    assert.deepEqual(mealPlan.body.ingredientProductIds, ['chicken', 'pasta', 'tomatoes']);
+    assert.equal(mealPlan.body.suggestions[0].title, 'Chicken thighs pasta bowl');
+    assert.equal(mealPlan.body.suggestions[0].estimatedCostPerServing, 26.18);
+    assert.match(mealPlan.body.guardrails[0], /never update a basket/i);
+    assert.equal(mealPlan.body.demo, true);
+
+    const constrainedMealPlan = await request(app.getHttpServer())
+      .get('/users/demo/meal-plans/suggestions?maxMealCost=20')
+      .expect(200);
+    assert.deepEqual(constrainedMealPlan.body.suggestions, []);
+    assert.deepEqual(constrainedMealPlan.body.ingredientProductIds, []);
 
     const freshness = await request(app.getHttpServer())
       .get('/prices/freshness?asOf=2026-06-03T00:00:00.000Z')
@@ -268,6 +289,11 @@ describe('GroceryView API app', () => {
 
   it('rejects invalid nutrition metrics', async () => {
     await request(app.getHttpServer()).get('/nutrition/value?metric=sugar').expect(400);
+  });
+
+  it('rejects invalid meal plan suggestion inputs', async () => {
+    await request(app.getHttpServer()).get('/users/demo/meal-plans/suggestions?servings=0').expect(400);
+    await request(app.getHttpServer()).get('/users/demo/meal-plans/suggestions?maxMealCost=abc').expect(400);
   });
 
   it('returns 404 for missing indices', async () => {

@@ -8,6 +8,7 @@ import { validateEnvironment } from './config/env.schema.js';
 import { DatabaseModule } from './database/database.module.js';
 import { HealthModule } from './health/health.module.js';
 import { MarketModule } from './market/market.module.js';
+import { MealPlansModule } from './meal-plans/meal-plans.module.js';
 import { PricesModule } from './prices/prices.module.js';
 import { ProductsModule } from './products/products.module.js';
 import { StoresModule } from './stores/stores.module.js';
@@ -20,6 +21,7 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     DatabaseModule,
     HealthModule,
     MarketModule,
+    MealPlansModule,
     ProductsModule,
     StoresModule,
     PricesModule,
