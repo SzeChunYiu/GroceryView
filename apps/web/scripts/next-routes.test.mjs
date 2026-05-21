@@ -104,9 +104,14 @@ describe('verified-data UI', () => {
     assert.match(shell, /homepageChainSavings\.map/);
     assert.match(shell, /chainSavingsLedger\.slice/);
     assert.match(shell, /chain\.topProductSlug/);
+    assert.match(shell, /Evidence route map/);
+    assert.match(shell, /homepageRouteMap\.map/);
+    assert.match(shell, /sourceRouteMap\.slice/);
+    assert.match(shell, /source\.supportingRoutes\.join/);
     assert.match(page, /GroceryView verified grocery snapshot/);
     assert.match(page, /product browsing/);
     assert.match(page, /category freshness/);
+    assert.match(page, /source route mapping/);
     assert.match(page, /catalogue savings/);
     assert.match(page, /gated feature readiness/);
   });
