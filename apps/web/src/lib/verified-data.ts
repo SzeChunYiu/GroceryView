@@ -345,6 +345,50 @@ export const sourceClaimLedger = sourceCoverage.map((source) => {
   };
 });
 
+export const chainSavingsLedger = Object.values(
+  matchedChainProducts.reduce<Record<string, {
+    chain: string;
+    products: number;
+    totalSavings: number;
+    topSaving: number;
+    topProductName: string;
+    topProductSlug: string;
+  }>>((ledger, product) => {
+    for (const row of chainPriceRows(product)) {
+      if (typeof row.savings !== 'number' || row.savings <= 0) continue;
+      const chain = row.chain;
+      const entry = ledger[chain] ?? {
+        chain,
+        products: 0,
+        totalSavings: 0,
+        topSaving: 0,
+        topProductName: '',
+        topProductSlug: ''
+      };
+
+      entry.products += 1;
+      entry.totalSavings += row.savings;
+      if (row.savings > entry.topSaving) {
+        entry.topSaving = row.savings;
+        entry.topProductName = product.name;
+        entry.topProductSlug = product.slug;
+      }
+      ledger[chain] = entry;
+    }
+    return ledger;
+  }, {})
+)
+  .map((row) => ({
+    chain: row.chain,
+    products: row.products,
+    totalSavings: row.totalSavings,
+    averageSaving: row.products ? row.totalSavings / row.products : 0,
+    topSaving: row.topSaving,
+    topProductName: row.topProductName,
+    topProductSlug: row.topProductSlug
+  }))
+  .sort((a, b) => b.totalSavings - a.totalSavings || a.chain.localeCompare(b.chain, 'sv'));
+
 export const keyMetrics = [
   { label: 'Verified price rows', value: (axfoodProducts.length + pricedProducts.length).toLocaleString('sv-SE'), detail: 'Axfood products plus OpenPrices observations rendered from generated modules.' },
   { label: 'Matched Willys/Hemköp products', value: matchedChainProducts.length.toLocaleString('sv-SE'), detail: 'Only products present in both chain catalogues are compared.' },
