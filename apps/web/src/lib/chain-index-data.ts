@@ -8,11 +8,11 @@
 //     mapped onto one coarse, shared taxonomy so a "category" means the same
 //     thing across chains,
 //   - the category key carries its base unit, so medians are always like-for-like.
-import { coopProducts } from './ingested/coop.js';
-import { willysProducts } from './ingested/willys.js';
-import { hemkopProducts } from './ingested/hemkop.js';
-import { matpriskollenOffers } from './ingested/matpriskollen.js';
-import { axfoodProducts } from './axfood-products.js';
+import { coopProducts } from './ingested/coop';
+import { willysProducts } from './ingested/willys';
+import { hemkopProducts } from './ingested/hemkop';
+import { matpriskollenOffers } from './ingested/matpriskollen';
+import { axfoodProducts } from './axfood-products';
 import type { BrandTierPriceObservation, ChainPriceObservation } from '@groceryview/core';
 
 // ── unit canonicalisation ────────────────────────────────────────────────────
