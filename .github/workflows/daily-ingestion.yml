@@ -1,0 +1,76 @@
+name: Daily ingestion readiness
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: daily-ingestion-readiness
+  cancel-in-progress: false
+
+jobs:
+  verify-daily-ingestion:
+    name: Verify daily ingestion evidence
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Verify ingestion and DB contracts
+        run: |
+          npm run test -w @groceryview/ingestion
+          npm run test -w @groceryview/db
+
+      - name: Check deployed PostgreSQL readiness
+        env:
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${GROCERYVIEW_SERVER_URL:-}"
+          test -n "${METRICS_TOKEN:-}"
+          curl -fsS \
+            -H "x-groceryview-metrics-token: ${METRICS_TOKEN}" \
+            "${GROCERYVIEW_SERVER_URL%/}/api/readiness/postgres" \
+            >/tmp/postgres-readiness.json
+          node -e "const body=require('/tmp/postgres-readiness.json'); if (body.status !== 'ready') { console.error(JSON.stringify(body)); process.exit(1); }"
+
+      - name: Check deployed daily source-run freshness
+        env:
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+        run: |
+          set -euo pipefail
+          test -n "${GROCERYVIEW_SERVER_URL:-}"
+          test -n "${METRICS_TOKEN:-}"
+          curl -fsS \
+            -H "x-groceryview-metrics-token: ${METRICS_TOKEN}" \
+            "${GROCERYVIEW_SERVER_URL%/}/api/readiness/source-runs" \
+            >/tmp/source-run-readiness.json
+          node <<'NODE'
+          const body = require('/tmp/source-run-readiness.json');
+          const requiredMissingChainBlockers = [
+            'source_run_missing_fresh_chain:ica',
+            'source_run_missing_fresh_chain:willys',
+            'source_run_missing_fresh_chain:coop',
+            'source_run_missing_fresh_chain:hemkop',
+            'source_run_missing_fresh_chain:lidl',
+            'source_run_missing_fresh_chain:city_gross'
+          ];
+          if (body.report?.status !== 'healthy') {
+            for (const blocker of requiredMissingChainBlockers) {
+              if (body.report?.blockers?.includes(blocker)) console.error(blocker);
+            }
+            console.error(JSON.stringify(body));
+            process.exit(1);
+          }
+          NODE
