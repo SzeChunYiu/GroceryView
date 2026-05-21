@@ -682,6 +682,8 @@ export type MobileScreenComponentAction =
   | 'configure_notifications'
   | 'update_privacy'
   | 'invite_household_member'
+  | 'review_household_basket'
+  | 'review_household_watchlist'
   | 'download_export';
 
 export type MobileScreenComponent =
@@ -769,6 +771,12 @@ function profileActionLabel(action: Extract<MobileScreenComponentAction, 'config
   return 'Invite member';
 }
 
+function householdActionLabel(action: MobileHouseholdViewModel['actions'][number]): string {
+  if (action === 'invite_household_member') return 'Invite member';
+  if (action === 'review_household_basket') return 'Review basket';
+  return 'Review watchlist';
+}
+
 const mobilePrivacyControls = [
   {
     label: 'Raw receipt media',
@@ -818,6 +826,26 @@ export type MobileProfileHubViewModel = {
     sharedFavoriteStoreCount: number;
   } | null;
   privacyControls: Array<{ label: string; detail: string; state: string }>;
+};
+
+export type MobileHouseholdViewModel = {
+  userId: string;
+  household: {
+    householdId: string;
+    name: string;
+    memberCount: number;
+    weeklyBudgetLabel: string;
+    estimatedTotalLabel: string;
+    remainingBudgetLabel: string;
+    approvalLimitLabel: string;
+    requiresOwnerApproval: boolean;
+    reviewer: string;
+    members: Array<{ userId: string; displayName: string; itemCount: number }>;
+    sharedFavoriteStores: Array<{ storeId: string; storeName: string }>;
+    basketItems: Array<{ productId: string; ticker: string; productName: string; quantity: number; addedBy: string; addedByName: string }>;
+    watchlistItems: Array<{ productId: string; ticker: string; productName: string; addedBy: string; addedByName: string; targetPriceLabel: string }>;
+  } | null;
+  actions: Array<'invite_household_member' | 'review_household_basket' | 'review_household_watchlist'>;
 };
 
 function formatMobileMoney(value: number): string {
@@ -943,6 +971,71 @@ export function createMobileProfileHubViewModel(
         }
       : null,
     privacyControls: mobilePrivacyControls.map((control) => ({ ...control }))
+  };
+}
+
+export function createMobileHouseholdViewModel(
+  userId: string,
+  api: MobileApi = createGroceryViewApi()
+): MobileHouseholdViewModel {
+  const householdPlan = api.getHouseholdPlan(userId);
+  if (!householdPlan) {
+    return {
+      userId,
+      household: null,
+      actions: ['invite_household_member']
+    };
+  }
+
+  const memberNameById = new Map(householdPlan.household.members.map((member) => [member.userId, member.displayName]));
+  const contributionByMember = new Map(householdPlan.summary.memberContributions.map((member) => [member.userId, member.itemCount]));
+  const reviewer = memberNameById.get(householdPlan.approvalPolicy.reviewer) ?? householdPlan.approvalPolicy.reviewer;
+
+  return {
+    userId,
+    household: {
+      householdId: householdPlan.household.id,
+      name: householdPlan.household.name,
+      memberCount: householdPlan.household.members.length,
+      weeklyBudgetLabel: formatMobileMoney(householdPlan.household.weeklyBudget),
+      estimatedTotalLabel: formatMobileMoney(householdPlan.summary.estimatedTotal),
+      remainingBudgetLabel: formatMobileMoney(householdPlan.summary.remainingBudget),
+      approvalLimitLabel: formatMobileMoney(householdPlan.approvalPolicy.approvalLimit),
+      requiresOwnerApproval: householdPlan.approvalPolicy.requiresOwnerApproval,
+      reviewer,
+      members: householdPlan.household.members.map((member) => ({
+        userId: member.userId,
+        displayName: member.displayName,
+        itemCount: contributionByMember.get(member.userId) ?? 0
+      })),
+      sharedFavoriteStores: householdPlan.household.sharedFavoriteStoreIds.map((storeId) => ({
+        storeId,
+        storeName: api.getStore(storeId)?.name ?? storeId
+      })),
+      basketItems: householdPlan.household.basketItems.map((item) => {
+        const product = api.getProduct(item.productId);
+        return {
+          productId: item.productId,
+          ticker: product?.ticker ?? item.productId,
+          productName: product?.name ?? item.productId,
+          quantity: item.quantity,
+          addedBy: item.addedBy,
+          addedByName: memberNameById.get(item.addedBy) ?? item.addedBy
+        };
+      }),
+      watchlistItems: householdPlan.household.watchlistItems.map((item) => {
+        const product = api.getProduct(item.productId);
+        return {
+          productId: item.productId,
+          ticker: product?.ticker ?? item.productId,
+          productName: product?.name ?? item.productId,
+          addedBy: item.addedBy,
+          addedByName: memberNameById.get(item.addedBy) ?? item.addedBy,
+          targetPriceLabel: item.targetPrice === undefined ? 'No target' : formatMobileMoney(item.targetPrice)
+        };
+      })
+    },
+    actions: ['invite_household_member', 'review_household_basket', 'review_household_watchlist']
   };
 }
 
@@ -1375,6 +1468,135 @@ export function composeMobileProfileScreen(
           key: action,
           action,
           label: profileActionLabel(action),
+          primary: index === 0
+        }))
+      }
+    ]
+  };
+}
+
+export function composeMobileHouseholdScreen(
+  userId: string,
+  api: MobileApi = createGroceryViewApi()
+): MobileScreenComponent {
+  const viewModel = createMobileHouseholdViewModel(userId, api);
+  const household = viewModel.household;
+
+  if (!household) {
+    return {
+      type: 'screen',
+      key: `household:${userId}`,
+      title: 'Household',
+      state: 'empty',
+      children: [
+        {
+          type: 'empty',
+          key: 'no-household',
+          message: 'Create or join a household to share baskets, budgets, and review duties.',
+          action: 'invite_household_member'
+        },
+        {
+          type: 'section',
+          key: 'actions',
+          title: 'Actions',
+          children: viewModel.actions.map((action, index) => ({
+            type: 'action',
+            key: action,
+            action,
+            label: householdActionLabel(action),
+            primary: index === 0
+          }))
+        }
+      ]
+    };
+  }
+
+  return {
+    type: 'screen',
+    key: `household:${household.householdId}`,
+    title: household.name,
+    state: 'ready',
+    children: [
+      {
+        type: 'section',
+        key: 'summary',
+        title: 'Summary',
+        children: [
+          { type: 'metric', key: 'members', label: 'Members', value: String(household.memberCount), tone: household.memberCount > 1 ? 'positive' : 'neutral' },
+          { type: 'metric', key: 'weekly-budget', label: 'Weekly budget', value: household.weeklyBudgetLabel, tone: 'neutral' },
+          { type: 'metric', key: 'planned-total', label: 'Planned total', value: household.estimatedTotalLabel, tone: household.requiresOwnerApproval ? 'warning' : 'positive' },
+          { type: 'metric', key: 'remaining-budget', label: 'Remaining', value: household.remainingBudgetLabel, tone: household.remainingBudgetLabel.startsWith('-') ? 'warning' : 'positive' }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'approval',
+        title: 'Approval',
+        children: [
+          { type: 'row', key: 'approval-limit', label: 'Approval limit', value: household.approvalLimitLabel },
+          { type: 'row', key: 'reviewer', label: 'Reviewer', value: household.reviewer },
+          { type: 'row', key: 'approval-status', label: 'Status', value: household.requiresOwnerApproval ? 'Review required' : 'No review needed' }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'members',
+        title: 'Members',
+        children: household.members.map((member) => ({
+          type: 'row',
+          key: `member:${member.userId}`,
+          label: member.displayName,
+          value: `${member.itemCount} basket items`
+        }))
+      },
+      {
+        type: 'section',
+        key: 'shared-stores',
+        title: 'Shared stores',
+        children: household.sharedFavoriteStores.length > 0
+          ? household.sharedFavoriteStores.map((store) => ({
+              type: 'row',
+              key: `shared-store:${store.storeId}`,
+              label: store.storeName,
+              value: 'Shared favorite'
+            }))
+          : [{ type: 'empty', key: 'no-shared-stores', message: 'Share favorite stores to align household deal filters.', action: 'scan_barcode' }]
+      },
+      {
+        type: 'section',
+        key: 'basket-items',
+        title: 'Basket items',
+        children: household.basketItems.length > 0
+          ? household.basketItems.map((item) => ({
+              type: 'row',
+              key: `household-basket:${item.productId}:${item.addedBy}`,
+              label: item.ticker,
+              value: `${item.quantity} planned by ${item.addedByName}`
+            }))
+          : [{ type: 'empty', key: 'no-household-basket-items', message: 'Add household basket items to coordinate the weekly shop.', action: 'scan_barcode' }]
+      },
+      {
+        type: 'section',
+        key: 'watchlist-items',
+        title: 'Watchlist',
+        children: household.watchlistItems.length > 0
+          ? household.watchlistItems.map((item) => ({
+              type: 'row',
+              key: `household-watch:${item.productId}:${item.addedBy}`,
+              label: item.ticker,
+              value: `${item.targetPriceLabel}, watched by ${item.addedByName}`
+            }))
+          : [{ type: 'empty', key: 'no-household-watchlist-items', message: 'Share watched products to avoid duplicate deal hunting.', action: 'scan_barcode' }]
+      },
+      {
+        type: 'section',
+        key: 'actions',
+        title: 'Actions',
+        children: viewModel.actions.map((action, index) => ({
+          type: 'action',
+          key: action,
+          action,
+          label: householdActionLabel(action),
           primary: index === 0
         }))
       }
