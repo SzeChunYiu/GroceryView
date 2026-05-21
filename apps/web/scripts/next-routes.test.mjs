@@ -352,4 +352,18 @@ describe('Next.js web scaffold', () => {
     assert.match(productPage, /scoreBand\(dealScore\)/);
     assert.match(productPage, /verdict/);
   });
+
+  it('surfaces category deal leaders on category routes and homepage', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+    const categoriesPage = await readFile(new URL('../src/app/categories/page.tsx', import.meta.url), 'utf8');
+    const categoryPage = await readFile(new URL('../src/app/categories/[slug]/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(demoData, /summarizeCategoryDealLeaders/);
+    assert.match(demoData, /export const categoryDealLeaders = /);
+    assert.match(marketShell, /categoryDealLeaders\.map/);
+    assert.match(marketShell, /Category deal leaders/);
+    assert.match(categoriesPage, /categoryDealLeaders/);
+    assert.match(categoryPage, /categoryDealLeaders/);
+  });
 });

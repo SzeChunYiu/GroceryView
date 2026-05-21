@@ -4,6 +4,7 @@ import {
   accountProfile,
   basketSubstitutionRadar,
   categories,
+  categoryDealLeaders,
   couponStackPlanner,
   dealOpportunityRail,
   householdSavings,
@@ -191,6 +192,33 @@ export function MarketShell() {
               <span className="mt-2 block font-black">{point.product}</span>
               <span className="mt-1 block text-market-ink/60">{point.store}</span>
               <span className="mt-3 block font-bold text-market-mint">{point.signal}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">Category deal leaders</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Each category highlights one high-confidence product picked by the core category leader summarizer.
+            </p>
+          </div>
+          <LightMetric label="Categories" value={String(categoryDealLeaders.length)} />
+        </div>
+        <div className="grid gap-0 md:grid-cols-2 lg:grid-cols-4">
+          {categoryDealLeaders.map((leader) => (
+            <Link
+              key={leader.category}
+              href={`/products/${leader.productId}`}
+              className="border-b border-market-ink/10 px-4 py-4 text-sm hover:bg-market-oat/45 md:border-r"
+            >
+              <span className="block text-xs font-bold uppercase text-market-ink/50">{leader.category}</span>
+              <span className="mt-1 block font-black">{leader.productName}</span>
+              <span className="mt-2 block text-market-ink/60">{leader.storeName}</span>
+              <span className="mt-3 block font-bold text-market-mint">{leader.signal}</span>
             </Link>
           ))}
         </div>

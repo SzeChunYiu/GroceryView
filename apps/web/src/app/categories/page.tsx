@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { categoryDealLeaders } from '@/lib/demo-data';
 import { pricedProducts, categoryLabels } from '@/lib/openprices-products';
 
 export const dynamic = 'force-static';
@@ -11,6 +12,7 @@ export default function CategoriesIndexPage() {
     byCat.get(k)!.push(p);
   }
   const ordered = [...byCat.entries()].sort((a, b) => b[1].length - a[1].length);
+  const leadersByCategory = new Map(categoryDealLeaders.map((leader) => [leader.category.toLowerCase(), leader]));
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
@@ -45,6 +47,11 @@ export default function CategoriesIndexPage() {
             <p className="mt-2 text-xs text-market-ink/45">
               Top: {items.slice(0, 3).map(i => i.name.split(' ').slice(0, 3).join(' ')).join(' · ')}
             </p>
+            {leadersByCategory.get((categoryLabels[cat] || cat).toLowerCase()) ? (
+              <p className="mt-3 rounded-md bg-market-mint/10 px-2 py-1 text-xs font-bold text-market-ink/70">
+                Deal leader: {leadersByCategory.get((categoryLabels[cat] || cat).toLowerCase())?.signal}
+              </p>
+            ) : null}
           </Link>
         ))}
       </section>
