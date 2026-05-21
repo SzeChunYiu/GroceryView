@@ -7,6 +7,7 @@ import { BasketsModule } from './baskets/baskets.module.js';
 import { CategoriesModule } from './categories/categories.module.js';
 import { validateEnvironment } from './config/env.schema.js';
 import { DatabaseModule } from './database/database.module.js';
+import { ExpiryDealsModule } from './expiry-deals/expiry-deals.module.js';
 import { HealthModule } from './health/health.module.js';
 import { LoyaltyModule } from './loyalty/loyalty.module.js';
 import { MarketModule } from './market/market.module.js';
@@ -24,6 +25,7 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     ConfigModule.forRoot({ isGlobal: true, validate: validateEnvironment }),
     AdsModule,
     DatabaseModule,
+    ExpiryDealsModule,
     HealthModule,
     LoyaltyModule,
     MarketModule,
