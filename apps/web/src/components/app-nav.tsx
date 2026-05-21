@@ -5,6 +5,7 @@ const navItems = [
   { href: "/", label: "Market", icon: Home },
   { href: "/weekly-basket", label: "Basket", icon: ShoppingBasket },
   { href: "/scanner", label: "Scanner", icon: ScanLine },
+  { href: "/watchlist", label: "Watchlist", icon: Bell },
   { href: "/household", label: "Household", icon: Users },
   { href: "/privacy", label: "Privacy", icon: ShieldCheck },
   { href: "/account", label: "Alerts", icon: Bell },

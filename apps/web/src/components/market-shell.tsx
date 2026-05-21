@@ -48,6 +48,7 @@ export function MarketShell() {
           <Link href="/products/zoegas-coffee-450g">Products</Link>
           <Link href="/stores/willys-odenplan">Stores</Link>
           <Link href="/categories/coffee">Categories</Link>
+          <Link href="/watchlist">Watchlist</Link>
         </div>
       </nav>
 
