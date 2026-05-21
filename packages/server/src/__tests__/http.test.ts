@@ -294,6 +294,39 @@ describe('createHttpHandler', () => {
       ['butter', 'willys-odenplan']
     ]);
 
+    const storeDealSummary = await handle(new Request('http://localhost/api/stores/willys-odenplan/deal-summary'));
+    assert.equal(storeDealSummary.status, 200);
+    const storeDealSummaryBody = await json(storeDealSummary) as {
+      storeId: string;
+      dealCount: number;
+      buyVerdictCount: number;
+      averageDealScore: number;
+      topDeal: { productId: string; dealScore: number };
+      categories: Array<{ category: string; dealCount: number; averageDealScore: number; topProductId: string; topDealScore: number }>;
+      guardrails: string[];
+    };
+    assert.equal(storeDealSummaryBody.storeId, 'willys-odenplan');
+    assert.equal(storeDealSummaryBody.dealCount, 4);
+    assert.equal(storeDealSummaryBody.buyVerdictCount, 1);
+    assert.equal(storeDealSummaryBody.averageDealScore, 67);
+    assert.deepEqual(storeDealSummaryBody.topDeal, {
+      productId: 'coffee',
+      ticker: 'ZOEGAS-COFFEE-450G',
+      productName: 'Zoégas Coffee 450g',
+      category: 'coffee',
+      storeId: 'willys-odenplan',
+      storeName: 'Willys Odenplan',
+      price: 49.9,
+      dealScore: 82,
+      band: { label: 'Good deal', verdict: 'Buy' },
+      unitPrice: '110.89 SEK/kg'
+    });
+    assert.deepEqual(storeDealSummaryBody.categories, [
+      { category: 'coffee', dealCount: 1, averageDealScore: 82, topProductId: 'coffee', topDealScore: 82 },
+      { category: 'dairy', dealCount: 3, averageDealScore: 62, topProductId: 'private-label-milk', topDealScore: 73 }
+    ]);
+    assert.match(storeDealSummaryBody.guardrails[0] ?? '', /verified in-store deal rows/i);
+
     const storeCoverage = await handle(new Request('http://localhost/api/stores/lidl-sveavagen/price-coverage'));
     assert.equal(storeCoverage.status, 200);
     const storeCoverageBody = await json(storeCoverage) as {
@@ -542,6 +575,10 @@ describe('createHttpHandler', () => {
     const storeCoverage = await handle(new Request('http://localhost/api/stores/missing-store/price-coverage'));
     assert.equal(storeCoverage.status, 404);
     assert.deepEqual(await json(storeCoverage), { error: 'Store not found.' });
+
+    const dealSummary = await handle(new Request('http://localhost/api/stores/missing-store/deal-summary'));
+    assert.equal(dealSummary.status, 404);
+    assert.deepEqual(await json(dealSummary), { error: 'Store not found.' });
 
     const categoryCoverage = await handle(new Request('http://localhost/api/stores/missing-store/category-coverage'));
     assert.equal(categoryCoverage.status, 404);

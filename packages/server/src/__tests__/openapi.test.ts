@@ -60,6 +60,7 @@ describe('buildOpenApiDocument', () => {
       '/api/stores',
       '/api/stores/{id}',
       '/api/stores/{id}/category-coverage',
+      '/api/stores/{id}/deal-summary',
       '/api/stores/{id}/deals',
       '/api/stores/{id}/price-coverage',
       '/api/users/{userId}/favorite-stores',
@@ -128,6 +129,8 @@ describe('buildOpenApiDocument', () => {
     assert.match(doc.paths['/api/categories/{category}/market'].get?.summary ?? '', /category market/i);
     assert.equal(doc.paths['/api/stores/{id}/category-coverage'].get?.security, undefined);
     assert.match(doc.paths['/api/stores/{id}/category-coverage'].get?.summary ?? '', /category/i);
+    assert.equal(doc.paths['/api/stores/{id}/deal-summary'].get?.security, undefined);
+    assert.match(doc.paths['/api/stores/{id}/deal-summary'].get?.summary ?? '', /deal summary/i);
     assert.equal(doc.paths['/api/stores/{id}/price-coverage'].get?.security, undefined);
     assert.match(doc.paths['/api/stores/{id}/price-coverage'].get?.summary ?? '', /price coverage/i);
   });
