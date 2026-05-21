@@ -97,13 +97,13 @@ class RecordingPgPool {
           {
             product_id: 'coffee',
             category_id: 'coffee',
-            observed_chain_ids: ['willys', 'coop'],
+            observed_chain_ids: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
             observed_store_ids: ['willys-odenplan', 'coop-odenplan']
           },
           {
             product_id: 'milk',
             category_id: 'dairy',
-            observed_chain_ids: ['willys'],
+            observed_chain_ids: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
             observed_store_ids: ['willys-odenplan']
           }
         ]
@@ -131,7 +131,7 @@ describe('runtime config', () => {
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
-        targetChains: ['willys'],
+        targetChains: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
         targetStores: ['willys-odenplan']
       })
     });
@@ -148,7 +148,7 @@ describe('runtime config', () => {
       catalogCoverageTargets: {
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
-        targetChains: ['willys'],
+        targetChains: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
         targetStores: ['willys-odenplan'],
         requireEveryProductInEveryStore: true
       }
@@ -161,7 +161,7 @@ describe('runtime config', () => {
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee', 'milk'],
         targetCategories: ['coffee', 'dairy'],
-        targetChains: ['willys', 'coop'],
+        targetChains: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
         targetStores: ['willys-odenplan', 'coop-odenplan'],
         requireEveryProductInEveryStore: true
       })
@@ -170,10 +170,22 @@ describe('runtime config', () => {
     assert.deepEqual(config.catalogCoverageTargets, {
       targetProducts: ['coffee', 'milk'],
       targetCategories: ['coffee', 'dairy'],
-      targetChains: ['willys', 'coop'],
+      targetChains: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
       targetStores: ['willys-odenplan', 'coop-odenplan'],
       requireEveryProductInEveryStore: true
     });
+  });
+
+  it('fails closed when catalog coverage targets omit required daily chains', () => {
+    assert.throws(() => loadRuntimeConfig({
+      NODE_ENV: 'development',
+      CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
+        targetProducts: ['coffee'],
+        targetCategories: ['coffee'],
+        targetChains: ['willys', 'coop'],
+        targetStores: ['willys-odenplan']
+      })
+    }), /targetChains is missing required chains: ica, hemkop, lidl, city_gross/);
   });
 
   it('fails closed when production secrets are missing', () => {
@@ -232,7 +244,7 @@ describe('runtime config', () => {
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee'],
         targetCategories: ['coffee'],
-        targetChains: ['willys'],
+        targetChains: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
         targetStores: ['willys-odenplan']
       })
     }), /PUBLIC_WEB_URL must use http or https/);
@@ -551,7 +563,7 @@ describe('runtime config', () => {
         CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
           targetProducts: ['coffee', 'milk'],
           targetCategories: ['coffee', 'dairy'],
-          targetChains: ['willys', 'coop'],
+          targetChains: ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'],
           targetStores: ['willys-odenplan', 'coop-odenplan'],
           requireEveryProductInEveryStore: true
         })
