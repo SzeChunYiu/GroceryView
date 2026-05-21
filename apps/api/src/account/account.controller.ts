@@ -10,4 +10,10 @@ export class AccountController {
   subscriptionAccess(@Query('now') now?: string) {
     return { ...groceryApi.getSubscriptionAccess('demo', now), demo: true };
   }
+
+  @Get('subscription-entitlement')
+  @ApiOkResponse({ description: 'Demo account subscription entitlement snapshot' })
+  subscriptionEntitlement() {
+    return { userId: 'demo', entitlement: groceryApi.getSubscriptionEntitlement('demo'), demo: true };
+  }
 }

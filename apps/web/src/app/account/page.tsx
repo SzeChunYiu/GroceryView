@@ -23,6 +23,9 @@ export default function FeaturePage() {
   return (
     <PageShell>
       <NoVerifiedData route={route} title={`${titles[route]} has no private production records in this static snapshot`} />
+      <p className="mt-4 max-w-3xl text-sm font-semibold text-slate-700">
+        Demo account entitlement snapshots stay empty until a verified billing event writes a subscription record.
+      </p>
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <TopSpreads limit={5} />
         <SourceCoverage />
