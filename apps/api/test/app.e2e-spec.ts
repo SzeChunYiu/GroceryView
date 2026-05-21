@@ -50,6 +50,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/prices/freshness']);
     assert.ok(docs.body.paths['/users/demo/privacy/export']);
     assert.ok(docs.body.paths['/users/demo/privacy/deletion-plan']);
+    assert.ok(docs.body.paths['/users/demo/privacy/request-fulfillment']);
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/products/{id}/spread']);
@@ -588,6 +589,45 @@ describe('GroceryView API app', () => {
     assert.ok(deletionPlan.body.deleteFromTables.includes('receipt_uploads'));
     assert.deepEqual(deletionPlan.body.anonymizeTables, ['community_price_reports']);
     assert.equal(deletionPlan.body.demo, true);
+
+    const fulfillmentPlan = await request(app.getHttpServer())
+      .post('/users/demo/privacy/request-fulfillment')
+      .send({
+        slaDays: 30,
+        alertBeforeDays: 5,
+        requests: [
+          {
+            id: 'privacy-export-overdue',
+            userId: 'demo',
+            type: 'data_export',
+            receivedAt: '2026-04-19T12:00:00.000Z',
+            status: 'in_progress'
+          },
+          {
+            id: 'privacy-delete-due-soon',
+            userId: 'demo',
+            type: 'account_deletion',
+            receivedAt: '2026-04-25T12:00:00.000Z',
+            status: 'received'
+          }
+        ]
+      })
+      .expect(200);
+    assert.equal(fulfillmentPlan.body.status, 'attention_required');
+    assert.deepEqual(fulfillmentPlan.body.overdueRequestIds, ['privacy-export-overdue']);
+    assert.deepEqual(fulfillmentPlan.body.dueSoonRequestIds, ['privacy-delete-due-soon']);
+    assert.deepEqual(
+      fulfillmentPlan.body.items.map((item: { id: string; requiredAction: string; risk: string }) => ({
+        id: item.id,
+        requiredAction: item.requiredAction,
+        risk: item.risk
+      })),
+      [
+        { id: 'privacy-export-overdue', requiredAction: 'fulfill_export', risk: 'overdue' },
+        { id: 'privacy-delete-due-soon', requiredAction: 'fulfill_deletion', risk: 'due_soon' }
+      ]
+    );
+    assert.equal(fulfillmentPlan.body.demo, true);
   });
 
   it('rejects invalid request DTOs through the global ValidationPipe', async () => {
@@ -639,6 +679,38 @@ describe('GroceryView API app', () => {
         reviewer: 'demo',
         members: [{ userId: 'demo', displayName: 'Demo Shopper' }],
         basketItems: [{ productId: 'missing-product', quantity: 1, addedBy: 'demo' }]
+      })
+      .expect(400);
+  });
+
+  it('rejects invalid privacy fulfillment inputs', async () => {
+    await request(app.getHttpServer())
+      .post('/users/demo/privacy/request-fulfillment')
+      .send({
+        requests: [
+          {
+            id: 'other-user-request',
+            userId: 'other-user',
+            type: 'data_export',
+            receivedAt: '2026-05-20T12:00:00.000Z',
+            status: 'received'
+          }
+        ]
+      })
+      .expect(400);
+
+    await request(app.getHttpServer())
+      .post('/users/demo/privacy/request-fulfillment')
+      .send({
+        requests: [
+          {
+            id: 'bad-date',
+            userId: 'demo',
+            type: 'data_export',
+            receivedAt: 'not-a-date',
+            status: 'received'
+          }
+        ]
       })
       .expect(400);
   });
