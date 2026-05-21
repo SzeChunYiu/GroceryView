@@ -107,6 +107,22 @@ describe('Next.js web scaffold', () => {
     assert.match(scannerPage, /Capture routing/);
   });
 
+  it('surfaces unit price alert rows on the homepage', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+
+    const alertSection = demoData.split('export const unitPriceAlertDesk = ')[1] ?? '';
+    const alertRows = alertSection.match(/productSlug: '[^']+'/g) ?? [];
+
+    assert.ok(alertRows.length >= 3, 'unit price driver data should expose at least 3 alert rows');
+    assert.match(demoData, /santa-maria-taco-spice-28g/);
+    assert.match(demoData, /426\.79 SEK\/kg/);
+    assert.match(marketShell, /Package-size alerts/);
+    assert.match(marketShell, /unitPriceAlertDesk\.map/);
+    assert.match(marketShell, /Unit price alert desk/);
+    assert.match(marketShell, /\/products\/\$\{alert\.productSlug\}/);
+  });
+
   it('surfaces savings playbook actions on the homepage', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');

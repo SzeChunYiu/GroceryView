@@ -19,6 +19,7 @@ import {
   stockholmAreas,
   storeComparisonBoard,
   stores,
+  unitPriceAlertDesk,
   weeklyBasket
 } from '@/lib/demo-data';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
@@ -567,6 +568,50 @@ export function MarketShell() {
             <span>{product.store}</span>
             <span>{product.unitPrice}</span>
           </Link>
+        ))}
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">Unit price alert desk</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Package-size alerts catch shelf prices that look acceptable until normalized by kilogram or liter.
+            </p>
+          </div>
+          <LightMetric label="Alerts" value={String(unitPriceAlertDesk.length)} />
+        </div>
+        <div className="hidden grid-cols-[1.2fr_0.7fr_0.8fr_1fr] gap-3 border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55 md:grid">
+          <span>Product</span>
+          <span>Unit price</span>
+          <span>Severity</span>
+          <span>Benchmark</span>
+        </div>
+        {unitPriceAlertDesk.map((alert) => (
+          <div
+            key={alert.productSlug}
+            className="grid gap-3 border-b border-market-ink/10 px-4 py-4 text-sm last:border-b-0 hover:bg-market-oat/45 md:grid-cols-[1.2fr_0.7fr_0.8fr_1fr]"
+          >
+            <div>
+              <Link href={`/products/${alert.productSlug}`} className="block font-black hover:text-market-mint">
+                {alert.productName}
+              </Link>
+              <Link href={`/stores/${alert.storeSlug}`} className="mt-1 block text-xs font-bold text-market-ink/55">
+                {alert.storeName} · {alert.packageSize} · {alert.shelfPrice}
+              </Link>
+              <p className="mt-2 leading-5 text-market-ink/65">{alert.reason}</p>
+            </div>
+            <div>
+              <span className="text-xs font-bold uppercase text-market-ink/45 md:hidden">Unit price</span>
+              <span className="block font-black tabular-nums">{alert.unitPrice}</span>
+            </div>
+            <div>
+              <span className="inline-flex rounded-full bg-market-mint/15 px-2 py-1 text-xs font-black uppercase text-market-ink/70">
+                {alert.severity}
+              </span>
+            </div>
+            <div className="font-semibold text-market-ink/65">{alert.benchmark}</div>
+          </div>
         ))}
       </section>
 

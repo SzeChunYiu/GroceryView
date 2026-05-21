@@ -1339,6 +1339,45 @@ export const receiptReviewDesk = [
   }
 ];
 
+export const unitPriceAlertDesk = [
+  {
+    productSlug: 'santa-maria-taco-spice-28g',
+    productName: 'Santa Maria Taco Spice Mix 28g',
+    storeSlug: 'ica-nara-sergels-torg',
+    storeName: 'ICA Nära Sergels Torg',
+    packageSize: '28g',
+    unitPrice: '426.79 SEK/kg',
+    shelfPrice: '11.95 SEK',
+    benchmark: 'Pantry spice median 310.00 SEK/kg',
+    severity: 'High',
+    reason: 'Small package looks cheap at shelf price but is expensive per kilogram.'
+  },
+  {
+    productSlug: 'zeta-olivolja-classico-500ml',
+    productName: 'Zeta Olivolja Classico 500ml',
+    storeSlug: 'coop-swedenborgsgatan',
+    storeName: 'Coop Swedenborgsgatan',
+    packageSize: '500ml',
+    unitPrice: '159.80 SEK/l',
+    shelfPrice: '79.90 SEK',
+    benchmark: 'Oil median 142.00 SEK/l',
+    severity: 'Medium',
+    reason: 'Member label still sits above the category median once normalized by liter.'
+  },
+  {
+    productSlug: 'fiskeriet-laxfile-500g',
+    productName: 'Fiskeriet Laxfile 500g',
+    storeSlug: 'ica-kvantum-liljeholmen',
+    storeName: 'ICA Kvantum Liljeholmen',
+    packageSize: '500g',
+    unitPrice: '238.00 SEK/kg',
+    shelfPrice: '119.00 SEK',
+    benchmark: 'Dinner protein median 199.00 SEK/kg',
+    severity: 'Review',
+    reason: 'Protein promo needs comparison against chicken before a dinner basket locks.'
+  }
+];
+
 export const mealBasketIdeas = [
   {
     title: 'weekday breakfast top-up',
