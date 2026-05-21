@@ -47,6 +47,8 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/nutrition/value']);
     assert.ok(docs.body.paths['/users/demo/pantry/replenishment']);
     assert.ok(docs.body.paths['/prices/freshness']);
+    assert.ok(docs.body.paths['/users/demo/privacy/export']);
+    assert.ok(docs.body.paths['/users/demo/privacy/deletion-plan']);
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/products/{id}/spread']);
@@ -539,6 +541,25 @@ describe('GroceryView API app', () => {
       removedFavorite.body.map((store: { id: string; demo: boolean }) => ({ id: store.id, demo: store.demo })),
       [{ id: 'willys-odenplan', demo: true }]
     );
+
+    const privacyExport = await request(app.getHttpServer()).get('/users/demo/privacy/export').expect(200);
+    assert.equal(privacyExport.body.userId, 'demo');
+    assert.equal(privacyExport.body.generatedAt, '2026-05-20T12:00:00.000Z');
+    assert.deepEqual(privacyExport.body.sections.find((section: { name: string }) => section.name === 'favorite_stores')?.records, [
+      { storeId: 'willys-odenplan' }
+    ]);
+    assert.deepEqual(privacyExport.body.sections.find((section: { name: string }) => section.name === 'watchlist')?.records, [
+      { productId: 'coffee' }
+    ]);
+    assert.equal(privacyExport.body.demo, true);
+
+    const deletionPlan = await request(app.getHttpServer()).post('/users/demo/privacy/deletion-plan').expect(200);
+    assert.equal(deletionPlan.body.userId, 'demo');
+    assert.equal(deletionPlan.body.destructiveAction, false);
+    assert.equal(deletionPlan.body.requiresReauthentication, true);
+    assert.ok(deletionPlan.body.deleteFromTables.includes('receipt_uploads'));
+    assert.deepEqual(deletionPlan.body.anonymizeTables, ['community_price_reports']);
+    assert.equal(deletionPlan.body.demo, true);
   });
 
   it('rejects invalid request DTOs through the global ValidationPipe', async () => {

@@ -17,6 +17,7 @@ import { MarketModule } from './market/market.module.js';
 import { MealPlansModule } from './meal-plans/meal-plans.module.js';
 import { PantryModule } from './pantry/pantry.module.js';
 import { PricesModule } from './prices/prices.module.js';
+import { PrivacyModule } from './privacy/privacy.module.js';
 import { ProductsModule } from './products/products.module.js';
 import { ReceiptsModule } from './receipts/receipts.module.js';
 import { StoresModule } from './stores/stores.module.js';
@@ -37,6 +38,7 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     MealPlansModule,
     PantryModule,
     ProductsModule,
+    PrivacyModule,
     StoresModule,
     PricesModule,
     UsersModule,
