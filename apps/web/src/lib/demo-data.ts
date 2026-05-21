@@ -2301,3 +2301,70 @@ export const nutritionValueBoard = {
     { label: 'Confidence gate', value: 'Do not rank nutrition swaps from unreviewed receipt rows' }
   ]
 };
+
+export const expiryDealReports = [
+  {
+    id: 'expiry-kronfagel-kycklingfile-1kg',
+    productId: 'kronfagel-kycklingfile-1kg',
+    productName: 'Kronfågel Kycklingfilé 1kg',
+    storeId: 'hemkop-hornstull',
+    storeName: 'Hemköp Hornstull',
+    category: 'protein',
+    originalPrice: 129.9,
+    currentPrice: 84.9,
+    markdownPercent: 35,
+    expiresAt: '2026-05-21T19:30:00.000Z',
+    reportedAt: '2026-05-21T08:10:00.000Z',
+    distanceKm: 1.8,
+    verificationCount: 2,
+    photoCount: 1
+  },
+  {
+    id: 'expiry-pagen-lingongrova-500g',
+    productId: 'pagen-lingongrova-500g',
+    productName: 'Pågen Lingongrova 500g',
+    storeId: 'coop-medborgarplatsen',
+    storeName: 'Coop Medborgarplatsen',
+    category: 'bakery',
+    originalPrice: 33.9,
+    currentPrice: 19.9,
+    markdownPercent: 41,
+    expiresAt: '2026-05-22T08:00:00.000Z',
+    reportedAt: '2026-05-21T07:50:00.000Z',
+    distanceKm: 2.4,
+    verificationCount: 1,
+    photoCount: 1
+  },
+  {
+    id: 'expiry-arla-hushallsost-500g',
+    productId: 'arla-hushallsost-500g',
+    productName: 'Arla Hushållsost 500g',
+    storeId: 'ica-maxi-lindhagen',
+    storeName: 'ICA Maxi Lindhagen',
+    category: 'dairy',
+    originalPrice: 74.9,
+    currentPrice: 52.9,
+    markdownPercent: 29,
+    expiresAt: '2026-05-22T18:00:00.000Z',
+    reportedAt: '2026-05-21T07:30:00.000Z',
+    distanceKm: 3.1,
+    verificationCount: 0,
+    photoCount: 0
+  },
+  {
+    id: 'expiry-expired-salad',
+    productId: 'garant-gurka-300g',
+    productName: 'Garant Gurka 300g',
+    storeId: 'willys-skanstull',
+    storeName: 'Willys Skanstull',
+    category: 'produce',
+    originalPrice: 18.9,
+    currentPrice: 9.9,
+    markdownPercent: 48,
+    expiresAt: '2026-05-20T18:00:00.000Z',
+    reportedAt: '2026-05-20T08:00:00.000Z',
+    distanceKm: 2.7,
+    verificationCount: 2,
+    photoCount: 1
+  }
+];
