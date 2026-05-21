@@ -434,6 +434,30 @@ export function MarketShell() {
         </div>
       </Card>
 
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Private evidence next steps</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">What each gated workflow needs before it can render personal rows</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-slate-600">
+            These next-step requirements come from the same verified feature copy that keeps private pages from inventing user data.
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          {featureReadinessQueue.slice(0, 4).map(([route, copy]) => (
+            <Link
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
+              href={`/${route === 'account-profile' ? 'account/profile' : route}`}
+              key={`next-${route}`}
+            >
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-emerald-800">{route.replace('-', ' ')}</p>
+              <p className="mt-3 text-sm leading-6 text-slate-700">{copy.nextStep}</p>
+            </Link>
+          ))}
+        </div>
+      </Card>
+
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1fr]">
         <Card>
           <Eyebrow>Store directory</Eyebrow>

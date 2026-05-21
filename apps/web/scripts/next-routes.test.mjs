@@ -97,6 +97,9 @@ describe('verified-data UI', () => {
     assert.match(shell, /Feature readiness queue/);
     assert.match(shell, /featureReadinessQueue\.map/);
     assert.match(shell, /privateFeatureCopy/);
+    assert.match(shell, /Private evidence next steps/);
+    assert.match(shell, /copy\.nextStep/);
+    assert.match(shell, /featureReadinessQueue\.slice\(0, 4\)\.map/);
     assert.match(shell, /Source readiness mix/);
     assert.match(shell, /homepageSourceReadiness\.map/);
     assert.match(shell, /sourceReadinessMatrix\.slice/);
@@ -118,6 +121,7 @@ describe('verified-data UI', () => {
     assert.match(page, /fresh OpenPrices observations/);
     assert.match(page, /source route mapping/);
     assert.match(page, /catalogue savings/);
+    assert.match(page, /private evidence next steps/);
     assert.match(page, /gated feature readiness/);
   });
 
