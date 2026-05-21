@@ -220,6 +220,54 @@ export const products = [
     confidence: 'high',
     observedAt: '2026-05-20 13:40 CET',
     source: 'in-store shelf observation'
+  },
+  {
+    slug: 'bravo-apelsinjuice-1l',
+    ticker: 'BRAVO-APELSINJUICE-1L',
+    name: 'Bravo Apelsinjuice 1L',
+    store: 'Hemköp Hornstull',
+    price: '22.90 SEK',
+    unitPrice: '22.90 SEK/l',
+    priceType: 'member promo',
+    confidence: 'high',
+    observedAt: '2026-05-20 16:10 CET',
+    source: 'retailer flyer observation'
+  },
+  {
+    slug: 'scan-falukorv-800g',
+    ticker: 'SCAN-FALUKORV-800G',
+    name: 'Scan Falukorv 800g',
+    store: 'ICA Kvantum Liljeholmen',
+    price: '49.95 SEK',
+    unitPrice: '62.44 SEK/kg',
+    priceType: 'shelf',
+    confidence: 'high',
+    observedAt: '2026-05-20 17:05 CET',
+    source: 'in-store shelf observation'
+  },
+  {
+    slug: 'felix-potatismos-33p',
+    ticker: 'FELIX-POTATISMOS-33P',
+    name: 'Felix Potatismos 33 portioner',
+    store: 'City Gross Stockholm',
+    price: '39.90 SEK',
+    unitPrice: '120.91 SEK/kg',
+    priceType: 'weekly deal',
+    confidence: 'medium',
+    observedAt: '2026-05-20 15:45 CET',
+    source: 'retailer flyer observation'
+  },
+  {
+    slug: 'garant-svensk-potatis-2kg',
+    ticker: 'GARANT-SVENSK-POTATIS-2KG',
+    name: 'Garant Svensk Potatis 2kg',
+    store: 'Tempo Hornstull',
+    price: '24.90 SEK',
+    unitPrice: '12.45 SEK/kg',
+    priceType: 'shelf',
+    confidence: 'high',
+    observedAt: '2026-05-20 16:35 CET',
+    source: 'in-store shelf observation'
   }
 ];
 
@@ -293,6 +341,24 @@ export const stores = [
     format: 'neighborhood supermarket',
     bestCategory: 'Breakfast',
     distanceLabel: '3.1 km from saved area'
+  },
+  {
+    slug: 'ica-kvantum-liljeholmen',
+    name: 'ICA Kvantum Liljeholmen',
+    ingestionFixture: 'ICA Kvantum Liljeholmen',
+    district: 'Liljeholmen',
+    format: 'large supermarket',
+    bestCategory: 'Dinner staples',
+    distanceLabel: '4.4 km from saved area'
+  },
+  {
+    slug: 'hemkop-hornstull',
+    name: 'Hemköp Hornstull',
+    ingestionFixture: 'Hemkop Hornstull',
+    district: 'Södermalm',
+    format: 'mid-size supermarket',
+    bestCategory: 'Beverages',
+    distanceLabel: '3.3 km from saved area'
   }
 ];
 
@@ -359,6 +425,13 @@ export const categories = [
     index: '93.4',
     movement: '-6.6%',
     topDeal: 'GARANT-HAVREGRYN-1KG'
+  },
+  {
+    slug: 'beverages',
+    name: 'Beverages',
+    index: '96.8',
+    movement: '-3.2%',
+    topDeal: 'BRAVO-APELSINJUICE-1L'
   }
 ];
 
@@ -393,6 +466,16 @@ export const dealOpportunityRail = rankDealOpportunities({
       regularPrice: 25.8,
       dealScore: 81,
       sourceConfidence: 0.86
+    },
+    {
+      productId: 'bravo-apelsinjuice-1l',
+      productName: 'Bravo Apelsinjuice 1L',
+      storeId: 'hemkop-hornstull',
+      storeName: 'Hemköp Hornstull',
+      currentPrice: 22.9,
+      regularPrice: 27.9,
+      dealScore: 79,
+      sourceConfidence: 0.9
     },
     {
       productId: 'felix-ketchup-1kg',
@@ -473,6 +556,7 @@ export const stockholmAreas = [
   { slug: 'sodermalm',  name: 'Södermalm',  storeCount: 2, topSavings: 'Breakfast' },
   { slug: 'vasastan',   name: 'Vasastan',   storeCount: 2, topSavings: 'Coffee' },
   { slug: 'hagersten',  name: 'Hägersten',  storeCount: 1, topSavings: 'Rice' },
+  { slug: 'liljeholmen', name: 'Liljeholmen', storeCount: 1, topSavings: 'Pantry' },
   { slug: 'stockholm-county', name: 'Stockholm County', storeCount: 1, topSavings: 'Pasta' },
   { slug: 'kungsholmen',name: 'Kungsholmen',storeCount: 0, topSavings: '—' },
   { slug: 'ostermalm',  name: 'Östermalm',  storeCount: 0, topSavings: '—' }
@@ -484,8 +568,8 @@ export const sourceCoverage = [
     fixture: 'Store locator',
     surface: 'public locator',
     status: 'ready',
-    visibleRows: 2,
-    newestSignal: 'Nära Sergels Torg matched to snacks and egg rows'
+    visibleRows: 3,
+    newestSignal: 'Sergels Torg and Liljeholmen rows cover snacks, egg, and dinner staples'
   },
   {
     chain: 'Willys',
@@ -508,8 +592,8 @@ export const sourceCoverage = [
     fixture: 'Offer review',
     surface: 'weekly deal',
     status: 'review',
-    visibleRows: 2,
-    newestSignal: 'Ketchup and soup stay medium-confidence until receipt review'
+    visibleRows: 3,
+    newestSignal: 'Ketchup, soup, and Hornstull juice rows keep offer review visible'
   },
   {
     chain: 'Lidl',
@@ -524,8 +608,8 @@ export const sourceCoverage = [
     fixture: 'Regional offer',
     surface: 'weekly page',
     status: 'stub',
-    visibleRows: 1,
-    newestSignal: 'Pasta row is visible while county coverage expands'
+    visibleRows: 2,
+    newestSignal: 'Pasta and pantry mash rows are visible while county coverage expands'
   }
 ];
 
@@ -603,7 +687,9 @@ export const weeklyBasket = [
   { slug: 'eldorado-basmati-rice-1kg',   qty: 1, total: '18.90 SEK', vsLastWeek: '-7.2%' },
   { slug: 'barilla-spaghetti-1kg',        qty: 2, total: '55.80 SEK', vsLastWeek: '-1.9%' },
   { slug: 'bregott-normalsaltat-600g',    qty: 1, total: '56.90 SEK', vsLastWeek: '+6.9%' },
-  { slug: 'garant-havregryn-1kg',         qty: 1, total: '21.90 SEK', vsLastWeek: '-6.6%' }
+  { slug: 'garant-havregryn-1kg',         qty: 1, total: '21.90 SEK', vsLastWeek: '-6.6%' },
+  { slug: 'bravo-apelsinjuice-1l',         qty: 2, total: '45.80 SEK', vsLastWeek: '-3.2%' },
+  { slug: 'garant-svensk-potatis-2kg',     qty: 1, total: '24.90 SEK', vsLastWeek: '-0.9%' }
 ];
 
 export const savingsPlaybook = [
@@ -634,14 +720,21 @@ export const savingsPlaybook = [
     action: 'Delay extra Bregott purchases unless basket coverage is low',
     impact: '+3.70 SEK risk per pack',
     href: '/categories/butter'
+  },
+  {
+    title: 'Juice promo top-up',
+    trigger: 'Beverages index is 3.2% under baseline with a high-confidence Hornstull row',
+    action: 'Add two Bravo cartons when the household route already passes Hornstull',
+    impact: '-5.00 SEK per carton vs usual shelf',
+    href: '/products/bravo-apelsinjuice-1l'
   }
 ];
 
 export const householdSavings = {
   weeklyTotal: '438.50 SEK',
-  vsLastWeek: '-19.20 SEK',
-  vsLastMonth: '-66.10 SEK',
-  topSaving: { product: 'Garant Havregryn 1kg', amount: '-3.90 SEK', driver: 'breakfast staple shelf drop' }
+  vsLastWeek: '-30.10 SEK',
+  vsLastMonth: '-78.40 SEK',
+  topSaving: { product: 'Bravo Apelsinjuice 1L', amount: '-10.00 SEK', driver: 'Hornstull member promo top-up' }
 };
 
 export const savingsDashboard = {
