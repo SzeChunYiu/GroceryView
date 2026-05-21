@@ -69,6 +69,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/favorite-stores']);
     assert.ok(docs.body.paths['/users/demo/favorite-stores/{storeId}']);
     assert.ok(docs.body.paths['/users/demo/watchlist/{productId}']);
+    assert.ok(docs.body.paths['/users/demo/watchlist/{productId}'].patch);
     assert.ok(docs.body.paths['/users/demo/alerts/inbox']);
     assert.ok(docs.body.paths['/users/demo/basket/local-offers']);
     assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
@@ -314,6 +315,16 @@ describe('GroceryView API app', () => {
     const watchlist = await request(app.getHttpServer()).get('/users/demo/watchlist').expect(200);
     assert.equal(watchlist.body.items[0].productId, 'coffee');
     assert.deepEqual(watchlist.body.items[0].allowedPriceTypes, ['shelf']);
+    const watchlistUpdate = await request(app.getHttpServer())
+      .patch('/users/demo/watchlist/coffee')
+      .send({ targetPrice: 48, alertDealScoreAt: 85, favoriteStoresOnly: true, allowedPriceTypes: ['shelf', 'promotion'] })
+      .expect(200);
+    assert.equal(watchlistUpdate.body.item.productId, 'coffee');
+    assert.equal(watchlistUpdate.body.item.targetPrice, 48);
+    assert.equal(watchlistUpdate.body.item.alertDealScoreAt, 85);
+    assert.equal(watchlistUpdate.body.item.favoriteStoresOnly, true);
+    assert.deepEqual(watchlistUpdate.body.item.allowedPriceTypes, ['shelf', 'promotion']);
+    assert.equal(watchlistUpdate.body.demo, true);
     await request(app.getHttpServer()).post('/users/demo/watchlist').send({ productId: 'milk', targetPrice: 14 }).expect(201);
     const watchlistRemoval = await request(app.getHttpServer()).delete('/users/demo/watchlist/milk').expect(200);
     assert.equal(watchlistRemoval.body.productId, 'milk');
@@ -633,6 +644,7 @@ describe('GroceryView API app', () => {
     await request(app.getHttpServer()).get('/products/missing-product/deal-score').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/equivalents').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/history').expect(404);
+    await request(app.getHttpServer()).patch('/users/demo/watchlist/missing-product').send({ targetPrice: 48 }).expect(404);
     await request(app.getHttpServer()).delete('/users/demo/watchlist/missing-product').expect(404);
   });
 
