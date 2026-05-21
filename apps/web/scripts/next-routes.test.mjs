@@ -13,6 +13,7 @@ const appFiles = [
   'src/app/compare/page.tsx',
   'src/app/chain-index/page.tsx',
   'src/app/map/page.tsx',
+  'src/app/data-sources/page.tsx',
   'src/components/market-shell.tsx',
   'src/components/data-ui.tsx',
   'src/lib/verified-data.ts'
@@ -169,5 +170,15 @@ describe('verified-data UI', () => {
     assert.match(householdPage, /Household planning evidence/);
     assert.doesNotMatch(householdPage, /@\/lib\/demo-data/);
     assert.doesNotMatch(householdPage, /@\/components\/sample-data/);
+  });
+
+  it('surfaces verified source coverage on the data sources route', async () => {
+    const route = await read('src/app/data-sources/page.tsx');
+
+    assert.match(route, /sourceCoverage\.map/);
+    assert.match(route, /storeBrandLedger\.map/);
+    assert.match(route, /categoryQualityMatrix\.map/);
+    assert.match(route, /Verified snapshot provenance/);
+    assert.match(route, /no branch-level prices|without implying branch-level prices/i);
   });
 });
