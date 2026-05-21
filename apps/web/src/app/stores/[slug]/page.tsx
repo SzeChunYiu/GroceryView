@@ -22,8 +22,9 @@ export default async function StorePage({ params }: Readonly<{ params: Promise<{
         <p className="mt-2 text-market-ink/65">
           {store.format} in {store.district}
         </p>
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        <div className="mt-6 grid gap-3 sm:grid-cols-4">
           <Metric label="Best category" value={store.bestCategory} />
+          <Metric label="Price coverage" value="Verified shelf rows" />
           <Metric label="Distance metadata" value={store.distanceLabel} />
           <Metric label="Deal Score policy" value="No distance penalty" />
         </div>
