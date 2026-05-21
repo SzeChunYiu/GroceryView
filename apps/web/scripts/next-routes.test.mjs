@@ -241,6 +241,10 @@ describe('Next.js web scaffold', () => {
     assert.match(demoData, /plannedMeals: 6/);
     assert.match(marketShell, /\/meal-planner/);
     assert.match(marketShell, /mealPlanner\.projectedSavings/);
+    assert.match(mealPlannerPage, /suggestDealBasedMeals/);
+    assert.match(mealPlannerPage, /buildMealDeals/);
+    assert.match(mealPlannerPage, /dealBasedMeals\.map/);
+    assert.match(mealPlannerPage, /Deal-based meals/);
     assert.match(mealPlannerPage, /mealPlanner\.days\.map/);
     assert.match(mealPlannerPage, /Planning constraints/);
   });

@@ -1,10 +1,17 @@
 import Link from 'next/link';
 import { CalendarDays, CheckCircle2, CircleDollarSign, ShoppingBasket, Store } from 'lucide-react';
-import { mealPlanner } from '@/lib/demo-data';
+import { suggestDealBasedMeals, type MealDeal } from '@groceryview/core';
+import { mealPlanner, products, weeklyBasket } from '@/lib/demo-data';
 
 export const dynamic = 'force-static';
 
 export default function MealPlannerPage() {
+  const dealBasedMeals = suggestDealBasedMeals({
+    deals: buildMealDeals(),
+    maxMealCost: 180,
+    servings: 4
+  });
+
   return (
     <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
       <nav className="flex flex-wrap items-center justify-between gap-3 border-b border-market-ink/10 pb-4">
@@ -56,6 +63,34 @@ export default function MealPlannerPage() {
       </section>
 
       <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="border-b border-market-ink/10 px-4 py-3">
+          <h2 className="text-lg font-black">Deal-based meals</h2>
+          <p className="mt-1 text-sm text-market-ink/60">
+            Suggested with suggestDealBasedMeals from current weekly-basket product rows, movement-derived deal scores,
+            and an explicit 180 SEK / 4 serving dinner budget.
+          </p>
+        </div>
+        <div className="grid gap-0 md:grid-cols-2">
+          {dealBasedMeals.map((meal) => (
+            <article key={meal.title} className="border-b border-market-ink/10 px-4 py-4 text-sm md:border-r">
+              <h3 className="text-lg font-black">{meal.title}</h3>
+              <p className="mt-2 leading-6 text-market-ink/65">{meal.reason}</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {meal.ingredientProductIds.map((productId) => (
+                  <Link key={productId} href={`/products/${productId}`} className="rounded-full bg-market-oat px-3 py-1 text-xs font-black hover:bg-market-mint">
+                    {products.find((product) => product.slug === productId)?.name ?? productId}
+                  </Link>
+                ))}
+              </div>
+              <p className="mt-4 font-black tabular-nums text-market-mint">
+                {meal.estimatedCost.toFixed(2)} SEK total · {meal.estimatedCostPerServing.toFixed(2)} SEK/serving
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
         <div className="grid grid-cols-[0.7fr_1fr_1fr_auto] gap-3 border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
           <span>Day</span>
           <span>Meal</span>
@@ -83,6 +118,40 @@ export default function MealPlannerPage() {
       </section>
     </main>
   );
+}
+
+function buildMealDeals(): MealDeal[] {
+  const deals: MealDeal[] = [];
+  for (const row of weeklyBasket) {
+    const product = products.find((candidate) => candidate.slug === row.slug);
+    const category = mealCategory(product?.name ?? row.slug);
+    if (category === 'other') continue;
+    const movement = Number(row.vsLastWeek.replace('%', ''));
+    const dealScore = Math.max(1, Math.round(70 + (Number.isFinite(movement) ? -movement * 3 : 0)));
+
+    deals.push({
+      productId: row.slug,
+      name: product?.name ?? row.slug,
+      category,
+      price: parseSek(row.total),
+      dealScore
+    });
+  }
+  return deals;
+}
+
+function mealCategory(name: string): MealDeal['category'] | 'other' {
+  const normalized = name.toLowerCase();
+  if (/kyckling|lax|färs|fars|falukorv|tofu|kik/.test(normalized)) return 'protein';
+  if (/rice|ris|spaghetti|pasta|ketchup|soup|pyttipanna|kåldolmar/.test(normalized)) return 'pantry';
+  if (/tomat|potatis|gurka|ärter|arter/.test(normalized)) return 'vegetables';
+  if (/milk|fil|ost|bregott/.test(normalized)) return 'dairy';
+  return 'other';
+}
+
+function parseSek(value: string): number {
+  const parsed = Number(value.replace(',', '.').match(/\d+(\.\d+)?/)?.[0] ?? '0');
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function Metric({ icon, label, value }: Readonly<{ icon: React.ReactNode; label: string; value: string }>) {
