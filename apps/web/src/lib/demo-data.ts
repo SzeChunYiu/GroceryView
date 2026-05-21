@@ -529,6 +529,57 @@ export const sourceCoverage = [
   }
 ];
 
+export const storeComparisonBoard = [
+  {
+    slug: 'vasastan-coffee-dairy',
+    area: 'Vasastan',
+    primaryStoreSlug: 'willys-odenplan',
+    primaryStoreName: 'Willys Odenplan',
+    comparisonStoreSlug: 'lidl-sveavagen',
+    comparisonStoreName: 'Lidl Sveavagen',
+    basketFocus: 'Coffee + dairy top-up',
+    leadSignal: 'Zoegas coffee is 8.4% under baseline while Lidl milk anchors the dairy check.',
+    visibleItems: 5,
+    basketImpact: '-21.20 SEK'
+  },
+  {
+    slug: 'norrmalm-snack-check',
+    area: 'Norrmalm',
+    primaryStoreSlug: 'ica-nara-sergels-torg',
+    primaryStoreName: 'ICA Nara Sergels Torg',
+    comparisonStoreSlug: 'hemkop-stockholm',
+    comparisonStoreName: 'Hemkop Stockholm',
+    basketFocus: 'Snacks + pantry fill',
+    leadSignal: 'High-confidence snack rows can be checked against Hemkop pantry deals before checkout.',
+    visibleItems: 4,
+    basketImpact: '-8.45 SEK'
+  },
+  {
+    slug: 'sodermalm-breakfast-loop',
+    area: 'Sodermalm',
+    primaryStoreSlug: 'coop-swedenborgsgatan',
+    primaryStoreName: 'Coop Swedenborgsgatan',
+    comparisonStoreSlug: 'tempo-hornstull',
+    comparisonStoreName: 'Tempo Hornstull',
+    basketFocus: 'Breakfast staples',
+    leadSignal: 'Tempo oats stay under trend while Coop bread and dairy keep the route comparable.',
+    visibleItems: 3,
+    basketImpact: '-6.60 SEK'
+  },
+  {
+    slug: 'pantry-county-split',
+    area: 'Stockholm County',
+    primaryStoreSlug: 'matmissionen-hagersten',
+    primaryStoreName: 'Matmissionen Hagersten',
+    comparisonStoreSlug: 'city-gross-stockholm',
+    comparisonStoreName: 'City Gross Stockholm',
+    basketFocus: 'Pantry bulk buy',
+    leadSignal: 'Rice and pasta rows expose whether the county trip is worth delaying or splitting.',
+    visibleItems: 2,
+    basketImpact: '-10.90 SEK'
+  }
+];
+
 export const indexHistory = [
   { date: '2026-05-12', coffee: 100.0, dairy: 100.0, bread: 100.0, pantry: 100.0, snacks: 100.0, frozen: 100.0 },
   { date: '2026-05-13', coffee:  98.4, dairy: 100.6, bread:  99.5, pantry:  99.2, snacks: 100.8, frozen:  99.4 },

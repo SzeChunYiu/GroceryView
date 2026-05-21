@@ -9,6 +9,7 @@ import {
   savingsPlaybook,
   sourceCoverage,
   stockholmAreas,
+  storeComparisonBoard,
   stores,
   weeklyBasket
 } from '@/lib/demo-data';
@@ -308,6 +309,45 @@ export function MarketShell() {
                 {store.district} · {store.bestCategory}
               </span>
             </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">Store comparison board</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Route-ready comparisons pair visible store pages with the products that change a weekly basket.
+            </p>
+          </div>
+          <LightMetric label="Comparisons" value={String(storeComparisonBoard.length)} />
+        </div>
+        <div className="grid gap-0 lg:grid-cols-2">
+          {storeComparisonBoard.map((comparison) => (
+            <div key={comparison.slug} className="border-b border-market-ink/10 px-4 py-4 text-sm lg:border-r">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <span className="block text-xs font-bold uppercase text-market-ink/50">{comparison.area}</span>
+                  <span className="mt-1 block font-black">{comparison.basketFocus}</span>
+                </div>
+                <span className="rounded-full bg-market-mint/15 px-2 py-1 text-xs font-black text-market-ink/70">
+                  {comparison.basketImpact}
+                </span>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-market-ink/60">
+                <Link href={`/stores/${comparison.primaryStoreSlug}`} className="rounded-md bg-market-oat/60 px-2 py-1 hover:text-market-mint">
+                  {comparison.primaryStoreName}
+                </Link>
+                <Link href={`/stores/${comparison.comparisonStoreSlug}`} className="rounded-md bg-market-oat/60 px-2 py-1 hover:text-market-mint">
+                  {comparison.comparisonStoreName}
+                </Link>
+              </div>
+              <p className="mt-3 leading-6 text-market-ink/65">{comparison.leadSignal}</p>
+              <p className="mt-3 text-xs font-bold uppercase text-market-ink/45">
+                {comparison.visibleItems} visible driver rows
+              </p>
+            </div>
           ))}
         </div>
       </section>
