@@ -36,6 +36,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/products/{id}/spread']);
     assert.ok(docs.body.paths['/stores']);
+    assert.ok(docs.body.paths['/stores/{id}/deals']);
   });
 
   it('serves products, stores, prices, watchlists, baskets, and alerts', async () => {
@@ -47,6 +48,22 @@ describe('GroceryView API app', () => {
 
     await request(app.getHttpServer()).get('/products/coffee').expect(200);
     await request(app.getHttpServer()).get('/stores/willys-odenplan').expect(200);
+
+    const storeDeals = await request(app.getHttpServer()).get('/stores/willys-odenplan/deals').expect(200);
+    assert.deepEqual(
+      storeDeals.body.map((deal: { productId: string; storeId: string; dealScore: number; demo: boolean }) => ({
+        productId: deal.productId,
+        storeId: deal.storeId,
+        dealScore: deal.dealScore,
+        demo: deal.demo
+      })),
+      [
+        { productId: 'coffee', storeId: 'willys-odenplan', dealScore: 82, demo: true },
+        { productId: 'private-label-milk', storeId: 'willys-odenplan', dealScore: 73, demo: true },
+        { productId: 'milk', storeId: 'willys-odenplan', dealScore: 73, demo: true },
+        { productId: 'butter', storeId: 'willys-odenplan', dealScore: 40, demo: true }
+      ]
+    );
 
     const prices = await request(app.getHttpServer()).get('/products/coffee/prices').expect(200);
     assert.equal(prices.body[0].currency, 'SEK');
@@ -122,5 +139,9 @@ describe('GroceryView API app', () => {
   it('returns 404 for missing product terminal data', async () => {
     await request(app.getHttpServer()).get('/products/missing-product/terminal').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/spread').expect(404);
+  });
+
+  it('returns 404 for missing store deals', async () => {
+    await request(app.getHttpServer()).get('/stores/missing-store/deals').expect(404);
   });
 });
