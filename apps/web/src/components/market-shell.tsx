@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
+import { mapChainIndexScores } from '@/lib/map-chain-index';
 import {
   chainSavingsLedger,
   chainCategoryCoverage,
@@ -28,6 +29,7 @@ const homepageSourceReadiness = sourceReadinessMatrix.slice(0, 3);
 const homepageChainSavings = chainSavingsLedger.slice(0, 2);
 const homepageRouteMap = sourceRouteMap.slice(0, 3);
 const homepageFreshOpenPrices = freshestOpenPrices.slice(3, 9);
+const homepageMapChainIndex = mapChainIndexScores.slice(0, 3);
 
 export function MarketShell() {
   return (
@@ -99,6 +101,34 @@ export function MarketShell() {
               </Link>
             );
           })}
+        </div>
+      </Card>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Map chain index signals</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Chain index coverage used by the Stockholm store map</h2>
+          </div>
+          <Link className="text-sm font-bold text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/map">
+            Open store map
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          {homepageMapChainIndex.map((chain) => (
+            <Link
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
+              href="/map"
+              key={chain.chainId}
+            >
+              <p className="text-sm font-black capitalize text-slate-950">{chain.chainId}</p>
+              <p className="mt-2 text-3xl font-black text-emerald-800">{chain.overallIndex.toFixed(1)}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">
+                {chain.observations.toLocaleString('sv-SE')} observations
+              </p>
+              <p className="mt-3 text-sm leading-6 text-slate-600">Confidence: {chain.confidence}</p>
+            </Link>
+          ))}
         </div>
       </Card>
 
