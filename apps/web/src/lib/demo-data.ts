@@ -2142,6 +2142,21 @@ export const mealBasketIdeas = [
   }
 ];
 
+export const mealIdeaBoard = {
+  title: 'Meal idea board',
+  focus: 'Turn route-ready baskets into weekly meal decisions',
+  newestSignal: 'Lunchbox and hydration rows are now visible beside breakfast, pantry, freezer, and plant-based prep',
+  readyIdeas: mealBasketIdeas.length,
+  spotlight: 'weekday lunchbox bundle',
+  rulesTitle: 'Basket idea rules',
+  ideas: mealBasketIdeas,
+  rules: [
+    { label: 'Route first', value: 'Prefer ideas that keep products inside one district or planned store path' },
+    { label: 'Evidence links', value: 'Every idea keeps product routes visible before it becomes a basket row' },
+    { label: 'Hold rule', value: 'Hydration and freezer top-ups wait for category comparison when savings are close' }
+  ]
+};
+
 export const mealPlanner = {
   weekLabel: 'May 21-27 dinner plan',
   targetSpend: '600.00 SEK',

@@ -10,6 +10,7 @@ import {
   dealOpportunityRail,
   householdSavings,
   mealBasketIdeas,
+  mealIdeaBoard,
   mealPlanner,
   nutritionValueBoard,
   pantryPlanner,
@@ -1013,6 +1014,17 @@ export function MarketShell() {
               </div>
             </div>
           ))}
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-market-ink/10 px-4 py-3 text-sm">
+          <span className="font-bold text-market-ink/65">
+            {mealIdeaBoard.title}: {mealIdeaBoard.newestSignal}
+          </span>
+          <Link
+            href="/basket-ideas"
+            className="rounded-md bg-market-ink px-3 py-2 font-black text-white hover:bg-market-mint hover:text-market-ink"
+          >
+            Open basket ideas
+          </Link>
         </div>
       </section>
 

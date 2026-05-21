@@ -202,6 +202,20 @@ describe('Next.js web scaffold', () => {
     assert.match(marketShell, /Meal basket ideas/);
   });
 
+  it('surfaces a dedicated basket ideas route from meal idea driver data', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+    const ideasPage = await readFile(new URL('../src/app/basket-ideas/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(demoData, /export const mealIdeaBoard = /);
+    assert.match(demoData, /Basket idea rules/);
+    assert.match(demoData, /weekday lunchbox bundle/);
+    assert.match(marketShell, /\/basket-ideas/);
+    assert.match(marketShell, /mealIdeaBoard\.newestSignal/);
+    assert.match(ideasPage, /mealIdeaBoard\.ideas\.map/);
+    assert.match(ideasPage, /mealIdeaBoard\.rulesTitle/);
+  });
+
   it('surfaces a dedicated meal planner route from meal driver data', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
