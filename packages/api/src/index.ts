@@ -496,6 +496,25 @@ export type StoreDeal = {
   unitPrice: string;
 };
 
+export type StoreDealSummaryCategory = {
+  category: string;
+  dealCount: number;
+  averageDealScore: number;
+  topProductId: string;
+  topDealScore: number;
+};
+
+export type StoreDealSummaryReport = {
+  storeId: string;
+  storeName: string;
+  dealCount: number;
+  buyVerdictCount: number;
+  averageDealScore: number;
+  topDeal: StoreDeal | null;
+  categories: StoreDealSummaryCategory[];
+  guardrails: string[];
+};
+
 export type BasketItemRequest = {
   productId: string;
   quantity: number;
@@ -1730,6 +1749,42 @@ function storeDealsFor(storeId: string): StoreDeal[] {
     .sort((left, right) => right.dealScore - left.dealScore || left.price - right.price || left.productName.localeCompare(right.productName));
 }
 
+function storeDealSummaryFor(storeId: string): StoreDealSummaryReport {
+  const deals = storeDealsFor(storeId);
+  const store = stores.find((candidate) => candidate.id === storeId);
+  if (!store) throw new Error(`Unknown storeId: ${storeId}`);
+  const grouped = new Map<string, StoreDeal[]>();
+  for (const deal of deals) {
+    grouped.set(deal.category, [...(grouped.get(deal.category) ?? []), deal]);
+  }
+
+  return {
+    storeId,
+    storeName: store.name,
+    dealCount: deals.length,
+    buyVerdictCount: deals.filter((deal) => deal.band.verdict === 'Buy').length,
+    averageDealScore: deals.length > 0
+      ? roundPercent(deals.reduce((sum, deal) => sum + deal.dealScore, 0) / deals.length)
+      : 0,
+    topDeal: deals[0] ?? null,
+    categories: [...grouped.entries()].map(([category, rows]) => {
+      const topDeal = [...rows].sort((left, right) => right.dealScore - left.dealScore || left.price - right.price || left.productName.localeCompare(right.productName))[0]!;
+      return {
+        category,
+        dealCount: rows.length,
+        averageDealScore: roundPercent(rows.reduce((sum, deal) => sum + deal.dealScore, 0) / rows.length),
+        topProductId: topDeal.productId,
+        topDealScore: topDeal.dealScore
+      };
+    }).sort((left, right) => right.averageDealScore - left.averageDealScore || left.category.localeCompare(right.category)),
+    guardrails: [
+      'Store deal summaries are derived from verified in-store deal rows only.',
+      'Average Deal Score is informational and does not hide lower-scoring products.',
+      'Category leaders summarize current rows but cannot fill missing store prices.'
+    ]
+  };
+}
+
 export function createGroceryViewApi() {
   const favoriteStores = new Map<string, Set<string>>();
   const watchlists = new Map<string, WatchlistItem[]>();
@@ -2064,6 +2119,10 @@ export function createGroceryViewApi() {
 
     getStoreDeals(storeId: string) {
       return storeDealsFor(storeId);
+    },
+
+    getStoreDealSummary(storeId: string): StoreDealSummaryReport {
+      return storeDealSummaryFor(storeId);
     },
 
     getStorePriceCoverage(storeId: string): StorePriceCoverageReport {
