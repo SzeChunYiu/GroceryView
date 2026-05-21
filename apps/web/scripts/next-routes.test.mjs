@@ -210,6 +210,20 @@ describe('Next.js web scaffold', () => {
     assert.match(nutritionPage, /Nutrition ranking rules/);
   });
 
+  it('surfaces a dedicated price reports route from report driver data', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+    const reportsPage = await readFile(new URL('../src/app/price-reports/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(demoData, /export const priceReportCenter = /);
+    assert.match(demoData, /Report send checklist/);
+    assert.match(demoData, /Coffee promo spread/);
+    assert.match(marketShell, /\/price-reports/);
+    assert.match(marketShell, /priceReportCenter\.headline/);
+    assert.match(reportsPage, /priceReportCenter\.reports\.map/);
+    assert.match(reportsPage, /priceReportCenter\.checklistTitle/);
+  });
+
   it('surfaces source coverage rows on the homepage', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
