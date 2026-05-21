@@ -5,6 +5,7 @@ const navItems = [
   { href: '/', label: 'Overview', icon: BarChart3 },
   { href: '/products', label: 'Products', icon: PackageSearch },
   { href: '/compare', label: 'Compare', icon: Tags },
+  { href: '/catalogue-savings', label: 'Savings', icon: Tags },
   { href: '/chain-coverage', label: 'Chain', icon: Tags },
   { href: '/stores', label: 'Stores', icon: Store },
   { href: '/openprices-depth', label: 'OpenPrices', icon: Activity },
