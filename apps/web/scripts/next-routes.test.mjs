@@ -59,6 +59,8 @@ describe('verified-data UI', () => {
     }
     const profile = await read('src/app/account/profile/page.tsx');
     assert.match(profile, /route="account-profile"/);
+    assert.doesNotMatch(profile, /@\/lib\/demo-data/);
+    assert.doesNotMatch(profile, /accountProfile/);
     assert.match(verified, /'account-profile'/);
     const login = await read('src/app/login/page.tsx');
     assert.doesNotMatch(login, /placeholder=/);
