@@ -295,4 +295,15 @@ describe('Next.js web scaffold', () => {
     assert.match(profilePage, /accountProfile\.preferences\.map/);
     assert.match(profilePage, /Connected routes/);
   });
+
+
+  it('surfaces deal score verdicts on product detail routes', async () => {
+    const productPage = await readFile(new URL('../src/app/products/[slug]/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(productPage, /calculateDealScore/);
+    assert.match(productPage, /scoreBand/);
+    assert.match(productPage, /Deal Score/);
+    assert.match(productPage, /scoreBand\(dealScore\)/);
+    assert.match(productPage, /verdict/);
+  });
 });

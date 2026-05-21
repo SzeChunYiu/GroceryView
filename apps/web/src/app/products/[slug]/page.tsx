@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { calculateDealScore, scoreBand } from '@groceryview/core';
 import { products } from '@/lib/demo-data';
 
 export function generateStaticParams() {
@@ -11,6 +12,8 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const product = products.find((item) => item.slug === slug);
   if (!product) notFound();
   const apiProductId = product.slug === 'zoegas-coffee-450g' ? 'coffee' : null;
+  const dealScore = calculateDealScore(buildDealScoreInput(product));
+  const verdict = scoreBand(dealScore);
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
@@ -21,10 +24,19 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         <div className="text-xs font-bold uppercase tracking-widest text-market-ink/50">Product terminal</div>
         <h1 className="mt-3 text-4xl font-black">{product.ticker}</h1>
         <p className="mt-2 text-market-ink/65">{product.name}</p>
-        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+        <div className="mt-6 grid gap-3 sm:grid-cols-4">
           <Metric label="Current price" value={product.price} />
           <Metric label="Unit price" value={product.unitPrice} />
           <Metric label="Store" value={product.store} />
+          <Metric label="Deal Score" value={String(dealScore)} />
+        </div>
+        <div className="mt-4 rounded-md border border-market-mint/20 bg-market-mint/10 p-4">
+          <div className="text-xs font-bold uppercase tracking-widest text-market-mint">Deal verdict</div>
+          <div className="mt-1 text-2xl font-black">{verdict.label}: {verdict.verdict}</div>
+          <p className="mt-2 text-sm leading-6 text-market-ink/65">
+            Score blends current city rank, known promo depth, equivalent unit-price pressure, and source confidence.
+            Sponsored placement is ignored by the core scorer.
+          </p>
         </div>
         <dl className="mt-6 grid gap-3 text-sm sm:grid-cols-2">
           <Metadata label="Price type" value={product.priceType} />
@@ -54,4 +66,38 @@ function Metadata({ label, value }: Readonly<{ label: string; value: string }>) 
       <dd className="mt-1 font-bold">{value}</dd>
     </div>
   );
+}
+
+
+type ProductDriver = (typeof products)[number];
+
+function parseSek(value: string): number {
+  const parsed = Number(value.replace(',', '.').match(/\d+(\.\d+)?/)?.[0] ?? '0');
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function confidenceWeight(confidence: string): number {
+  if (confidence === 'high') return 0.92;
+  if (confidence === 'medium') return 0.72;
+  return 0.55;
+}
+
+function buildDealScoreInput(product: ProductDriver) {
+  const currentPrice = parseSek(product.price);
+  const promoLike = /promo|deal|clearance/i.test(product.priceType);
+  const onlineOnly = /online/i.test(product.priceType);
+  const cityPercentile = promoLike ? 18 : onlineOnly ? 46 : 58;
+  const promoHistoryPercentile = promoLike ? 22 : 52;
+  const equivalentPercentile = product.unitPrice.includes('/kg') ? 35 : product.unitPrice.includes('/l') ? 42 : 50;
+  const assumedRegularPrice = promoLike ? currentPrice * 1.2 : currentPrice * 1.06;
+  const discountDepthPercent = assumedRegularPrice > 0 ? ((assumedRegularPrice - currentPrice) / assumedRegularPrice) * 100 : 0;
+
+  return {
+    currentCityPercentile: cityPercentile,
+    knownPromoHistoryPercentile: promoHistoryPercentile,
+    equivalentUnitPricePercentile: equivalentPercentile,
+    discountDepthPercent,
+    sourceConfidence: confidenceWeight(product.confidence),
+    sponsoredPlacement: false
+  };
 }
