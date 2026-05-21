@@ -1,6 +1,6 @@
 # GOAL — GroceryView
 
-Updated: 2026-05-20 15:30 by billy (operator)
+Updated: 2026-05-21 10:30 by billy (operator)
 
 ## Sprint target (≤7 days)
 
@@ -83,6 +83,60 @@ must either (a) bump a driver file, OR (b) be an explicit `wire:` PR titled
   status-summary-as-deliverable
 - **NEW:** infrastructure-only iterations that do not reach a driver file (see
   Visible Artifact above)
+
+## Feature backlog — surface the analytics engine (operator priority, 2026-05-21)
+
+`@groceryview/core` already exports ~41 TESTED analytics functions; the web app
+imports only ~4. The single biggest visible-value lever now is **wiring real
+core analytics into the already-scaffolded routes** (`/compare`, `/meal-planner`,
+`/savings-dashboard`, `/watchlist`, `/pantry-planner`, `categories/[slug]`,
+`products/[slug]`). Each item below is one feature = one PR.
+
+**Hard rules for every backlog item:**
+- Import and call the REAL core function — never reimplement, stub, or hardcode
+  its output.
+- **No fabricated numbers.** If an input is missing (e.g. price history for a
+  percentile), derive it from data we actually have (cross-chain spread, unit
+  prices) and show a coverage/confidence indicator — never invent values. This
+  is the same discipline as `calculateChainPriceIndex` (already shipped).
+- Reach a driver file / visible route (Visible-Artifact gate still applies).
+- Build + typecheck must pass; add/extend a core test if you touch core.
+
+### P1 — highest visible value
+1. **Deal score + verdict on `products/[slug]`** — `calculateDealScore` + `scoreBand`
+   ("Excellent deal / Buy now" … "Not a real deal / Wait"). Where full history is
+   missing, feed percentiles derived from the cross-chain price spread and mark
+   confidence. This is the "real-deal detector".
+2. **Cheapest-chain-per-product** — use the cross-chain matched products (the
+   #531 Willys↔Hemköp matches) to show, on `products/[slug]` and `/compare`,
+   each chain's price for the item and highlight the cheapest. The user's
+   "price across chains / who's cheapest" ask.
+3. **Category deal leaders** — `summarizeCategoryDealLeaders` on `categories/[slug]`
+   and a "Today's best deals" strip on `/`.
+4. **Personal grocery inflation** — `calculatePersonalGroceryInflation` on
+   `/savings-dashboard` (a personal CPI for the visitor's basket).
+5. **Smart swaps** — `recommendSmartSwaps` on `products/[slug]` (cheaper
+   equivalent substitutes).
+
+### P2
+6. **Nutrition per krona** — `rankNutritionPerKrona` (best calories/protein per SEK).
+7. **Expiry deal radar** — `buildExpiryDealRadar` on a `/deals` page.
+8. **Watchlist price alerts** — `buildWatchlistAlerts` + `planNotifications` on `/watchlist`.
+9. **Basket optimizer** — `compareBasketStrategies` + `summarizeStoreBasketCoverage`
+   on `/weekly-basket` (which store is cheapest for *your* basket).
+10. **Deal-based meals** — `suggestDealBasedMeals` on `/meal-planner`.
+11. **Pantry replenishment** — `planPantryReplenishment` on `/pantry-planner`.
+12. **Brand-tier index** — `calculateBrandTierIndices` (budget vs premium) as a
+    section on `/chain-index`.
+
+### P3 — map + index tie-ins
+13. Color `/map` store markers by their chain's `/chain-index` score; add a
+    "cheapest chain near me" highlight.
+14. Price-by-district heat overlay on `/map`.
+15. Matched-basket refinement for `calculateChainPriceIndex` using the cross-chain
+    matched products (raises confidence; keep the 100-centred scale).
+
+Already shipped this sprint (regression bars): `/map` (#575), `/chain-index` (#583).
 
 ## Updated by operator only
 
