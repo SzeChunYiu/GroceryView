@@ -66,4 +66,17 @@ describe('verified-data UI', () => {
     assert.match(shell, /sourceCoverage\.map/);
     assert.match(page, /GroceryView verified grocery snapshot/);
   });
+
+  it('surfaces verified OSM store brand coverage on the homepage', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(verified, /export const storeBrandLedger = /);
+    assert.match(verified, /osmStores\.reduce/);
+    assert.match(verified, /addressCoverage/);
+    assert.match(shell, /storeBrandLedger\.map/);
+    assert.match(shell, /OSM brand ledger/);
+    assert.match(shell, /Store brands with verified location coverage/);
+    assert.match(shell, /\/stores\/\$\{brand\.sampleSlug\}/);
+  });
 });
