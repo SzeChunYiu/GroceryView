@@ -4,6 +4,7 @@ import {
   categoryQualityMatrix,
   formatPct,
   snapshot,
+  sourceClaimLedger,
   sourceCoverage,
   sourceReadinessMatrix,
   sourceRouteMap,
@@ -115,6 +116,42 @@ export default function DataSourcesPage() {
                     {route}
                   </Link>
                 ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="text-2xl font-black tracking-tight">Claim boundary ledger</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Each source group separates the public claim it can support from claims that remain blocked until a stronger production record exists.
+            </p>
+          </div>
+          <Link className="text-sm font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/store-coverage">
+            Inspect store coverage
+          </Link>
+        </div>
+        <div className="mt-5 divide-y divide-slate-200">
+          {sourceClaimLedger.map((source) => (
+            <section className="grid gap-4 py-5 lg:grid-cols-[0.8fr_1fr_1fr]" key={source.name}>
+              <div>
+                <p className="font-black text-slate-950">{source.name}</p>
+                <p className="mt-2 text-sm leading-6 text-slate-600">{source.evidence}</p>
+                <p className="mt-2 text-sm font-semibold text-slate-700">Freshness: {source.freshness}</p>
+                <Link className="mt-3 inline-block text-sm font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href={source.evidenceRoute}>
+                  Evidence route
+                </Link>
+              </div>
+              <div className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">Supported claim</p>
+                <p className="mt-2 text-sm leading-6 text-emerald-950">{source.allowedClaim}</p>
+              </div>
+              <div className="rounded-2xl border border-amber-100 bg-amber-50 p-4">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Blocked claim</p>
+                <p className="mt-2 text-sm leading-6 text-amber-950">{source.blockedClaim}</p>
               </div>
             </section>
           ))}
