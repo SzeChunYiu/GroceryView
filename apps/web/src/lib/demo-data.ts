@@ -2,6 +2,8 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
+import { rankDealOpportunities } from '@groceryview/core';
+
 export const products = [
   {
     slug: 'zoegas-coffee-450g',
@@ -359,6 +361,53 @@ export const categories = [
     topDeal: 'GARANT-HAVREGRYN-1KG'
   }
 ];
+
+export const dealOpportunityRail = rankDealOpportunities({
+  deals: [
+    {
+      productId: 'zoegas-coffee-450g',
+      productName: 'Zoegas Coffee 450g',
+      storeId: 'willys-odenplan',
+      storeName: 'Willys Odenplan',
+      currentPrice: 49.9,
+      regularPrice: 64.9,
+      dealScore: 91,
+      sourceConfidence: 0.92
+    },
+    {
+      productId: 'eldorado-basmati-rice-1kg',
+      productName: 'Eldorado Basmati Rice 1kg',
+      storeId: 'matmissionen-hagersten',
+      storeName: 'Matmissionen Hägersten',
+      currentPrice: 18.9,
+      regularPrice: 27.9,
+      dealScore: 88,
+      sourceConfidence: 0.74
+    },
+    {
+      productId: 'garant-havregryn-1kg',
+      productName: 'Garant Havregryn 1kg',
+      storeId: 'tempo-hornstull',
+      storeName: 'Tempo Hornstull',
+      currentPrice: 21.9,
+      regularPrice: 25.8,
+      dealScore: 81,
+      sourceConfidence: 0.86
+    },
+    {
+      productId: 'felix-ketchup-1kg',
+      productName: 'Felix Tomatketchup 1kg',
+      storeId: 'hemkop-stockholm',
+      storeName: 'Hemköp Stockholm',
+      currentPrice: 32,
+      regularPrice: 39.9,
+      dealScore: 76,
+      sourceConfidence: 0.68
+    }
+  ],
+  minimumDealScore: 70,
+  minimumSourceConfidence: 0.6
+});
 
 export const stockholmAreas = [
   { slug: 'norrmalm',   name: 'Norrmalm',   storeCount: 2, topSavings: 'Snacks' },
