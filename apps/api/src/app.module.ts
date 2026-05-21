@@ -7,6 +7,7 @@ import { CategoriesModule } from './categories/categories.module.js';
 import { validateEnvironment } from './config/env.schema.js';
 import { DatabaseModule } from './database/database.module.js';
 import { HealthModule } from './health/health.module.js';
+import { LoyaltyModule } from './loyalty/loyalty.module.js';
 import { MarketModule } from './market/market.module.js';
 import { MealPlansModule } from './meal-plans/meal-plans.module.js';
 import { PantryModule } from './pantry/pantry.module.js';
@@ -21,6 +22,7 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     ConfigModule.forRoot({ isGlobal: true, validate: validateEnvironment }),
     DatabaseModule,
     HealthModule,
+    LoyaltyModule,
     MarketModule,
     MealPlansModule,
     PantryModule,
