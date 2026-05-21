@@ -90,4 +90,17 @@ describe('verified-data UI', () => {
     assert.match(shell, /Store brands with verified location coverage/);
     assert.match(shell, /\/stores\/\$\{brand\.sampleSlug\}/);
   });
+
+  it('surfaces verified category quality on the homepage', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(verified, /export const categoryQualityMatrix = /);
+    assert.match(verified, /qualityScore/);
+    assert.match(verified, /chainMatches/);
+    assert.match(shell, /categoryQualityMatrix\.map/);
+    assert.match(shell, /Category quality matrix/);
+    assert.match(shell, /Categories ranked by verified row depth/);
+    assert.match(shell, /\/categories\/\$\{category\.slug\}/);
+  });
 });

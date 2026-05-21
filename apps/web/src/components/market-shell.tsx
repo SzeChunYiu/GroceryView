@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
 import {
+  categoryQualityMatrix,
   categorySummaries,
   featuredStores,
   formatPct,
@@ -115,6 +116,37 @@ export function MarketShell() {
                 {category.openPriceRows.toLocaleString('sv-SE')} OpenPrices rows
               </p>
               <p className="text-sm text-slate-600">{category.chainRows.toLocaleString('sv-SE')} chain rows</p>
+            </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Category quality matrix</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Categories ranked by verified row depth</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-slate-600">
+            OpenPrices observations and Willys/Hemkop chain matches are scored together before a category appears as decision-ready.
+          </p>
+        </div>
+        <div className="mt-5 divide-y divide-slate-200">
+          {categoryQualityMatrix.map((category) => (
+            <Link
+              className="grid gap-3 py-4 transition hover:bg-emerald-50/70 md:grid-cols-[1fr_auto_auto_auto]"
+              href={`/categories/${category.slug}`}
+              key={category.slug}
+            >
+              <div>
+                <p className="font-black text-slate-950">{category.label}</p>
+                <p className="text-sm text-slate-600">
+                  {category.observedProducts.toLocaleString('sv-SE')} observed products · latest {category.latestOpenPrice || 'not reported'}
+                </p>
+              </div>
+              <p className="font-black text-emerald-800">{category.verifiedRows.toLocaleString('sv-SE')} rows</p>
+              <p className="font-semibold text-slate-700">{category.chainMatches.toLocaleString('sv-SE')} chain matches</p>
+              <p className="text-sm font-semibold text-slate-600">{formatPct(category.spreadSignal)} max spread</p>
             </Link>
           ))}
         </div>
