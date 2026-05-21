@@ -92,6 +92,34 @@ export function MarketShell() {
         </Card>
       </div>
 
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Category freshness strip</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Latest observed category dates from verified rows</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-slate-600">
+            Each category shows its newest OpenPrices observation date beside verified category and chain row counts.
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {categorySummaries.slice(0, 8).map((category) => (
+            <Link
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
+              href={`/categories/${category.slug}`}
+              key={category.slug}
+            >
+              <p className="text-sm font-black text-slate-950">{category.label}</p>
+              <p className="mt-2 text-2xl font-black text-emerald-800">{category.latestObservation || 'Not reported'}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">
+                {category.openPriceRows.toLocaleString('sv-SE')} OpenPrices rows
+              </p>
+              <p className="text-sm text-slate-600">{category.chainRows.toLocaleString('sv-SE')} chain rows</p>
+            </Link>
+          ))}
+        </div>
+      </Card>
+
       <div className="mt-6 grid gap-6 lg:grid-cols-[0.9fr_1fr]">
         <Card>
           <Eyebrow>Store directory</Eyebrow>
