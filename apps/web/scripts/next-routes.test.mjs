@@ -260,6 +260,20 @@ describe('Next.js web scaffold', () => {
     assert.match(reportsPage, /priceReportCenter\.checklistTitle/);
   });
 
+  it('surfaces expiry deal radar on a dedicated deals route', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+    const dealsPage = await readFile(new URL('../src/app/deals/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(demoData, /export const expiryDealReports = /);
+    assert.match(marketShell, /\/deals/);
+    assert.match(dealsPage, /buildExpiryDealRadar/);
+    assert.match(dealsPage, /expiryDealReports/);
+    assert.match(dealsPage, /Expiry deal radar/);
+    assert.match(dealsPage, /radar\.stores\.map/);
+    assert.match(dealsPage, /radar\.alerts\.map/);
+  });
+
   it('surfaces source coverage rows on the homepage', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');

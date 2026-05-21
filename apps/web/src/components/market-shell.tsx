@@ -62,6 +62,7 @@ export function MarketShell() {
           <Link href="/categories/coffee">Categories</Link>
           <Link href="/chain-index">Index</Link>
           <Link href="/compare">Compare</Link>
+          <Link href="/deals">Deals</Link>
           <Link href="/watchlist">Watchlist</Link>
         </div>
       </nav>
