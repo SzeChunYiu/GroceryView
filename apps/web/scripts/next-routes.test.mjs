@@ -275,6 +275,10 @@ describe('Next.js web scaffold', () => {
     assert.match(demoData, /Matmissionen Hägersten/);
     assert.match(marketShell, /\/pantry-planner/);
     assert.match(marketShell, /pantryPlanner\.projectedSavings/);
+    assert.match(pantryPlannerPage, /planPantryReplenishment/);
+    assert.match(pantryPlannerPage, /buildPantryPlanInput/);
+    assert.match(pantryPlannerPage, /pantryPlan\.replenishment\.map/);
+    assert.match(pantryPlannerPage, /Replenishment plan/);
     assert.match(pantryPlannerPage, /pantryPlanner\.staples\.map/);
     assert.match(pantryPlannerPage, /Decision rules/);
   });
