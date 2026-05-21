@@ -2053,7 +2053,9 @@ export const nutritionValueBoard = {
       unitCost: '21.90 SEK/kg',
       nutritionSignal: 'High fiber breakfast base',
       score: 92,
-      basketRole: 'breakfast staple'
+      basketRole: 'breakfast staple',
+      nutritionPerPackage: { proteinGrams: 130, calories: 3700, fiberGrams: 100, sugarGrams: 10, saltGrams: 0.1 },
+      nutritionSource: 'Package nutrition label fixture'
     },
     {
       product: 'Anamma Formbar Färs 850g',
@@ -2062,7 +2064,9 @@ export const nutritionValueBoard = {
       unitCost: '82.24 SEK/kg',
       nutritionSignal: 'Plant protein meal prep',
       score: 88,
-      basketRole: 'dinner protein'
+      basketRole: 'dinner protein',
+      nutritionPerPackage: { proteinGrams: 136, calories: 1700, fiberGrams: 51, sugarGrams: 8.5, saltGrams: 4.3 },
+      nutritionSource: 'Package nutrition label fixture'
     },
     {
       product: 'Zeta Kikärtor 380g',
@@ -2071,7 +2075,9 @@ export const nutritionValueBoard = {
       unitCost: '36.58 SEK/kg',
       nutritionSignal: 'Fiber and protein pantry add-on',
       score: 84,
-      basketRole: 'pantry protein'
+      basketRole: 'pantry protein',
+      nutritionPerPackage: { proteinGrams: 29, calories: 570, fiberGrams: 23, sugarGrams: 3, saltGrams: 1.4 },
+      nutritionSource: 'Package nutrition label fixture'
     },
     {
       product: 'Pågen Lingongrova 500g',
@@ -2080,7 +2086,9 @@ export const nutritionValueBoard = {
       unitCost: '67.80 SEK/kg',
       nutritionSignal: 'Wholegrain lunchbox bread',
       score: 86,
-      basketRole: 'weekday lunch base'
+      basketRole: 'weekday lunch base',
+      nutritionPerPackage: { proteinGrams: 45, calories: 1175, fiberGrams: 30, sugarGrams: 25, saltGrams: 4.5 },
+      nutritionSource: 'Package nutrition label fixture'
     }
   ],
   rules: [

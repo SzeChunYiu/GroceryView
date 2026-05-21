@@ -1,10 +1,13 @@
 import Link from 'next/link';
 import { Leaf, Scale, ShieldCheck, Wheat } from 'lucide-react';
+import { rankNutritionPerKrona, type NutritionProduct } from '@groceryview/core';
 import { nutritionValueBoard } from '@/lib/demo-data';
 
 export const dynamic = 'force-static';
 
 export default function NutritionValuePage() {
+  const nutritionRanks = rankNutritionPerKrona(buildNutritionProducts(), 'protein');
+
   return (
     <main className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-8">
       <nav className="flex flex-wrap items-center justify-between gap-3 border-b border-market-ink/10 pb-4">
@@ -53,6 +56,32 @@ export default function NutritionValuePage() {
       </section>
 
       <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="border-b border-market-ink/10 px-4 py-3">
+          <h2 className="text-lg font-black">Protein per 10 SEK</h2>
+          <p className="mt-1 text-sm text-market-ink/60">
+            Calculated with rankNutritionPerKrona from package nutrition label fixtures and the visible unit-cost rows.
+          </p>
+        </div>
+        {nutritionRanks.map((rank) => (
+          <Link
+            key={rank.productId}
+            href={`/products/${rank.productId}`}
+            className="grid gap-3 border-b border-market-ink/10 px-4 py-4 text-sm last:border-b-0 hover:bg-market-oat/45 md:grid-cols-[1fr_auto_auto_auto]"
+          >
+            <span>
+              <span className="block font-black">{rank.name}</span>
+              <span className="mt-1 block text-market-ink/60">
+                {rank.nutritionPerPackage.proteinGrams}g protein/package · {rank.sugarPerPackage}g sugar · {rank.saltWarning ? 'salt flag' : 'salt ok'}
+              </span>
+            </span>
+            <span className="font-black tabular-nums text-market-mint">{rank.valuePer10Sek.toFixed(2)}</span>
+            <span className="tabular-nums text-market-ink/65">{rank.nutritionPerPackage.calories.toLocaleString()} kcal</span>
+            <span className="text-right tabular-nums text-market-ink/65">{rank.nutritionPerPackage.fiberGrams}g fiber</span>
+          </Link>
+        ))}
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
         <div className="grid grid-cols-[1fr_auto_auto] gap-3 border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
           <span>Product</span>
           <span>Score</span>
@@ -77,6 +106,20 @@ export default function NutritionValuePage() {
       </section>
     </main>
   );
+}
+
+function buildNutritionProducts(): NutritionProduct[] {
+  return nutritionValueBoard.cards.map((card) => ({
+    productId: card.slug,
+    name: card.product,
+    price: parseSek(card.unitCost),
+    nutritionPerPackage: card.nutritionPerPackage
+  }));
+}
+
+function parseSek(value: string): number {
+  const parsed = Number(value.replace(',', '.').match(/\d+(\.\d+)?/)?.[0] ?? '0');
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
 }
 
 function Metric({ icon, label, value }: Readonly<{ icon: React.ReactNode; label: string; value: string }>) {
