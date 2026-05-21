@@ -6,6 +6,7 @@ import { BasketsModule } from './baskets/baskets.module.js';
 import { validateEnvironment } from './config/env.schema.js';
 import { DatabaseModule } from './database/database.module.js';
 import { HealthModule } from './health/health.module.js';
+import { MarketModule } from './market/market.module.js';
 import { PricesModule } from './prices/prices.module.js';
 import { ProductsModule } from './products/products.module.js';
 import { StoresModule } from './stores/stores.module.js';
@@ -17,6 +18,7 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     ConfigModule.forRoot({ isGlobal: true, validate: validateEnvironment }),
     DatabaseModule,
     HealthModule,
+    MarketModule,
     ProductsModule,
     StoresModule,
     PricesModule,
