@@ -47,6 +47,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/products/{id}/spread']);
     assert.ok(docs.body.paths['/products/{id}/deal-score']);
     assert.ok(docs.body.paths['/products/{id}/equivalents']);
+    assert.ok(docs.body.paths['/users/demo/receipts/review']);
     assert.ok(docs.body.paths['/stores']);
     assert.ok(docs.body.paths['/stores/{id}/coverage']);
     assert.ok(docs.body.paths['/stores/{id}/deals']);
@@ -268,6 +269,25 @@ describe('GroceryView API app', () => {
     assert.deepEqual(disclosure.body.excludedSurfaces, ['deal_score', 'checkout_decision', 'basket_optimizer']);
     assert.match(disclosure.body.guardrails[0], /Sponsored placements cannot change Deal Score/i);
     assert.equal(disclosure.body.demo, true);
+
+    const receiptReview = await request(app.getHttpServer()).get('/users/demo/receipts/review').expect(200);
+    assert.equal(receiptReview.body.userId, 'demo');
+    assert.equal(receiptReview.body.lineCount, 3);
+    assert.equal(receiptReview.body.matchedCount, 2);
+    assert.equal(receiptReview.body.needsReviewCount, 2);
+    assert.equal(receiptReview.body.review.budget.afterReceiptSpend, 762);
+    assert.equal(receiptReview.body.review.budget.remaining, 38);
+    assert.equal(receiptReview.body.review.comparedWithLocalMedianDelta, 3);
+    assert.deepEqual(receiptReview.body.review.goodBuys.map((item: { productId: string }) => item.productId), ['coffee']);
+    assert.deepEqual(
+      receiptReview.body.review.overspend.map((item: { productId: string; deltaVsMedian: number }) => [
+        item.productId,
+        item.deltaVsMedian
+      ]),
+      [['cheese', 18]]
+    );
+    assert.match(receiptReview.body.guardrails[0], /Low confidence.*cannot update catalog or Deal Score/i);
+    assert.equal(receiptReview.body.demo, true);
 
     const comparison = await request(app.getHttpServer()).get('/users/demo/basket/comparison').expect(200);
     assert.deepEqual(comparison.body.strategies.map((strategy: { id: string }) => strategy.id), [
