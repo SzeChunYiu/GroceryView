@@ -701,6 +701,36 @@ export const dealOpportunityRail = rankDealOpportunities({
   minimumSourceConfidence: 0.6
 });
 
+export const priceReportDigest = [
+  {
+    title: 'Coffee promo spread',
+    scope: 'Vasastan',
+    anchor: 'Zoegas Coffee 450g',
+    summary: 'Willys member promo remains the strongest coffee signal against the current index.',
+    metric: '-15.00 SEK',
+    confidence: '92%',
+    href: '/products/zoegas-coffee-450g'
+  },
+  {
+    title: 'Dinner protein watch',
+    scope: 'Södermalm + Liljeholmen',
+    anchor: 'Chicken vs salmon',
+    summary: 'Two dinner protein rows are visible, but the salmon receipt line still needs review.',
+    metric: '-10.00 SEK',
+    confidence: '72%',
+    href: '/meal-planner'
+  },
+  {
+    title: 'Pantry split signal',
+    scope: 'Hägersten',
+    anchor: 'Rice and pasta',
+    summary: 'Matmissionen rice keeps the pantry split attractive when combined with county pasta rows.',
+    metric: '-14.20 SEK',
+    confidence: '69%',
+    href: '/categories/pantry'
+  }
+];
+
 export const basketSubstitutionRadar = [
   {
     anchorSlug: 'bregott-normalsaltat-600g',
