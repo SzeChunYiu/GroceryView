@@ -73,6 +73,9 @@ describe('verified-data UI', () => {
     assert.match(nav, /Verified grocery intelligence/);
     assert.match(shell, /zero placeholder rows/);
     assert.match(shell, /Data provenance|SourceCoverage/);
+    assert.match(shell, /Verified product universe/);
+    assert.match(shell, /productUniverseRail\.map/);
+    assert.match(shell, /\/products\/\$\{product\.slug\}/);
     assert.match(shell, /Freshness board/);
     assert.match(shell, /sourceCoverage\.map/);
     assert.match(shell, /Category freshness strip/);
@@ -81,6 +84,7 @@ describe('verified-data UI', () => {
     assert.match(shell, /featureReadinessQueue\.map/);
     assert.match(shell, /privateFeatureCopy/);
     assert.match(page, /GroceryView verified grocery snapshot/);
+    assert.match(page, /product browsing/);
     assert.match(page, /category freshness/);
     assert.match(page, /gated feature readiness/);
   });

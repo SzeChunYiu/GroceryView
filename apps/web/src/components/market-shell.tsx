@@ -10,12 +10,14 @@ import {
   freshestOpenPrices,
   openPriceObservationDepth,
   privateFeatureCopy,
+  productUniverse,
   snapshot,
   sourceCoverage,
   storeBrandLedger
 } from '@/lib/verified-data';
 
 const featureReadinessQueue = Object.entries(privateFeatureCopy).slice(0, 6);
+const productUniverseRail = productUniverse.slice(0, 6);
 
 export function MarketShell() {
   return (
@@ -53,6 +55,42 @@ export function MarketShell() {
       </section>
 
       <div className="mt-6"><MetricGrid /></div>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Verified product universe</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Products that can already support public browsing</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-slate-600">
+            Chain spread rows and OpenPrices observations are shown together, with every card linking to a verified product page.
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {productUniverseRail.map((product) => {
+            const brand = 'brands' in product ? product.brands : product.brand;
+            const priceSignal =
+              'priceMedian' in product
+                ? `Median ${formatSek(product.priceMedian)} · ${product.observationCount.toLocaleString('sv-SE')} observations`
+                : `${product.lowestChain} lowest · ${formatPct(product.spreadPct)} spread`;
+            const sourceSignal =
+              'lastObservedAt' in product ? `OpenPrices ${product.lastObservedAt}` : 'Willys/Hemkop chain match';
+
+            return (
+              <Link
+                className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
+                href={`/products/${product.slug}`}
+                key={product.slug}
+              >
+                <p className="font-black text-slate-950">{product.name}</p>
+                <p className="mt-1 text-sm text-slate-600">{brand || 'Brand not reported'}</p>
+                <p className="mt-3 font-black text-emerald-800">{priceSignal}</p>
+                <p className="mt-2 text-sm font-semibold text-slate-600">{sourceSignal}</p>
+              </Link>
+            );
+          })}
+        </div>
+      </Card>
 
       <Card className="mt-6">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
