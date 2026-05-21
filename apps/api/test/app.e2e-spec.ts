@@ -55,6 +55,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/products/{id}/spread']);
     assert.ok(docs.body.paths['/products/{id}/store-savings']);
     assert.ok(docs.body.paths['/products/{id}/history-summary']);
+    assert.ok(docs.body.paths['/products/{id}/history-confidence']);
     assert.ok(docs.body.paths['/products/{id}/deal-score']);
     assert.ok(docs.body.paths['/products/{id}/equivalents']);
     assert.ok(docs.body.paths['/products/{id}/history']);
@@ -239,6 +240,29 @@ describe('GroceryView API app', () => {
     });
     assert.match(historySummary.body.guardrails[0], /recorded product history/i);
     assert.equal(historySummary.body.demo, true);
+
+    const historyConfidence = await request(app.getHttpServer()).get('/products/coffee/history-confidence').expect(200);
+    assert.equal(historyConfidence.body.productId, 'coffee');
+    assert.equal(historyConfidence.body.ticker, 'ZOEGAS-COFFEE-450G');
+    assert.deepEqual(historyConfidence.body.disclosure, {
+      rangeDays: 90,
+      firstObservedAt: '2026-04-01T00:00:00.000Z',
+      lastObservedAt: '2026-05-19T00:00:00.000Z',
+      observationCount: 3,
+      sourceTypesIncluded: ['shelf'],
+      sourceTypesMissing: [],
+      availabilityGapCount: 0,
+      hasConfirmedOutOfStock: false,
+      hasEstimatedPoints: false,
+      hasMemberOnlyExcluded: false,
+      confidenceState: 'limited_history',
+      headlineCopy: 'Limited history',
+      detailCopy: 'We have observed this item for 49 days, so older lows may be missing.',
+      canClaimLowestInWindow: false,
+      legalCopyMode: 'observed_low_only'
+    });
+    assert.match(historyConfidence.body.guardrails[0], /lowest-price claim/i);
+    assert.equal(historyConfidence.body.demo, true);
 
     const dealScore = await request(app.getHttpServer()).get('/products/coffee/deal-score?distanceKm=12.5').expect(200);
     assert.equal(dealScore.body.productId, 'coffee');
@@ -578,6 +602,7 @@ describe('GroceryView API app', () => {
     await request(app.getHttpServer()).get('/products/missing-product/spread').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/store-savings').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/history-summary').expect(404);
+    await request(app.getHttpServer()).get('/products/missing-product/history-confidence').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/deal-score').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/equivalents').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/history').expect(404);

@@ -43,6 +43,14 @@ export class ProductsController {
     return { ...summary, demo: true };
   }
 
+  @Get(':id/history-confidence')
+  @ApiOkResponse({ description: 'Product price history confidence disclosure and claim guardrails' })
+  historyConfidence(@Param('id') id: string) {
+    const report = groceryApi.getProductHistoryConfidence(id);
+    if (!report) throw new NotFoundException('Product not found');
+    return { ...report, demo: true };
+  }
+
   @Get(':id/deal-score')
   @ApiOkResponse({ description: 'Deal Score v1 report with customer-facing reasons' })
   dealScore(@Param('id') id: string, @Query('distanceKm') distanceKm?: string) {
