@@ -7,6 +7,7 @@ import {
   dealOpportunityRail,
   householdSavings,
   mealBasketIdeas,
+  mealPlanner,
   products,
   receiptReviewQueue,
   savingsPlaybook,
@@ -521,6 +522,17 @@ export function MarketShell() {
               <p className="mt-4 leading-6 text-market-ink/65">{trip.decision}</p>
             </Link>
           ))}
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-market-ink/10 px-4 py-3 text-sm">
+          <span className="font-bold text-market-ink/65">
+            {mealPlanner.weekLabel}: {mealPlanner.plannedMeals} planned meals, {mealPlanner.projectedSavings} projected.
+          </span>
+          <Link
+            href="/meal-planner"
+            className="rounded-md bg-market-ink px-3 py-2 font-black text-white hover:bg-market-mint hover:text-market-ink"
+          >
+            Open planner
+          </Link>
         </div>
       </section>
 

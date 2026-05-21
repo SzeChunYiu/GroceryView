@@ -1189,3 +1189,53 @@ export const mealBasketIdeas = [
     products: ['zoegas-coffee-450g', 'marabou-mjolkchoklad-200g', 'skogaholm-rostbrod-500g']
   }
 ];
+
+export const mealPlanner = {
+  weekLabel: 'May 21-27 dinner plan',
+  targetSpend: '525.00 SEK',
+  plannedMeals: 5,
+  projectedSavings: '-41.80 SEK',
+  constraints: [
+    { label: 'Protein rotation', value: 'Fish, chicken, and pantry vegetarian nights' },
+    { label: 'Store limit', value: 'Two planned stops plus one pantry split only if nearby' },
+    { label: 'Confidence rule', value: 'Skip low-confidence dinner rows until receipt review clears them' }
+  ],
+  days: [
+    {
+      day: 'Monday',
+      meal: 'Salmon tray bake',
+      basket: 'Laxfile, potatoes, tomatoes',
+      store: 'ICA Kvantum Liljeholmen',
+      total: '154.70 SEK',
+      savings: '-10.00 SEK',
+      href: '/products/ica-laxfile-500g'
+    },
+    {
+      day: 'Tuesday',
+      meal: 'Pantry pasta night',
+      basket: 'Spaghetti, ketchup, soup',
+      store: 'City Gross Stockholm + Hemkop',
+      total: '90.70 SEK',
+      savings: '-8.20 SEK',
+      href: '/categories/pantry'
+    },
+    {
+      day: 'Thursday',
+      meal: 'Chicken rice bowls',
+      basket: 'Kycklingfile, rice, peas',
+      store: 'Hemkop Skanstull + Matmissionen',
+      total: '152.80 SEK',
+      savings: '-15.90 SEK',
+      href: '/products/kronfagel-kycklingfile-1kg'
+    },
+    {
+      day: 'Friday',
+      meal: 'Breakfast-for-dinner',
+      basket: 'Eggs, oats, fil',
+      store: 'ICA Sergels Torg + Tempo Hornstull',
+      total: '126.80 SEK',
+      savings: '-7.70 SEK',
+      href: '/weekly-basket'
+    }
+  ]
+};
