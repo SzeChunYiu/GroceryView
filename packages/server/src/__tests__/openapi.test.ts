@@ -51,6 +51,7 @@ describe('buildOpenApiDocument', () => {
       '/api/products/{id}/price-spread',
       '/api/products/{id}/prices',
       '/api/products/{id}/terminal',
+      '/api/readiness/catalog-coverage',
       '/api/readiness/postgres',
       '/api/readiness/source-runs',
       '/api/receipts/review',

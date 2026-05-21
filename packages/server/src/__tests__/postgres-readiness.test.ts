@@ -235,3 +235,79 @@ describe('source run readiness endpoint', () => {
     assert.equal(JSON.stringify(body).includes('super-secret'), false);
   });
 });
+
+describe('catalog coverage readiness endpoint', () => {
+  const completeCoverage = {
+    status: 'complete' as const,
+    productCount: 2,
+    coverage: {
+      products: { covered: 2, target: 2, percent: 100, missing: [] },
+      categories: { covered: 2, target: 2, percent: 100, missing: [] },
+      chains: { covered: 2, target: 2, percent: 100, missing: [] },
+      stores: { covered: 2, target: 2, percent: 100, missing: [] }
+    },
+    missingProductStorePairs: [],
+    requiredActions: []
+  };
+
+  it('requires a metrics token before exposing catalog coverage evidence', async () => {
+    const handle = createHttpHandler(undefined, {
+      notificationMetricsToken: 'metrics-token',
+      catalogCoverageProvider: async () => completeCoverage
+    });
+
+    const unauthorized = await handle(new Request('http://localhost/api/readiness/catalog-coverage'));
+    assert.equal(unauthorized.status, 401);
+
+    const authorized = await handle(new Request('http://localhost/api/readiness/catalog-coverage', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }));
+    assert.equal(authorized.status, 200);
+    assert.deepEqual(await authorized.json(), completeCoverage);
+  });
+
+  it('fails closed when catalog coverage is incomplete or not configured', async () => {
+    const incompleteCoverage = {
+      ...completeCoverage,
+      status: 'incomplete' as const,
+      missingProductStorePairs: [{ productId: 'milk', storeId: 'coop-odenplan' }],
+      requiredActions: ['backfill_product_store_pairs:1']
+    };
+    const blocked = createHttpHandler(undefined, {
+      notificationMetricsToken: 'metrics-token',
+      catalogCoverageProvider: async () => incompleteCoverage
+    });
+    const blockedResponse = await blocked(new Request('http://localhost/api/readiness/catalog-coverage', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }));
+    assert.equal(blockedResponse.status, 503);
+    assert.deepEqual(await blockedResponse.json(), incompleteCoverage);
+
+    const missingToken = createHttpHandler(undefined, {
+      catalogCoverageProvider: async () => completeCoverage
+    });
+    assert.equal((await missingToken(new Request('http://localhost/api/readiness/catalog-coverage'))).status, 503);
+
+    const missingProvider = createHttpHandler(undefined, { notificationMetricsToken: 'metrics-token' });
+    assert.equal((await missingProvider(new Request('http://localhost/api/readiness/catalog-coverage', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }))).status, 503);
+  });
+
+  it('fails closed without leaking catalog coverage errors when the provider throws', async () => {
+    const handle = createHttpHandler(undefined, {
+      notificationMetricsToken: 'metrics-token',
+      async catalogCoverageProvider() {
+        throw new Error('database password=super-secret could not read latest_prices');
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/readiness/catalog-coverage', {
+      headers: { 'x-groceryview-metrics-token': 'metrics-token' }
+    }));
+    assert.equal(response.status, 503);
+    const body = await response.json() as { requiredActions: string[] };
+    assert.deepEqual(body.requiredActions, ['catalog_coverage_probe_failed']);
+    assert.equal(JSON.stringify(body).includes('super-secret'), false);
+  });
+});

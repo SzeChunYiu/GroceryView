@@ -5,6 +5,7 @@ import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { createGroceryViewApi, type CategoryBudgetPatch, type HouseholdPlanRequest } from '@groceryview/api';
 import { createSessionToken, parseBearerToken, verifySessionToken, type SessionPayload } from '@groceryview/auth';
+import type { CatalogCoverageReport } from '@groceryview/catalog';
 import {
   checkPostgresIntegrationReadiness,
   checkSourceRunHealth,
@@ -98,6 +99,7 @@ export type AuthOptions = {
   notificationWorkerRunner?: () => Promise<RepositoryNotificationWorkerCycleResult>;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
+  catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
   scanProviders?: ScanProviders;
   scanUploadStorage?: ScanUploadStorage;
 };
@@ -150,6 +152,7 @@ export type RuntimeHandlerOptions = {
   notificationWorkerRunner?: () => Promise<RepositoryNotificationWorkerCycleResult>;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
+  catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
   pgPoolFactory?: RuntimePgPoolFactory;
 };
 
@@ -549,7 +552,7 @@ function sourceRunHealthFailureResponse(): SourceRunHealthCheckResult {
         finishedInFuture: 0,
         noFreshRuns: 0,
         missingFreshChains: 0,
-          insufficientAcceptedRows: 0
+        insufficientAcceptedRows: 0
       },
       evidence: {
         total: 0,
@@ -560,6 +563,20 @@ function sourceRunHealthFailureResponse(): SourceRunHealthCheckResult {
     },
     runCount: 0,
     filter: { limit: 0 }
+  };
+}
+
+function catalogCoverageFailureResponse(): CatalogCoverageReport {
+  return {
+    status: 'incomplete',
+    productCount: 0,
+    coverage: {
+      categories: { covered: 0, target: 0, percent: 100, missing: [] },
+      chains: { covered: 0, target: 0, percent: 100, missing: [] },
+      stores: { covered: 0, target: 0, percent: 100, missing: [] }
+    },
+    missingProductStorePairs: [],
+    requiredActions: ['catalog_coverage_probe_failed']
   };
 }
 
@@ -903,6 +920,21 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           return jsonResponse(result, { status: result.report.status === 'healthy' ? 200 : 503 });
         } catch {
           return jsonResponse(sourceRunHealthFailureResponse(), { status: 503 });
+        }
+      }
+
+      if (method === 'GET' && path === '/api/readiness/catalog-coverage') {
+        if (!authOptions.notificationMetricsToken) return errorResponse(503, 'Catalog coverage readiness token is not configured.');
+        if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
+          return errorResponse(401, 'A valid catalog coverage readiness token is required.');
+        }
+        if (!authOptions.catalogCoverageProvider) return errorResponse(503, 'Catalog coverage provider is not configured.');
+
+        try {
+          const report = await authOptions.catalogCoverageProvider();
+          return jsonResponse(report, { status: report.status === 'complete' ? 200 : 503 });
+        } catch {
+          return jsonResponse(catalogCoverageFailureResponse(), { status: 503 });
         }
       }
 
@@ -1576,6 +1608,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/metrics/notifications': { get: metricsOperation('Export notification operations metrics.') },
       '/api/readiness/postgres': { get: metricsOperation('Check PostgreSQL schema and migration readiness without exposing database secrets.') },
       '/api/readiness/source-runs': { get: metricsOperation('Check source run freshness and terminal status without exposing source secrets.') },
+      '/api/readiness/catalog-coverage': { get: metricsOperation('Check product, chain, store, and product-store catalog coverage without exposing database secrets.') },
       '/api/workers/notifications/run': { post: metricsOperation('Run the configured notification worker cycle for cron execution.') },
       '/api/notifications/suppression-events': { post: webhookOperation('Accept signed normalized notification suppression events.') },
       '/api/notifications/provider-suppression-events': { post: webhookOperation('Accept signed SendGrid, SES, or Expo suppression payloads.') }
@@ -1644,7 +1677,8 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     notificationMetricsProvider: options.notificationMetricsProvider,
     notificationWorkerRunner: options.notificationWorkerRunner,
     postgresReadinessProvider: options.postgresReadinessProvider,
-    sourceRunHealthProvider: options.sourceRunHealthProvider
+    sourceRunHealthProvider: options.sourceRunHealthProvider,
+    catalogCoverageProvider: options.catalogCoverageProvider
   };
 }
 
@@ -1694,6 +1728,7 @@ function createRuntimeRepositoryResource(config: RuntimeConfig, options: Runtime
   repository?: RuntimePersistenceRepository;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
+  catalogCoverageProvider?: () => Promise<CatalogCoverageReport>;
   close(): Promise<void>;
 } {
   if (options.repository || !config.databaseUrl) return { close: noopClose };
@@ -1726,7 +1761,8 @@ function createRuntimeHttpServiceFromConfig(config: RuntimeConfig, options: Runt
     ...options,
     ...(resource.repository ? { repository: resource.repository } : {}),
     postgresReadinessProvider: options.postgresReadinessProvider ?? resource.postgresReadinessProvider,
-    sourceRunHealthProvider: options.sourceRunHealthProvider ?? resource.sourceRunHealthProvider
+    sourceRunHealthProvider: options.sourceRunHealthProvider ?? resource.sourceRunHealthProvider,
+    catalogCoverageProvider: options.catalogCoverageProvider ?? resource.catalogCoverageProvider
   };
   const authOptions = buildRuntimeRequestAuthOptions(config, runtimeOptions);
   return {
