@@ -139,6 +139,22 @@ describe('Next.js web scaffold', () => {
     assert.match(mealPlannerPage, /Planning constraints/);
   });
 
+  it('surfaces receipt review rows on the homepage', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+
+    const receiptSection = demoData.split('export const receiptReviewDesk = ')[1] ?? '';
+    const receiptRows = receiptSection.match(/receiptId: '[^']+'/g) ?? [];
+
+    assert.ok(receiptRows.length >= 3, 'homepage driver data should expose at least 3 receipt review rows');
+    assert.match(demoData, /R-2026-05-21-ICA-LILJEHOLMEN/);
+    assert.match(demoData, /Chicken fillet weight mismatch/);
+    assert.match(demoData, /Receipt privacy/);
+    assert.match(marketShell, /receiptReviewDesk\.map/);
+    assert.match(marketShell, /Receipt review desk/);
+    assert.match(marketShell, /\/products\/\$\{line\.productSlug\}/);
+  });
+
   it('surfaces source coverage rows on the homepage', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');

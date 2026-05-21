@@ -1163,6 +1163,54 @@ export const receiptReviewQueue = [
   }
 ];
 
+export const receiptReviewDesk = [
+  {
+    receiptId: 'R-2026-05-21-ICA-LILJEHOLMEN',
+    storeName: 'ICA Kvantum Liljeholmen',
+    storeSlug: 'ica-kvantum-liljeholmen',
+    capturedAt: '2026-05-21 18:42 CET',
+    total: '286.40 SEK',
+    status: 'Needs review',
+    owner: 'Sam',
+    confidence: 0.72,
+    flaggedLines: [
+      { productSlug: 'kronfagel-kycklingfile-1kg', label: 'Chicken fillet weight mismatch' },
+      { productSlug: 'garant-korsbarstomater-250g', label: 'Produce price needs unit check' }
+    ],
+    nextAction: 'Confirm weighted dinner lines before they update the basket index.'
+  },
+  {
+    receiptId: 'R-2026-05-20-WILLYS-ODENPLAN',
+    storeName: 'Willys Odenplan',
+    storeSlug: 'willys-odenplan',
+    capturedAt: '2026-05-20 09:58 CET',
+    total: '438.50 SEK',
+    status: 'Matched',
+    owner: 'Alex',
+    confidence: 0.94,
+    flaggedLines: [
+      { productSlug: 'zoegas-coffee-450g', label: 'Member promo matched' },
+      { productSlug: 'bregott-normalsaltat-600g', label: 'Above-target butter retained' }
+    ],
+    nextAction: 'Keep as verified evidence for watchlist and weekly basket totals.'
+  },
+  {
+    receiptId: 'R-2026-05-19-TEMPO-HORNSTULL',
+    storeName: 'Tempo Hornstull',
+    storeSlug: 'tempo-hornstull',
+    capturedAt: '2026-05-19 17:20 CET',
+    total: '121.70 SEK',
+    status: 'Ready',
+    owner: 'Mira',
+    confidence: 0.88,
+    flaggedLines: [
+      { productSlug: 'garant-havregryn-1kg', label: 'Breakfast staple confirmed' },
+      { productSlug: 'bravo-apelsinjuice-1l', label: 'Beverage promo row accepted' }
+    ],
+    nextAction: 'Publish high-confidence breakfast and beverage rows to the savings dashboard.'
+  }
+];
+
 export const mealBasketIdeas = [
   {
     title: 'weekday breakfast top-up',

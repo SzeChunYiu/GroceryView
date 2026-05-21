@@ -10,6 +10,7 @@ import {
   mealPlanner,
   products,
   receiptReviewQueue,
+  receiptReviewDesk,
   savingsPlaybook,
   savingsDashboard,
   shoppingTripSwitchboard,
@@ -589,6 +590,64 @@ export function MarketShell() {
             </Link>
           );
         })}
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">Receipt review desk</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Receipt rows expose review state, confidence, owner, and the exact product lines waiting to update prices.
+            </p>
+          </div>
+          <LightMetric label="Receipts" value={String(receiptReviewDesk.length)} />
+          <LightMetric
+            label="Lowest confidence"
+            value={formatConfidence(Math.min(...receiptReviewDesk.map((receipt) => receipt.confidence)))}
+          />
+        </div>
+        <div className="hidden grid-cols-[1fr_0.8fr_0.7fr_0.9fr] gap-3 border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55 md:grid">
+          <span>Receipt</span>
+          <span>Status</span>
+          <span>Confidence</span>
+          <span>Flagged lines</span>
+        </div>
+        {receiptReviewDesk.map((receipt) => (
+          <div
+            key={receipt.receiptId}
+            className="grid gap-3 border-b border-market-ink/10 px-4 py-4 text-sm last:border-b-0 hover:bg-market-oat/45 md:grid-cols-[1fr_0.8fr_0.7fr_0.9fr]"
+          >
+            <div>
+              <Link href={`/stores/${receipt.storeSlug}`} className="block font-black hover:text-market-mint">
+                {receipt.storeName}
+              </Link>
+              <span className="mt-1 block text-xs font-semibold text-market-ink/50">{receipt.capturedAt}</span>
+              <span className="mt-2 block font-bold tabular-nums">{receipt.total}</span>
+            </div>
+            <div>
+              <span className="inline-flex rounded-full bg-market-oat px-2 py-1 text-xs font-black uppercase text-market-ink/65">
+                {receipt.status}
+              </span>
+              <span className="mt-2 block text-xs font-semibold text-market-ink/55">Owner: {receipt.owner}</span>
+              <p className="mt-2 leading-5 text-market-ink/65">{receipt.nextAction}</p>
+            </div>
+            <div>
+              <span className="text-xs font-bold uppercase text-market-ink/45 md:hidden">Confidence</span>
+              <span className="block text-2xl font-black tabular-nums">{formatConfidence(receipt.confidence)}</span>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {receipt.flaggedLines.map((line) => (
+                <Link
+                  key={`${receipt.receiptId}-${line.productSlug}`}
+                  href={`/products/${line.productSlug}`}
+                  className="rounded-full bg-market-mint/15 px-2 py-1 text-xs font-bold text-market-ink/70 hover:text-market-mint"
+                >
+                  {line.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
       </section>
 
       <section className="rounded-lg border border-market-ink/10 bg-white">
