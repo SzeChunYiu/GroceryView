@@ -16,6 +16,7 @@ import {
   composeMobileHouseholdScreen,
   composeMobilePrivacyScreen,
   composeMobileProfileScreen,
+  composeMobileReceiptScanScreen,
   composeMobileSearchScreen,
   composeMobileStoresScreen,
   composeMobileTodayScreen,
@@ -32,7 +33,8 @@ import {
   createMobileStoresViewModel,
   createMobileWatchlistViewModel,
   createMobileViewModel,
-  loadMobileProductTerminal
+  loadMobileProductTerminal,
+  type MobileReceiptReview
 } from '../index.js';
 
 describe('mobile app foundation', () => {
@@ -987,6 +989,64 @@ describe('mobile app foundation', () => {
     assert.equal(result.product, null);
     assert.equal(result.confidenceLabel, 'medium-high after OCR review');
     assert.deepEqual(result.actions, ['extract_receipt_items', 'review_budget_impact', 'confirm_matches']);
+  });
+
+  it('composes a renderable mobile Receipt Scan screen with OCR rows, blockers, budget impact, and actions', () => {
+    const review: MobileReceiptReview = {
+      storeId: 'willys-odenplan',
+      purchasedAt: '2026-05-19T16:00:00.000Z',
+      confidenceLabel: 'medium-high',
+      matchedItems: [
+        { rawName: 'ZOEGA SKANEROST', productId: 'coffee', canonicalName: 'Zoegas Coffee 450g', itemTotal: 49.9, matchConfidence: 0.9, deltaVsMedian: -15 },
+        { rawName: 'CHEESE 500G', productId: 'cheese', canonicalName: 'Cheese 500g', itemTotal: 78, matchConfidence: 0.7, deltaVsMedian: 18 },
+        { rawName: 'SMUDGED ITEM', productId: null, canonicalName: null, itemTotal: 18, matchConfidence: 0, deltaVsMedian: 0 }
+      ],
+      goodBuys: [{ rawName: 'ZOEGA SKANEROST', productId: 'coffee', canonicalName: 'Zoegas Coffee 450g', itemTotal: 49.9, matchConfidence: 0.9, deltaVsMedian: -15 }],
+      overspend: [{ rawName: 'CHEESE 500G', productId: 'cheese', canonicalName: 'Cheese 500g', itemTotal: 78, matchConfidence: 0.7, deltaVsMedian: 18 }],
+      comparedWithLocalMedianDelta: 3,
+      budget: {
+        weeklyBudget: 800,
+        beforeReceiptSpend: 120,
+        afterReceiptSpend: 762,
+        remaining: 38,
+        status: 'under'
+      }
+    };
+
+    const screen = composeMobileReceiptScanScreen({
+      userId: 'shopper-1',
+      receiptId: 'receipt-1',
+      review,
+      now: '2026-05-20T09:00:00.000Z',
+      networkOnline: true,
+      cameraPermissionReady: true
+    });
+
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.title, 'Receipt scan');
+    assert.equal(screen.state, 'needs_human_review');
+    assert.deepEqual(screen.children.map((section) => section.key), ['summary', 'receipt-lines', 'budget-impact', 'blockers', 'actions']);
+
+    const summary = screen.children.find((section) => section.key === 'summary');
+    assert.equal(summary?.type, 'section');
+    assert.deepEqual(summary?.children.map((metric) => 'value' in metric ? metric.value : null), ['medium-high', '3', '2', '38.00 SEK']);
+
+    const lines = screen.children.find((section) => section.key === 'receipt-lines');
+    if (!lines || lines.type !== 'section') throw new Error('receipt lines section missing');
+    assert.deepEqual(lines.children.map((row) => row.key), ['receipt-line:ZOEGA SKANEROST', 'receipt-line:CHEESE 500G', 'receipt-line:SMUDGED ITEM']);
+    assert.equal('value' in lines.children[1]! ? lines.children[1]!.value : null, '78.00 SEK, 70% match, review required');
+
+    const budget = screen.children.find((section) => section.key === 'budget-impact');
+    if (!budget || budget.type !== 'section') throw new Error('budget impact section missing');
+    assert.deepEqual(budget.children.map((row) => 'value' in row ? row.value : null), ['642.00 SEK', '1', '1', '3.00 SEK']);
+
+    const blockers = screen.children.find((section) => section.key === 'blockers');
+    if (!blockers || blockers.type !== 'section') throw new Error('blockers section missing');
+    assert.deepEqual(blockers.children.map((row) => row.key), ['blocker:line_match_review_required']);
+
+    const actions = screen.children.find((section) => section.key === 'actions');
+    assert.equal(actions?.type, 'section');
+    assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Review matches']);
   });
 
   it('defines Expo route and device-build readiness for proposal-critical screens', () => {

@@ -1,4 +1,7 @@
 import { createGroceryViewApi, type ProductDetail, type ProductPriceTerminalReport } from '@groceryview/api';
+import { buildMobileReceiptReviewPlan, selectMobileReceiptReviewRows } from './receipts.js';
+import type { MobileReceiptReview, MobileReceiptReviewInput } from './receipts.js';
+export { buildMobileReceiptReviewPlan, selectMobileReceiptReviewRows };
 export { buildMobileAppSessionPlan } from './appSession.js';
 export type { MobileAppSessionInput, MobileAppSessionPlan, MobileConnectivityState } from './appSession.js';
 export { buildMobileBudgetReviewPlan, selectMobileBudgetMilestones } from './budget.js';
@@ -24,7 +27,6 @@ export { buildMobilePermissionPlan, nextMobilePermissionPrompt, summarizeMobileP
 export type { MobilePermissionKind, MobilePermissionPlan, MobilePermissionPrompt, MobilePermissionSnapshot, MobilePermissionState, MobilePermissionSurface } from './permissions.js';
 export { buildMobileNotificationPreferencePlan, summarizeMobileNotificationTopics } from './notifications.js';
 export type { MobileNotificationPreferenceInput, MobileNotificationPreferencePlan, MobileNotificationQuietHours, MobileNotificationTopic } from './notifications.js';
-export { buildMobileReceiptReviewPlan, selectMobileReceiptReviewRows } from './receipts.js';
 export type { MobileReceiptReview, MobileReceiptReviewInput, MobileReceiptReviewItem, MobileReceiptReviewPlan } from './receipts.js';
 export { buildMobilePersistedCachePlan, buildMobileQueryKey, buildMobileQueryRegistry } from './queryCache.js';
 export type { MobilePersistedCachePlan, MobileQueryDefinition, MobileQueryId, MobileQueryKeyInput, MobileScreenRoute } from './queryCache.js';
@@ -733,14 +735,19 @@ export type MobileScreenComponentAction =
   | 'download_export'
   | 'confirm_account_deletion'
   | 'open_ad_privacy_controls'
-  | 'schedule_receipt_image_cleanup';
+  | 'schedule_receipt_image_cleanup'
+  | 'request_camera_permission'
+  | 'review_line_matches'
+  | 'confirm_receipt_items'
+  | 'queue_for_sync'
+  | 'sync_when_online';
 
 export type MobileScreenComponent =
   | {
       type: 'screen';
       key: string;
       title: string;
-      state: 'ready' | 'empty';
+      state: 'ready' | 'empty' | 'needs_permission' | 'needs_human_review' | 'needs_provider';
       children: MobileScreenComponent[];
     }
   | {
@@ -773,7 +780,7 @@ export type MobileScreenComponent =
       type: 'empty';
       key: string;
       message: string;
-      action: 'search_product' | 'scan_barcode' | 'invite_household_member' | 'set_weekly_budget';
+      action: 'search_product' | 'scan_barcode' | 'invite_household_member' | 'set_weekly_budget' | 'review_line_matches' | 'request_camera_permission';
     };
 
 function actionLabel(action: MobileProductPriceTerminalViewModel['actions'][number]): string {
@@ -789,6 +796,14 @@ function scanActionLabel(action: Extract<MobileScreenComponentAction, 'add_to_we
   if (action === 'compare_stores') return 'Compare stores';
   if (action === 'search_product') return 'Search product';
   return 'Report barcode';
+}
+
+function receiptActionLabel(action: Extract<MobileScreenComponentAction, 'request_camera_permission' | 'review_line_matches' | 'confirm_receipt_items' | 'queue_for_sync' | 'sync_when_online'>): string {
+  if (action === 'request_camera_permission') return 'Allow camera';
+  if (action === 'review_line_matches') return 'Review matches';
+  if (action === 'confirm_receipt_items') return 'Confirm receipt';
+  if (action === 'queue_for_sync') return 'Queue offline';
+  return 'Sync when online';
 }
 
 function todayActionLabel(action: Extract<MobileScreenComponentAction, 'open_product' | 'compare_basket' | 'scan_barcode'>): string {
@@ -1986,6 +2001,87 @@ export function composeMobileBarcodeScanScreen(
           key: action,
           action,
           label: scanActionLabel(action),
+          primary: index === 0
+        }))
+      }
+    ]
+  };
+}
+
+function receiptScreenState(plan: ReturnType<typeof buildMobileReceiptReviewPlan>): Extract<MobileScreenComponent, { type: 'screen' }>['state'] {
+  if (plan.status === 'ready_to_confirm') return 'ready';
+  if (plan.blockers.includes('camera_permission_required')) return 'needs_permission';
+  if (plan.status === 'needs_review') return 'needs_human_review';
+  return 'needs_provider';
+}
+
+export function composeMobileReceiptScanScreen(input: MobileReceiptReviewInput): MobileScreenComponent {
+  const plan = buildMobileReceiptReviewPlan(input);
+  const rows = selectMobileReceiptReviewRows(input.review);
+
+  return {
+    type: 'screen',
+    key: `receipt-scan:${plan.receiptId}`,
+    title: 'Receipt scan',
+    state: receiptScreenState(plan),
+    children: [
+      {
+        type: 'section',
+        key: 'summary',
+        title: 'Summary',
+        children: [
+          { type: 'metric', key: 'confidence', label: 'Confidence', value: plan.confidenceLabel, tone: plan.confidenceLabel === 'high' ? 'positive' : 'warning' },
+          { type: 'metric', key: 'lines', label: 'Lines', value: String(plan.summary.lineCount), tone: plan.summary.lineCount > 0 ? 'positive' : 'neutral' },
+          { type: 'metric', key: 'needs-review', label: 'Needs review', value: String(plan.summary.needsReviewCount), tone: plan.summary.needsReviewCount > 0 ? 'warning' : 'positive' },
+          { type: 'metric', key: 'weekly-remaining', label: 'Budget left', value: formatMobileMoney(plan.summary.weeklyRemainingAfterReceipt), tone: plan.summary.weeklyStatus === 'under' ? 'positive' : 'warning' }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'receipt-lines',
+        title: 'Receipt lines',
+        children: rows.length > 0
+          ? rows.map((row) => ({
+              type: 'row',
+              key: `receipt-line:${row.rawName}`,
+              label: row.label,
+              value: `${formatMobileMoney(row.itemTotal)}, ${(row.matchConfidence * 100).toFixed(0)}% match${row.reviewRequired ? ', review required' : ''}`
+            }))
+          : [{ type: 'empty', key: 'no-receipt-lines', message: 'Scan a receipt to extract grocery lines.', action: 'scan_barcode' }]
+      },
+      {
+        type: 'section',
+        key: 'budget-impact',
+        title: 'Budget impact',
+        children: [
+          { type: 'row', key: 'budget-impact', label: 'Receipt impact', value: formatMobileMoney(plan.summary.budgetImpact) },
+          { type: 'row', key: 'good-buys', label: 'Good buys', value: String(plan.summary.goodBuyCount) },
+          { type: 'row', key: 'overspend', label: 'Overspend lines', value: String(plan.summary.overspendCount) },
+          { type: 'row', key: 'local-median-delta', label: 'Local median delta', value: formatMobileMoney(input.review.comparedWithLocalMedianDelta) }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'blockers',
+        title: 'Blockers',
+        children: plan.blockers.length > 0
+          ? plan.blockers.map((blocker) => ({
+              type: 'row',
+              key: `blocker:${blocker}`,
+              label: blocker,
+              value: blocker === 'line_match_review_required' ? `${plan.summary.needsReviewCount} lines need review` : 'Required before receipt writeback'
+            }))
+          : [{ type: 'row', key: 'ready-to-confirm', label: 'Ready', value: 'Receipt lines can update budget and basket context.' }]
+      },
+      {
+        type: 'section',
+        key: 'actions',
+        title: 'Actions',
+        children: plan.actions.map((action, index) => ({
+          type: 'action',
+          key: action,
+          action,
+          label: receiptActionLabel(action),
           primary: index === 0
         }))
       }
