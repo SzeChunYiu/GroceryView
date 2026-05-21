@@ -436,6 +436,43 @@ describe('runtime config', () => {
     assert.equal(pool.calls.some((call) => /\b(insert|update|delete)\b/i.test(call.text)), false);
   });
 
+  it('exposes source-run freshness from the runtime DATABASE_URL pool and blocks missing daily chain ingestion', async () => {
+    const pool = new RecordingPgPool();
+    const service = createRuntimeHttpService(
+      {
+        NODE_ENV: 'development',
+        PORT: '3000',
+        AUTH_SECRET: 'auth-secret',
+        DATABASE_URL: 'postgres://runtime-user:runtime-password@runtime-db.example/groceryview',
+        PUBLIC_WEB_URL: 'https://groceryview.example',
+        NOTIFICATION_WEBHOOK_SECRET: 'notification-secret',
+        BILLING_WEBHOOK_SECRET: 'billing-secret',
+        METRICS_TOKEN: 'metrics-secret'
+      },
+      { pgPoolFactory: () => pool }
+    );
+
+    try {
+      const response = await service.handler(new Request('http://localhost/api/readiness/source-runs', {
+        headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
+      }));
+
+      assert.equal(response.status, 503);
+      const body = await response.json() as { report: { blockers: string[] }; summary: { blockers: { noFreshRuns: number; missingFreshChains: number } } };
+      assert.equal(body.report.blockers.includes('source_run_no_fresh_success'), true);
+      assert.equal(body.report.blockers.includes('source_run_missing_fresh_chain:willys'), true);
+      assert.equal(body.report.blockers.includes('source_run_missing_fresh_chain:ica'), true);
+      assert.equal(body.summary.blockers.noFreshRuns, 1);
+      assert.equal(body.summary.blockers.missingFreshChains, 6);
+      assert.equal(JSON.stringify(body).includes('runtime-password'), false);
+    } finally {
+      await service.close();
+    }
+
+    assert.equal(pool.closed, true);
+    assert.equal(pool.calls.some((call) => call.text.includes('from source_runs')), true);
+  });
+
   it('detects when the server module is executed directly as the deployment entrypoint', () => {
     const moduleUrl = new URL('../index.js', import.meta.url).href;
     const modulePath = fileURLToPath(moduleUrl);
