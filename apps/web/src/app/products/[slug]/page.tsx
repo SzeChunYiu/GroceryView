@@ -10,6 +10,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const { slug } = await params;
   const product = products.find((item) => item.slug === slug);
   if (!product) notFound();
+  const apiProductId = product.slug === 'zoegas-coffee-450g' ? 'coffee' : null;
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
@@ -30,6 +31,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <Metadata label="Confidence" value={product.confidence} />
           <Metadata label="Source timestamp" value={product.observedAt} />
           <Metadata label="Source type" value={product.source} />
+          {apiProductId ? <Metadata label="API spread" value={`/products/${apiProductId}/spread`} /> : null}
         </dl>
       </section>
     </main>

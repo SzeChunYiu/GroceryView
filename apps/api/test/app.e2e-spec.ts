@@ -34,6 +34,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/health']);
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
+    assert.ok(docs.body.paths['/products/{id}/spread']);
     assert.ok(docs.body.paths['/stores']);
   });
 
@@ -62,6 +63,26 @@ describe('GroceryView API app', () => {
     assert.equal(terminal.body.chart.series[0].id, 'willys-odenplan:shelf');
     assert.equal(terminal.body.historySummary.isNewLow, true);
     assert.equal(terminal.body.evidenceGuardrails.length, 3);
+
+    const spread = await request(app.getHttpServer()).get('/products/coffee/spread').expect(200);
+    assert.equal(spread.body.productId, 'coffee');
+    assert.equal(spread.body.currency, 'SEK');
+    assert.equal(spread.body.sampleSize, 3);
+    assert.equal(spread.body.bestStoreId, 'willys-odenplan');
+    assert.equal(spread.body.highestStoreId, 'coop-odenplan');
+    assert.equal(spread.body.spread, 15);
+    assert.equal(spread.body.spreadPercent, 30.1);
+    assert.deepEqual(spread.body.rows.map((row: { storeId: string; rank: number; priceLabel: string }) => ({
+      storeId: row.storeId,
+      rank: row.rank,
+      priceLabel: row.priceLabel
+    })), [
+      { storeId: 'willys-odenplan', rank: 1, priceLabel: 'best' },
+      { storeId: 'lidl-sveavagen', rank: 2, priceLabel: 'above_best' },
+      { storeId: 'coop-odenplan', rank: 3, priceLabel: 'above_best' }
+    ]);
+    assert.match(spread.body.customerRead, /ranges 15.00 SEK/);
+    assert.equal(spread.body.guardrails.length, 3);
 
     await request(app.getHttpServer())
       .post('/users/demo/watchlist')
@@ -100,5 +121,6 @@ describe('GroceryView API app', () => {
 
   it('returns 404 for missing product terminal data', async () => {
     await request(app.getHttpServer()).get('/products/missing-product/terminal').expect(404);
+    await request(app.getHttpServer()).get('/products/missing-product/spread').expect(404);
   });
 });
