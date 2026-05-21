@@ -32,6 +32,7 @@ describe('GroceryView API app', () => {
     const docs = await request(app.getHttpServer()).get('/api-json').expect(200);
     assert.equal(docs.body.info.title, 'GroceryView API');
     assert.ok(docs.body.paths['/categories/{category}/market']);
+    assert.ok(docs.body.paths['/users/demo/budget/summary']);
     assert.ok(docs.body.paths['/users/demo/ads/disclosure']);
     assert.ok(docs.body.paths['/users/demo/expiry-deals/radar']);
     assert.ok(docs.body.paths['/health']);
@@ -210,6 +211,19 @@ describe('GroceryView API app', () => {
       .expect(201);
     const basket = await request(app.getHttpServer()).get('/users/demo/basket').expect(200);
     assert.equal(basket.body.items[0].quantity, 2);
+
+    const budget = await request(app.getHttpServer()).get('/users/demo/budget/summary').expect(200);
+    assert.equal(budget.body.weeklyBudget, 0);
+    assert.equal(budget.body.monthlyBudget, 0);
+    assert.equal(budget.body.estimatedBasketTotal, 99.8);
+    assert.equal(budget.body.weeklyActualSpend, 0);
+    assert.equal(budget.body.monthlyActualSpend, 0);
+    assert.equal(budget.body.weeklyRemainingAfterEstimate, -99.8);
+    assert.equal(budget.body.weeklyRemainingActual, 0);
+    assert.equal(budget.body.monthlyRemainingActual, 0);
+    assert.equal(budget.body.weeklyStatus, 'under');
+    assert.equal(budget.body.monthlyStatus, 'under');
+    assert.equal(budget.body.demo, true);
 
     const pantry = await request(app.getHttpServer())
       .get('/users/demo/pantry/replenishment?asOf=2026-05-20T08:00:00.000Z')

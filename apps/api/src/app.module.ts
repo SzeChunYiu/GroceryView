@@ -4,6 +4,7 @@ import { AdsModule } from './ads/ads.module.js';
 import { AlertsModule } from './alerts/alerts.module.js';
 import { AppController } from './app.controller.js';
 import { BasketsModule } from './baskets/baskets.module.js';
+import { BudgetsModule } from './budgets/budgets.module.js';
 import { CategoriesModule } from './categories/categories.module.js';
 import { validateEnvironment } from './config/env.schema.js';
 import { DatabaseModule } from './database/database.module.js';
@@ -38,6 +39,7 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     ReceiptsModule,
     WatchlistsModule,
     BasketsModule,
+    BudgetsModule,
     CategoriesModule,
     AlertsModule
   ],
