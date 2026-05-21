@@ -1130,6 +1130,39 @@ export const accountProfile = {
   ]
 };
 
+export const receiptReviewQueue = [
+  {
+    receipt: 'Willys Odenplan basket',
+    store: 'Willys Odenplan',
+    area: 'Vasastan',
+    items: 'Coffee, peas, butter',
+    confidence: '84%',
+    issue: 'Member promo needs line-total confirmation',
+    impact: '-18.30 SEK',
+    href: '/scanner'
+  },
+  {
+    receipt: 'Hemköp Skanstull dinner stop',
+    store: 'Hemköp Skanstull',
+    area: 'Södermalm',
+    items: 'Chicken, soup, ketchup',
+    confidence: '73%',
+    issue: 'Weekly deal rows are still medium confidence',
+    impact: '-7.90 SEK',
+    href: '/scanner'
+  },
+  {
+    receipt: 'Matmissionen pantry split',
+    store: 'Matmissionen Hägersten',
+    area: 'Hägersten',
+    items: 'Rice, pasta, shelf-stable pantry',
+    confidence: '69%',
+    issue: 'Community shelf observation needs reviewer approval',
+    impact: '-14.20 SEK',
+    href: '/scanner'
+  }
+];
+
 export const mealBasketIdeas = [
   {
     title: 'weekday breakfast top-up',
