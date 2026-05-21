@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { gzipSync } from 'node:zlib';
 import {
+  buildHemkopSearchUrl,
   buildOpenFoodFactsProductUrl,
   buildOpenPricesConnectorUrl,
   cacheKeyForScbPxWebQueryFixture,
@@ -12,6 +13,7 @@ import {
   fetchOpenFoodFactsProducts,
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
+  fetchHemkopProducts,
   fetchWillysProducts,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -188,6 +190,76 @@ describe('fetchOverpassGroceryStores', () => {
 
     assert.equal(rows.length, 1);
     assert.equal(rows[0].name, 'Valid');
+  });
+});
+
+describe('fetchHemkopProducts', () => {
+  it('fetches public Hemkop search rows with price provenance', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify({
+        results: [{
+          code: '101205621_ST',
+          name: 'Idealmakaroner Gammaldags',
+          manufacturer: 'Kungsörnen',
+          productLine2: 'KUNGSÖRNEN, 750g',
+          googleAnalyticsCategory: 'skafferi|pasta',
+          priceValue: 14.14,
+          price: '14,14 kr',
+          comparePrice: '18,85 kr',
+          comparePriceUnit: 'kg',
+          image: { url: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03' },
+          labels: ['keyhole'],
+          online: true,
+          outOfStock: false
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchHemkopProducts({
+      queries: ['makaroner'],
+      fetchImpl,
+      retrievedAt: '2026-05-21T00:45:00.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildHemkopSearchUrl('makaroner'));
+    assert.deepEqual(rows, [{
+      code: '101205621_ST',
+      name: 'Idealmakaroner Gammaldags',
+      brand: 'Kungsörnen',
+      packageText: 'KUNGSÖRNEN, 750g',
+      category: 'skafferi|pasta',
+      price: 14.14,
+      priceText: '14,14 kr',
+      unitPriceText: '18,85 kr',
+      unitPriceUnit: 'kg',
+      imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03',
+      labels: ['keyhole'],
+      online: true,
+      outOfStock: false,
+      sourceUrl: buildHemkopSearchUrl('makaroner'),
+      retrievedAt: '2026-05-21T00:45:00.000Z'
+    }]);
+  });
+
+  it('deduplicates products across Hemkop search queries', async () => {
+    const fetchImpl: typeof fetch = async () => new Response(JSON.stringify({
+      results: [{
+        code: 'duplicate',
+        name: 'Same product',
+        priceValue: 10,
+        price: '10,00 kr'
+      }]
+    }), { status: 200 });
+
+    const rows = await fetchHemkopProducts({
+      queries: ['a', 'b'],
+      fetchImpl,
+      retrievedAt: '2026-05-21T00:45:00.000Z'
+    });
+
+    assert.equal(rows.length, 1);
   });
 });
 
