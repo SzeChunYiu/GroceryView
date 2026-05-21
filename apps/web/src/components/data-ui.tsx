@@ -1,0 +1,108 @@
+import Link from 'next/link';
+import type { ReactNode } from 'react';
+import { AppNav } from './app-nav';
+import { formatPct, formatSek, keyMetrics, sourceCoverage, topChainSpreads, unavailablePanels } from '@/lib/verified-data';
+
+export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
+  return (
+    <div className="min-h-screen bg-[#f5f1e8] text-slate-950">
+      <AppNav />
+      <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+    </div>
+  );
+}
+
+export function Eyebrow({ children }: Readonly<{ children: ReactNode }>) {
+  return <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-800">{children}</p>;
+}
+
+export function Card({ children, className = '' }: Readonly<{ children: ReactNode; className?: string }>) {
+  return <section className={`rounded-[1.75rem] border border-slate-200 bg-white/88 p-5 shadow-sm ${className}`}>{children}</section>;
+}
+
+export function MetricGrid() {
+  return (
+    <div className="grid gap-3 md:grid-cols-4">
+      {keyMetrics.map((metric) => (
+        <Card key={metric.label} className="p-4">
+          <p className="text-sm font-semibold text-slate-600">{metric.label}</p>
+          <p className="mt-2 text-3xl font-black tracking-tight text-slate-950">{metric.value}</p>
+          <p className="mt-2 text-sm leading-6 text-slate-600">{metric.detail}</p>
+        </Card>
+      ))}
+    </div>
+  );
+}
+
+export function SourceCoverage() {
+  return (
+    <Card>
+      <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+        <div>
+          <Eyebrow>Data provenance</Eyebrow>
+          <h2 className="mt-2 text-2xl font-black tracking-tight">Only verified snapshot data is rendered</h2>
+        </div>
+        <Link className="text-sm font-bold text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/data-sources">
+          Data source notes live in docs/data-sources.md
+        </Link>
+      </div>
+      <div className="mt-5 grid gap-3 lg:grid-cols-3">
+        {sourceCoverage.map((source) => (
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={source.name}>
+            <p className="text-sm font-black text-slate-950">{source.name}</p>
+            <p className="mt-2 text-3xl font-black text-emerald-800">{source.rows.toLocaleString('sv-SE')}</p>
+            <p className="text-sm font-semibold text-slate-700">{source.coverage}</p>
+            <p className="mt-3 text-sm leading-6 text-slate-600">Source: {source.source}. Freshness: {source.freshness}.</p>
+            <p className="mt-2 rounded-xl bg-amber-50 p-3 text-sm font-semibold text-amber-900">{source.caveat}</p>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+export function TopSpreads({ limit = 6 }: Readonly<{ limit?: number }>) {
+  return (
+    <Card>
+      <div className="flex items-center justify-between gap-4">
+        <div>
+          <Eyebrow>Comparable prices</Eyebrow>
+          <h2 className="mt-2 text-2xl font-black tracking-tight">Largest verified Willys/Hemköp spreads</h2>
+        </div>
+        <Link className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white" href="/compare">Compare all</Link>
+      </div>
+      <div className="mt-5 divide-y divide-slate-200">
+        {topChainSpreads.slice(0, limit).map((product) => (
+          <Link className="grid gap-3 py-4 transition hover:bg-emerald-50/70 md:grid-cols-[1fr_auto_auto]" href={`/products/${product.slug}`} key={product.slug}>
+            <div>
+              <p className="font-black text-slate-950">{product.name}</p>
+              <p className="text-sm text-slate-600">{product.brand || 'Brand not reported'} · {product.subline || 'Size not reported'}</p>
+            </div>
+            <p className="font-black text-emerald-800">{formatSek(product.lowestPrice)}</p>
+            <p className="rounded-full bg-amber-100 px-3 py-1 text-sm font-black text-amber-950">{formatPct(product.spreadPct)} spread</p>
+          </Link>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
+export function NoVerifiedData({ title = 'No verified records for this feature yet' }: Readonly<{ title?: string }>) {
+  return (
+    <Card className="border-amber-200 bg-amber-50">
+      <Eyebrow>Fail-closed UI</Eyebrow>
+      <h2 className="mt-2 text-2xl font-black tracking-tight text-amber-950">{title}</h2>
+      <p className="mt-3 max-w-3xl text-sm leading-6 text-amber-950">
+        This page intentionally avoids sample people, fake receipts, estimated coupons, and placeholder workflow rows. It shows only what the current generated data modules can support.
+      </p>
+      <div className="mt-4 grid gap-3 md:grid-cols-3">
+        {unavailablePanels.map((panel) => (
+          <div className="rounded-2xl bg-white/70 p-4" key={panel.title}>
+            <p className="font-black text-amber-950">{panel.title}</p>
+            <p className="mt-2 text-sm leading-6 text-amber-900">{panel.detail}</p>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+}

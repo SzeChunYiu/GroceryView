@@ -72,3 +72,6 @@ th { color:#88a49c; font-size: 12px; text-transform: uppercase; letter-spacing: 
 .pin-3 { left: 68%; top: 64%; }
 .pin-4 { left: 24%; top: 42%; }
 @media (max-width: 800px) { .hero, .market, .grid, .quote-strip, .distribution-row { grid-template-columns: 1fr; } }
+
+/* Verified-data redesign fallback */
+.app-shell{min-height:100vh;display:grid;place-items:center;padding:32px;background:#f5f1e8;color:#0f172a;font-family:Georgia,Cambria,serif}.app-shell .card{max-width:820px;border:1px solid #d6d3c7;border-radius:28px;background:#fff;padding:32px;box-shadow:0 20px 60px rgba(15,23,42,.08)}.app-shell .eyebrow{font-size:12px;font-weight:900;letter-spacing:.22em;text-transform:uppercase;color:#065f46}.app-shell h1{font-size:clamp(36px,7vw,72px);line-height:.96;margin:16px 0}.app-shell .lede{font-size:18px;line-height:1.7;color:#334155}.app-shell .button{display:inline-block;border-radius:999px;background:#064e3b;color:#fff;padding:12px 18px;font-weight:900;text-decoration:none}
