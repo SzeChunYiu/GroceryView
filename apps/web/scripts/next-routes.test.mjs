@@ -168,6 +168,8 @@ describe('verified-data UI', () => {
     assert.match(shell, /openPriceObservationDepth\.map/);
     assert.match(shell, /OpenPrices depth/);
     assert.match(shell, /Categories with the deepest community price history/);
+    assert.match(shell, /Open depth board/);
+    assert.match(shell, /href="\/openprices-depth"/);
     assert.match(shell, /Top product:/);
     assert.match(shell, /\/categories\/\$\{category\.slug\}/);
   });
