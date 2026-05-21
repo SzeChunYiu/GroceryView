@@ -116,12 +116,16 @@ describe('verified-data UI', () => {
     assert.match(shell, /homepageFreshOpenPrices\.map/);
     assert.match(shell, /freshestOpenPrices\.slice\(3, 9\)/);
     assert.match(shell, /product\.observationCount\.toLocaleString/);
+    assert.match(shell, /Map chain index signals/);
+    assert.match(shell, /homepageMapChainIndex\.map/);
+    assert.match(shell, /mapChainIndexScores\.slice/);
+    assert.match(shell, /chain\.overallIndex\.toFixed/);
     assert.match(page, /GroceryView verified grocery snapshot/);
     assert.match(page, /product browsing/);
     assert.match(page, /fresh OpenPrices observations/);
     assert.match(page, /source route mapping/);
     assert.match(page, /catalogue savings/);
-    assert.match(page, /private evidence next steps/);
+    assert.match(page, /map chain index signals/);
     assert.match(page, /gated feature readiness/);
   });
 
