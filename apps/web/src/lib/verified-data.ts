@@ -118,6 +118,49 @@ export const categoryQualityMatrix = categorySummaries
   .sort((a, b) => b.qualityScore - a.qualityScore || a.label.localeCompare(b.label, 'sv'))
   .slice(0, 8);
 
+export const chainCategoryCoverage = Object.values(
+  matchedChainProducts.reduce<Record<string, {
+    slug: string;
+    chainRows: number;
+    matchedProducts: number;
+    spreadTotal: number;
+    topSpread: number;
+    willysLowest: number;
+    hemkopLowest: number;
+  }>>((ledger, product) => {
+    const row = ledger[product.category] ?? {
+      slug: product.category,
+      chainRows: 0,
+      matchedProducts: 0,
+      spreadTotal: 0,
+      topSpread: 0,
+      willysLowest: 0,
+      hemkopLowest: 0
+    };
+
+    row.chainRows += 1;
+    row.matchedProducts += 1;
+    row.spreadTotal += product.spreadPct;
+    row.topSpread = Math.max(row.topSpread, product.spreadPct);
+    if (product.lowestChain === 'willys') row.willysLowest += 1;
+    if (product.lowestChain === 'hemkop') row.hemkopLowest += 1;
+    ledger[product.category] = row;
+    return ledger;
+  }, {})
+)
+  .map((row) => ({
+    slug: row.slug,
+    label: labelFromSlug(row.slug),
+    chainRows: row.chainRows,
+    matchedProducts: row.matchedProducts,
+    averageSpread: row.matchedProducts ? row.spreadTotal / row.matchedProducts : 0,
+    topSpread: row.topSpread,
+    leadingLowestChain: row.willysLowest >= row.hemkopLowest ? 'Willys' : 'Hemkop',
+    coverageScore: row.matchedProducts * 2 + row.topSpread
+  }))
+  .sort((a, b) => b.coverageScore - a.coverageScore || a.label.localeCompare(b.label, 'sv'))
+  .slice(0, 6);
+
 export const sourceCoverage = [
   {
     name: 'Axfood chain price snapshot',

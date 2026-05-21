@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
 import {
+  chainCategoryCoverage,
   categoryQualityMatrix,
   categorySummaries,
   featuredStores,
@@ -116,6 +117,36 @@ export function MarketShell() {
                 {category.openPriceRows.toLocaleString('sv-SE')} OpenPrices rows
               </p>
               <p className="text-sm text-slate-600">{category.chainRows.toLocaleString('sv-SE')} chain rows</p>
+            </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Chain price coverage</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Categories with repeat Willys/Hemkop matches</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-slate-600">
+            Matched Axfood rows are grouped by category so spread signals stay tied to products visible in both chains.
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {chainCategoryCoverage.map((category) => (
+            <Link
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
+              href={`/categories/${category.slug}`}
+              key={category.slug}
+            >
+              <p className="font-black text-slate-950">{category.label}</p>
+              <p className="mt-2 text-2xl font-black text-emerald-800">{formatPct(category.averageSpread)} avg spread</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">
+                {category.matchedProducts.toLocaleString('sv-SE')} matched chain products
+              </p>
+              <p className="text-sm text-slate-600">
+                {formatPct(category.topSpread)} top spread · {category.leadingLowestChain} most often lower
+              </p>
             </Link>
           ))}
         </div>
