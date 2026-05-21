@@ -368,6 +368,13 @@ export type StoreCatalogListFilter = {
   limit?: number;
 };
 
+export type CatalogProductCoverageRecord = {
+  id: string;
+  categoryId: string;
+  observedChainIds: string[];
+  observedStoreIds: string[];
+};
+
 export type ProductAliasSourceType = 'retailer' | 'receipt' | 'community' | 'import' | 'manual';
 
 export type ProductAliasRecord = {
@@ -404,6 +411,7 @@ export type PostgresCatalogReader = {
   listProducts(filter?: ProductCatalogListFilter): Promise<ProductCatalogRecord[]>;
   getStoreBySlug(slug: string): Promise<StoreCatalogRecord | null>;
   listStores(filter?: StoreCatalogListFilter): Promise<StoreCatalogRecord[]>;
+  listProductCoverageRows(filter?: { limit?: number }): Promise<CatalogProductCoverageRecord[]>;
 };
 
 export type PostgresProductAliasRepository = {
@@ -1463,6 +1471,12 @@ type StoreCatalogRow = {
   created_at: string | Date;
   updated_at: string | Date;
 };
+type CatalogProductCoverageRow = {
+  product_id: string;
+  category_id: string | null;
+  observed_chain_ids: string[] | null;
+  observed_store_ids: string[] | null;
+};
 type ProductAliasRow = {
   id: string;
   product_id: string;
@@ -1604,6 +1618,15 @@ function mapStoreCatalog(row: StoreCatalogRow): StoreCatalogRecord {
     ...(row.online_order_url ? { onlineOrderUrl: row.online_order_url } : {}),
     createdAt: asIso(row.created_at),
     updatedAt: asIso(row.updated_at)
+  };
+}
+
+function mapCatalogProductCoverage(row: CatalogProductCoverageRow): CatalogProductCoverageRecord {
+  return {
+    id: row.product_id,
+    categoryId: row.category_id ?? 'uncategorized',
+    observedChainIds: [...(row.observed_chain_ids ?? [])].sort(),
+    observedStoreIds: [...(row.observed_store_ids ?? [])].sort()
   };
 }
 
@@ -2775,6 +2798,23 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
         [filter.search ?? null, filter.chainSlug ?? null, filter.city ?? null, limit]
       );
       return rows.map(mapStoreCatalog);
+    },
+
+    async listProductCoverageRows(filter = {}) {
+      const limit = Math.min(Math.max(filter.limit ?? 5000, 1), 50_000);
+      const rows = await executor.query<CatalogProductCoverageRow>(
+        `select products.id as product_id,
+                coalesce(products.category_path[1], 'uncategorized') as category_id,
+                coalesce(array_agg(distinct latest_prices.chain_id) filter (where latest_prices.chain_id is not null), '{}') as observed_chain_ids,
+                coalesce(array_agg(distinct latest_prices.store_id) filter (where latest_prices.store_id is not null), '{}') as observed_store_ids
+         from products
+         left join latest_prices on latest_prices.product_id = products.id
+         group by products.id, products.category_path
+         order by products.id
+         limit $1`,
+        [limit]
+      );
+      return rows.map(mapCatalogProductCoverage);
     }
   };
 }

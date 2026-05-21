@@ -311,6 +311,20 @@ class RecordingQueryExecutor implements QueryExecutor {
       provenance: { sourceType: 'retailer_page', campaign: 'weekly' }
     }
   ];
+  catalogCoverageRows: unknown[] = [
+    {
+      product_id: 'coffee',
+      category_id: 'pantry',
+      observed_chain_ids: ['coop', 'willys'],
+      observed_store_ids: ['coop-odenplan', 'willys-odenplan']
+    },
+    {
+      product_id: 'milk',
+      category_id: 'dairy',
+      observed_chain_ids: ['willys'],
+      observed_store_ids: ['willys-odenplan']
+    }
+  ];
 
   async query<T>(sql: string, params: unknown[] = []) {
     this.calls.push({ sql, params });
@@ -320,6 +334,7 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('insert into raw_records')) return this.rawRecordId === undefined ? ([] as T[]) : ([{ id: this.rawRecordId }] as T[]);
     if (sql.includes('from raw_records')) return this.rawRecordRows as T[];
     if (sql.includes('insert into observations')) return this.observationId === undefined ? ([] as T[]) : ([{ id: this.observationId }] as T[]);
+    if (sql.includes('left join latest_prices')) return this.catalogCoverageRows as T[];
     if (sql.includes('from latest_prices')) return this.latestPriceRows as T[];
     if (sql.includes('from observations')) return this.observationHistoryRows as T[];
     if (sql.includes('from stores')) return this.storeRows as T[];
@@ -1079,6 +1094,30 @@ describe('createPostgresCatalogReader', () => {
 
     assert.deepEqual(executor.calls[0]!.params, [null, null, null, 500]);
     assert.deepEqual(executor.calls[1]!.params, [null, null, null, 1]);
+  });
+
+  it('lists product coverage rows from latest prices for catalog completeness checks', async () => {
+    const executor = new RecordingQueryExecutor();
+    const reader = createPostgresCatalogReader(executor);
+
+    assert.deepEqual(await reader.listProductCoverageRows({ limit: 25 }), [
+      {
+        id: 'coffee',
+        categoryId: 'pantry',
+        observedChainIds: ['coop', 'willys'],
+        observedStoreIds: ['coop-odenplan', 'willys-odenplan']
+      },
+      {
+        id: 'milk',
+        categoryId: 'dairy',
+        observedChainIds: ['willys'],
+        observedStoreIds: ['willys-odenplan']
+      }
+    ]);
+    assert.match(executor.calls[0]!.sql, /left join latest_prices on latest_prices\.product_id = products\.id/);
+    assert.match(executor.calls[0]!.sql, /array_agg\(distinct latest_prices\.chain_id\)/);
+    assert.match(executor.calls[0]!.sql, /array_agg\(distinct latest_prices\.store_id\)/);
+    assert.deepEqual(executor.calls[0]!.params, [25]);
   });
 });
 
