@@ -125,4 +125,19 @@ describe('verified-data UI', () => {
     assert.match(shell, /matched chain products/);
     assert.match(shell, /\/categories\/\$\{category\.slug\}/);
   });
+
+  it('surfaces verified OpenPrices observation depth on the homepage', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(verified, /export const openPriceObservationDepth = /);
+    assert.match(verified, /pricedProducts\.reduce/);
+    assert.match(verified, /observationTotal/);
+    assert.match(verified, /topProductObservations/);
+    assert.match(shell, /openPriceObservationDepth\.map/);
+    assert.match(shell, /OpenPrices depth/);
+    assert.match(shell, /Categories with the deepest community price history/);
+    assert.match(shell, /Top product:/);
+    assert.match(shell, /\/categories\/\$\{category\.slug\}/);
+  });
 });

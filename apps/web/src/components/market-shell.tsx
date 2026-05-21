@@ -8,6 +8,7 @@ import {
   formatPct,
   formatSek,
   freshestOpenPrices,
+  openPriceObservationDepth,
   privateFeatureCopy,
   snapshot,
   sourceCoverage,
@@ -120,6 +121,38 @@ export function MarketShell() {
                 {category.openPriceRows.toLocaleString('sv-SE')} OpenPrices rows
               </p>
               <p className="text-sm text-slate-600">{category.chainRows.toLocaleString('sv-SE')} chain rows</p>
+            </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>OpenPrices depth</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Categories with the deepest community price history</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-slate-600">
+            Observation counts are rolled up from verified OpenPrices rows so volatile categories show whether their median prices rest on repeat sightings.
+          </p>
+        </div>
+        <div className="mt-5 divide-y divide-slate-200">
+          {openPriceObservationDepth.map((category) => (
+            <Link
+              className="grid gap-3 py-4 transition hover:bg-emerald-50/70 md:grid-cols-[1fr_auto_auto]"
+              href={`/categories/${category.slug}`}
+              key={category.slug}
+            >
+              <div>
+                <p className="font-black text-slate-950">{category.label}</p>
+                <p className="text-sm text-slate-600">
+                  Top product: {category.topProductName} · {category.topProductObservations.toLocaleString('sv-SE')} observations
+                </p>
+              </div>
+              <p className="font-black text-emerald-800">{category.observationTotal.toLocaleString('sv-SE')} observations</p>
+              <p className="text-sm font-semibold text-slate-600">
+                {category.products.toLocaleString('sv-SE')} products · latest {category.latestObservation || 'not reported'}
+              </p>
             </Link>
           ))}
         </div>

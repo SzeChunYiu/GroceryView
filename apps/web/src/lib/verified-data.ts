@@ -161,6 +161,52 @@ export const chainCategoryCoverage = Object.values(
   .sort((a, b) => b.coverageScore - a.coverageScore || a.label.localeCompare(b.label, 'sv'))
   .slice(0, 6);
 
+export const openPriceObservationDepth = Object.values(
+  pricedProducts.reduce<Record<string, {
+    slug: string;
+    products: number;
+    observationTotal: number;
+    latestObservation: string;
+    topProductName: string;
+    topProductSlug: string;
+    topProductObservations: number;
+  }>>((ledger, product) => {
+    const row = ledger[product.category] ?? {
+      slug: product.category,
+      products: 0,
+      observationTotal: 0,
+      latestObservation: '',
+      topProductName: '',
+      topProductSlug: '',
+      topProductObservations: 0
+    };
+
+    row.products += 1;
+    row.observationTotal += product.observationCount;
+    if (product.lastObservedAt > row.latestObservation) row.latestObservation = product.lastObservedAt;
+    if (product.observationCount > row.topProductObservations) {
+      row.topProductName = product.name;
+      row.topProductSlug = product.slug;
+      row.topProductObservations = product.observationCount;
+    }
+    ledger[product.category] = row;
+    return ledger;
+  }, {})
+)
+  .map((row) => ({
+    slug: row.slug,
+    label: labelFromSlug(row.slug),
+    products: row.products,
+    observationTotal: row.observationTotal,
+    latestObservation: row.latestObservation,
+    topProductName: row.topProductName,
+    topProductSlug: row.topProductSlug,
+    topProductObservations: row.topProductObservations,
+    averageObservations: row.products ? row.observationTotal / row.products : 0
+  }))
+  .sort((a, b) => b.observationTotal - a.observationTotal || a.label.localeCompare(b.label, 'sv'))
+  .slice(0, 6);
+
 export const sourceCoverage = [
   {
     name: 'Axfood chain price snapshot',
