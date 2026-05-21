@@ -1,7 +1,16 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { AppNav } from './app-nav';
-import { formatPct, formatSek, keyMetrics, sourceCoverage, topChainSpreads, unavailablePanels } from '@/lib/verified-data';
+import {
+  formatPct,
+  formatSek,
+  keyMetrics,
+  privateFeatureCopy,
+  sourceCoverage,
+  topChainSpreads,
+  unavailablePanels
+} from '@/lib/verified-data';
+import type { PrivateFeatureRoute } from '@/lib/verified-data';
 
 export function PageShell({ children }: Readonly<{ children: ReactNode }>) {
   return (
@@ -87,7 +96,11 @@ export function TopSpreads({ limit = 6 }: Readonly<{ limit?: number }>) {
   );
 }
 
-export function NoVerifiedData({ title = 'No verified records for this feature yet' }: Readonly<{ title?: string }>) {
+export function NoVerifiedData({
+  route,
+  title = 'No verified records for this feature yet'
+}: Readonly<{ route?: PrivateFeatureRoute; title?: string }>) {
+  const routeCopy = route ? privateFeatureCopy[route] : null;
   return (
     <Card className="border-amber-200 bg-amber-50">
       <Eyebrow>Fail-closed UI</Eyebrow>
@@ -95,6 +108,22 @@ export function NoVerifiedData({ title = 'No verified records for this feature y
       <p className="mt-3 max-w-3xl text-sm leading-6 text-amber-950">
         This page intentionally avoids sample people, fake receipts, estimated coupons, and placeholder workflow rows. It shows only what the current generated data modules can support.
       </p>
+      {routeCopy ? (
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          <div className="rounded-2xl bg-white/70 p-4">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Verified surface</p>
+            <p className="mt-2 text-sm leading-6 text-amber-950">{routeCopy.verifiedSurface}</p>
+          </div>
+          <div className="rounded-2xl bg-white/70 p-4">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Gate before launch</p>
+            <p className="mt-2 text-sm leading-6 text-amber-950">{routeCopy.gatedBy}</p>
+          </div>
+          <div className="rounded-2xl bg-white/70 p-4">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-amber-700">Next verified step</p>
+            <p className="mt-2 text-sm leading-6 text-amber-950">{routeCopy.nextStep}</p>
+          </div>
+        </div>
+      ) : null}
       <div className="mt-4 grid gap-3 md:grid-cols-3">
         {unavailablePanels.map((panel) => (
           <div className="rounded-2xl bg-white/70 p-4" key={panel.title}>

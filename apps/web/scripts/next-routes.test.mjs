@@ -43,9 +43,14 @@ describe('verified-data UI', () => {
 
   it('makes unavailable private features fail closed instead of showing fabricated rows', async () => {
     const featureRoutes = ['weekly-basket','watchlist','scanner','household','account','basket-ideas','coupon-stacks','deals','meal-planner','nutrition-value','pantry-planner','price-reports','savings-dashboard','shopping-trips','privacy'];
+    const verified = await read('src/lib/verified-data.ts');
+    assert.match(verified, /privateFeatureCopy/);
+    assert.match(verified, /verifiedSurface/);
+    assert.match(verified, /Gate before launch|gatedBy/);
     for (const route of featureRoutes) {
       const source = await read(`src/app/${route}/page.tsx`);
       assert.match(source, /NoVerifiedData/);
+      assert.match(source, /route=\{route\}/);
       assert.match(source, /static snapshot/);
     }
     const login = await read('src/app/login/page.tsx');
