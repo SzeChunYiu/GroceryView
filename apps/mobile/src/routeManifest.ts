@@ -1,6 +1,28 @@
-export type MobileMvpRouteId = 'today' | 'search' | 'product' | 'basket' | 'budget' | 'camera-placeholder' | 'notifications-placeholder';
+export type MobileMvpRouteId =
+  | 'today'
+  | 'stores'
+  | 'search'
+  | 'product'
+  | 'basket'
+  | 'budget'
+  | 'profile'
+  | 'household'
+  | 'privacy'
+  | 'camera-placeholder'
+  | 'notifications-placeholder';
 
-export type MobileMvpRoutePath = '/today' | '/search' | '/products/[id]' | '/basket' | '/budget' | '/scan/camera-placeholder' | '/profile/notifications-placeholder';
+export type MobileMvpRoutePath =
+  | '/today'
+  | '/stores'
+  | '/search'
+  | '/products/[id]'
+  | '/basket'
+  | '/budget'
+  | '/profile'
+  | '/household'
+  | '/privacy'
+  | '/scan/camera-placeholder'
+  | '/profile/notifications-placeholder';
 
 export type MobileRouteParam = {
   name: string;
@@ -13,10 +35,10 @@ export type MobileMvpRoute = {
   path: MobileMvpRoutePath;
   screen: string;
   title: string;
-  tab: 'today' | 'basket' | 'scan' | 'profile';
+  tab: 'today' | 'stores' | 'basket' | 'scan' | 'profile';
   params: MobileRouteParam[];
   requiresAuth: boolean;
-  preloadQueryIds: Array<'today' | 'search' | 'product' | 'basket' | 'budget'>;
+  preloadQueryIds: Array<'today' | 'stores' | 'search' | 'product' | 'basket' | 'budget'>;
   placeholderFor?: 'camera' | 'notifications';
 };
 
@@ -38,6 +60,16 @@ const routes: MobileMvpRoute[] = [
     params: [],
     requiresAuth: true,
     preloadQueryIds: ['today', 'basket', 'budget']
+  },
+  {
+    id: 'stores',
+    path: '/stores',
+    screen: 'StoresScreen',
+    title: 'Stores',
+    tab: 'stores',
+    params: [],
+    requiresAuth: true,
+    preloadQueryIds: ['stores', 'basket']
   },
   {
     id: 'search',
@@ -78,6 +110,36 @@ const routes: MobileMvpRoute[] = [
     params: [],
     requiresAuth: true,
     preloadQueryIds: ['budget', 'basket']
+  },
+  {
+    id: 'profile',
+    path: '/profile',
+    screen: 'ProfileScreen',
+    title: 'Profile',
+    tab: 'profile',
+    params: [],
+    requiresAuth: true,
+    preloadQueryIds: ['budget', 'basket']
+  },
+  {
+    id: 'household',
+    path: '/household',
+    screen: 'HouseholdScreen',
+    title: 'Household',
+    tab: 'profile',
+    params: [],
+    requiresAuth: true,
+    preloadQueryIds: ['basket', 'budget']
+  },
+  {
+    id: 'privacy',
+    path: '/privacy',
+    screen: 'PrivacyScreen',
+    title: 'Privacy',
+    tab: 'profile',
+    params: [],
+    requiresAuth: true,
+    preloadQueryIds: []
   },
   {
     id: 'camera-placeholder',

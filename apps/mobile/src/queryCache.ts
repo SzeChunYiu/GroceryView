@@ -1,6 +1,6 @@
-export type MobileQueryId = 'today' | 'search' | 'product' | 'productTerminal' | 'basket' | 'budget';
+export type MobileQueryId = 'today' | 'stores' | 'search' | 'product' | 'productTerminal' | 'basket' | 'budget';
 
-export type MobileScreenRoute = '/today' | '/search' | '/products/[id]' | '/products/[id]/terminal' | '/basket' | '/budget';
+export type MobileScreenRoute = '/today' | '/stores' | '/search' | '/products/[id]' | '/products/[id]/terminal' | '/basket' | '/budget';
 
 export type MobileQueryDefinition = {
   id: MobileQueryId;
@@ -26,6 +26,7 @@ export type MobilePersistedCachePlan = {
 
 export type MobileQueryKeyInput =
   | { id: 'today'; userId: string }
+  | { id: 'stores'; userId: string }
   | { id: 'search'; userId: string; query: string }
   | { id: 'product'; userId: string; productId: string }
   | { id: 'productTerminal'; userId: string; productId: string }
@@ -45,6 +46,16 @@ const definitions: MobileQueryDefinition[] = [
     persist: true,
     networkMode: 'offlineFirst',
     invalidatesOn: ['favorite_store_changed', 'basket_changed', 'budget_changed', 'watchlist_changed', 'receipt_synced']
+  },
+  {
+    id: 'stores',
+    route: '/stores',
+    queryKey: ['mobile', 'stores'],
+    staleTimeMs: 5 * minute,
+    gcTimeMs: 12 * hour,
+    persist: true,
+    networkMode: 'offlineFirst',
+    invalidatesOn: ['favorite_store_changed', 'basket_changed', 'receipt_synced']
   },
   {
     id: 'search',
@@ -133,7 +144,7 @@ export function buildMobilePersistedCachePlan(userId: string): MobilePersistedCa
     storageKey: 'groceryview.mobile.query-cache.v1',
     schemaVersion: 1,
     userPartitionKey: `user:${userSegment}`,
-    hydrateOrder: ['today', 'basket', 'budget', 'search', 'product', 'productTerminal'],
+    hydrateOrder: ['today', 'stores', 'basket', 'budget', 'search', 'product', 'productTerminal'],
     persistedQueryIds: definitions.filter((definition) => definition.persist).map((definition) => definition.id),
     maxPersistedAgeMs: 24 * hour,
     purgeOnSignOut: true,

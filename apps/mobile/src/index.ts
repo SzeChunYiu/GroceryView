@@ -255,6 +255,37 @@ export type MobileDiscoveryViewModel = {
   };
 };
 
+export type MobileStoresViewModel = {
+  userId: string;
+  favoriteStoreCount: number;
+  basketItemCount: number;
+  stores: Array<{
+    id: string;
+    name: string;
+    chain: string;
+    district: string;
+    address: string;
+    confidence: 'high' | 'medium' | 'low';
+    isFavorite: boolean;
+    dealCount: number;
+    topDeal: {
+      productId: string;
+      ticker: string;
+      productName: string;
+      price: number;
+      dealScore: number;
+      verdict: string;
+    } | null;
+    basketQuote: {
+      subtotal: number;
+      coveragePercent: number;
+      savingsVsBaseline: number;
+      freshnessLabel: 'fresh' | 'mixed' | 'stale';
+    } | null;
+  }>;
+  actions: Array<'open_store' | 'compare_basket' | 'scan_barcode'>;
+};
+
 export function createMobileDiscoveryViewModel(
   input: { userId: string; query: string; selectedProductId?: string },
   api: MobileApi = createGroceryViewApi()
@@ -319,6 +350,51 @@ export function createMobileDiscoveryViewModel(
       alertCount: watchlist.alerts.length,
       alertTypes: [...new Set(watchlist.alerts.map((alert) => alert.type))].sort()
     }
+  };
+}
+
+export function createMobileStoresViewModel(userId: string, api: MobileApi = createGroceryViewApi()): MobileStoresViewModel {
+  const favoriteStoreIds = new Set(api.getFavoriteStores(userId).map((store) => store.id));
+  const offerBasket = api.getLocalOfferBasketReport(userId);
+
+  return {
+    userId,
+    favoriteStoreCount: favoriteStoreIds.size,
+    basketItemCount: offerBasket.basketItemCount,
+    stores: api.getStores().map((store) => {
+      const deals = api.getStoreDeals(store.id);
+      const topDeal = deals[0] ?? null;
+      const basketQuote = offerBasket.stores.find((candidate) => candidate.storeId === store.id) ?? null;
+      return {
+        id: store.id,
+        name: store.name,
+        chain: store.chain,
+        district: store.district,
+        address: store.address,
+        confidence: store.confidence,
+        isFavorite: favoriteStoreIds.has(store.id),
+        dealCount: deals.length,
+        topDeal: topDeal
+          ? {
+              productId: topDeal.productId,
+              ticker: topDeal.ticker,
+              productName: topDeal.productName,
+              price: topDeal.price,
+              dealScore: topDeal.dealScore,
+              verdict: topDeal.band.verdict
+            }
+          : null,
+        basketQuote: basketQuote
+          ? {
+              subtotal: basketQuote.subtotal,
+              coveragePercent: basketQuote.coveragePercent,
+              savingsVsBaseline: basketQuote.savingsVsBaseline ?? 0,
+              freshnessLabel: basketQuote.freshnessLabel
+            }
+          : null
+      };
+    }),
+    actions: ['open_store', 'compare_basket', 'scan_barcode']
   };
 }
 
@@ -430,9 +506,14 @@ export function createMobileProductPriceTerminalViewModel(
 
 export type MobileScreenComponentAction =
   | MobileProductPriceTerminalViewModel['actions'][number]
+  | MobileStoresViewModel['actions'][number]
   | 'open_product'
   | 'compare_basket'
-  | 'scan_barcode';
+  | 'scan_barcode'
+  | 'configure_notifications'
+  | 'update_privacy'
+  | 'invite_household_member'
+  | 'download_export';
 
 export type MobileScreenComponent =
   | {
@@ -472,7 +553,7 @@ export type MobileScreenComponent =
       type: 'empty';
       key: string;
       message: string;
-      action: 'search_product' | 'scan_barcode';
+      action: 'search_product' | 'scan_barcode' | 'invite_household_member';
     };
 
 function actionLabel(action: MobileProductPriceTerminalViewModel['actions'][number]): string {
@@ -486,6 +567,116 @@ function todayActionLabel(action: Extract<MobileScreenComponentAction, 'open_pro
   if (action === 'open_product') return 'Open deal';
   if (action === 'compare_basket') return 'Compare basket';
   return 'Scan barcode';
+}
+
+function storesActionLabel(action: MobileStoresViewModel['actions'][number]): string {
+  if (action === 'open_store') return 'Open store';
+  if (action === 'compare_basket') return 'Compare basket';
+  return 'Scan barcode';
+}
+
+function profileActionLabel(action: Extract<MobileScreenComponentAction, 'configure_notifications' | 'update_privacy' | 'invite_household_member'>): string {
+  if (action === 'configure_notifications') return 'Configure alerts';
+  if (action === 'update_privacy') return 'Update privacy';
+  return 'Invite member';
+}
+
+const mobilePrivacyControls = [
+  {
+    label: 'Raw receipt media',
+    detail: 'Stored separately from normalized price observations and deleted after review.',
+    state: 'Limited'
+  },
+  {
+    label: 'Location precision',
+    detail: 'Store and district metadata are retained without route history.',
+    state: 'Reduced'
+  },
+  {
+    label: 'Catalog contributions',
+    detail: 'Shared price facts keep provenance and remove household identifiers.',
+    state: 'Anonymized'
+  },
+  {
+    label: 'Advertiser payloads',
+    detail: 'No raw receipt lines, household identity, or private notes are exposed.',
+    state: 'Aggregated'
+  }
+] as const;
+
+export type MobileProfileHubViewModel = {
+  userId: string;
+  budget: {
+    weeklyBudgetLabel: string;
+    plannedBasketLabel: string;
+    remainingLabel: string;
+    status: 'under' | 'over';
+  };
+  watchlist: {
+    itemCount: number;
+    alertCount: number;
+  };
+  notifications: {
+    deliveredCount: number;
+    heldCount: number;
+    highPriorityCount: number;
+  };
+  household: {
+    name: string;
+    memberCount: number;
+    weeklyBudgetLabel: string;
+    approvalLimitLabel: string;
+    reviewer: string;
+    sharedFavoriteStoreCount: number;
+  } | null;
+  privacyControls: Array<{ label: string; detail: string; state: string }>;
+};
+
+function formatMobileMoney(value: number): string {
+  return `${value.toFixed(2)} SEK`;
+}
+
+export function createMobileProfileHubViewModel(
+  userId: string,
+  api: MobileApi = createGroceryViewApi()
+): MobileProfileHubViewModel {
+  const budget = api.getBudgetSummary(userId);
+  const watchlist = api.getWatchlist(userId);
+  const inbox = api.getNotificationInboxReport(userId);
+  const householdPlan = api.getHouseholdPlan(userId);
+  const reviewerDisplayName = householdPlan
+    ? householdPlan.household.members.find((member) => member.userId === householdPlan.approvalPolicy.reviewer)?.displayName ?? householdPlan.approvalPolicy.reviewer
+    : null;
+
+  return {
+    userId,
+    budget: {
+      weeklyBudgetLabel: formatMobileMoney(budget.weeklyBudget),
+      plannedBasketLabel: formatMobileMoney(budget.estimatedBasketTotal),
+      remainingLabel: formatMobileMoney(budget.weeklyRemainingAfterEstimate),
+      status: budget.weeklyStatus
+    },
+    watchlist: {
+      itemCount: watchlist.items.length,
+      alertCount: watchlist.alerts.length
+    },
+    notifications: {
+      deliveredCount: inbox.queue.filter((item) => item.status === 'delivered').length,
+      heldCount: inbox.queue.filter((item) => item.status === 'held').length,
+      highPriorityCount: inbox.queue.filter((item) => item.priority === 'high').length
+    },
+    household: householdPlan
+      ? {
+          name: householdPlan.household.name,
+          memberCount: householdPlan.household.members.length,
+          weeklyBudgetLabel: formatMobileMoney(householdPlan.household.weeklyBudget),
+          approvalLimitLabel: formatMobileMoney(householdPlan.approvalPolicy.approvalLimit),
+          reviewer: reviewerDisplayName ?? householdPlan.approvalPolicy.reviewer,
+          sharedFavoriteStoreCount: householdPlan.household.sharedFavoriteStoreIds.length
+        }
+      : null,
+    privacyControls: mobilePrivacyControls.map((control) => ({ ...control }))
+  };
 }
 
 export function composeMobileTodayScreen(
@@ -551,6 +742,163 @@ export function composeMobileTodayScreen(
           key: action,
           action,
           label: todayActionLabel(action),
+          primary: index === 0
+        }))
+      }
+    ]
+  };
+}
+
+export function composeMobileStoresScreen(
+  userId: string,
+  api: MobileApi = createGroceryViewApi()
+): MobileScreenComponent {
+  const viewModel = createMobileStoresViewModel(userId, api);
+  const favoriteStores = viewModel.stores.filter((store) => store.isFavorite);
+  const rankedStores = [...viewModel.stores].sort((left, right) => {
+    if (left.isFavorite !== right.isFavorite) return left.isFavorite ? -1 : 1;
+    const leftSavings = left.basketQuote?.savingsVsBaseline ?? 0;
+    const rightSavings = right.basketQuote?.savingsVsBaseline ?? 0;
+    return rightSavings - leftSavings || (right.topDeal?.dealScore ?? 0) - (left.topDeal?.dealScore ?? 0) || left.name.localeCompare(right.name);
+  });
+  const topDeals = rankedStores.flatMap((store) => store.topDeal ? [{ store, deal: store.topDeal }] : []).slice(0, 3);
+
+  return {
+    type: 'screen',
+    key: `stores:${userId}`,
+    title: 'Stores',
+    state: 'ready',
+    children: [
+      {
+        type: 'section',
+        key: 'summary',
+        title: 'Summary',
+        children: [
+          { type: 'metric', key: 'favorite-store-count', label: 'Favorite stores', value: String(viewModel.favoriteStoreCount), tone: viewModel.favoriteStoreCount > 0 ? 'positive' : 'neutral' },
+          { type: 'metric', key: 'basket-item-count', label: 'Basket items', value: String(viewModel.basketItemCount), tone: viewModel.basketItemCount > 0 ? 'positive' : 'neutral' }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'favorite-stores',
+        title: 'Favorite stores',
+        children: favoriteStores.length > 0
+          ? favoriteStores.map((store) => ({
+              type: 'row',
+              key: `favorite-store:${store.id}`,
+              label: store.name,
+              value: `${store.district}, ${store.dealCount} current deals`
+            }))
+          : [{ type: 'empty', key: 'no-favorite-stores', message: 'Save favorite stores to rank nearby offers.', action: 'scan_barcode' }]
+      },
+      {
+        type: 'section',
+        key: 'ranked-stores',
+        title: 'Ranked stores',
+        children: rankedStores.map((store) => ({
+          type: 'row',
+          key: `store:${store.id}`,
+          label: store.name,
+          value: store.basketQuote
+            ? `${store.basketQuote.coveragePercent}% coverage, ${store.basketQuote.subtotal.toFixed(2)} SEK, ${store.basketQuote.freshnessLabel}`
+            : `${store.dealCount} current deals, top score ${store.topDeal?.dealScore ?? 'n/a'}`
+        }))
+      },
+      {
+        type: 'section',
+        key: 'top-store-deals',
+        title: 'Top store deals',
+        children: topDeals.map(({ store, deal }) => ({
+          type: 'row',
+          key: `store-deal:${store.id}:${deal.productId}`,
+          label: `${deal.ticker} at ${store.chain}`,
+          value: `${deal.price.toFixed(2)} SEK, score ${deal.dealScore}, ${deal.verdict}`
+        }))
+      },
+      {
+        type: 'section',
+        key: 'actions',
+        title: 'Actions',
+        children: viewModel.actions.map((action, index) => ({
+          type: 'action',
+          key: action,
+          action,
+          label: storesActionLabel(action),
+          primary: index === 0
+        }))
+      }
+    ]
+  };
+}
+
+export function composeMobileProfileScreen(
+  userId: string,
+  api: MobileApi = createGroceryViewApi()
+): MobileScreenComponent {
+  const viewModel = createMobileProfileHubViewModel(userId, api);
+  const actions: Array<Extract<MobileScreenComponentAction, 'configure_notifications' | 'update_privacy' | 'invite_household_member'>> = [
+    'configure_notifications',
+    'update_privacy',
+    'invite_household_member'
+  ];
+
+  return {
+    type: 'screen',
+    key: `profile:${userId}`,
+    title: 'Profile',
+    state: 'ready',
+    children: [
+      {
+        type: 'section',
+        key: 'account-summary',
+        title: 'Account summary',
+        children: [
+          { type: 'metric', key: 'weekly-budget', label: 'Weekly budget', value: viewModel.budget.weeklyBudgetLabel, tone: 'neutral' },
+          { type: 'metric', key: 'planned-basket', label: 'Planned basket', value: viewModel.budget.plannedBasketLabel, tone: viewModel.budget.status === 'under' ? 'positive' : 'warning' },
+          { type: 'metric', key: 'watchlist-items', label: 'Watched products', value: String(viewModel.watchlist.itemCount), tone: viewModel.watchlist.itemCount > 0 ? 'positive' : 'neutral' },
+          { type: 'metric', key: 'held-notifications', label: 'Held alerts', value: String(viewModel.notifications.heldCount), tone: viewModel.notifications.heldCount > 0 ? 'warning' : 'neutral' }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'household',
+        title: 'Household',
+        children: viewModel.household
+          ? [
+              { type: 'row', key: 'household-name', label: viewModel.household.name, value: `${viewModel.household.memberCount} members` },
+              { type: 'row', key: 'household-budget', label: 'Shared budget', value: viewModel.household.weeklyBudgetLabel },
+              { type: 'row', key: 'approval-policy', label: 'Approval policy', value: `${viewModel.household.reviewer} reviews over ${viewModel.household.approvalLimitLabel}` },
+              { type: 'row', key: 'shared-stores', label: 'Shared stores', value: `${viewModel.household.sharedFavoriteStoreCount} favorites` }
+            ]
+          : [
+              {
+                type: 'empty',
+                key: 'no-household',
+                message: 'Create or join a household to share baskets, budgets, and review duties.',
+                action: 'invite_household_member'
+              }
+            ]
+      },
+      {
+        type: 'section',
+        key: 'privacy-controls',
+        title: 'Privacy controls',
+        children: viewModel.privacyControls.map((control) => ({
+          type: 'row',
+          key: `privacy:${control.label.toLowerCase().replaceAll(' ', '-')}`,
+          label: control.label,
+          value: `${control.state}: ${control.detail}`
+        }))
+      },
+      {
+        type: 'section',
+        key: 'actions',
+        title: 'Actions',
+        children: actions.map((action, index) => ({
+          type: 'action',
+          key: action,
+          action,
+          label: profileActionLabel(action),
           primary: index === 0
         }))
       }
