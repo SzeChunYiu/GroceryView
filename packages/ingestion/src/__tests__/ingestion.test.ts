@@ -4,6 +4,7 @@ import { gzipSync } from 'node:zlib';
 import {
   buildCoopSearchUrl,
   buildHemkopSearchUrl,
+  buildEmaginPdfUrl,
   buildIcaHandlaUrl,
   buildMatpriskollenStoreOffersUrl,
   buildMatpriskollenStoresUrl,
@@ -23,10 +24,12 @@ import {
   fetchCoopProducts,
   fetchHemkopProducts,
   fetchIcaProducts,
+  fetchIcaReklambladOffers,
   fetchMathemProducts,
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
   fetchWillysProducts,
+  parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
   ingestRetailerProduct,
@@ -407,6 +410,92 @@ describe('fetchIcaProducts', () => {
       retrievedAt: '2026-05-21T01:05:00.000Z'
     });
 
+    assert.equal(rows.length, 1);
+  });
+});
+
+describe('fetchIcaReklambladOffers', () => {
+  const icaReklambladHtml = `
+    <script>
+      window.__INITIAL_STATE__ = {
+        "headerStore": {
+          "activeStore": {
+            "urls": [
+              {"text":"DRBlad","type":"DRBlad","url":"https:\\u002F\\u002Fwww.e-magin.se\\u002Flatestpaper\\u002F6h3pqb3k\\u002Fpaper\\u002F1"}
+            ]
+          }
+        },
+        "offers": {
+          "weeklyOffers": [{
+            "id": "5003918750",
+            "details": {
+              "brand": "Trocadero, Loka crush, Champis",
+              "packageInformation": "140-150 cl",
+              "name": "Läsk",
+              "mechanicInfo": "3 för 40 kr"
+            },
+            "category": { "articleGroupName": "Skafferivaror" },
+            "usesLeft": undefined,
+            "validTo": "2026-05-24T00:00:00",
+            "comparisonPrice": "8:89-9:52/liter + pant",
+            "stores": [{
+              "storeMarketingName": "ICA Focus",
+              "BMSStoreId": 1735,
+              "regularPrice": "14,66-22,66",
+              "onlineInd": true,
+              "storeInd": true,
+              "referencePriceText": "Ord.pris 14:66-22:66 kr."
+            }],
+            "eans": [{ "id": "7310401000374", "image": "https://assets.icanet.se/7310401000374.jpg" }]
+          }]
+        }
+      };
+    </script>
+  `;
+
+  it('parses ICA weekly offer rows with e-magin flyer provenance', () => {
+    const rows = parseIcaReklambladOffers(icaReklambladHtml, {
+      sourceUrl: 'https://www.ica.se/erbjudanden/ica-focus-1004247/',
+      retrievedAt: '2026-05-21T01:45:00.000Z'
+    });
+
+    assert.deepEqual(rows, [{
+      code: '5003918750',
+      name: 'Läsk',
+      brand: 'Trocadero, Loka crush, Champis',
+      packageText: '140-150 cl',
+      category: 'Skafferivaror',
+      priceText: '3 för 40 kr',
+      comparisonPrice: '8:89-9:52/liter + pant',
+      regularPriceText: 'Ord.pris 14:66-22:66 kr.',
+      validTo: '2026-05-24T00:00:00',
+      storeName: 'ICA Focus',
+      storeId: '1735',
+      availableInStore: true,
+      availableOnline: true,
+      eans: ['7310401000374'],
+      sourceUrl: 'https://www.ica.se/erbjudanden/ica-focus-1004247/',
+      flyerUrl: 'https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1',
+      flyerPdfUrl: buildEmaginPdfUrl('https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1'),
+      imageUrl: 'https://assets.icanet.se/7310401000374.jpg',
+      retrievedAt: '2026-05-21T01:45:00.000Z'
+    }]);
+  });
+
+  it('fetches ICA reklamblad offer rows from the public store offer page', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(icaReklambladHtml, { status: 200, headers: { 'content-type': 'text/html' } });
+    };
+
+    const rows = await fetchIcaReklambladOffers({
+      fetchImpl,
+      maxRows: 1,
+      retrievedAt: '2026-05-21T01:45:00.000Z'
+    });
+
+    assert.equal(requestedUrls[0], 'https://www.ica.se/erbjudanden/ica-focus-1004247/');
     assert.equal(rows.length, 1);
   });
 });
