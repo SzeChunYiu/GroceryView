@@ -74,8 +74,12 @@ describe('verified-data UI', () => {
     assert.match(shell, /sourceCoverage\.map/);
     assert.match(shell, /Category freshness strip/);
     assert.match(shell, /category\.latestObservation/);
+    assert.match(shell, /Feature readiness queue/);
+    assert.match(shell, /featureReadinessQueue\.map/);
+    assert.match(shell, /privateFeatureCopy/);
     assert.match(page, /GroceryView verified grocery snapshot/);
     assert.match(page, /category freshness/);
+    assert.match(page, /gated feature readiness/);
   });
 
   it('surfaces verified OSM store brand coverage on the homepage', async () => {
