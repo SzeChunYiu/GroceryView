@@ -5,6 +5,7 @@ import {
   formatPct,
   snapshot,
   sourceCoverage,
+  sourceReadinessMatrix,
   storeBrandLedger
 } from '@/lib/verified-data';
 
@@ -48,6 +49,38 @@ export default function DataSourcesPage() {
                 Freshness: {source.freshness}. {source.caveat}
               </p>
             </section>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="text-2xl font-black tracking-tight">Source readiness matrix</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Row share, freshness, caveat, and the primary public route are shown together for each verified source group.
+            </p>
+          </div>
+          <Link className="text-sm font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/">
+            Back to homepage
+          </Link>
+        </div>
+        <div className="mt-5 divide-y divide-slate-200">
+          {sourceReadinessMatrix.map((source) => (
+            <Link
+              className="grid gap-3 py-4 transition hover:bg-emerald-50/70 md:grid-cols-[1fr_auto_auto]"
+              href={source.primaryRoute}
+              key={source.name}
+            >
+              <div>
+                <p className="font-black text-slate-950">{source.name}</p>
+                <p className="text-sm text-slate-600">{source.coverage}</p>
+              </div>
+              <p className="font-black text-emerald-800">{formatPct(source.rowShare * 100)} of rows</p>
+              <p className="text-sm font-semibold text-slate-700">
+                {source.rows.toLocaleString('sv-SE')} rows · {source.freshness}
+              </p>
+            </Link>
           ))}
         </div>
       </Card>
