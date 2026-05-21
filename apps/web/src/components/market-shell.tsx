@@ -10,6 +10,7 @@ import {
   mealPlanner,
   nutritionValueBoard,
   pantryPlanner,
+  priceReportCenter,
   priceReportDigest,
   products,
   receiptReviewQueue,
@@ -261,6 +262,17 @@ export function MarketShell() {
               </p>
             </Link>
           ))}
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-market-ink/10 px-4 py-3 text-sm">
+          <span className="font-bold text-market-ink/65">
+            {priceReportCenter.title}: {priceReportCenter.headline}
+          </span>
+          <Link
+            href="/price-reports"
+            className="rounded-md bg-market-ink px-3 py-2 font-black text-white hover:bg-market-mint hover:text-market-ink"
+          >
+            Open reports
+          </Link>
         </div>
       </section>
 

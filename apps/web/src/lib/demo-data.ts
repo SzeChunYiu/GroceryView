@@ -795,6 +795,52 @@ export const priceReportDigest = [
   }
 ];
 
+export const priceReportCenter = {
+  title: 'Price report center',
+  freshnessWindow: 'May 21, 2026 08:00 CET',
+  headline: '3 shopper-ready reports need one source-confidence pass before send',
+  readyCount: 2,
+  reviewCount: 1,
+  checklistTitle: 'Report send checklist',
+  reports: [
+    {
+      title: 'Coffee promo spread',
+      owner: 'Savings desk',
+      status: 'ready',
+      audience: 'Vasastan households',
+      source: 'Weekly offers plus product terminal',
+      metric: '-15.00 SEK',
+      confidence: '92%',
+      href: '/products/zoegas-coffee-450g'
+    },
+    {
+      title: 'Dinner protein watch',
+      owner: 'Meal planning desk',
+      status: 'review',
+      audience: 'Sodermalm and Liljeholmen',
+      source: 'Meal planner plus receipt queue',
+      metric: '-10.00 SEK',
+      confidence: '72%',
+      href: '/meal-planner'
+    },
+    {
+      title: 'Pantry split signal',
+      owner: 'Pantry desk',
+      status: 'ready',
+      audience: 'Hagersten stock-up trips',
+      source: 'Category tape plus store comparison',
+      metric: '-14.20 SEK',
+      confidence: '69%',
+      href: '/categories/pantry'
+    }
+  ],
+  checklist: [
+    { label: 'Source timestamp', value: 'Show last observed date before every report is sent' },
+    { label: 'Confidence label', value: 'Hold reports below 70% until a receipt or source refresh lands' },
+    { label: 'Route evidence', value: 'Link each report to the product, meal, or category page behind the claim' }
+  ]
+};
+
 export const basketSubstitutionRadar = [
   {
     anchorSlug: 'bregott-normalsaltat-600g',
