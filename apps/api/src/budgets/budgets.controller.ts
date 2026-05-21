@@ -10,4 +10,10 @@ export class BudgetsController {
   summary() {
     return { ...groceryApi.getBudgetSummary('demo'), demo: true };
   }
+
+  @Get('categories')
+  @ApiOkResponse({ description: 'Demo household category budget summary from the current basket' })
+  categories() {
+    return { ...groceryApi.getCategoryBudgetSummary('demo'), demo: true };
+  }
 }

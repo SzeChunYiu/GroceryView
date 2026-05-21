@@ -33,6 +33,7 @@ describe('GroceryView API app', () => {
     assert.equal(docs.body.info.title, 'GroceryView API');
     assert.ok(docs.body.paths['/categories/{category}/market']);
     assert.ok(docs.body.paths['/users/demo/budget/summary']);
+    assert.ok(docs.body.paths['/users/demo/budget/categories']);
     assert.ok(docs.body.paths['/users/demo/ads/disclosure']);
     assert.ok(docs.body.paths['/users/demo/expiry-deals/radar']);
     assert.ok(docs.body.paths['/health']);
@@ -224,6 +225,14 @@ describe('GroceryView API app', () => {
     assert.equal(budget.body.weeklyStatus, 'under');
     assert.equal(budget.body.monthlyStatus, 'under');
     assert.equal(budget.body.demo, true);
+
+    const categoryBudget = await request(app.getHttpServer()).get('/users/demo/budget/categories').expect(200);
+    assert.equal(categoryBudget.body.userId, 'demo');
+    assert.deepEqual(categoryBudget.body.categories, []);
+    assert.deepEqual(categoryBudget.body.unbudgetedCategories, [
+      { category: 'coffee', estimatedSpend: 99.8, productIds: ['coffee'] }
+    ]);
+    assert.equal(categoryBudget.body.demo, true);
 
     const pantry = await request(app.getHttpServer())
       .get('/users/demo/pantry/replenishment?asOf=2026-05-20T08:00:00.000Z')
