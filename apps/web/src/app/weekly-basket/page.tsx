@@ -30,9 +30,10 @@ export default function WeeklyBasketPage() {
             The basket combines observed Stockholm shelf rows, weekly movement, and action cards so shoppers can see what to buy, hold, or split across stores.
           </p>
         </div>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 sm:grid-cols-3">
           <Metric icon={ShoppingBasket} label="Basket total" value={`${basketTotal.toFixed(2)} SEK`} detail={`${lineCount} tracked lines`} />
           <Metric icon={PiggyBank} label="Weekly saving" value={householdSavings.vsLastWeek} detail={`Current total ${householdSavings.weeklyTotal}`} />
+          <Metric icon={ListChecks} label="Local offers" value="Ranked" detail="API basket coverage" />
         </div>
       </section>
 
