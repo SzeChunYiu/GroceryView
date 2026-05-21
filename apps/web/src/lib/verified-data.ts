@@ -144,6 +144,101 @@ export const unavailablePanels = [
   }
 ];
 
+export type PrivateFeatureRoute =
+  | 'weekly-basket'
+  | 'watchlist'
+  | 'scanner'
+  | 'household'
+  | 'account'
+  | 'basket-ideas'
+  | 'coupon-stacks'
+  | 'deals'
+  | 'meal-planner'
+  | 'nutrition-value'
+  | 'pantry-planner'
+  | 'price-reports'
+  | 'savings-dashboard'
+  | 'shopping-trips'
+  | 'privacy';
+
+export const privateFeatureCopy: Record<PrivateFeatureRoute, { verifiedSurface: string; gatedBy: string; nextStep: string }> = {
+  'weekly-basket': {
+    verifiedSurface: 'The page can compare verified Willys/Hemkop spreads and source coverage, but it cannot assemble a household basket without authenticated pantry and quantity records.',
+    gatedBy: 'Requires a real household profile, saved staples, and opt-in purchase history before totals or substitutions are shown.',
+    nextStep: 'Connect authenticated basket records, then render item-level totals with source timestamps beside every price.'
+  },
+  watchlist: {
+    verifiedSurface: 'The public snapshot supports product spread browsing, but it does not know which products a shopper personally follows.',
+    gatedBy: 'Requires signed-in watchlist records and notification consent before alerts can be personalized.',
+    nextStep: 'Store verified watchlist preferences first, then show only alerts backed by current chain or OpenPrices rows.'
+  },
+  scanner: {
+    verifiedSurface: 'Scanner routes can explain coverage and price sources, but no production receipt images or review queue rows are bundled.',
+    gatedBy: 'Requires uploaded receipts, parser output, and human review status before line-item corrections appear.',
+    nextStep: 'Add receipt review records with redacted merchant metadata, then expose the queue with confidence labels.'
+  },
+  household: {
+    verifiedSurface: 'The static build can show public grocery data, not household members, budgets, diets, or location preferences.',
+    gatedBy: 'Requires authenticated account records and explicit household sharing settings.',
+    nextStep: 'Load profile fields from production auth, then render only confirmed preferences and consent states.'
+  },
+  account: {
+    verifiedSurface: 'The account page stays browse-only because this repository snapshot has no verified user identity records.',
+    gatedBy: 'Requires a production auth session plus alert, privacy, and subscription records.',
+    nextStep: 'Wire the sign-in flow before showing account settings, saved areas, or message preferences.'
+  },
+  'basket-ideas': {
+    verifiedSurface: 'The app can rank public price spreads, but it cannot suggest personal baskets without real household goals.',
+    gatedBy: 'Requires saved staples, dietary constraints, and accepted substitutions before basket ideas are personalized.',
+    nextStep: 'Combine verified profile preferences with current product rows, then label every suggestion by source confidence.'
+  },
+  'coupon-stacks': {
+    verifiedSurface: 'The static snapshot has chain prices but no authenticated coupons, loyalty balances, or receipt bonuses.',
+    gatedBy: 'Requires a coupon feed tied to a real account before stacked savings can be counted.',
+    nextStep: 'Ingest coupon eligibility and expiry data, then separate guaranteed discounts from receipt-pending bonuses.'
+  },
+  deals: {
+    verifiedSurface: 'Deal radar can point to verified chain-price spreads, but private deal decisions need shopper-specific thresholds.',
+    gatedBy: 'Requires saved stores, stock-up rules, and notification consent before deal pushes are shown.',
+    nextStep: 'Attach user thresholds to verified product rows, then show deal rationale with price-source caveats.'
+  },
+  'meal-planner': {
+    verifiedSurface: 'Verified product rows can support ingredient research, but meal plans need real preferences and portions.',
+    gatedBy: 'Requires dietary preferences, household size, and accepted recipe substitutions.',
+    nextStep: 'Load signed-in meal constraints, then build plans only from products with current source coverage.'
+  },
+  'nutrition-value': {
+    verifiedSurface: 'The static snapshot has price data, not complete nutrition labels for every rendered product.',
+    gatedBy: 'Requires verified nutrition facts matched to each product code before nutrition-per-krona rankings are shown.',
+    nextStep: 'Join nutrition labels to product identifiers, then rank only rows with both price and nutrition evidence.'
+  },
+  'pantry-planner': {
+    verifiedSurface: 'Pantry planning is withheld because the app does not know current household inventory or shelf-life rules.',
+    gatedBy: 'Requires saved pantry counts, preferred stores, and real replenishment cadence.',
+    nextStep: 'Sync pantry records first, then show restock recommendations with verified price and freshness context.'
+  },
+  'price-reports': {
+    verifiedSurface: 'Public report pages can summarize generated sources, but no private report subscriptions are present.',
+    gatedBy: 'Requires subscribed audiences, send approvals, and report history before personalized reports appear.',
+    nextStep: 'Store report recipients and approval records, then attach each report claim to a generated data source.'
+  },
+  'savings-dashboard': {
+    verifiedSurface: 'The dashboard can show public coverage, not personal avoided spend or budget progress.',
+    gatedBy: 'Requires real baskets, receipts, and baseline prices before savings totals are calculated.',
+    nextStep: 'Backfill verified purchase history, then compute savings only from reviewed transactions.'
+  },
+  'shopping-trips': {
+    verifiedSurface: 'Store and price rows are available, but route planning needs real saved locations and trip constraints.',
+    gatedBy: 'Requires saved areas, transport mode, store preferences, and consent to use location context.',
+    nextStep: 'Connect signed-in trip preferences, then show only trips with current store and product evidence.'
+  },
+  privacy: {
+    verifiedSurface: 'The privacy page avoids pretend toggles because no authenticated consent records are loaded in this snapshot.',
+    gatedBy: 'Requires real user consent state and account identity before controls can be changed.',
+    nextStep: 'Read privacy preferences from production auth, then render controls with audit timestamps.'
+  }
+};
+
 export function findProduct(slug: string) {
   return axfoodProducts.find((product) => product.slug === slug) ?? pricedProducts.find((product) => product.slug === slug);
 }

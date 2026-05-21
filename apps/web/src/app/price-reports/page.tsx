@@ -22,7 +22,7 @@ export default function FeaturePage() {
   const route = 'price-reports';
   return (
     <PageShell>
-      <NoVerifiedData title={`${titles[route]} has no private production records in this static snapshot`} />
+      <NoVerifiedData route={route} title={`${titles[route]} has no private production records in this static snapshot`} />
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <TopSpreads limit={5} />
         <SourceCoverage />
