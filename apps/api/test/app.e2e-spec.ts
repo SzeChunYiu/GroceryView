@@ -31,6 +31,7 @@ describe('GroceryView API app', () => {
 
     const docs = await request(app.getHttpServer()).get('/api-json').expect(200);
     assert.equal(docs.body.info.title, 'GroceryView API');
+    assert.ok(docs.body.paths['/categories/{category}/market']);
     assert.ok(docs.body.paths['/health']);
     assert.ok(docs.body.paths['/indices']);
     assert.ok(docs.body.paths['/indices/{id}']);
@@ -48,7 +49,6 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/alerts/inbox']);
     assert.ok(docs.body.paths['/users/demo/basket/local-offers']);
     assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
-    assert.ok(docs.body.paths['/categories/{category}/market']);
   });
 
   it('serves products, stores, prices, watchlists, baskets, and alerts', async () => {
