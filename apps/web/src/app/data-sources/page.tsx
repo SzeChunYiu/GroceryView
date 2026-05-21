@@ -6,6 +6,7 @@ import {
   snapshot,
   sourceCoverage,
   sourceReadinessMatrix,
+  sourceRouteMap,
   storeBrandLedger
 } from '@/lib/verified-data';
 
@@ -81,6 +82,41 @@ export default function DataSourcesPage() {
                 {source.rows.toLocaleString('sv-SE')} rows · {source.freshness}
               </p>
             </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="text-2xl font-black tracking-tight">Source route map</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Each source group lists the public routes that render its verified rows, keeping provenance tied to the browsing surface.
+            </p>
+          </div>
+          <Link className="text-sm font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/compare">
+            Open comparisons
+          </Link>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {sourceRouteMap.map((source) => (
+            <section className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={source.name}>
+              <p className="font-black text-slate-950">{source.name}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">
+                {source.routeCount.toLocaleString('sv-SE')} public routes · {source.freshness}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {source.supportingRoutes.map((route) => (
+                  <Link
+                    className="rounded-full bg-white px-3 py-1 text-sm font-black text-emerald-900 ring-1 ring-emerald-100"
+                    href={route}
+                    key={`${source.name}-${route}`}
+                  >
+                    {route}
+                  </Link>
+                ))}
+              </div>
+            </section>
           ))}
         </div>
       </Card>

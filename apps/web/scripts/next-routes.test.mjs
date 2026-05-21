@@ -181,12 +181,17 @@ describe('verified-data UI', () => {
     assert.match(verified, /export const sourceReadinessMatrix = /);
     assert.match(verified, /sourceRowsTotal/);
     assert.match(verified, /primaryRoute/);
+    assert.match(verified, /export const sourceRouteMap = /);
+    assert.match(verified, /supportingRoutes/);
     assert.match(route, /sourceCoverage\.map/);
     assert.match(route, /sourceReadinessMatrix\.map/);
+    assert.match(route, /sourceRouteMap\.map/);
     assert.match(route, /storeBrandLedger\.map/);
     assert.match(route, /categoryQualityMatrix\.map/);
     assert.match(route, /Verified snapshot provenance/);
     assert.match(route, /Source readiness matrix/);
+    assert.match(route, /Source route map/);
+    assert.match(route, /source\.supportingRoutes\.map/);
     assert.match(route, /Row share, freshness, caveat/);
     assert.match(route, /source\.primaryRoute/);
     assert.match(route, /no branch-level prices|without implying branch-level prices/i);
