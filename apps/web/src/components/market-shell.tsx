@@ -14,6 +14,7 @@ import {
   snapshot,
   sourceClaimLedger,
   sourceCoverage,
+  sourceReadinessMatrix,
   storeBrandLedger,
   storeFormatCoverage
 } from '@/lib/verified-data';
@@ -21,6 +22,7 @@ import {
 const featureReadinessQueue = Object.entries(privateFeatureCopy).slice(0, 6);
 const productUniverseRail = productUniverse.slice(0, 6);
 const homepageClaimLedger = sourceClaimLedger.slice(0, 3);
+const homepageSourceReadiness = sourceReadinessMatrix.slice(0, 3);
 
 export function MarketShell() {
   return (
@@ -113,6 +115,34 @@ export function MarketShell() {
               <p className="mt-2 text-sm font-semibold text-slate-700">{source.coverage}</p>
               <p className="mt-3 text-sm leading-6 text-slate-600">{source.caveat}</p>
             </div>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Source readiness mix</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Verified source weight behind public routes</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-slate-600">
+            Each source shows its share of verified rows and the public route that can use those rows without private account data.
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {homepageSourceReadiness.map((source) => (
+            <Link
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
+              href={source.primaryRoute}
+              key={source.name}
+            >
+              <p className="font-black text-slate-950">{source.name}</p>
+              <p className="mt-2 text-3xl font-black text-emerald-800">{formatPct(source.rowShare * 100)}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">
+                {source.rows.toLocaleString('sv-SE')} rows · {source.freshness}
+              </p>
+              <p className="mt-3 text-sm text-slate-600">Primary route: {source.primaryRoute}</p>
+            </Link>
           ))}
         </div>
       </Card>

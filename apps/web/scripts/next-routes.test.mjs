@@ -96,9 +96,14 @@ describe('verified-data UI', () => {
     assert.match(shell, /Feature readiness queue/);
     assert.match(shell, /featureReadinessQueue\.map/);
     assert.match(shell, /privateFeatureCopy/);
+    assert.match(shell, /Source readiness mix/);
+    assert.match(shell, /homepageSourceReadiness\.map/);
+    assert.match(shell, /sourceReadinessMatrix\.slice/);
+    assert.match(shell, /formatPct\(source\.rowShare \* 100\)/);
     assert.match(page, /GroceryView verified grocery snapshot/);
     assert.match(page, /product browsing/);
     assert.match(page, /category freshness/);
+    assert.match(page, /source readiness/);
     assert.match(page, /gated feature readiness/);
   });
 
