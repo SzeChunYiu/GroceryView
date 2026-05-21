@@ -513,6 +513,33 @@ describe('createHttpHandler', () => {
     });
     assert.match(historySummaryBody.guardrails[0] ?? '', /recorded product history/i);
 
+    const historyConfidence = await handle(new Request('http://localhost/api/products/coffee/history-confidence'));
+    assert.equal(historyConfidence.status, 200);
+    const historyConfidenceBody = await json(historyConfidence) as {
+      productId: string;
+      disclosure: {
+        rangeDays: number;
+        observationCount: number;
+        confidenceState: string;
+        headlineCopy: string;
+        canClaimLowestInWindow: boolean;
+        legalCopyMode: string;
+        sourceTypesIncluded: string[];
+        sourceTypesMissing: string[];
+      };
+      guardrails: string[];
+    };
+    assert.equal(historyConfidenceBody.productId, 'coffee');
+    assert.equal(historyConfidenceBody.disclosure.rangeDays, 90);
+    assert.equal(historyConfidenceBody.disclosure.observationCount, 3);
+    assert.equal(historyConfidenceBody.disclosure.confidenceState, 'limited_history');
+    assert.equal(historyConfidenceBody.disclosure.headlineCopy, 'Limited history');
+    assert.equal(historyConfidenceBody.disclosure.canClaimLowestInWindow, false);
+    assert.equal(historyConfidenceBody.disclosure.legalCopyMode, 'observed_low_only');
+    assert.deepEqual(historyConfidenceBody.disclosure.sourceTypesIncluded, ['shelf']);
+    assert.deepEqual(historyConfidenceBody.disclosure.sourceTypesMissing, []);
+    assert.match(historyConfidenceBody.guardrails[0] ?? '', /lowest-price claim/i);
+
     const equivalents = await handle(new Request('http://localhost/api/products/milk/equivalents'));
     assert.equal(equivalents.status, 200);
     assert.deepEqual(await json(equivalents), [
@@ -606,6 +633,10 @@ describe('createHttpHandler', () => {
     const historySummary = await handle(new Request('http://localhost/api/products/missing-product/history-summary'));
     assert.equal(historySummary.status, 404);
     assert.deepEqual(await json(historySummary), { error: 'Product not found.' });
+
+    const historyConfidence = await handle(new Request('http://localhost/api/products/missing-product/history-confidence'));
+    assert.equal(historyConfidence.status, 404);
+    assert.deepEqual(await json(historyConfidence), { error: 'Product not found.' });
 
     const terminal = await handle(new Request('http://localhost/api/products/missing-product/terminal'));
     assert.equal(terminal.status, 404);

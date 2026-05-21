@@ -12,6 +12,7 @@ import {
   scoreBand,
   searchProducts,
   summarizeBudget,
+  summarizePriceHistoryConfidence,
   summarizePriceHistory,
   summarizeHousehold,
   summarizeLocalOfferBasket,
@@ -25,6 +26,7 @@ import {
   type MealSuggestion,
   type PriceChartAdapterResult,
   type PriceChartObservation,
+  type PriceHistoryConfidenceDisclosure,
   type PriceHistorySummary,
   type ReceiptReview,
   type HouseholdBasketItem,
@@ -457,6 +459,14 @@ export type ProductHistorySummaryReport = {
   productName: string;
   summary: PriceHistorySummary;
   trend: 'new_low' | 'down' | 'up' | 'flat';
+  guardrails: string[];
+};
+
+export type ProductHistoryConfidenceReport = {
+  productId: string;
+  ticker: string;
+  productName: string;
+  disclosure: PriceHistoryConfidenceDisclosure;
   guardrails: string[];
 };
 
@@ -1273,6 +1283,31 @@ function productHistorySummaryFor(product: ProductDetail): ProductHistorySummary
       'History summaries use recorded product history points only.',
       'New-low signals compare the latest observation against earlier observed prices.',
       'Missing history stays explicit instead of inferring movement from current store quotes.'
+    ]
+  };
+}
+
+function productHistoryConfidenceFor(product: ProductDetail): ProductHistoryConfidenceReport {
+  const history = [...product.history].sort((left, right) => Date.parse(toIsoObservedAt(left.date)) - Date.parse(toIsoObservedAt(right.date)));
+  const disclosure = summarizePriceHistoryConfidence({
+    rangeDays: 90,
+    firstObservedAt: history[0] ? toIsoObservedAt(history[0].date) : undefined,
+    lastObservedAt: history.at(-1) ? toIsoObservedAt(history.at(-1)!.date) : undefined,
+    observationCount: history.length,
+    sourceTypesIncluded: history.some((point) => point.verified) ? ['shelf'] : ['estimated'],
+    expectedSourceTypes: ['shelf'],
+    hasEstimatedPoints: history.some((point) => !point.verified)
+  });
+
+  return {
+    productId: product.id,
+    ticker: product.ticker,
+    productName: product.name,
+    disclosure,
+    guardrails: [
+      'History confidence explains whether a lowest-price claim can be used.',
+      'Estimated history points block deal-alert confidence until confirmed by a source.',
+      'Sparse or short windows stay labeled instead of implying a complete price history.'
     ]
   };
 }
@@ -2269,6 +2304,12 @@ export function createGroceryViewApi() {
       const product = this.getProduct(id);
       if (!product) return null;
       return productHistorySummaryFor(product);
+    },
+
+    getProductHistoryConfidence(id: string): ProductHistoryConfidenceReport | null {
+      const product = this.getProduct(id);
+      if (!product) return null;
+      return productHistoryConfidenceFor(product);
     },
 
     getProductPriceTerminal(id: string, options: { asOf?: string } = {}): ProductPriceTerminalReport | null {
