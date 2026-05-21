@@ -484,6 +484,42 @@ export const products = [
     confidence: 'high',
     observedAt: '2026-05-21 16:20 CET',
     source: 'in-store shelf observation'
+  },
+  {
+    slug: 'lindahls-kvarg-500g',
+    ticker: 'LINDAHLS-KVARG-500G',
+    name: 'Lindahls Kvarg Naturell 500g',
+    store: 'Willys Fridhemsplan',
+    price: '19.90 SEK',
+    unitPrice: '39.80 SEK/kg',
+    priceType: 'member promo',
+    confidence: 'high',
+    observedAt: '2026-05-21 17:05 CET',
+    source: 'retailer flyer observation'
+  },
+  {
+    slug: 'arla-keso-500g',
+    ticker: 'ARLA-KESO-500G',
+    name: 'Arla Keso Cottage Cheese 500g',
+    store: 'Willys Fridhemsplan',
+    price: '32.90 SEK',
+    unitPrice: '65.80 SEK/kg',
+    priceType: 'shelf',
+    confidence: 'high',
+    observedAt: '2026-05-21 17:12 CET',
+    source: 'in-store shelf observation'
+  },
+  {
+    slug: 'ica-applen-royal-gala-1kg',
+    ticker: 'ICA-APPLEN-ROYAL-GALA-1KG',
+    name: 'ICA Äpplen Royal Gala 1kg',
+    store: 'Willys Fridhemsplan',
+    price: '29.90 SEK',
+    unitPrice: '29.90 SEK/kg',
+    priceType: 'weekly deal',
+    confidence: 'medium',
+    observedAt: '2026-05-21 17:20 CET',
+    source: 'retailer flyer observation'
   }
 ];
 
@@ -647,6 +683,15 @@ export const stores = [
     format: 'convenience supermarket',
     bestCategory: 'Beverages',
     distanceLabel: '3.0 km from saved area'
+  },
+  {
+    slug: 'willys-fridhemsplan',
+    name: 'Willys Fridhemsplan',
+    ingestionFixture: 'Willys Fridhemsplan',
+    district: 'Kungsholmen',
+    format: 'discount supermarket',
+    bestCategory: 'Protein snacks',
+    distanceLabel: '2.6 km from saved area'
   }
 ];
 
@@ -661,9 +706,9 @@ export const categories = [
   {
     slug: 'dairy',
     name: 'Dairy',
-    index: '102.3',
-    movement: '+2.3%',
-    topDeal: 'ARLA-MILK-1L'
+    index: '99.1',
+    movement: '-0.9%',
+    topDeal: 'LINDAHLS-KVARG-500G'
   },
   {
     slug: 'bread',
@@ -861,6 +906,16 @@ export const dealOpportunityRail = rankDealOpportunities({
       sourceConfidence: 0.76
     },
     {
+      productId: 'lindahls-kvarg-500g',
+      productName: 'Lindahls Kvarg Naturell 500g',
+      storeId: 'willys-fridhemsplan',
+      storeName: 'Willys Fridhemsplan',
+      currentPrice: 19.9,
+      regularPrice: 26.9,
+      dealScore: 85,
+      sourceConfidence: 0.91
+    },
+    {
       productId: 'felix-ketchup-1kg',
       productName: 'Felix Tomatketchup 1kg',
       storeId: 'hemkop-stockholm',
@@ -957,6 +1012,7 @@ const dealCategoryByProductId: Record<string, string> = {
   'garant-havregryn-1kg': 'Breakfast',
   'bravo-apelsinjuice-1l': 'Beverages',
   'festis-paron-10p': 'Beverages',
+  'lindahls-kvarg-500g': 'Dairy',
   'garant-korsbarstomater-250g': 'Produce',
   'libresse-bindor-normal-14p': 'Personal care',
   'anamma-formbar-fars-850g': 'Plant-based',
@@ -1119,6 +1175,20 @@ export const basketSubstitutionRadar = [
     basketImpact: '-8.50 SEK hydration top-up',
     sourceConfidence: 0.76,
     reason: 'Hydration rows now span juice, water, and kids drinks, so beverage trips should compare Mariatorget against Hornstull before routing.'
+  },
+  {
+    anchorSlug: 'lindahls-kvarg-500g',
+    anchorName: 'Lindahls Kvarg Naturell 500g',
+    anchorStoreSlug: 'willys-fridhemsplan',
+    anchorStoreName: 'Willys Fridhemsplan',
+    substituteSlug: 'arla-keso-500g',
+    substituteName: 'Arla Keso Cottage Cheese 500g',
+    substituteStoreSlug: 'willys-fridhemsplan',
+    substituteStoreName: 'Willys Fridhemsplan',
+    verdict: 'bundle',
+    basketImpact: '-7.00 SEK protein snack',
+    sourceConfidence: 0.91,
+    reason: 'Kvarg and cottage cheese rows are both high-confidence at one Fridhemsplan stop, making protein snack prep easy to bundle.'
   }
 ];
 
@@ -1129,7 +1199,7 @@ export const stockholmAreas = [
   { slug: 'hagersten',  name: 'Hägersten',  storeCount: 1, topSavings: 'Rice' },
   { slug: 'liljeholmen', name: 'Liljeholmen', storeCount: 1, topSavings: 'Pantry' },
   { slug: 'stockholm-county', name: 'Stockholm County', storeCount: 1, topSavings: 'Pasta' },
-  { slug: 'kungsholmen',name: 'Kungsholmen',storeCount: 2, topSavings: 'Personal care' },
+  { slug: 'kungsholmen',name: 'Kungsholmen',storeCount: 3, topSavings: 'Protein snacks' },
   { slug: 'hammarby-sjostad', name: 'Hammarby Sjöstad', storeCount: 1, topSavings: 'Frozen snacks' },
   { slug: 'ostermalm',  name: 'Östermalm',  storeCount: 0, topSavings: '—' }
 ];
@@ -1148,8 +1218,8 @@ export const sourceCoverage = [
     fixture: 'Weekly offers',
     surface: 'public flyer',
     status: 'ready',
-    visibleRows: 6,
-    newestSignal: 'Coffee, peas, fil, butter, kåldolmar, and pyttipanna rows anchor basket planning'
+    visibleRows: 9,
+    newestSignal: 'Coffee, peas, fil, butter, kåldolmar, pyttipanna, kvarg, keso, and apples anchor basket planning'
   },
   {
     chain: 'Coop',
@@ -1313,6 +1383,18 @@ export const storeComparisonBoard = [
     leadSignal: 'Loka, Festis, and Proviva rows make beverage restocks visible before the Hornstull juice run.',
     visibleItems: 3,
     basketImpact: '-8.50 SEK'
+  },
+  {
+    slug: 'kungsholmen-protein-snack',
+    area: 'Kungsholmen',
+    primaryStoreSlug: 'willys-fridhemsplan',
+    primaryStoreName: 'Willys Fridhemsplan',
+    comparisonStoreSlug: 'coop-daglivs-fridhemsplan',
+    comparisonStoreName: 'Coop Daglivs Fridhemsplan',
+    basketFocus: 'Protein snack prep',
+    leadSignal: 'Kvarg, keso, and apples give the nutrition board a protein snack route before evening training.',
+    visibleItems: 3,
+    basketImpact: '-12.20 SEK'
   }
 ];
 
@@ -1404,6 +1486,17 @@ export const shoppingTripSwitchboard = [
     saving: '-8.50 SEK',
     decision: 'Use when school drinks and sparkling water can be added without a second beverage stop.',
     href: '/categories/beverages'
+  },
+  {
+    title: 'Protein snack prep',
+    area: 'Kungsholmen',
+    store: 'Willys Fridhemsplan',
+    category: 'Dairy',
+    basket: 'Kvarg, keso, apples',
+    spend: '82.70 SEK',
+    saving: '-12.20 SEK',
+    decision: 'Use before evening training when protein snacks can be handled in one discount stop.',
+    href: '/nutrition-value'
   }
 ];
 
@@ -1417,7 +1510,7 @@ export const indexHistory = [
   { date: '2026-05-18', coffee:  91.8, dairy: 102.3, bread:  98.7, pantry:  95.5, snacks: 103.8, frozen:  97.5 },
   { date: '2026-05-19', coffee:  91.6, dairy: 102.3, bread:  98.7, pantry:  95.2, snacks: 104.1, frozen:  97.4 },
   { date: '2026-05-20', coffee:  91.5, dairy: 102.1, bread:  98.8, pantry:  95.0, snacks: 103.4, frozen:  94.9 },
-  { date: '2026-05-21', coffee:  91.4, dairy: 101.8, bread:  96.5, pantry:  94.9, snacks: 103.1, frozen:  94.7, beverages: 94.6 }
+  { date: '2026-05-21', coffee:  91.4, dairy:  99.1, bread:  96.5, pantry:  94.9, snacks: 103.1, frozen:  94.7, beverages: 94.6 }
 ];
 
 export const weeklyBasket = [
@@ -1448,7 +1541,10 @@ export const weeklyBasket = [
   { slug: 'garant-gurka-300g',              qty: 1, total: '16.90 SEK', vsLastWeek: '-2.6%' },
   { slug: 'loka-naturell-150cl',            qty: 2, total: '29.80 SEK', vsLastWeek: '-5.4%' },
   { slug: 'festis-paron-10p',               qty: 1, total: '39.90 SEK', vsLastWeek: '-4.0%' },
-  { slug: 'proviva-blabar-1l',              qty: 1, total: '24.90 SEK', vsLastWeek: '-1.8%' }
+  { slug: 'proviva-blabar-1l',              qty: 1, total: '24.90 SEK', vsLastWeek: '-1.8%' },
+  { slug: 'lindahls-kvarg-500g',            qty: 2, total: '39.80 SEK', vsLastWeek: '-0.9%' },
+  { slug: 'arla-keso-500g',                 qty: 1, total: '32.90 SEK', vsLastWeek: '-1.5%' },
+  { slug: 'ica-applen-royal-gala-1kg',      qty: 1, total: '29.90 SEK', vsLastWeek: '-2.2%' }
 ];
 
 export const savingsPlaybook = [
@@ -1528,6 +1624,13 @@ export const savingsPlaybook = [
     action: 'Bundle Loka, Festis, and Proviva when the route already crosses Mariatorget',
     impact: '-8.50 SEK beverage basket',
     href: '/categories/beverages'
+  },
+  {
+    title: 'Protein snack prep',
+    trigger: 'Dairy index is back under baseline with a Fridhemsplan kvarg promo',
+    action: 'Bundle kvarg, keso, and apples for training snacks when the route passes Kungsholmen',
+    impact: '-12.20 SEK snack basket',
+    href: '/nutrition-value'
   }
 ];
 
@@ -1627,13 +1730,25 @@ export const watchlistAlerts = [
     confidence: 'medium',
     allowedPriceTypes: ['weekly deal', 'member promo'],
     nextAction: 'Add the kids drink pack only when the Mariatorget route is already planned.'
+  },
+  {
+    productSlug: 'lindahls-kvarg-500g',
+    storeSlug: 'willys-fridhemsplan',
+    targetPrice: 22,
+    currentPrice: 19.9,
+    usualPrice: 26.9,
+    trigger: 'target met',
+    channel: 'push',
+    confidence: 'high',
+    allowedPriceTypes: ['member promo', 'shelf'],
+    nextAction: 'Add two kvarg tubs before the nutrition board locks the protein snack route.'
   }
 ];
 
 export const householdSavings = {
-  weeklyTotal: '710.60 SEK',
-  vsLastWeek: '-65.90 SEK',
-  vsLastMonth: '-114.20 SEK',
+  weeklyTotal: '813.20 SEK',
+  vsLastWeek: '-78.10 SEK',
+  vsLastMonth: '-126.40 SEK',
   topSaving: { product: 'Felix Pyttipanna 720g', amount: '-16.50 SEK', driver: 'Skanstull freezer stock-up' }
 };
 
@@ -1669,7 +1784,7 @@ export const personalGroceryInflation = calculatePersonalGroceryInflation({
 export const savingsDashboard = {
   monthToDate: {
     plannedSpend: '1,756.00 SEK',
-    avoidedSpend: '101.90 SEK',
+    avoidedSpend: '114.10 SEK',
     basketCount: 4,
     bestDistrict: 'Vasastan'
   },
@@ -1737,6 +1852,14 @@ export const savingsDashboard = {
       signal: '5.4% under beverages baseline',
       action: 'Bundle with Loka and Proviva before the weekend drink shelf runs low',
       href: '/products/festis-paron-10p'
+    },
+    {
+      label: 'Protein snack prep',
+      product: 'Lindahls Kvarg Naturell 500g',
+      store: 'Willys Fridhemsplan',
+      signal: '0.9% under dairy baseline',
+      action: 'Bundle with Keso and apples when the household needs training snacks',
+      href: '/products/lindahls-kvarg-500g'
     }
   ],
   districtSavings: [
@@ -1744,7 +1867,7 @@ export const savingsDashboard = {
     { district: 'Södermalm', planned: '753.50 SEK', avoided: '59.30 SEK', driver: 'Breakfast, chicken, frozen, lunchbox, and beverage promos' },
     { district: 'Norrmalm', planned: '391.20 SEK', avoided: '13.90 SEK', driver: 'Snacks and eggs' },
     { district: 'Hägersten', planned: '264.10 SEK', avoided: '9.90 SEK', driver: 'Rice and pantry clearance' },
-    { district: 'Kungsholmen', planned: '198.70 SEK', avoided: '16.00 SEK', driver: 'Produce shelf drop' },
+    { district: 'Kungsholmen', planned: '281.40 SEK', avoided: '28.20 SEK', driver: 'Produce shelf drop and protein snack prep' },
     { district: 'Hammarby Sjöstad', planned: '116.70 SEK', avoided: '16.50 SEK', driver: 'Frozen snack add-on' }
   ]
 };
@@ -1763,8 +1886,8 @@ export const accountProfile = {
     { label: 'Alert timing', value: 'Push before weekly route planning', status: 'Active' }
   ],
   routeLinks: [
-    { label: 'Saved weekly basket', href: '/weekly-basket', detail: '28 visible driver rows' },
-    { label: 'Savings dashboard', href: '/savings-dashboard', detail: '101.90 SEK avoided month-to-date' },
+    { label: 'Saved weekly basket', href: '/weekly-basket', detail: '31 visible driver rows' },
+    { label: 'Savings dashboard', href: '/savings-dashboard', detail: '114.10 SEK avoided month-to-date' },
     { label: 'Home store profile', href: '/stores/willys-odenplan', detail: 'Coffee and dairy anchor store' }
   ]
 };
@@ -1828,6 +1951,16 @@ export const receiptReviewQueue = [
     confidence: '78%',
     issue: 'Weekly drink deal needs receipt confirmation before basket totals update',
     impact: '-8.50 SEK',
+    href: '/scanner'
+  },
+  {
+    receipt: 'Willys Fridhemsplan protein snack',
+    store: 'Willys Fridhemsplan',
+    area: 'Kungsholmen',
+    items: 'Kvarg, Keso, apples',
+    confidence: '89%',
+    issue: 'Nutrition route needs protein label confirmation before publishing',
+    impact: '-12.20 SEK',
     href: '/scanner'
   }
 ];
@@ -1924,6 +2057,22 @@ export const receiptReviewDesk = [
       { productSlug: 'proviva-blabar-1l', label: 'Shelf price accepted' }
     ],
     nextAction: 'Hold the beverage watchlist update until the Festis line total is confirmed.'
+  },
+  {
+    receiptId: 'R-2026-05-21-WILLYS-FRIDHEMSPLAN',
+    storeName: 'Willys Fridhemsplan',
+    storeSlug: 'willys-fridhemsplan',
+    capturedAt: '2026-05-21 17:44 CET',
+    total: '82.70 SEK',
+    status: 'Ready',
+    owner: 'Alex',
+    confidence: 0.89,
+    flaggedLines: [
+      { productSlug: 'lindahls-kvarg-500g', label: 'Kvarg member promo matched' },
+      { productSlug: 'arla-keso-500g', label: 'Cottage cheese shelf row accepted' },
+      { productSlug: 'ica-applen-royal-gala-1kg', label: 'Apple weekly deal needs nutrition pairing' }
+    ],
+    nextAction: 'Publish the protein snack route after nutrition label confirmation.'
   }
 ];
 
@@ -2034,6 +2183,20 @@ export const couponStackPlanner = [
     stackState: 'Review',
     basketImpact: '-10.00 SEK',
     nextAction: 'Confirm receipt line before sending the beverage push alert.'
+  },
+  {
+    title: 'Protein snack member stack',
+    productSlug: 'lindahls-kvarg-500g',
+    productName: 'Lindahls Kvarg Naturell 500g',
+    storeSlug: 'willys-fridhemsplan',
+    storeName: 'Willys Fridhemsplan',
+    basePrice: '26.90 SEK',
+    coupon: '-3.00 SEK app coupon',
+    memberPrice: '-4.00 SEK member price',
+    finalPrice: '19.90 SEK',
+    stackState: 'Ready',
+    basketImpact: '-7.00 SEK',
+    nextAction: 'Apply before the protein snack route is sent to the nutrition board.'
   }
 ];
 
@@ -2139,6 +2302,14 @@ export const mealBasketIdeas = [
     savings: '-10.80 SEK',
     route: 'Use Coop Medborgarplatsen for bread, cheese, and cucumber when school lunches need one stop',
     products: ['pagen-lingongrova-500g', 'arla-hushallsost-500g', 'garant-gurka-300g']
+  },
+  {
+    title: 'protein snack prep',
+    area: 'Kungsholmen',
+    total: '82.70 SEK',
+    savings: '-12.20 SEK',
+    route: 'Use Willys Fridhemsplan for kvarg, Keso, and apples before evening training',
+    products: ['lindahls-kvarg-500g', 'arla-keso-500g', 'ica-applen-royal-gala-1kg']
   }
 ];
 
@@ -2262,8 +2433,8 @@ export const pantryPlanner = {
 export const nutritionValueBoard = {
   title: 'Nutrition value board',
   target: 'Rank dinner staples by protein, fiber, and basket cost',
-  bestValue: 'Garant Havregryn 1kg',
-  weeklySignal: 'Plant-based prep rows reduce protein spend by 12.8%',
+  bestValue: 'Lindahls Kvarg Naturell 500g',
+  weeklySignal: 'Protein snack rows reduce protein spend by 14.6%',
   cards: [
     {
       product: 'Garant Havregryn 1kg',
@@ -2307,6 +2478,17 @@ export const nutritionValueBoard = {
       score: 86,
       basketRole: 'weekday lunch base',
       nutritionPerPackage: { proteinGrams: 45, calories: 1175, fiberGrams: 30, sugarGrams: 25, saltGrams: 4.5 },
+      nutritionSource: 'Package nutrition label fixture'
+    },
+    {
+      product: 'Lindahls Kvarg Naturell 500g',
+      slug: 'lindahls-kvarg-500g',
+      store: 'Willys Fridhemsplan',
+      unitCost: '39.80 SEK/kg',
+      nutritionSignal: 'Lean protein snack base',
+      score: 94,
+      basketRole: 'training snack',
+      nutritionPerPackage: { proteinGrams: 55, calories: 300, fiberGrams: 0, sugarGrams: 18, saltGrams: 0.5 },
       nutritionSource: 'Package nutrition label fixture'
     }
   ],
