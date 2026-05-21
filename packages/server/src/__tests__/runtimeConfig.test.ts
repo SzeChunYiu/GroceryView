@@ -91,6 +91,24 @@ class RecordingPgPool {
       const row = this.entitlementRow as { user_id?: string } | null;
       return { rows: row?.user_id === values[0] ? [row] : [] };
     }
+    if (text.includes('left join latest_prices')) {
+      return {
+        rows: [
+          {
+            product_id: 'coffee',
+            category_id: 'coffee',
+            observed_chain_ids: ['willys', 'coop'],
+            observed_store_ids: ['willys-odenplan', 'coop-odenplan']
+          },
+          {
+            product_id: 'milk',
+            category_id: 'dairy',
+            observed_chain_ids: ['willys'],
+            observed_store_ids: ['willys-odenplan']
+          }
+        ]
+      };
+    }
     return { rows: [] };
   }
 
@@ -121,6 +139,27 @@ describe('runtime config', () => {
       notificationWebhookSecret: 'webhook-secret',
       billingWebhookSecret: 'billing-webhook-secret',
       metricsToken: 'metrics-token'
+    });
+  });
+
+  it('loads catalog coverage targets from runtime environment JSON', () => {
+    const config = loadRuntimeConfig({
+      NODE_ENV: 'development',
+      CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
+        targetProducts: ['coffee', 'milk'],
+        targetCategories: ['coffee', 'dairy'],
+        targetChains: ['willys', 'coop'],
+        targetStores: ['willys-odenplan', 'coop-odenplan'],
+        requireEveryProductInEveryStore: true
+      })
+    });
+
+    assert.deepEqual(config.catalogCoverageTargets, {
+      targetProducts: ['coffee', 'milk'],
+      targetCategories: ['coffee', 'dairy'],
+      targetChains: ['willys', 'coop'],
+      targetStores: ['willys-odenplan', 'coop-odenplan'],
+      requireEveryProductInEveryStore: true
     });
   });
 
@@ -471,6 +510,43 @@ describe('runtime config', () => {
 
     assert.equal(pool.closed, true);
     assert.equal(pool.calls.some((call) => call.text.includes('from source_runs')), true);
+  });
+
+  it('exposes catalog coverage readiness from PostgreSQL coverage rows and configured targets', async () => {
+    const pool = new RecordingPgPool();
+    const service = createRuntimeHttpService(
+      {
+        NODE_ENV: 'development',
+        DATABASE_URL: 'postgres://runtime-db.example/groceryview',
+        METRICS_TOKEN: 'metrics-secret',
+        CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
+          targetProducts: ['coffee', 'milk'],
+          targetCategories: ['coffee', 'dairy'],
+          targetChains: ['willys', 'coop'],
+          targetStores: ['willys-odenplan', 'coop-odenplan'],
+          requireEveryProductInEveryStore: true
+        })
+      },
+      { pgPoolFactory: () => pool }
+    );
+
+    try {
+      const response = await service.handler(new Request('http://localhost/api/readiness/catalog-coverage', {
+        headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
+      }));
+      assert.equal(response.status, 503);
+      const body = await response.json() as {
+        missingProductStorePairs: Array<{ productId: string; storeId: string }>;
+        requiredActions: string[];
+      };
+      assert.deepEqual(body.missingProductStorePairs, [{ productId: 'milk', storeId: 'coop-odenplan' }]);
+      assert.deepEqual(body.requiredActions, ['backfill_product_store_pairs:1']);
+    } finally {
+      await service.close();
+    }
+
+    assert.equal(pool.calls.some((call) => call.text.includes('left join latest_prices')), true);
+    assert.equal(pool.closed, true);
   });
 
   it('detects when the server module is executed directly as the deployment entrypoint', () => {
