@@ -200,9 +200,12 @@ export function MarketShell() {
             <Eyebrow>OpenPrices depth</Eyebrow>
             <h2 className="mt-2 text-2xl font-black tracking-tight">Categories with the deepest community price history</h2>
           </div>
-          <p className="max-w-xl text-sm leading-6 text-slate-600">
-            Observation counts are rolled up from verified OpenPrices rows so volatile categories show whether their median prices rest on repeat sightings.
-          </p>
+          <div className="max-w-xl text-sm leading-6 text-slate-600">
+            <p>Observation counts are rolled up from verified OpenPrices rows so volatile categories show whether their median prices rest on repeat sightings.</p>
+            <Link className="mt-2 inline-block font-black text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/openprices-depth">
+              Open depth board
+            </Link>
+          </div>
         </div>
         <div className="mt-5 divide-y divide-slate-200">
           {openPriceObservationDepth.map((category) => (
