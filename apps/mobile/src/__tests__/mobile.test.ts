@@ -10,10 +10,14 @@ import {
   buildMobileScreenBlueprints,
   buildMobileShell,
   buildScanResult,
+  composeMobileProfileScreen,
+  composeMobileStoresScreen,
   composeMobileTodayScreen,
   composeMobileProductTerminalScreen,
+  createMobileProfileHubViewModel,
   createMobileProductPriceTerminalViewModel,
   createMobileDiscoveryViewModel,
+  createMobileStoresViewModel,
   createMobileViewModel,
   loadMobileProductTerminal
 } from '../index.js';
@@ -205,6 +209,175 @@ describe('mobile app foundation', () => {
         action: 'search_product'
       }
     ]);
+  });
+
+  it('builds mobile Stores state from favorites, store deals, and local offer baskets', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+
+    const viewModel = createMobileStoresViewModel('user-1', api);
+
+    assert.equal(viewModel.favoriteStoreCount, 2);
+    assert.equal(viewModel.basketItemCount, 2);
+    assert.deepEqual(viewModel.actions, ['open_store', 'compare_basket', 'scan_barcode']);
+
+    const willys = viewModel.stores.find((store) => store.id === 'willys-odenplan');
+    assert.equal(willys?.isFavorite, true);
+    assert.equal(willys?.topDeal?.ticker, 'ZOEGAS-COFFEE-450G');
+    assert.equal(willys?.topDeal?.price, 49.9);
+    assert.equal(willys?.basketQuote?.coveragePercent, 100);
+    assert.equal(willys?.basketQuote?.subtotal, 79.7);
+
+    const coop = viewModel.stores.find((store) => store.id === 'coop-odenplan');
+    assert.equal(coop?.isFavorite, false);
+    assert.equal(coop?.basketQuote, null);
+  });
+
+  it('composes a renderable mobile Stores screen with ranked stores, deal rows, and actions', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+
+    const screen = composeMobileStoresScreen('user-1', api);
+
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.title, 'Stores');
+    assert.equal(screen.state, 'ready');
+    assert.deepEqual(screen.children.map((section) => section.key), ['summary', 'favorite-stores', 'ranked-stores', 'top-store-deals', 'actions']);
+
+    const summary = screen.children.find((section) => section.key === 'summary');
+    assert.equal(summary?.type, 'section');
+    assert.deepEqual(summary?.children.map((metric) => 'value' in metric ? metric.value : null), ['2', '2']);
+
+    const favorites = screen.children.find((section) => section.key === 'favorite-stores');
+    assert.equal(favorites?.type, 'section');
+    assert.deepEqual(favorites?.children.map((row) => row.key), ['favorite-store:willys-odenplan', 'favorite-store:lidl-sveavagen']);
+
+    const ranked = screen.children.find((section) => section.key === 'ranked-stores');
+    if (!ranked || ranked.type !== 'section') throw new Error('ranked stores section missing');
+    assert.equal(ranked.children[0]?.key, 'store:willys-odenplan');
+    assert.equal('value' in ranked.children[0]! ? ranked.children[0]!.value : null, '100% coverage, 79.70 SEK, fresh');
+
+    const deals = screen.children.find((section) => section.key === 'top-store-deals');
+    if (!deals || deals.type !== 'section') throw new Error('top store deals section missing');
+    assert.equal(deals.children[0]?.key, 'store-deal:willys-odenplan:coffee');
+    assert.equal('value' in deals.children[0]! ? deals.children[0]!.value : null, '49.90 SEK, score 82, Buy');
+
+    const actions = screen.children.find((section) => section.key === 'actions');
+    assert.equal(actions?.type, 'section');
+    assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Open store', 'Compare basket', 'Scan barcode']);
+  });
+
+  it('composes a Stores empty state when favorites have not been selected', () => {
+    const screen = composeMobileStoresScreen('new-user');
+    assert.equal(screen.type, 'screen');
+    const favorites = screen.children.find((section) => section.key === 'favorite-stores');
+
+    if (!favorites || favorites.type !== 'section') throw new Error('favorite stores section missing');
+    assert.deepEqual(favorites.children, [
+      {
+        type: 'empty',
+        key: 'no-favorite-stores',
+        message: 'Save favorite stores to rank nearby offers.',
+        action: 'scan_barcode'
+      }
+    ]);
+  });
+
+  it('builds mobile Profile hub state from budget, household, notification, and privacy data', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 55, alertDealScoreAt: 80, favoriteStoresOnly: true });
+    api.updateBudget('user-1', { weeklyBudget: 150, monthlyBudget: 600 });
+    api.upsertHouseholdPlan('user-1', {
+      householdId: 'house-1',
+      name: 'Shared flat',
+      weeklyBudget: 6800,
+      approvalLimit: 400,
+      reviewer: 'user-1',
+      members: [
+        { userId: 'user-1', displayName: 'Alex' },
+        { userId: 'partner', displayName: 'Mina' }
+      ],
+      basketItems: [{ productId: 'coffee', quantity: 1, addedBy: 'user-1' }],
+      watchlistItems: [{ productId: 'coffee', addedBy: 'partner', targetPrice: 55 }],
+      sharedFavoriteStoreIds: ['willys-odenplan', 'lidl-sveavagen']
+    });
+
+    const viewModel = createMobileProfileHubViewModel('user-1', api);
+
+    assert.deepEqual(viewModel.budget, {
+      weeklyBudgetLabel: '150.00 SEK',
+      plannedBasketLabel: '49.90 SEK',
+      remainingLabel: '100.10 SEK',
+      status: 'under'
+    });
+    assert.deepEqual(viewModel.watchlist, { itemCount: 1, alertCount: 3 });
+    assert.equal(viewModel.notifications.heldCount, 1);
+    assert.equal(viewModel.household?.name, 'Shared flat');
+    assert.equal(viewModel.household?.memberCount, 2);
+    assert.equal(viewModel.household?.approvalLimitLabel, '400.00 SEK');
+    assert.deepEqual(viewModel.privacyControls.map((control) => control.label), [
+      'Raw receipt media',
+      'Location precision',
+      'Catalog contributions',
+      'Advertiser payloads'
+    ]);
+  });
+
+  it('composes a renderable mobile Profile screen with household and privacy controls', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addWatchlistItem('user-1', { productId: 'coffee', targetPrice: 55, alertDealScoreAt: 80, favoriteStoresOnly: true });
+    api.updateBudget('user-1', { weeklyBudget: 150, monthlyBudget: 600 });
+    api.upsertHouseholdPlan('user-1', {
+      householdId: 'house-1',
+      name: 'Shared flat',
+      weeklyBudget: 6800,
+      approvalLimit: 400,
+      reviewer: 'user-1',
+      members: [
+        { userId: 'user-1', displayName: 'Alex' },
+        { userId: 'partner', displayName: 'Mina' }
+      ],
+      sharedFavoriteStoreIds: ['willys-odenplan', 'lidl-sveavagen']
+    });
+
+    const screen = composeMobileProfileScreen('user-1', api);
+
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.title, 'Profile');
+    assert.equal(screen.state, 'ready');
+    assert.deepEqual(screen.children.map((section) => section.key), ['account-summary', 'household', 'privacy-controls', 'actions']);
+
+    const account = screen.children.find((section) => section.key === 'account-summary');
+    assert.equal(account?.type, 'section');
+    assert.deepEqual(account?.children.map((metric) => 'value' in metric ? metric.value : null), ['150.00 SEK', '49.90 SEK', '1', '1']);
+
+    const household = screen.children.find((section) => section.key === 'household');
+    if (!household || household.type !== 'section') throw new Error('household section missing');
+    assert.deepEqual(household.children.map((row) => 'value' in row ? row.value : null), [
+      '2 members',
+      '6800.00 SEK',
+      'Alex reviews over 400.00 SEK',
+      '2 favorites'
+    ]);
+
+    const privacy = screen.children.find((section) => section.key === 'privacy-controls');
+    if (!privacy || privacy.type !== 'section') throw new Error('privacy section missing');
+    assert.equal(privacy.children.length, 4);
+    assert.equal(privacy.children[0]?.key, 'privacy:raw-receipt-media');
+
+    const actions = screen.children.find((section) => section.key === 'actions');
+    assert.equal(actions?.type, 'section');
+    assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Configure alerts', 'Update privacy', 'Invite member']);
   });
 
   it('composes a renderable mobile product terminal screen with quote, evidence, chart, and actions', () => {
