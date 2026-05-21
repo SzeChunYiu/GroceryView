@@ -447,6 +447,31 @@ describe('createHttpHandler', () => {
     ]);
     assert.match(priceSpreadBody.guardrails[0] ?? '', /verified store quotes/i);
 
+    const storeSavings = await handle(new Request('http://localhost/api/products/coffee/store-savings'));
+    assert.equal(storeSavings.status, 200);
+    const storeSavingsBody = await json(storeSavings) as {
+      productId: string;
+      sampleSize: number;
+      bestStoreId: string;
+      highestStoreId: string;
+      maxSavings: number;
+      maxSavingsPercent: number;
+      rows: Array<{ storeId: string; rank: number; savingsVsHighest: number; priceLabel: string }>;
+      guardrails: string[];
+    };
+    assert.equal(storeSavingsBody.productId, 'coffee');
+    assert.equal(storeSavingsBody.sampleSize, 3);
+    assert.equal(storeSavingsBody.bestStoreId, 'willys-odenplan');
+    assert.equal(storeSavingsBody.highestStoreId, 'coop-odenplan');
+    assert.equal(storeSavingsBody.maxSavings, 15);
+    assert.equal(storeSavingsBody.maxSavingsPercent, 23.1);
+    assert.deepEqual(storeSavingsBody.rows.map((row) => [row.storeId, row.rank, row.savingsVsHighest, row.priceLabel]), [
+      ['willys-odenplan', 1, 15, 'best_savings'],
+      ['lidl-sveavagen', 2, 5, 'saves_vs_highest'],
+      ['coop-odenplan', 3, 0, 'highest_price']
+    ]);
+    assert.match(storeSavingsBody.guardrails[0] ?? '', /verified quotes/i);
+
     const terminal = await handle(new Request('http://localhost/api/products/coffee/terminal?asOf=2026-05-19T00:00:00.000Z'));
     assert.equal(terminal.status, 200);
     const terminalBody = await json(terminal) as {
@@ -563,6 +588,10 @@ describe('createHttpHandler', () => {
     const priceSpread = await handle(new Request('http://localhost/api/products/missing-product/price-spread'));
     assert.equal(priceSpread.status, 404);
     assert.deepEqual(await json(priceSpread), { error: 'Product not found.' });
+
+    const storeSavings = await handle(new Request('http://localhost/api/products/missing-product/store-savings'));
+    assert.equal(storeSavings.status, 404);
+    assert.deepEqual(await json(storeSavings), { error: 'Product not found.' });
 
     const dealScore = await handle(new Request('http://localhost/api/products/missing-product/deal-score'));
     assert.equal(dealScore.status, 404);
