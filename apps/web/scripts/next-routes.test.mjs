@@ -78,6 +78,17 @@ describe('Next.js web scaffold', () => {
     assert.match(marketShell, /Weekly basket tape/);
   });
 
+  it('surfaces core basket optimizer on the weekly basket route', async () => {
+    const weeklyBasketPage = await readFile(new URL('../src/app/weekly-basket/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(weeklyBasketPage, /compareBasketStrategies/);
+    assert.match(weeklyBasketPage, /summarizeStoreBasketCoverage/);
+    assert.match(weeklyBasketPage, /buildBasketComparisonInput/);
+    assert.match(weeklyBasketPage, /basketStrategy\.cheapestByProduct/);
+    assert.match(weeklyBasketPage, /storeCoverage\.stores\.map/);
+    assert.match(weeklyBasketPage, /Basket optimizer/);
+  });
+
   it('surfaces a driver-backed watchlist App Router page', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
     const watchlistPage = await readFile(new URL('../src/app/watchlist/page.tsx', import.meta.url), 'utf8');
