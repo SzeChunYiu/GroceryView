@@ -2526,7 +2526,13 @@ export function createGroceryViewApi() {
 
     getBudgetSummary(userId: string): BudgetSummary {
       const budget = budgets.get(userId) ?? { weeklyBudget: 0, monthlyBudget: 0 };
-      return summarizeBudget({ ...budget, estimatedBasketTotal: this.compareBasket(userId).cheapestByProduct.total, receiptTotalsThisWeek: [], receiptTotalsThisMonth: [] });
+      const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
+      const comparisonStoreIds = favoriteStoreIds.length > 0 ? favoriteStoreIds : stores.map((store) => store.id);
+      const comparison = compareBasketStrategies({
+        favoriteStoreIds: comparisonStoreIds,
+        items: basketInputItems(baskets.get(userId) ?? [])
+      });
+      return summarizeBudget({ ...budget, estimatedBasketTotal: comparison.cheapestByProduct.total, receiptTotalsThisWeek: [], receiptTotalsThisMonth: [] });
     },
 
     updateCategoryBudgets(userId: string, patches: CategoryBudgetPatch[]) {
