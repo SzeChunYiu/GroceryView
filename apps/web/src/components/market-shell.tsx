@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { BarChart3, Database, MapPin, ScanSearch, ShoppingBasket, Store } from 'lucide-react';
 import {
   categories,
+  dealOpportunityRail,
   householdSavings,
   products,
   savingsPlaybook,
@@ -24,6 +25,10 @@ const openPriceLeaders = pricedProducts.slice(0, 6);
 
 function formatSek(value: number) {
   return `SEK ${value.toFixed(2)}`;
+}
+
+function formatConfidence(value: number) {
+  return `${Math.round(value * 100)}%`;
 }
 
 export function MarketShell() {
@@ -78,6 +83,66 @@ export function MarketShell() {
         <FeatureCard icon={<ShoppingBasket size={20} />} title="Basket planner" href="/weekly-basket">
           Weekly basket work can build on the same App Router shell and TanStack Query provider.
         </FeatureCard>
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">Deal opportunity rail</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Ranked homepage signals combine Deal Score, discount depth, confidence, and shopper-ready verdicts.
+            </p>
+          </div>
+          <LightMetric label="Top score" value={String(dealOpportunityRail[0]?.dealScore ?? 'n/a')} />
+          <LightMetric label="Top drop" value={formatSek(dealOpportunityRail[0]?.priceDrop ?? 0)} />
+        </div>
+        <div className="hidden grid-cols-[0.9fr_1.4fr_0.7fr_0.8fr_0.8fr] gap-3 border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55 md:grid">
+          <span>Verdict</span>
+          <span>Opportunity</span>
+          <span>Score</span>
+          <span>Discount</span>
+          <span className="text-right">Confidence</span>
+        </div>
+        {dealOpportunityRail.map((deal) => (
+          <div
+            key={`${deal.productId}-${deal.storeId}`}
+            className="grid gap-3 border-b border-market-ink/10 px-4 py-4 text-sm last:border-b-0 hover:bg-market-oat/45 md:grid-cols-[0.9fr_1.4fr_0.7fr_0.8fr_0.8fr]"
+          >
+            <div>
+              <span className="inline-flex rounded-full bg-market-mint/15 px-2 py-1 text-xs font-black uppercase text-market-ink/70">
+                {deal.band.verdict}
+              </span>
+              <span className="mt-2 block text-xs font-bold text-market-ink/50">{deal.band.label}</span>
+            </div>
+            <div className="min-w-0">
+              <Link href={`/products/${deal.productId}`} className="block truncate font-black hover:text-market-mint">
+                {deal.productName}
+              </Link>
+              <Link href={`/stores/${deal.storeId}`} className="mt-1 block truncate text-xs font-bold text-market-ink/55">
+                {deal.storeName}
+              </Link>
+              <p className="mt-2 leading-5 text-market-ink/65">{deal.reason}</p>
+            </div>
+            <div>
+              <span className="text-xs font-bold uppercase text-market-ink/45 md:hidden">Score</span>
+              <span className="block text-2xl font-black tabular-nums">{deal.dealScore}</span>
+            </div>
+            <div>
+              <span className="text-xs font-bold uppercase text-market-ink/45 md:hidden">Discount</span>
+              <span className="block font-black tabular-nums">{deal.discountPercent.toFixed(1)}%</span>
+              <span className="mt-1 block text-xs font-semibold text-market-ink/55">
+                {formatSek(deal.priceDrop)} drop
+              </span>
+            </div>
+            <div className="md:text-right">
+              <span className="text-xs font-bold uppercase text-market-ink/45 md:hidden">Confidence</span>
+              <span className="block font-black tabular-nums">{formatConfidence(deal.sourceConfidence)}</span>
+              <span className="mt-1 block text-xs font-semibold text-market-ink/55">
+                {formatSek(deal.currentPrice)}
+              </span>
+            </div>
+          </div>
+        ))}
       </section>
 
       <section className="rounded-lg border border-market-ink/10 bg-white">
