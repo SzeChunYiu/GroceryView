@@ -12,12 +12,14 @@ import {
   buildScanResult,
   composeMobileBasketScreen,
   composeMobileBudgetScreen,
+  composeMobileHouseholdScreen,
   composeMobileProfileScreen,
   composeMobileStoresScreen,
   composeMobileTodayScreen,
   composeMobileWatchlistScreen,
   composeMobileProductTerminalScreen,
   createMobileBudgetRouteViewModel,
+  createMobileHouseholdViewModel,
   createMobileProfileHubViewModel,
   createMobileProductPriceTerminalViewModel,
   createMobileBasketViewModel,
@@ -651,6 +653,116 @@ describe('mobile app foundation', () => {
     const actions = screen.children.find((section) => section.key === 'actions');
     assert.equal(actions?.type, 'section');
     assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Configure alerts', 'Update privacy', 'Invite member']);
+  });
+
+  it('builds mobile Household state from members, shared stores, basket, watchlist, and approval data', () => {
+    const api = createGroceryViewApi();
+    api.upsertHouseholdPlan('user-1', {
+      householdId: 'house-1',
+      name: 'Shared flat',
+      weeklyBudget: 100,
+      approvalLimit: 60,
+      reviewer: 'partner',
+      members: [
+        { userId: 'user-1', displayName: 'Alex' },
+        { userId: 'partner', displayName: 'Mina' }
+      ],
+      basketItems: [
+        { productId: 'coffee', quantity: 1, addedBy: 'user-1' },
+        { productId: 'milk', quantity: 2, addedBy: 'partner' }
+      ],
+      watchlistItems: [{ productId: 'coffee', addedBy: 'partner', targetPrice: 55 }],
+      sharedFavoriteStoreIds: ['willys-odenplan', 'lidl-sveavagen']
+    });
+
+    const viewModel = createMobileHouseholdViewModel('user-1', api);
+
+    assert.equal(viewModel.household?.name, 'Shared flat');
+    assert.equal(viewModel.household?.memberCount, 2);
+    assert.equal(viewModel.household?.weeklyBudgetLabel, '100.00 SEK');
+    assert.equal(viewModel.household?.estimatedTotalLabel, '77.70 SEK');
+    assert.equal(viewModel.household?.remainingBudgetLabel, '22.30 SEK');
+    assert.equal(viewModel.household?.approvalLimitLabel, '60.00 SEK');
+    assert.equal(viewModel.household?.requiresOwnerApproval, true);
+    assert.equal(viewModel.household?.reviewer, 'Mina');
+    assert.deepEqual(viewModel.household?.members.map((member) => `${member.displayName}:${member.itemCount}`), ['Alex:1', 'Mina:1']);
+    assert.deepEqual(viewModel.household?.sharedFavoriteStores.map((store) => store.storeName), ['Lidl Sveavägen', 'Willys Odenplan']);
+    assert.deepEqual(viewModel.household?.basketItems.map((item) => `${item.ticker}:${item.quantity}:${item.addedByName}`), [
+      'ZOEGAS-COFFEE-450G:1:Alex',
+      'ARLA-MILK-1L:2:Mina'
+    ]);
+    assert.deepEqual(viewModel.household?.watchlistItems.map((item) => `${item.ticker}:${item.targetPriceLabel}:${item.addedByName}`), [
+      'ZOEGAS-COFFEE-450G:55.00 SEK:Mina'
+    ]);
+    assert.deepEqual(viewModel.actions, ['invite_household_member', 'review_household_basket', 'review_household_watchlist']);
+  });
+
+  it('composes a renderable mobile Household screen with approval, members, shared stores, basket, watchlist, and actions', () => {
+    const api = createGroceryViewApi();
+    api.upsertHouseholdPlan('user-1', {
+      householdId: 'house-1',
+      name: 'Shared flat',
+      weeklyBudget: 100,
+      approvalLimit: 60,
+      reviewer: 'partner',
+      members: [
+        { userId: 'user-1', displayName: 'Alex' },
+        { userId: 'partner', displayName: 'Mina' }
+      ],
+      basketItems: [
+        { productId: 'coffee', quantity: 1, addedBy: 'user-1' },
+        { productId: 'milk', quantity: 2, addedBy: 'partner' }
+      ],
+      watchlistItems: [{ productId: 'coffee', addedBy: 'partner', targetPrice: 55 }],
+      sharedFavoriteStoreIds: ['willys-odenplan', 'lidl-sveavagen']
+    });
+
+    const screen = composeMobileHouseholdScreen('user-1', api);
+
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.title, 'Shared flat');
+    assert.equal(screen.state, 'ready');
+    assert.deepEqual(screen.children.map((section) => section.key), ['summary', 'approval', 'members', 'shared-stores', 'basket-items', 'watchlist-items', 'actions']);
+
+    const summary = screen.children.find((section) => section.key === 'summary');
+    assert.equal(summary?.type, 'section');
+    assert.deepEqual(summary?.children.map((metric) => 'value' in metric ? metric.value : null), ['2', '100.00 SEK', '77.70 SEK', '22.30 SEK']);
+
+    const approval = screen.children.find((section) => section.key === 'approval');
+    if (!approval || approval.type !== 'section') throw new Error('approval section missing');
+    assert.deepEqual(approval.children.map((row) => 'value' in row ? row.value : null), ['60.00 SEK', 'Mina', 'Review required']);
+
+    const members = screen.children.find((section) => section.key === 'members');
+    if (!members || members.type !== 'section') throw new Error('members section missing');
+    assert.deepEqual(members.children.map((row) => row.key), ['member:user-1', 'member:partner']);
+
+    const sharedStores = screen.children.find((section) => section.key === 'shared-stores');
+    if (!sharedStores || sharedStores.type !== 'section') throw new Error('shared stores section missing');
+    assert.deepEqual(sharedStores.children.map((row) => row.key), ['shared-store:lidl-sveavagen', 'shared-store:willys-odenplan']);
+
+    const basket = screen.children.find((section) => section.key === 'basket-items');
+    if (!basket || basket.type !== 'section') throw new Error('basket section missing');
+    assert.equal('value' in basket.children[1]! ? basket.children[1]!.value : null, '2 planned by Mina');
+
+    const watchlist = screen.children.find((section) => section.key === 'watchlist-items');
+    if (!watchlist || watchlist.type !== 'section') throw new Error('watchlist section missing');
+    assert.equal('value' in watchlist.children[0]! ? watchlist.children[0]!.value : null, '55.00 SEK, watched by Mina');
+
+    const actions = screen.children.find((section) => section.key === 'actions');
+    assert.equal(actions?.type, 'section');
+    assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Invite member', 'Review basket', 'Review watchlist']);
+  });
+
+  it('composes a Household empty state when the user has not joined a household', () => {
+    const screen = composeMobileHouseholdScreen('new-user');
+
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.state, 'empty');
+    assert.deepEqual(screen.children.map((child) => child.key), ['no-household', 'actions']);
+    assert.equal(screen.children[0]?.type, 'empty');
+    const actions = screen.children.find((section) => section.key === 'actions');
+    assert.equal(actions?.type, 'section');
+    assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Invite member']);
   });
 
   it('composes a renderable mobile product terminal screen with quote, evidence, chart, and actions', () => {
