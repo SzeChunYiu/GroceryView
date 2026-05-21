@@ -4,6 +4,7 @@ import {
   accountProfile,
   basketSubstitutionRadar,
   categories,
+  couponStackPlanner,
   dealOpportunityRail,
   householdSavings,
   mealBasketIdeas,
@@ -672,6 +673,61 @@ export function MarketShell() {
               </span>
             </div>
             <div className="font-semibold text-market-ink/65">{alert.benchmark}</div>
+          </div>
+        ))}
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">Coupon stack planner</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Digital coupons, member prices, and receipt bonuses stay visible before the basket total is trusted.
+            </p>
+          </div>
+          <LightMetric label="Stacks" value={String(couponStackPlanner.length)} />
+          <LightMetric
+            label="Visible impact"
+            value={`-${couponStackPlanner
+              .reduce((sum, stack) => sum + Number(stack.basketImpact.replace(/[^0-9.]/g, '')), 0)
+              .toFixed(2)} SEK`}
+          />
+        </div>
+        <div className="hidden grid-cols-[1.1fr_0.8fr_0.8fr_0.7fr] gap-3 border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55 md:grid">
+          <span>Stack</span>
+          <span>Coupon</span>
+          <span>Final price</span>
+          <span>State</span>
+        </div>
+        {couponStackPlanner.map((stack) => (
+          <div
+            key={stack.title}
+            className="grid gap-3 border-b border-market-ink/10 px-4 py-4 text-sm last:border-b-0 hover:bg-market-oat/45 md:grid-cols-[1.1fr_0.8fr_0.8fr_0.7fr]"
+          >
+            <div>
+              <Link href={`/products/${stack.productSlug}`} className="block font-black hover:text-market-mint">
+                {stack.productName}
+              </Link>
+              <Link href={`/stores/${stack.storeSlug}`} className="mt-1 block text-xs font-bold text-market-ink/55">
+                {stack.storeName} · {stack.basePrice}
+              </Link>
+              <p className="mt-2 leading-5 text-market-ink/65">{stack.nextAction}</p>
+            </div>
+            <div>
+              <span className="text-xs font-bold uppercase text-market-ink/45 md:hidden">Coupon</span>
+              <span className="block font-semibold text-market-ink/70">{stack.coupon}</span>
+              <span className="mt-1 block text-xs font-bold text-market-ink/50">{stack.memberPrice}</span>
+            </div>
+            <div>
+              <span className="text-xs font-bold uppercase text-market-ink/45 md:hidden">Final price</span>
+              <span className="block font-black tabular-nums">{stack.finalPrice}</span>
+              <span className="mt-1 block text-xs font-bold text-market-ink/50">{stack.basketImpact}</span>
+            </div>
+            <div>
+              <span className="inline-flex rounded-full bg-market-mint/15 px-2 py-1 text-xs font-black uppercase text-market-ink/70">
+                {stack.stackState}
+              </span>
+            </div>
           </div>
         ))}
       </section>

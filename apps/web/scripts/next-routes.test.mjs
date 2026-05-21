@@ -123,6 +123,24 @@ describe('Next.js web scaffold', () => {
     assert.match(marketShell, /\/products\/\$\{alert\.productSlug\}/);
   });
 
+  it('surfaces coupon stack planner rows on the homepage', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+
+    const couponSection = demoData.split('export const couponStackPlanner = ')[1] ?? '';
+    const couponRows = couponSection.match(/productSlug: '[^']+'/g) ?? [];
+
+    assert.ok(couponRows.length >= 3, 'homepage driver data should expose at least 3 coupon stack rows');
+    assert.match(demoData, /Coffee member match/);
+    assert.match(demoData, /44\.90 SEK/);
+    assert.match(demoData, /garant-havregryn-1kg/);
+    assert.match(marketShell, /couponStackPlanner\.map/);
+    assert.match(marketShell, /Coupon stack planner/);
+    assert.match(marketShell, /Digital coupons, member prices, and receipt bonuses/);
+    assert.match(marketShell, /\/products\/\$\{stack\.productSlug\}/);
+    assert.match(marketShell, /\/stores\/\$\{stack\.storeSlug\}/);
+  });
+
   it('surfaces savings playbook actions on the homepage', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
