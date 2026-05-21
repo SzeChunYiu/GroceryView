@@ -91,6 +91,21 @@ describe('Next.js web scaffold', () => {
     assert.match(marketShell, /Savings playbook/);
   });
 
+  it('surfaces meal basket ideas on the homepage', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+
+    const mealBasketSection = demoData.split('export const mealBasketIdeas = ')[1] ?? '';
+    const mealBasketRows = mealBasketSection.match(/title: '[^']+'/g) ?? [];
+
+    assert.ok(mealBasketRows.length >= 3, 'homepage driver data should expose at least 3 meal basket ideas');
+    assert.match(demoData, /weekday breakfast top-up/);
+    assert.match(demoData, /pantry pasta night/);
+    assert.match(demoData, /coffee and fika hold/);
+    assert.match(marketShell, /mealBasketIdeas\.map/);
+    assert.match(marketShell, /Meal basket ideas/);
+  });
+
   it('surfaces source coverage rows on the homepage', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
