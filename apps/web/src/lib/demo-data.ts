@@ -1872,6 +1872,21 @@ export const couponStackPlanner = [
   }
 ];
 
+export const couponStackCenter = {
+  title: 'Coupon stack center',
+  freshnessWindow: 'May 21 coupon sync',
+  headline: 'Review digital coupons, member cuts, and receipt bonuses before basket lock',
+  readyStacks: 1,
+  watchStacks: 2,
+  stacks: couponStackPlanner,
+  rulesTitle: 'Stack decision rules',
+  rules: [
+    { label: 'Apply order', value: 'Coupon first, member price second, receipt bonus only after review' },
+    { label: 'Trust gate', value: 'Do not count receipt bonuses until the receipt review queue confirms them' },
+    { label: 'Basket link', value: 'Every stack must link back to the product and store evidence rows' }
+  ]
+};
+
 export const mealBasketIdeas = [
   {
     title: 'weekday breakfast top-up',

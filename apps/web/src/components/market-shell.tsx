@@ -5,6 +5,7 @@ import {
   basketSubstitutionRadar,
   categories,
   categoryDealLeaders,
+  couponStackCenter,
   couponStackPlanner,
   dealOpportunityRail,
   householdSavings,
@@ -784,6 +785,17 @@ export function MarketShell() {
             </div>
           </div>
         ))}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-market-ink/10 px-4 py-3 text-sm">
+          <span className="font-bold text-market-ink/65">
+            {couponStackCenter.title}: {couponStackCenter.headline}
+          </span>
+          <Link
+            href="/coupon-stacks"
+            className="rounded-md bg-market-ink px-3 py-2 font-black text-white hover:bg-market-mint hover:text-market-ink"
+          >
+            Open coupon stacks
+          </Link>
+        </div>
       </section>
 
       <section className="rounded-lg border border-market-ink/10 bg-white">
