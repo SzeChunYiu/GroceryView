@@ -1505,3 +1505,44 @@ export const pantryPlanner = {
     { label: 'Stock limit', value: 'Two rice bags max to avoid stale inventory' }
   ]
 };
+
+export const nutritionValueBoard = {
+  title: 'Nutrition value board',
+  target: 'Rank dinner staples by protein, fiber, and basket cost',
+  bestValue: 'Garant Havregryn 1kg',
+  weeklySignal: 'Plant-based prep rows reduce protein spend by 12.8%',
+  cards: [
+    {
+      product: 'Garant Havregryn 1kg',
+      slug: 'garant-havregryn-1kg',
+      store: 'Tempo Hornstull',
+      unitCost: '21.90 SEK/kg',
+      nutritionSignal: 'High fiber breakfast base',
+      score: 92,
+      basketRole: 'breakfast staple'
+    },
+    {
+      product: 'Anamma Formbar Färs 850g',
+      slug: 'anamma-formbar-fars-850g',
+      store: 'Coop Norra Stationsgatan',
+      unitCost: '82.24 SEK/kg',
+      nutritionSignal: 'Plant protein meal prep',
+      score: 88,
+      basketRole: 'dinner protein'
+    },
+    {
+      product: 'Zeta Kikärtor 380g',
+      slug: 'zeta-kikartor-380g',
+      store: 'Hemköp Hornstull',
+      unitCost: '36.58 SEK/kg',
+      nutritionSignal: 'Fiber and protein pantry add-on',
+      score: 84,
+      basketRole: 'pantry protein'
+    }
+  ],
+  rules: [
+    { label: 'Protein floor', value: 'Prefer rows that replace meat without raising total dinner spend' },
+    { label: 'Fiber boost', value: 'Promote oats, chickpeas, and produce when unit price is under trend' },
+    { label: 'Confidence gate', value: 'Do not rank nutrition swaps from unreviewed receipt rows' }
+  ]
+};

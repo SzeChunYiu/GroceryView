@@ -8,6 +8,7 @@ import {
   householdSavings,
   mealBasketIdeas,
   mealPlanner,
+  nutritionValueBoard,
   pantryPlanner,
   products,
   receiptReviewQueue,
@@ -548,6 +549,17 @@ export function MarketShell() {
             className="rounded-md bg-market-oat px-3 py-2 font-black text-market-ink hover:bg-market-mint"
           >
             Open pantry plan
+          </Link>
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-market-ink/10 px-4 py-3 text-sm">
+          <span className="font-bold text-market-ink/65">
+            {nutritionValueBoard.title}: {nutritionValueBoard.weeklySignal}
+          </span>
+          <Link
+            href="/nutrition-value"
+            className="rounded-md bg-market-oat px-3 py-2 font-black text-market-ink hover:bg-market-mint"
+          >
+            Open nutrition board
           </Link>
         </div>
       </section>

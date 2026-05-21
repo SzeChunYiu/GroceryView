@@ -196,6 +196,20 @@ describe('Next.js web scaffold', () => {
     assert.match(pantryPlannerPage, /Decision rules/);
   });
 
+  it('surfaces a dedicated nutrition value route from nutrition driver data', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+    const nutritionPage = await readFile(new URL('../src/app/nutrition-value/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(demoData, /export const nutritionValueBoard = /);
+    assert.match(demoData, /Protein floor/);
+    assert.match(demoData, /Garant Havregryn 1kg/);
+    assert.match(marketShell, /\/nutrition-value/);
+    assert.match(marketShell, /nutritionValueBoard\.weeklySignal/);
+    assert.match(nutritionPage, /nutritionValueBoard\.cards\.map/);
+    assert.match(nutritionPage, /Nutrition ranking rules/);
+  });
+
   it('surfaces source coverage rows on the homepage', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
