@@ -5,6 +5,7 @@ import {
   buildHemkopSearchUrl,
   buildIcaHandlaUrl,
   buildMathemSearchUrl,
+  buildMatsparSearchUrl,
   buildOpenFoodFactsProductUrl,
   buildOpenPricesConnectorUrl,
   cacheKeyForScbPxWebQueryFixture,
@@ -18,6 +19,7 @@ import {
   fetchHemkopProducts,
   fetchIcaProducts,
   fetchMathemProducts,
+  fetchMatsparProducts,
   fetchWillysProducts,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -414,6 +416,83 @@ describe('fetchMathemProducts', () => {
       queries: ['a', 'b'],
       fetchImpl,
       retrievedAt: '2026-05-21T01:00:00.000Z'
+    });
+
+    assert.equal(rows.length, 1);
+  });
+});
+
+describe('fetchMatsparProducts', () => {
+  it('fetches public Matspar page data rows with price provenance', async () => {
+    const requestedUrls: string[] = [];
+    const pageData = {
+      payload: {
+        products: [{
+          productid: 3270,
+          name: 'Snabbmakaroner',
+          brand: 'Kungsörnen',
+          image: '6204b6c746fe26cfce7c4246c2f3a29f',
+          weight_pretty: '750g',
+          country_from: 'Sverige',
+          slug: 'produkt/snabbmakaroner-750-g-kungsornen',
+          price: 1500,
+          median_price: 1750,
+          w_prices: { 1886: 1665, 1887: 1877 }
+        }]
+      }
+    };
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const escaped = JSON.stringify(JSON.stringify(pageData));
+      return new Response(`<script>window.__PAGEDATA__ = JSON.parse(${escaped});</script>`, {
+        status: 200,
+        headers: { 'content-type': 'text/html' }
+      });
+    };
+
+    const rows = await fetchMatsparProducts({
+      queries: ['makaroner'],
+      fetchImpl,
+      retrievedAt: '2026-05-21T01:10:00.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildMatsparSearchUrl('makaroner'));
+    assert.deepEqual(rows, [{
+      code: '3270',
+      name: 'Snabbmakaroner',
+      brand: 'Kungsörnen',
+      packageText: '750g',
+      countryFrom: 'Sverige',
+      price: 15,
+      priceText: '15.00 SEK',
+      medianPrice: 17.5,
+      warehousePriceCount: 2,
+      sourceUrl: buildMatsparSearchUrl('makaroner'),
+      productUrl: 'https://www.matspar.se/produkt/snabbmakaroner-750-g-kungsornen',
+      imageHash: '6204b6c746fe26cfce7c4246c2f3a29f',
+      retrievedAt: '2026-05-21T01:10:00.000Z'
+    }]);
+  });
+
+  it('deduplicates products across Matspar search pages', async () => {
+    const pageData = {
+      payload: {
+        products: [{
+          productid: 1,
+          name: 'Same product',
+          price: 1000
+        }]
+      }
+    };
+    const fetchImpl: typeof fetch = async () => new Response(
+      `<script>window.__PAGEDATA__ = JSON.parse(${JSON.stringify(JSON.stringify(pageData))});</script>`,
+      { status: 200 }
+    );
+
+    const rows = await fetchMatsparProducts({
+      queries: ['a', 'b'],
+      fetchImpl,
+      retrievedAt: '2026-05-21T01:10:00.000Z'
     });
 
     assert.equal(rows.length, 1);
