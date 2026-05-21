@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { BarChart3, Database, MapPin, ScanSearch, ShoppingBasket, Store } from 'lucide-react';
 import {
+  basketSubstitutionRadar,
   categories,
   dealOpportunityRail,
   householdSavings,
@@ -140,6 +141,70 @@ export function MarketShell() {
               <span className="mt-1 block text-xs font-semibold text-market-ink/55">
                 {formatSek(deal.currentPrice)}
               </span>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">Basket substitution radar</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Driver rows flag swaps, holds, and compare checks before a planned basket becomes a store trip.
+            </p>
+          </div>
+          <LightMetric label="Signals" value={String(basketSubstitutionRadar.length)} />
+          <LightMetric
+            label="Highest confidence"
+            value={formatConfidence(Math.max(...basketSubstitutionRadar.map((item) => item.sourceConfidence)))}
+          />
+        </div>
+        <div className="hidden grid-cols-[0.6fr_1fr_1fr_0.8fr] gap-3 border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55 md:grid">
+          <span>Verdict</span>
+          <span>Watch item</span>
+          <span>Suggested check</span>
+          <span className="text-right">Impact</span>
+        </div>
+        {basketSubstitutionRadar.map((signal) => (
+          <div
+            key={`${signal.anchorSlug}-${signal.substituteSlug}`}
+            className="grid gap-3 border-b border-market-ink/10 px-4 py-4 text-sm last:border-b-0 hover:bg-market-oat/45 md:grid-cols-[0.6fr_1fr_1fr_0.8fr]"
+          >
+            <div>
+              <span className="inline-flex rounded-full bg-market-oat px-2 py-1 text-xs font-black uppercase text-market-ink/65">
+                {signal.verdict}
+              </span>
+              <span className="mt-2 block text-xs font-bold text-market-ink/50">
+                {formatConfidence(signal.sourceConfidence)}
+              </span>
+            </div>
+            <div className="min-w-0">
+              <Link href={`/products/${signal.anchorSlug}`} className="block truncate font-black hover:text-market-mint">
+                {signal.anchorName}
+              </Link>
+              <Link
+                href={`/stores/${signal.anchorStoreSlug}`}
+                className="mt-1 block truncate text-xs font-bold text-market-ink/55"
+              >
+                {signal.anchorStoreName}
+              </Link>
+            </div>
+            <div className="min-w-0">
+              <Link href={`/products/${signal.substituteSlug}`} className="block truncate font-black hover:text-market-mint">
+                {signal.substituteName}
+              </Link>
+              <Link
+                href={`/stores/${signal.substituteStoreSlug}`}
+                className="mt-1 block truncate text-xs font-bold text-market-ink/55"
+              >
+                {signal.substituteStoreName}
+              </Link>
+              <p className="mt-2 leading-5 text-market-ink/65">{signal.reason}</p>
+            </div>
+            <div className="md:text-right">
+              <span className="text-xs font-bold uppercase text-market-ink/45 md:hidden">Impact</span>
+              <span className="block font-black">{signal.basketImpact}</span>
             </div>
           </div>
         ))}
