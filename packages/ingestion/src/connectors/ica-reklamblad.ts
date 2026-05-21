@@ -1,0 +1,222 @@
+export type IcaReklambladOffer = {
+  code: string;
+  name: string;
+  brand: string;
+  packageText: string;
+  category: string;
+  priceText: string;
+  comparisonPrice: string;
+  regularPriceText: string;
+  validTo: string;
+  storeName: string;
+  storeId: string;
+  availableInStore: boolean;
+  availableOnline: boolean;
+  eans: string[];
+  sourceUrl: string;
+  flyerUrl: string;
+  flyerPdfUrl: string;
+  imageUrl: string;
+  retrievedAt: string;
+};
+
+type IcaWeeklyOffer = {
+  id?: unknown;
+  details?: {
+    brand?: unknown;
+    packageInformation?: unknown;
+    name?: unknown;
+    mechanicInfo?: unknown;
+  };
+  category?: {
+    articleGroupName?: unknown;
+  };
+  validTo?: unknown;
+  comparisonPrice?: unknown;
+  stores?: Array<{
+    storeMarketingName?: unknown;
+    BMSStoreId?: unknown;
+    regularPrice?: unknown;
+    referencePriceText?: unknown;
+    onlineInd?: unknown;
+    storeInd?: unknown;
+  }>;
+  eans?: Array<{
+    id?: unknown;
+    image?: unknown;
+  }>;
+};
+
+export const ICA_REKLAMBLAD_OFFER_PAGE_URL = 'https://www.ica.se/erbjudanden/ica-focus-1004247/';
+export const EMAGIN_PDF_API_BASE_URL = 'https://api.e-magin.se/api/pdf/';
+
+export type FetchIcaReklambladOffersOptions = {
+  fetchImpl?: typeof fetch;
+  sourceUrl?: string;
+  maxRows?: number;
+  retrievedAt?: string;
+};
+
+export async function fetchIcaReklambladOffers(
+  options: FetchIcaReklambladOffersOptions = {}
+): Promise<IcaReklambladOffer[]> {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const sourceUrl = options.sourceUrl ?? ICA_REKLAMBLAD_OFFER_PAGE_URL;
+  const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const response = await fetchImpl(sourceUrl, {
+    headers: {
+      accept: 'text/html,application/xhtml+xml',
+      'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`ICA reklamblad offer page request failed: ${response.status}`);
+  }
+
+  return parseIcaReklambladOffers(await response.text(), {
+    sourceUrl,
+    retrievedAt,
+    maxRows: options.maxRows ?? 75
+  });
+}
+
+export function parseIcaReklambladOffers(
+  html: string,
+  context: {
+    sourceUrl: string;
+    retrievedAt: string;
+    maxRows?: number;
+  }
+): IcaReklambladOffer[] {
+  const flyerUrl = extractIcaReklambladUrl(html);
+  const flyerPdfUrl = buildEmaginPdfUrl(flyerUrl);
+  const rows: IcaReklambladOffer[] = [];
+  const seenCodes = new Set<string>();
+
+  for (const offer of parseWeeklyOffers(html)) {
+    const row = normalizeIcaReklambladOffer(offer, {
+      sourceUrl: context.sourceUrl,
+      flyerUrl,
+      flyerPdfUrl,
+      retrievedAt: context.retrievedAt
+    });
+    if (!row || seenCodes.has(row.code)) {
+      continue;
+    }
+    seenCodes.add(row.code);
+    rows.push(row);
+    if (rows.length >= (context.maxRows ?? 75)) {
+      return rows;
+    }
+  }
+
+  return rows;
+}
+
+export function extractIcaReklambladUrl(html: string): string {
+  const match = html.match(/"text":"DRBlad","type":"DRBlad","url":"([^"]+)"/);
+  return match ? decodeJsonString(match[1]) : '';
+}
+
+export function buildEmaginPdfUrl(flyerUrl: string): string {
+  const paperKey = flyerUrl.match(/\/latestpaper\/([^/]+)/)?.[1] ?? flyerUrl.match(/\/paper\/([^/]+)/)?.[1] ?? '';
+  return paperKey ? new URL(encodeURIComponent(paperKey), EMAGIN_PDF_API_BASE_URL).toString() : '';
+}
+
+export function normalizeIcaReklambladOffer(
+  offer: IcaWeeklyOffer,
+  context: {
+    sourceUrl: string;
+    flyerUrl: string;
+    flyerPdfUrl: string;
+    retrievedAt: string;
+  }
+): IcaReklambladOffer | null {
+  const code = text(offer.id);
+  const name = text(offer.details?.name);
+  const priceText = text(offer.details?.mechanicInfo);
+  if (!code || !name || !priceText) {
+    return null;
+  }
+
+  const store = offer.stores?.[0];
+  return {
+    code,
+    name,
+    brand: text(offer.details?.brand),
+    packageText: text(offer.details?.packageInformation),
+    category: text(offer.category?.articleGroupName),
+    priceText,
+    comparisonPrice: text(offer.comparisonPrice),
+    regularPriceText: text(store?.referencePriceText) || formatRegularPrice(store?.regularPrice),
+    validTo: text(offer.validTo),
+    storeName: text(store?.storeMarketingName),
+    storeId: text(store?.BMSStoreId),
+    availableInStore: store?.storeInd === true,
+    availableOnline: store?.onlineInd === true,
+    eans: Array.isArray(offer.eans) ? offer.eans.map((ean) => text(ean.id)).filter(Boolean) : [],
+    sourceUrl: context.sourceUrl,
+    flyerUrl: context.flyerUrl,
+    flyerPdfUrl: context.flyerPdfUrl,
+    imageUrl: text(offer.eans?.[0]?.image),
+    retrievedAt: context.retrievedAt
+  };
+}
+
+function parseWeeklyOffers(html: string): IcaWeeklyOffer[] {
+  const marker = '"weeklyOffers":';
+  const markerIndex = html.indexOf(marker);
+  if (markerIndex < 0) {
+    throw new Error('ICA offer page did not include weeklyOffers');
+  }
+
+  const arrayStart = html.indexOf('[', markerIndex);
+  const arrayEnd = findMatchingBracket(html, arrayStart);
+  if (arrayStart < 0 || arrayEnd < 0) {
+    throw new Error('ICA weeklyOffers array was malformed');
+  }
+
+  return JSON.parse(html.slice(arrayStart, arrayEnd).replace(/\bundefined\b/g, 'null')) as IcaWeeklyOffer[];
+}
+
+function findMatchingBracket(textValue: string, start: number): number {
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let index = start; index < textValue.length; index += 1) {
+    const char = textValue[index];
+    if (inString) {
+      if (escaped) {
+        escaped = false;
+      } else if (char === '\\') {
+        escaped = true;
+      } else if (char === '"') {
+        inString = false;
+      }
+    } else if (char === '"') {
+      inString = true;
+    } else if (char === '[') {
+      depth += 1;
+    } else if (char === ']') {
+      depth -= 1;
+      if (depth === 0) {
+        return index + 1;
+      }
+    }
+  }
+  return -1;
+}
+
+function formatRegularPrice(value: unknown): string {
+  const regularPrice = text(value);
+  return regularPrice ? `Ord.pris ${regularPrice} kr.` : '';
+}
+
+function decodeJsonString(value: string): string {
+  return JSON.parse(`"${value}"`) as string;
+}
+
+function text(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : typeof value === 'number' ? String(value) : '';
+}
