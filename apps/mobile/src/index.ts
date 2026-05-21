@@ -740,7 +740,9 @@ export type MobileScreenComponentAction =
   | 'review_line_matches'
   | 'confirm_receipt_items'
   | 'queue_for_sync'
-  | 'sync_when_online';
+  | 'sync_when_online'
+  | 'review_assignment'
+  | 'submit_review_decision';
 
 export type MobileScreenComponent =
   | {
@@ -780,7 +782,7 @@ export type MobileScreenComponent =
       type: 'empty';
       key: string;
       message: string;
-      action: 'search_product' | 'scan_barcode' | 'invite_household_member' | 'set_weekly_budget' | 'review_line_matches' | 'request_camera_permission';
+      action: 'search_product' | 'scan_barcode' | 'invite_household_member' | 'set_weekly_budget' | 'review_line_matches' | 'request_camera_permission' | 'review_assignment';
     };
 
 function actionLabel(action: MobileProductPriceTerminalViewModel['actions'][number]): string {
@@ -804,6 +806,11 @@ function receiptActionLabel(action: Extract<MobileScreenComponentAction, 'reques
   if (action === 'confirm_receipt_items') return 'Confirm receipt';
   if (action === 'queue_for_sync') return 'Queue offline';
   return 'Sync when online';
+}
+
+function humanReviewActionLabel(action: Extract<MobileScreenComponentAction, 'review_assignment' | 'submit_review_decision'>): string {
+  if (action === 'review_assignment') return 'Review assignment';
+  return 'Submit decision';
 }
 
 function todayActionLabel(action: Extract<MobileScreenComponentAction, 'open_product' | 'compare_basket' | 'scan_barcode'>): string {
@@ -2082,6 +2089,104 @@ export function composeMobileReceiptScanScreen(input: MobileReceiptReviewInput):
           key: action,
           action,
           label: receiptActionLabel(action),
+          primary: index === 0
+        }))
+      }
+    ]
+  };
+}
+
+export type MobileHumanReviewAssignment = {
+  assignmentId: string;
+  kind: 'receipt_line_match' | 'barcode_report' | 'price_claim';
+  title: string;
+  submittedBy: string;
+  confidenceLabel: 'high' | 'medium' | 'low';
+  slaDueAt: string;
+  status: 'open' | 'in_review' | 'blocked';
+};
+
+export type MobileHumanReviewQueueInput = {
+  reviewerId: string;
+  canSubmitDecisions: boolean;
+  assignments: MobileHumanReviewAssignment[];
+  now: string;
+};
+
+function reviewQueueState(input: MobileHumanReviewQueueInput): Extract<MobileScreenComponent, { type: 'screen' }>['state'] {
+  if (!input.canSubmitDecisions) return 'needs_provider';
+  return input.assignments.length > 0 ? 'needs_human_review' : 'empty';
+}
+
+export function composeMobileHumanReviewQueueScreen(input: MobileHumanReviewQueueInput): MobileScreenComponent {
+  const overdueCount = input.assignments.filter((assignment) => Date.parse(assignment.slaDueAt) < Date.parse(input.now)).length;
+  const blockedCount = input.assignments.filter((assignment) => assignment.status === 'blocked').length;
+  const lowConfidenceCount = input.assignments.filter((assignment) => assignment.confidenceLabel === 'low').length;
+  const actions: Array<Extract<MobileScreenComponentAction, 'review_assignment' | 'submit_review_decision'>> = input.assignments.length > 0
+    ? ['review_assignment', 'submit_review_decision']
+    : ['review_assignment'];
+
+  return {
+    type: 'screen',
+    key: `human-review-queue:${input.reviewerId}`,
+    title: 'Review queue',
+    state: reviewQueueState(input),
+    children: [
+      {
+        type: 'section',
+        key: 'summary',
+        title: 'Summary',
+        children: [
+          { type: 'metric', key: 'open-assignments', label: 'Open', value: String(input.assignments.length), tone: input.assignments.length > 0 ? 'warning' : 'positive' },
+          { type: 'metric', key: 'overdue', label: 'Overdue', value: String(overdueCount), tone: overdueCount > 0 ? 'warning' : 'positive' },
+          { type: 'metric', key: 'blocked', label: 'Blocked', value: String(blockedCount), tone: blockedCount > 0 ? 'warning' : 'neutral' },
+          { type: 'metric', key: 'low-confidence', label: 'Low confidence', value: String(lowConfidenceCount), tone: lowConfidenceCount > 0 ? 'warning' : 'positive' }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'assignments',
+        title: 'Assignments',
+        children: input.assignments.length > 0
+          ? input.assignments.map((assignment) => ({
+              type: 'row',
+              key: `assignment:${assignment.assignmentId}`,
+              label: assignment.title,
+              value: `${assignment.kind}, ${assignment.confidenceLabel} confidence, ${assignment.status}`
+            }))
+          : [{ type: 'empty', key: 'no-review-assignments', message: 'No low-confidence product matches or community reports need review.', action: 'review_assignment' }]
+      },
+      {
+        type: 'section',
+        key: 'sla',
+        title: 'SLA',
+        children: input.assignments.length > 0
+          ? input.assignments.map((assignment) => ({
+              type: 'row',
+              key: `sla:${assignment.assignmentId}`,
+              label: assignment.assignmentId,
+              value: Date.parse(assignment.slaDueAt) < Date.parse(input.now) ? `Overdue since ${assignment.slaDueAt}` : `Due ${assignment.slaDueAt}`
+            }))
+          : [{ type: 'row', key: 'sla-clear', label: 'Queue clear', value: 'No active SLA timers.' }]
+      },
+      {
+        type: 'section',
+        key: 'permissions',
+        title: 'Permissions',
+        children: [
+          { type: 'row', key: 'reviewer', label: 'Reviewer', value: input.reviewerId },
+          { type: 'row', key: 'decision-permission', label: 'Decision writes', value: input.canSubmitDecisions ? 'Enabled' : 'Blocked until reviewer permission is granted' }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'actions',
+        title: 'Actions',
+        children: actions.map((action, index) => ({
+          type: 'action',
+          key: action,
+          action,
+          label: humanReviewActionLabel(action),
           primary: index === 0
         }))
       }

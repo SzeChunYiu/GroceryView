@@ -14,6 +14,7 @@ import {
   composeMobileBasketScreen,
   composeMobileBudgetScreen,
   composeMobileHouseholdScreen,
+  composeMobileHumanReviewQueueScreen,
   composeMobilePrivacyScreen,
   composeMobileProfileScreen,
   composeMobileReceiptScanScreen,
@@ -34,6 +35,7 @@ import {
   createMobileWatchlistViewModel,
   createMobileViewModel,
   loadMobileProductTerminal,
+  type MobileHumanReviewAssignment,
   type MobileReceiptReview
 } from '../index.js';
 
@@ -1047,6 +1049,62 @@ describe('mobile app foundation', () => {
     const actions = screen.children.find((section) => section.key === 'actions');
     assert.equal(actions?.type, 'section');
     assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Review matches']);
+  });
+
+  it('composes a renderable mobile Review Queue screen with assignments, SLA status, permissions, and actions', () => {
+    const assignments: MobileHumanReviewAssignment[] = [
+      {
+        assignmentId: 'review-1',
+        kind: 'receipt_line_match',
+        title: 'Match CHEESE 500G to catalog item',
+        submittedBy: 'shopper-1',
+        confidenceLabel: 'low',
+        slaDueAt: '2026-05-20T08:00:00.000Z',
+        status: 'open'
+      },
+      {
+        assignmentId: 'review-2',
+        kind: 'barcode_report',
+        title: 'Verify unknown barcode report',
+        submittedBy: 'shopper-2',
+        confidenceLabel: 'medium',
+        slaDueAt: '2026-05-21T12:00:00.000Z',
+        status: 'blocked'
+      }
+    ];
+
+    const screen = composeMobileHumanReviewQueueScreen({
+      reviewerId: 'reviewer-1',
+      canSubmitDecisions: true,
+      assignments,
+      now: '2026-05-20T09:00:00.000Z'
+    });
+
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.title, 'Review queue');
+    assert.equal(screen.state, 'needs_human_review');
+    assert.deepEqual(screen.children.map((section) => section.key), ['summary', 'assignments', 'sla', 'permissions', 'actions']);
+
+    const summary = screen.children.find((section) => section.key === 'summary');
+    assert.equal(summary?.type, 'section');
+    assert.deepEqual(summary?.children.map((metric) => 'value' in metric ? metric.value : null), ['2', '1', '1', '1']);
+
+    const assignmentRows = screen.children.find((section) => section.key === 'assignments');
+    if (!assignmentRows || assignmentRows.type !== 'section') throw new Error('assignments section missing');
+    assert.deepEqual(assignmentRows.children.map((row) => row.key), ['assignment:review-1', 'assignment:review-2']);
+    assert.equal('value' in assignmentRows.children[0]! ? assignmentRows.children[0]!.value : null, 'receipt_line_match, low confidence, open');
+
+    const sla = screen.children.find((section) => section.key === 'sla');
+    if (!sla || sla.type !== 'section') throw new Error('sla section missing');
+    assert.equal('value' in sla.children[0]! ? sla.children[0]!.value : null, 'Overdue since 2026-05-20T08:00:00.000Z');
+
+    const permissions = screen.children.find((section) => section.key === 'permissions');
+    if (!permissions || permissions.type !== 'section') throw new Error('permissions section missing');
+    assert.deepEqual(permissions.children.map((row) => 'value' in row ? row.value : null), ['reviewer-1', 'Enabled']);
+
+    const actions = screen.children.find((section) => section.key === 'actions');
+    assert.equal(actions?.type, 'section');
+    assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Review assignment', 'Submit decision']);
   });
 
   it('defines Expo route and device-build readiness for proposal-critical screens', () => {
