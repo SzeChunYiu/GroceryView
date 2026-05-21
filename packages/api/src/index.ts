@@ -451,6 +451,35 @@ export type ProductPriceSpreadReport = {
   guardrails: string[];
 };
 
+export type ProductStoreSavingsRow = {
+  storeId: string;
+  storeName: string;
+  price: number;
+  rank: number;
+  savingsVsHighest: number;
+  savingsVsHighestPercent: number;
+  priceLabel: 'best_savings' | 'saves_vs_highest' | 'highest_price';
+};
+
+export type ProductStoreSavingsReport = {
+  productId: string;
+  ticker: string;
+  productName: string;
+  currency: 'SEK';
+  sampleSize: number;
+  bestStoreId: string | null;
+  bestStoreName: string | null;
+  bestPrice: number | null;
+  highestStoreId: string | null;
+  highestStoreName: string | null;
+  highestPrice: number | null;
+  maxSavings: number;
+  maxSavingsPercent: number;
+  rows: ProductStoreSavingsRow[];
+  customerRead: string;
+  guardrails: string[];
+};
+
 export type MarketMover = {
   productId: string;
   ticker: string;
@@ -1210,6 +1239,57 @@ function productPriceSpreadFor(product: ProductDetail): ProductPriceSpreadReport
       'Price spread compares only current verified store quotes for the selected product.',
       'Spread rankings do not change Deal Score or basket routing without the product-specific price evidence.',
       'Missing stores stay out of the spread sample until a current quote is verified.'
+    ]
+  };
+}
+
+function productStoreSavingsFor(product: ProductDetail): ProductStoreSavingsReport {
+  const sortedPrices = sortPricesByValue(product.currentPrices);
+  const bestPrice = sortedPrices[0] ?? null;
+  const highestPrice = sortedPrices.at(-1) ?? null;
+  const maxSavings = bestPrice && highestPrice ? roundPrice(highestPrice.price - bestPrice.price) : 0;
+  const maxSavingsPercent = highestPrice && highestPrice.price > 0 ? roundPercent((maxSavings / highestPrice.price) * 100) : 0;
+  const rows = sortedPrices.map((price, index) => {
+    const savingsVsHighest = highestPrice ? roundPrice(highestPrice.price - price.price) : 0;
+    const priceLabel = index === 0
+      ? 'best_savings' as const
+      : savingsVsHighest > 0
+        ? 'saves_vs_highest' as const
+        : 'highest_price' as const;
+
+    return {
+      storeId: price.storeId,
+      storeName: price.storeName,
+      price: price.price,
+      rank: index + 1,
+      savingsVsHighest,
+      savingsVsHighestPercent: highestPrice && highestPrice.price > 0 ? roundPercent((savingsVsHighest / highestPrice.price) * 100) : 0,
+      priceLabel
+    };
+  });
+
+  return {
+    productId: product.id,
+    ticker: product.ticker,
+    productName: product.name,
+    currency: 'SEK',
+    sampleSize: rows.length,
+    bestStoreId: bestPrice?.storeId ?? null,
+    bestStoreName: bestPrice?.storeName ?? null,
+    bestPrice: bestPrice?.price ?? null,
+    highestStoreId: highestPrice?.storeId ?? null,
+    highestStoreName: highestPrice?.storeName ?? null,
+    highestPrice: highestPrice?.price ?? null,
+    maxSavings,
+    maxSavingsPercent,
+    rows,
+    customerRead: bestPrice && highestPrice
+      ? `Choosing ${bestPrice.storeName} saves up to ${maxSavings.toFixed(2)} SEK versus ${highestPrice.storeName} for ${product.name}.`
+      : `${product.name} has no verified store savings sample yet.`,
+    guardrails: [
+      'Store savings compare only current verified quotes for the selected product.',
+      'Savings rows do not hide the highest verified price from the comparison.',
+      'Missing stores stay out of the savings sample until a current quote is verified.'
     ]
   };
 }
@@ -2161,6 +2241,12 @@ export function createGroceryViewApi() {
       const product = this.getProduct(id);
       if (!product) return null;
       return productPriceSpreadFor(product);
+    },
+
+    getProductStoreSavings(id: string): ProductStoreSavingsReport | null {
+      const product = this.getProduct(id);
+      if (!product) return null;
+      return productStoreSavingsFor(product);
     },
 
     getDealScore(productId: string, options: { distanceKm?: number } = {}): DealScoreReport | null {

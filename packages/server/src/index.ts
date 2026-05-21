@@ -1143,6 +1143,12 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return report ? jsonResponse(report) : errorResponse(404, 'Product not found.');
       }
 
+      const productStoreSavingsMatch = path.match(/^\/api\/products\/([^/]+)\/store-savings$/);
+      if (method === 'GET' && productStoreSavingsMatch) {
+        const report = api.getProductStoreSavings(decodeURIComponent(productStoreSavingsMatch[1]));
+        return report ? jsonResponse(report) : errorResponse(404, 'Product not found.');
+      }
+
       const productHistoryMatch = path.match(/^\/api\/products\/([^/]+)\/history$/);
       if (method === 'GET' && productHistoryMatch) {
         const productId = decodeURIComponent(productHistoryMatch[1]);
@@ -1568,6 +1574,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/products/{id}/equivalents': { get: publicOperation('Get comparable products in the same category.') },
       '/api/products/{id}/price-spread': { get: publicOperation('Get product price spread across current verified store quotes.') },
       '/api/products/{id}/prices': { get: publicOperation('Get product prices by store.') },
+      '/api/products/{id}/store-savings': { get: publicOperation('Get product store savings against the highest current verified quote.') },
       '/api/products/{id}/history': { get: publicOperation('Get product price history.') },
       '/api/products/{id}/terminal': { get: publicOperation('Get product price terminal distribution, quote, and chart data.') },
       '/api/prices/freshness': { get: publicOperation('Get price freshness and stale-price backfill queue.') },
