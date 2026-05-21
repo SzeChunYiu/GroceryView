@@ -11,6 +11,7 @@ const appFiles = [
   'src/app/categories/page.tsx',
   'src/app/categories/[slug]/page.tsx',
   'src/app/compare/page.tsx',
+  'src/app/catalogue-savings/page.tsx',
   'src/app/chain-index/page.tsx',
   'src/app/chain-coverage/page.tsx',
   'src/app/map/page.tsx',
@@ -295,6 +296,21 @@ describe('verified-data UI', () => {
     assert.match(route, /Willys\/Hemkop category coverage/);
     assert.match(route, /Claim boundary/);
     assert.match(route, /per-store availability/);
+    assert.match(route, /@\/lib\/verified-data/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
+  it('surfaces verified catalogue savings on its own route', async () => {
+    const route = await read('src/app/catalogue-savings/page.tsx');
+
+    assert.match(route, /chainSavingsLedger\.map/);
+    assert.match(route, /matchedChainProducts/);
+    assert.match(route, /chainPriceRows\(product\)/);
+    assert.match(route, /SourceCoverage/);
+    assert.match(route, /Matched catalogue savings ledger/);
+    assert.match(route, /Claim boundary/);
+    assert.match(route, /store-specific availability/);
     assert.match(route, /@\/lib\/verified-data/);
     assert.doesNotMatch(route, /@\/lib\/demo-data/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);
