@@ -28,6 +28,7 @@ export default function StoresIndexPage() {
       <nav className="mb-6 flex items-center justify-between border-b border-market-ink/10 pb-4">
         <Link href="/" className="text-lg font-black tracking-tight">GroceryView</Link>
         <div className="flex gap-3 text-sm font-semibold text-market-ink/70">
+          <Link href="/map" className="text-market-mint">Map</Link>
           <Link href="/products/zoegas-coffee-450g">Products</Link>
           <Link href="/categories/coffee">Categories</Link>
         </div>
