@@ -3,18 +3,48 @@ import assert from 'node:assert/strict';
 import { buildMobileDeepLink, buildMobileRouteManifest, findMobileRoute } from '../routeManifest.js';
 
 describe('mobile route manifest', () => {
-  it('declares the Today, Stores, Watchlist, Search, Product, Basket, Budget, Profile, Household, and Privacy routes as routable Expo screens', () => {
+  it('declares core, scan, product terminal, review queue, and profile routes as routable Expo screens', () => {
     const manifest = buildMobileRouteManifest();
 
     assert.equal(manifest.router, 'expo-router');
     assert.equal(manifest.initialRoute, '/today');
     assert.deepEqual(
       manifest.requiredRoutes.map((route) => route.path),
-      ['/today', '/stores', '/watchlist', '/search', '/products/[id]', '/basket', '/budget', '/profile', '/household', '/privacy']
+      [
+        '/today',
+        '/stores',
+        '/watchlist',
+        '/search',
+        '/products/[id]',
+        '/products/[id]/terminal',
+        '/basket',
+        '/budget',
+        '/scan/barcode',
+        '/scan/receipt',
+        '/profile',
+        '/household',
+        '/privacy',
+        '/review-queue'
+      ]
     );
     assert.deepEqual(
       manifest.requiredRoutes.map((route) => route.screen),
-      ['TodayScreen', 'StoresScreen', 'WatchlistScreen', 'SearchScreen', 'ProductScreen', 'BasketScreen', 'BudgetScreen', 'ProfileScreen', 'HouseholdScreen', 'PrivacyScreen']
+      [
+        'TodayScreen',
+        'StoresScreen',
+        'WatchlistScreen',
+        'SearchScreen',
+        'ProductScreen',
+        'ProductPriceTerminalScreen',
+        'BasketScreen',
+        'BudgetScreen',
+        'BarcodeScanScreen',
+        'ReceiptScanScreen',
+        'ProfileScreen',
+        'HouseholdScreen',
+        'PrivacyScreen',
+        'HumanReviewQueueScreen'
+      ]
     );
     assert.equal(manifest.requiredRoutes.every((route) => route.requiresAuth), true);
   });
@@ -37,11 +67,15 @@ describe('mobile route manifest', () => {
     assert.deepEqual(findMobileRoute('/watchlist')?.preloadQueryIds, ['watchlist', 'product']);
     assert.deepEqual(findMobileRoute('/search')?.preloadQueryIds, ['search']);
     assert.deepEqual(findMobileRoute('/products/[id]')?.preloadQueryIds, ['product']);
+    assert.deepEqual(findMobileRoute('/products/[id]/terminal')?.preloadQueryIds, ['product', 'productTerminal']);
     assert.deepEqual(findMobileRoute('/basket')?.preloadQueryIds, ['basket', 'budget']);
     assert.deepEqual(findMobileRoute('/budget')?.preloadQueryIds, ['budget', 'basket']);
+    assert.deepEqual(findMobileRoute('/scan/barcode')?.preloadQueryIds, ['barcodeScan', 'product']);
+    assert.deepEqual(findMobileRoute('/scan/receipt')?.preloadQueryIds, ['receiptReview', 'budget', 'basket']);
     assert.deepEqual(findMobileRoute('/profile')?.preloadQueryIds, ['budget', 'basket']);
     assert.deepEqual(findMobileRoute('/household')?.preloadQueryIds, ['basket', 'budget']);
     assert.deepEqual(findMobileRoute('/privacy')?.preloadQueryIds, []);
+    assert.deepEqual(findMobileRoute('/review-queue')?.preloadQueryIds, ['reviewQueue']);
   });
 
   it('builds stable deep links and requires product ids for product links', () => {
@@ -53,6 +87,11 @@ describe('mobile route manifest', () => {
     assert.equal(buildMobileDeepLink('/privacy'), 'groceryview://privacy');
     assert.equal(buildMobileDeepLink('/search', { q: 'coffee deals' }), 'groceryview://search?q=coffee+deals');
     assert.equal(buildMobileDeepLink('/products/[id]', { id: 'ZOEGAS-COFFEE-450G' }), 'groceryview://products/ZOEGAS-COFFEE-450G');
+    assert.equal(buildMobileDeepLink('/products/[id]/terminal', { id: 'coffee' }), 'groceryview://products/coffee/terminal');
+    assert.equal(buildMobileDeepLink('/scan/barcode', { code: '7310000000000' }), 'groceryview://scan/barcode?code=7310000000000');
+    assert.equal(buildMobileDeepLink('/scan/receipt', { receiptId: 'receipt-1' }), 'groceryview://scan/receipt?receiptId=receipt-1');
+    assert.equal(buildMobileDeepLink('/review-queue'), 'groceryview://review-queue');
     assert.throws(() => buildMobileDeepLink('/products/[id]'), /id is required/);
+    assert.throws(() => buildMobileDeepLink('/products/[id]/terminal'), /id is required/);
   });
 });
