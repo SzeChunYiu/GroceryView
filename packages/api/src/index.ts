@@ -1,5 +1,6 @@
 import {
   buildPriceChartSeries,
+  buildExpiryDealRadar,
   buildWatchlistAlerts,
   calculateDealScore,
   calculateFixedBasketIndex,
@@ -17,6 +18,8 @@ import {
   suggestDealBasedMeals,
   type BasketComparisonResult,
   type BudgetSummary,
+  type ExpiryDealRadar,
+  type ExpiryDealReport,
   type LocalOfferBasketSummary,
   type MealDeal,
   type MealSuggestion,
@@ -530,6 +533,16 @@ export type MealPlanSuggestionsReport = {
   guardrails: string[];
 };
 
+export type ExpiryDealRadarReport = ExpiryDealRadar & {
+  userId: string;
+  now: string;
+  favoriteStoreIds: string[];
+  categoryFilter: string[];
+  maxDistanceKm?: number;
+  reportCount: number;
+  guardrails: string[];
+};
+
 export type LoyaltyOfferStatus = 'eligible' | 'needs_coupon' | 'needs_membership';
 
 export type LoyaltyOffer = {
@@ -706,6 +719,57 @@ const mealDeals: MealDeal[] = [
   { productId: 'pasta', name: 'Pasta', category: 'pantry', price: 14.9, dealScore: 82 },
   { productId: 'tomatoes', name: 'Tomatoes', category: 'vegetables', price: 19.9, dealScore: 79 },
   { productId: 'milk', name: 'Arla Milk 1L', category: 'dairy', price: 13.9, dealScore: 73 }
+];
+
+const expiryDealReports: ExpiryDealReport[] = [
+  {
+    id: 'expiry-chicken-hemkop',
+    productId: 'chicken',
+    productName: 'Chicken breast',
+    storeId: 'hemkop-fridhemsplan',
+    storeName: 'Hemkop Fridhemsplan',
+    category: 'protein',
+    originalPrice: 99.9,
+    currentPrice: 49.9,
+    markdownPercent: 50,
+    expiresAt: '2026-05-20T20:00:00.000Z',
+    reportedAt: '2026-05-20T08:00:00.000Z',
+    distanceKm: 2.4,
+    verificationCount: 2,
+    photoCount: 1
+  },
+  {
+    id: 'expiry-tomatoes-coop',
+    productId: 'tomatoes',
+    productName: 'Tomatoes',
+    storeId: 'coop-odenplan',
+    storeName: 'Coop Odenplan',
+    category: 'vegetables',
+    originalPrice: 39.9,
+    currentPrice: 24.9,
+    markdownPercent: 38,
+    expiresAt: '2026-05-21T14:00:00.000Z',
+    reportedAt: '2026-05-20T09:30:00.000Z',
+    distanceKm: 0.8,
+    verificationCount: 1,
+    photoCount: 0
+  },
+  {
+    id: 'expiry-yogurt-lidl',
+    productId: 'yogurt',
+    productName: 'Greek yogurt',
+    storeId: 'lidl-sveavagen',
+    storeName: 'Lidl Sveavägen',
+    category: 'dairy',
+    originalPrice: 34.9,
+    currentPrice: 19.9,
+    markdownPercent: 43,
+    expiresAt: '2026-05-22T12:00:00.000Z',
+    reportedAt: '2026-05-19T06:00:00.000Z',
+    distanceKm: 1.1,
+    verificationCount: 1,
+    photoCount: 1
+  }
 ];
 
 const defaultPantry: PantryInventoryItem[] = [
@@ -1638,6 +1702,35 @@ export function createGroceryViewApi() {
           'Meal suggestions use current high-scoring deals but never update a basket without user confirmation.',
           'Diet, allergen, and household rules must be checked before a suggested meal is saved.',
           'Per-serving cost is advisory and cannot hide stale or missing ingredient price evidence.'
+        ]
+      };
+    },
+
+    getExpiryDealRadarReport(userId: string, options: { now?: string; categoryFilter?: string[]; maxDistanceKm?: number } = {}): ExpiryDealRadarReport {
+      requireNonEmptyId(userId, 'userId');
+      const now = options.now ?? '2026-05-20T10:00:00.000Z';
+      const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
+      const categoryFilter = options.categoryFilter ?? [];
+      if (options.maxDistanceKm !== undefined) requirePositiveFinite(options.maxDistanceKm, 'maxDistanceKm');
+      const radar = buildExpiryDealRadar({
+        now,
+        reports: expiryDealReports,
+        favoriteStoreIds,
+        categoryFilter,
+        ...(options.maxDistanceKm === undefined ? {} : { maxDistanceKm: options.maxDistanceKm })
+      });
+      return {
+        userId,
+        now,
+        favoriteStoreIds,
+        categoryFilter,
+        ...(options.maxDistanceKm === undefined ? {} : { maxDistanceKm: options.maxDistanceKm }),
+        reportCount: expiryDealReports.length,
+        ...radar,
+        guardrails: [
+          'Expiry markdowns require recent reports and remain separate from public shelf-price history.',
+          'Favorite-store and category filters narrow visibility without changing markdown scores.',
+          'Needs-confirmation markdowns can inform planning but cannot trigger automatic basket updates.'
         ]
       };
     },
