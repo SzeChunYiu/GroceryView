@@ -67,6 +67,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/stores/{id}/deals']);
     assert.ok(docs.body.paths['/users/demo/favorite-stores']);
     assert.ok(docs.body.paths['/users/demo/favorite-stores/{storeId}']);
+    assert.ok(docs.body.paths['/users/demo/watchlist/{productId}']);
     assert.ok(docs.body.paths['/users/demo/alerts/inbox']);
     assert.ok(docs.body.paths['/users/demo/basket/local-offers']);
     assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
@@ -312,6 +313,15 @@ describe('GroceryView API app', () => {
     const watchlist = await request(app.getHttpServer()).get('/users/demo/watchlist').expect(200);
     assert.equal(watchlist.body.items[0].productId, 'coffee');
     assert.deepEqual(watchlist.body.items[0].allowedPriceTypes, ['shelf']);
+    await request(app.getHttpServer()).post('/users/demo/watchlist').send({ productId: 'milk', targetPrice: 14 }).expect(201);
+    const watchlistRemoval = await request(app.getHttpServer()).delete('/users/demo/watchlist/milk').expect(200);
+    assert.equal(watchlistRemoval.body.productId, 'milk');
+    assert.equal(watchlistRemoval.body.removed, true);
+    assert.deepEqual(
+      watchlistRemoval.body.watchlist.items.map((item: { productId: string }) => item.productId),
+      ['coffee']
+    );
+    assert.equal(watchlistRemoval.body.demo, true);
 
     await request(app.getHttpServer())
       .post('/users/demo/basket/items')
@@ -606,6 +616,7 @@ describe('GroceryView API app', () => {
     await request(app.getHttpServer()).get('/products/missing-product/deal-score').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/equivalents').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/history').expect(404);
+    await request(app.getHttpServer()).delete('/users/demo/watchlist/missing-product').expect(404);
   });
 
   it('returns 404 for missing store deals', async () => {

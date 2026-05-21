@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { groceryApi } from '../demo-data.js';
@@ -29,6 +29,13 @@ class WatchlistItemDto {
   allowedPriceTypes?: Array<(typeof allowedWatchlistPriceTypes)[number]>;
 }
 
+function asProductNotFound(error: unknown) {
+  if (error instanceof Error && /Unknown productId/.test(error.message)) {
+    throw new NotFoundException('Product not found');
+  }
+  throw error;
+}
+
 @ApiTags('watchlists')
 @Controller('users/demo/watchlist')
 export class WatchlistsController {
@@ -44,5 +51,16 @@ export class WatchlistsController {
     const item = { ...body, favoriteStoresOnly: body.favoriteStoresOnly ?? false };
     groceryApi.addWatchlistItem('demo', item);
     return item;
+  }
+
+  @Delete(':productId')
+  @ApiOkResponse({ description: 'Watchlist item removed' })
+  remove(@Param('productId') productId: string) {
+    try {
+      const result = groceryApi.removeWatchlistItem('demo', productId);
+      return { productId, ...result, watchlist: groceryApi.getWatchlist('demo'), demo: true };
+    } catch (error) {
+      asProductNotFound(error);
+    }
   }
 }
