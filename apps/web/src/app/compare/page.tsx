@@ -38,6 +38,28 @@ export default function ComparePage() {
         </p>
       </header>
 
+      <section className="mb-6 rounded-lg border border-market-ink/10 bg-market-oat/30 p-4">
+        <div className="text-xs font-bold uppercase tracking-widest text-market-mint">Cheapest chain per product</div>
+        <div className="mt-3 grid gap-3 md:grid-cols-3">
+          {sorted.slice(0, 6).map((p) => (
+            <article key={p.code} className="rounded-md border border-market-ink/10 bg-white p-3">
+              <div className="truncate font-black" title={p.name}>{p.name}</div>
+              <div className="mt-1 text-sm text-market-ink/60">
+                Cheapest at {CHAIN_LABEL[p.lowestChain] || p.lowestChain} · {p.spreadPct.toFixed(1)}% spread
+              </div>
+              <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                <span className={p.lowestChain === 'willys' ? 'font-black text-market-mint' : 'text-market-ink/65'}>
+                  Willys {p.chains.willys?.price != null ? `${p.chains.willys.price.toFixed(2)} kr` : '—'}
+                </span>
+                <span className={p.lowestChain === 'hemkop' ? 'font-black text-market-mint' : 'text-market-ink/65'}>
+                  Hemköp {p.chains.hemkop?.price != null ? `${p.chains.hemkop.price.toFixed(2)} kr` : '—'}
+                </span>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="rounded-lg border border-market-ink/10 bg-white">
         <div className="grid grid-cols-[2.5fr_1fr_1fr_1fr_0.6fr] border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55">
           <span>Product</span>
