@@ -303,6 +303,30 @@ export type StoreBasketQuote = {
   warnings: string[];
 };
 
+export type StorePriceCoverageLine = {
+  productId: string;
+  productName: string;
+  category: string;
+  price: number | null;
+  unitPrice: string;
+  priceLabel: 'verified_shelf' | 'missing_price';
+  dealScore: number;
+  band: ReturnType<typeof scoreBand>;
+};
+
+export type StorePriceCoverageReport = {
+  storeId: string;
+  storeName: string;
+  currency: 'SEK';
+  productCount: number;
+  pricedProductCount: number;
+  coveragePercent: number;
+  totalKnownPrice: number;
+  missingProductIds: string[];
+  lines: StorePriceCoverageLine[];
+  guardrails: string[];
+};
+
 export type ProductEquivalent = {
   productId: string;
   productName: string;
@@ -1588,6 +1612,44 @@ function buildStoreBasketQuote(userId: string, storeId: string, userItems: Baske
   };
 }
 
+function buildStorePriceCoverage(storeId: string): StorePriceCoverageReport {
+  requireKnownStore(storeId);
+  const store = stores.find((candidate) => candidate.id === storeId);
+  if (!store) throw new Error(`Unknown storeId: ${storeId}`);
+
+  const lines = products.map((product): StorePriceCoverageLine => {
+    const price = product.currentPrices.find((candidate) => candidate.storeId === storeId);
+    return {
+      productId: product.id,
+      productName: product.name,
+      category: product.category,
+      price: price?.price ?? null,
+      unitPrice: product.unitPrice,
+      priceLabel: price ? 'verified_shelf' : 'missing_price',
+      dealScore: product.dealScore,
+      band: scoreBand(product.dealScore)
+    };
+  });
+  const pricedLines = lines.filter((line) => line.price !== null);
+
+  return {
+    storeId,
+    storeName: store.name,
+    currency: 'SEK',
+    productCount: lines.length,
+    pricedProductCount: pricedLines.length,
+    coveragePercent: roundPercent((pricedLines.length / lines.length) * 100),
+    totalKnownPrice: roundPrice(pricedLines.reduce((sum, line) => sum + (line.price ?? 0), 0)),
+    missingProductIds: lines.filter((line) => line.price === null).map((line) => line.productId),
+    lines,
+    guardrails: [
+      'Store coverage counts only products with current verified shelf prices at the selected store.',
+      'Missing products stay visible instead of being priced from another store.',
+      'Coverage can guide store-page merchandising but does not change Deal Score or basket routing.'
+    ]
+  };
+}
+
 function storeDealsFor(storeId: string): StoreDeal[] {
   requireKnownStore(storeId);
   return products
@@ -1944,6 +2006,10 @@ export function createGroceryViewApi() {
 
     getStoreDeals(storeId: string) {
       return storeDealsFor(storeId);
+    },
+
+    getStorePriceCoverage(storeId: string): StorePriceCoverageReport {
+      return buildStorePriceCoverage(storeId);
     },
 
     searchProducts(query: string) {
