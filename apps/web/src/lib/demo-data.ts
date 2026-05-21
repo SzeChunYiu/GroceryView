@@ -409,6 +409,65 @@ export const dealOpportunityRail = rankDealOpportunities({
   minimumSourceConfidence: 0.6
 });
 
+export const basketSubstitutionRadar = [
+  {
+    anchorSlug: 'bregott-normalsaltat-600g',
+    anchorName: 'Bregott Normalsaltat 600g',
+    anchorStoreSlug: 'willys-odenplan',
+    anchorStoreName: 'Willys Odenplan',
+    substituteSlug: 'garant-havregryn-1kg',
+    substituteName: 'Garant Havregryn 1kg',
+    substituteStoreSlug: 'tempo-hornstull',
+    substituteStoreName: 'Tempo Hornstull',
+    verdict: 'hold',
+    basketImpact: '+3.70 SEK risk',
+    sourceConfidence: 0.86,
+    reason: 'Butter is above baseline while breakfast oats remain under trend for a nearby top-up.'
+  },
+  {
+    anchorSlug: 'barilla-spaghetti-1kg',
+    anchorName: 'Barilla Spaghetti 1kg',
+    anchorStoreSlug: 'city-gross-stockholm',
+    anchorStoreName: 'City Gross Stockholm',
+    substituteSlug: 'eldorado-basmati-rice-1kg',
+    substituteName: 'Eldorado Basmati Rice 1kg',
+    substituteStoreSlug: 'matmissionen-hagersten',
+    substituteStoreName: 'Matmissionen Hägersten',
+    verdict: 'swap',
+    basketImpact: '-9.00 SEK',
+    sourceConfidence: 0.74,
+    reason: 'Pantry rice is materially below the pasta row and should be checked before a county trip.'
+  },
+  {
+    anchorSlug: 'marabou-mjolkchoklad-200g',
+    anchorName: 'Marabou Mjölkchoklad 200g',
+    anchorStoreSlug: 'lidl-sveavagen',
+    anchorStoreName: 'Lidl Sveavägen',
+    substituteSlug: 'olw-cheez-doodles-160g',
+    substituteName: 'OLW Cheez Doodles 160g',
+    substituteStoreSlug: 'ica-nara-sergels-torg',
+    substituteStoreName: 'ICA Nära Sergels Torg',
+    verdict: 'compare',
+    basketImpact: 'snack basket check',
+    sourceConfidence: 0.91,
+    reason: 'High-confidence snack rows are split across stores, so the terminal should flag the comparison.'
+  },
+  {
+    anchorSlug: 'kelda-pumpkin-soup-1l',
+    anchorName: 'Kelda Pumpa Soppa 1L',
+    anchorStoreSlug: 'hemkop-stockholm',
+    anchorStoreName: 'Hemköp Stockholm',
+    substituteSlug: 'felix-ketchup-1kg',
+    substituteName: 'Felix Tomatketchup 1kg',
+    substituteStoreSlug: 'hemkop-stockholm',
+    substituteStoreName: 'Hemköp Stockholm',
+    verdict: 'bundle',
+    basketImpact: '-2.90 SEK pantry add-on',
+    sourceConfidence: 0.68,
+    reason: 'Medium-confidence Hemkop rows should travel together until receipt review confirms the soup price.'
+  }
+];
+
 export const stockholmAreas = [
   { slug: 'norrmalm',   name: 'Norrmalm',   storeCount: 2, topSavings: 'Snacks' },
   { slug: 'sodermalm',  name: 'Södermalm',  storeCount: 2, topSavings: 'Breakfast' },
