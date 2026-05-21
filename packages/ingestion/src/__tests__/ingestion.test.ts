@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { gzipSync } from 'node:zlib';
 import {
   buildHemkopSearchUrl,
+  buildIcaHandlaUrl,
   buildMathemSearchUrl,
   buildOpenFoodFactsProductUrl,
   buildOpenPricesConnectorUrl,
@@ -15,6 +16,7 @@ import {
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
   fetchHemkopProducts,
+  fetchIcaProducts,
   fetchMathemProducts,
   fetchWillysProducts,
   groceryCategoryCoicopMappings,
@@ -259,6 +261,52 @@ describe('fetchHemkopProducts', () => {
       queries: ['a', 'b'],
       fetchImpl,
       retrievedAt: '2026-05-21T00:45:00.000Z'
+    });
+
+    assert.equal(rows.length, 1);
+  });
+});
+
+describe('fetchIcaProducts', () => {
+  it('fetches public ICA handla product cards with source provenance', async () => {
+    const requestedUrls: string[] = [];
+    const html = `
+      <a title="Pasta Gnocchi Färsk 400g ICA" href="/produkt/2118838" class="product-link" data-name="Pasta Gnocchi Färsk 400g ICA" data-index="24" data-categories="[&#34;Färdigmat &#38; Såser&#34;,&#34;Färsk pasta&#34;]" data-price="0">
+        <img src="https://assets.icanet.se/image/upload/cs_srgb/t_product_medium_v1/ul98v6ybpfgb1z7127y9.webp" alt="Pasta Gnocchi Färsk 400g ICA">
+      </a>`;
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(html, { status: 200, headers: { 'content-type': 'text/html' } });
+    };
+
+    const rows = await fetchIcaProducts({
+      paths: ['/kategori/306'],
+      fetchImpl,
+      retrievedAt: '2026-05-21T01:05:00.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildIcaHandlaUrl('/kategori/306'));
+    assert.deepEqual(rows, [{
+      code: '2118838',
+      name: 'Pasta Gnocchi Färsk 400g ICA',
+      brand: '',
+      categories: ['Färdigmat & Såser', 'Färsk pasta'],
+      imageUrl: 'https://assets.icanet.se/image/upload/cs_srgb/t_product_medium_v1/ul98v6ybpfgb1z7127y9.webp',
+      productUrl: 'https://handla.ica.se/produkt/2118838',
+      dataPrice: '0',
+      sourceUrl: buildIcaHandlaUrl('/kategori/306'),
+      retrievedAt: '2026-05-21T01:05:00.000Z'
+    }]);
+  });
+
+  it('deduplicates products across ICA handla pages', async () => {
+    const html = '<a title="Same product" href="/produkt/1" class="product-link" data-name="Same product" data-categories="[]" data-price="0"><img src="/image.webp"></a>';
+    const fetchImpl: typeof fetch = async () => new Response(html, { status: 200 });
+
+    const rows = await fetchIcaProducts({
+      paths: ['/', '/kategori/1'],
+      fetchImpl,
+      retrievedAt: '2026-05-21T01:05:00.000Z'
     });
 
     assert.equal(rows.length, 1);
