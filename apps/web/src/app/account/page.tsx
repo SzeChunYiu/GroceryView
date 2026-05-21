@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { Bell, CheckCircle2, Clock, Mail, Smartphone } from "lucide-react";
+import { Bell, CheckCircle2, Clock, Mail, Smartphone, UserRound } from "lucide-react";
 import { basketItems, formatSek } from "@/components/sample-data";
+import { accountProfile } from "@/lib/demo-data";
 
 const alertRules = [
   { label: "Coffee drops below median", channel: "Push", threshold: "Under 52 kr", status: "Active" },
@@ -27,6 +28,23 @@ export default function AccountPage() {
           <Metric icon={Mail} label="Email" value="1" />
         </div>
       </section>
+
+      <Link
+        className="grid gap-3 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm transition hover:border-emerald-300 md:grid-cols-[auto_1fr_auto] md:items-center"
+        href="/account/profile"
+      >
+        <UserRound className="h-6 w-6 text-emerald-700" aria-hidden="true" />
+        <span>
+          <span className="block text-sm font-semibold uppercase tracking-wide text-zinc-500">Profile hub</span>
+          <span className="mt-1 block text-xl font-semibold text-zinc-950">
+            {accountProfile.shopperName} · {accountProfile.profileCompleteness} complete
+          </span>
+          <span className="mt-1 block text-sm text-zinc-500">
+            {accountProfile.homeDistrict} home area with {accountProfile.preferredStore} as the default store.
+          </span>
+        </span>
+        <span className="text-sm font-semibold text-emerald-700">Open profile</span>
+      </Link>
 
       <section className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
         <div className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">

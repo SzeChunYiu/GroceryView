@@ -143,4 +143,20 @@ describe('Next.js web scaffold', () => {
     assert.match(savingsPage, /savingsDashboard\.districtSavings\.map/);
     assert.match(savingsPage, /Priority watchpoints/);
   });
+
+  it('surfaces a dedicated account profile route from homepage driver data', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+    const accountPage = await readFile(new URL('../src/app/account/page.tsx', import.meta.url), 'utf8');
+    const profilePage = await readFile(new URL('../src/app/account/profile/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(demoData, /export const accountProfile = /);
+    assert.match(demoData, /profileCompleteness/);
+    assert.match(demoData, /routeLinks/);
+    assert.match(marketShell, /\/account\/profile/);
+    assert.match(marketShell, /accountProfile\.routeLinks\.map/);
+    assert.match(accountPage, /accountProfile\.shopperName/);
+    assert.match(profilePage, /accountProfile\.preferences\.map/);
+    assert.match(profilePage, /Connected routes/);
+  });
 });

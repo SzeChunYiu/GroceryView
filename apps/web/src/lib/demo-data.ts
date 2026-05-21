@@ -777,3 +777,23 @@ export const savingsDashboard = {
     { district: 'Hägersten', planned: '264.10 SEK', avoided: '9.90 SEK', driver: 'Rice and pantry clearance' }
   ]
 };
+
+export const accountProfile = {
+  shopperName: 'Alex Household',
+  homeDistrict: 'Vasastan',
+  preferredStore: 'Willys Odenplan',
+  weeklyBudget: '1,150.00 SEK',
+  savedSince: '2026-05-01',
+  profileCompleteness: '83%',
+  preferences: [
+    { label: 'Primary basket', value: 'Breakfast and pantry staples', status: 'Active' },
+    { label: 'Substitution mode', value: 'Diet-safe savings first', status: 'Active' },
+    { label: 'Receipt privacy', value: 'Line totals only for household sharing', status: 'Limited' },
+    { label: 'Alert timing', value: 'Push before weekly route planning', status: 'Active' }
+  ],
+  routeLinks: [
+    { label: 'Saved weekly basket', href: '/weekly-basket', detail: '12 visible driver rows' },
+    { label: 'Savings dashboard', href: '/savings-dashboard', detail: '66.10 SEK avoided month-to-date' },
+    { label: 'Home store profile', href: '/stores/willys-odenplan', detail: 'Coffee and dairy anchor store' }
+  ]
+};
