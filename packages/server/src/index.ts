@@ -11,6 +11,7 @@ import {
   createPgQueryExecutor,
   createPostgresRepository,
   createPostgresSourceRecordReader,
+  type BudgetRecord,
   type PgLikeClient,
   type PostgresIntegrationReadinessReport,
   type QueryExecutor,
@@ -73,6 +74,10 @@ export type AuthOptions = {
   subscriptionEntitlementRepository?: {
     getSubscriptionEntitlement(userId: string): Promise<SubscriptionEntitlementLookupRecord | null>;
   };
+  budgetRepository?: {
+    upsertBudget(userId: string, budget: BudgetRecord): Promise<void>;
+    getBudget(userId: string): Promise<BudgetRecord | null>;
+  };
   humanReviewRepository?: {
     getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
     listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
@@ -122,6 +127,8 @@ export type SubscriptionEntitlementLookupRecord = SubscriptionEntitlementSnapsho
 export type RuntimePersistenceRepository = {
   getSubscriptionEntitlement(userId: string): Promise<SubscriptionEntitlementLookupRecord | null>;
   upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
+  upsertBudget(userId: string, budget: BudgetRecord): Promise<void>;
+  getBudget(userId: string): Promise<BudgetRecord | null>;
   getHumanReviewer(reviewerId: string): Promise<HumanReviewOperator | null>;
   listOpenHumanReviewAssignments(): Promise<HumanReviewAssignment[]>;
   saveHumanReviewAssignment(assignment: HumanReviewAssignment): Promise<void>;
@@ -1190,10 +1197,12 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (authError) return authError;
         if (method === 'PATCH') {
           const body = await readJson(request);
-          api.updateBudget(user, {
+          const budget = {
             weeklyBudget: requiredNumber(body.weeklyBudget, 'weeklyBudget'),
             monthlyBudget: requiredNumber(body.monthlyBudget, 'monthlyBudget')
-          });
+          };
+          api.updateBudget(user, budget);
+          await authOptions.budgetRepository?.upsertBudget(user, budget);
           return jsonResponse(api.getBudgetSummary(user));
         }
       }
@@ -1203,7 +1212,11 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (user instanceof Response) return user;
         const authError = await authorizeUser(request, user);
         if (authError) return authError;
-        if (method === 'GET') return jsonResponse(api.getBudgetSummary(user));
+        if (method === 'GET') {
+          const budget = await authOptions.budgetRepository?.getBudget(user);
+          if (budget) api.updateBudget(user, budget);
+          return jsonResponse(api.getBudgetSummary(user));
+        }
       }
 
       if (path === '/api/budget/categories') {
@@ -1571,6 +1584,10 @@ export function buildRepositoryBackedAuthOptions(
     ...buildRuntimeAuthOptions(config, options),
     subscriptionEntitlementRepository: {
       getSubscriptionEntitlement: (userId) => repository.getSubscriptionEntitlement(userId)
+    },
+    budgetRepository: {
+      upsertBudget: (userId, budget) => repository.upsertBudget(userId, budget),
+      getBudget: (userId) => repository.getBudget(userId)
     },
     humanReviewRepository: {
       getHumanReviewer: (reviewerId) => repository.getHumanReviewer(reviewerId),

@@ -225,12 +225,19 @@ describe('runtime config', () => {
 
   it('wires repository-backed runtime sinks into account access and billing webhooks', async () => {
     let entitlement: SubscriptionEntitlementLookupRecord | null = null;
+    let persistedBudget: { weeklyBudget: number; monthlyBudget: number } | null = null;
     const repository: RuntimePersistenceRepository = {
       async getSubscriptionEntitlement(userId: string) {
         return userId === 'user-1' ? entitlement : null;
       },
       async upsertSubscriptionEntitlement(nextEntitlement) {
         entitlement = nextEntitlement;
+      },
+      async upsertBudget(userId, budget) {
+        if (userId === 'user-1') persistedBudget = { ...budget };
+      },
+      async getBudget(userId) {
+        return userId === 'user-1' ? persistedBudget : null;
       },
       async getHumanReviewer() {
         return null;
@@ -261,6 +268,22 @@ describe('runtime config', () => {
       { repository }
     );
     const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, authSecret);
+
+    const budgetPatch = await handle(new Request('http://localhost/api/budget?userId=user-1', {
+      method: 'PATCH',
+      headers: { authorization: `Bearer ${token}` },
+      body: JSON.stringify({ weeklyBudget: 900, monthlyBudget: 3600 })
+    }));
+    assert.equal(budgetPatch.status, 200);
+    assert.equal((await budgetPatch.json() as { weeklyBudget: number }).weeklyBudget, 900);
+    assert.deepEqual(persistedBudget, { weeklyBudget: 900, monthlyBudget: 3600 });
+
+    persistedBudget = { weeklyBudget: 650, monthlyBudget: 2600 };
+    const budgetSummary = await handle(new Request('http://localhost/api/budget/summary?userId=user-1', {
+      headers: { authorization: `Bearer ${token}` }
+    }));
+    assert.equal(budgetSummary.status, 200);
+    assert.equal((await budgetSummary.json() as { weeklyBudget: number }).weeklyBudget, 650);
 
     const before = await handle(new Request('http://localhost/api/account/subscription-access?userId=user-1', {
       headers: { authorization: `Bearer ${token}` }
