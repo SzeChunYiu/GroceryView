@@ -297,6 +297,23 @@ export const sourceReadinessMatrix = sourceCoverage.map((source) => {
   };
 });
 
+export const sourceRouteMap = sourceReadinessMatrix.map((source) => {
+  const supportingRoutes =
+    source.name === 'Stockholm store directory'
+      ? ['/stores', '/map', '/data-sources']
+      : source.name === 'OpenPrices SEK observations'
+        ? ['/products', '/categories', '/data-sources']
+        : ['/compare', '/chain-index', '/data-sources'];
+
+  return {
+    name: source.name,
+    primaryRoute: source.primaryRoute,
+    supportingRoutes,
+    routeCount: supportingRoutes.length,
+    freshness: source.freshness
+  };
+});
+
 export const keyMetrics = [
   { label: 'Verified price rows', value: (axfoodProducts.length + pricedProducts.length).toLocaleString('sv-SE'), detail: 'Axfood products plus OpenPrices observations rendered from generated modules.' },
   { label: 'Matched Willys/Hemköp products', value: matchedChainProducts.length.toLocaleString('sv-SE'), detail: 'Only products present in both chain catalogues are compared.' },
