@@ -33,6 +33,7 @@ describe('GroceryView API app', () => {
     assert.equal(docs.body.info.title, 'GroceryView API');
     assert.ok(docs.body.paths['/categories/{category}/market']);
     assert.ok(docs.body.paths['/users/demo/account/subscription-access']);
+    assert.ok(docs.body.paths['/users/demo/account/subscription-entitlement']);
     assert.ok(docs.body.paths['/users/demo/budget/summary']);
     assert.ok(docs.body.paths['/users/demo/budget/categories']);
     assert.ok(docs.body.paths['/users/demo/ads/disclosure']);
@@ -97,6 +98,9 @@ describe('GroceryView API app', () => {
     assert.deepEqual(subscriptionAccess.body.accountActions, ['show_upgrade']);
     assert.equal(subscriptionAccess.body.summary, 'Free tier: no active subscription entitlement.');
     assert.equal(subscriptionAccess.body.demo, true);
+
+    const subscriptionEntitlement = await request(app.getHttpServer()).get('/users/demo/account/subscription-entitlement').expect(200);
+    assert.deepEqual(subscriptionEntitlement.body, { userId: 'demo', entitlement: null, demo: true });
 
     const mealPlan = await request(app.getHttpServer())
       .get('/users/demo/meal-plans/suggestions?maxMealCost=120&servings=4')
@@ -271,9 +275,9 @@ describe('GroceryView API app', () => {
         demo: point.demo
       })),
       [
-        { productId: 'coffee', date: '2026-03-20', price: 69.9, verified: true, demo: true },
-        { productId: 'coffee', date: '2026-04-20', price: 59.9, verified: true, demo: true },
-        { productId: 'coffee', date: '2026-05-20', price: 49.9, verified: true, demo: true }
+        { productId: 'coffee', date: '2026-04-01', price: 69.9, verified: true, demo: true },
+        { productId: 'coffee', date: '2026-05-01', price: 59.9, verified: true, demo: true },
+        { productId: 'coffee', date: '2026-05-19', price: 49.9, verified: true, demo: true }
       ]
     );
 
