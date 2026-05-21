@@ -53,10 +53,11 @@ export default function WatchlistPage() {
           </p>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+        <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-1">
           <Metric icon={BellRing} label="Tracked rules" value={String(watchlistAlerts.length)} />
           <Metric icon={CheckCircle2} label="Targets met" value={String(targetMetCount)} />
           <Metric icon={WalletCards} label="Visible upside" value={formatSek(visibleUpside)} />
+          <Metric icon={Clock} label="Inbox holds" value="2" />
         </div>
       </section>
 
