@@ -366,4 +366,15 @@ describe('Next.js web scaffold', () => {
     assert.match(categoriesPage, /categoryDealLeaders/);
     assert.match(categoryPage, /categoryDealLeaders/);
   });
+
+
+  it('surfaces smart swaps on product detail routes', async () => {
+    const productPage = await readFile(new URL('../src/app/products/[slug]/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(productPage, /recommendSmartSwaps/);
+    assert.match(productPage, /buildSmartSwapInput/);
+    assert.match(productPage, /Smart swaps/);
+    assert.match(productPage, /smartSwaps\.map/);
+    assert.match(productPage, /qualityRisk/);
+  });
 });

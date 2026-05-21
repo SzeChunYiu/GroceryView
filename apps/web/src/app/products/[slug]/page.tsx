@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { calculateDealScore, scoreBand } from '@groceryview/core';
+import { calculateDealScore, recommendSmartSwaps, scoreBand, type BrandTier, type SmartSwapInput } from '@groceryview/core';
 import { products } from '@/lib/demo-data';
 
 export function generateStaticParams() {
@@ -14,6 +14,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const apiProductId = product.slug === 'zoegas-coffee-450g' ? 'coffee' : null;
   const dealScore = calculateDealScore(buildDealScoreInput(product));
   const verdict = scoreBand(dealScore);
+  const smartSwaps = recommendSmartSwaps(buildSmartSwapInput(product));
 
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
@@ -38,6 +39,30 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
             Sponsored placement is ignored by the core scorer.
           </p>
         </div>
+
+        {smartSwaps.length > 0 ? (
+          <section className="mt-4 rounded-md border border-market-ink/10 bg-market-oat/25 p-4">
+            <div className="text-xs font-bold uppercase tracking-widest text-market-mint">Smart swaps</div>
+            <div className="mt-3 grid gap-3">
+              {smartSwaps.map((swap) => {
+                const swapProduct = products.find((candidate) => candidate.slug === swap.productId);
+                return (
+                  <Link
+                    key={swap.productId}
+                    href={`/products/${swap.productId}`}
+                    className="rounded-md border border-market-ink/10 bg-white p-3 text-sm hover:border-market-mint/60"
+                  >
+                    <span className="block font-black">{swapProduct?.name ?? swap.productId}</span>
+                    <span className="mt-1 block text-market-ink/60">
+                      Save {swap.savingsPercent.toFixed(1)}% · {swap.confidence} confidence · {swap.qualityRisk} qualityRisk
+                    </span>
+                    <span className="mt-2 block text-market-ink/65">{swap.reason}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
         <dl className="mt-6 grid gap-3 text-sm sm:grid-cols-2">
           <Metadata label="Price type" value={product.priceType} />
           <Metadata label="Confidence" value={product.confidence} />
@@ -99,5 +124,57 @@ function buildDealScoreInput(product: ProductDriver) {
     discountDepthPercent,
     sourceConfidence: confidenceWeight(product.confidence),
     sponsoredPlacement: false
+  };
+}
+
+
+function categoryForProduct(product: ProductDriver): string {
+  const name = product.name.toLowerCase();
+  if (/rice|spaghetti|pasta|ketchup|kik/.test(name)) return 'rice';
+  if (/coffee|kaffe/.test(name)) return 'coffee';
+  if (/milk|fil|bregott|ost|egg|ägg/.test(name)) return 'milk';
+  if (/bread|fralla|rostbröd/.test(name)) return 'bread';
+  if (/juice|olivolja|soup/.test(name)) return 'beverages';
+  if (/falukorv|kyckling|lax|färs/.test(name)) return 'meat';
+  if (/tomat|potatis/.test(name)) return 'vegetables';
+  return 'pantry';
+}
+
+function brandTierForProduct(product: ProductDriver) {
+  const name = product.name.toLowerCase();
+  if (/eldorado|garant/.test(name)) return 'standard_private_label' as const;
+  if (/ica|coop|willys|lidl/.test(name)) return 'discount_chain_label' as const;
+  if (/zeta|zoegas|barilla|bregott/.test(name)) return 'premium' as const;
+  return 'national' as const;
+}
+
+function buildProductMatch(product: ProductDriver) {
+  return {
+    id: product.slug,
+    brand: product.name.split(' ')[0] ?? product.name,
+    category: categoryForProduct(product),
+    packageSize: 1,
+    packageUnit: categoryForProduct(product),
+    brandTier: brandTierForProduct(product),
+    unitPrice: parseSek(product.unitPrice)
+  };
+}
+
+function buildSmartSwapInput(product: ProductDriver): SmartSwapInput {
+  const source = buildProductMatch(product);
+  const candidates = products
+    .filter((candidate) => candidate.slug !== product.slug)
+    .map(buildProductMatch)
+    .filter((candidate) => candidate.category === source.category && candidate.unitPrice < source.unitPrice);
+
+  return {
+    source,
+    candidates,
+    acceptPrivateLabel: 'maybe' as const,
+    minimumSavingsPercent: 5,
+    privateLabelPreference: {
+      acceptedTiers: ['standard_private_label', 'organic_private_label', 'discount_chain_label'] satisfies BrandTier[],
+      blockedCategories: ['baby_formula', 'medical_diet']
+    }
   };
 }
