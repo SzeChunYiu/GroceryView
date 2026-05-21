@@ -1,11 +1,12 @@
 import Link from 'next/link';
-import { BarChart3, Database, Map, PackageSearch, Store, Tags } from 'lucide-react';
+import { Activity, BarChart3, Database, Map, PackageSearch, Store, Tags } from 'lucide-react';
 
 const navItems = [
   { href: '/', label: 'Overview', icon: BarChart3 },
   { href: '/products', label: 'Products', icon: PackageSearch },
   { href: '/compare', label: 'Compare', icon: Tags },
   { href: '/stores', label: 'Stores', icon: Store },
+  { href: '/openprices-depth', label: 'OpenPrices', icon: Activity },
   { href: '/map', label: 'Map', icon: Map },
   { href: '/categories', label: 'Categories', icon: Database }
 ];
