@@ -1156,6 +1156,12 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return jsonResponse(api.getProductHistory(productId));
       }
 
+      const productHistorySummaryMatch = path.match(/^\/api\/products\/([^/]+)\/history-summary$/);
+      if (method === 'GET' && productHistorySummaryMatch) {
+        const report = api.getProductHistorySummary(decodeURIComponent(productHistorySummaryMatch[1]));
+        return report ? jsonResponse(report) : errorResponse(404, 'Product not found.');
+      }
+
 
       const productTerminalMatch = path.match(/^\/api\/products\/([^/]+)\/terminal$/);
       if (method === 'GET' && productTerminalMatch) {
@@ -1576,6 +1582,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/products/{id}/prices': { get: publicOperation('Get product prices by store.') },
       '/api/products/{id}/store-savings': { get: publicOperation('Get product store savings against the highest current verified quote.') },
       '/api/products/{id}/history': { get: publicOperation('Get product price history.') },
+      '/api/products/{id}/history-summary': { get: publicOperation('Get product price history summary and movement guardrails.') },
       '/api/products/{id}/terminal': { get: publicOperation('Get product price terminal distribution, quote, and chart data.') },
       '/api/prices/freshness': { get: publicOperation('Get price freshness and stale-price backfill queue.') },
       '/api/households/current': {
