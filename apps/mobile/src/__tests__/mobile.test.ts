@@ -10,6 +10,7 @@ import {
   buildMobileScreenBlueprints,
   buildMobileShell,
   buildScanResult,
+  composeMobileBasketScreen,
   composeMobileBudgetScreen,
   composeMobileProfileScreen,
   composeMobileStoresScreen,
@@ -19,6 +20,7 @@ import {
   createMobileBudgetRouteViewModel,
   createMobileProfileHubViewModel,
   createMobileProductPriceTerminalViewModel,
+  createMobileBasketViewModel,
   createMobileDiscoveryViewModel,
   createMobileStoresViewModel,
   createMobileWatchlistViewModel,
@@ -458,6 +460,106 @@ describe('mobile app foundation', () => {
     const actions = screen.children.find((section) => section.key === 'actions');
     assert.equal(actions?.type, 'section');
     assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Set budget', 'Review categories', 'Review receipts']);
+  });
+
+  it('builds mobile Basket state from cheapest assignments, single-store options, and budget data', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.updateBudget('user-1', { weeklyBudget: 150, monthlyBudget: 600 });
+
+    const viewModel = createMobileBasketViewModel('user-1', api);
+
+    assert.equal(viewModel.itemCount, 3);
+    assert.equal(viewModel.cheapestTotalLabel, '77.70 SEK');
+    assert.deepEqual(viewModel.bestSingleStore, {
+      storeId: 'willys-odenplan',
+      storeName: 'Willys Odenplan',
+      totalLabel: '79.70 SEK',
+      itemCount: 2
+    });
+    assert.equal(viewModel.savingsVsBestSingleStoreLabel, '2.00 SEK');
+    assert.equal(viewModel.splitStoreCount, 2);
+    assert.deepEqual(viewModel.budget, {
+      weeklyBudgetLabel: '150.00 SEK',
+      remainingLabel: '72.30 SEK',
+      status: 'under'
+    });
+    assert.deepEqual(viewModel.assignments.map((assignment) => ({
+      productId: assignment.productId,
+      ticker: assignment.ticker,
+      storeName: assignment.storeName,
+      quantity: assignment.quantity,
+      lineTotalLabel: assignment.lineTotalLabel
+    })), [
+      { productId: 'coffee', ticker: 'ZOEGAS-COFFEE-450G', storeName: 'Willys Odenplan', quantity: 1, lineTotalLabel: '49.90 SEK' },
+      { productId: 'milk', ticker: 'ARLA-MILK-1L', storeName: 'Lidl Sveavägen', quantity: 2, lineTotalLabel: '27.80 SEK' }
+    ]);
+    assert.deepEqual(viewModel.singleStoreOptions.map((option) => option.storeId), ['willys-odenplan', 'lidl-sveavagen']);
+    assert.deepEqual(viewModel.actions, ['compare_basket', 'open_product', 'scan_barcode']);
+  });
+
+  it('composes a renderable mobile Basket screen with assignment rows, store options, and actions', () => {
+    const api = createGroceryViewApi();
+    api.addFavoriteStore('user-1', 'willys-odenplan');
+    api.addFavoriteStore('user-1', 'lidl-sveavagen');
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    api.addBasketItem('user-1', { productId: 'milk', quantity: 2 });
+    api.updateBudget('user-1', { weeklyBudget: 150, monthlyBudget: 600 });
+
+    const screen = composeMobileBasketScreen('user-1', api);
+
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.title, 'Basket');
+    assert.equal(screen.state, 'ready');
+    assert.deepEqual(screen.children.map((section) => section.key), ['summary', 'assignments', 'single-store-options', 'actions']);
+
+    const summary = screen.children.find((section) => section.key === 'summary');
+    assert.equal(summary?.type, 'section');
+    assert.deepEqual(summary?.children.map((metric) => 'value' in metric ? metric.value : null), ['3', '77.70 SEK', '72.30 SEK']);
+
+    const assignments = screen.children.find((section) => section.key === 'assignments');
+    if (!assignments || assignments.type !== 'section') throw new Error('assignments section missing');
+    assert.deepEqual(assignments.children.map((row) => row.key), ['assignment:coffee:willys-odenplan', 'assignment:milk:lidl-sveavagen']);
+    assert.equal('value' in assignments.children[0]! ? assignments.children[0]!.value : null, '1 x 49.90 SEK at Willys Odenplan, line 49.90 SEK');
+
+    const storeOptions = screen.children.find((section) => section.key === 'single-store-options');
+    if (!storeOptions || storeOptions.type !== 'section') throw new Error('single store options section missing');
+    assert.equal(storeOptions.children[0]?.key, 'store-option:willys-odenplan');
+    assert.equal('value' in storeOptions.children[0]! ? storeOptions.children[0]!.value : null, '79.70 SEK, 2 matched items');
+
+    const actions = screen.children.find((section) => section.key === 'actions');
+    assert.equal(actions?.type, 'section');
+    assert.deepEqual(actions?.children.map((action) => 'label' in action ? action.label : null), ['Compare basket', 'Open product', 'Scan barcode']);
+  });
+
+  it('composes a Basket empty state when no products have been added', () => {
+    const screen = composeMobileBasketScreen('new-user');
+    assert.equal(screen.type, 'screen');
+    assert.equal(screen.state, 'empty');
+    const assignments = screen.children.find((section) => section.key === 'assignments');
+    const storeOptions = screen.children.find((section) => section.key === 'single-store-options');
+
+    if (!assignments || assignments.type !== 'section') throw new Error('assignments section missing');
+    if (!storeOptions || storeOptions.type !== 'section') throw new Error('single store options section missing');
+    assert.deepEqual(assignments.children, [
+      {
+        type: 'empty',
+        key: 'empty-basket',
+        message: 'Start a basket from a deal, search result, or barcode scan.',
+        action: 'scan_barcode'
+      }
+    ]);
+    assert.deepEqual(storeOptions.children, [
+      {
+        type: 'empty',
+        key: 'no-store-options',
+        message: 'Add items and favorite stores to compare basket totals.',
+        action: 'scan_barcode'
+      }
+    ]);
   });
 
   it('builds mobile Profile hub state from budget, household, notification, and privacy data', () => {
