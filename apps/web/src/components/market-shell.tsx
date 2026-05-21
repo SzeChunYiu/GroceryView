@@ -10,6 +10,7 @@ import {
   mealPlanner,
   nutritionValueBoard,
   pantryPlanner,
+  priceReportDigest,
   products,
   receiptReviewQueue,
   receiptReviewDesk,
@@ -225,6 +226,42 @@ export function MarketShell() {
             </div>
           </div>
         ))}
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">Price report digest</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Report-ready summaries turn the highest-signal price rows into shopper-facing route evidence.
+            </p>
+          </div>
+          <LightMetric label="Reports" value={String(priceReportDigest.length)} />
+        </div>
+        <div className="grid gap-0 lg:grid-cols-3">
+          {priceReportDigest.map((report) => (
+            <Link
+              key={report.title}
+              href={report.href}
+              className="border-b border-market-ink/10 px-4 py-4 text-sm hover:bg-market-oat/45 lg:border-r"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <span className="block text-xs font-bold uppercase text-market-ink/50">{report.scope}</span>
+                  <span className="mt-1 block font-black">{report.title}</span>
+                </div>
+                <span className="shrink-0 rounded-full bg-market-mint/15 px-2 py-1 text-xs font-black text-market-ink/70">
+                  {report.metric}
+                </span>
+              </div>
+              <p className="mt-3 font-bold text-market-ink/70">{report.anchor}</p>
+              <p className="mt-2 leading-6 text-market-ink/65">{report.summary}</p>
+              <p className="mt-3 text-xs font-bold uppercase text-market-ink/45">
+                {report.confidence} confidence
+              </p>
+            </Link>
+          ))}
+        </div>
       </section>
 
       <section className="rounded-lg border border-market-ink/10 bg-white">
