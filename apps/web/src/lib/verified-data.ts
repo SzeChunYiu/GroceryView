@@ -150,6 +150,7 @@ export type PrivateFeatureRoute =
   | 'scanner'
   | 'household'
   | 'account'
+  | 'account-profile'
   | 'basket-ideas'
   | 'coupon-stacks'
   | 'deals'
@@ -186,6 +187,11 @@ export const privateFeatureCopy: Record<PrivateFeatureRoute, { verifiedSurface: 
     verifiedSurface: 'The account page stays browse-only because this repository snapshot has no verified user identity records.',
     gatedBy: 'Requires a production auth session plus alert, privacy, and subscription records.',
     nextStep: 'Wire the sign-in flow before showing account settings, saved areas, or message preferences.'
+  },
+  'account-profile': {
+    verifiedSurface: 'The profile page can explain why account data is absent, but it cannot show names, emails, saved areas, or household roles from this static snapshot.',
+    gatedBy: 'Requires a signed production session and verified account profile record before personal details are rendered.',
+    nextStep: 'Load profile fields from authenticated storage, then show only confirmed identity, consent, and saved-area metadata.'
   },
   'basket-ideas': {
     verifiedSurface: 'The app can rank public price spreads, but it cannot suggest personal baskets without real household goals.',
