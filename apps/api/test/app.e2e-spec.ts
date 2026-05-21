@@ -36,6 +36,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/indices']);
     assert.ok(docs.body.paths['/indices/{id}']);
     assert.ok(docs.body.paths['/market/overview']);
+    assert.ok(docs.body.paths['/users/demo/loyalty/offers']);
     assert.ok(docs.body.paths['/users/demo/meal-plans/suggestions']);
     assert.ok(docs.body.paths['/nutrition/value']);
     assert.ok(docs.body.paths['/users/demo/pantry/replenishment']);
@@ -232,6 +233,28 @@ describe('GroceryView API app', () => {
       [{ productId: 'coffee', alreadyInBasket: true, bestDeal: { storeId: 'willys-odenplan', price: 49.9 } }]
     );
     assert.equal(pantry.body.demo, true);
+
+    const loyalty = await request(app.getHttpServer()).get('/users/demo/loyalty/offers').expect(200);
+    assert.equal(loyalty.body.userId, 'demo');
+    assert.equal(loyalty.body.totalEligibleSavings, 26);
+    assert.equal(loyalty.body.requiresActionCount, 1);
+    assert.equal(loyalty.body.membershipRequiredCount, 1);
+    assert.deepEqual(
+      loyalty.body.offers.map((offer: { productId: string; chain: string; savings: number; status: string; actionRequired: boolean }) => ({
+        productId: offer.productId,
+        chain: offer.chain,
+        savings: offer.savings,
+        status: offer.status,
+        actionRequired: offer.actionRequired
+      })),
+      [
+        { productId: 'coffee', chain: 'ica', savings: 7, status: 'eligible', actionRequired: false },
+        { productId: 'milk', chain: 'coop', savings: 12, status: 'needs_coupon', actionRequired: true },
+        { productId: 'private-label-milk', chain: 'willys', savings: 7, status: 'eligible', actionRequired: false }
+      ]
+    );
+    assert.match(loyalty.body.guardrails[0], /member-only savings never overwrite verified public shelf evidence/i);
+    assert.equal(loyalty.body.demo, true);
 
     const comparison = await request(app.getHttpServer()).get('/users/demo/basket/comparison').expect(200);
     assert.deepEqual(comparison.body.strategies.map((strategy: { id: string }) => strategy.id), [
