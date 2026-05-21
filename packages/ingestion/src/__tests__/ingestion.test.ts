@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { gzipSync } from 'node:zlib';
 import {
+  buildCoopSearchUrl,
   buildHemkopSearchUrl,
   buildIcaHandlaUrl,
   buildMatpriskollenStoreOffersUrl,
@@ -18,6 +19,8 @@ import {
   fetchOpenFoodFactsProducts,
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
+  fetchCoopPublicServiceAccess,
+  fetchCoopProducts,
   fetchHemkopProducts,
   fetchIcaProducts,
   fetchMathemProducts,
@@ -134,6 +137,96 @@ describe('fetchOpenFoodFactsExportProducts', () => {
     assert.equal(rows[0].name, 'Havredryck choklad');
     assert.deepEqual(rows[0].categories, ['en:beverages', 'en:dairy-substitutes']);
     assert.equal(rows[0].sourceUrl, `${OPENFOODFACTS_EXPORT_URL}#code=7340083494406`);
+  });
+});
+
+describe('fetchCoopProducts', () => {
+  it('fetches public Coop personalization rows with price provenance', async () => {
+    const requestedUrls: string[] = [];
+    let requestBody = '';
+    const fetchImpl: typeof fetch = async (url, init) => {
+      requestedUrls.push(String(url));
+      assert.equal(init?.method, 'POST');
+      requestBody = String(init?.body);
+      return new Response(JSON.stringify({
+        results: {
+          items: [{
+            id: '7310760012896',
+            ean: '7310760012896',
+            name: 'Bryggkaffe Mellanrost',
+            manufacturerName: 'Arvid Nordquist',
+            packageSizeInformation: '500 g',
+            imageUrl: 'http://res.cloudinary.com/coopsverige/image/upload/v1676905402/cloud/274664.tiff',
+            availableOnline: true,
+            salesPriceData: { b2cPrice: 75.17 },
+            comparativePriceData: { b2cPrice: 150.34 },
+            comparativePriceText: 'kr/kg',
+            navCategories: [{
+              name: 'Bryggkaffe',
+              superCategories: [{
+                name: 'Kaffe',
+                superCategories: [{ name: 'Dryck', superCategories: [] }]
+              }]
+            }],
+            onlinePromotions: [{
+              message: 'Arvid Nordquist 2 för 130-2 för 130:-',
+              priceData: { b2cPrice: 130 },
+              medMeraRequired: false
+            }]
+          }]
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopProducts({
+      fetchImpl,
+      subscriptionKey: 'public-test-key',
+      retrievedAt: '2026-05-21T01:30:00.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildCoopSearchUrl());
+    assert.equal(JSON.parse(requestBody).query, 'kaffe');
+    assert.deepEqual(rows, [{
+      code: '7310760012896',
+      ean: '7310760012896',
+      name: 'Bryggkaffe Mellanrost',
+      brand: 'Arvid Nordquist',
+      packageText: '500 g',
+      category: 'Bryggkaffe',
+      price: 75.17,
+      priceText: '75.17 SEK',
+      unitPrice: 150.34,
+      unitPriceText: '150.34 kr/kg',
+      unitPriceUnit: 'kr/kg',
+      promotionText: 'Arvid Nordquist 2 för 130-2 för 130:-',
+      promotionPrice: 130,
+      medMeraRequired: false,
+      availableOnline: true,
+      sourceUrl: buildCoopSearchUrl(),
+      productUrl: 'https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-7310760012896/',
+      imageUrl: 'http://res.cloudinary.com/coopsverige/image/upload/v1676905402/cloud/274664.tiff',
+      retrievedAt: '2026-05-21T01:30:00.000Z'
+    }]);
+  });
+
+  it('reads Coop personalization API settings from the public handla page', async () => {
+    const fetchImpl: typeof fetch = async () => new Response(`
+      <script>
+        window.coopSettings = {
+          "serviceAccess": {
+            "personalizationApiUrl": "https://external.api.coop.se/personalization",
+            "personalizationApiSubscriptionKey": "public-page-key",
+            "personalizationApiVersion": "v1"
+          }
+        };
+      </script>
+    `, { status: 200, headers: { 'content-type': 'text/html' } });
+
+    assert.deepEqual(await fetchCoopPublicServiceAccess(fetchImpl), {
+      personalizationApiUrl: 'https://external.api.coop.se/personalization',
+      personalizationApiSubscriptionKey: 'public-page-key',
+      personalizationApiVersion: 'v1'
+    });
   });
 });
 
