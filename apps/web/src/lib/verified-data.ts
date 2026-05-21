@@ -95,6 +95,29 @@ export const categorySummaries = Object.entries(categoryLabels)
   .filter((category) => category.openPriceRows > 0 || category.chainRows > 0)
   .sort((a, b) => (b.openPriceRows + b.chainRows) - (a.openPriceRows + a.chainRows));
 
+export const categoryQualityMatrix = categorySummaries
+  .map((category) => {
+    const openRows = pricedProducts.filter((product) => product.category === category.slug);
+    const chainRows = axfoodProducts.filter((product) => product.category === category.slug);
+    const latestOpenPrice = openRows.reduce((latest, product) => product.lastObservedAt > latest ? product.lastObservedAt : latest, '');
+    const observedProducts = new Set(openRows.map((product) => product.code || product.slug)).size;
+    const chainMatches = chainRows.filter((product) => product.inChains.length > 1).length;
+
+    return {
+      slug: category.slug,
+      label: category.label,
+      verifiedRows: openRows.length + chainRows.length,
+      observedProducts,
+      chainMatches,
+      latestOpenPrice,
+      spreadSignal: category.strongestSpread,
+      qualityScore: openRows.length + chainMatches * 2 + (latestOpenPrice ? 1 : 0)
+    };
+  })
+  .filter((category) => category.verifiedRows > 0)
+  .sort((a, b) => b.qualityScore - a.qualityScore || a.label.localeCompare(b.label, 'sv'))
+  .slice(0, 8);
+
 export const sourceCoverage = [
   {
     name: 'Axfood chain price snapshot',
