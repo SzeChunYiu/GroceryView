@@ -7,6 +7,7 @@ const requiredFiles = [
   'src/app/products/[slug]/page.tsx',
   'src/app/stores/[slug]/page.tsx',
   'src/app/categories/[slug]/page.tsx',
+  'src/app/watchlist/page.tsx',
   'src/app/providers.tsx',
   'tailwind.config.ts',
   'src/components/ui/button.tsx'
@@ -75,6 +76,24 @@ describe('Next.js web scaffold', () => {
     assert.match(marketShell, /weeklyBasket\.map/);
     assert.match(marketShell, /householdSavings\.weeklyTotal/);
     assert.match(marketShell, /Weekly basket tape/);
+  });
+
+  it('surfaces a driver-backed watchlist App Router page', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const watchlistPage = await readFile(new URL('../src/app/watchlist/page.tsx', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+
+    const alertSection = demoData.split('export const watchlistAlerts = ')[1] ?? '';
+    const alertRows = alertSection.match(/productSlug: '[^']+'/g) ?? [];
+
+    assert.ok(alertRows.length >= 4, 'watchlist driver data should expose at least 4 alert rows');
+    assert.match(demoData, /zoegas-coffee-450g/);
+    assert.match(demoData, /bregott-normalsaltat-600g/);
+    assert.match(demoData, /allowedPriceTypes/);
+    assert.match(watchlistPage, /watchlistAlerts\.map/);
+    assert.match(watchlistPage, /Target-price alerts tied to real Stockholm product rows/);
+    assert.match(watchlistPage, /\/products\/\$\{alert\.productSlug\}/);
+    assert.match(marketShell, /href="\/watchlist"/);
   });
 
   it('surfaces savings playbook actions on the homepage', async () => {

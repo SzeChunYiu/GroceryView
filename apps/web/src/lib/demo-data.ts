@@ -527,6 +527,57 @@ export const savingsPlaybook = [
   }
 ];
 
+export const watchlistAlerts = [
+  {
+    productSlug: 'zoegas-coffee-450g',
+    storeSlug: 'willys-odenplan',
+    targetPrice: 52,
+    currentPrice: 49.9,
+    usualPrice: 64.9,
+    trigger: 'target met',
+    channel: 'push',
+    confidence: 'high',
+    allowedPriceTypes: ['member promo', 'shelf'],
+    nextAction: 'Buy one extra coffee pack while the Willys member promo is active.'
+  },
+  {
+    productSlug: 'bregott-normalsaltat-600g',
+    storeSlug: 'willys-odenplan',
+    targetPrice: 52,
+    currentPrice: 56.9,
+    usualPrice: 53.2,
+    trigger: 'above target',
+    channel: 'digest',
+    confidence: 'high',
+    allowedPriceTypes: ['member promo', 'shelf'],
+    nextAction: 'Keep butter on watch and delay stock-up until the price falls below target.'
+  },
+  {
+    productSlug: 'eldorado-basmati-rice-1kg',
+    storeSlug: 'matmissionen-hagersten',
+    targetPrice: 22,
+    currentPrice: 18.9,
+    usualPrice: 27.9,
+    trigger: 'target met',
+    channel: 'push',
+    confidence: 'medium',
+    allowedPriceTypes: ['clearance shelf', 'community shelf'],
+    nextAction: 'Add a pantry top-up if the weekly route passes Hagersten.'
+  },
+  {
+    productSlug: 'garant-havregryn-1kg',
+    storeSlug: 'tempo-hornstull',
+    targetPrice: 23,
+    currentPrice: 21.9,
+    usualPrice: 25.8,
+    trigger: 'target met',
+    channel: 'email',
+    confidence: 'high',
+    allowedPriceTypes: ['shelf'],
+    nextAction: 'Move breakfast staples to Hornstull this week.'
+  }
+];
+
 export const householdSavings = {
   weeklyTotal: '438.50 SEK',
   vsLastWeek: '-19.20 SEK',
