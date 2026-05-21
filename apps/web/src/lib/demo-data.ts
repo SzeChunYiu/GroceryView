@@ -970,3 +970,30 @@ export const accountProfile = {
     { label: 'Home store profile', href: '/stores/willys-odenplan', detail: 'Coffee and dairy anchor store' }
   ]
 };
+
+export const mealBasketIdeas = [
+  {
+    title: 'weekday breakfast top-up',
+    area: 'Vasastan + Hornstull',
+    total: '99.30 SEK',
+    savings: '-13.20 SEK',
+    route: 'Start at Willys Odenplan, add Tempo oats when already near Hornstull',
+    products: ['lattfil-arla-1l', 'garant-havregryn-1kg', 'icas-egg-15p']
+  },
+  {
+    title: 'pantry pasta night',
+    area: 'Stockholm County + Hägersten',
+    total: '74.70 SEK',
+    savings: '-15.40 SEK',
+    route: 'Split pasta at City Gross from rice at Matmissionen when freezer space is low',
+    products: ['barilla-spaghetti-1kg', 'eldorado-basmati-rice-1kg', 'felix-ketchup-1kg']
+  },
+  {
+    title: 'coffee and fika hold',
+    area: 'Vasastan + Norrmalm',
+    total: '104.30 SEK',
+    savings: '-10.50 SEK',
+    route: 'Take the Zoegas member promo and skip chocolate stock-up while snacks trend high',
+    products: ['zoegas-coffee-450g', 'marabou-mjolkchoklad-200g', 'skogaholm-rostbrod-500g']
+  }
+];

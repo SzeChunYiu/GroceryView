@@ -6,6 +6,7 @@ import {
   categories,
   dealOpportunityRail,
   householdSavings,
+  mealBasketIdeas,
   products,
   savingsPlaybook,
   savingsDashboard,
@@ -598,6 +599,53 @@ export function MarketShell() {
               <p className="mt-3 font-semibold text-market-ink/70">{play.trigger}</p>
               <p className="mt-2 leading-6 text-market-ink/60">{play.action}</p>
             </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">Meal basket ideas</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Shopper-ready baskets combine visible product rows, district context, and route notes.
+            </p>
+          </div>
+          <LightMetric label="Visible baskets" value={String(mealBasketIdeas.length)} />
+        </div>
+        <div className="grid gap-0 lg:grid-cols-3">
+          {mealBasketIdeas.map((basket) => (
+            <div key={basket.title} className="border-b border-market-ink/10 px-4 py-4 text-sm lg:border-r">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <span className="block text-xs font-bold uppercase text-market-ink/50">{basket.area}</span>
+                  <h3 className="mt-1 font-black capitalize">{basket.title}</h3>
+                </div>
+                <span className="shrink-0 rounded-full bg-market-mint/15 px-2 py-1 text-xs font-black text-market-ink/70">
+                  {basket.savings}
+                </span>
+              </div>
+              <p className="mt-3 leading-6 text-market-ink/65">{basket.route}</p>
+              <div className="mt-4 flex items-baseline justify-between border-t border-market-ink/10 pt-3">
+                <span className="text-xs font-bold uppercase text-market-ink/50">Projected total</span>
+                <span className="font-black tabular-nums">{basket.total}</span>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {basket.products.map((slug) => {
+                  const product = products.find((candidate) => candidate.slug === slug);
+
+                  return (
+                    <Link
+                      key={slug}
+                      href={`/products/${slug}`}
+                      className="rounded-full bg-market-oat px-2 py-1 text-xs font-bold text-market-ink/65 hover:text-market-mint"
+                    >
+                      {product?.ticker ?? slug}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
           ))}
         </div>
       </section>
