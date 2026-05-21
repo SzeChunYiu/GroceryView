@@ -14,6 +14,7 @@ const appFiles = [
   'src/app/chain-index/page.tsx',
   'src/app/map/page.tsx',
   'src/app/data-sources/page.tsx',
+  'src/app/store-coverage/page.tsx',
   'src/components/market-shell.tsx',
   'src/components/data-ui.tsx',
   'src/lib/verified-data.ts'
@@ -190,5 +191,16 @@ describe('verified-data UI', () => {
     assert.match(route, /Row share, freshness, caveat/);
     assert.match(route, /source\.primaryRoute/);
     assert.match(route, /no branch-level prices|without implying branch-level prices/i);
+  });
+
+  it('surfaces verified OSM coverage on the store coverage route', async () => {
+    const route = await read('src/app/store-coverage/page.tsx');
+
+    assert.match(route, /storeBrandLedger\.map/);
+    assert.match(route, /storeFormatCoverage\.map/);
+    assert.match(route, /SourceCoverage/);
+    assert.match(route, /OSM store coverage without inferred prices/);
+    assert.match(route, /without turning coordinates into branch-level price claims/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data/);
   });
 });
