@@ -315,6 +315,43 @@ export type MobileWatchlistViewModel = {
   actions: Array<'open_product' | 'compare_stores' | 'add_to_weekly_basket' | 'scan_barcode'>;
 };
 
+export type MobileBasketViewModel = {
+  userId: string;
+  itemCount: number;
+  cheapestTotalLabel: string;
+  bestSingleStore: {
+    storeId: string;
+    storeName: string;
+    totalLabel: string;
+    itemCount: number;
+  } | null;
+  savingsVsBestSingleStoreLabel: string;
+  splitStoreCount: number;
+  missingProductIds: string[];
+  budget: {
+    weeklyBudgetLabel: string;
+    remainingLabel: string;
+    status: 'under' | 'over';
+  };
+  assignments: Array<{
+    productId: string;
+    ticker: string;
+    productName: string;
+    storeId: string;
+    storeName: string;
+    quantity: number;
+    unitPriceLabel: string;
+    lineTotalLabel: string;
+  }>;
+  singleStoreOptions: Array<{
+    storeId: string;
+    storeName: string;
+    totalLabel: string;
+    itemCount: number;
+  }>;
+  actions: Array<'compare_basket' | 'open_product' | 'scan_barcode'>;
+};
+
 export function createMobileDiscoveryViewModel(
   input: { userId: string; query: string; selectedProductId?: string },
   api: MobileApi = createGroceryViewApi()
@@ -477,6 +514,54 @@ export function createMobileWatchlistViewModel(userId: string, api: MobileApi = 
   };
 }
 
+export function createMobileBasketViewModel(userId: string, api: MobileApi = createGroceryViewApi()): MobileBasketViewModel {
+  const basket = api.getBasket(userId);
+  const comparison = api.compareBasket(userId);
+  const budget = api.getBudgetSummary(userId);
+
+  return {
+    userId,
+    itemCount: basket.items.reduce((total, item) => total + item.quantity, 0),
+    cheapestTotalLabel: formatPriceLabel(comparison.cheapestByProduct.total),
+    bestSingleStore: comparison.bestSingleStore
+      ? {
+          storeId: comparison.bestSingleStore.storeId,
+          storeName: comparison.bestSingleStore.storeName,
+          totalLabel: formatPriceLabel(comparison.bestSingleStore.total),
+          itemCount: comparison.bestSingleStore.itemCount
+        }
+      : null,
+    savingsVsBestSingleStoreLabel: formatPriceLabel(comparison.savingsVsBestSingleStore),
+    splitStoreCount: comparison.splitStoreCount,
+    missingProductIds: [...comparison.missingProductIds],
+    budget: {
+      weeklyBudgetLabel: formatMobileMoney(budget.weeklyBudget),
+      remainingLabel: formatMobileMoney(budget.weeklyRemainingAfterEstimate),
+      status: budget.weeklyStatus
+    },
+    assignments: comparison.cheapestByProduct.assignments.map((assignment) => {
+      const product = api.getProduct(assignment.productId);
+      return {
+        productId: assignment.productId,
+        ticker: product?.ticker ?? assignment.productId,
+        productName: product?.name ?? assignment.productId,
+        storeId: assignment.storeId,
+        storeName: assignment.storeName,
+        quantity: assignment.quantity,
+        unitPriceLabel: formatPriceLabel(assignment.unitPrice),
+        lineTotalLabel: formatPriceLabel(assignment.lineTotal)
+      };
+    }),
+    singleStoreOptions: comparison.singleStoreOptions.map((option) => ({
+      storeId: option.storeId,
+      storeName: option.storeName,
+      totalLabel: formatPriceLabel(option.total),
+      itemCount: option.itemCount
+    })),
+    actions: ['compare_basket', 'open_product', 'scan_barcode']
+  };
+}
+
 export type MobileProductPriceTerminalViewModel = {
   productId: string;
   ticker: string;
@@ -587,6 +672,7 @@ export type MobileScreenComponentAction =
   | MobileProductPriceTerminalViewModel['actions'][number]
   | MobileStoresViewModel['actions'][number]
   | MobileWatchlistViewModel['actions'][number]
+  | MobileBasketViewModel['actions'][number]
   | 'open_product'
   | 'compare_basket'
   | 'scan_barcode'
@@ -669,6 +755,12 @@ function budgetActionLabel(action: Extract<MobileScreenComponentAction, 'set_wee
   if (action === 'set_weekly_budget') return 'Set budget';
   if (action === 'review_category_budgets') return 'Review categories';
   return 'Review receipts';
+}
+
+function basketActionLabel(action: MobileBasketViewModel['actions'][number]): string {
+  if (action === 'compare_basket') return 'Compare basket';
+  if (action === 'open_product') return 'Open product';
+  return 'Scan barcode';
 }
 
 function profileActionLabel(action: Extract<MobileScreenComponentAction, 'configure_notifications' | 'update_privacy' | 'invite_household_member'>): string {
@@ -1144,6 +1236,70 @@ export function composeMobileWatchlistScreen(
           key: action,
           action,
           label: watchlistActionLabel(action),
+          primary: index === 0
+        }))
+      }
+    ]
+  };
+}
+
+export function composeMobileBasketScreen(
+  userId: string,
+  api: MobileApi = createGroceryViewApi()
+): MobileScreenComponent {
+  const viewModel = createMobileBasketViewModel(userId, api);
+
+  return {
+    type: 'screen',
+    key: `basket:${userId}`,
+    title: 'Basket',
+    state: viewModel.itemCount > 0 ? 'ready' : 'empty',
+    children: [
+      {
+        type: 'section',
+        key: 'summary',
+        title: 'Summary',
+        children: [
+          { type: 'metric', key: 'item-count', label: 'Items', value: String(viewModel.itemCount), tone: viewModel.itemCount > 0 ? 'positive' : 'neutral' },
+          { type: 'metric', key: 'cheapest-total', label: 'Cheapest split', value: viewModel.cheapestTotalLabel, tone: 'positive' },
+          { type: 'metric', key: 'budget-remaining', label: 'Budget left', value: viewModel.budget.remainingLabel, tone: viewModel.budget.status === 'under' ? 'positive' : 'warning' }
+        ]
+      },
+      {
+        type: 'section',
+        key: 'assignments',
+        title: 'Cheapest assignments',
+        children: viewModel.assignments.length > 0
+          ? viewModel.assignments.map((assignment) => ({
+              type: 'row',
+              key: `assignment:${assignment.productId}:${assignment.storeId}`,
+              label: assignment.ticker,
+              value: `${assignment.quantity} x ${assignment.unitPriceLabel} at ${assignment.storeName}, line ${assignment.lineTotalLabel}`
+            }))
+          : [{ type: 'empty', key: 'empty-basket', message: 'Start a basket from a deal, search result, or barcode scan.', action: 'scan_barcode' }]
+      },
+      {
+        type: 'section',
+        key: 'single-store-options',
+        title: 'Single-store options',
+        children: viewModel.singleStoreOptions.length > 0
+          ? viewModel.singleStoreOptions.map((option) => ({
+              type: 'row',
+              key: `store-option:${option.storeId}`,
+              label: option.storeName,
+              value: `${option.totalLabel}, ${option.itemCount} matched items`
+            }))
+          : [{ type: 'empty', key: 'no-store-options', message: 'Add items and favorite stores to compare basket totals.', action: 'scan_barcode' }]
+      },
+      {
+        type: 'section',
+        key: 'actions',
+        title: 'Actions',
+        children: viewModel.actions.map((action, index) => ({
+          type: 'action',
+          key: action,
+          action,
+          label: basketActionLabel(action),
           primary: index === 0
         }))
       }
