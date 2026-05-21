@@ -33,6 +33,7 @@ describe('GroceryView API app', () => {
     assert.equal(docs.body.info.title, 'GroceryView API');
     assert.ok(docs.body.paths['/categories/{category}/market']);
     assert.ok(docs.body.paths['/users/demo/ads/disclosure']);
+    assert.ok(docs.body.paths['/users/demo/expiry-deals/radar']);
     assert.ok(docs.body.paths['/health']);
     assert.ok(docs.body.paths['/indices']);
     assert.ok(docs.body.paths['/indices/{id}']);
@@ -271,6 +272,28 @@ describe('GroceryView API app', () => {
     assert.match(disclosure.body.guardrails[0], /Sponsored placements cannot change Deal Score/i);
     assert.equal(disclosure.body.demo, true);
 
+    const expiryRadar = await request(app.getHttpServer())
+      .get('/users/demo/expiry-deals/radar?now=2026-05-20T10:00:00.000Z&category=vegetables&maxDistanceKm=2')
+      .expect(200);
+    assert.equal(expiryRadar.body.userId, 'demo');
+    assert.deepEqual(expiryRadar.body.categoryFilter, ['vegetables']);
+    assert.equal(expiryRadar.body.maxDistanceKm, 2);
+    assert.equal(expiryRadar.body.reportCount, 3);
+    assert.deepEqual(expiryRadar.body.stores.map((store: { storeId: string }) => store.storeId), ['coop-odenplan']);
+    assert.deepEqual(
+      expiryRadar.body.stores[0].items.map((item: { id: string; urgency: string; verification: string; savings: number; radarScore: number }) => ({
+        id: item.id,
+        urgency: item.urgency,
+        verification: item.verification,
+        savings: item.savings,
+        radarScore: item.radarScore
+      })),
+      [{ id: 'expiry-tomatoes-coop', urgency: 'expires_soon', verification: 'needs_confirmation', savings: 15, radarScore: 68 }]
+    );
+    assert.deepEqual(expiryRadar.body.alerts, []);
+    assert.match(expiryRadar.body.guardrails[0], /separate from public shelf-price history/i);
+    assert.equal(expiryRadar.body.demo, true);
+
     const receiptReview = await request(app.getHttpServer()).get('/users/demo/receipts/review').expect(200);
     assert.equal(receiptReview.body.userId, 'demo');
     assert.equal(receiptReview.body.lineCount, 3);
@@ -379,6 +402,10 @@ describe('GroceryView API app', () => {
   it('rejects invalid meal plan suggestion inputs', async () => {
     await request(app.getHttpServer()).get('/users/demo/meal-plans/suggestions?servings=0').expect(400);
     await request(app.getHttpServer()).get('/users/demo/meal-plans/suggestions?maxMealCost=abc').expect(400);
+  });
+
+  it('rejects invalid expiry markdown radar inputs', async () => {
+    await request(app.getHttpServer()).get('/users/demo/expiry-deals/radar?maxDistanceKm=0').expect(400);
   });
 
   it('returns 404 for missing indices', async () => {
