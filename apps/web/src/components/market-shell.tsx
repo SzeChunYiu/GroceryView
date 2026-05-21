@@ -8,6 +8,7 @@ import {
   householdSavings,
   mealBasketIdeas,
   mealPlanner,
+  pantryPlanner,
   products,
   receiptReviewQueue,
   receiptReviewDesk,
@@ -534,6 +535,17 @@ export function MarketShell() {
             className="rounded-md bg-market-ink px-3 py-2 font-black text-white hover:bg-market-mint hover:text-market-ink"
           >
             Open planner
+          </Link>
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-market-ink/10 px-4 py-3 text-sm">
+          <span className="font-bold text-market-ink/65">
+            {pantryPlanner.title}: {pantryPlanner.projectedSpend}, {pantryPlanner.projectedSavings} projected.
+          </span>
+          <Link
+            href="/pantry-planner"
+            className="rounded-md bg-market-oat px-3 py-2 font-black text-market-ink hover:bg-market-mint"
+          >
+            Open pantry plan
           </Link>
         </div>
       </section>

@@ -1287,3 +1287,46 @@ export const mealPlanner = {
     }
   ]
 };
+
+export const pantryPlanner = {
+  title: 'Pantry split planner',
+  target: 'Keep shelf-stable top-ups under 220.00 SEK',
+  projectedSpend: '207.90 SEK',
+  projectedSavings: '-28.30 SEK',
+  anchorStore: 'Matmissionen Hägersten',
+  reviewRule: 'Use medium-confidence pantry rows only when receipt review is queued',
+  staples: [
+    {
+      product: 'Eldorado Basmati Rice 1kg',
+      slug: 'eldorado-basmati-rice-1kg',
+      store: 'Matmissionen Hägersten',
+      role: 'bulk base',
+      quantity: '2 bags',
+      planned: '37.80 SEK',
+      saving: '-18.00 SEK'
+    },
+    {
+      product: 'Barilla Spaghetti 1kg',
+      slug: 'barilla-spaghetti-1kg',
+      store: 'City Gross Stockholm',
+      role: 'dinner base',
+      quantity: '2 packs',
+      planned: '55.80 SEK',
+      saving: '-3.80 SEK'
+    },
+    {
+      product: 'Felix Tomatketchup 1kg',
+      slug: 'felix-ketchup-1kg',
+      store: 'Hemköp Stockholm',
+      role: 'sauce add-on',
+      quantity: '1 bottle',
+      planned: '32.00 SEK',
+      saving: '-7.90 SEK'
+    }
+  ],
+  decisions: [
+    { label: 'Split trip', value: 'Only if Hägersten route is already planned' },
+    { label: 'Hold item', value: 'Delay soup until Hemköp receipt confirms shelf price' },
+    { label: 'Stock limit', value: 'Two rice bags max to avoid stale inventory' }
+  ]
+};
