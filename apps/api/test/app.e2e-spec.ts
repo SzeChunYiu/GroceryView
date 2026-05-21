@@ -47,6 +47,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/alerts/inbox']);
     assert.ok(docs.body.paths['/users/demo/basket/local-offers']);
     assert.ok(docs.body.paths['/users/demo/basket/stores/{storeId}/quote']);
+    assert.ok(docs.body.paths['/categories/{category}/market']);
   });
 
   it('serves products, stores, prices, watchlists, baskets, and alerts', async () => {
@@ -211,6 +212,18 @@ describe('GroceryView API app', () => {
     assert.deepEqual(storeQuote.body.missingProductIds, []);
     assert.equal(storeQuote.body.demo, true);
 
+    const categoryMarket = await request(app.getHttpServer()).get('/categories/coffee/market').expect(200);
+    assert.equal(categoryMarket.body.category, 'coffee');
+    assert.equal(categoryMarket.body.city, 'Stockholm');
+    assert.equal(categoryMarket.body.productCount, 1);
+    assert.deepEqual(categoryMarket.body.topDeal, { productId: 'coffee', currentPrice: 49.9, dealScore: 82 });
+    assert.equal(categoryMarket.body.rows[0].productId, 'coffee');
+    assert.equal(categoryMarket.body.rows[0].currentPrice, 49.9);
+    assert.equal(categoryMarket.body.rows[0].verifiedHistoryPoints, 3);
+    assert.match(categoryMarket.body.rows[0].customerRead, /49\.90 SEK at Willys Odenplan/);
+    assert.equal(categoryMarket.body.guardrails.length, 3);
+    assert.equal(categoryMarket.body.demo, true);
+
     await request(app.getHttpServer()).get('/users/demo/alerts').expect(200);
     const inbox = await request(app.getHttpServer()).get('/users/demo/alerts/inbox').expect(200);
     assert.equal(inbox.body.userId, 'demo');
@@ -258,5 +271,9 @@ describe('GroceryView API app', () => {
 
   it('returns 404 for missing indices', async () => {
     await request(app.getHttpServer()).get('/indices/missing-index').expect(404);
+  });
+
+  it('returns 404 for missing category market reports', async () => {
+    await request(app.getHttpServer()).get('/categories/missing-category/market').expect(404);
   });
 });
