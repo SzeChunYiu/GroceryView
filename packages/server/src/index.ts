@@ -51,6 +51,7 @@ import {
   processNotificationSuppressionEvent,
   type DeliveryChannel,
   type NotificationOperationsReport,
+  type RepositoryNotificationWorkerCycleResult,
   type NotificationSuppressionWebhookProvider,
   type NotificationSuppressionEventType,
   type NotificationSuppressionMutation
@@ -94,6 +95,7 @@ export type AuthOptions = {
   };
   notificationMetricsToken?: string;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
+  notificationWorkerRunner?: () => Promise<RepositoryNotificationWorkerCycleResult>;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   scanProviders?: ScanProviders;
@@ -145,6 +147,7 @@ export type RuntimeHandlerOptions = {
   now?: Date;
   repository?: RuntimePersistenceRepository;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
+  notificationWorkerRunner?: () => Promise<RepositoryNotificationWorkerCycleResult>;
   postgresReadinessProvider?: () => Promise<PostgresIntegrationReadinessReport>;
   sourceRunHealthProvider?: () => Promise<SourceRunHealthCheckResult>;
   pgPoolFactory?: RuntimePgPoolFactory;
@@ -557,6 +560,50 @@ function sourceRunHealthFailureResponse(): SourceRunHealthCheckResult {
   };
 }
 
+function notificationWorkerRunResponse(result: RepositoryNotificationWorkerCycleResult) {
+  return {
+    accepted: true,
+    dueTaskCount: result.dueTasks.length,
+    suppressionCount: result.suppressions.length,
+    persistedTaskUpdateCount: result.persistedTaskUpdates.length,
+    alertCount: result.alerts.length,
+    worker: result.worker.summary,
+    report: result.report
+  };
+}
+
+function notificationWorkerFailureResponse() {
+  return {
+    accepted: false,
+    dueTaskCount: 0,
+    suppressionCount: 0,
+    persistedTaskUpdateCount: 0,
+    alertCount: 0,
+    worker: {
+      delivered: 0,
+      notDue: 0,
+      retryScheduled: 0,
+      deadLettered: 0,
+      suppressed: 0
+    },
+    report: {
+      status: 'blocked',
+      metrics: {
+        delivered: 0,
+        notDue: 0,
+        retryScheduled: 0,
+        deadLettered: 0,
+        suppressed: 0,
+        providerFailures: 0,
+        staleDueTasks: 0
+      },
+      blockers: ['notification_worker_run_failed'],
+      warnings: [],
+      staleTaskIds: []
+    }
+  };
+}
+
 const sensitiveBillingEventFields = new Set([
   'cardnumber',
   'card',
@@ -853,6 +900,21 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
           return jsonResponse(result, { status: result.report.status === 'healthy' ? 200 : 503 });
         } catch {
           return jsonResponse(sourceRunHealthFailureResponse(), { status: 503 });
+        }
+      }
+
+      if (method === 'POST' && path === '/api/workers/notifications/run') {
+        if (!authOptions.notificationMetricsToken) return errorResponse(503, 'Notification worker token is not configured.');
+        if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
+          return errorResponse(401, 'A valid notification worker token is required.');
+        }
+        if (!authOptions.notificationWorkerRunner) return errorResponse(503, 'Notification worker runner is not configured.');
+
+        try {
+          const result = await authOptions.notificationWorkerRunner();
+          return jsonResponse(notificationWorkerRunResponse(result), { status: result.report.status === 'healthy' ? 202 : 503 });
+        } catch {
+          return jsonResponse(notificationWorkerFailureResponse(), { status: 503 });
         }
       }
 
@@ -1495,6 +1557,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/metrics/notifications': { get: metricsOperation('Export notification operations metrics.') },
       '/api/readiness/postgres': { get: metricsOperation('Check PostgreSQL schema and migration readiness without exposing database secrets.') },
       '/api/readiness/source-runs': { get: metricsOperation('Check source run freshness and terminal status without exposing source secrets.') },
+      '/api/workers/notifications/run': { post: metricsOperation('Run the configured notification worker cycle for cron execution.') },
       '/api/notifications/suppression-events': { post: webhookOperation('Accept signed normalized notification suppression events.') },
       '/api/notifications/provider-suppression-events': { post: webhookOperation('Accept signed SendGrid, SES, or Expo suppression payloads.') }
     }
@@ -1560,6 +1623,7 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     billingWebhookSecret: config.billingWebhookSecret,
     notificationMetricsToken: config.metricsToken,
     notificationMetricsProvider: options.notificationMetricsProvider,
+    notificationWorkerRunner: options.notificationWorkerRunner,
     postgresReadinessProvider: options.postgresReadinessProvider,
     sourceRunHealthProvider: options.sourceRunHealthProvider
   };
