@@ -155,6 +155,24 @@ describe('Next.js web scaffold', () => {
     assert.match(stacksPage, /couponStackCenter\.rulesTitle/);
   });
 
+  it('surfaces price freshness monitor rows on the homepage', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+
+    const freshnessSection = demoData.split('export const priceFreshnessMonitor = ')[1] ?? '';
+    const freshnessRows = freshnessSection.match(/productSlug: '[^']+'/g) ?? [];
+
+    assert.ok(freshnessRows.length >= 3, 'homepage driver data should expose at least 3 freshness rows');
+    assert.match(demoData, /2026-05-21 14:10 CET/);
+    assert.match(demoData, /Block dinner basket auto-approval/);
+    assert.match(demoData, /fiskeriet-laxfile-500g/);
+    assert.match(marketShell, /priceFreshnessMonitor\.map/);
+    assert.match(marketShell, /Price freshness monitor/);
+    assert.match(marketShell, /Freshness rows keep stale observations out of basket approvals/);
+    assert.match(marketShell, /\/products\/\$\{row\.productSlug\}/);
+    assert.match(marketShell, /\/stores\/\$\{row\.storeSlug\}/);
+  });
+
   it('surfaces savings playbook actions on the homepage', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');

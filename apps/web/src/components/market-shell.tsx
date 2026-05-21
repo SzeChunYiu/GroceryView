@@ -14,6 +14,7 @@ import {
   nutritionValueBoard,
   pantryPlanner,
   personalGroceryInflation,
+  priceFreshnessMonitor,
   priceReportCenter,
   priceReportDigest,
   products,
@@ -796,6 +797,55 @@ export function MarketShell() {
             Open coupon stacks
           </Link>
         </div>
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">Price freshness monitor</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Freshness rows keep stale observations out of basket approvals until a newer source or receipt lands.
+            </p>
+          </div>
+          <LightMetric label="Rows" value={String(priceFreshnessMonitor.length)} />
+          <LightMetric
+            label="Needs refresh"
+            value={String(priceFreshnessMonitor.filter((row) => row.status !== 'Fresh').length)}
+          />
+        </div>
+        <div className="hidden grid-cols-[1.1fr_0.75fr_0.65fr_1fr] gap-3 border-b border-market-ink/10 px-4 py-3 text-xs font-bold uppercase tracking-wide text-market-ink/55 md:grid">
+          <span>Observation</span>
+          <span>Age</span>
+          <span>Status</span>
+          <span>Next refresh</span>
+        </div>
+        {priceFreshnessMonitor.map((row) => (
+          <div
+            key={`${row.productSlug}-${row.storeSlug}`}
+            className="grid gap-3 border-b border-market-ink/10 px-4 py-4 text-sm last:border-b-0 hover:bg-market-oat/45 md:grid-cols-[1.1fr_0.75fr_0.65fr_1fr]"
+          >
+            <div>
+              <Link href={`/products/${row.productSlug}`} className="block font-black hover:text-market-mint">
+                {row.productName}
+              </Link>
+              <Link href={`/stores/${row.storeSlug}`} className="mt-1 block text-xs font-bold text-market-ink/55">
+                {row.storeName} · {row.observedAt}
+              </Link>
+              <p className="mt-2 leading-5 text-market-ink/65">{row.reason}</p>
+            </div>
+            <div>
+              <span className="text-xs font-bold uppercase text-market-ink/45 md:hidden">Age</span>
+              <span className="block font-black tabular-nums">{row.age}</span>
+              <span className="mt-1 block text-xs font-bold text-market-ink/50">{row.confidence} confidence</span>
+            </div>
+            <div>
+              <span className="inline-flex rounded-full bg-market-mint/15 px-2 py-1 text-xs font-black uppercase text-market-ink/70">
+                {row.status}
+              </span>
+            </div>
+            <div className="font-semibold leading-6 text-market-ink/65">{row.nextRefresh}</div>
+          </div>
+        ))}
       </section>
 
       <section className="rounded-lg border border-market-ink/10 bg-white">
