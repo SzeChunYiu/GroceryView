@@ -296,7 +296,6 @@ describe('Next.js web scaffold', () => {
     assert.match(profilePage, /Connected routes/);
   });
 
-
   it('surfaces deal score verdicts on product detail routes', async () => {
     const productPage = await readFile(new URL('../src/app/products/[slug]/page.tsx', import.meta.url), 'utf8');
 
@@ -305,5 +304,16 @@ describe('Next.js web scaffold', () => {
     assert.match(productPage, /Deal Score/);
     assert.match(productPage, /scoreBand\(dealScore\)/);
     assert.match(productPage, /verdict/);
+  });
+
+  it('surfaces household planning from shared driver data', async () => {
+    const householdPage = await readFile(new URL('../src/app/household/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(householdPage, /import \{ accountProfile, receiptReviewQueue \} from "@\/lib\/demo-data"/);
+    assert.match(householdPage, /accountProfile\.shopperName/);
+    assert.match(householdPage, /accountProfile\.preferredStore/);
+    assert.match(householdPage, /receiptReviewQueue\.map/);
+    assert.match(householdPage, /Receipt queue/);
+    assert.match(householdPage, /href=\{receipt\.href\}/);
   });
 });

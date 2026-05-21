@@ -1,5 +1,7 @@
-import { AlertTriangle, ReceiptText, ShieldCheck, Users } from "lucide-react";
+import Link from "next/link";
+import { AlertTriangle, ReceiptText, ShieldCheck, Store, Users } from "lucide-react";
 import { householdMembers } from "@/components/sample-data";
+import { accountProfile, receiptReviewQueue } from "@/lib/demo-data";
 
 const householdStats = [
   { label: "Monthly budget", value: "6 800 kr", detail: "Shared grocery target", icon: ReceiptText },
@@ -59,6 +61,44 @@ export default function HouseholdPage() {
         <Panel title="Substitution guard" value="Diet first" detail="Smart swaps must satisfy member restrictions before price ranking." />
         <Panel title="Export scope" value="Totals only" detail="Shared exports omit payment methods, precise locations, and raw images." />
       </section>
+
+      <section className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+        <div className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+          <Store className="h-5 w-5 text-emerald-700" aria-hidden="true" />
+          <p className="mt-4 text-sm font-semibold uppercase tracking-wide text-zinc-500">Household profile</p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-tight text-zinc-950">{accountProfile.shopperName}</h2>
+          <dl className="mt-5 grid gap-3 text-sm">
+            <ProfileRow label="Home district" value={accountProfile.homeDistrict} />
+            <ProfileRow label="Default store" value={accountProfile.preferredStore} />
+            <ProfileRow label="Weekly budget" value={accountProfile.weeklyBudget} />
+            <ProfileRow label="Profile complete" value={accountProfile.profileCompleteness} />
+          </dl>
+        </div>
+
+        <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
+          <div className="grid gap-3 border-b border-zinc-200 bg-zinc-50 px-5 py-3 text-xs font-semibold uppercase tracking-wide text-zinc-500 md:grid-cols-[1fr_0.7fr_0.55fr_0.5fr]">
+            <span>Receipt queue</span>
+            <span>Store</span>
+            <span>Impact</span>
+            <span>Confidence</span>
+          </div>
+          {receiptReviewQueue.map((receipt) => (
+            <Link
+              className="grid gap-3 border-b border-zinc-200 px-5 py-4 text-sm transition last:border-b-0 hover:bg-emerald-50/40 md:grid-cols-[1fr_0.7fr_0.55fr_0.5fr]"
+              href={receipt.href}
+              key={receipt.receipt}
+            >
+              <span>
+                <span className="block font-semibold text-zinc-950">{receipt.receipt}</span>
+                <span className="mt-1 block text-zinc-500">{receipt.issue}</span>
+              </span>
+              <span className="text-zinc-700">{receipt.store}</span>
+              <span className="font-semibold tabular-nums text-zinc-950">{receipt.impact}</span>
+              <span className="font-semibold tabular-nums text-zinc-700">{receipt.confidence}</span>
+            </Link>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }
@@ -70,5 +110,14 @@ function Panel({ title, value, detail }: { title: string; value: string; detail:
       <p className="mt-2 text-xl font-semibold text-zinc-950">{value}</p>
       <p className="mt-2 text-sm leading-6 text-zinc-600">{detail}</p>
     </article>
+  );
+}
+
+function ProfileRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4 border-b border-zinc-100 pb-3 last:border-b-0 last:pb-0">
+      <dt className="text-zinc-500">{label}</dt>
+      <dd className="font-semibold text-zinc-950">{value}</dd>
+    </div>
   );
 }
