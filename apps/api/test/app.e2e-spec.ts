@@ -49,6 +49,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/products/{id}/spread']);
+    assert.ok(docs.body.paths['/products/{id}/store-savings']);
     assert.ok(docs.body.paths['/products/{id}/deal-score']);
     assert.ok(docs.body.paths['/products/{id}/equivalents']);
     assert.ok(docs.body.paths['/users/demo/receipts/review']);
@@ -186,6 +187,30 @@ describe('GroceryView API app', () => {
     ]);
     assert.match(spread.body.customerRead, /ranges 15.00 SEK/);
     assert.equal(spread.body.guardrails.length, 3);
+
+    const storeSavings = await request(app.getHttpServer()).get('/products/coffee/store-savings').expect(200);
+    assert.equal(storeSavings.body.productId, 'coffee');
+    assert.equal(storeSavings.body.currency, 'SEK');
+    assert.equal(storeSavings.body.sampleSize, 3);
+    assert.equal(storeSavings.body.bestStoreId, 'willys-odenplan');
+    assert.equal(storeSavings.body.highestStoreId, 'coop-odenplan');
+    assert.equal(storeSavings.body.maxSavings, 15);
+    assert.equal(storeSavings.body.maxSavingsPercent, 23.1);
+    assert.deepEqual(
+      storeSavings.body.rows.map((row: { storeId: string; rank: number; savingsVsHighest: number; priceLabel: string }) => ({
+        storeId: row.storeId,
+        rank: row.rank,
+        savingsVsHighest: row.savingsVsHighest,
+        priceLabel: row.priceLabel
+      })),
+      [
+        { storeId: 'willys-odenplan', rank: 1, savingsVsHighest: 15, priceLabel: 'best_savings' },
+        { storeId: 'lidl-sveavagen', rank: 2, savingsVsHighest: 5, priceLabel: 'saves_vs_highest' },
+        { storeId: 'coop-odenplan', rank: 3, savingsVsHighest: 0, priceLabel: 'highest_price' }
+      ]
+    );
+    assert.match(storeSavings.body.guardrails[0], /verified quotes/i);
+    assert.equal(storeSavings.body.demo, true);
 
     const dealScore = await request(app.getHttpServer()).get('/products/coffee/deal-score?distanceKm=12.5').expect(200);
     assert.equal(dealScore.body.productId, 'coffee');
@@ -423,6 +448,7 @@ describe('GroceryView API app', () => {
   it('returns 404 for missing product terminal data', async () => {
     await request(app.getHttpServer()).get('/products/missing-product/terminal').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/spread').expect(404);
+    await request(app.getHttpServer()).get('/products/missing-product/store-savings').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/deal-score').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/equivalents').expect(404);
   });
