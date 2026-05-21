@@ -180,6 +180,18 @@ describe('Next.js web scaffold', () => {
     assert.match(marketShell, /Source coverage tape/);
   });
 
+  it('surfaces a dedicated chain index route from ingested chain data', async () => {
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+    const chainIndexPage = await readFile(new URL('../src/app/chain-index/page.tsx', import.meta.url), 'utf8');
+    const chainIndexData = await readFile(new URL('../src/lib/chain-index-data.ts', import.meta.url), 'utf8');
+
+    assert.match(marketShell, /\/chain-index/);
+    assert.match(chainIndexPage, /calculateChainPriceIndex/);
+    assert.match(chainIndexPage, /buildChainPriceObservations/);
+    assert.match(chainIndexData, /coopProducts/);
+    assert.match(chainIndexData, /matpriskollenOffers/);
+  });
+
   it('surfaces generated OpenPrices and OSM fixture counts on the homepage', async () => {
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
 

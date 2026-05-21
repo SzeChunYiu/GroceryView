@@ -3029,3 +3029,158 @@ export function calculatePersonalGroceryInflation(input: PersonalInflationInput)
     missingProductIds
   };
 }
+
+// ── Chain price index ────────────────────────────────────────────────────────
+// Cross-chain "how expensive is this chain" index on a 100-centred scale where
+// 100 = the market median for a category. Designed to stay comparable even when
+// chains carry different products and coverage is sparse — the explicit ask of
+// "for chains we don't have full price information, design a way to do similar":
+//   1. caller normalises to unit price (SEK per comparable unit),
+//   2. per category the market reference = median unit price across ALL chains,
+//      and each chain's category median is expressed as a ratio to it (so a chain
+//      is only ever judged against the market for the categories it actually
+//      carries — no cross-chain product matching needed),
+//   3. thin cells are shrunk toward 1.0 (market) by pseudo-observations, so a
+//      single observation can't swing the index,
+//   4. categories aggregate via a market-size-weighted GEOMETRIC mean (symmetric
+//      to up/down moves),
+//   5. coverage + confidence are reported per cell and overall, and low-coverage
+//      cells are flagged `estimated` so the UI can mark modelled values honestly.
+// Matched-basket refinement (EAN / fuzzy product matching) can layer on top later
+// for the categories where it's available, raising confidence without changing
+// the scale.
+
+export type ChainPriceObservation = {
+  chainId: string;
+  category: string;
+  unitPrice: number; // SEK per comparable unit (kg / l / pcs)
+};
+
+export type ChainCategoryIndex = {
+  category: string;
+  index: number; // 100 = market median for the category
+  observations: number;
+  marketReference: number; // market median unit price for the category
+  confidence: 'high' | 'medium' | 'low';
+  estimated: boolean; // true when coverage is below the confident threshold
+};
+
+export type ChainPriceIndex = {
+  chainId: string;
+  overallIndex: number; // 100 = market-median basket
+  observations: number;
+  categoriesCovered: number;
+  confidence: 'high' | 'medium' | 'low';
+  byCategory: ChainCategoryIndex[];
+};
+
+export type ChainPriceIndexSummary = {
+  chains: ChainPriceIndex[]; // sorted cheapest (lowest index) first
+  categories: string[]; // every category present in the market
+  marketReferenceByCategory: Record<string, number>;
+  generatedFrom: number; // total observations used
+};
+
+const CHAIN_INDEX_SHRINKAGE_PRIOR = 4; // pseudo-observations pulling a cell toward the market
+const CHAIN_INDEX_MIN_CONFIDENT = 4; // observations before a cell is "measured" not "estimated"
+
+function weightedGeometricMean(values: number[], weights: number[]): number {
+  let weightSum = 0;
+  let logSum = 0;
+  for (let i = 0; i < values.length; i += 1) {
+    const value = values[i];
+    if (!Number.isFinite(value) || value <= 0) continue;
+    const weight = weights[i] ?? 1;
+    logSum += weight * Math.log(value);
+    weightSum += weight;
+  }
+  if (weightSum === 0) return 0;
+  return Math.exp(logSum / weightSum);
+}
+
+export function calculateChainPriceIndex(observations: ChainPriceObservation[]): ChainPriceIndexSummary {
+  const usable = observations.filter(
+    (o) => Number.isFinite(o.unitPrice) && o.unitPrice > 0 && Boolean(o.chainId) && Boolean(o.category)
+  );
+  if (usable.length === 0) {
+    return { chains: [], categories: [], marketReferenceByCategory: {}, generatedFrom: 0 };
+  }
+
+  // Market reference (median unit price) + size per category, across all chains.
+  const marketByCategory = new Map<string, number[]>();
+  for (const o of usable) {
+    const arr = marketByCategory.get(o.category) ?? [];
+    arr.push(o.unitPrice);
+    marketByCategory.set(o.category, arr);
+  }
+  const marketReferenceByCategory: Record<string, number> = {};
+  const marketCategorySize: Record<string, number> = {};
+  for (const [category, prices] of marketByCategory) {
+    marketReferenceByCategory[category] = median(prices);
+    marketCategorySize[category] = prices.length;
+  }
+  const categories = [...marketByCategory.keys()].sort((a, b) => a.localeCompare(b));
+
+  // Group observations by chain.
+  const byChain = new Map<string, ChainPriceObservation[]>();
+  for (const o of usable) {
+    const arr = byChain.get(o.chainId) ?? [];
+    arr.push(o);
+    byChain.set(o.chainId, arr);
+  }
+
+  const chains: ChainPriceIndex[] = [];
+  for (const [chainId, rows] of byChain) {
+    const chainByCategory = new Map<string, number[]>();
+    for (const r of rows) {
+      const arr = chainByCategory.get(r.category) ?? [];
+      arr.push(r.unitPrice);
+      chainByCategory.set(r.category, arr);
+    }
+
+    const byCategory: ChainCategoryIndex[] = [];
+    const ratios: number[] = [];
+    const weights: number[] = [];
+    for (const [category, prices] of chainByCategory) {
+      const reference = marketReferenceByCategory[category];
+      if (!reference || reference <= 0) continue;
+      const n = prices.length;
+      const rawRatio = median(prices) / reference;
+      // Shrink toward the market (1.0) by CHAIN_INDEX_SHRINKAGE_PRIOR pseudo-obs.
+      const adjustedRatio = (n * rawRatio + CHAIN_INDEX_SHRINKAGE_PRIOR) / (n + CHAIN_INDEX_SHRINKAGE_PRIOR);
+      byCategory.push({
+        category,
+        index: roundMoney(adjustedRatio * 100),
+        observations: n,
+        marketReference: roundMoney(reference),
+        confidence: n >= 12 ? 'high' : n >= CHAIN_INDEX_MIN_CONFIDENT ? 'medium' : 'low',
+        estimated: n < CHAIN_INDEX_MIN_CONFIDENT
+      });
+      ratios.push(adjustedRatio);
+      weights.push(marketCategorySize[category] ?? 1);
+    }
+
+    byCategory.sort((a, b) => a.category.localeCompare(b.category));
+    const overall = roundMoney(weightedGeometricMean(ratios, weights) * 100) || 100;
+    const totalObs = rows.length;
+    const confidence =
+      totalObs >= 30 && byCategory.length >= 4
+        ? 'high'
+        : totalObs >= 10 && byCategory.length >= 2
+          ? 'medium'
+          : 'low';
+
+    chains.push({
+      chainId,
+      overallIndex: overall,
+      observations: totalObs,
+      categoriesCovered: byCategory.length,
+      confidence,
+      byCategory
+    });
+  }
+
+  chains.sort((a, b) => a.overallIndex - b.overallIndex);
+
+  return { chains, categories, marketReferenceByCategory, generatedFrom: usable.length };
+}
