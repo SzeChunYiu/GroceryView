@@ -141,6 +141,20 @@ describe('Next.js web scaffold', () => {
     assert.match(marketShell, /\/stores\/\$\{stack\.storeSlug\}/);
   });
 
+  it('surfaces a dedicated coupon stacks route from coupon driver data', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+    const stacksPage = await readFile(new URL('../src/app/coupon-stacks/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(demoData, /export const couponStackCenter = /);
+    assert.match(demoData, /Stack decision rules/);
+    assert.match(demoData, /Coffee member match/);
+    assert.match(marketShell, /\/coupon-stacks/);
+    assert.match(marketShell, /couponStackCenter\.headline/);
+    assert.match(stacksPage, /couponStackCenter\.stacks\.map/);
+    assert.match(stacksPage, /couponStackCenter\.rulesTitle/);
+  });
+
   it('surfaces savings playbook actions on the homepage', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
