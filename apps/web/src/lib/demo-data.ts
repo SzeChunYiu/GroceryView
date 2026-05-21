@@ -664,6 +664,42 @@ export const storeComparisonBoard = [
   }
 ];
 
+export const shoppingTripSwitchboard = [
+  {
+    title: 'Fast breakfast restock',
+    area: 'Södermalm',
+    store: 'Tempo Hornstull',
+    category: 'Breakfast',
+    basket: 'Oats, fil, bread',
+    spend: '67.40 SEK',
+    saving: '-10.50 SEK',
+    decision: 'Use when pantry staples are low and dairy can wait one day.',
+    href: '/stores/tempo-hornstull'
+  },
+  {
+    title: 'Coffee and freezer run',
+    area: 'Vasastan',
+    store: 'Willys Odenplan',
+    category: 'Coffee',
+    basket: 'Zoegas, peas, butter',
+    spend: '131.70 SEK',
+    saving: '-18.30 SEK',
+    decision: 'Best single stop when coffee index stays below baseline.',
+    href: '/stores/willys-odenplan'
+  },
+  {
+    title: 'Pantry split stop',
+    area: 'Hägersten',
+    store: 'Matmissionen Hägersten',
+    category: 'Rice',
+    basket: 'Rice, pasta, soup',
+    spend: '109.60 SEK',
+    saving: '-14.20 SEK',
+    decision: 'Split from the main weekly basket when travel cost is already covered.',
+    href: '/categories/rice'
+  }
+];
+
 export const indexHistory = [
   { date: '2026-05-12', coffee: 100.0, dairy: 100.0, bread: 100.0, pantry: 100.0, snacks: 100.0, frozen: 100.0 },
   { date: '2026-05-13', coffee:  98.4, dairy: 100.6, bread:  99.5, pantry:  99.2, snacks: 100.8, frozen:  99.4 },
