@@ -175,12 +175,20 @@ describe('verified-data UI', () => {
   });
 
   it('surfaces verified source coverage on the data sources route', async () => {
+    const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/data-sources/page.tsx');
 
+    assert.match(verified, /export const sourceReadinessMatrix = /);
+    assert.match(verified, /sourceRowsTotal/);
+    assert.match(verified, /primaryRoute/);
     assert.match(route, /sourceCoverage\.map/);
+    assert.match(route, /sourceReadinessMatrix\.map/);
     assert.match(route, /storeBrandLedger\.map/);
     assert.match(route, /categoryQualityMatrix\.map/);
     assert.match(route, /Verified snapshot provenance/);
+    assert.match(route, /Source readiness matrix/);
+    assert.match(route, /Row share, freshness, caveat/);
+    assert.match(route, /source\.primaryRoute/);
     assert.match(route, /no branch-level prices|without implying branch-level prices/i);
   });
 });
