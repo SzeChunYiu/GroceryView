@@ -51,6 +51,13 @@ export class ProductsController {
     return groceryApi.getProductEquivalents(id).map((equivalent) => ({ ...equivalent, demo: true }));
   }
 
+  @Get(':id/history')
+  @ApiOkResponse({ description: 'Raw product price history points' })
+  history(@Param('id') id: string) {
+    if (!groceryApi.getProduct(id)) throw new NotFoundException('Product not found');
+    return groceryApi.getProductHistory(id).map((point) => ({ ...point, productId: id, demo: true }));
+  }
+
   @Get(':id')
   @ApiOkResponse({ description: 'Product detail data' })
   detail(@Param('id') id: string) {

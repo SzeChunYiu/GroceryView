@@ -52,6 +52,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/products/{id}/store-savings']);
     assert.ok(docs.body.paths['/products/{id}/deal-score']);
     assert.ok(docs.body.paths['/products/{id}/equivalents']);
+    assert.ok(docs.body.paths['/products/{id}/history']);
     assert.ok(docs.body.paths['/users/demo/receipts/review']);
     assert.ok(docs.body.paths['/stores']);
     assert.ok(docs.body.paths['/stores/{id}/category-coverage']);
@@ -234,6 +235,22 @@ describe('GroceryView API app', () => {
       [
         { productId: 'private-label-milk', bestStoreId: 'willys-odenplan', dealScore: 73, demo: true },
         { productId: 'butter', bestStoreId: 'coop-odenplan', dealScore: 40, demo: true }
+      ]
+    );
+
+    const history = await request(app.getHttpServer()).get('/products/coffee/history').expect(200);
+    assert.deepEqual(
+      history.body.map((point: { productId: string; date: string; price: number; verified: boolean; demo: boolean }) => ({
+        productId: point.productId,
+        date: point.date,
+        price: point.price,
+        verified: point.verified,
+        demo: point.demo
+      })),
+      [
+        { productId: 'coffee', date: '2026-03-20', price: 69.9, verified: true, demo: true },
+        { productId: 'coffee', date: '2026-04-20', price: 59.9, verified: true, demo: true },
+        { productId: 'coffee', date: '2026-05-20', price: 49.9, verified: true, demo: true }
       ]
     );
 
@@ -451,6 +468,7 @@ describe('GroceryView API app', () => {
     await request(app.getHttpServer()).get('/products/missing-product/store-savings').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/deal-score').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/equivalents').expect(404);
+    await request(app.getHttpServer()).get('/products/missing-product/history').expect(404);
   });
 
   it('returns 404 for missing store deals', async () => {
