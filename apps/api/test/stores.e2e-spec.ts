@@ -27,6 +27,7 @@ describe('GroceryView API store deals', () => {
     const docs = await request(app.getHttpServer()).get('/api-json').expect(200);
     assert.ok(docs.body.paths['/stores/{id}/deals']);
     assert.ok(docs.body.paths['/stores/{id}/coverage']);
+    assert.ok(docs.body.paths['/stores/{id}/category-coverage']);
 
     const response = await request(app.getHttpServer()).get('/stores/willys-odenplan/deals').expect(200);
 
@@ -73,5 +74,58 @@ describe('GroceryView API store deals', () => {
 
   it('returns 404 for missing store coverage feeds', async () => {
     await request(app.getHttpServer()).get('/stores/missing-store/coverage').expect(404);
+  });
+
+  it('serves verified shelf price coverage grouped by category', async () => {
+    const response = await request(app.getHttpServer()).get('/stores/willys-odenplan/category-coverage').expect(200);
+
+    assert.equal(response.body.storeId, 'willys-odenplan');
+    assert.equal(response.body.storeName, 'Willys Odenplan');
+    assert.equal(response.body.currency, 'SEK');
+    assert.equal(response.body.demo, true);
+    assert.equal(response.body.categoryCount, response.body.categories.length);
+    assert.equal(response.body.fullyPricedCategoryCount, 2);
+    assert.deepEqual(
+      response.body.categories.map(
+        (category: {
+          category: string;
+          productCount: number;
+          pricedProductCount: number;
+          coveragePercent: number;
+          missingProductIds: string[];
+          bestDealProductId: string | null;
+        }) => ({
+          category: category.category,
+          productCount: category.productCount,
+          pricedProductCount: category.pricedProductCount,
+          coveragePercent: category.coveragePercent,
+          missingProductIds: category.missingProductIds,
+          bestDealProductId: category.bestDealProductId
+        })
+      ),
+      [
+        {
+          category: 'coffee',
+          productCount: 1,
+          pricedProductCount: 1,
+          coveragePercent: 100,
+          missingProductIds: [],
+          bestDealProductId: 'coffee'
+        },
+        {
+          category: 'dairy',
+          productCount: 3,
+          pricedProductCount: 3,
+          coveragePercent: 100,
+          missingProductIds: [],
+          bestDealProductId: 'milk'
+        }
+      ]
+    );
+    assert.equal(response.body.guardrails.length, 3);
+  });
+
+  it('returns 404 for missing store category coverage feeds', async () => {
+    await request(app.getHttpServer()).get('/stores/missing-store/category-coverage').expect(404);
   });
 });

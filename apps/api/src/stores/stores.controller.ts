@@ -25,6 +25,13 @@ export class StoresController {
     return { ...groceryApi.getStorePriceCoverage(id), demo: true };
   }
 
+  @Get(':id/category-coverage')
+  @ApiOkResponse({ description: 'Verified shelf price coverage grouped by category for one store' })
+  categoryCoverage(@Param('id') id: string) {
+    if (!groceryApi.getStore(id)) throw new NotFoundException('Store not found');
+    return { ...groceryApi.getStoreCategoryCoverage(id), demo: true };
+  }
+
   @Get(':id')
   @ApiOkResponse({ description: 'Store detail' })
   detail(@Param('id') id: string) {
