@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { gzipSync } from 'node:zlib';
 import {
   buildHemkopSearchUrl,
+  buildMathemSearchUrl,
   buildOpenFoodFactsProductUrl,
   buildOpenPricesConnectorUrl,
   cacheKeyForScbPxWebQueryFixture,
@@ -14,6 +15,7 @@ import {
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
   fetchHemkopProducts,
+  fetchMathemProducts,
   fetchWillysProducts,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -257,6 +259,113 @@ describe('fetchHemkopProducts', () => {
       queries: ['a', 'b'],
       fetchImpl,
       retrievedAt: '2026-05-21T00:45:00.000Z'
+    });
+
+    assert.equal(rows.length, 1);
+  });
+});
+
+describe('fetchMathemProducts', () => {
+  it('fetches public Mathem search page rows from embedded Next data', async () => {
+    const requestedUrls: string[] = [];
+    const nextData = {
+      props: {
+        pageProps: {
+          dehydratedState: {
+            queries: [{
+              state: {
+                data: {
+                  items: [{
+                    id: 6448,
+                    type: 'product',
+                    attributes: {
+                      id: 6448,
+                      fullName: 'Kungsörnen Gammaldags Idealmakaroner',
+                      brand: 'Kungsörnen',
+                      nameExtra: '1300 g',
+                      frontUrl: 'https://www.mathem.se/se/products/6448-kungsornen-gammaldags-idealmakaroner/',
+                      grossPrice: '22.24',
+                      grossUnitPrice: '17.11',
+                      unitPriceQuantityAbbreviation: 'kg',
+                      currency: 'SEK',
+                      availability: { isAvailable: true },
+                      images: [{ thumbnail: { url: 'https://images.mathem.se/product.jpg' } }]
+                    }
+                  }]
+                }
+              }
+            }]
+          }
+        }
+      }
+    };
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(`<script id="__NEXT_DATA__" type="application/json">${JSON.stringify(nextData)}</script>`, {
+        status: 200,
+        headers: { 'content-type': 'text/html' }
+      });
+    };
+
+    const rows = await fetchMathemProducts({
+      queries: ['makaroner'],
+      fetchImpl,
+      retrievedAt: '2026-05-21T01:00:00.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildMathemSearchUrl('makaroner'));
+    assert.deepEqual(rows, [{
+      code: '6448',
+      name: 'Kungsörnen Gammaldags Idealmakaroner',
+      brand: 'Kungsörnen',
+      packageText: '1300 g',
+      price: 22.24,
+      priceText: '22.24 SEK',
+      unitPrice: 17.11,
+      unitPriceText: '17.11 SEK',
+      unitPriceUnit: 'kg',
+      imageUrl: 'https://images.mathem.se/product.jpg',
+      productUrl: 'https://www.mathem.se/se/products/6448-kungsornen-gammaldags-idealmakaroner/',
+      available: true,
+      sourceUrl: buildMathemSearchUrl('makaroner'),
+      retrievedAt: '2026-05-21T01:00:00.000Z'
+    }]);
+  });
+
+  it('deduplicates products across Mathem search queries', async () => {
+    const nextData = {
+      props: {
+        pageProps: {
+          dehydratedState: {
+            queries: [{
+              state: {
+                data: {
+                  items: [{
+                    id: 1,
+                    type: 'product',
+                    attributes: {
+                      id: 1,
+                      fullName: 'Same product',
+                      grossPrice: '10.00',
+                      currency: 'SEK'
+                    }
+                  }]
+                }
+              }
+            }]
+          }
+        }
+      }
+    };
+    const fetchImpl: typeof fetch = async () => new Response(
+      `<script id="__NEXT_DATA__" type="application/json">${JSON.stringify(nextData)}</script>`,
+      { status: 200 }
+    );
+
+    const rows = await fetchMathemProducts({
+      queries: ['a', 'b'],
+      fetchImpl,
+      retrievedAt: '2026-05-21T01:00:00.000Z'
     });
 
     assert.equal(rows.length, 1);
