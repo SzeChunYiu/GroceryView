@@ -43,6 +43,25 @@ describe('Next.js web scaffold', () => {
     assert.match(marketShell, /Stockholm store tape/);
   });
 
+  it('keeps GOAL acceptance fixtures mirrored in visible driver data', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const ingestion = await readFile(new URL('../../../packages/ingestion/src/index.ts', import.meta.url), 'utf8');
+
+    const productSlugs = demoData.match(/^\s*slug: '[^']+'/gm) ?? [];
+    const namedRows = demoData.match(/name: '[A-ZÅÄÖ]/g) ?? [];
+    const prodStoreSlugs = ['willys-odenplan', 'ica-nara-sergels-torg', 'coop-swedenborgsgatan', 'lidl-sveavagen'];
+    const ingestionStores = [...new Set([...ingestion.matchAll(/storeName: '([^']+)'/g)].map((match) => match[1]))];
+
+    assert.ok(productSlugs.length >= 10, 'GOAL acceptance #1 requires at least 10 driver product slugs');
+    assert.ok(namedRows.length >= 6, 'GOAL acceptance #1 requires at least 6 visible named rows');
+    for (const slug of prodStoreSlugs) {
+      assert.match(demoData, new RegExp(slug), `GOAL acceptance #2 requires ${slug} in the driver data`);
+    }
+    for (const storeName of ingestionStores) {
+      assert.match(demoData, new RegExp(storeName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), `${storeName} should be mirrored from ingestion fixtures`);
+    }
+  });
+
   it('surfaces category instruments from the homepage driver data', async () => {
     const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
     const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
