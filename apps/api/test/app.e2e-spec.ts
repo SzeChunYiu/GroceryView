@@ -38,6 +38,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/ads/disclosure']);
     assert.ok(docs.body.paths['/users/demo/expiry-deals/radar']);
     assert.ok(docs.body.paths['/health']);
+    assert.ok(docs.body.paths['/users/demo/households/current']);
     assert.ok(docs.body.paths['/indices']);
     assert.ok(docs.body.paths['/indices/{id}']);
     assert.ok(docs.body.paths['/market/overview']);
@@ -308,6 +309,46 @@ describe('GroceryView API app', () => {
     ]);
     assert.equal(categoryBudget.body.demo, true);
 
+    await request(app.getHttpServer()).get('/users/demo/households/current').expect(404);
+
+    const householdPayload = {
+      householdId: 'demo-household',
+      name: 'Demo Household',
+      weeklyBudget: 500,
+      approvalLimit: 70,
+      reviewer: 'demo',
+      members: [
+        { userId: 'demo', displayName: 'Demo Shopper' },
+        { userId: 'partner', displayName: 'Partner Shopper' }
+      ],
+      basketItems: [
+        { productId: 'milk', quantity: 2, addedBy: 'demo' },
+        { productId: 'coffee', quantity: 1, addedBy: 'partner' }
+      ],
+      watchlistItems: [{ productId: 'coffee', addedBy: 'demo', targetPrice: 50 }],
+      sharedFavoriteStoreIds: ['willys-odenplan', 'lidl-sveavagen']
+    };
+    const householdWrite = await request(app.getHttpServer())
+      .put('/users/demo/households/current')
+      .send(householdPayload)
+      .expect(200);
+    assert.equal(householdWrite.body.userId, 'demo');
+    assert.equal(householdWrite.body.household.id, 'demo-household');
+    assert.equal(householdWrite.body.summary.estimatedTotal, 77.7);
+    assert.equal(householdWrite.body.summary.remainingBudget, 422.3);
+    assert.deepEqual(householdWrite.body.summary.sharedFavoriteStoreIds, ['lidl-sveavagen', 'willys-odenplan']);
+    assert.deepEqual(householdWrite.body.approvalPolicy, {
+      approvalLimit: 70,
+      reviewer: 'demo',
+      requiresOwnerApproval: true
+    });
+    assert.equal(householdWrite.body.demo, true);
+
+    const householdRead = await request(app.getHttpServer()).get('/users/demo/households/current').expect(200);
+    assert.equal(householdRead.body.household.id, 'demo-household');
+    assert.equal(householdRead.body.household.members.length, 2);
+    assert.equal(householdRead.body.demo, true);
+
     const pantry = await request(app.getHttpServer())
       .get('/users/demo/pantry/replenishment?asOf=2026-05-20T08:00:00.000Z')
       .expect(200);
@@ -506,6 +547,21 @@ describe('GroceryView API app', () => {
 
   it('rejects invalid expiry markdown radar inputs', async () => {
     await request(app.getHttpServer()).get('/users/demo/expiry-deals/radar?maxDistanceKm=0').expect(400);
+  });
+
+  it('rejects invalid household plan inputs', async () => {
+    await request(app.getHttpServer())
+      .put('/users/demo/households/current')
+      .send({
+        householdId: 'demo-household',
+        name: 'Demo Household',
+        weeklyBudget: 500,
+        approvalLimit: 70,
+        reviewer: 'demo',
+        members: [{ userId: 'demo', displayName: 'Demo Shopper' }],
+        basketItems: [{ productId: 'missing-product', quantity: 1, addedBy: 'demo' }]
+      })
+      .expect(400);
   });
 
   it('returns 404 for missing indices', async () => {
