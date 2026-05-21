@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { categoryDealLeaders } from '@/lib/demo-data';
 import { pricedProducts, categoryLabels } from '@/lib/openprices-products';
 
 export const dynamic = 'force-static';
@@ -14,6 +15,7 @@ export default async function CategoryPage({ params }: Readonly<{ params: Promis
   const items = pricedProducts.filter((p) => (p.category || 'pantry') === slug);
   if (items.length === 0) notFound();
   const label = categoryLabels[slug] || slug;
+  const leader = categoryDealLeaders.find((candidate) => candidate.category.toLowerCase() === label.toLowerCase());
 
   return (
     <main className="mx-auto max-w-5xl px-4 py-8">
@@ -28,6 +30,17 @@ export default async function CategoryPage({ params }: Readonly<{ params: Promis
           {items.length.toLocaleString()} priced products · SEK {Math.min(...items.map(i => i.priceMin)).toFixed(2)} – {Math.max(...items.map(i => i.priceMax)).toFixed(2)}
         </p>
       </header>
+      {leader ? (
+        <section className="mb-6 rounded-lg border border-market-mint/20 bg-market-mint/10 p-4">
+          <div className="text-xs font-bold uppercase tracking-widest text-market-mint">Category deal leader</div>
+          <Link href={`/products/${leader.productId}`} className="mt-2 block text-2xl font-black hover:text-market-mint">
+            {leader.productName}
+          </Link>
+          <p className="mt-2 text-sm text-market-ink/65">
+            {leader.signal} · {leader.storeName} · score {leader.dealScore}
+          </p>
+        </section>
+      ) : null}
       <ul className="divide-y divide-market-ink/5 rounded-lg border border-market-ink/10 bg-white">
         {items.map((p) => (
           <li key={p.code} className="grid grid-cols-[2.5fr_1fr_1fr_0.5fr] gap-3 px-4 py-3 text-sm">

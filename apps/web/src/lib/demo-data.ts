@@ -2,7 +2,7 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { calculatePersonalGroceryInflation, rankDealOpportunities } from '@groceryview/core';
+import { calculatePersonalGroceryInflation, rankDealOpportunities, summarizeCategoryDealLeaders } from '@groceryview/core';
 
 export const products = [
   {
@@ -840,6 +840,31 @@ export const priceReportCenter = {
     { label: 'Route evidence', value: 'Link each report to the product, meal, or category page behind the claim' }
   ]
 };
+
+const dealCategoryByProductId: Record<string, string> = {
+  'zoegas-coffee-450g': 'Coffee',
+  'eldorado-basmati-rice-1kg': 'Rice',
+  'garant-havregryn-1kg': 'Breakfast',
+  'bravo-apelsinjuice-1l': 'Beverages',
+  'garant-korsbarstomater-250g': 'Produce',
+  'libresse-bindor-normal-14p': 'Personal care',
+  'anamma-formbar-fars-850g': 'Plant-based',
+  'felix-ketchup-1kg': 'Pantry'
+};
+
+export const categoryDealLeaders = summarizeCategoryDealLeaders({
+  candidates: dealOpportunityRail.map((deal) => ({
+    productId: deal.productId,
+    productName: deal.productName,
+    category: dealCategoryByProductId[deal.productId] ?? 'Pantry',
+    storeName: deal.storeName,
+    price: deal.currentPrice,
+    dealScore: deal.dealScore,
+    sourceConfidence: deal.sourceConfidence
+  })),
+  minimumSourceConfidence: 0.6
+});
+
 
 export const basketSubstitutionRadar = [
   {
