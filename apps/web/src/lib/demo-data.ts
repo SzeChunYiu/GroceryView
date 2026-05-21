@@ -268,6 +268,42 @@ export const products = [
     confidence: 'high',
     observedAt: '2026-05-20 16:35 CET',
     source: 'in-store shelf observation'
+  },
+  {
+    slug: 'garant-korsbarstomater-250g',
+    ticker: 'GARANT-KORSBARSTOMATER-250G',
+    name: 'Garant Körsbärstomater 250g',
+    store: 'Coop Daglivs Fridhemsplan',
+    price: '19.90 SEK',
+    unitPrice: '79.60 SEK/kg',
+    priceType: 'shelf',
+    confidence: 'high',
+    observedAt: '2026-05-20 18:05 CET',
+    source: 'in-store shelf observation'
+  },
+  {
+    slug: 'fiskeriet-laxfile-500g',
+    ticker: 'FISKERIET-LAXFILE-500G',
+    name: 'Fiskeriet Laxfilé 500g',
+    store: 'ICA Kvantum Liljeholmen',
+    price: '119.00 SEK',
+    unitPrice: '238.00 SEK/kg',
+    priceType: 'member promo',
+    confidence: 'medium',
+    observedAt: '2026-05-20 18:30 CET',
+    source: 'retailer flyer observation'
+  },
+  {
+    slug: 'kronfagel-kycklingfile-1kg',
+    ticker: 'KRONFAGEL-KYCKLINGFILE-1KG',
+    name: 'Kronfågel Kycklingfilé 1kg',
+    store: 'Hemköp Skanstull',
+    price: '109.00 SEK',
+    unitPrice: '109.00 SEK/kg',
+    priceType: 'weekly deal',
+    confidence: 'medium',
+    observedAt: '2026-05-20 18:45 CET',
+    source: 'retailer flyer observation'
   }
 ];
 
@@ -359,6 +395,24 @@ export const stores = [
     format: 'mid-size supermarket',
     bestCategory: 'Beverages',
     distanceLabel: '3.3 km from saved area'
+  },
+  {
+    slug: 'coop-daglivs-fridhemsplan',
+    name: 'Coop Daglivs Fridhemsplan',
+    ingestionFixture: 'Coop Daglivs Fridhemsplan',
+    district: 'Kungsholmen',
+    format: 'large supermarket',
+    bestCategory: 'Produce',
+    distanceLabel: '2.8 km from saved area'
+  },
+  {
+    slug: 'hemkop-skanstull',
+    name: 'Hemköp Skanstull',
+    ingestionFixture: 'Hemkop Skanstull',
+    district: 'Södermalm',
+    format: 'mid-size supermarket',
+    bestCategory: 'Meat',
+    distanceLabel: '3.7 km from saved area'
   }
 ];
 
@@ -432,6 +486,27 @@ export const categories = [
     index: '96.8',
     movement: '-3.2%',
     topDeal: 'BRAVO-APELSINJUICE-1L'
+  },
+  {
+    slug: 'produce',
+    name: 'Produce',
+    index: '94.6',
+    movement: '-5.4%',
+    topDeal: 'GARANT-KORSBARSTOMATER-250G'
+  },
+  {
+    slug: 'fish',
+    name: 'Fish',
+    index: '98.9',
+    movement: '-1.1%',
+    topDeal: 'FISKERIET-LAXFILE-500G'
+  },
+  {
+    slug: 'meat',
+    name: 'Meat',
+    index: '97.8',
+    movement: '-2.2%',
+    topDeal: 'KRONFAGEL-KYCKLINGFILE-1KG'
   }
 ];
 
@@ -476,6 +551,16 @@ export const dealOpportunityRail = rankDealOpportunities({
       regularPrice: 27.9,
       dealScore: 79,
       sourceConfidence: 0.9
+    },
+    {
+      productId: 'garant-korsbarstomater-250g',
+      productName: 'Garant Körsbärstomater 250g',
+      storeId: 'coop-daglivs-fridhemsplan',
+      storeName: 'Coop Daglivs Fridhemsplan',
+      currentPrice: 19.9,
+      regularPrice: 27.9,
+      dealScore: 84,
+      sourceConfidence: 0.88
     },
     {
       productId: 'felix-ketchup-1kg',
@@ -548,17 +633,31 @@ export const basketSubstitutionRadar = [
     basketImpact: '-2.90 SEK pantry add-on',
     sourceConfidence: 0.68,
     reason: 'Medium-confidence Hemkop rows should travel together until receipt review confirms the soup price.'
+  },
+  {
+    anchorSlug: 'fiskeriet-laxfile-500g',
+    anchorName: 'Fiskeriet Laxfilé 500g',
+    anchorStoreSlug: 'ica-kvantum-liljeholmen',
+    anchorStoreName: 'ICA Kvantum Liljeholmen',
+    substituteSlug: 'kronfagel-kycklingfile-1kg',
+    substituteName: 'Kronfågel Kycklingfilé 1kg',
+    substituteStoreSlug: 'hemkop-skanstull',
+    substituteStoreName: 'Hemköp Skanstull',
+    verdict: 'compare',
+    basketImpact: '-10.00 SEK dinner protein check',
+    sourceConfidence: 0.78,
+    reason: 'Fish and meat promos are close enough that dinner baskets should compare both before routing.'
   }
 ];
 
 export const stockholmAreas = [
   { slug: 'norrmalm',   name: 'Norrmalm',   storeCount: 2, topSavings: 'Snacks' },
-  { slug: 'sodermalm',  name: 'Södermalm',  storeCount: 2, topSavings: 'Breakfast' },
+  { slug: 'sodermalm',  name: 'Södermalm',  storeCount: 3, topSavings: 'Meat' },
   { slug: 'vasastan',   name: 'Vasastan',   storeCount: 2, topSavings: 'Coffee' },
   { slug: 'hagersten',  name: 'Hägersten',  storeCount: 1, topSavings: 'Rice' },
   { slug: 'liljeholmen', name: 'Liljeholmen', storeCount: 1, topSavings: 'Pantry' },
   { slug: 'stockholm-county', name: 'Stockholm County', storeCount: 1, topSavings: 'Pasta' },
-  { slug: 'kungsholmen',name: 'Kungsholmen',storeCount: 0, topSavings: '—' },
+  { slug: 'kungsholmen',name: 'Kungsholmen',storeCount: 1, topSavings: 'Produce' },
   { slug: 'ostermalm',  name: 'Östermalm',  storeCount: 0, topSavings: '—' }
 ];
 
@@ -584,16 +683,16 @@ export const sourceCoverage = [
     fixture: 'Store profile',
     surface: 'district store',
     status: 'ready',
-    visibleRows: 2,
-    newestSignal: 'Swedenborgsgatan contributes dairy and bread observations'
+    visibleRows: 3,
+    newestSignal: 'Swedenborgsgatan and Daglivs rows now cover dairy, bread, and produce'
   },
   {
     chain: 'Hemköp',
     fixture: 'Offer review',
     surface: 'weekly deal',
     status: 'review',
-    visibleRows: 3,
-    newestSignal: 'Ketchup, soup, and Hornstull juice rows keep offer review visible'
+    visibleRows: 4,
+    newestSignal: 'Ketchup, soup, Hornstull juice, and Skanstull chicken rows keep offer review visible'
   },
   {
     chain: 'Lidl',
@@ -610,6 +709,14 @@ export const sourceCoverage = [
     status: 'stub',
     visibleRows: 2,
     newestSignal: 'Pasta and pantry mash rows are visible while county coverage expands'
+  },
+  {
+    chain: 'Fiskeriet',
+    fixture: 'Seafood flyer',
+    surface: 'fresh counter promo',
+    status: 'review',
+    visibleRows: 1,
+    newestSignal: 'Laxfilé row is visible for dinner basket comparisons before receipt confirmation'
   }
 ];
 
@@ -661,6 +768,18 @@ export const storeComparisonBoard = [
     leadSignal: 'Rice and pasta rows expose whether the county trip is worth delaying or splitting.',
     visibleItems: 2,
     basketImpact: '-10.90 SEK'
+  },
+  {
+    slug: 'dinner-protein-loop',
+    area: 'Liljeholmen + Södermalm',
+    primaryStoreSlug: 'ica-kvantum-liljeholmen',
+    primaryStoreName: 'ICA Kvantum Liljeholmen',
+    comparisonStoreSlug: 'hemkop-skanstull',
+    comparisonStoreName: 'Hemköp Skanstull',
+    basketFocus: 'Fish and chicken dinner',
+    leadSignal: 'Laxfilé and kycklingfilé promos are both visible, so dinner baskets can compare protein cost before routing.',
+    visibleItems: 2,
+    basketImpact: '-10.00 SEK'
   }
 ];
 
@@ -725,7 +844,9 @@ export const weeklyBasket = [
   { slug: 'bregott-normalsaltat-600g',    qty: 1, total: '56.90 SEK', vsLastWeek: '+6.9%' },
   { slug: 'garant-havregryn-1kg',         qty: 1, total: '21.90 SEK', vsLastWeek: '-6.6%' },
   { slug: 'bravo-apelsinjuice-1l',         qty: 2, total: '45.80 SEK', vsLastWeek: '-3.2%' },
-  { slug: 'garant-svensk-potatis-2kg',     qty: 1, total: '24.90 SEK', vsLastWeek: '-0.9%' }
+  { slug: 'garant-svensk-potatis-2kg',     qty: 1, total: '24.90 SEK', vsLastWeek: '-0.9%' },
+  { slug: 'garant-korsbarstomater-250g',   qty: 2, total: '39.80 SEK', vsLastWeek: '-5.4%' },
+  { slug: 'kronfagel-kycklingfile-1kg',    qty: 1, total: '109.00 SEK', vsLastWeek: '-2.2%' }
 ];
 
 export const savingsPlaybook = [
@@ -763,6 +884,13 @@ export const savingsPlaybook = [
     action: 'Add two Bravo cartons when the household route already passes Hornstull',
     impact: '-5.00 SEK per carton vs usual shelf',
     href: '/products/bravo-apelsinjuice-1l'
+  },
+  {
+    title: 'Dinner protein compare',
+    trigger: 'Fish and meat indexes are both under baseline on fresh evening rows',
+    action: 'Compare Liljeholmen salmon against Skanstull chicken before locking the dinner route',
+    impact: '-10.00 SEK route choice',
+    href: '/products/kronfagel-kycklingfile-1kg'
   }
 ];
 
@@ -770,7 +898,7 @@ export const householdSavings = {
   weeklyTotal: '438.50 SEK',
   vsLastWeek: '-30.10 SEK',
   vsLastMonth: '-78.40 SEK',
-  topSaving: { product: 'Bravo Apelsinjuice 1L', amount: '-10.00 SEK', driver: 'Hornstull member promo top-up' }
+  topSaving: { product: 'Garant Körsbärstomater 250g', amount: '-16.00 SEK', driver: 'Daglivs produce shelf drop' }
 };
 
 export const savingsDashboard = {
@@ -804,13 +932,22 @@ export const savingsDashboard = {
       signal: '32% below regular big-box shelf',
       action: 'Route pantry top-ups separately from dairy trips',
       href: '/products/eldorado-basmati-rice-1kg'
+    },
+    {
+      label: 'Dinner protein check',
+      product: 'Kronfågel Kycklingfilé 1kg',
+      store: 'Hemköp Skanstull',
+      signal: '2.2% under meat baseline',
+      action: 'Compare against the Liljeholmen salmon promo before shopping',
+      href: '/products/kronfagel-kycklingfile-1kg'
     }
   ],
   districtSavings: [
     { district: 'Vasastan', planned: '612.40 SEK', avoided: '24.80 SEK', driver: 'Coffee and dairy promos' },
-    { district: 'Södermalm', planned: '488.30 SEK', avoided: '17.50 SEK', driver: 'Breakfast staples' },
+    { district: 'Södermalm', planned: '488.30 SEK', avoided: '23.50 SEK', driver: 'Breakfast and chicken promos' },
     { district: 'Norrmalm', planned: '391.20 SEK', avoided: '13.90 SEK', driver: 'Snacks and eggs' },
-    { district: 'Hägersten', planned: '264.10 SEK', avoided: '9.90 SEK', driver: 'Rice and pantry clearance' }
+    { district: 'Hägersten', planned: '264.10 SEK', avoided: '9.90 SEK', driver: 'Rice and pantry clearance' },
+    { district: 'Kungsholmen', planned: '198.70 SEK', avoided: '16.00 SEK', driver: 'Produce shelf drop' }
   ]
 };
 
