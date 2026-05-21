@@ -294,6 +294,32 @@ describe('createHttpHandler', () => {
       ['butter', 'willys-odenplan']
     ]);
 
+    const storeCoverage = await handle(new Request('http://localhost/api/stores/lidl-sveavagen/price-coverage'));
+    assert.equal(storeCoverage.status, 200);
+    const storeCoverageBody = await json(storeCoverage) as {
+      storeId: string;
+      productCount: number;
+      pricedProductCount: number;
+      coveragePercent: number;
+      totalKnownPrice: number;
+      missingProductIds: string[];
+      lines: Array<{ productId: string; price: number | null; priceLabel: string }>;
+      guardrails: string[];
+    };
+    assert.equal(storeCoverageBody.storeId, 'lidl-sveavagen');
+    assert.equal(storeCoverageBody.productCount, 4);
+    assert.equal(storeCoverageBody.pricedProductCount, 2);
+    assert.equal(storeCoverageBody.coveragePercent, 50);
+    assert.equal(storeCoverageBody.totalKnownPrice, 73.8);
+    assert.deepEqual(storeCoverageBody.missingProductIds, ['private-label-milk', 'butter']);
+    assert.deepEqual(storeCoverageBody.lines.map((line) => [line.productId, line.price, line.priceLabel]), [
+      ['coffee', 59.9, 'verified_shelf'],
+      ['milk', 13.9, 'verified_shelf'],
+      ['private-label-milk', null, 'missing_price'],
+      ['butter', null, 'missing_price']
+    ]);
+    assert.match(storeCoverageBody.guardrails[0] ?? '', /verified shelf prices/i);
+
     const product = await handle(new Request('http://localhost/api/products/coffee'));
     assert.equal(product.status, 200);
     assert.equal((await json(product) as { ticker: string }).ticker, 'ZOEGAS-COFFEE-450G');
@@ -467,6 +493,10 @@ describe('createHttpHandler', () => {
     const equivalents = await handle(new Request('http://localhost/api/products/missing-product/equivalents'));
     assert.equal(equivalents.status, 404);
     assert.deepEqual(await json(equivalents), { error: 'Product not found.' });
+
+    const storeCoverage = await handle(new Request('http://localhost/api/stores/missing-store/price-coverage'));
+    assert.equal(storeCoverage.status, 404);
+    assert.deepEqual(await json(storeCoverage), { error: 'Store not found.' });
   });
 
   it('mutates favorite stores, watchlist, basket, and budget through proposal routes', async () => {

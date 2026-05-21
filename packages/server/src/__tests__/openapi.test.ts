@@ -59,6 +59,7 @@ describe('buildOpenApiDocument', () => {
       '/api/stores',
       '/api/stores/{id}',
       '/api/stores/{id}/deals',
+      '/api/stores/{id}/price-coverage',
       '/api/users/{userId}/favorite-stores',
       '/api/users/{userId}/favorite-stores/{storeId}',
       '/api/watchlist',
@@ -123,5 +124,7 @@ describe('buildOpenApiDocument', () => {
     assert.match(doc.paths['/api/receipts/review'].get?.summary ?? '', /receipt review/i);
     assert.equal(doc.paths['/api/categories/{category}/market'].get?.security, undefined);
     assert.match(doc.paths['/api/categories/{category}/market'].get?.summary ?? '', /category market/i);
+    assert.equal(doc.paths['/api/stores/{id}/price-coverage'].get?.security, undefined);
+    assert.match(doc.paths['/api/stores/{id}/price-coverage'].get?.summary ?? '', /price coverage/i);
   });
 });
