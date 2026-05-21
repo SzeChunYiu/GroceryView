@@ -14,6 +14,7 @@ import { MealPlansModule } from './meal-plans/meal-plans.module.js';
 import { PantryModule } from './pantry/pantry.module.js';
 import { PricesModule } from './prices/prices.module.js';
 import { ProductsModule } from './products/products.module.js';
+import { ReceiptsModule } from './receipts/receipts.module.js';
 import { StoresModule } from './stores/stores.module.js';
 import { UsersModule } from './users/users.module.js';
 import { WatchlistsModule } from './watchlists/watchlists.module.js';
@@ -32,6 +33,7 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     StoresModule,
     PricesModule,
     UsersModule,
+    ReceiptsModule,
     WatchlistsModule,
     BasketsModule,
     CategoriesModule,
