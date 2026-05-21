@@ -9,6 +9,20 @@ export default function LoginPage() {
       <Card className="mt-6 border-amber-200 bg-amber-50">
         <h2 className="text-2xl font-black text-amber-950">Fail-closed auth state</h2>
         <p className="mt-3 leading-7 text-amber-950">The static website can be browsed without credentials. Private account, household, receipt, notification, and subscription records are withheld because the repo snapshot does not include verified production records.</p>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <div className="rounded-2xl bg-white/70 p-4">
+            <p className="text-sm font-black text-amber-950">Session source</p>
+            <p className="mt-2 text-sm leading-6 text-amber-900">Show sign-in controls only after a production auth provider returns a verified session.</p>
+          </div>
+          <div className="rounded-2xl bg-white/70 p-4">
+            <p className="text-sm font-black text-amber-950">Profile scope</p>
+            <p className="mt-2 text-sm leading-6 text-amber-900">Keep saved areas, alerts, and household roles hidden until the account record confirms access.</p>
+          </div>
+          <div className="rounded-2xl bg-white/70 p-4">
+            <p className="text-sm font-black text-amber-950">Audit trail</p>
+            <p className="mt-2 text-sm leading-6 text-amber-900">Render privacy and notification settings only with source timestamps from authenticated storage.</p>
+          </div>
+        </div>
       </Card>
     </PageShell>
   );
