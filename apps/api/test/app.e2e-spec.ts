@@ -37,6 +37,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/products/{id}/spread']);
     assert.ok(docs.body.paths['/stores']);
     assert.ok(docs.body.paths['/stores/{id}/deals']);
+    assert.ok(docs.body.paths['/users/demo/basket/local-offers']);
   });
 
   it('serves products, stores, prices, watchlists, baskets, and alerts', async () => {
@@ -125,6 +126,17 @@ describe('GroceryView API app', () => {
     ]);
     assert.deepEqual(comparison.body.strategies[0].missingProductIds, ['coffee']);
     assert.match(comparison.body.strategies[0].warnings[0], /missing verified prices/);
+
+    const localOffers = await request(app.getHttpServer())
+      .get('/users/demo/basket/local-offers?asOf=2026-05-20T12:00:00.000Z')
+      .expect(200);
+    assert.equal(localOffers.body.userId, 'demo');
+    assert.equal(localOffers.body.demo, true);
+    assert.equal(localOffers.body.basketItemCount, 1);
+    assert.ok(localOffers.body.storeIds.length > 0);
+    assert.equal(localOffers.body.bestStore.storeId, 'willys-odenplan');
+    assert.equal(localOffers.body.bestStore.matchedProductIds[0], 'coffee');
+    assert.equal(localOffers.body.guardrails.length, 3);
 
     await request(app.getHttpServer()).get('/users/demo/alerts').expect(200);
   });
