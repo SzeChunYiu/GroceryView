@@ -8,6 +8,7 @@ import {
   householdSavings,
   mealBasketIdeas,
   products,
+  receiptReviewQueue,
   savingsPlaybook,
   savingsDashboard,
   shoppingTripSwitchboard,
@@ -647,6 +648,52 @@ export function MarketShell() {
                 })}
               </div>
             </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">Receipt review queue</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Scanner-bound receipts show which medium-confidence basket rows still need household review.
+            </p>
+          </div>
+          <LightMetric label="Queued" value={String(receiptReviewQueue.length)} />
+        </div>
+        <div className="grid gap-0 lg:grid-cols-3">
+          {receiptReviewQueue.map((receipt) => (
+            <Link
+              key={receipt.receipt}
+              href={receipt.href}
+              className="border-b border-market-ink/10 px-4 py-4 text-sm hover:bg-market-oat/45 lg:border-r"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <span className="block text-xs font-bold uppercase text-market-ink/50">{receipt.area}</span>
+                  <span className="mt-1 block font-black">{receipt.receipt}</span>
+                </div>
+                <span className="shrink-0 rounded-full bg-market-mint/15 px-2 py-1 text-xs font-black text-market-ink/70">
+                  {receipt.impact}
+                </span>
+              </div>
+              <dl className="mt-4 grid gap-2 text-xs font-semibold text-market-ink/60">
+                <div className="flex items-center justify-between gap-3">
+                  <dt>Store</dt>
+                  <dd className="text-right text-market-ink">{receipt.store}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt>Items</dt>
+                  <dd className="text-right text-market-ink">{receipt.items}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt>Confidence</dt>
+                  <dd className="text-right text-market-ink">{receipt.confidence}</dd>
+                </div>
+              </dl>
+              <p className="mt-4 leading-6 text-market-ink/65">{receipt.issue}</p>
+            </Link>
           ))}
         </div>
       </section>
