@@ -49,6 +49,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/products/{id}/equivalents']);
     assert.ok(docs.body.paths['/users/demo/receipts/review']);
     assert.ok(docs.body.paths['/stores']);
+    assert.ok(docs.body.paths['/stores/{id}/category-coverage']);
     assert.ok(docs.body.paths['/stores/{id}/coverage']);
     assert.ok(docs.body.paths['/stores/{id}/deals']);
     assert.ok(docs.body.paths['/users/demo/alerts/inbox']);
