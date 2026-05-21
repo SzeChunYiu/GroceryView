@@ -85,6 +85,11 @@ describe('verified-data UI', () => {
     assert.match(shell, /\/products\/\$\{product\.slug\}/);
     assert.match(shell, /Freshness board/);
     assert.match(shell, /sourceCoverage\.map/);
+    assert.match(shell, /Claim boundaries/);
+    assert.match(shell, /homepageClaimLedger\.map/);
+    assert.match(shell, /sourceClaimLedger\.slice/);
+    assert.match(shell, /Supported: \{source\.allowedClaim\}/);
+    assert.match(shell, /Blocked: \{source\.blockedClaim\}/);
     assert.match(shell, /Category freshness strip/);
     assert.match(shell, /category\.latestObservation/);
     assert.match(shell, /Feature readiness queue/);
