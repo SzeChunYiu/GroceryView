@@ -7,7 +7,8 @@ import {
   formatSek,
   freshestOpenPrices,
   snapshot,
-  sourceCoverage
+  sourceCoverage,
+  storeBrandLedger
 } from '@/lib/verified-data';
 
 export function MarketShell() {
@@ -106,6 +107,37 @@ export function MarketShell() {
         </Card>
         <SourceCoverage />
       </div>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>OSM brand ledger</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Store brands with verified location coverage</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-slate-600">
+            Counts, address coverage, formats, and retrieval dates are derived directly from the OpenStreetMap store extract.
+          </p>
+        </div>
+        <div className="mt-5 divide-y divide-slate-200">
+          {storeBrandLedger.map((brand) => (
+            <Link
+              className="grid gap-3 py-4 transition hover:bg-emerald-50/70 md:grid-cols-[1fr_auto_auto_auto]"
+              href={`/stores/${brand.sampleSlug}`}
+              key={brand.brand}
+            >
+              <div>
+                <p className="font-black text-slate-950">{brand.brand}</p>
+                <p className="text-sm text-slate-600">
+                  {brand.districts} districts · {brand.formats.join(', ') || 'format not reported'}
+                </p>
+              </div>
+              <p className="font-black text-emerald-800">{brand.stores.toLocaleString('sv-SE')} stores</p>
+              <p className="font-semibold text-slate-700">{formatPct(brand.addressCoverage * 100)} addressed</p>
+              <p className="text-sm font-semibold text-slate-600">OSM {brand.latestRetrieved}</p>
+            </Link>
+          ))}
+        </div>
+      </Card>
     </PageShell>
   );
 }

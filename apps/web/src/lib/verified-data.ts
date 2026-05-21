@@ -35,6 +35,48 @@ export const featuredStores = [...osmStores]
   .sort((a, b) => a.name.localeCompare(b.name, 'sv'))
   .slice(0, 24);
 
+export const storeBrandLedger = Object.values(
+  osmStores.reduce<Record<string, {
+    brand: string;
+    stores: number;
+    districts: Set<string>;
+    formats: Set<string>;
+    addressedStores: number;
+    latestRetrieved: string;
+    sampleSlug: string;
+  }>>((ledger, store) => {
+    const brand = store.brand || 'Unbranded';
+    const row = ledger[brand] ?? {
+      brand,
+      stores: 0,
+      districts: new Set<string>(),
+      formats: new Set<string>(),
+      addressedStores: 0,
+      latestRetrieved: '',
+      sampleSlug: store.slug
+    };
+
+    row.stores += 1;
+    if (store.district) row.districts.add(store.district);
+    if (store.format) row.formats.add(store.format);
+    if (store.address) row.addressedStores += 1;
+    if (store.retrievedDate > row.latestRetrieved) row.latestRetrieved = store.retrievedDate;
+    ledger[brand] = row;
+    return ledger;
+  }, {})
+)
+  .map((row) => ({
+    brand: row.brand,
+    stores: row.stores,
+    districts: row.districts.size,
+    formats: Array.from(row.formats).sort((a, b) => a.localeCompare(b, 'sv')).slice(0, 3),
+    addressCoverage: row.stores ? row.addressedStores / row.stores : 0,
+    latestRetrieved: row.latestRetrieved,
+    sampleSlug: row.sampleSlug
+  }))
+  .sort((a, b) => b.stores - a.stores || a.brand.localeCompare(b.brand, 'sv'))
+  .slice(0, 8);
+
 export const categorySummaries = Object.entries(categoryLabels)
   .map(([slug, label]) => {
     const openRows = pricedProducts.filter((product) => product.category === slug);
