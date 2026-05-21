@@ -8,6 +8,7 @@ import {
   products,
   savingsPlaybook,
   savingsDashboard,
+  shoppingTripSwitchboard,
   sourceCoverage,
   stockholmAreas,
   storeComparisonBoard,
@@ -431,6 +432,56 @@ export function MarketShell() {
                 Top savings: {area.topSavings}
               </span>
             </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="grid gap-3 border-b border-market-ink/10 px-4 py-3 md:grid-cols-[1fr_auto] md:items-center">
+          <div>
+            <h2 className="text-lg font-black">Shopping trip switchboard</h2>
+            <p className="mt-1 text-sm text-market-ink/60">
+              Trip-sized driver rows show which store or category route can cover the next basket decision.
+            </p>
+          </div>
+          <LightMetric label="Visible routes" value={String(shoppingTripSwitchboard.length)} />
+        </div>
+        <div className="grid gap-0 lg:grid-cols-3">
+          {shoppingTripSwitchboard.map((trip) => (
+            <Link
+              key={trip.title}
+              href={trip.href}
+              className="border-b border-market-ink/10 px-4 py-4 text-sm hover:bg-market-oat/45 lg:border-r"
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <span className="block text-xs font-bold uppercase text-market-ink/50">{trip.area}</span>
+                  <span className="mt-1 block font-black">{trip.title}</span>
+                </div>
+                <span className="shrink-0 rounded-full bg-market-mint/15 px-2 py-1 text-xs font-bold text-market-ink/65">
+                  {trip.saving}
+                </span>
+              </div>
+              <dl className="mt-4 grid gap-2 text-xs font-semibold text-market-ink/60">
+                <div className="flex items-center justify-between gap-3">
+                  <dt>Stop</dt>
+                  <dd className="text-right text-market-ink">{trip.store}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt>Basket</dt>
+                  <dd className="text-right text-market-ink">{trip.basket}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt>Category</dt>
+                  <dd className="text-right text-market-ink">{trip.category}</dd>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <dt>Spend</dt>
+                  <dd className="text-right text-market-ink">{trip.spend}</dd>
+                </div>
+              </dl>
+              <p className="mt-4 leading-6 text-market-ink/65">{trip.decision}</p>
+            </Link>
           ))}
         </div>
       </section>
