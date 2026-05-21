@@ -127,7 +127,13 @@ describe('runtime config', () => {
       PUBLIC_WEB_URL: 'https://groceryview.example',
       NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
-      METRICS_TOKEN: 'metrics-token'
+      METRICS_TOKEN: 'metrics-token',
+      CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
+        targetProducts: ['coffee'],
+        targetCategories: ['coffee'],
+        targetChains: ['willys'],
+        targetStores: ['willys-odenplan']
+      })
     });
 
     assert.deepEqual(config, {
@@ -138,7 +144,14 @@ describe('runtime config', () => {
       publicWebUrl: 'https://groceryview.example',
       notificationWebhookSecret: 'webhook-secret',
       billingWebhookSecret: 'billing-webhook-secret',
-      metricsToken: 'metrics-token'
+      metricsToken: 'metrics-token',
+      catalogCoverageTargets: {
+        targetProducts: ['coffee'],
+        targetCategories: ['coffee'],
+        targetChains: ['willys'],
+        targetStores: ['willys-odenplan'],
+        requireEveryProductInEveryStore: true
+      }
     });
   });
 
@@ -189,6 +202,16 @@ describe('runtime config', () => {
       NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret'
     }), /METRICS_TOKEN is required/);
+    assert.throws(() => loadRuntimeConfig({
+      NODE_ENV: 'production',
+      PORT: '8080',
+      AUTH_SECRET: 'super-secret',
+      DATABASE_URL: 'postgres://example',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
+      BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
+      METRICS_TOKEN: 'metrics-token'
+    }), /CATALOG_COVERAGE_TARGETS_JSON is required/);
   });
 
   it('rejects invalid public web urls', () => {
@@ -205,7 +228,13 @@ describe('runtime config', () => {
       PUBLIC_WEB_URL: 'mailto:support@groceryview.example',
       NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
-      METRICS_TOKEN: 'metrics-token'
+      METRICS_TOKEN: 'metrics-token',
+      CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
+        targetProducts: ['coffee'],
+        targetCategories: ['coffee'],
+        targetChains: ['willys'],
+        targetStores: ['willys-odenplan']
+      })
     }), /PUBLIC_WEB_URL must use http or https/);
   });
 

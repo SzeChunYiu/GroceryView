@@ -1677,6 +1677,7 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     if (!env.NOTIFICATION_WEBHOOK_SECRET) throw new Error('NOTIFICATION_WEBHOOK_SECRET is required in production.');
     if (!env.BILLING_WEBHOOK_SECRET) throw new Error('BILLING_WEBHOOK_SECRET is required in production.');
     if (!env.METRICS_TOKEN) throw new Error('METRICS_TOKEN is required in production.');
+    if (!env.CATALOG_COVERAGE_TARGETS_JSON) throw new Error('CATALOG_COVERAGE_TARGETS_JSON is required in production.');
   }
   validatePublicWebUrl(env.PUBLIC_WEB_URL);
   const catalogCoverageTargets = parseCatalogCoverageTargets(env.CATALOG_COVERAGE_TARGETS_JSON);
