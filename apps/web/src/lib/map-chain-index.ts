@@ -1,5 +1,5 @@
 import { calculateChainPriceIndex } from '@groceryview/core';
-import { buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from './chain-index-data';
+import { buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from './chain-index-data.js';
 
 export type MapChainIndexScore = {
   chainId: string;
