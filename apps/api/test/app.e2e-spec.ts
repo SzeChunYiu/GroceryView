@@ -32,8 +32,11 @@ describe('GroceryView API app', () => {
     const docs = await request(app.getHttpServer()).get('/api-json').expect(200);
     assert.equal(docs.body.info.title, 'GroceryView API');
     assert.ok(docs.body.paths['/health']);
+    assert.ok(docs.body.paths['/indices']);
+    assert.ok(docs.body.paths['/indices/{id}']);
     assert.ok(docs.body.paths['/market/overview']);
     assert.ok(docs.body.paths['/nutrition/value']);
+    assert.ok(docs.body.paths['/prices/freshness']);
     assert.ok(docs.body.paths['/products']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/products/{id}/spread']);
@@ -61,6 +64,22 @@ describe('GroceryView API app', () => {
     assert.equal(nutrition.body.leader.productId, 'chicken');
     assert.equal(nutrition.body.rows[0].valuePer10Sek, 22.89);
     assert.equal(nutrition.body.guardrails.length, 3);
+
+    const freshness = await request(app.getHttpServer())
+      .get('/prices/freshness?asOf=2026-06-03T00:00:00.000Z')
+      .expect(200);
+    assert.equal(freshness.body.asOf, '2026-06-03T00:00:00.000Z');
+    assert.equal(freshness.body.demo, true);
+    assert.deepEqual(freshness.body.summary, { fresh: 0, aging: 0, stale: 4 });
+    assert.deepEqual(freshness.body.backfillProductIds, ['butter', 'coffee', 'milk', 'private-label-milk']);
+
+    const indices = await request(app.getHttpServer()).get('/indices').expect(200);
+    assert.equal(indices.body[0].id, 'stockholm-grocery-index');
+    assert.equal(indices.body[0].demo, true);
+
+    const index = await request(app.getHttpServer()).get('/indices/stockholm-grocery-index').expect(200);
+    assert.equal(index.body.label, 'Stockholm Grocery Index');
+    assert.equal(index.body.demo, true);
 
     const products = await request(app.getHttpServer()).get('/products?q=coffee').expect(200);
     assert.equal(products.body[0].id, 'coffee');
@@ -235,5 +254,9 @@ describe('GroceryView API app', () => {
 
   it('rejects invalid nutrition metrics', async () => {
     await request(app.getHttpServer()).get('/nutrition/value?metric=sugar').expect(400);
+  });
+
+  it('returns 404 for missing indices', async () => {
+    await request(app.getHttpServer()).get('/indices/missing-index').expect(404);
   });
 });
