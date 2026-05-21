@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { ArrowDownRight, CircleDollarSign, MapPinned, ShoppingBasket } from 'lucide-react';
-import { savingsDashboard } from '@/lib/demo-data';
+import { personalGroceryInflation, savingsDashboard } from '@/lib/demo-data';
 
 export const dynamic = 'force-static';
 
@@ -34,7 +34,46 @@ export default function SavingsDashboardPage() {
           <Metric icon={<ShoppingBasket size={20} />} label="Baskets tracked" value={String(savingsDashboard.monthToDate.basketCount)} />
           <Metric icon={<ArrowDownRight size={20} />} label="Planned spend" value={savingsDashboard.monthToDate.plannedSpend} />
           <Metric icon={<MapPinned size={20} />} label="Best district" value={savingsDashboard.monthToDate.bestDistrict} />
+          <Metric icon={<ArrowDownRight size={20} />} label="Personal CPI" value={`${personalGroceryInflation.inflationPercent.toFixed(1)}%`} />
+          <Metric icon={<CircleDollarSign size={20} />} label="Basket change" value={`${personalGroceryInflation.changeAmount.toFixed(2)} SEK`} />
         </div>
+      </section>
+
+
+      <section className="rounded-lg border border-market-ink/10 bg-white">
+        <div className="border-b border-market-ink/10 px-4 py-3">
+          <h2 className="text-lg font-black">Personal grocery inflation</h2>
+          <p className="mt-1 text-sm text-market-ink/60">
+            Calculated from the visible weekly basket: current line totals, quantities, and each row's week-over-week movement.
+            Confidence is inherited from the product observation, and missing products stay listed below.
+          </p>
+        </div>
+        <div className="grid gap-0 md:grid-cols-4">
+          <Metric icon={<ArrowDownRight size={20} />} label="Inflation" value={`${personalGroceryInflation.inflationPercent.toFixed(1)}%`} />
+          <Metric icon={<CircleDollarSign size={20} />} label="Base basket" value={`${personalGroceryInflation.baseSpend.toFixed(2)} SEK`} />
+          <Metric icon={<ShoppingBasket size={20} />} label="Current basket" value={`${personalGroceryInflation.currentSpend.toFixed(2)} SEK`} />
+          <Metric icon={<MapPinned size={20} />} label="Coverage" value={`${personalGroceryInflation.itemContributions.length} items`} />
+        </div>
+        <div className="grid gap-0 md:grid-cols-2">
+          {personalGroceryInflation.itemContributions.map((item) => (
+            <Link
+              key={item.productId}
+              href={`/products/${item.productId}`}
+              className="border-t border-market-ink/10 px-4 py-4 text-sm hover:bg-market-oat/45 md:border-r"
+            >
+              <span className="block font-black">{item.productName}</span>
+              <span className="mt-1 block text-market-ink/60">{item.category} · weight {(item.weight * 100).toFixed(0)}% · {item.confidence} confidence</span>
+              <span className={item.changePercent > 0 ? 'mt-3 block font-bold text-market-tomato' : 'mt-3 block font-bold text-market-mint'}>
+                {item.changePercent.toFixed(1)}% · {item.changeAmount.toFixed(2)} SEK
+              </span>
+            </Link>
+          )).slice(0, 8)}
+        </div>
+        {personalGroceryInflation.missingProductIds.length > 0 ? (
+          <p className="border-t border-market-ink/10 px-4 py-3 text-sm text-market-ink/55">
+            Missing from product driver: {personalGroceryInflation.missingProductIds.join(', ')}
+          </p>
+        ) : null}
       </section>
 
       <section className="rounded-lg border border-market-ink/10 bg-white">

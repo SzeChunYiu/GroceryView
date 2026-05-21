@@ -311,6 +311,20 @@ describe('Next.js web scaffold', () => {
   });
 
 
+  it('surfaces personal grocery inflation on the savings dashboard', async () => {
+    const demoData = await readFile(new URL('../src/lib/demo-data.ts', import.meta.url), 'utf8');
+    const marketShell = await readFile(new URL('../src/components/market-shell.tsx', import.meta.url), 'utf8');
+    const savingsPage = await readFile(new URL('../src/app/savings-dashboard/page.tsx', import.meta.url), 'utf8');
+
+    assert.match(demoData, /calculatePersonalGroceryInflation/);
+    assert.match(demoData, /export const personalGroceryInflation = /);
+    assert.match(demoData, /weeklyBasket\.map/);
+    assert.match(marketShell, /personalGroceryInflation\.inflationPercent/);
+    assert.match(savingsPage, /personalGroceryInflation\.itemContributions\.map/);
+    assert.match(savingsPage, /Personal grocery inflation/);
+  });
+
+
   it('surfaces deal score verdicts on product detail routes', async () => {
     const productPage = await readFile(new URL('../src/app/products/[slug]/page.tsx', import.meta.url), 'utf8');
 
