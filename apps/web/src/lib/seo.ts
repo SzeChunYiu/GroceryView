@@ -4,6 +4,7 @@ export const siteUrl = 'https://grocery-web-mu.vercel.app';
 export const siteName = 'GroceryView';
 
 const defaultDescription = 'Verified Swedish grocery price intelligence with product tickers, chain comparisons, store coverage, and confidence-labelled savings signals.';
+const localeNegotiatedCurrentRouteCaveat = 'Locale-negotiated current route hreflang alternates share the canonical URL until native route translations exist beyond /sv and /en.';
 
 type RouteMetadataConfig = {
   path: string;
@@ -187,6 +188,22 @@ function absoluteUrl(path: string) {
   return new URL(path, siteUrl).toString();
 }
 
+export function languageAlternateUrls(path: string) {
+  if (path === '/' || path === '') {
+    return {
+      'sv-SE': absoluteUrl('/sv'),
+      'en-SE': absoluteUrl('/en'),
+      'x-default': absoluteUrl('/')
+    };
+  }
+
+  return {
+    'sv-SE': absoluteUrl(path),
+    'en-SE': absoluteUrl(path),
+    'x-default': absoluteUrl(path)
+  };
+}
+
 function truncateDescription(description: string) {
   return description.length > 180 ? `${description.slice(0, 177)}...` : description;
 }
@@ -212,10 +229,14 @@ export function routeMetadata(route: keyof typeof routeMetadataCatalog | RouteMe
       };
 
   return {
+    metadataBase: new URL(siteUrl),
     title,
     description,
     manifest: '/manifest.webmanifest',
-    alternates: { canonical: canonical },
+    alternates: { canonical: canonical, languages: languageAlternateUrls(config.path) },
+    other: {
+      'x-groceryview-hreflang-boundary': localeNegotiatedCurrentRouteCaveat
+    },
     openGraph: {
       title,
       description,
