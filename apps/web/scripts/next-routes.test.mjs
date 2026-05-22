@@ -295,6 +295,17 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces immigrant multilingual UI access in the public shell', async () => {
+    const source = await read('src/components/market-shell.tsx');
+    assert.match(source, /immigrantMultilingualUi/);
+    assert.match(source, /Multilingual UI starter/);
+    assert.match(source, /languageOptions/);
+    assert.match(source, /Arabic/);
+    assert.match(source, /Somali/);
+    assert.match(source, /No machine-translated prices/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces an elderly fixed-income monthly budget using real budget summaries', async () => {
     const source = await read('src/app/savings-dashboard/page.tsx');
     const demo = await read('src/lib/demo-data.ts');
