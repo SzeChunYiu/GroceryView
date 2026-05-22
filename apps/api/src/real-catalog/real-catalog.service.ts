@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, ServiceUnavailableException } from '@nestjs/common';
 import {
   buildFacetedProductSearch,
   buildRealBasketComparison,
@@ -131,6 +131,7 @@ export class RealCatalogService {
     if (filters.minPrice !== undefined && filters.maxPrice !== undefined && filters.minPrice > filters.maxPrice) {
       throw new BadRequestException('minPrice must be less than or equal to maxPrice.');
     }
+    this.requireDatabase();
     const categories = filters.categories ?? [];
     const brands = filters.brands ?? [];
     const chains = filters.chains ?? [];
@@ -156,6 +157,7 @@ export class RealCatalogService {
       if (!item.productId?.trim()) throw new BadRequestException('items.productId is required.');
       if (!Number.isFinite(item.quantity) || item.quantity <= 0) throw new BadRequestException('items.quantity must be positive.');
     }
+    this.requireDatabase();
 
     const productRefs = [...new Set(input.items.map((item) => item.productId))];
     const rows = await this.database.query<CatalogPriceSqlRow>(this.basketPriceSql(), [
@@ -177,6 +179,7 @@ export class RealCatalogService {
   }
 
   async compareSavedBasket(userId: string, storeSlugs?: string[]) {
+    this.requireDatabase();
     const basketRows = await this.database.query<BasketItemSqlRow>(
       `with latest_basket as (
          select id
@@ -269,6 +272,12 @@ export class RealCatalogService {
         and ($7::numeric is null or latest_prices.price >= $7::numeric)
         and ($8::numeric is null or latest_prices.price <= $8::numeric)
       order by products.canonical_name, latest_prices.price nulls last, stores.name nulls last`;
+  }
+
+  private requireDatabase(): void {
+    if (!this.database.isConfigured()) {
+      throw new ServiceUnavailableException('DATABASE_URL is required for real catalog search and basket comparison data.');
+    }
   }
 
   private basketPriceSql(): string {
