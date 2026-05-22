@@ -44,6 +44,16 @@ const CONNECTOR_TEMPLATES = [
     hasDataAgreement: true
   },
   {
+    connectorId: 'coop-weekly-all-stores',
+    chainId: 'coop',
+    sourceType: 'flyer_campaign',
+    endpointUrl: 'groceryview://daily/coop/weekly-offers/all-stores',
+    parserVersion: 'coop-weekly-native-v1',
+    robotsTxtStatus: 'not_applicable',
+    legalReviewStatus: 'approved',
+    hasDataAgreement: true
+  },
+  {
     connectorId: 'hemkop-weekly-all-stores',
     chainId: 'hemkop',
     sourceType: 'flyer_campaign',

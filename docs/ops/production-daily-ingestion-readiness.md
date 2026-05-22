@@ -53,7 +53,8 @@ Branch ids are fetched from public/native store catalogs where available:
 
 - Willys: `https://www.willys.se/axfood/rest/store?online=true`
 - Coop: `https://proxy.api.coop.se/external/store/stores?api-version=v5`, with
-  store details from `/stores/{ledgerAccountNumber}`
+  store details from `/stores/{ledgerAccountNumber}` for both product and weekly
+  flyer campaign connectors
 - Lidl: `https://www.lidl.se/s/sv-SE/butiker/` store detail pages
 - City Gross: `https://www.citygross.se/api/v1/PageData/stores`
 - ICA: built from the checked-in ICA default store promotion configs
