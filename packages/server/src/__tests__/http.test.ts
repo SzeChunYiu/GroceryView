@@ -809,6 +809,36 @@ describe('createHttpHandler', () => {
     })), [{ productId: 'coffee', lineTotal: 99.8, priceLabel: 'verified_shelf' }]);
 
 
+
+    const handoff = await json(await handle(new Request('http://localhost/api/basket/handoff/willys?userId=user-1'))) as {
+      userId: string;
+      retailerId: string;
+      primaryAction: { actionType: string; status: string };
+      actions: Array<{ actionType: string; status: string; lineCount: number }>;
+      unsupportedReasons: string[];
+      guardrails: string[];
+    };
+    assert.equal(handoff.userId, 'user-1');
+    assert.equal(handoff.retailerId, 'willys');
+    assert.deepEqual(handoff.primaryAction, {
+      actionType: 'copy_list',
+      status: 'ready',
+      label: 'Copy list',
+      lineCount: 1,
+      productIds: ['coffee'],
+      urlCount: 1,
+      requiresRetailerConfirmation: true,
+      reason: 'Copy list is ready for all basket lines.'
+    });
+    assert.deepEqual(handoff.actions.map((action) => ({ actionType: action.actionType, status: action.status, lineCount: action.lineCount })), [
+      { actionType: 'copy_list', status: 'ready', lineCount: 1 },
+      { actionType: 'product_deep_links', status: 'ready', lineCount: 1 },
+      { actionType: 'retailer_app_search', status: 'manual_review', lineCount: 1 },
+      { actionType: 'basket_transfer', status: 'unsupported', lineCount: 0 }
+    ]);
+    assert.match(handoff.unsupportedReasons[1] ?? '', /cannot claim purchase completion/i);
+    assert.match(handoff.guardrails[0], /not checkout confirmation/i);
+
     const tripCost = await json(await handle(new Request('http://localhost/api/basket/trip-cost?userId=user-1&travelMode=car&valueOfTimePerHour=120&carCostPerKm=3.5&splitTripPenalty=15'))) as {
       userId: string;
       bestOption?: { strategyId: string; pricedBasketTotal: number; travelCost: number; effectiveTotal: number; storeIds: string[] };

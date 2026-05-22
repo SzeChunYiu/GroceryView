@@ -411,6 +411,34 @@ export const unavailablePanels = [
   }
 ];
 
+export const retailerHandoffContract = {
+  endpoint: '/api/basket/handoff/{retailerId}',
+  title: 'Retailer handoff support matrix',
+  status: 'implemented_account_api',
+  supportedRetailers: [
+    { retailerId: 'willys', label: 'Willys', productLinks: 'supported', basketTransfer: 'unsupported', checkoutConfirmation: 'unsupported' },
+    { retailerId: 'coop', label: 'Coop', productLinks: 'supported', basketTransfer: 'unsupported', checkoutConfirmation: 'unsupported' },
+    { retailerId: 'lidl', label: 'Lidl', productLinks: 'manual', basketTransfer: 'unsupported', checkoutConfirmation: 'unsupported' }
+  ],
+  requiredInputs: [
+    'signed-in userId',
+    'target retailerId with a verified support-matrix entry',
+    'current basket product ids, product names, quantities, and optional retailer product links',
+    'explicit retailer capability flags for product links, basket transfer, app search, copy list, and checkout confirmation'
+  ],
+  shippedBehaviors: [
+    'Builds a prioritized handoff plan with copy-list, product-link, retailer app search, and basket-transfer actions.',
+    'Marks basket transfer unsupported unless a retailer capability is verified in the support matrix.',
+    'Keeps unmatched basket lines visible for manual shopper review before leaving GroceryView.',
+    'States that checkout confirmation is unavailable so GroceryView cannot claim purchase completion.'
+  ],
+  blockedInStaticSnapshot: [
+    'No authenticated household basket is bundled with this static build.',
+    'No retailer checkout session, delivery slot, or purchase confirmation is rendered from static data.',
+    'No automatic retailer basket transfer is advertised without verified retailer support.'
+  ]
+};
+
 export const basketTripCostContract = {
   endpoint: '/api/basket/trip-cost',
   title: 'Basket + trip cost optimizer',

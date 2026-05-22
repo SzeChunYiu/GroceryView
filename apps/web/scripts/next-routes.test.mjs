@@ -75,6 +75,22 @@ describe('verified-data UI', () => {
   });
 
 
+  it('surfaces the retailer handoff support matrix contract on the basket ideas route', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/basket-ideas/page.tsx');
+
+    assert.match(verified, /export const retailerHandoffContract = /);
+    assert.match(verified, /\/api\/basket\/handoff/);
+    assert.match(route, /retailerHandoffContract/);
+    assert.match(route, /Retailer handoff support matrix/);
+    assert.match(route, /basket transfer/);
+    assert.match(route, /checkout confirmation/);
+    assert.match(route, /NoVerifiedData/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
+
   it('surfaces the basket trip-cost optimizer contract on the shopping trips route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/shopping-trips/page.tsx');
