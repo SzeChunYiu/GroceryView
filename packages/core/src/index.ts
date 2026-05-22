@@ -3094,6 +3094,77 @@ export function summarizeHousehold(snapshot: HouseholdSnapshot, priceByProductId
   };
 }
 
+
+export type ShareableHouseholdListRole = 'viewer' | 'editor';
+
+export type ShareableHouseholdListRecipient = {
+  userId?: string;
+  email?: string;
+  role: ShareableHouseholdListRole;
+};
+
+export type ShareableHouseholdListPermission = {
+  recipient: string;
+  role: ShareableHouseholdListRole;
+  canEdit: boolean;
+  reason: string;
+};
+
+export type ShareableHouseholdListPlan = {
+  householdId: string;
+  householdName: string;
+  requesterUserId: string;
+  canShare: boolean;
+  itemCount: number;
+  memberCount: number;
+  shareTokenRequired: boolean;
+  expiresAt: string | null;
+  permissions: ShareableHouseholdListPermission[];
+  blockers: string[];
+  guardrails: string[];
+};
+
+export function planShareableHouseholdList(snapshot: HouseholdSnapshot, input: {
+  requesterUserId: string;
+  recipients: ShareableHouseholdListRecipient[];
+  expiresAt?: string;
+}): ShareableHouseholdListPlan {
+  const memberIds = new Set(snapshot.members.map((member) => member.userId));
+  const blockers: string[] = [];
+  if (!memberIds.has(input.requesterUserId)) blockers.push('requester_not_household_member');
+  if (input.recipients.some((recipient) => !recipient.userId && recipient.role === 'editor')) blockers.push('external_invite_cannot_edit');
+
+  const permissions = input.recipients.map<ShareableHouseholdListPermission>((recipient) => {
+    const recipientId = recipient.userId ?? recipient.email ?? 'unknown-recipient';
+    const isHouseholdMember = !!recipient.userId && memberIds.has(recipient.userId);
+    const canEdit = recipient.role === 'editor' && isHouseholdMember;
+    return {
+      recipient: recipientId,
+      role: recipient.role,
+      canEdit,
+      reason: canEdit ? 'household_member_editor' : recipient.role === 'editor' ? 'external_or_unknown_view_only' : 'viewer_permission'
+    };
+  });
+
+  return {
+    householdId: snapshot.id,
+    householdName: snapshot.name,
+    requesterUserId: input.requesterUserId,
+    canShare: blockers.length === 0,
+    itemCount: snapshot.basketItems.length,
+    memberCount: snapshot.members.length,
+    shareTokenRequired: true,
+    expiresAt: input.expiresAt ?? null,
+    permissions,
+    blockers,
+    guardrails: [
+      'No anonymous household edits: requester identity must match a signed-in household member before sharing.',
+      'External invite links are view-only until the recipient signs in and joins the household.',
+      'Shared lists expose product ids, quantities, and store preferences only after an expiring share token is minted server-side.'
+    ]
+  };
+}
+
 export type PantryInventoryItem = {
   productId: string;
   name: string;

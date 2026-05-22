@@ -110,6 +110,23 @@ describe('verified-data UI', () => {
     assert.match(server, /Household plan not found/);
   });
 
+  it('surfaces shareable household lists with role-based permission guardrails', async () => {
+    const household = await read('src/app/household/page.tsx');
+    const core = await read('../../packages/core/src/index.ts');
+
+    assert.match(core, /planShareableHouseholdList/);
+    assert.match(core, /external_invite_cannot_edit/);
+    assert.match(core, /requester_not_household_member/);
+    assert.match(household, /shareableHouseholdListContract/);
+    assert.match(household, /Shareable household lists/);
+    assert.match(household, /role-based permissions/);
+    assert.match(household, /No anonymous household edits/);
+    assert.match(household, /viewer/);
+    assert.match(household, /editor/);
+    assert.doesNotMatch(household, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
+
 
   it('ships signed-in scanner upload and barcode processing controls without anonymous uploads', async () => {
     const scanner = await read('src/app/scanner/page.tsx');

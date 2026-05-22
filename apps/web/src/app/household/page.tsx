@@ -1,6 +1,6 @@
 import { Card, Eyebrow, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { HouseholdPlanActions } from '@/components/household-plan-actions';
-import { formatPct, formatSek, sourceCoverage, topChainSpreads } from '@/lib/verified-data';
+import { formatPct, formatSek, shareableHouseholdListContract, sourceCoverage, topChainSpreads } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -61,6 +61,25 @@ export default function FeaturePage() {
           </Card>
         ))}
       </section>
+
+      <Card className="mt-6">
+        <Eyebrow>Shareable household lists</Eyebrow>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">role-based permissions before any shared grocery list can edit account state</h2>
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
+          {shareableHouseholdListContract.corePlanner} keeps shared lists account-bound: viewers can open an expiring list, editors must already be signed-in household members, and missing-price blockers stay visible to everyone. No anonymous household edits are allowed.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {shareableHouseholdListContract.roles.map((role) => (
+            <div key={role.role} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">{role.role}</p>
+              <p className="mt-2 text-sm leading-6 text-slate-700">{role.label}</p>
+            </div>
+          ))}
+        </div>
+        <ul className="mt-4 grid gap-2 text-sm leading-6 text-slate-600 md:grid-cols-2">
+          {shareableHouseholdListContract.guardrails.map((guardrail) => <li key={guardrail}>• {guardrail}</li>)}
+        </ul>
+      </Card>
 
       <section className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <Card>
