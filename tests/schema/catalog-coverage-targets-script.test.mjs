@@ -23,6 +23,8 @@ describe('catalog coverage target export script', () => {
     const output = execFileSync(process.execPath, [scriptPath.pathname, '--self-test'], { encoding: 'utf8' });
     const targets = JSON.parse(output);
     assert.deepEqual(targets.targetChains, ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']);
+    const hyphenatedOutput = execFileSync(process.execPath, [scriptPath.pathname, '--self-test-hyphenated-chain-slugs'], { encoding: 'utf8' });
+    assert.deepEqual(JSON.parse(hyphenatedOutput).targetChains, ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross']);
     assert.deepEqual(targets.targetProducts, ['coffee', 'milk']);
     assert.deepEqual(targets.targetStores, ['coop-odenplan', 'willys-odenplan']);
     assert.equal(targets.requireEveryProductInEveryStore, true);
