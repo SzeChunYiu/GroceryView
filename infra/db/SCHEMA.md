@@ -112,13 +112,15 @@ Immutable normalized price facts. This is the canonical table for historical cha
 
 Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `source_run_id`, `raw_record_id`, `retailer_product_ref`, `price_type`, `price`, `regular_price`, `unit_price`, `currency`, `quantity`, `quantity_unit`, promotion fields, `member_required`, `observed_at`, validity window fields, `confidence`, `provenance`.
 
+Write policy: daily ingestion uses change-only writes. Before inserting a new immutable observation, the PostgreSQL writer compares the incoming `(product_id, chain_id, store_id, price_type)` price tuple with `latest_prices`; unchanged current snapshots reuse the existing `observation_id` instead of creating another daily duplicate. Changed rows keep temporal state by writing `valid_from` from source evidence or defaulting it to `observed_at`.
+
 Allowed `price_type` values: `shelf`, `online`, `member`, `promotion`, `receipt`, `community`, `estimated`.
 
 Indexes: product/time, store/time, price type/time, and provenance GIN.
 
 ### `latest_prices`
 
-Materialized latest price lookup for API and UI reads. Each row references the observation that won the rollup.
+Materialized latest price lookup for API and UI reads, and the write-side change detector for daily ingestion. Each row references the observation that won the rollup.
 
 Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `observation_id`, `price`, `regular_price`, `unit_price`, `currency`, `observed_at`, `confidence`, `provenance`, `updated_at`.
 

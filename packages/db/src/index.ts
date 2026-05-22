@@ -469,6 +469,7 @@ export type PriceObservationRecord = {
 
 export type PriceObservationWriteResult = {
   observationId: string;
+  status?: 'unchanged';
 };
 
 export type PostgresPriceObservationWriter = {
@@ -1628,6 +1629,27 @@ function mapLatestPrice(row: LatestPriceRow): LatestPriceRecord {
     confidence: Number(row.confidence),
     provenance: asRecord(row.provenance)
   };
+}
+
+function samePriceValue(left: string | number | null, right: number | null | undefined): boolean {
+  if (left === null || right === null || right === undefined) return left === null && (right === null || right === undefined);
+  return Math.abs(Number(left) - Number(right)) < 0.000001;
+}
+
+function sameLatestPriceKey(row: LatestPriceRow, observation: PriceObservationRecord): boolean {
+  return row.product_id === observation.productId &&
+    row.chain_id === observation.chainId &&
+    (row.store_id ?? null) === (observation.storeId ?? null) &&
+    row.price_type === observation.priceType;
+}
+
+function latestPriceIsUnchanged(row: LatestPriceRow, observation: PriceObservationRecord): boolean {
+  if (!sameLatestPriceKey(row, observation)) return false;
+  if (Date.parse(asIso(row.observed_at)) > Date.parse(observation.observedAt)) return false;
+  return samePriceValue(row.price, observation.price) &&
+    samePriceValue(row.regular_price, observation.regularPrice ?? null) &&
+    samePriceValue(row.unit_price, observation.unitPrice) &&
+    row.currency === (observation.currency ?? 'SEK');
 }
 
 
@@ -3674,6 +3696,38 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
   return {
     async recordPriceObservation(observation) {
       const provenanceJson = JSON.stringify(observation.provenance);
+      const latestRows = await executor.query<LatestPriceRow>(
+        `select product_id,
+                chain_id,
+                store_id,
+                price_type,
+                observation_id,
+                price,
+                regular_price,
+                unit_price,
+                currency,
+                observed_at,
+                confidence,
+                provenance
+         from latest_prices
+         where product_id = $1
+           and chain_id = $2
+           and store_id is not distinct from $3::uuid
+           and price_type = $4
+         order by observed_at desc
+         limit 1`,
+        [
+          observation.productId,
+          observation.chainId,
+          observation.storeId ?? null,
+          observation.priceType
+        ]
+      );
+      const latestRow = latestRows.find((row) => sameLatestPriceKey(row, observation)) ?? latestRows[0];
+      if (latestRow && latestPriceIsUnchanged(latestRow, observation)) {
+        return { observationId: latestRow.observation_id, status: 'unchanged' };
+      }
+
       const rows = await executor.query<ObservationIdRow>(
         `insert into observations(
            product_id,
@@ -3722,7 +3776,7 @@ export function createPostgresPriceObservationWriter(executor: QueryExecutor): P
           observation.promotionEndsOn ?? null,
           observation.memberRequired ?? false,
           observation.observedAt,
-          observation.validFrom ?? null,
+          observation.validFrom ?? observation.observedAt,
           observation.validUntil ?? null,
           observation.confidence,
           provenanceJson
