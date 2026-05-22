@@ -29,6 +29,7 @@ import {
   fetchCoopProducts,
   fetchHemkopProducts,
   fetchHemkopWeeklyDiscounts,
+  fetchIcaDefaultStoreProducts,
   fetchIcaProducts,
   fetchIcaReklambladOffers,
   fetchMathemProducts,
@@ -641,6 +642,52 @@ describe('fetchIcaProducts', () => {
     });
 
     assert.equal(rows.length, 1);
+  });
+
+  it('fetches configured ICA store-scoped promotion batches', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const storeAccountId = String(url).includes('/stores/1004247/') ? '1004247' : '1004599';
+      return Response.json({
+        productGroups: [{
+          type: 'ON_OFFER',
+          decoratedProducts: [{
+            productId: `product-${storeAccountId}`,
+            retailerProductId: `retailer-${storeAccountId}`,
+            name: `Product ${storeAccountId}`,
+            price: { amount: 10, currency: 'SEK' }
+          }]
+        }]
+      });
+    };
+
+    const rows = await fetchIcaDefaultStoreProducts({
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:49:49.000Z',
+      maxRows: 1,
+      stores: [
+        {
+          storeAccountId: '1004599',
+          storeName: 'ICA Kvantum Kungsholmen',
+          regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d'
+        },
+        {
+          storeAccountId: '1004247',
+          storeName: 'ICA Focus',
+          regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d'
+        }
+      ]
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildIcaStorePromotionsUrl('1004599', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 1),
+      buildIcaStorePromotionsUrl('1004247', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 1)
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeAccountId, row.storeName, row.code]), [
+      ['1004599', 'ICA Kvantum Kungsholmen', 'retailer-1004599'],
+      ['1004247', 'ICA Focus', 'retailer-1004247']
+    ]);
   });
 });
 
