@@ -888,6 +888,7 @@ ${seo}`;
       'src/app/account/page.tsx',
       'src/app/account/profile/page.tsx',
       'src/app/basket-ideas/page.tsx',
+      'src/app/billigaste/[slug]/page.tsx',
       'src/app/catalogue-savings/page.tsx',
       'src/app/categories/page.tsx',
       'src/app/categories/[slug]/page.tsx',
@@ -906,6 +907,7 @@ ${seo}`;
       'src/app/pantry-planner/page.tsx',
       'src/app/price-reports/page.tsx',
       'src/app/privacy/page.tsx',
+      'src/app/prisjamforelse/[slug]/page.tsx',
       'src/app/products/page.tsx',
       'src/app/products/[slug]/page.tsx',
       'src/app/savings-dashboard/page.tsx',
@@ -916,7 +918,8 @@ ${seo}`;
       'src/app/stores/[slug]/page.tsx',
       'src/app/unit-price-alerts/page.tsx',
       'src/app/watchlist/page.tsx',
-      'src/app/weekly-basket/page.tsx'
+      'src/app/weekly-basket/page.tsx',
+      'src/app/[city]/billigaste/[slug]/page.tsx'
     ];
     const seo = await read('src/lib/seo.ts');
 
@@ -931,7 +934,7 @@ ${seo}`;
     for (const page of routePages) {
       const source = await read(page);
       assert.match(source, /generateMetadata/, `${page} should export generateMetadata`);
-      assert.match(source, /routeMetadata|metadataForProduct|metadataForCategory|metadataForStore/, `${page} should use the shared SEO metadata helpers`);
+      assert.match(source, /routeMetadata|metadataForProduct|metadataForCategory|metadataForStore|metadataForCheapestLanding|metadataForPriceComparisonLanding|metadataForCityCheapestLanding/, `${page} should use the shared SEO metadata helpers`);
       assert.doesNotMatch(source, /export const metadata = /, `${page} should avoid stale metadata objects`);
     }
 
@@ -944,6 +947,55 @@ ${seo}`;
     assert.match(category, /categoryLabels/);
     assert.match(store, /metadataForStore/);
     assert.match(store, /findStore/);
+  });
+
+  it('ships programmatic SEO landing pages from verified price spreads', async () => {
+    const landingData = await read('src/lib/seo-landing-pages.ts');
+    const landingComponent = await read('src/components/seo-landing-page.tsx');
+    const cheapestRoute = await read('src/app/billigaste/[slug]/page.tsx');
+    const compareRoute = await read('src/app/prisjamforelse/[slug]/page.tsx');
+    const cityRoute = await read('src/app/[city]/billigaste/[slug]/page.tsx');
+    const products = await read('src/app/products/page.tsx');
+    const sitemap = await read('src/app/sitemap.ts');
+
+    assert.match(landingData, /seoLandingProducts/);
+    assert.match(landingData, /topChainSpreads/);
+    assert.match(landingData, /chainPriceRows/);
+    assert.match(landingData, /formatSek/);
+    assert.match(landingData, /formatPct/);
+    assert.match(landingData, /seoLandingCities/);
+    assert.match(landingData, /stockholm/);
+    assert.doesNotMatch(landingData, /@\/lib\/demo-data|@\/components\/sample-data/);
+
+    for (const route of [cheapestRoute, compareRoute, cityRoute]) {
+      assert.match(route, /generateStaticParams/);
+      assert.match(route, /generateMetadata/);
+      assert.match(route, /findSeoLandingProduct/);
+      assert.match(route, /SeoLandingPage/);
+      assert.match(route, /notFound/);
+    }
+    assert.match(cheapestRoute, /kind="cheapest"/);
+    assert.match(compareRoute, /kind="compare"/);
+    assert.match(cityRoute, /findSeoLandingCity/);
+    assert.match(cityRoute, /kind="city"/);
+
+    assert.match(landingComponent, /Billigaste|prisjämförelse/i);
+    assert.match(landingComponent, /Verified price spread/);
+    assert.match(landingComponent, /No synthetic prices/);
+    assert.match(landingComponent, /chainRows\.map/);
+    assert.match(landingComponent, /\/products\/\$\{product\.slug\}/);
+    assert.match(landingComponent, /\/compare/);
+
+    assert.match(products, /SEO landing pages/);
+    assert.match(products, /seoLandingProducts\.slice/);
+    assert.match(products, /\/billigaste\/\$\{landing\.slug\}/);
+    assert.match(products, /\/prisjamforelse\/\$\{landing\.slug\}/);
+
+    assert.match(sitemap, /seoLandingProducts/);
+    assert.match(sitemap, /seoLandingCities/);
+    assert.match(sitemap, /\/billigaste\/\$\{product\.slug\}/);
+    assert.match(sitemap, /\/prisjamforelse\/\$\{product\.slug\}/);
+    assert.match(sitemap, /\/\$\{city\.slug\}\/billigaste\/\$\{product\.slug\}/);
   });
 
   it('surfaces adaptive total and unit price product cards with a compare-mode toggle', async () => {
