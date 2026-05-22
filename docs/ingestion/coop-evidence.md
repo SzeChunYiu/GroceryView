@@ -4,10 +4,10 @@
 - Source URL: https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1
 - Request body: query kaffe, resultsOptions take 75, empty sort/facets, relatedResultsOptions take 16
 - Required public header: Ocp-Apim-Subscription-Key value exposed in window.coopSettings.serviceAccess.personalizationApiSubscriptionKey
-- Retrieved: 2026-05-21T01:29:42.710Z
+- Retrieved: 2026-05-22T10:32:35.907Z
 - Store: 251300
 - Device parameter: desktop
-- Real rows fetched: 75
+- Real rows fetched: 290
 - Connector: packages/ingestion/src/connectors/coop.ts
 - Web wire: apps/web/src/lib/ingested/coop.ts
 
@@ -21,7 +21,7 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
 - Product search URLs: per-branch `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1`, listed in `apps/web/src/lib/ingested/coop.ts`
 - Request body: weekly flyer item queries listed in `DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES`, resultsOptions take 8, empty sort/facets, relatedResultsOptions take 0
 - Required public headers: `storeApiSubscriptionKey` for store metadata and `personalizationApiSubscriptionKey` for product search, both exposed in `window.coopSettings.serviceAccess` on https://www.coop.se/handla/
-- Retrieved: 2026-05-22T09:40:13.630Z
+- Retrieved: 2026-05-22T10:32:37.171Z
 - Stores:
   - 251300, Stora Coop Boländerna, Uppsala, 26 real discount rows
   - 252700, Stora Coop Bromma, Bromma, 24 real discount rows

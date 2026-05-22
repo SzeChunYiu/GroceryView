@@ -4,7 +4,7 @@
 // Row count: 150 real product rows fetched from handla.willys.se / willys.se search.
 // Weekly discount source URL pattern: https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
 // Weekly discount source URLs: https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100; https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100; https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100; https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100; https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100; https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100; https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100; https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100; https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100; https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100; https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100; https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=2&size=100; https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100; https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100; https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=2&size=100; https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100; https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100; https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=2&size=100
-// Weekly discount retrieved: 2026-05-22T10:35:51.543Z
+// Weekly discount retrieved: 2026-05-22T10:31:23.203Z
 // Weekly discount row count: 1216 real Axfood campaign rows fetched from willys.se for store IDs 2110, 2187, 2102, 2149, 2355, and 2268.
 
 export type WillysIngestedProduct = {
@@ -2843,7 +2843,7 @@ export const willysProducts: WillysIngestedProduct[] = [
 
 export const willysWeeklyDiscountSource = {
   "source": "willys.se public Axfood campaign JSON",
-  "retrievedAt": "2026-05-22T10:35:51.543Z",
+  "retrievedAt": "2026-05-22T10:31:23.203Z",
   "rowCount": 1216,
   "storeIds": [
     "2110",
@@ -2902,7 +2902,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306996",
@@ -2930,7 +2930,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500303258",
@@ -2955,7 +2955,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08000430133035_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298388",
@@ -2983,7 +2983,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301201",
@@ -3008,7 +3008,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05449000259127_C1L1_s06",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297764",
@@ -3035,7 +3035,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500308130",
@@ -3062,7 +3062,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298073",
@@ -3087,7 +3087,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298184",
@@ -3114,7 +3114,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297334",
@@ -3143,7 +3143,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298121",
@@ -3172,7 +3172,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295760",
@@ -3197,7 +3197,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310027605_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295548",
@@ -3222,7 +3222,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240060072_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298373",
@@ -3250,7 +3250,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295482",
@@ -3275,7 +3275,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311311014017_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500303335",
@@ -3302,7 +3302,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298041",
@@ -3332,7 +3332,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295432",
@@ -3357,7 +3357,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08715700422046_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295666",
@@ -3382,7 +3382,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043007271_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298253",
@@ -3410,7 +3410,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295522",
@@ -3435,7 +3435,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043014842_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298337",
@@ -3460,7 +3460,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310628005572_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295679",
@@ -3485,7 +3485,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07316110001886_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500296825",
@@ -3513,7 +3513,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298420",
@@ -3538,7 +3538,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622210697134_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298366",
@@ -3563,7 +3563,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03523230062633_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298359",
@@ -3588,7 +3588,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015498_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500279416",
@@ -3615,7 +3615,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301294",
@@ -3644,7 +3644,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301271",
@@ -3672,7 +3672,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301272",
@@ -3700,7 +3700,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298095",
@@ -3728,7 +3728,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301909",
@@ -3753,7 +3753,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340052513046_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298123",
@@ -3781,7 +3781,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298363",
@@ -3806,7 +3806,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083435645_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300844",
@@ -3833,7 +3833,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298140",
@@ -3861,7 +3861,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298294",
@@ -3888,7 +3888,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298141",
@@ -3918,7 +3918,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298295",
@@ -3943,7 +3943,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083456701_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298145",
@@ -3968,7 +3968,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05059319023229_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295678",
@@ -3993,7 +3993,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001761_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298129",
@@ -4018,7 +4018,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447549_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298034",
@@ -4046,7 +4046,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298371",
@@ -4071,7 +4071,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451996_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298383",
@@ -4096,7 +4096,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07331217012993_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298161",
@@ -4121,7 +4121,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451439_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500293352",
@@ -4149,7 +4149,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298187",
@@ -4177,7 +4177,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500293354",
@@ -4202,7 +4202,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006274_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297576",
@@ -4227,7 +4227,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451880_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298449",
@@ -4252,7 +4252,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020829_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295519",
@@ -4277,7 +4277,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083472275_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298066",
@@ -4305,7 +4305,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295802",
@@ -4330,7 +4330,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020683_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298272",
@@ -4357,7 +4357,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298033",
@@ -4387,7 +4387,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298125",
@@ -4412,7 +4412,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/donutss-x4-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3wxMDU2NnxpbWFnZS9qcGVnfGMzbHpMVzFoYzNSbGNpOXBiV0ZuWlhNdmFHUTVMMmczT0M4eE1qZzVNemMwTVRVNE1ETXhPQzlrYjI1MWRITnpJSGcwSUZOR1RVTmZZWGhtYjI5a1h6TXdNQXw5NzllOTAyZTRiMTBlNDE5NzFlMzhlMzNlZjAzYjIwMTJmYWUyODY5MTY5YmQwY2M5YjI3YzgyZTVmMTgzMDY5",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298029",
@@ -4437,7 +4437,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08076809513739_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298035",
@@ -4465,7 +4465,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "swedish_bird"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298692",
@@ -4493,7 +4493,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298186",
@@ -4518,7 +4518,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490446_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295520",
@@ -4545,7 +4545,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298303",
@@ -4570,7 +4570,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350045596499_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298229",
@@ -4599,7 +4599,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295388",
@@ -4624,7 +4624,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471193_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297257",
@@ -4649,7 +4649,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08718951560109_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295799",
@@ -4674,7 +4674,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083486920_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297066",
@@ -4699,7 +4699,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04015400565574_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298153",
@@ -4726,7 +4726,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295542",
@@ -4751,7 +4751,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05701090068493_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297073",
@@ -4779,7 +4779,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "flame"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500302552",
@@ -4804,7 +4804,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04820218098677_C1N0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500269629",
@@ -4829,7 +4829,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489358_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298137",
@@ -4854,7 +4854,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/axfood-300-Pampers-Blo-jor-x2-SFMC.jpg?context=bWFzdGVyfGltYWdlc3w3NzgwfGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YUdOaUwyZzROeTh5TmpVeE56UTFPVEEzTlRFd01pOWhlR1p2YjJSZk16QXdYMUJoYlhCbGNuTWdRbXh2eklocWIzSWdlRElnVTBaTlF5NXFjR2N8OWU1NmEzYTc5MDgzOGJhYTdiYWYxNTcwNzI1NWI5ZDMzMjhiNzZjNzg2YTIwZGZjNWYyYTE1NTQ5MjIzMzQwMg",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297260",
@@ -4879,7 +4879,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000059092629_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298039",
@@ -4906,7 +4906,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297070",
@@ -4931,7 +4931,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089812_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298148",
@@ -4959,7 +4959,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297064",
@@ -4984,7 +4984,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531127547_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298149",
@@ -5012,7 +5012,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297161",
@@ -5037,7 +5037,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531130141_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298038",
@@ -5066,7 +5066,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298203",
@@ -5093,7 +5093,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298356",
@@ -5122,7 +5122,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306008",
@@ -5149,7 +5149,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306011",
@@ -5176,7 +5176,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306000",
@@ -5204,7 +5204,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295381",
@@ -5233,7 +5233,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305999",
@@ -5260,7 +5260,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295518",
@@ -5287,7 +5287,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305998",
@@ -5314,7 +5314,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306009",
@@ -5341,7 +5341,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306013",
@@ -5368,7 +5368,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306971",
@@ -5393,7 +5393,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042009658_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306012",
@@ -5420,7 +5420,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298100",
@@ -5445,7 +5445,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07317530110394_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297072",
@@ -5470,7 +5470,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04005900100115_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297190",
@@ -5495,7 +5495,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600522287339_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297123",
@@ -5520,7 +5520,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05703147053209_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297124",
@@ -5545,7 +5545,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600523183524_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301864",
@@ -5570,7 +5570,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531093965_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301133",
@@ -5595,7 +5595,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089874_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500299056",
@@ -5620,7 +5620,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/mariestads-flak-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3w2NjM3fGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YURVekwyZ3dNUzh4TWpjeE5ESTROelU1TlRVMU1DOXRZWEpwWlhOMFlXUnpJR1pzWVdzZ1UwWk5RMTloZUdadmIyUmZNekF3fDQxMTlkNmI1OGMzYmJkNDFmZWQ5NDZlZGE2M2U4OTg5NWU4YzViN2RhMjMzN2RiY2UwZjk0YmU5MWE5YzFjZWM",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295405",
@@ -5648,7 +5648,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295684",
@@ -5673,7 +5673,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07042110081848_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295551",
@@ -5698,7 +5698,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04014400901191_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295703",
@@ -5723,7 +5723,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350106844_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295397",
@@ -5752,7 +5752,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500299037",
@@ -5777,7 +5777,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310403059240_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295463",
@@ -5805,7 +5805,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295696",
@@ -5830,7 +5830,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041006597_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295892",
@@ -5855,7 +5855,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310029500_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301062",
@@ -5880,7 +5880,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310070124906_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295830",
@@ -5905,7 +5905,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03838975566606_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295700",
@@ -5933,7 +5933,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295571",
@@ -5958,7 +5958,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622300336738_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295709",
@@ -5983,7 +5983,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532150764_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297781",
@@ -6011,7 +6011,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295372",
@@ -6036,7 +6036,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04008429037894_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295812",
@@ -6061,7 +6061,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001785_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295692",
@@ -6089,7 +6089,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295841",
@@ -6114,7 +6114,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350028546992_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295614",
@@ -6139,7 +6139,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043019557_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300934",
@@ -6164,7 +6164,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07312720021238_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295591",
@@ -6192,7 +6192,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298030",
@@ -6220,7 +6220,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "milk_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295378",
@@ -6248,7 +6248,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298348",
@@ -6273,7 +6273,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043012855_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295377",
@@ -6301,7 +6301,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298438",
@@ -6326,7 +6326,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07330416751092_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298841",
@@ -6354,7 +6354,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298380",
@@ -6382,7 +6382,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295677",
@@ -6409,7 +6409,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298062",
@@ -6434,7 +6434,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468391_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295365",
@@ -6459,7 +6459,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612700092_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300393",
@@ -6484,7 +6484,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471650_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295524",
@@ -6512,7 +6512,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298144",
@@ -6537,7 +6537,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160004638_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295674",
@@ -6564,7 +6564,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298152",
@@ -6589,7 +6589,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068295867_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295657",
@@ -6617,7 +6617,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "corrosion"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298446",
@@ -6645,7 +6645,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295392",
@@ -6670,7 +6670,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112690569_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298023",
@@ -6695,7 +6695,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491863_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500296249",
@@ -6724,7 +6724,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298395",
@@ -6749,7 +6749,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043000517_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301061",
@@ -6774,7 +6774,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473173_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298128",
@@ -6799,7 +6799,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08001665722131_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295409",
@@ -6824,7 +6824,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473180_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298132",
@@ -6849,7 +6849,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350051214561_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295544",
@@ -6874,7 +6874,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327416239_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500304896",
@@ -6899,7 +6899,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07038010070839_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295589",
@@ -6924,7 +6924,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083475337_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305045",
@@ -6952,7 +6952,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500292984",
@@ -6977,7 +6977,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312005458_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298017",
@@ -7005,7 +7005,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295737",
@@ -7032,7 +7032,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298278",
@@ -7057,7 +7057,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04100290056308_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295371",
@@ -7082,7 +7082,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350113940285_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301055",
@@ -7110,7 +7110,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295547",
@@ -7135,7 +7135,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031130973_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295708",
@@ -7162,7 +7162,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295385",
@@ -7187,7 +7187,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796091_C1N1_s05",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295804",
@@ -7212,7 +7212,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350116923957_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295835",
@@ -7237,7 +7237,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004270_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295531",
@@ -7267,7 +7267,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295805",
@@ -7292,7 +7292,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000396055979_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295528",
@@ -7317,7 +7317,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311441165610_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295370",
@@ -7342,7 +7342,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006946_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295369",
@@ -7367,7 +7367,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006977_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295374",
@@ -7397,7 +7397,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295670",
@@ -7427,7 +7427,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295807",
@@ -7452,7 +7452,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088005_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295975",
@@ -7477,7 +7477,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720608006656_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295768",
@@ -7505,7 +7505,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295525",
@@ -7530,7 +7530,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05010394006804_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297649",
@@ -7555,7 +7555,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04002359021022_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500294890",
@@ -7583,7 +7583,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295695",
@@ -7608,7 +7608,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154813648_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295815",
@@ -7633,7 +7633,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08723400940982_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500291111",
@@ -7661,7 +7661,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295836",
@@ -7686,7 +7686,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015856_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295834",
@@ -7711,7 +7711,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154815260_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295640",
@@ -7736,7 +7736,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310155803771_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295688",
@@ -7764,7 +7764,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295533",
@@ -7789,7 +7789,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181638701_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295527",
@@ -7817,7 +7817,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295384",
@@ -7842,7 +7842,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796084_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295187",
@@ -7867,7 +7867,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613287554376_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301321",
@@ -7892,7 +7892,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07392031803853_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295642",
@@ -7917,7 +7917,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06006507008840_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295407",
@@ -7942,7 +7942,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000073550013_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295569",
@@ -7967,7 +7967,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018851324_C1N1_s06",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301380",
@@ -7992,7 +7992,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491108_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295568",
@@ -8017,7 +8017,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018458110_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297318",
@@ -8042,7 +8042,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216596701_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295566",
@@ -8067,7 +8067,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216568944_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295567",
@@ -8092,7 +8092,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216489720_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298005",
@@ -8120,7 +8120,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298700",
@@ -8145,7 +8145,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216456876_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500310063",
@@ -8172,7 +8172,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306014",
@@ -8199,7 +8199,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306996",
@@ -8227,7 +8227,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500303258",
@@ -8252,7 +8252,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08000430133035_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298388",
@@ -8280,7 +8280,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301201",
@@ -8305,7 +8305,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05449000259127_C1L1_s06",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297764",
@@ -8332,7 +8332,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500308130",
@@ -8359,7 +8359,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298073",
@@ -8384,7 +8384,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298184",
@@ -8411,7 +8411,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297334",
@@ -8440,7 +8440,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298121",
@@ -8469,7 +8469,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295760",
@@ -8494,7 +8494,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310027605_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295548",
@@ -8519,7 +8519,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240060072_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298373",
@@ -8547,7 +8547,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295482",
@@ -8572,7 +8572,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311311014017_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500303335",
@@ -8599,7 +8599,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298041",
@@ -8629,7 +8629,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295432",
@@ -8654,7 +8654,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08715700422046_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295666",
@@ -8679,7 +8679,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043007271_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298253",
@@ -8707,7 +8707,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295522",
@@ -8732,7 +8732,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043014842_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298337",
@@ -8757,7 +8757,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310628005572_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295679",
@@ -8782,7 +8782,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07316110001886_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500296825",
@@ -8810,7 +8810,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298420",
@@ -8835,7 +8835,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622210697134_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298366",
@@ -8860,7 +8860,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03523230062633_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298359",
@@ -8885,7 +8885,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015498_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500279416",
@@ -8912,7 +8912,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301294",
@@ -8941,7 +8941,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301271",
@@ -8969,7 +8969,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301272",
@@ -8997,7 +8997,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298095",
@@ -9025,7 +9025,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301909",
@@ -9050,7 +9050,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340052513046_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298123",
@@ -9078,7 +9078,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298363",
@@ -9103,7 +9103,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083435645_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300844",
@@ -9130,7 +9130,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298140",
@@ -9158,7 +9158,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298294",
@@ -9185,7 +9185,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298141",
@@ -9215,7 +9215,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298295",
@@ -9240,7 +9240,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083456701_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298145",
@@ -9265,7 +9265,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05059319023229_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295678",
@@ -9290,7 +9290,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001761_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298129",
@@ -9315,7 +9315,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447549_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298034",
@@ -9343,7 +9343,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298371",
@@ -9368,7 +9368,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451996_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298383",
@@ -9393,7 +9393,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07331217012993_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298161",
@@ -9418,7 +9418,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451439_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500293352",
@@ -9446,7 +9446,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298187",
@@ -9474,7 +9474,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500293354",
@@ -9499,7 +9499,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006274_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297576",
@@ -9524,7 +9524,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451880_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298449",
@@ -9549,7 +9549,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020829_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295519",
@@ -9574,7 +9574,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083472275_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298066",
@@ -9602,7 +9602,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295802",
@@ -9627,7 +9627,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020683_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298272",
@@ -9654,7 +9654,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298033",
@@ -9684,7 +9684,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298125",
@@ -9709,7 +9709,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/donutss-x4-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3wxMDU2NnxpbWFnZS9qcGVnfGMzbHpMVzFoYzNSbGNpOXBiV0ZuWlhNdmFHUTVMMmczT0M4eE1qZzVNemMwTVRVNE1ETXhPQzlrYjI1MWRITnpJSGcwSUZOR1RVTmZZWGhtYjI5a1h6TXdNQXw5NzllOTAyZTRiMTBlNDE5NzFlMzhlMzNlZjAzYjIwMTJmYWUyODY5MTY5YmQwY2M5YjI3YzgyZTVmMTgzMDY5",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298029",
@@ -9734,7 +9734,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08076809513739_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298035",
@@ -9762,7 +9762,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "swedish_bird"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298692",
@@ -9790,7 +9790,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298186",
@@ -9815,7 +9815,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490446_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295520",
@@ -9842,7 +9842,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298303",
@@ -9867,7 +9867,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350045596499_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298229",
@@ -9896,7 +9896,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295388",
@@ -9921,7 +9921,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471193_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297257",
@@ -9946,7 +9946,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08718951560109_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295799",
@@ -9971,7 +9971,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083486920_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297066",
@@ -9996,7 +9996,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04015400565574_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298153",
@@ -10023,7 +10023,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295542",
@@ -10048,7 +10048,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05701090068493_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297073",
@@ -10076,7 +10076,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "flame"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500302552",
@@ -10101,7 +10101,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04820218098677_C1N0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500269629",
@@ -10126,7 +10126,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489358_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298137",
@@ -10151,7 +10151,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/axfood-300-Pampers-Blo-jor-x2-SFMC.jpg?context=bWFzdGVyfGltYWdlc3w3NzgwfGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YUdOaUwyZzROeTh5TmpVeE56UTFPVEEzTlRFd01pOWhlR1p2YjJSZk16QXdYMUJoYlhCbGNuTWdRbXh2eklocWIzSWdlRElnVTBaTlF5NXFjR2N8OWU1NmEzYTc5MDgzOGJhYTdiYWYxNTcwNzI1NWI5ZDMzMjhiNzZjNzg2YTIwZGZjNWYyYTE1NTQ5MjIzMzQwMg",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297260",
@@ -10176,7 +10176,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000059092629_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298039",
@@ -10203,7 +10203,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297070",
@@ -10228,7 +10228,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089812_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298148",
@@ -10256,7 +10256,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297064",
@@ -10281,7 +10281,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531127547_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298149",
@@ -10309,7 +10309,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297161",
@@ -10334,7 +10334,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531130141_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298038",
@@ -10363,7 +10363,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298203",
@@ -10390,7 +10390,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298356",
@@ -10419,7 +10419,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306008",
@@ -10446,7 +10446,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306011",
@@ -10473,7 +10473,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306000",
@@ -10501,7 +10501,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295381",
@@ -10530,7 +10530,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305999",
@@ -10557,7 +10557,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295518",
@@ -10584,7 +10584,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305998",
@@ -10611,7 +10611,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306009",
@@ -10638,7 +10638,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306013",
@@ -10665,7 +10665,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306971",
@@ -10690,7 +10690,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042009658_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306012",
@@ -10717,7 +10717,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298100",
@@ -10742,7 +10742,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07317530110394_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297072",
@@ -10767,7 +10767,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04005900100115_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297190",
@@ -10792,7 +10792,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600522287339_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297123",
@@ -10817,7 +10817,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05703147053209_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297124",
@@ -10842,7 +10842,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600523183524_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301864",
@@ -10867,7 +10867,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531093965_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301133",
@@ -10892,7 +10892,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089874_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500299056",
@@ -10917,7 +10917,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/mariestads-flak-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3w2NjM3fGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YURVekwyZ3dNUzh4TWpjeE5ESTROelU1TlRVMU1DOXRZWEpwWlhOMFlXUnpJR1pzWVdzZ1UwWk5RMTloZUdadmIyUmZNekF3fDQxMTlkNmI1OGMzYmJkNDFmZWQ5NDZlZGE2M2U4OTg5NWU4YzViN2RhMjMzN2RiY2UwZjk0YmU5MWE5YzFjZWM",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295405",
@@ -10945,7 +10945,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295684",
@@ -10970,7 +10970,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07042110081848_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295551",
@@ -10995,7 +10995,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04014400901191_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295703",
@@ -11020,7 +11020,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350106844_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295397",
@@ -11049,7 +11049,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500299037",
@@ -11074,7 +11074,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310403059240_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295463",
@@ -11102,7 +11102,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295696",
@@ -11127,7 +11127,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041006597_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295892",
@@ -11152,7 +11152,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310029500_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301062",
@@ -11177,7 +11177,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310070124906_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295830",
@@ -11202,7 +11202,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03838975566606_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295700",
@@ -11230,7 +11230,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295571",
@@ -11255,7 +11255,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622300336738_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295709",
@@ -11280,7 +11280,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532150764_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297781",
@@ -11308,7 +11308,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295372",
@@ -11333,7 +11333,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04008429037894_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295812",
@@ -11358,7 +11358,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001785_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295692",
@@ -11386,7 +11386,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295841",
@@ -11411,7 +11411,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350028546992_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295614",
@@ -11436,7 +11436,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043019557_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300934",
@@ -11461,7 +11461,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07312720021238_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295591",
@@ -11489,7 +11489,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298030",
@@ -11517,7 +11517,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "milk_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295378",
@@ -11545,7 +11545,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298348",
@@ -11570,7 +11570,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043012855_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295377",
@@ -11598,7 +11598,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298438",
@@ -11623,7 +11623,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07330416751092_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298841",
@@ -11651,7 +11651,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298380",
@@ -11679,7 +11679,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295677",
@@ -11706,7 +11706,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298062",
@@ -11731,7 +11731,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468391_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295365",
@@ -11756,7 +11756,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612700092_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300393",
@@ -11781,7 +11781,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471650_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295524",
@@ -11809,7 +11809,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298144",
@@ -11834,7 +11834,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160004638_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295674",
@@ -11861,7 +11861,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298152",
@@ -11886,7 +11886,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068295867_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295657",
@@ -11914,7 +11914,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "corrosion"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298446",
@@ -11942,7 +11942,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295392",
@@ -11967,7 +11967,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112690569_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298023",
@@ -11992,7 +11992,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491863_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500296249",
@@ -12021,7 +12021,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298395",
@@ -12046,7 +12046,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043000517_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301061",
@@ -12071,7 +12071,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473173_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298128",
@@ -12096,7 +12096,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08001665722131_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295409",
@@ -12121,7 +12121,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473180_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298132",
@@ -12146,7 +12146,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350051214561_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295544",
@@ -12171,7 +12171,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327416239_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500304896",
@@ -12196,7 +12196,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07038010070839_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295589",
@@ -12221,7 +12221,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083475337_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305045",
@@ -12249,7 +12249,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500292984",
@@ -12274,7 +12274,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312005458_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298017",
@@ -12302,7 +12302,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295737",
@@ -12329,7 +12329,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298278",
@@ -12354,7 +12354,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04100290056308_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295371",
@@ -12379,7 +12379,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350113940285_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301055",
@@ -12407,7 +12407,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295547",
@@ -12432,7 +12432,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031130973_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295708",
@@ -12459,7 +12459,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295385",
@@ -12484,7 +12484,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796091_C1N1_s05",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295804",
@@ -12509,7 +12509,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350116923957_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295835",
@@ -12534,7 +12534,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004270_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295531",
@@ -12564,7 +12564,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295805",
@@ -12589,7 +12589,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000396055979_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295528",
@@ -12614,7 +12614,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311441165610_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295370",
@@ -12639,7 +12639,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006946_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295369",
@@ -12664,7 +12664,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006977_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295374",
@@ -12694,7 +12694,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295670",
@@ -12724,7 +12724,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295807",
@@ -12749,7 +12749,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088005_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295975",
@@ -12774,7 +12774,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720608006656_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295768",
@@ -12802,7 +12802,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295525",
@@ -12827,7 +12827,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05010394006804_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297649",
@@ -12852,7 +12852,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04002359021022_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500294890",
@@ -12880,7 +12880,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295695",
@@ -12905,7 +12905,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154813648_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295815",
@@ -12930,7 +12930,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08723400940982_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500291111",
@@ -12958,7 +12958,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295836",
@@ -12983,7 +12983,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015856_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295834",
@@ -13008,7 +13008,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154815260_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295640",
@@ -13033,7 +13033,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310155803771_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295688",
@@ -13061,7 +13061,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295533",
@@ -13086,7 +13086,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181638701_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295527",
@@ -13114,7 +13114,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295384",
@@ -13139,7 +13139,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796084_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295187",
@@ -13164,7 +13164,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613287554376_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301321",
@@ -13189,7 +13189,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07392031803853_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295642",
@@ -13214,7 +13214,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06006507008840_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295407",
@@ -13239,7 +13239,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000073550013_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295569",
@@ -13264,7 +13264,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018851324_C1N1_s06",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301380",
@@ -13289,7 +13289,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491108_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295568",
@@ -13314,7 +13314,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018458110_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297318",
@@ -13339,7 +13339,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216596701_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295566",
@@ -13364,7 +13364,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216568944_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295567",
@@ -13389,7 +13389,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216489720_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298005",
@@ -13417,7 +13417,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298700",
@@ -13442,7 +13442,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216456876_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500310063",
@@ -13469,7 +13469,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306014",
@@ -13496,7 +13496,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306996",
@@ -13524,7 +13524,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500303258",
@@ -13549,7 +13549,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08000430133035_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298388",
@@ -13577,7 +13577,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301201",
@@ -13602,7 +13602,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05449000259127_C1L1_s06",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297764",
@@ -13629,7 +13629,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500308130",
@@ -13656,7 +13656,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298073",
@@ -13681,7 +13681,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298184",
@@ -13708,7 +13708,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297334",
@@ -13737,7 +13737,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298121",
@@ -13766,7 +13766,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295760",
@@ -13791,7 +13791,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310027605_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295548",
@@ -13816,7 +13816,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240060072_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298373",
@@ -13844,7 +13844,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295482",
@@ -13869,7 +13869,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311311014017_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500303335",
@@ -13896,7 +13896,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298041",
@@ -13926,7 +13926,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295432",
@@ -13951,7 +13951,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08715700422046_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295666",
@@ -13976,7 +13976,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043007271_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298253",
@@ -14004,7 +14004,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295522",
@@ -14029,7 +14029,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043014842_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298337",
@@ -14054,7 +14054,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310628005572_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295679",
@@ -14079,7 +14079,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07316110001886_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500296825",
@@ -14107,7 +14107,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298420",
@@ -14132,7 +14132,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622210697134_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298366",
@@ -14157,7 +14157,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03523230062633_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298359",
@@ -14182,7 +14182,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015498_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500279416",
@@ -14209,7 +14209,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301294",
@@ -14238,7 +14238,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301271",
@@ -14266,7 +14266,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301272",
@@ -14294,7 +14294,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298095",
@@ -14322,7 +14322,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301909",
@@ -14347,7 +14347,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340052513046_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298123",
@@ -14375,7 +14375,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298363",
@@ -14400,7 +14400,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083435645_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300844",
@@ -14427,7 +14427,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298140",
@@ -14455,7 +14455,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298294",
@@ -14482,7 +14482,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298141",
@@ -14512,7 +14512,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298295",
@@ -14537,7 +14537,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083456701_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298145",
@@ -14562,7 +14562,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05059319023229_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295678",
@@ -14587,7 +14587,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001761_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298129",
@@ -14612,7 +14612,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447549_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298034",
@@ -14640,7 +14640,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298371",
@@ -14665,7 +14665,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451996_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298383",
@@ -14690,7 +14690,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07331217012993_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298161",
@@ -14715,7 +14715,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451439_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500293352",
@@ -14743,7 +14743,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298187",
@@ -14771,7 +14771,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500293354",
@@ -14796,7 +14796,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006274_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297576",
@@ -14821,7 +14821,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451880_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298449",
@@ -14846,7 +14846,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020829_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295519",
@@ -14871,7 +14871,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083472275_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298066",
@@ -14899,7 +14899,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295802",
@@ -14924,7 +14924,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020683_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298272",
@@ -14951,7 +14951,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298033",
@@ -14981,7 +14981,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298125",
@@ -15006,7 +15006,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/donutss-x4-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3wxMDU2NnxpbWFnZS9qcGVnfGMzbHpMVzFoYzNSbGNpOXBiV0ZuWlhNdmFHUTVMMmczT0M4eE1qZzVNemMwTVRVNE1ETXhPQzlrYjI1MWRITnpJSGcwSUZOR1RVTmZZWGhtYjI5a1h6TXdNQXw5NzllOTAyZTRiMTBlNDE5NzFlMzhlMzNlZjAzYjIwMTJmYWUyODY5MTY5YmQwY2M5YjI3YzgyZTVmMTgzMDY5",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298029",
@@ -15031,7 +15031,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08076809513739_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298035",
@@ -15059,7 +15059,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "swedish_bird"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298692",
@@ -15087,7 +15087,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298186",
@@ -15112,7 +15112,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490446_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295520",
@@ -15139,7 +15139,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298303",
@@ -15164,7 +15164,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350045596499_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298229",
@@ -15193,7 +15193,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295388",
@@ -15218,7 +15218,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471193_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297257",
@@ -15243,7 +15243,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08718951560109_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295799",
@@ -15268,7 +15268,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083486920_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297066",
@@ -15293,7 +15293,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04015400565574_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298153",
@@ -15320,7 +15320,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295542",
@@ -15345,7 +15345,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05701090068493_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297073",
@@ -15373,7 +15373,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "flame"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500302552",
@@ -15398,7 +15398,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04820218098677_C1N0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500269629",
@@ -15423,7 +15423,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489358_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298137",
@@ -15448,7 +15448,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/axfood-300-Pampers-Blo-jor-x2-SFMC.jpg?context=bWFzdGVyfGltYWdlc3w3NzgwfGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YUdOaUwyZzROeTh5TmpVeE56UTFPVEEzTlRFd01pOWhlR1p2YjJSZk16QXdYMUJoYlhCbGNuTWdRbXh2eklocWIzSWdlRElnVTBaTlF5NXFjR2N8OWU1NmEzYTc5MDgzOGJhYTdiYWYxNTcwNzI1NWI5ZDMzMjhiNzZjNzg2YTIwZGZjNWYyYTE1NTQ5MjIzMzQwMg",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297260",
@@ -15473,7 +15473,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000059092629_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298039",
@@ -15500,7 +15500,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297070",
@@ -15525,7 +15525,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089812_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298148",
@@ -15553,7 +15553,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297064",
@@ -15578,7 +15578,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531127547_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298149",
@@ -15606,7 +15606,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297161",
@@ -15631,7 +15631,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531130141_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298038",
@@ -15660,7 +15660,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298203",
@@ -15687,7 +15687,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298356",
@@ -15716,7 +15716,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306008",
@@ -15743,7 +15743,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306011",
@@ -15770,7 +15770,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306000",
@@ -15798,7 +15798,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295381",
@@ -15827,7 +15827,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305999",
@@ -15854,7 +15854,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295518",
@@ -15881,7 +15881,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305998",
@@ -15908,7 +15908,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306009",
@@ -15935,7 +15935,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306013",
@@ -15962,7 +15962,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306971",
@@ -15987,7 +15987,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042009658_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306012",
@@ -16014,7 +16014,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298100",
@@ -16039,7 +16039,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07317530110394_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297072",
@@ -16064,7 +16064,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04005900100115_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297190",
@@ -16089,7 +16089,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600522287339_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297123",
@@ -16114,7 +16114,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05703147053209_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297124",
@@ -16139,7 +16139,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600523183524_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301864",
@@ -16164,7 +16164,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531093965_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301133",
@@ -16189,7 +16189,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089874_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500299056",
@@ -16214,7 +16214,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/mariestads-flak-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3w2NjM3fGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YURVekwyZ3dNUzh4TWpjeE5ESTROelU1TlRVMU1DOXRZWEpwWlhOMFlXUnpJR1pzWVdzZ1UwWk5RMTloZUdadmIyUmZNekF3fDQxMTlkNmI1OGMzYmJkNDFmZWQ5NDZlZGE2M2U4OTg5NWU4YzViN2RhMjMzN2RiY2UwZjk0YmU5MWE5YzFjZWM",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295405",
@@ -16242,7 +16242,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295684",
@@ -16267,7 +16267,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07042110081848_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295551",
@@ -16292,7 +16292,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04014400901191_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295703",
@@ -16317,7 +16317,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350106844_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295397",
@@ -16346,7 +16346,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500299037",
@@ -16371,7 +16371,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310403059240_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295463",
@@ -16399,7 +16399,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295696",
@@ -16424,7 +16424,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041006597_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295892",
@@ -16449,7 +16449,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310029500_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301062",
@@ -16474,7 +16474,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310070124906_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295830",
@@ -16499,7 +16499,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03838975566606_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295700",
@@ -16527,7 +16527,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295571",
@@ -16552,7 +16552,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622300336738_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295709",
@@ -16577,7 +16577,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532150764_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297781",
@@ -16605,7 +16605,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295372",
@@ -16630,7 +16630,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04008429037894_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295812",
@@ -16655,7 +16655,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001785_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295692",
@@ -16683,7 +16683,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295841",
@@ -16708,7 +16708,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350028546992_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295614",
@@ -16733,7 +16733,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043019557_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300934",
@@ -16758,7 +16758,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07312720021238_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295591",
@@ -16786,7 +16786,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298030",
@@ -16814,7 +16814,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "milk_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295378",
@@ -16842,7 +16842,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298348",
@@ -16867,7 +16867,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043012855_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295377",
@@ -16895,7 +16895,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298438",
@@ -16920,7 +16920,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07330416751092_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298841",
@@ -16948,7 +16948,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298380",
@@ -16976,7 +16976,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295677",
@@ -17003,7 +17003,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298062",
@@ -17028,7 +17028,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468391_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295365",
@@ -17053,7 +17053,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612700092_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300393",
@@ -17078,7 +17078,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471650_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295524",
@@ -17106,7 +17106,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298144",
@@ -17131,7 +17131,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160004638_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295674",
@@ -17158,7 +17158,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298152",
@@ -17183,7 +17183,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068295867_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295657",
@@ -17211,7 +17211,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "corrosion"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298446",
@@ -17239,7 +17239,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295392",
@@ -17264,7 +17264,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112690569_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298023",
@@ -17289,7 +17289,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491863_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500296249",
@@ -17318,7 +17318,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298395",
@@ -17343,7 +17343,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043000517_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301061",
@@ -17368,7 +17368,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473173_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298128",
@@ -17393,7 +17393,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08001665722131_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295409",
@@ -17418,7 +17418,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473180_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298132",
@@ -17443,7 +17443,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350051214561_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295544",
@@ -17468,7 +17468,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327416239_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500304896",
@@ -17493,7 +17493,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07038010070839_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295589",
@@ -17518,7 +17518,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083475337_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305045",
@@ -17546,7 +17546,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500292984",
@@ -17571,7 +17571,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312005458_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298017",
@@ -17599,7 +17599,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295737",
@@ -17626,7 +17626,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298278",
@@ -17651,7 +17651,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04100290056308_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295371",
@@ -17676,7 +17676,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350113940285_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301055",
@@ -17704,7 +17704,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295547",
@@ -17729,7 +17729,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031130973_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295708",
@@ -17756,7 +17756,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295385",
@@ -17781,7 +17781,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796091_C1N1_s05",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295804",
@@ -17806,7 +17806,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350116923957_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295835",
@@ -17831,7 +17831,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004270_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295531",
@@ -17861,7 +17861,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295805",
@@ -17886,7 +17886,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000396055979_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295528",
@@ -17911,7 +17911,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311441165610_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295370",
@@ -17936,7 +17936,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006946_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295369",
@@ -17961,7 +17961,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006977_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295374",
@@ -17991,7 +17991,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295670",
@@ -18021,7 +18021,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295807",
@@ -18046,7 +18046,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088005_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295975",
@@ -18071,7 +18071,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720608006656_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295768",
@@ -18099,7 +18099,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295525",
@@ -18124,7 +18124,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05010394006804_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297649",
@@ -18149,7 +18149,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04002359021022_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500294890",
@@ -18177,7 +18177,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295695",
@@ -18202,7 +18202,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154813648_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295815",
@@ -18227,7 +18227,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08723400940982_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500291111",
@@ -18255,7 +18255,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295836",
@@ -18280,7 +18280,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015856_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295834",
@@ -18305,7 +18305,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154815260_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295640",
@@ -18330,7 +18330,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310155803771_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295688",
@@ -18358,7 +18358,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295533",
@@ -18383,7 +18383,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181638701_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295527",
@@ -18411,7 +18411,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295384",
@@ -18436,7 +18436,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796084_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295187",
@@ -18461,7 +18461,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613287554376_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301321",
@@ -18486,7 +18486,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07392031803853_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295642",
@@ -18511,7 +18511,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06006507008840_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295407",
@@ -18536,7 +18536,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000073550013_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295569",
@@ -18561,7 +18561,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018851324_C1N1_s06",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301380",
@@ -18586,7 +18586,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491108_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295568",
@@ -18611,7 +18611,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018458110_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297318",
@@ -18636,7 +18636,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216596701_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295566",
@@ -18661,7 +18661,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216568944_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295567",
@@ -18686,7 +18686,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216489720_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298005",
@@ -18714,7 +18714,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298700",
@@ -18739,7 +18739,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216456876_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500310063",
@@ -18766,7 +18766,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306014",
@@ -18793,7 +18793,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306996",
@@ -18821,7 +18821,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500303258",
@@ -18846,7 +18846,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08000430133035_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298388",
@@ -18874,7 +18874,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301201",
@@ -18899,7 +18899,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05449000259127_C1L1_s06",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297764",
@@ -18926,7 +18926,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500308130",
@@ -18953,7 +18953,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298073",
@@ -18978,7 +18978,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298184",
@@ -19005,7 +19005,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297334",
@@ -19034,7 +19034,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298121",
@@ -19063,7 +19063,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295760",
@@ -19088,7 +19088,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310027605_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295548",
@@ -19113,7 +19113,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240060072_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298373",
@@ -19141,7 +19141,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295482",
@@ -19166,7 +19166,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311311014017_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500303335",
@@ -19193,7 +19193,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298041",
@@ -19223,7 +19223,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295432",
@@ -19248,7 +19248,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08715700422046_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295666",
@@ -19273,7 +19273,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043007271_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298253",
@@ -19301,7 +19301,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295522",
@@ -19326,7 +19326,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043014842_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298337",
@@ -19351,7 +19351,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310628005572_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295679",
@@ -19376,7 +19376,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07316110001886_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500296825",
@@ -19404,7 +19404,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298420",
@@ -19429,7 +19429,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622210697134_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298366",
@@ -19454,7 +19454,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03523230062633_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298359",
@@ -19479,7 +19479,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015498_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500279416",
@@ -19506,7 +19506,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301294",
@@ -19535,7 +19535,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301271",
@@ -19563,7 +19563,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301272",
@@ -19591,7 +19591,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298095",
@@ -19619,7 +19619,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301909",
@@ -19644,7 +19644,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340052513046_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298123",
@@ -19672,7 +19672,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298363",
@@ -19697,7 +19697,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083435645_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300844",
@@ -19724,7 +19724,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298140",
@@ -19752,7 +19752,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298294",
@@ -19779,7 +19779,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298141",
@@ -19809,7 +19809,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298295",
@@ -19834,7 +19834,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083456701_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298145",
@@ -19859,7 +19859,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05059319023229_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295678",
@@ -19884,7 +19884,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001761_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298129",
@@ -19909,7 +19909,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447549_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298034",
@@ -19937,7 +19937,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298371",
@@ -19962,7 +19962,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451996_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298383",
@@ -19987,7 +19987,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07331217012993_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298161",
@@ -20012,7 +20012,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451439_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500293352",
@@ -20040,7 +20040,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298187",
@@ -20068,7 +20068,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500293354",
@@ -20093,7 +20093,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006274_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297576",
@@ -20118,7 +20118,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451880_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298449",
@@ -20143,7 +20143,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020829_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295519",
@@ -20168,7 +20168,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083472275_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298066",
@@ -20196,7 +20196,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295802",
@@ -20221,7 +20221,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020683_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298272",
@@ -20248,7 +20248,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298033",
@@ -20278,7 +20278,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298125",
@@ -20303,7 +20303,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/donutss-x4-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3wxMDU2NnxpbWFnZS9qcGVnfGMzbHpMVzFoYzNSbGNpOXBiV0ZuWlhNdmFHUTVMMmczT0M4eE1qZzVNemMwTVRVNE1ETXhPQzlrYjI1MWRITnpJSGcwSUZOR1RVTmZZWGhtYjI5a1h6TXdNQXw5NzllOTAyZTRiMTBlNDE5NzFlMzhlMzNlZjAzYjIwMTJmYWUyODY5MTY5YmQwY2M5YjI3YzgyZTVmMTgzMDY5",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298029",
@@ -20328,7 +20328,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08076809513739_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298035",
@@ -20356,7 +20356,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "swedish_bird"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298692",
@@ -20384,7 +20384,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298186",
@@ -20409,7 +20409,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490446_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295520",
@@ -20436,7 +20436,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298303",
@@ -20461,7 +20461,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350045596499_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298229",
@@ -20490,7 +20490,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295388",
@@ -20515,7 +20515,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471193_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297257",
@@ -20540,7 +20540,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08718951560109_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295799",
@@ -20565,7 +20565,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083486920_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297066",
@@ -20590,7 +20590,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04015400565574_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298153",
@@ -20617,7 +20617,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295542",
@@ -20642,7 +20642,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05701090068493_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297073",
@@ -20670,7 +20670,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "flame"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500302552",
@@ -20695,7 +20695,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04820218098677_C1N0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500269629",
@@ -20720,7 +20720,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489358_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298137",
@@ -20745,7 +20745,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/axfood-300-Pampers-Blo-jor-x2-SFMC.jpg?context=bWFzdGVyfGltYWdlc3w3NzgwfGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YUdOaUwyZzROeTh5TmpVeE56UTFPVEEzTlRFd01pOWhlR1p2YjJSZk16QXdYMUJoYlhCbGNuTWdRbXh2eklocWIzSWdlRElnVTBaTlF5NXFjR2N8OWU1NmEzYTc5MDgzOGJhYTdiYWYxNTcwNzI1NWI5ZDMzMjhiNzZjNzg2YTIwZGZjNWYyYTE1NTQ5MjIzMzQwMg",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297260",
@@ -20770,7 +20770,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000059092629_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298039",
@@ -20797,7 +20797,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297070",
@@ -20822,7 +20822,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089812_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298148",
@@ -20850,7 +20850,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297064",
@@ -20875,7 +20875,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531127547_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298149",
@@ -20903,7 +20903,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297161",
@@ -20928,7 +20928,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531130141_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298038",
@@ -20957,7 +20957,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298203",
@@ -20984,7 +20984,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298356",
@@ -21013,7 +21013,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306008",
@@ -21040,7 +21040,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306011",
@@ -21067,7 +21067,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306000",
@@ -21095,7 +21095,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295381",
@@ -21124,7 +21124,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305999",
@@ -21151,7 +21151,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295518",
@@ -21178,7 +21178,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305998",
@@ -21205,7 +21205,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306009",
@@ -21232,7 +21232,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306013",
@@ -21259,7 +21259,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306971",
@@ -21284,7 +21284,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042009658_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306012",
@@ -21311,7 +21311,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298100",
@@ -21336,7 +21336,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07317530110394_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297072",
@@ -21361,7 +21361,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04005900100115_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297190",
@@ -21386,7 +21386,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600522287339_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297123",
@@ -21411,7 +21411,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05703147053209_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297124",
@@ -21436,7 +21436,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600523183524_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301864",
@@ -21461,7 +21461,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531093965_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301133",
@@ -21486,7 +21486,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089874_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500299056",
@@ -21511,7 +21511,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/mariestads-flak-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3w2NjM3fGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YURVekwyZ3dNUzh4TWpjeE5ESTROelU1TlRVMU1DOXRZWEpwWlhOMFlXUnpJR1pzWVdzZ1UwWk5RMTloZUdadmIyUmZNekF3fDQxMTlkNmI1OGMzYmJkNDFmZWQ5NDZlZGE2M2U4OTg5NWU4YzViN2RhMjMzN2RiY2UwZjk0YmU5MWE5YzFjZWM",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295405",
@@ -21539,7 +21539,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295684",
@@ -21564,7 +21564,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07042110081848_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295551",
@@ -21589,7 +21589,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04014400901191_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295703",
@@ -21614,7 +21614,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350106844_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295397",
@@ -21643,7 +21643,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500299037",
@@ -21668,7 +21668,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310403059240_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295463",
@@ -21696,7 +21696,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295696",
@@ -21721,7 +21721,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041006597_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295892",
@@ -21746,7 +21746,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310029500_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301062",
@@ -21771,7 +21771,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310070124906_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295830",
@@ -21796,7 +21796,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03838975566606_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295700",
@@ -21824,7 +21824,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295571",
@@ -21849,7 +21849,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622300336738_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295709",
@@ -21874,7 +21874,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532150764_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297781",
@@ -21902,7 +21902,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295372",
@@ -21927,7 +21927,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04008429037894_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295812",
@@ -21952,7 +21952,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001785_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295692",
@@ -21980,7 +21980,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295841",
@@ -22005,7 +22005,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350028546992_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295614",
@@ -22030,7 +22030,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043019557_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300934",
@@ -22055,7 +22055,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07312720021238_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295591",
@@ -22083,7 +22083,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298030",
@@ -22111,7 +22111,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "milk_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295378",
@@ -22139,7 +22139,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298348",
@@ -22164,7 +22164,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043012855_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295377",
@@ -22192,7 +22192,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298438",
@@ -22217,7 +22217,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07330416751092_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298841",
@@ -22245,7 +22245,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298380",
@@ -22273,7 +22273,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295677",
@@ -22300,7 +22300,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298062",
@@ -22325,7 +22325,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468391_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295365",
@@ -22350,7 +22350,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612700092_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300393",
@@ -22375,7 +22375,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471650_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295524",
@@ -22403,7 +22403,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298144",
@@ -22428,7 +22428,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160004638_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295674",
@@ -22455,7 +22455,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298152",
@@ -22480,7 +22480,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068295867_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295657",
@@ -22508,7 +22508,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "corrosion"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298446",
@@ -22536,7 +22536,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295392",
@@ -22561,7 +22561,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112690569_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298023",
@@ -22586,7 +22586,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491863_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500296249",
@@ -22615,7 +22615,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298395",
@@ -22640,7 +22640,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043000517_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301061",
@@ -22665,7 +22665,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473173_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298128",
@@ -22690,7 +22690,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08001665722131_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295409",
@@ -22715,7 +22715,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473180_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298132",
@@ -22740,7 +22740,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350051214561_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295544",
@@ -22765,7 +22765,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327416239_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500304896",
@@ -22790,7 +22790,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07038010070839_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295589",
@@ -22815,7 +22815,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083475337_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305045",
@@ -22843,7 +22843,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500292984",
@@ -22868,7 +22868,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312005458_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298017",
@@ -22896,7 +22896,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295737",
@@ -22923,7 +22923,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298278",
@@ -22948,7 +22948,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04100290056308_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295371",
@@ -22973,7 +22973,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350113940285_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301055",
@@ -23001,7 +23001,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295547",
@@ -23026,7 +23026,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031130973_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295708",
@@ -23053,7 +23053,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295385",
@@ -23078,7 +23078,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796091_C1N1_s05",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295804",
@@ -23103,7 +23103,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350116923957_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295835",
@@ -23128,7 +23128,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004270_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295531",
@@ -23158,7 +23158,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295805",
@@ -23183,7 +23183,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000396055979_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295528",
@@ -23208,7 +23208,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311441165610_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295370",
@@ -23233,7 +23233,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006946_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295369",
@@ -23258,7 +23258,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006977_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295374",
@@ -23288,7 +23288,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295670",
@@ -23318,7 +23318,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295807",
@@ -23343,7 +23343,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088005_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295975",
@@ -23368,7 +23368,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720608006656_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295768",
@@ -23396,7 +23396,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295525",
@@ -23421,7 +23421,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05010394006804_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297649",
@@ -23446,7 +23446,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04002359021022_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500294890",
@@ -23474,7 +23474,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295695",
@@ -23499,7 +23499,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154813648_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295815",
@@ -23524,7 +23524,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08723400940982_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500291111",
@@ -23552,7 +23552,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295836",
@@ -23577,7 +23577,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015856_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295834",
@@ -23602,7 +23602,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154815260_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295640",
@@ -23627,7 +23627,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310155803771_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295688",
@@ -23655,7 +23655,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295533",
@@ -23680,7 +23680,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181638701_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295527",
@@ -23708,7 +23708,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295384",
@@ -23733,7 +23733,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796084_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295187",
@@ -23758,7 +23758,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613287554376_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301321",
@@ -23783,7 +23783,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07392031803853_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295642",
@@ -23808,7 +23808,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06006507008840_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295407",
@@ -23833,7 +23833,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000073550013_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295569",
@@ -23858,7 +23858,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018851324_C1N1_s06",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301380",
@@ -23883,7 +23883,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491108_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295568",
@@ -23908,7 +23908,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018458110_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297318",
@@ -23933,7 +23933,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216596701_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295566",
@@ -23958,7 +23958,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216568944_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295567",
@@ -23983,7 +23983,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216489720_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298005",
@@ -24011,7 +24011,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298700",
@@ -24036,7 +24036,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216456876_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500310063",
@@ -24063,7 +24063,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2149&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306014",
@@ -24090,7 +24090,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306996",
@@ -24118,7 +24118,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500303258",
@@ -24143,7 +24143,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08000430133035_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298388",
@@ -24171,7 +24171,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301201",
@@ -24196,7 +24196,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05449000259127_C1L1_s06",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297764",
@@ -24223,7 +24223,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500308130",
@@ -24250,7 +24250,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298073",
@@ -24275,7 +24275,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298184",
@@ -24302,7 +24302,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297334",
@@ -24331,7 +24331,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298121",
@@ -24360,7 +24360,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295760",
@@ -24385,7 +24385,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310027605_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295548",
@@ -24410,7 +24410,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240060072_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298373",
@@ -24438,7 +24438,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295482",
@@ -24463,7 +24463,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311311014017_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500303335",
@@ -24490,7 +24490,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298041",
@@ -24520,7 +24520,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295432",
@@ -24545,7 +24545,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08715700422046_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295666",
@@ -24570,7 +24570,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043007271_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298253",
@@ -24598,7 +24598,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295522",
@@ -24623,7 +24623,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043014842_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298337",
@@ -24648,7 +24648,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310628005572_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295679",
@@ -24673,7 +24673,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07316110001886_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500296825",
@@ -24701,7 +24701,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298420",
@@ -24726,7 +24726,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622210697134_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298366",
@@ -24751,7 +24751,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03523230062633_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298359",
@@ -24776,7 +24776,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015498_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500279416",
@@ -24803,7 +24803,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301294",
@@ -24832,7 +24832,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301271",
@@ -24860,7 +24860,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301272",
@@ -24888,7 +24888,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298095",
@@ -24916,7 +24916,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301909",
@@ -24941,7 +24941,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340052513046_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298123",
@@ -24969,7 +24969,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298363",
@@ -24994,7 +24994,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083435645_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300844",
@@ -25021,7 +25021,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298140",
@@ -25049,7 +25049,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298294",
@@ -25076,7 +25076,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298141",
@@ -25106,7 +25106,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298295",
@@ -25131,7 +25131,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083456701_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298145",
@@ -25156,7 +25156,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05059319023229_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295678",
@@ -25181,7 +25181,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001761_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298129",
@@ -25206,7 +25206,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447549_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298034",
@@ -25234,7 +25234,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298371",
@@ -25259,7 +25259,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451996_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298383",
@@ -25284,7 +25284,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07331217012993_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298161",
@@ -25309,7 +25309,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451439_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500293352",
@@ -25337,7 +25337,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298187",
@@ -25365,7 +25365,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500293354",
@@ -25390,7 +25390,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006274_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297576",
@@ -25415,7 +25415,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451880_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298449",
@@ -25440,7 +25440,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020829_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295519",
@@ -25465,7 +25465,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083472275_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298066",
@@ -25493,7 +25493,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295802",
@@ -25518,7 +25518,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020683_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298272",
@@ -25545,7 +25545,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298033",
@@ -25575,7 +25575,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298125",
@@ -25600,7 +25600,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/donutss-x4-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3wxMDU2NnxpbWFnZS9qcGVnfGMzbHpMVzFoYzNSbGNpOXBiV0ZuWlhNdmFHUTVMMmczT0M4eE1qZzVNemMwTVRVNE1ETXhPQzlrYjI1MWRITnpJSGcwSUZOR1RVTmZZWGhtYjI5a1h6TXdNQXw5NzllOTAyZTRiMTBlNDE5NzFlMzhlMzNlZjAzYjIwMTJmYWUyODY5MTY5YmQwY2M5YjI3YzgyZTVmMTgzMDY5",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298029",
@@ -25625,7 +25625,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08076809513739_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298035",
@@ -25653,7 +25653,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "swedish_bird"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298692",
@@ -25681,7 +25681,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298186",
@@ -25706,7 +25706,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490446_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295520",
@@ -25733,7 +25733,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298303",
@@ -25758,7 +25758,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350045596499_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298229",
@@ -25787,7 +25787,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295388",
@@ -25812,7 +25812,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471193_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297257",
@@ -25837,7 +25837,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08718951560109_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295799",
@@ -25862,7 +25862,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083486920_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297066",
@@ -25887,7 +25887,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04015400565574_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298153",
@@ -25914,7 +25914,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295542",
@@ -25939,7 +25939,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05701090068493_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297073",
@@ -25967,7 +25967,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "flame"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500302552",
@@ -25992,7 +25992,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04820218098677_C1N0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500269629",
@@ -26017,7 +26017,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489358_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298137",
@@ -26042,7 +26042,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/axfood-300-Pampers-Blo-jor-x2-SFMC.jpg?context=bWFzdGVyfGltYWdlc3w3NzgwfGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YUdOaUwyZzROeTh5TmpVeE56UTFPVEEzTlRFd01pOWhlR1p2YjJSZk16QXdYMUJoYlhCbGNuTWdRbXh2eklocWIzSWdlRElnVTBaTlF5NXFjR2N8OWU1NmEzYTc5MDgzOGJhYTdiYWYxNTcwNzI1NWI5ZDMzMjhiNzZjNzg2YTIwZGZjNWYyYTE1NTQ5MjIzMzQwMg",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297260",
@@ -26067,7 +26067,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000059092629_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298039",
@@ -26094,7 +26094,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297070",
@@ -26119,7 +26119,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089812_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298148",
@@ -26147,7 +26147,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297064",
@@ -26172,7 +26172,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531127547_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298149",
@@ -26200,7 +26200,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297161",
@@ -26225,7 +26225,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531130141_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298038",
@@ -26254,7 +26254,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298203",
@@ -26281,7 +26281,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298356",
@@ -26310,7 +26310,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306008",
@@ -26337,7 +26337,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306011",
@@ -26364,7 +26364,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306000",
@@ -26392,7 +26392,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295381",
@@ -26421,7 +26421,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305999",
@@ -26448,7 +26448,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295518",
@@ -26475,7 +26475,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305998",
@@ -26502,7 +26502,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306009",
@@ -26529,7 +26529,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306013",
@@ -26556,7 +26556,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306971",
@@ -26581,7 +26581,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042009658_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306012",
@@ -26608,7 +26608,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298100",
@@ -26633,7 +26633,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07317530110394_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297072",
@@ -26658,7 +26658,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04005900100115_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297190",
@@ -26683,7 +26683,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600522287339_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297123",
@@ -26708,7 +26708,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05703147053209_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297124",
@@ -26733,7 +26733,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600523183524_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301864",
@@ -26758,7 +26758,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531093965_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301133",
@@ -26783,7 +26783,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089874_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500299056",
@@ -26808,7 +26808,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/mariestads-flak-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3w2NjM3fGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YURVekwyZ3dNUzh4TWpjeE5ESTROelU1TlRVMU1DOXRZWEpwWlhOMFlXUnpJR1pzWVdzZ1UwWk5RMTloZUdadmIyUmZNekF3fDQxMTlkNmI1OGMzYmJkNDFmZWQ5NDZlZGE2M2U4OTg5NWU4YzViN2RhMjMzN2RiY2UwZjk0YmU5MWE5YzFjZWM",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295405",
@@ -26836,7 +26836,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295684",
@@ -26861,7 +26861,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07042110081848_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295551",
@@ -26886,7 +26886,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04014400901191_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295703",
@@ -26911,7 +26911,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350106844_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295397",
@@ -26940,7 +26940,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500299037",
@@ -26965,7 +26965,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310403059240_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295463",
@@ -26993,7 +26993,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295696",
@@ -27018,7 +27018,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041006597_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295892",
@@ -27043,7 +27043,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310029500_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301062",
@@ -27068,7 +27068,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310070124906_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295830",
@@ -27093,7 +27093,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03838975566606_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295700",
@@ -27121,7 +27121,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295571",
@@ -27146,7 +27146,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622300336738_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295709",
@@ -27171,7 +27171,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532150764_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297781",
@@ -27199,7 +27199,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295372",
@@ -27224,7 +27224,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04008429037894_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295812",
@@ -27249,7 +27249,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001785_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295692",
@@ -27277,7 +27277,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295841",
@@ -27302,7 +27302,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350028546992_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295614",
@@ -27327,7 +27327,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043019557_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300934",
@@ -27352,7 +27352,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07312720021238_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295591",
@@ -27380,7 +27380,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298030",
@@ -27408,7 +27408,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "milk_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295378",
@@ -27436,7 +27436,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298348",
@@ -27461,7 +27461,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043012855_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295377",
@@ -27489,7 +27489,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298438",
@@ -27514,7 +27514,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07330416751092_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298841",
@@ -27542,7 +27542,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298380",
@@ -27570,7 +27570,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295677",
@@ -27597,7 +27597,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298062",
@@ -27622,7 +27622,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468391_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295365",
@@ -27647,7 +27647,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612700092_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300393",
@@ -27672,7 +27672,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471650_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295524",
@@ -27700,7 +27700,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298144",
@@ -27725,7 +27725,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160004638_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295674",
@@ -27752,7 +27752,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298152",
@@ -27777,7 +27777,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068295867_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295657",
@@ -27805,7 +27805,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "corrosion"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298446",
@@ -27833,7 +27833,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295392",
@@ -27858,7 +27858,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112690569_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298023",
@@ -27883,7 +27883,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491863_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500296249",
@@ -27912,7 +27912,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298395",
@@ -27937,7 +27937,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043000517_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301061",
@@ -27962,7 +27962,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473173_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298128",
@@ -27987,7 +27987,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08001665722131_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295409",
@@ -28012,7 +28012,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473180_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298132",
@@ -28037,7 +28037,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350051214561_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295544",
@@ -28062,7 +28062,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327416239_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500304896",
@@ -28087,7 +28087,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07038010070839_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295589",
@@ -28112,7 +28112,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083475337_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305045",
@@ -28140,7 +28140,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500292984",
@@ -28165,7 +28165,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312005458_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298017",
@@ -28193,7 +28193,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295737",
@@ -28220,7 +28220,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298278",
@@ -28245,7 +28245,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04100290056308_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295371",
@@ -28270,7 +28270,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350113940285_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301055",
@@ -28298,7 +28298,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295547",
@@ -28323,7 +28323,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031130973_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295708",
@@ -28350,7 +28350,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295385",
@@ -28375,7 +28375,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796091_C1N1_s05",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295804",
@@ -28400,7 +28400,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350116923957_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295835",
@@ -28425,7 +28425,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004270_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295531",
@@ -28455,7 +28455,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295805",
@@ -28480,7 +28480,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000396055979_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295528",
@@ -28505,7 +28505,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311441165610_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295370",
@@ -28530,7 +28530,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006946_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295369",
@@ -28555,7 +28555,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006977_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295374",
@@ -28585,7 +28585,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295670",
@@ -28615,7 +28615,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295807",
@@ -28640,7 +28640,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088005_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295975",
@@ -28665,7 +28665,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720608006656_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295768",
@@ -28693,7 +28693,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295525",
@@ -28718,7 +28718,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05010394006804_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297649",
@@ -28743,7 +28743,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04002359021022_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500294890",
@@ -28771,7 +28771,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295695",
@@ -28796,7 +28796,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154813648_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295815",
@@ -28821,7 +28821,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08723400940982_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500291111",
@@ -28849,7 +28849,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295836",
@@ -28874,7 +28874,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015856_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295834",
@@ -28899,7 +28899,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154815260_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295640",
@@ -28924,7 +28924,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310155803771_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295688",
@@ -28952,7 +28952,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295533",
@@ -28977,7 +28977,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181638701_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295527",
@@ -29005,7 +29005,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295384",
@@ -29030,7 +29030,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796084_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295187",
@@ -29055,7 +29055,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613287554376_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301321",
@@ -29080,7 +29080,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07392031803853_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295642",
@@ -29105,7 +29105,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06006507008840_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295407",
@@ -29130,7 +29130,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000073550013_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295569",
@@ -29155,7 +29155,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018851324_C1N1_s06",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301380",
@@ -29180,7 +29180,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491108_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295568",
@@ -29205,7 +29205,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018458110_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297318",
@@ -29230,7 +29230,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216596701_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295566",
@@ -29255,7 +29255,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216568944_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295567",
@@ -29280,7 +29280,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216489720_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298005",
@@ -29308,7 +29308,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298700",
@@ -29333,7 +29333,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216456876_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301777",
@@ -29360,7 +29360,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500303244",
@@ -29387,7 +29387,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500303262",
@@ -29415,7 +29415,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301915",
@@ -29440,7 +29440,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350101198575_C1N0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500310063",
@@ -29467,7 +29467,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2355&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306014",
@@ -29494,7 +29494,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306996",
@@ -29522,7 +29522,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500303258",
@@ -29547,7 +29547,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08000430133035_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298388",
@@ -29575,7 +29575,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301201",
@@ -29600,7 +29600,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05449000259127_C1L1_s06",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297764",
@@ -29627,7 +29627,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500308130",
@@ -29654,7 +29654,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298073",
@@ -29679,7 +29679,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298184",
@@ -29706,7 +29706,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297334",
@@ -29735,7 +29735,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298121",
@@ -29764,7 +29764,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295760",
@@ -29789,7 +29789,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310027605_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295548",
@@ -29814,7 +29814,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240060072_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298373",
@@ -29842,7 +29842,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295482",
@@ -29867,7 +29867,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311311014017_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500303335",
@@ -29894,7 +29894,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298041",
@@ -29924,7 +29924,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295432",
@@ -29949,7 +29949,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08715700422046_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295666",
@@ -29974,7 +29974,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043007271_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298253",
@@ -30002,7 +30002,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295522",
@@ -30027,7 +30027,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043014842_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298337",
@@ -30052,7 +30052,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310628005572_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295679",
@@ -30077,7 +30077,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07316110001886_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500296825",
@@ -30105,7 +30105,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298420",
@@ -30130,7 +30130,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622210697134_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298366",
@@ -30155,7 +30155,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03523230062633_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298359",
@@ -30180,7 +30180,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015498_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500279416",
@@ -30207,7 +30207,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301294",
@@ -30236,7 +30236,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301271",
@@ -30264,7 +30264,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301272",
@@ -30292,7 +30292,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298095",
@@ -30320,7 +30320,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301909",
@@ -30345,7 +30345,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340052513046_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298123",
@@ -30373,7 +30373,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298363",
@@ -30398,7 +30398,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083435645_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300844",
@@ -30425,7 +30425,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298140",
@@ -30453,7 +30453,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298294",
@@ -30480,7 +30480,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298141",
@@ -30510,7 +30510,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298295",
@@ -30535,7 +30535,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083456701_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298145",
@@ -30560,7 +30560,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05059319023229_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295678",
@@ -30585,7 +30585,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001761_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298129",
@@ -30610,7 +30610,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447549_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298034",
@@ -30638,7 +30638,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298371",
@@ -30663,7 +30663,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451996_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298383",
@@ -30688,7 +30688,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07331217012993_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298161",
@@ -30713,7 +30713,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451439_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500293352",
@@ -30741,7 +30741,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298187",
@@ -30769,7 +30769,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500293354",
@@ -30794,7 +30794,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006274_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297576",
@@ -30819,7 +30819,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451880_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298449",
@@ -30844,7 +30844,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020829_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295519",
@@ -30869,7 +30869,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083472275_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298066",
@@ -30897,7 +30897,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295802",
@@ -30922,7 +30922,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020683_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298272",
@@ -30949,7 +30949,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298033",
@@ -30979,7 +30979,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298125",
@@ -31004,7 +31004,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/donutss-x4-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3wxMDU2NnxpbWFnZS9qcGVnfGMzbHpMVzFoYzNSbGNpOXBiV0ZuWlhNdmFHUTVMMmczT0M4eE1qZzVNemMwTVRVNE1ETXhPQzlrYjI1MWRITnpJSGcwSUZOR1RVTmZZWGhtYjI5a1h6TXdNQXw5NzllOTAyZTRiMTBlNDE5NzFlMzhlMzNlZjAzYjIwMTJmYWUyODY5MTY5YmQwY2M5YjI3YzgyZTVmMTgzMDY5",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298029",
@@ -31029,7 +31029,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08076809513739_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298035",
@@ -31057,7 +31057,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "swedish_bird"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298692",
@@ -31085,7 +31085,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298186",
@@ -31110,7 +31110,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490446_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295520",
@@ -31137,7 +31137,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298303",
@@ -31162,7 +31162,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350045596499_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298229",
@@ -31191,7 +31191,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295388",
@@ -31216,7 +31216,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471193_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297257",
@@ -31241,7 +31241,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08718951560109_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295799",
@@ -31266,7 +31266,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083486920_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297066",
@@ -31291,7 +31291,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04015400565574_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298153",
@@ -31318,7 +31318,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295542",
@@ -31343,7 +31343,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05701090068493_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297073",
@@ -31371,7 +31371,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "flame"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500302552",
@@ -31396,7 +31396,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04820218098677_C1N0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500269629",
@@ -31421,7 +31421,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489358_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298137",
@@ -31446,7 +31446,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/axfood-300-Pampers-Blo-jor-x2-SFMC.jpg?context=bWFzdGVyfGltYWdlc3w3NzgwfGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YUdOaUwyZzROeTh5TmpVeE56UTFPVEEzTlRFd01pOWhlR1p2YjJSZk16QXdYMUJoYlhCbGNuTWdRbXh2eklocWIzSWdlRElnVTBaTlF5NXFjR2N8OWU1NmEzYTc5MDgzOGJhYTdiYWYxNTcwNzI1NWI5ZDMzMjhiNzZjNzg2YTIwZGZjNWYyYTE1NTQ5MjIzMzQwMg",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297260",
@@ -31471,7 +31471,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000059092629_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298039",
@@ -31498,7 +31498,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297070",
@@ -31523,7 +31523,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089812_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298148",
@@ -31551,7 +31551,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297064",
@@ -31576,7 +31576,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531127547_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298149",
@@ -31604,7 +31604,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297161",
@@ -31629,7 +31629,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531130141_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298038",
@@ -31658,7 +31658,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298203",
@@ -31685,7 +31685,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298356",
@@ -31714,7 +31714,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306008",
@@ -31741,7 +31741,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306011",
@@ -31768,7 +31768,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306000",
@@ -31796,7 +31796,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295381",
@@ -31825,7 +31825,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305999",
@@ -31852,7 +31852,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295518",
@@ -31879,7 +31879,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305998",
@@ -31906,7 +31906,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306009",
@@ -31933,7 +31933,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306013",
@@ -31960,7 +31960,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306971",
@@ -31985,7 +31985,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042009658_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500306012",
@@ -32012,7 +32012,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298100",
@@ -32037,7 +32037,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07317530110394_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297072",
@@ -32062,7 +32062,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04005900100115_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297190",
@@ -32087,7 +32087,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600522287339_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297123",
@@ -32112,7 +32112,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05703147053209_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297124",
@@ -32137,7 +32137,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600523183524_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301864",
@@ -32162,7 +32162,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531093965_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301133",
@@ -32187,7 +32187,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089874_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500299056",
@@ -32212,7 +32212,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/mariestads-flak-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3w2NjM3fGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YURVekwyZ3dNUzh4TWpjeE5ESTROelU1TlRVMU1DOXRZWEpwWlhOMFlXUnpJR1pzWVdzZ1UwWk5RMTloZUdadmIyUmZNekF3fDQxMTlkNmI1OGMzYmJkNDFmZWQ5NDZlZGE2M2U4OTg5NWU4YzViN2RhMjMzN2RiY2UwZjk0YmU5MWE5YzFjZWM",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295405",
@@ -32240,7 +32240,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295684",
@@ -32265,7 +32265,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07042110081848_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295551",
@@ -32290,7 +32290,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04014400901191_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295703",
@@ -32315,7 +32315,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350106844_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295397",
@@ -32344,7 +32344,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500299037",
@@ -32369,7 +32369,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310403059240_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295463",
@@ -32397,7 +32397,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295696",
@@ -32422,7 +32422,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041006597_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295892",
@@ -32447,7 +32447,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310029500_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301062",
@@ -32472,7 +32472,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310070124906_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295830",
@@ -32497,7 +32497,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03838975566606_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295700",
@@ -32525,7 +32525,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295571",
@@ -32550,7 +32550,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622300336738_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295709",
@@ -32575,7 +32575,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532150764_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297781",
@@ -32603,7 +32603,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295372",
@@ -32628,7 +32628,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04008429037894_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295812",
@@ -32653,7 +32653,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001785_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295692",
@@ -32681,7 +32681,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295841",
@@ -32706,7 +32706,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350028546992_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295614",
@@ -32731,7 +32731,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043019557_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300934",
@@ -32756,7 +32756,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07312720021238_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295591",
@@ -32784,7 +32784,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298030",
@@ -32812,7 +32812,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "milk_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295378",
@@ -32840,7 +32840,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298348",
@@ -32865,7 +32865,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043012855_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295377",
@@ -32893,7 +32893,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298438",
@@ -32918,7 +32918,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07330416751092_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298841",
@@ -32946,7 +32946,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298380",
@@ -32974,7 +32974,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295677",
@@ -33001,7 +33001,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298062",
@@ -33026,7 +33026,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468391_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295365",
@@ -33051,7 +33051,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612700092_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500300393",
@@ -33076,7 +33076,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471650_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295524",
@@ -33104,7 +33104,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298144",
@@ -33129,7 +33129,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160004638_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295674",
@@ -33156,7 +33156,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298152",
@@ -33181,7 +33181,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068295867_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295657",
@@ -33209,7 +33209,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "corrosion"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298446",
@@ -33237,7 +33237,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295392",
@@ -33262,7 +33262,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112690569_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298023",
@@ -33287,7 +33287,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491863_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500296249",
@@ -33316,7 +33316,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298395",
@@ -33341,7 +33341,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043000517_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301061",
@@ -33366,7 +33366,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473173_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298128",
@@ -33391,7 +33391,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08001665722131_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295409",
@@ -33416,7 +33416,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473180_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298132",
@@ -33441,7 +33441,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350051214561_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295544",
@@ -33466,7 +33466,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327416239_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500304896",
@@ -33491,7 +33491,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07038010070839_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295589",
@@ -33516,7 +33516,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083475337_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500305045",
@@ -33544,7 +33544,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500292984",
@@ -33569,7 +33569,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312005458_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298017",
@@ -33597,7 +33597,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295737",
@@ -33624,7 +33624,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298278",
@@ -33649,7 +33649,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04100290056308_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295371",
@@ -33674,7 +33674,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350113940285_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301055",
@@ -33702,7 +33702,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295547",
@@ -33727,7 +33727,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031130973_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295708",
@@ -33754,7 +33754,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295385",
@@ -33779,7 +33779,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796091_C1N1_s05",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295804",
@@ -33804,7 +33804,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350116923957_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295835",
@@ -33829,7 +33829,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004270_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295531",
@@ -33859,7 +33859,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295805",
@@ -33884,7 +33884,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000396055979_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295528",
@@ -33909,7 +33909,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311441165610_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295370",
@@ -33934,7 +33934,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006946_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295369",
@@ -33959,7 +33959,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006977_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295374",
@@ -33989,7 +33989,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295670",
@@ -34019,7 +34019,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295807",
@@ -34044,7 +34044,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088005_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295975",
@@ -34069,7 +34069,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720608006656_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295768",
@@ -34097,7 +34097,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295525",
@@ -34122,7 +34122,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05010394006804_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297649",
@@ -34147,7 +34147,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04002359021022_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500294890",
@@ -34175,7 +34175,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295695",
@@ -34200,7 +34200,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154813648_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295815",
@@ -34225,7 +34225,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08723400940982_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500291111",
@@ -34253,7 +34253,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295836",
@@ -34278,7 +34278,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015856_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295834",
@@ -34303,7 +34303,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154815260_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295640",
@@ -34328,7 +34328,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310155803771_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295688",
@@ -34356,7 +34356,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295533",
@@ -34381,7 +34381,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181638701_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295527",
@@ -34409,7 +34409,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295384",
@@ -34434,7 +34434,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796084_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295187",
@@ -34459,7 +34459,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613287554376_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301321",
@@ -34484,7 +34484,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07392031803853_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295642",
@@ -34509,7 +34509,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06006507008840_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295407",
@@ -34534,7 +34534,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000073550013_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295569",
@@ -34559,7 +34559,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018851324_C1N1_s06",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500301380",
@@ -34584,7 +34584,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491108_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295568",
@@ -34609,7 +34609,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018458110_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500297318",
@@ -34634,7 +34634,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216596701_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295566",
@@ -34659,7 +34659,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216568944_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500295567",
@@ -34684,7 +34684,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216489720_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298005",
@@ -34712,7 +34712,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500298700",
@@ -34737,7 +34737,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216456876_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   },
   {
     "code": "2500310063",
@@ -34764,6 +34764,6 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2268&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:35:51.543Z"
+    "retrievedAt": "2026-05-22T10:31:23.203Z"
   }
 ];

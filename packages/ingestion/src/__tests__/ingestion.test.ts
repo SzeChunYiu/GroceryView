@@ -583,10 +583,11 @@ describe('fetchHemkopProducts', () => {
     const rows = await fetchHemkopProducts({
       queries: ['makaroner'],
       fetchImpl,
+      pageSize: 100,
       retrievedAt: '2026-05-21T00:45:00.000Z'
     });
 
-    assert.equal(requestedUrls[0], buildHemkopSearchUrl('makaroner'));
+    assert.equal(requestedUrls[0], buildHemkopSearchUrl('makaroner', 100, 0));
     assert.deepEqual(rows, [{
       code: '101205621_ST',
       name: 'Idealmakaroner Gammaldags',
@@ -601,9 +602,41 @@ describe('fetchHemkopProducts', () => {
       labels: ['keyhole'],
       online: true,
       outOfStock: false,
-      sourceUrl: buildHemkopSearchUrl('makaroner'),
+      sourceUrl: buildHemkopSearchUrl('makaroner', 100, 0),
       retrievedAt: '2026-05-21T00:45:00.000Z'
     }]);
+  });
+
+  it('paginates Hemkop search rows until reported pages are exhausted', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const page = new URL(String(url)).searchParams.get('page');
+      return new Response(JSON.stringify({
+        pagination: { numberOfPages: 2, currentPage: Number(page) },
+        results: [{
+          code: `hemkop-product-${page}`,
+          name: `Hemkop product ${page}`,
+          priceValue: 10,
+          price: '10,00 kr'
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchHemkopProducts({
+      queries: ['makaroner'],
+      maxRows: 10,
+      pageSize: 1,
+      fetchImpl,
+      retrievedAt: '2026-05-21T00:45:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildHemkopSearchUrl('makaroner', 1, 0),
+      buildHemkopSearchUrl('makaroner', 1, 1)
+    ]);
+    assert.deepEqual(rows.map((row) => row.code), ['hemkop-product-0', 'hemkop-product-1']);
+    assert.equal(rows[1]?.sourceUrl, buildHemkopSearchUrl('makaroner', 1, 1));
   });
 
   it('deduplicates products across Hemkop search queries', async () => {

@@ -2,13 +2,13 @@
 // Source URL: https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1
 // Query: kaffe
 // Store: 251300
-// Retrieved: 2026-05-22T09:20:43.762Z
-// Row count: 150 real product rows fetched from coop.se.
+// Retrieved: 2026-05-22T10:32:35.907Z
+// Row count: 290 real product rows fetched from coop.se.
 //
 // Weekly discounts source URLs: https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true | https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true
 // Weekly discounts flyer URLs: https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna | https://dr.coop.se/Butik/Stora-Coop-Bromma | https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga | https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik | https://dr.coop.se/Butik/Stora-Coop-Danderyd | https://dr.coop.se/Butik/Stora-Coop-Sundby-Park | https://dr.coop.se/Butik/Stora-Coop-Huddinge | https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta | https://dr.coop.se/Butik/Stora-Coop-Stuvsta | https://dr.coop.se/Butik/Stora-Coop-Orminge | https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6 | https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje | https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga | https://dr.coop.se/Butik/Stora-Coop-Arninge | https://dr.coop.se/Butik/Stora-Coop-Haninge
 // Weekly discounts product search URLs: https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1 | https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1
-// Weekly discounts retrieved: 2026-05-22T09:40:13.630Z
+// Weekly discounts retrieved: 2026-05-22T10:32:37.171Z
 // Weekly discounts row count: 360 real current flyer discount rows for 15 Coop branches, valid 2026-05-18T00:00:00 through 2026-05-24T23:59:59.
 
 export type CoopIngestedProduct = {
@@ -61,8 +61,8 @@ export type CoopIngestedWeeklyDiscount = {
 
 export const coopSource = {
   "source": "coop.se public personalization search API",
-  "retrievedAt": "2026-05-22T09:20:43.762Z",
-  "rowCount": 150,
+  "retrievedAt": "2026-05-22T10:32:35.907Z",
+  "rowCount": 290,
   "query": "kaffe",
   "storeId": "251300",
   "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1"
@@ -70,7 +70,7 @@ export const coopSource = {
 
 export const coopWeeklyDiscountSource = {
   "source": "Coop public store API current flyer plus public personalization product search",
-  "retrievedAt": "2026-05-22T09:40:13.630Z",
+  "retrievedAt": "2026-05-22T10:32:37.171Z",
   "rowCount": 360,
   "storeIds": [
     "251300",
@@ -239,7 +239,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317342100007",
@@ -264,7 +264,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865005168",
@@ -289,7 +289,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2340375400004",
@@ -314,7 +314,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7340191179691",
@@ -339,7 +339,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300206718000",
@@ -364,7 +364,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865095466",
@@ -389,7 +389,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "80508816",
@@ -414,7 +414,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7331044072573",
@@ -439,7 +439,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2385912200006",
@@ -464,7 +464,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317264300004",
@@ -489,7 +489,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2307125100003",
@@ -514,7 +514,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317075000001",
@@ -539,7 +539,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5740301203124",
@@ -564,7 +564,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2330120500004",
@@ -589,7 +589,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310074014630",
@@ -614,7 +614,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300207071005",
@@ -639,7 +639,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300156596727",
@@ -664,7 +664,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317474500003",
@@ -689,7 +689,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7314873525014",
@@ -714,7 +714,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7311070330243",
@@ -739,7 +739,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7350051211164",
@@ -764,7 +764,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7622210929525",
@@ -789,7 +789,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5701092111067",
@@ -814,7 +814,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "4006000089874",
@@ -839,7 +839,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310867561020",
@@ -864,7 +864,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317342100007",
@@ -889,7 +889,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865005168",
@@ -914,7 +914,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2340375400004",
@@ -939,7 +939,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7340191179691",
@@ -964,7 +964,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300206718000",
@@ -989,7 +989,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865095466",
@@ -1014,7 +1014,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "80508816",
@@ -1039,7 +1039,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7331044072573",
@@ -1064,7 +1064,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2385912200006",
@@ -1089,7 +1089,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317264300004",
@@ -1114,7 +1114,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2307125100003",
@@ -1139,7 +1139,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317075000001",
@@ -1164,7 +1164,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5740301203124",
@@ -1189,7 +1189,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2330120500004",
@@ -1214,7 +1214,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310074014630",
@@ -1239,7 +1239,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300207071005",
@@ -1264,7 +1264,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317474500003",
@@ -1289,7 +1289,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7314873525014",
@@ -1314,7 +1314,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7311070330243",
@@ -1339,7 +1339,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7350051211164",
@@ -1364,7 +1364,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7622210929525",
@@ -1389,7 +1389,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5701092111067",
@@ -1414,7 +1414,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "4006000089874",
@@ -1439,7 +1439,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310867561020",
@@ -1464,7 +1464,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Bromma",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2383471000006",
@@ -1489,7 +1489,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317342100007",
@@ -1514,7 +1514,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865005168",
@@ -1539,7 +1539,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2340375400004",
@@ -1564,7 +1564,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7340191179691",
@@ -1589,7 +1589,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300206718000",
@@ -1614,7 +1614,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865095466",
@@ -1639,7 +1639,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "80508816",
@@ -1664,7 +1664,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7331044072573",
@@ -1689,7 +1689,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317264300004",
@@ -1714,7 +1714,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2307125100003",
@@ -1739,7 +1739,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317075000001",
@@ -1764,7 +1764,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5740301203124",
@@ -1789,7 +1789,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2330120500004",
@@ -1814,7 +1814,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310074009230",
@@ -1839,7 +1839,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300207071005",
@@ -1864,7 +1864,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317474500003",
@@ -1889,7 +1889,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7314873525014",
@@ -1914,7 +1914,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7311070330243",
@@ -1939,7 +1939,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7350051211164",
@@ -1964,7 +1964,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7622210929525",
@@ -1989,7 +1989,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5701092111067",
@@ -2014,7 +2014,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "4006000089874",
@@ -2039,7 +2039,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310867561020",
@@ -2064,7 +2064,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4stberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=256600&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/256600?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2383471000006",
@@ -2089,7 +2089,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317342100007",
@@ -2114,7 +2114,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865005168",
@@ -2139,7 +2139,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2340375400004",
@@ -2164,7 +2164,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7340191179691",
@@ -2189,7 +2189,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865095466",
@@ -2214,7 +2214,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7331044072573",
@@ -2239,7 +2239,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2385912200006",
@@ -2264,7 +2264,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317264300004",
@@ -2289,7 +2289,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2307125100003",
@@ -2314,7 +2314,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317075000001",
@@ -2339,7 +2339,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5740301203124",
@@ -2364,7 +2364,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2330120500004",
@@ -2389,7 +2389,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310074014630",
@@ -2414,7 +2414,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300207071005",
@@ -2439,7 +2439,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300156596727",
@@ -2464,7 +2464,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7314873525014",
@@ -2489,7 +2489,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7350051211164",
@@ -2514,7 +2514,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7622210929525",
@@ -2539,7 +2539,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5701092111067",
@@ -2564,7 +2564,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "4006000089874",
@@ -2589,7 +2589,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310867561020",
@@ -2614,7 +2614,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-H%C3%A4ggvik",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2383471000006",
@@ -2639,7 +2639,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317342100007",
@@ -2664,7 +2664,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865005168",
@@ -2689,7 +2689,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2340375400004",
@@ -2714,7 +2714,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7340191179691",
@@ -2739,7 +2739,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300206718000",
@@ -2764,7 +2764,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865095466",
@@ -2789,7 +2789,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "80508816",
@@ -2814,7 +2814,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7331044072573",
@@ -2839,7 +2839,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2385912200006",
@@ -2864,7 +2864,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317264300004",
@@ -2889,7 +2889,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2307125100003",
@@ -2914,7 +2914,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317075000001",
@@ -2939,7 +2939,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5740301203124",
@@ -2964,7 +2964,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2330120500004",
@@ -2989,7 +2989,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310074014630",
@@ -3014,7 +3014,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300207071005",
@@ -3039,7 +3039,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317474500003",
@@ -3064,7 +3064,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7314873525014",
@@ -3089,7 +3089,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7311070330243",
@@ -3114,7 +3114,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7350051211164",
@@ -3139,7 +3139,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5701092111067",
@@ -3164,7 +3164,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "4006000089874",
@@ -3189,7 +3189,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310867561020",
@@ -3214,7 +3214,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Danderyd",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015700&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2383471000006",
@@ -3239,7 +3239,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317342100007",
@@ -3264,7 +3264,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865005168",
@@ -3289,7 +3289,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2340375400004",
@@ -3314,7 +3314,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7340191179691",
@@ -3339,7 +3339,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300206718000",
@@ -3364,7 +3364,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865095466",
@@ -3389,7 +3389,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "80508816",
@@ -3414,7 +3414,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7331044072573",
@@ -3439,7 +3439,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2385912200006",
@@ -3464,7 +3464,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317264300004",
@@ -3489,7 +3489,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2307125100003",
@@ -3514,7 +3514,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317075000001",
@@ -3539,7 +3539,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5740301203124",
@@ -3564,7 +3564,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2330120500004",
@@ -3589,7 +3589,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310074014630",
@@ -3614,7 +3614,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300207071005",
@@ -3639,7 +3639,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300156596727",
@@ -3664,7 +3664,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317474500003",
@@ -3689,7 +3689,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7314873525014",
@@ -3714,7 +3714,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7311070330243",
@@ -3739,7 +3739,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7622210929525",
@@ -3764,7 +3764,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5701092111067",
@@ -3789,7 +3789,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "4006000089874",
@@ -3814,7 +3814,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310867561020",
@@ -3839,7 +3839,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Sundby-Park",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015810&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015810?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2383471000006",
@@ -3864,7 +3864,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317342100007",
@@ -3889,7 +3889,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865005168",
@@ -3914,7 +3914,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2340375400004",
@@ -3939,7 +3939,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7340191179691",
@@ -3964,7 +3964,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300206718000",
@@ -3989,7 +3989,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865095466",
@@ -4014,7 +4014,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "80508816",
@@ -4039,7 +4039,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7331044072573",
@@ -4064,7 +4064,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2385912200006",
@@ -4089,7 +4089,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317264300004",
@@ -4114,7 +4114,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317075000001",
@@ -4139,7 +4139,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5740301203124",
@@ -4164,7 +4164,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2330120500004",
@@ -4189,7 +4189,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310074014630",
@@ -4214,7 +4214,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300207071005",
@@ -4239,7 +4239,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317474500003",
@@ -4264,7 +4264,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7314873525014",
@@ -4289,7 +4289,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7311070330243",
@@ -4314,7 +4314,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7622210929525",
@@ -4339,7 +4339,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5701092111067",
@@ -4364,7 +4364,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "4006000089874",
@@ -4389,7 +4389,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310867561020",
@@ -4414,7 +4414,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Huddinge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015350&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015350?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2383471000006",
@@ -4439,7 +4439,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317342100007",
@@ -4464,7 +4464,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865005168",
@@ -4489,7 +4489,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2340375400004",
@@ -4514,7 +4514,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7340191179691",
@@ -4539,7 +4539,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300206718000",
@@ -4564,7 +4564,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865095466",
@@ -4589,7 +4589,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "80508816",
@@ -4614,7 +4614,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7331044072573",
@@ -4639,7 +4639,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2385912200006",
@@ -4664,7 +4664,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317264300004",
@@ -4689,7 +4689,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2307125100003",
@@ -4714,7 +4714,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317075000001",
@@ -4739,7 +4739,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5740301203124",
@@ -4764,7 +4764,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2330120500004",
@@ -4789,7 +4789,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310074014630",
@@ -4814,7 +4814,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300207071005",
@@ -4839,7 +4839,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317474500003",
@@ -4864,7 +4864,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7314873525014",
@@ -4889,7 +4889,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7311070330243",
@@ -4914,7 +4914,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7350051211164",
@@ -4939,7 +4939,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7622210929525",
@@ -4964,7 +4964,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5701092111067",
@@ -4989,7 +4989,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "4006000089874",
@@ -5014,7 +5014,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310867561020",
@@ -5039,7 +5039,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-M%C3%A4rsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=026000&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/026000?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2383471000006",
@@ -5064,7 +5064,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317342100007",
@@ -5089,7 +5089,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865005168",
@@ -5114,7 +5114,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2340375400004",
@@ -5139,7 +5139,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7340191179691",
@@ -5164,7 +5164,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300206718000",
@@ -5189,7 +5189,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865095466",
@@ -5214,7 +5214,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "80508816",
@@ -5239,7 +5239,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7331044072573",
@@ -5264,7 +5264,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2385912200006",
@@ -5289,7 +5289,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2307125100003",
@@ -5314,7 +5314,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317075000001",
@@ -5339,7 +5339,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5740301203124",
@@ -5364,7 +5364,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2330120500004",
@@ -5389,7 +5389,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310074014630",
@@ -5414,7 +5414,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300207071005",
@@ -5439,7 +5439,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317474500003",
@@ -5464,7 +5464,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7314873525014",
@@ -5489,7 +5489,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7311070330243",
@@ -5514,7 +5514,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7350051211164",
@@ -5539,7 +5539,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7622210929525",
@@ -5564,7 +5564,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5701092111067",
@@ -5589,7 +5589,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "4006000089874",
@@ -5614,7 +5614,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310867561020",
@@ -5639,7 +5639,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Stuvsta",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015220&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015220?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317342100007",
@@ -5664,7 +5664,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865005168",
@@ -5689,7 +5689,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2340375400004",
@@ -5714,7 +5714,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7340191179691",
@@ -5739,7 +5739,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300206718000",
@@ -5764,7 +5764,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865095466",
@@ -5789,7 +5789,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "80508816",
@@ -5814,7 +5814,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7331044072573",
@@ -5839,7 +5839,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2385912200006",
@@ -5864,7 +5864,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317264300004",
@@ -5889,7 +5889,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2307125100003",
@@ -5914,7 +5914,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317075000001",
@@ -5939,7 +5939,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5740301203124",
@@ -5964,7 +5964,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2330120500004",
@@ -5989,7 +5989,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310074014630",
@@ -6014,7 +6014,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300207071005",
@@ -6039,7 +6039,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317474500003",
@@ -6064,7 +6064,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7314873525014",
@@ -6089,7 +6089,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7311070330243",
@@ -6114,7 +6114,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7350051211164",
@@ -6139,7 +6139,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5701092111067",
@@ -6164,7 +6164,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "4006000089874",
@@ -6189,7 +6189,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310867561020",
@@ -6214,7 +6214,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Orminge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=016141&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/016141?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2383471000006",
@@ -6239,7 +6239,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317342100007",
@@ -6264,7 +6264,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865005168",
@@ -6289,7 +6289,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2340375400004",
@@ -6314,7 +6314,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7340191179691",
@@ -6339,7 +6339,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300206718000",
@@ -6364,7 +6364,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865095466",
@@ -6389,7 +6389,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "80508816",
@@ -6414,7 +6414,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7331044072573",
@@ -6439,7 +6439,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2385912200006",
@@ -6464,7 +6464,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317264300004",
@@ -6489,7 +6489,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2307125100003",
@@ -6514,7 +6514,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317075000001",
@@ -6539,7 +6539,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5740301203124",
@@ -6564,7 +6564,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2330120500004",
@@ -6589,7 +6589,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310074014630",
@@ -6614,7 +6614,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300207071005",
@@ -6639,7 +6639,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7314873525014",
@@ -6664,7 +6664,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7311070330243",
@@ -6689,7 +6689,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7350051211164",
@@ -6714,7 +6714,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7622210929525",
@@ -6739,7 +6739,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5701092111067",
@@ -6764,7 +6764,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "4006000089874",
@@ -6789,7 +6789,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310867561020",
@@ -6814,7 +6814,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-V%C3%A4rmd%C3%B6",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=255400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/255400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2383471000006",
@@ -6839,7 +6839,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317342100007",
@@ -6864,7 +6864,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865005168",
@@ -6889,7 +6889,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2340375400004",
@@ -6914,7 +6914,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7340191179691",
@@ -6939,7 +6939,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300206718000",
@@ -6964,7 +6964,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865095466",
@@ -6989,7 +6989,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "80508816",
@@ -7014,7 +7014,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7331044072573",
@@ -7039,7 +7039,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2385912200006",
@@ -7064,7 +7064,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317264300004",
@@ -7089,7 +7089,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2307125100003",
@@ -7114,7 +7114,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317075000001",
@@ -7139,7 +7139,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5740301203124",
@@ -7164,7 +7164,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2330120500004",
@@ -7189,7 +7189,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310074009230",
@@ -7214,7 +7214,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300207071005",
@@ -7239,7 +7239,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317474500003",
@@ -7264,7 +7264,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7314873525014",
@@ -7289,7 +7289,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7311070330243",
@@ -7314,7 +7314,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7622210929525",
@@ -7339,7 +7339,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5701092111067",
@@ -7364,7 +7364,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "4006000089874",
@@ -7389,7 +7389,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310867561020",
@@ -7414,7 +7414,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-S%C3%B6dert%C3%A4lje",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250800&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250800?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2383471000006",
@@ -7439,7 +7439,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317342100007",
@@ -7464,7 +7464,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865005168",
@@ -7489,7 +7489,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2340375400004",
@@ -7514,7 +7514,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7340191179691",
@@ -7539,7 +7539,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300206718000",
@@ -7564,7 +7564,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865095466",
@@ -7589,7 +7589,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "80508816",
@@ -7614,7 +7614,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7331044072573",
@@ -7639,7 +7639,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2385912200006",
@@ -7664,7 +7664,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317075000001",
@@ -7689,7 +7689,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5740301203124",
@@ -7714,7 +7714,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2330120500004",
@@ -7739,7 +7739,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310074014630",
@@ -7764,7 +7764,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300207071005",
@@ -7789,7 +7789,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317474500003",
@@ -7814,7 +7814,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7314873525014",
@@ -7839,7 +7839,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7311070330243",
@@ -7864,7 +7864,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7350051211164",
@@ -7889,7 +7889,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7622210929525",
@@ -7914,7 +7914,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5701092111067",
@@ -7939,7 +7939,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310867561020",
@@ -7964,7 +7964,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-%C3%85kersberga",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2383471000006",
@@ -7989,7 +7989,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317342100007",
@@ -8014,7 +8014,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865005168",
@@ -8039,7 +8039,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2340375400004",
@@ -8064,7 +8064,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7340191179691",
@@ -8089,7 +8089,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300206718000",
@@ -8114,7 +8114,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865095466",
@@ -8139,7 +8139,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "80508816",
@@ -8164,7 +8164,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7331044072573",
@@ -8189,7 +8189,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2385912200006",
@@ -8214,7 +8214,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317264300004",
@@ -8239,7 +8239,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2307125100003",
@@ -8264,7 +8264,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317075000001",
@@ -8289,7 +8289,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5740301203124",
@@ -8314,7 +8314,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2330120500004",
@@ -8339,7 +8339,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310074009230",
@@ -8364,7 +8364,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300207071005",
@@ -8389,7 +8389,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317474500003",
@@ -8414,7 +8414,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7314873525014",
@@ -8439,7 +8439,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7311070330243",
@@ -8464,7 +8464,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7350051211164",
@@ -8489,7 +8489,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7622210929525",
@@ -8514,7 +8514,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5701092111067",
@@ -8539,7 +8539,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "4006000089874",
@@ -8564,7 +8564,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310867561020",
@@ -8589,7 +8589,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Arninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=015470&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/015470?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2383471000006",
@@ -8614,7 +8614,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317342100007",
@@ -8639,7 +8639,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865005168",
@@ -8664,7 +8664,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2340375400004",
@@ -8689,7 +8689,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7340191179691",
@@ -8714,7 +8714,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300206718000",
@@ -8739,7 +8739,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310865095466",
@@ -8764,7 +8764,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "80508816",
@@ -8789,7 +8789,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7331044072573",
@@ -8814,7 +8814,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2385912200006",
@@ -8839,7 +8839,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317264300004",
@@ -8864,7 +8864,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2307125100003",
@@ -8889,7 +8889,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317075000001",
@@ -8914,7 +8914,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5740301203124",
@@ -8939,7 +8939,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2330120500004",
@@ -8964,7 +8964,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310074014630",
@@ -8989,7 +8989,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7300207071005",
@@ -9014,7 +9014,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "2317474500003",
@@ -9039,7 +9039,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7314873525014",
@@ -9064,7 +9064,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7311070330243",
@@ -9089,7 +9089,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7350051211164",
@@ -9114,7 +9114,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7622210929525",
@@ -9139,7 +9139,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "5701092111067",
@@ -9164,7 +9164,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "4006000089874",
@@ -9189,7 +9189,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   },
   {
     "code": "7310867561020",
@@ -9214,7 +9214,7 @@ export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
     "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Haninge",
     "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=250400&device=desktop&direct=true&api-version=v1",
     "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
-    "retrievedAt": "2026-05-22T09:40:13.630Z"
+    "retrievedAt": "2026-05-22T10:32:37.171Z"
   }
 ];
 
@@ -9238,7 +9238,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-7310760012896/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676905402/cloud/274664.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000530085",
@@ -9259,7 +9259,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-8711000530085/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1762457505/cloud/551035.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000591840",
@@ -9280,7 +9280,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-ebony-morkrost-8711000591840/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1748002447/cloud/484045.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000530252",
@@ -9301,7 +9301,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/kaffe-presso-mellanrost-8711000530252/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1762513032/cloud/551330.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760012919",
@@ -9322,7 +9322,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanmork-svea-7310760012919/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676904843/cloud/274612.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000530207",
@@ -9343,7 +9343,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-el-brygg-mellanrost-8711000530207/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1762513028/cloud/551329.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000537411",
@@ -9364,7 +9364,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-eko-8711000537411/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1764376139/cloud/563117.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000602102",
@@ -9385,7 +9385,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-karaktar-morkrost-8711000602102/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1748001589/cloud/484008.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000530283",
@@ -9406,7 +9406,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-latt-morkrost-8711000530283/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1759284486/cloud/529083.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000602164",
@@ -9427,7 +9427,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-milea-ljusrost-8711000602164/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1748275576/cloud/484846.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760012988",
@@ -9448,7 +9448,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/presskaffe-morkrost-pressiado-7310760012988/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676904714/cloud/274600.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000537497",
@@ -9469,7 +9469,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-koffeinfritt-mellanrost-8711000537497/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1764376142/cloud/563118.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310050001043",
@@ -9490,7 +9490,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-7310050001043/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1702449797/cloud/309941.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8000070024083",
@@ -9511,7 +9511,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-qualita-rossa-8000070024083/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1730796869/cloud/399722.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310831020058",
@@ -9532,7 +9532,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-7310831020058/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1701774760/cloud/307099.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310050003580",
@@ -9553,7 +9553,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-fika-lovers-7310050003580/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1612742611/420380.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310050001791",
@@ -9574,7 +9574,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-eko-7310050001791/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1625358409/cloud/169793.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310050001777",
@@ -9595,7 +9595,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-fair-eko-7310050001777/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1645507431/cloud/129827.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8000070028050",
@@ -9616,7 +9616,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-qualita-oro-8000070028050/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1730796878/cloud/399723.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310831020010",
@@ -9637,7 +9637,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-eko-7310831020010/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1701774714/cloud/307096.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731102397",
@@ -9658,7 +9658,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-kahawa-7310731102397/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1736635762/cloud/422994.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310050001135",
@@ -9679,7 +9679,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-prezzo-mellanrost-7310050001135/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1706706324/cloud/324098.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310050001982",
@@ -9700,28 +9700,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-kharisma-7310050001982/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1706704679/cloud/324069.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
-  },
-  {
-    "code": "7310731101604",
-    "ean": "7310731101604",
-    "name": "Bryggkaffe Extra Mörkrost Forza!",
-    "brand": "ZOÉGAS",
-    "packageText": "450 G",
-    "category": "Bryggkaffe",
-    "price": 79.89,
-    "priceText": "79.89 SEK",
-    "unitPrice": 177.53,
-    "unitPriceText": "177.53 kr/kg",
-    "unitPriceUnit": "kr/kg",
-    "promotionText": "",
-    "promotionPrice": null,
-    "medMeraRequired": false,
-    "availableOnline": true,
-    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
-    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-extra-morkrost-forza-7310731101604/",
-    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1736647135/cloud/423292.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731103165",
@@ -9742,7 +9721,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-koffeinfri-eko-7310731103165/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1758668305/cloud/521280.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310050001159",
@@ -9763,7 +9742,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanmork-7310050001159/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1706706334/cloud/324099.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731101666",
@@ -9784,7 +9763,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-mollbergs-blandning-7310731101666/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1567113117/380226.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310050001883",
@@ -9805,7 +9784,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-7310050001883/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1724850077/cloud/381409.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310050001999",
@@ -9826,7 +9805,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-crescendo-extra-morkrost-7310050001999/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1706704702/cloud/324070.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760012438",
@@ -9847,7 +9826,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanmorkrost-eko-7310760012438/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1730795277/cloud/399677.jpg",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310050010854",
@@ -9868,7 +9847,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-7310050010854/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1706704717/cloud/324071.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760012506",
@@ -9889,7 +9868,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-solid-eko-7310760012506/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676902201/cloud/274570.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7300156576903",
@@ -9910,7 +9889,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-eko-7300156576903/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1582124429/393910.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310050001975",
@@ -9931,7 +9910,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-jubileum-latt-morkrost-7310050001975/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1706704640/cloud/324065.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7300156576477",
@@ -9952,7 +9931,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-eko-7300156576477/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1635852962/cloud/237971.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731103011",
@@ -9973,7 +9952,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-skanerost-7310731103011/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1734533714/cloud/417088.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731101680",
@@ -9994,7 +9973,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-latt-morkrost-pasion-colombia-7310731101680/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1736635268/cloud/422972.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731103042",
@@ -10015,7 +9994,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-mezzo-7310731103042/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1734533739/cloud/417090.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760012537",
@@ -10036,28 +10015,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-amigas-eko-7310760012537/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676888010/cloud/274479.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
-  },
-  {
-    "code": "7310731103035",
-    "ean": "7310731103035",
-    "name": "Bryggkaffe Mörkrost Intenzo",
-    "brand": "ZOÉGAS",
-    "packageText": "450 G",
-    "category": "Bryggkaffe",
-    "price": 70.45,
-    "priceText": "70.45 SEK",
-    "unitPrice": 156.56,
-    "unitPriceText": "156.56 kr/kg",
-    "unitPriceUnit": "kr/kg",
-    "promotionText": "",
-    "promotionPrice": null,
-    "medMeraRequired": false,
-    "availableOnline": true,
-    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
-    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-intenzo-7310731103035/",
-    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1734533728/cloud/417089.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760012445",
@@ -10078,7 +10036,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-extra-morkrost-reko-eko-7310760012445/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676901666/cloud/274543.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760012568",
@@ -10099,7 +10057,28 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-ljusrost-blond-eko-7310760012568/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676902267/cloud/274579.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310731103035",
+    "ean": "7310731103035",
+    "name": "Bryggkaffe Mörkrost Intenzo",
+    "brand": "ZOÉGAS",
+    "packageText": "450 G",
+    "category": "Bryggkaffe",
+    "price": 70.45,
+    "priceText": "70.45 SEK",
+    "unitPrice": 156.56,
+    "unitPriceText": "156.56 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-intenzo-7310731103035/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1734533728/cloud/417089.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7300156589194",
@@ -10120,7 +10099,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-eko-7300156589194/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1597323412/405125.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310831020034",
@@ -10141,7 +10120,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-7310831020034/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1701821167/cloud/307334.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731101611",
@@ -10162,7 +10141,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-hazienda-7310731101611/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1736641451/cloud/423160.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731101567",
@@ -10183,7 +10162,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-latt-morkrost-estanzia-eko-7310731101567/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1736628692/cloud/422608.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7340191139435",
@@ -10204,7 +10183,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-7340191139435/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1683811012/cloud/280605.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000538050",
@@ -10225,7 +10204,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-original-mellanrost-refill-8711000538050/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1707734459/cloud/326586.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7300156576484",
@@ -10246,7 +10225,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-eko-7300156576484/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1637684919/cloud/239764.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7613035850194",
@@ -10267,7 +10246,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-azera-espresso-7613035850194/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1721295604/cloud/373989.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760012315",
@@ -10288,7 +10267,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanmork-gran-dia-7310760012315/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676905217/cloud/274646.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000538166",
@@ -10309,7 +10288,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-morkrost-refill-8711000538166/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1708519469/cloud/329329.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7300156589187",
@@ -10330,7 +10309,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-extra-mork-7300156589187/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1612355760/419963.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000538227",
@@ -10351,7 +10330,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-mellanrost-refill-eko-8711000538227/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1708519482/cloud/329330.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7610100021510",
@@ -10372,7 +10351,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-mellanrost-refill-7610100021510/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1716368233/cloud/356869.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7340011353195",
@@ -10393,7 +10372,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-mellanrost-7340011353195/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1638661504/cloud/201777.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7613031210374",
@@ -10414,7 +10393,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/lyx-snabbkaffe-mellanrost-refill-7613031210374/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1716368237/cloud/356870.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760012902",
@@ -10435,7 +10414,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-extra-mork-franskrost-7310760012902/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676905322/cloud/274657.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7613287111180",
@@ -10456,7 +10435,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-mellanrost-koffeinfri-7613287111180/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1721295676/cloud/373993.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7613036832748",
@@ -10477,7 +10456,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-gold-7613036832748/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1716368530/cloud/356881.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000538197",
@@ -10498,49 +10477,28 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-gold-mellanrost-refill-8711000538197/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1717146368/cloud/360081.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
-    "code": "7310760012391",
-    "ean": "7310760012391",
-    "name": "Bryggkaffe Mörkrost Wanyama",
-    "brand": "Arvid Nordquist",
-    "packageText": "500 g",
+    "code": "7310731101604",
+    "ean": "7310731101604",
+    "name": "Bryggkaffe Extra Mörkrost Forza!",
+    "brand": "ZOÉGAS",
+    "packageText": "450 G",
     "category": "Bryggkaffe",
-    "price": 75.17,
-    "priceText": "75.17 SEK",
-    "unitPrice": 150.34,
-    "unitPriceText": "150.34 kr/kg",
+    "price": 79.89,
+    "priceText": "79.89 SEK",
+    "unitPrice": 177.53,
+    "unitPriceText": "177.53 kr/kg",
     "unitPriceUnit": "kr/kg",
-    "promotionText": "Arvid Nordquist 2 för 130-2 för 130:-",
-    "promotionPrice": 130,
+    "promotionText": "",
+    "promotionPrice": null,
     "medMeraRequired": false,
     "availableOnline": true,
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
-    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-wanyama-7310760012391/",
-    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676904790/cloud/274608.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
-  },
-  {
-    "code": "7310760012308",
-    "ean": "7310760012308",
-    "name": "Bryggkaffe Extra Mörkrost Festivita",
-    "brand": "Arvid Nordquist",
-    "packageText": "500g",
-    "category": "Bryggkaffe",
-    "price": 75.17,
-    "priceText": "75.17 SEK",
-    "unitPrice": 150.34,
-    "unitPriceText": "150.34 kr/kg",
-    "unitPriceUnit": "kr/kg",
-    "promotionText": "Arvid Nordquist 2 för 130-2 för 130:-",
-    "promotionPrice": 130,
-    "medMeraRequired": false,
-    "availableOnline": true,
-    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
-    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-extra-morkrost-festivita-7310760012308/",
-    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676904949/cloud/274622.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-extra-morkrost-forza-7310731101604/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1736647135/cloud/423292.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731101536",
@@ -10561,7 +10519,49 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-dark-temptation-7310731101536/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1736628878/cloud/422625.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310760012391",
+    "ean": "7310760012391",
+    "name": "Bryggkaffe Mörkrost Wanyama",
+    "brand": "Arvid Nordquist",
+    "packageText": "500 g",
+    "category": "Bryggkaffe",
+    "price": 75.17,
+    "priceText": "75.17 SEK",
+    "unitPrice": 150.34,
+    "unitPriceText": "150.34 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Arvid Nordquist 2 för 130-2 för 130:-",
+    "promotionPrice": 130,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-wanyama-7310760012391/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676904790/cloud/274608.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310760012308",
+    "ean": "7310760012308",
+    "name": "Bryggkaffe Extra Mörkrost Festivita",
+    "brand": "Arvid Nordquist",
+    "packageText": "500g",
+    "category": "Bryggkaffe",
+    "price": 75.17,
+    "priceText": "75.17 SEK",
+    "unitPrice": 150.34,
+    "unitPriceText": "150.34 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Arvid Nordquist 2 för 130-2 för 130:-",
+    "promotionPrice": 130,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-extra-morkrost-festivita-7310760012308/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676904949/cloud/274622.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731101697",
@@ -10582,7 +10582,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-presso-7310731101697/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1736630044/cloud/422693.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731102328",
@@ -10603,7 +10603,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-skanerost-maria-zoega-7310731102328/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1736629023/cloud/422633.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7340191139558",
@@ -10624,7 +10624,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-eko-7340191139558/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1708952311/cloud/330827.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7613031239436",
@@ -10645,7 +10645,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/lyx-morkrost-snabbkaffe-refill-7613031239436/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1721295777/cloud/374000.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731103066",
@@ -10666,7 +10666,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-vastkust-7310731103066/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1734533475/cloud/417061.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "5900649083097",
@@ -10687,7 +10687,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-matcha-latte-6-pack-5900649083097/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1733296332/cloud/412609.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7613032873691",
@@ -10708,7 +10708,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-original-refill-7613032873691/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1724405109/cloud/380641.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8445291509207",
@@ -10729,28 +10729,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-ice-coffee-frappe-8-pack-8445291509207/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1734533876/cloud/417101.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
-  },
-  {
-    "code": "7340011340089",
-    "ean": "7340011340089",
-    "name": "Snabbkaffe",
-    "brand": "Xtra",
-    "packageText": "200 G",
-    "category": "Snabbkaffe",
-    "price": 47.27,
-    "priceText": "47.27 SEK",
-    "unitPrice": 236.35,
-    "unitPriceText": "236.35 kr/kg",
-    "unitPriceUnit": "kr/kg",
-    "promotionText": "",
-    "promotionPrice": null,
-    "medMeraRequired": false,
-    "availableOnline": true,
-    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
-    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-7340011340089/",
-    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1671096428/cloud/269474.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731103059",
@@ -10771,7 +10750,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-stockholm-7310731103059/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1734533795/cloud/417096.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731103073",
@@ -10792,28 +10771,28 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-fikastund-7310731103073/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1734533618/cloud/417078.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
-    "code": "7613034532657",
-    "ean": "7613034532657",
-    "name": "Snabbkaffe Cappuccino 18-pack",
-    "brand": "NESCAFÉ",
-    "packageText": "18 ST",
+    "code": "7340011340089",
+    "ean": "7340011340089",
+    "name": "Snabbkaffe",
+    "brand": "Xtra",
+    "packageText": "200 G",
     "category": "Snabbkaffe",
-    "price": 42.54,
-    "priceText": "42.54 SEK",
-    "unitPrice": 2.36,
-    "unitPriceText": "2.36 kr/st",
-    "unitPriceUnit": "kr/st",
+    "price": 47.27,
+    "priceText": "47.27 SEK",
+    "unitPrice": 236.35,
+    "unitPriceText": "236.35 kr/kg",
+    "unitPriceUnit": "kr/kg",
     "promotionText": "",
     "promotionPrice": null,
     "medMeraRequired": false,
     "availableOnline": true,
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
-    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-cappuccino-18-pack-7613034532657/",
-    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1717486747/cloud/360623.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-7340011340089/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1671096428/cloud/269474.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731103028",
@@ -10834,7 +10813,28 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-latt-morkrost-blue-java-7310731103028/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1734533782/cloud/417095.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7613034532657",
+    "ean": "7613034532657",
+    "name": "Snabbkaffe Cappuccino 18-pack",
+    "brand": "NESCAFÉ",
+    "packageText": "18 ST",
+    "category": "Snabbkaffe",
+    "price": 42.54,
+    "priceText": "42.54 SEK",
+    "unitPrice": 2.36,
+    "unitPriceText": "2.36 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-cappuccino-18-pack-7613034532657/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1717486747/cloud/360623.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7613036352697",
@@ -10855,7 +10855,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-gold-crema-7613036352697/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1748002461/cloud/484046.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8445290914200",
@@ -10876,7 +10876,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-3in1-creamy-latte-10-pack-8445290914200/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1734533869/cloud/417100.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310050001197",
@@ -10897,7 +10897,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-eko-7310050001197/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1549022554/361311.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000494585",
@@ -10918,7 +10918,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-latte-caramel-8711000494585/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1687245054/cloud/283602.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000494615",
@@ -10939,7 +10939,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-cappuccino-8711000494615/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1657117883/cloud/255309.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000494554",
@@ -10960,7 +10960,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-iced-cappuccino-8711000494554/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1657710438/cloud/255649.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7300156585578",
@@ -10981,7 +10981,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-7300156585578/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1695816459/cloud/291631.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7300156585608",
@@ -11002,7 +11002,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/kaffe-presso-mellanrost-7300156585608/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1695820275/cloud/291653.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310050001067",
@@ -11023,7 +11023,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-120-ar-7310050001067/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1764507631/cloud/566095.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7300156585592",
@@ -11044,7 +11044,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/kokkaffe-mellanrost-7300156585592/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1700224231/cloud/303209.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7300156585585",
@@ -11065,7 +11065,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-7300156585585/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1695816516/cloud/291637.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7392736065709",
@@ -11086,7 +11086,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-7392736065709/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1632563044/cloud/235041.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310831020072",
@@ -11107,7 +11107,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/kaffe-tricolore-7310831020072/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1701774730/cloud/307097.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310830020103",
@@ -11128,7 +11128,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-colombia-mellanrost-7310830020103/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1701774748/cloud/307098.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310831020089",
@@ -11149,7 +11149,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-brazil-7310831020089/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1701774776/cloud/307100.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310830020110",
@@ -11170,7 +11170,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-colombia-morkrost-7310830020110/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1701774684/cloud/307094.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7392736065808",
@@ -11191,7 +11191,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-morkrost-eko-7392736065808/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1498100260/243578.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8445291484634",
@@ -11212,7 +11212,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-kitkat-7-pack-8445291484634/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1765502588/cloud/582066.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7613035830318",
@@ -11233,7 +11233,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-mellanrost-7613035830318/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1721295579/cloud/373987.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7613035830332",
@@ -11254,7 +11254,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/snabbkaffe-lyx-mellanrost-7613035830332/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1721295589/cloud/373988.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7613039840047",
@@ -11275,7 +11275,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-caffe-latte-12-pack-7613039840047/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1701075949/cloud/305090.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7613037564426",
@@ -11296,7 +11296,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-caramel-macchiato-12-pack-7613037564426/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1701076019/cloud/305096.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8000070053526",
@@ -11317,7 +11317,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-rossa-10-pack-8000070053526/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1758830455/cloud/523109.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8000070053465",
@@ -11338,7 +11338,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-oro-10-pack-8000070053465/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1759115469/cloud/526220.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "5063270127827",
@@ -11359,7 +11359,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/snabbkaffe/matcha-barista-10-pack-5063270127827/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1765645348/cloud/585412.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000616239",
@@ -11380,7 +11380,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/bryggkaffe/bryggkaffe-mellanrost-summer-8711000616239/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1764522763/cloud/566576.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7340011330042",
@@ -11401,7 +11401,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffefilter/kaffefilter-oblekt-1x4-200-pack-7340011330042/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1632559904/cloud/234940.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731101802",
@@ -11422,7 +11422,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-morkrost-mollbergs-blandning-7310731101802/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1736633913/cloud/422898.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760041094",
@@ -11443,7 +11443,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-mellanrost-7310760041094/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676593554/cloud/274085.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8000070035980",
@@ -11464,7 +11464,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/espressokaffe/kaffe-espresso-rossa-8000070035980/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1699972034/cloud/301143.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8000070012837",
@@ -11485,7 +11485,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/espressokaffe/kaffe-espresso-italiano-classico-8000070012837/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1600261818/407558.png",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "4006508200450",
@@ -11506,7 +11506,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffefilter/kaffefilter-vit-1x4-80-pack-4006508200450/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1737555506/cloud/427134.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000530153",
@@ -11527,7 +11527,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kokkaffe/kokkaffe-mellanrost-8711000530153/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1762513025/cloud/551328.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7340191174276",
@@ -11548,7 +11548,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffefilter/kaffefilter-vit-1x4-100-pack-7340191174276/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1770292934/cloud/612171.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760040929",
@@ -11569,7 +11569,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-mellanmork-gran-dia-7310760040929/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676904772/cloud/274606.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000360569",
@@ -11590,7 +11590,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-lungo-profondo-10-pack-8711000360569/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1693397489/cloud/288562.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000360316",
@@ -11611,7 +11611,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-lungo-profondo-20-pack-8711000360316/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1693814545/cloud/289796.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760012483",
@@ -11632,7 +11632,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-mellanmork-eko-7310760012483/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676904690/cloud/274597.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731103202",
@@ -11653,7 +11653,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-morkrost-skanerost-7310731103202/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1758443910/cloud/519701.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000891643",
@@ -11674,7 +11674,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-ristretto-10-pack-8711000891643/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1693395550/cloud/288547.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000360835",
@@ -11695,7 +11695,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-ristretto-11-20-pack-8711000360835/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1693818134/cloud/289826.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731103219",
@@ -11716,7 +11716,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-latt-morkrost-blue-java-7310731103219/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1758443916/cloud/519702.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731103226",
@@ -11737,7 +11737,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-morkrost-intenzo-7310731103226/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1757828353/cloud/513825.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760040912",
@@ -11758,7 +11758,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-extra-mork-franskrost-7310760040912/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676905089/cloud/274635.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731103233",
@@ -11779,7 +11779,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-mellanrost-mezzo-7310731103233/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1757644449/cloud/512059.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000543153",
@@ -11800,7 +11800,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-ultimo-13-10-pack-8711000543153/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1702451155/cloud/310027.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760012544",
@@ -11821,7 +11821,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-morkrost-amigas-eko-7310760012544/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676905231/cloud/274648.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000360545",
@@ -11842,7 +11842,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-lungo-mattinata-10-pack-8711000360545/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1693816838/cloud/289807.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8445292132107",
@@ -11863,7 +11863,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-mollbergs-16-pack-8445292132107/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1765499168/cloud/581973.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000488225",
@@ -11884,7 +11884,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-caramel-10-pack-8711000488225/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1695196664/cloud/290878.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7613033174667",
@@ -11905,7 +11905,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-cafe-au-lait-16-pack-7613033174667/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1740654488/cloud/445850.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731101840",
@@ -11926,7 +11926,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-hazienda-7310731101840/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1736628346/cloud/422589.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8445290448668",
@@ -11947,7 +11947,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-grande-intenso-16-pack-8445290448668/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1715070426/cloud/352479.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000573501",
@@ -11968,7 +11968,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-brazil-10-pack-8711000573501/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1733292727/cloud/412405.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000360040",
@@ -11989,7 +11989,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-lungo-estremo-10-pack-8711000360040/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1693992819/cloud/290009.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760012513",
@@ -12010,7 +12010,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-mellanrost-solid-eko-7310760012513/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676902219/cloud/274573.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760012469",
@@ -12031,7 +12031,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-extra-morkrost-reko-eko-7310760012469/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676901578/cloud/274539.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000712559",
@@ -12052,7 +12052,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-hazelnut-10-pack-8711000712559/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1764516040/cloud/566346.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8445290448743",
@@ -12073,7 +12073,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-morgonstund-16-pack-8445290448743/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1716972863/cloud/359067.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000488188",
@@ -12094,7 +12094,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-chocolate-10-pack-8711000488188/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1686760101/cloud/282271.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731102878",
@@ -12115,7 +12115,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-kahawa-morkrost-7310731102878/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1736636539/cloud/423055.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760041087",
@@ -12136,7 +12136,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-extra-morkrost-festivita-7310760041087/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676905297/cloud/274655.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000581049",
@@ -12157,7 +12157,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-pumpkin-spice-10-pack-8711000581049/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1748277280/cloud/484863.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7340011333692",
@@ -12178,7 +12178,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffefilter/kaffefilter-oblekt-102-200-pack-7340011333692/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1653990988/cloud/252811.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000360521",
@@ -12199,7 +12199,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-supremo-10-pack-8711000360521/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1693404485/cloud/289614.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760012889",
@@ -12220,7 +12220,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kokkaffe/kokkaffe-mellanrost-7310760012889/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676904994/cloud/274626.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310731101819",
@@ -12241,7 +12241,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-extra-morkrost-forza-7310731101819/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1736646955/cloud/423282.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760040691",
@@ -12262,7 +12262,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-espresso-nero-7310760040691/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676901773/cloud/274553.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "7310760041360",
@@ -12283,7 +12283,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-espresso-buono-7310760041360/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1764707850/cloud/567755.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8445290870858",
@@ -12304,7 +12304,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-16-pack-8445290870858/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1702545284/cloud/310799.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "8711000379660",
@@ -12325,7 +12325,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-lungo-6-classico-10-pack-8711000379660/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1677848017/cloud/275996.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "4100290056308",
@@ -12346,7 +12346,7 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/kaffedryck-caffe-latte-4100290056308/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1758361937/cloud/519197.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   },
   {
     "code": "4100290056438",
@@ -12367,6 +12367,2946 @@ export const coopProducts: CoopIngestedProduct[] = [
     "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
     "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/kaffedryck-cappuccino-4100290056438/",
     "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1757964762/cloud/515607.tiff",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "4100290024758",
+    "ean": "4100290024758",
+    "name": "Kaffedryck Caramel Macchiato",
+    "brand": "Starbucks®",
+    "packageText": "750 ml",
+    "category": "Kalla kaffedrycker",
+    "price": 39.28,
+    "priceText": "39.28 SEK",
+    "unitPrice": 52.37,
+    "unitPriceText": "52.37 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/kaffedryck-caramel-macchiato-4100290024758/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1695305289/cloud/291217.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711000413371",
+    "ean": "8711000413371",
+    "name": "Kaffekapslar Ristretto Decaffeinato 10-pack",
+    "brand": "L´OR",
+    "packageText": "10 st",
+    "category": "Kaffekapslar",
+    "price": 42.54,
+    "priceText": "42.54 SEK",
+    "unitPrice": 4.25,
+    "unitPriceText": "4.25 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "LÒR Kapslar 2 för 65kr-2 för 65:-",
+    "promotionPrice": 65,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-ristretto-decaffeinato-10-pack-8711000413371/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1693404493/cloud/289615.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711000360583",
+    "ean": "8711000360583",
+    "name": "Kaffekapslar Espresso Onyx 10-pack",
+    "brand": "L´OR",
+    "packageText": "10 st",
+    "category": "Kaffekapslar",
+    "price": 42.54,
+    "priceText": "42.54 SEK",
+    "unitPrice": 4.25,
+    "unitPriceText": "4.25 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "LÒR Kapslar 2 för 65kr-2 för 65:-",
+    "promotionPrice": 65,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-onyx-10-pack-8711000360583/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1693399525/cloud/288574.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8445291658110",
+    "ean": "8445291658110",
+    "name": "Kaffekapslar Espresso Skånerost 10-pack",
+    "brand": "ZOÉGAS",
+    "packageText": "10 st",
+    "category": "Kaffekapslar",
+    "price": 39.28,
+    "priceText": "39.28 SEK",
+    "unitPrice": 3.93,
+    "unitPriceText": "3.93 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-skanerost-10-pack-8445291658110/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1734533377/cloud/417048.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8445291154063",
+    "ean": "8445291154063",
+    "name": "Kaffekapslar Lungo Buongiorno 10-pack",
+    "brand": "ZOÉGAS",
+    "packageText": "10 st",
+    "category": "Kaffekapslar",
+    "price": 39.28,
+    "priceText": "39.28 SEK",
+    "unitPrice": 3.93,
+    "unitPriceText": "3.93 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-lungo-buongiorno-10-pack-8445291154063/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1702449142/cloud/309913.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8445291563377",
+    "ean": "8445291563377",
+    "name": "Kaffekapslar Espresso Roast Decaf 10-pack",
+    "brand": "STARBUCKS",
+    "packageText": "10 st",
+    "category": "Kaffekapslar",
+    "price": 49.17,
+    "priceText": "49.17 SEK",
+    "unitPrice": 4.92,
+    "unitPriceText": "4.92 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-roast-decaf-10-pack-8445291563377/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1765949480/cloud/589092.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8445291105737",
+    "ean": "8445291105737",
+    "name": "Kaffekapslar Espresso Originale 10-pack",
+    "brand": "ZOÉGAS",
+    "packageText": "10 st",
+    "category": "Kaffekapslar",
+    "price": 39.28,
+    "priceText": "39.28 SEK",
+    "unitPrice": 3.93,
+    "unitPriceText": "3.93 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-originale-10-pack-8445291105737/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1702451139/cloud/310025.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "4100290056421",
+    "ean": "4100290056421",
+    "name": "Kaffedryck Caramel Macchiato",
+    "brand": "Starbucks®",
+    "packageText": "220ml",
+    "category": "Kalla kaffedrycker",
+    "price": 19.25,
+    "priceText": "19.25 SEK",
+    "unitPrice": 87.5,
+    "unitPriceText": "87.50 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/kaffedryck-caramel-macchiato-4100290056421/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1757635412/cloud/511988.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7613037561197",
+    "ean": "7613037561197",
+    "name": "Kaffekapslar House Blend 12-pack",
+    "brand": "STARBUCKS",
+    "packageText": "12 st",
+    "category": "Kaffekapslar",
+    "price": 58.63,
+    "priceText": "58.63 SEK",
+    "unitPrice": 574.8,
+    "unitPriceText": "574.80 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-house-blend-12-pack-7613037561197/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1701076010/cloud/305095.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711000379646",
+    "ean": "8711000379646",
+    "name": "Kaffekapslar Espresso 10 Intenso 10-pack",
+    "brand": "Gevalia",
+    "packageText": "10 st",
+    "category": "Kaffekapslar",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 3.78,
+    "unitPriceText": "3.78 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "LÒR Kapslar 2 för 65kr-2 för 65:-",
+    "promotionPrice": 65,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-10-intenso-10-pack-8711000379646/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1677848002/cloud/275995.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "4100290031701",
+    "ean": "4100290031701",
+    "name": "Kaffedryck Cappuccino",
+    "brand": "Starbucks®",
+    "packageText": "750 ml",
+    "category": "Kalla kaffedrycker",
+    "price": 39.28,
+    "priceText": "39.28 SEK",
+    "unitPrice": 52.37,
+    "unitPriceText": "52.37 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/kaffedryck-cappuccino-4100290031701/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1732694470/cloud/408804.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "4100290025083",
+    "ean": "4100290025083",
+    "name": "Iskaffe Latte",
+    "brand": "Arla®",
+    "packageText": "1000 ml",
+    "category": "Kalla kaffedrycker",
+    "price": 29.81,
+    "priceText": "29.81 SEK",
+    "unitPrice": 29.81,
+    "unitPriceText": "29.81 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/iskaffe-latte-4100290025083/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1647607450/cloud/249602.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711000393765",
+    "ean": "8711000393765",
+    "name": "Kaffekapslar Strong Medium 36-pack",
+    "brand": "Senseo",
+    "packageText": "36 st",
+    "category": "Kaffekapslar",
+    "price": 68.1,
+    "priceText": "68.10 SEK",
+    "unitPrice": 1.89,
+    "unitPriceText": "1.89 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-strong-medium-36-pack-8711000393765/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1720789436/cloud/372941.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711000341001",
+    "ean": "8711000341001",
+    "name": "Kaffekapslar Classic Medium 36-pack",
+    "brand": "Senseo",
+    "packageText": "36 st",
+    "category": "Kaffekapslar",
+    "price": 68.1,
+    "priceText": "68.10 SEK",
+    "unitPrice": 1.89,
+    "unitPriceText": "1.89 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-classic-medium-36-pack-8711000341001/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1720789430/cloud/372940.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8000070053472",
+    "ean": "8000070053472",
+    "name": "Kaffekapslar Crema e gusto Classico 10-pack",
+    "brand": "Lavazza",
+    "packageText": "10 kapsl",
+    "category": "Kaffekapslar",
+    "price": 42.54,
+    "priceText": "42.54 SEK",
+    "unitPrice": 4.25,
+    "unitPriceText": "4.25 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "Lavazza Kapslar 2 f 69kr-2 för 69:-",
+    "promotionPrice": 69,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-crema-e-gusto-classico-10-pack-8000070053472/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1692868071/cloud/288353.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8000070025066",
+    "ean": "8000070025066",
+    "name": "Kaffebönor Espresso Barista Gran Crema",
+    "brand": "Lavazza",
+    "packageText": "1000g",
+    "category": "Hela kaffebönor",
+    "price": 254.59,
+    "priceText": "254.59 SEK",
+    "unitPrice": 254.59,
+    "unitPriceText": "254.59 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-espresso-barista-gran-crema-8000070025066/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1759091950/cloud/526111.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711000899465",
+    "ean": "8711000899465",
+    "name": "Kaffebönor Mellanrost",
+    "brand": "GEVALIA",
+    "packageText": "500 g",
+    "category": "Hela kaffebönor",
+    "price": 95.8,
+    "priceText": "95.80 SEK",
+    "unitPrice": 191.6,
+    "unitPriceText": "191.60 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-mellanrost-8711000899465/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1716379118/cloud/356970.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8000070025400",
+    "ean": "8000070025400",
+    "name": "Kaffebönor Crema E Aroma",
+    "brand": "Lavazza",
+    "packageText": "1000 g",
+    "category": "Hela kaffebönor",
+    "price": 268.79,
+    "priceText": "268.79 SEK",
+    "unitPrice": 268.79,
+    "unitPriceText": "268.79 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-crema-e-aroma-8000070025400/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1727350925/cloud/389809.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711000705063",
+    "ean": "8711000705063",
+    "name": "Kaffekapslar Espresso Lungo Profondo 50-pack",
+    "brand": "L'OR",
+    "packageText": "50 st",
+    "category": "Kaffekapslar",
+    "price": 197.8,
+    "priceText": "197.80 SEK",
+    "unitPrice": 3.96,
+    "unitPriceText": "3.96 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-lungo-profondo-50-pack-8711000705063/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1747639536/cloud/481343.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8000070035898",
+    "ean": "8000070035898",
+    "name": "Kaffebönor Qualita Rossa",
+    "brand": "Lavazza",
+    "packageText": "1000g",
+    "category": "Hela kaffebönor",
+    "price": 245.12,
+    "priceText": "245.12 SEK",
+    "unitPrice": 245.12,
+    "unitPriceText": "245.12 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-qualita-rossa-8000070035898/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1699971969/cloud/301142.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711000587249",
+    "ean": "8711000587249",
+    "name": "Kaffebönor Mellanrost Crema",
+    "brand": "GEVALIA",
+    "packageText": "900 g",
+    "category": "Hela kaffebönor",
+    "price": 173.21,
+    "priceText": "173.21 SEK",
+    "unitPrice": 192.46,
+    "unitPriceText": "192.46 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-mellanrost-crema-8711000587249/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1733292772/cloud/412410.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711000587270",
+    "ean": "8711000587270",
+    "name": "Kaffebönor Mörkrost Espresso",
+    "brand": "GEVALIA",
+    "packageText": "900 g",
+    "category": "Hela kaffebönor",
+    "price": 173.21,
+    "priceText": "173.21 SEK",
+    "unitPrice": 192.46,
+    "unitPriceText": "192.46 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-morkrost-espresso-8711000587270/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1733295091/cloud/412560.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8000070020559",
+    "ean": "8000070020559",
+    "name": "Kaffebönor Qualità Oro",
+    "brand": "Lavazza",
+    "packageText": "1000g",
+    "category": "Hela kaffebönor",
+    "price": 273.52,
+    "priceText": "273.52 SEK",
+    "unitPrice": 273.52,
+    "unitPriceText": "273.52 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-qualita-oro-8000070020559/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1699974382/cloud/301178.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8000070009745",
+    "ean": "8000070009745",
+    "name": "Kaffebönor Tierra Eko",
+    "brand": "Lavazza",
+    "packageText": "1000g",
+    "category": "Hela kaffebönor",
+    "price": 287.71,
+    "priceText": "287.71 SEK",
+    "unitPrice": 287.71,
+    "unitPriceText": "287.71 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-tierra-eko-8000070009745/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1695774355/cloud/291547.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8000070027442",
+    "ean": "8000070027442",
+    "name": "Kaffebönor Decaf Classico",
+    "brand": "Lavazza",
+    "packageText": "500 g",
+    "category": "Hela kaffebönor",
+    "price": 141.02,
+    "priceText": "141.02 SEK",
+    "unitPrice": 282.04,
+    "unitPriceText": "282.04 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-decaf-classico-8000070027442/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1748001618/cloud/484010.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8000070067417",
+    "ean": "8000070067417",
+    "name": "Kaffebönor Gran Crema",
+    "brand": "Lavazza",
+    "packageText": "500 g",
+    "category": "Hela kaffebönor",
+    "price": 136.29,
+    "priceText": "136.29 SEK",
+    "unitPrice": 272.58,
+    "unitPriceText": "272.58 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-gran-crema-8000070067417/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1748001341/cloud/483993.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8000070021631",
+    "ean": "8000070021631",
+    "name": "Kaffebönor Tierra For Planet Eko",
+    "brand": "Lavazza",
+    "packageText": "500 g",
+    "category": "Hela kaffebönor",
+    "price": 136.29,
+    "priceText": "136.29 SEK",
+    "unitPrice": 272.58,
+    "unitPriceText": "272.58 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-tierra-for-planet-eko-8000070021631/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1695774360/cloud/291548.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8000070083882",
+    "ean": "8000070083882",
+    "name": "Kaffebönor Mörkrost Tales of Napoli",
+    "brand": "Lavazza",
+    "packageText": "450g",
+    "category": "Hela kaffebönor",
+    "price": 144.8,
+    "priceText": "144.80 SEK",
+    "unitPrice": 321.78,
+    "unitPriceText": "321.78 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-morkrost-tales-of-napoli-8000070083882/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1764510481/cloud/566141.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711000899403",
+    "ean": "8711000899403",
+    "name": "Kaffebönor Mörkrost Ebony",
+    "brand": "GEVALIA",
+    "packageText": "500g",
+    "category": "Hela kaffebönor",
+    "price": 95.8,
+    "priceText": "95.80 SEK",
+    "unitPrice": 191.6,
+    "unitPriceText": "191.60 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-morkrost-ebony-8711000899403/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1716381577/cloud/356999.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7300156580092",
+    "ean": "7300156580092",
+    "name": "Kaffebönor Mellanrost Eko",
+    "brand": "Änglamark",
+    "packageText": "400 g",
+    "category": "Hela kaffebönor",
+    "price": 69.93,
+    "priceText": "69.93 SEK",
+    "unitPrice": 174.83,
+    "unitPriceText": "174.83 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-mellanrost-eko-7300156580092/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1635852933/cloud/237968.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310760040684",
+    "ean": "7310760040684",
+    "name": "Kaffebönor Espresso Giusto Eko",
+    "brand": "Arvid Nordquist",
+    "packageText": "500 g",
+    "category": "Espressokaffe",
+    "price": 100.79,
+    "priceText": "100.79 SEK",
+    "unitPrice": 201.58,
+    "unitPriceText": "201.58 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/espressokaffe/kaffebonor-espresso-giusto-eko-7310760040684/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1676905083/cloud/274634.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8000070036321",
+    "ean": "8000070036321",
+    "name": "Kaffebönor Espresso Rossa",
+    "brand": "Lavazza",
+    "packageText": "500 g",
+    "category": "Espressokaffe",
+    "price": 136.29,
+    "priceText": "136.29 SEK",
+    "unitPrice": 272.58,
+    "unitPriceText": "272.58 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/espressokaffe/kaffebonor-espresso-rossa-8000070036321/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1699882561/cloud/300662.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310831022175",
+    "ean": "7310831022175",
+    "name": "Kaffebönor Mörkrost",
+    "brand": "Lindvalls Kaffe",
+    "packageText": "450 g",
+    "category": "Hela kaffebönor",
+    "price": 92.55,
+    "priceText": "92.55 SEK",
+    "unitPrice": 205.67,
+    "unitPriceText": "205.67 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-morkrost-7310831022175/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1528794642/300328.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310831022137",
+    "ean": "7310831022137",
+    "name": "Kaffebönor Mellanrost",
+    "brand": "Lindvalls Kaffe",
+    "packageText": "450 g",
+    "category": "Hela kaffebönor",
+    "price": 92.55,
+    "priceText": "92.55 SEK",
+    "unitPrice": 205.67,
+    "unitPriceText": "205.67 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-mellanrost-7310831022137/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1531320086/339670.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "4006508208821",
+    "ean": "4006508208821",
+    "name": "Kaffefilter Gourmet Intense 1x4 80-pack",
+    "brand": "MELITTA",
+    "packageText": "80 st",
+    "category": "Kaffefilter",
+    "price": 31.95,
+    "priceText": "31.95 SEK",
+    "unitPrice": 0.4,
+    "unitPriceText": "0.40 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffefilter/kaffefilter-gourmet-intense-1x4-80-pack-4006508208821/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1737555516/cloud/427135.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711000504956",
+    "ean": "8711000504956",
+    "name": "Kaffekapslar Mellanrost Original 16-pack",
+    "brand": "Tassimo",
+    "packageText": "16 st",
+    "category": "Kaffekapslar",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 3.55,
+    "unitPriceText": "3.55 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-mellanrost-original-16-pack-8711000504956/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1697461870/cloud/292965.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7300156580115",
+    "ean": "7300156580115",
+    "name": "Kaffebönor Espresso Eko",
+    "brand": "Änglamark",
+    "packageText": "400 g",
+    "category": "Espressokaffe",
+    "price": 69.93,
+    "priceText": "69.93 SEK",
+    "unitPrice": 174.83,
+    "unitPriceText": "174.83 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/espressokaffe/kaffebonor-espresso-eko-7300156580115/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1637676759/cloud/239618.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "5710326014302",
+    "ean": "5710326014302",
+    "name": "Iskaffe",
+    "brand": "Geia Food",
+    "packageText": "1000ml",
+    "category": "Kalla kaffedrycker",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 23.61,
+    "unitPriceText": "23.61 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/iskaffe-5710326014302/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1716368515/cloud/356879.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "4006508114863",
+    "ean": "4006508114863",
+    "name": "Kaffefilter Vit 102 80-pack",
+    "brand": "Melitta",
+    "packageText": "80st",
+    "category": "Kaffefilter",
+    "price": 19.95,
+    "priceText": "19.95 SEK",
+    "unitPrice": 0.25,
+    "unitPriceText": "0.25 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffefilter/kaffefilter-vit-102-80-pack-4006508114863/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1737555491/cloud/427132.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711000501429",
+    "ean": "8711000501429",
+    "name": "Kaffekapslar Dark Extra Mörkrost 16-pack",
+    "brand": "Tassimo",
+    "packageText": "16 st",
+    "category": "Kaffekapslar",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 3.55,
+    "unitPriceText": "3.55 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-dark-extra-morkrost-16-pack-8711000501429/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1697549875/cloud/293020.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "5710326016788",
+    "ean": "5710326016788",
+    "name": "Iskaffe Cappuccino",
+    "brand": "Geia Food",
+    "packageText": "1000ml",
+    "category": "Kalla kaffedrycker",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 23.61,
+    "unitPriceText": "23.61 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/iskaffe-cappuccino-5710326016788/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1716368522/cloud/356880.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7613036961721",
+    "ean": "7613036961721",
+    "name": "Kaffekapslar Colombia Mellanrost 10-pack",
+    "brand": "STARBUCKS",
+    "packageText": "10 st",
+    "category": "Kaffekapslar",
+    "price": 46.33,
+    "priceText": "46.33 SEK",
+    "unitPrice": 4.63,
+    "unitPriceText": "4.63 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-colombia-mellanrost-10-pack-7613036961721/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1702365678/cloud/309413.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310050005355",
+    "ean": "7310050005355",
+    "name": "Kaffedryck Salted Caramel",
+    "brand": "Löfbergs",
+    "packageText": "230 ml",
+    "category": "Kalla kaffedrycker",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 90.3,
+    "unitPriceText": "90.30 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "2 Ice Coffee 34 kr-2 för 34:-",
+    "promotionPrice": 34,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/kaffedryck-salted-caramel-7310050005355/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1747986839/cloud/483667.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310831020041",
+    "ean": "7310831020041",
+    "name": "Kokkaffe Mellanrost",
+    "brand": "Lindvalls Kaffe",
+    "packageText": "450 g",
+    "category": "Kokkaffe",
+    "price": 74.18,
+    "priceText": "74.18 SEK",
+    "unitPrice": 164.84,
+    "unitPriceText": "164.84 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kokkaffe/kokkaffe-mellanrost-7310831020041/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1701774674/cloud/307093.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7613287302137",
+    "ean": "7613287302137",
+    "name": "Kaffekapslar Italian Roast Mörkrost 10-pack",
+    "brand": "STARBUCKS",
+    "packageText": "10 st",
+    "category": "Kaffekapslar",
+    "price": 46.33,
+    "priceText": "46.33 SEK",
+    "unitPrice": 4.63,
+    "unitPriceText": "4.63 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-italian-roast-morkrost-10-pack-7613287302137/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1702364703/cloud/309374.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711000703397",
+    "ean": "8711000703397",
+    "name": "Kaffekapslar L'OR Latte Macchiato 8-pack",
+    "brand": "Tassimo",
+    "packageText": "8 st",
+    "category": "Kaffekapslar",
+    "price": 73.77,
+    "priceText": "73.77 SEK",
+    "unitPrice": 9.22,
+    "unitPriceText": "9.22 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-l-or-latte-macchiato-8-pack-8711000703397/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1733292784/cloud/412412.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310050012193",
+    "ean": "7310050012193",
+    "name": "Kaffebönor Mörkrost Kharisma",
+    "brand": "Löfbergs",
+    "packageText": "400 g",
+    "category": "Hela kaffebönor",
+    "price": 79.49,
+    "priceText": "79.49 SEK",
+    "unitPrice": 198.73,
+    "unitPriceText": "198.73 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-morkrost-kharisma-7310050012193/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1727949687/cloud/391484.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "5711953124860",
+    "ean": "5711953124860",
+    "name": "Kaffedryck Tripleshot Espresso",
+    "brand": "Starbucks®",
+    "packageText": "300 ml",
+    "category": "Kalla kaffedrycker",
+    "price": 22.24,
+    "priceText": "22.24 SEK",
+    "unitPrice": 74.13,
+    "unitPriceText": "74.13 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/kaffedryck-tripleshot-espresso-5711953124860/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1716540815/cloud/358124.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7613036961608",
+    "ean": "7613036961608",
+    "name": "Kaffekapslar Espresso Blonde Ljustrost 10-pack",
+    "brand": "STARBUCKS",
+    "packageText": "10 st",
+    "category": "Kaffekapslar",
+    "price": 46.33,
+    "priceText": "46.33 SEK",
+    "unitPrice": 4.63,
+    "unitPriceText": "4.63 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-blonde-ljustrost-10-pack-7613036961608/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1702365654/cloud/309411.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8445291366329",
+    "ean": "8445291366329",
+    "name": "Kaffekapslar Espresso Roast 10-pack",
+    "brand": "STARBUCKS",
+    "packageText": "10 st",
+    "category": "Kaffekapslar",
+    "price": 49.17,
+    "priceText": "49.17 SEK",
+    "unitPrice": 4.92,
+    "unitPriceText": "4.92 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-espresso-roast-10-pack-8445291366329/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1765502398/cloud/582056.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310050012278",
+    "ean": "7310050012278",
+    "name": "Kaffebönor Mellanrost Eko",
+    "brand": "Löfbergs",
+    "packageText": "400 g",
+    "category": "Hela kaffebönor",
+    "price": 79.49,
+    "priceText": "79.49 SEK",
+    "unitPrice": 198.73,
+    "unitPriceText": "198.73 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-mellanrost-eko-7310050012278/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1639404128/cloud/241019.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "5710326017792",
+    "ean": "5710326017792",
+    "name": "Laktosfritt Iskaffe",
+    "brand": "Geiafood",
+    "packageText": "1000ml",
+    "category": "Kalla kaffedrycker",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 23.61,
+    "unitPriceText": "23.61 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/laktosfritt-iskaffe-5710326017792/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1685010136/cloud/281368.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310050012209",
+    "ean": "7310050012209",
+    "name": "Kaffebönor Mellanrost Jubileum",
+    "brand": "Löfbergs",
+    "packageText": "400 g",
+    "category": "Hela kaffebönor",
+    "price": 79.49,
+    "priceText": "79.49 SEK",
+    "unitPrice": 198.73,
+    "unitPriceText": "198.73 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-mellanrost-jubileum-7310050012209/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1727949705/cloud/391485.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310050005096",
+    "ean": "7310050005096",
+    "name": "Kaffedryck Cappuccino Vanilla",
+    "brand": "Löfbergs",
+    "packageText": "230 ml",
+    "category": "Kalla kaffedrycker",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 90.3,
+    "unitPriceText": "90.30 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "2 Ice Coffee 34 kr-2 för 34:-",
+    "promotionPrice": 34,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/kaffedryck-cappuccino-vanilla-7310050005096/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1747986782/cloud/483664.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7613036961806",
+    "ean": "7613036961806",
+    "name": "Kaffekapslar Pike Place 10-pack",
+    "brand": "STARBUCKS",
+    "packageText": "10 st",
+    "category": "Kaffekapslar",
+    "price": 46.33,
+    "priceText": "46.33 SEK",
+    "unitPrice": 4.63,
+    "unitPriceText": "4.63 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-pike-place-10-pack-7613036961806/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1702366858/cloud/309462.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8445291451780",
+    "ean": "8445291451780",
+    "name": "Kaffekapslar Ristretto Shot 10-pack",
+    "brand": "STARBUCKS",
+    "packageText": "10 st",
+    "category": "Kaffekapslar",
+    "price": 46.33,
+    "priceText": "46.33 SEK",
+    "unitPrice": 4.63,
+    "unitPriceText": "4.63 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kaffekapslar/kaffekapslar-ristretto-shot-10-pack-8445291451780/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1734533370/cloud/417047.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310050005072",
+    "ean": "7310050005072",
+    "name": "Laktosfri Kaffedryck Creamy cookie",
+    "brand": "Löfbergs",
+    "packageText": "230 ml",
+    "category": "Kalla kaffedrycker",
+    "price": 19.83,
+    "priceText": "19.83 SEK",
+    "unitPrice": 86.22,
+    "unitPriceText": "86.22 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "2 Ice Coffee 34 kr-2 för 34:-",
+    "promotionPrice": 34,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/laktosfri-kaffedryck-creamy-cookie-7310050005072/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1764523857/cloud/566617.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "5710326022819",
+    "ean": "5710326022819",
+    "name": "Iskaffe Salted Caramel",
+    "brand": "Monday&",
+    "packageText": "1000ml",
+    "category": "Kalla kaffedrycker",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 23.61,
+    "unitPriceText": "23.61 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/iskaffe-salted-caramel-5710326022819/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1725531856/cloud/383436.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7350086161960",
+    "ean": "7350086161960",
+    "name": "Iskaffe Latte",
+    "brand": "Hell",
+    "packageText": "250 ml",
+    "category": "Kalla kaffedrycker",
+    "price": 15.62,
+    "priceText": "15.62 SEK",
+    "unitPrice": 62.48,
+    "unitPriceText": "62.48 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/iskaffe-latte-7350086161960/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1769432342/cloud/604902.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310050012353",
+    "ean": "7310050012353",
+    "name": "Kaffebönor Lätt Mellanrost",
+    "brand": "Löfbergs",
+    "packageText": "400 g",
+    "category": "Hela kaffebönor",
+    "price": 79.49,
+    "priceText": "79.49 SEK",
+    "unitPrice": 198.73,
+    "unitPriceText": "198.73 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-latt-mellanrost-7310050012353/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1727949750/cloud/391488.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310050012285",
+    "ean": "7310050012285",
+    "name": "Kaffebönor Mörkrost Eko",
+    "brand": "Löfbergs",
+    "packageText": "400 g",
+    "category": "Hela kaffebönor",
+    "price": 79.49,
+    "priceText": "79.49 SEK",
+    "unitPrice": 198.73,
+    "unitPriceText": "198.73 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-morkrost-eko-7310050012285/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1639648570/cloud/241438.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310050012483",
+    "ean": "7310050012483",
+    "name": "Kaffebönor Mörkrost Brazil",
+    "brand": "Löfbergs",
+    "packageText": "400 g",
+    "category": "Hela kaffebönor",
+    "price": 79.49,
+    "priceText": "79.49 SEK",
+    "unitPrice": 198.73,
+    "unitPriceText": "198.73 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-morkrost-brazil-7310050012483/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1639651084/cloud/241451.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310050003504",
+    "ean": "7310050003504",
+    "name": "Kokkaffe Mellanrost",
+    "brand": "Löfbergs",
+    "packageText": "450 g",
+    "category": "Kokkaffe",
+    "price": 63.26,
+    "priceText": "63.26 SEK",
+    "unitPrice": 140.58,
+    "unitPriceText": "140.58 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kokkaffe/kokkaffe-mellanrost-7310050003504/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1706706381/cloud/324103.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310050012858",
+    "ean": "7310050012858",
+    "name": "Kaffebönor Mörkrost",
+    "brand": "Löfbergs",
+    "packageText": "400 g",
+    "category": "Hela kaffebönor",
+    "price": 79.49,
+    "priceText": "79.49 SEK",
+    "unitPrice": 198.73,
+    "unitPriceText": "198.73 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-morkrost-7310050012858/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1727949762/cloud/391489.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8006924000135",
+    "ean": "8006924000135",
+    "name": "Kaffebönor Gold",
+    "brand": "Amigos Caffe",
+    "packageText": "1 kg",
+    "category": "Hela kaffebönor",
+    "price": 166.57,
+    "priceText": "166.57 SEK",
+    "unitPrice": 166.57,
+    "unitPriceText": "166.57 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-gold-8006924000135/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1674868318/cloud/272778.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "4002720008102",
+    "ean": "4002720008102",
+    "name": "Kaffebönor La crema",
+    "brand": "MELITTA",
+    "packageText": "1000g",
+    "category": "Hela kaffebönor",
+    "price": 197.8,
+    "priceText": "197.80 SEK",
+    "unitPrice": 197.8,
+    "unitPriceText": "197.80 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-la-crema-4002720008102/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1757999662/cloud/516025.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "4002720008300",
+    "ean": "4002720008300",
+    "name": "Kaffebönor Espresso",
+    "brand": "MELITTA",
+    "packageText": "1000g",
+    "category": "Hela kaffebönor",
+    "price": 197.8,
+    "priceText": "197.80 SEK",
+    "unitPrice": 197.8,
+    "unitPriceText": "197.80 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-espresso-4002720008300/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1758540127/cloud/520186.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "4002720008621",
+    "ean": "4002720008621",
+    "name": "Kaffebönor Espresso forte",
+    "brand": "MELITTA",
+    "packageText": "1000 g",
+    "category": "Hela kaffebönor",
+    "price": 197.8,
+    "priceText": "197.80 SEK",
+    "unitPrice": 197.8,
+    "unitPriceText": "197.80 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-espresso-forte-4002720008621/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1757601774/cloud/511548.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711000400760",
+    "ean": "8711000400760",
+    "name": "Kaffebönor Forza",
+    "brand": "L'Or",
+    "packageText": "1000 g",
+    "category": "Hela kaffebönor",
+    "price": 197.8,
+    "priceText": "197.80 SEK",
+    "unitPrice": 197.8,
+    "unitPriceText": "197.80 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/hela-kaffebonor/kaffebonor-forza-8711000400760/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1748275554/cloud/484845.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310731101864",
+    "ean": "7310731101864",
+    "name": "Kaffebönor Espresso Della Casa",
+    "brand": "ZOÉGAS",
+    "packageText": "450 g",
+    "category": "Espressokaffe",
+    "price": 88.15,
+    "priceText": "88.15 SEK",
+    "unitPrice": 195.89,
+    "unitPriceText": "195.89 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Hela bönor Zoega 2 för 15-2 för 159:-",
+    "promotionPrice": 159,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/espressokaffe/kaffebonor-espresso-della-casa-7310731101864/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1687422771/cloud/283888.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310050012230",
+    "ean": "7310050012230",
+    "name": "Kaffebönor Espresso",
+    "brand": "Löfbergs",
+    "packageText": "400 g",
+    "category": "Espressokaffe",
+    "price": 79.49,
+    "priceText": "79.49 SEK",
+    "unitPrice": 198.73,
+    "unitPriceText": "198.73 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/espressokaffe/kaffebonor-espresso-7310050012230/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1727949733/cloud/391487.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7392736060506",
+    "ean": "7392736060506",
+    "name": "Kaffebönor Espresso Bukoba Blend",
+    "brand": "Eguale",
+    "packageText": "425 g",
+    "category": "Espressokaffe",
+    "price": 122.09,
+    "priceText": "122.09 SEK",
+    "unitPrice": 287.27,
+    "unitPriceText": "287.27 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/espressokaffe/kaffebonor-espresso-bukoba-blend-7392736060506/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1617021916/426239.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7311311004353",
+    "ean": "7311311004353",
+    "name": "Kardemumma Malen",
+    "brand": "Santa Maria",
+    "packageText": "18g",
+    "category": "Kryddor K - P",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 1153.89,
+    "unitPriceText": "1153.89 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/kryddor-smaksattare/kryddor/kryddor-k-p/kardemumma-malen-7311311004353/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1497886530/232240.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7350028546459",
+    "ean": "7350028546459",
+    "name": "Proteinkaffe Caramel Cappuccino",
+    "brand": "Naturdiet",
+    "packageText": "330 ml",
+    "category": "Kalla kaffedrycker",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 77.3,
+    "unitPriceText": "77.30 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/proteinkaffe-caramel-cappuccino-7350028546459/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1768319970/cloud/597395.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "6430081491277",
+    "ean": "6430081491277",
+    "name": "Havredryck Barista Hazelnut",
+    "brand": "Oddlygood®",
+    "packageText": "1L",
+    "category": "Växtbaserad dryck",
+    "price": 21.72,
+    "priceText": "21.72 SEK",
+    "unitPrice": 21.72,
+    "unitPriceText": "21.72 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/vaxtbaserad-dryck/havredryck-barista-hazelnut-6430081491277/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1757852620/cloud/514159.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "6408430102365",
+    "ean": "6408430102365",
+    "name": "Havredryck Barista Salt karamell",
+    "brand": "Oddlygood®",
+    "packageText": "1000ml",
+    "category": "Kaffemjölk & baristamjölk",
+    "price": 21.29,
+    "priceText": "21.29 SEK",
+    "unitPrice": 21.29,
+    "unitPriceText": "21.29 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/kaffemjolk-baristamjolk/havredryck-barista-salt-karamell-6408430102365/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1703242885/cloud/314312.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "6430081490584",
+    "ean": "6430081490584",
+    "name": "Havredryck Barista Delight",
+    "brand": "Oddlygood®",
+    "packageText": "1L",
+    "category": "Växtbaserad dryck",
+    "price": 18.46,
+    "priceText": "18.46 SEK",
+    "unitPrice": 18.46,
+    "unitPriceText": "18.46 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/vaxtbaserad-dryck/havredryck-barista-delight-6430081490584/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1758480240/cloud/519878.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "6408430102358",
+    "ean": "6408430102358",
+    "name": "Havredryck Barista Vanilj",
+    "brand": "Oddlygood®",
+    "packageText": "1000ml",
+    "category": "Kaffemjölk & baristamjölk",
+    "price": 21.29,
+    "priceText": "21.29 SEK",
+    "unitPrice": 21.29,
+    "unitPriceText": "21.29 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/kaffemjolk-baristamjolk/havredryck-barista-vanilj-6408430102358/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1703242863/cloud/314310.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "5711953194054",
+    "ean": "5711953194054",
+    "name": "Protein Coffee latte 1,1%",
+    "brand": "Starbucks®",
+    "packageText": "330ml",
+    "category": "Kalla kaffedrycker",
+    "price": 25.08,
+    "priceText": "25.08 SEK",
+    "unitPrice": 76,
+    "unitPriceText": "76.00 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/protein-coffee-latte-1-1-5711953194054/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1734570341/cloud/418861.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7300156587121",
+    "ean": "7300156587121",
+    "name": "Havredryck Till Kaffe",
+    "brand": "Coop",
+    "packageText": "1000 MLT",
+    "category": "Kaffemjölk & baristamjölk",
+    "price": 16.04,
+    "priceText": "16.04 SEK",
+    "unitPrice": 16.04,
+    "unitPriceText": "16.04 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/kaffemjolk-baristamjolk/havredryck-till-kaffe-7300156587121/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1733237643/cloud/412279.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7394376616037",
+    "ean": "7394376616037",
+    "name": "Havredryck IKaffe",
+    "brand": "Oatly",
+    "packageText": "1L",
+    "category": "Kaffemjölk & baristamjölk",
+    "price": 17.9,
+    "priceText": "17.90 SEK",
+    "unitPrice": 17.9,
+    "unitPriceText": "17.90 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/kaffemjolk-baristamjolk/havredryck-ikaffe-7394376616037/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1712302277/cloud/341759.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7394376621666",
+    "ean": "7394376621666",
+    "name": "iKaffe Eko",
+    "brand": "Oatly",
+    "packageText": "1L",
+    "category": "Växtbaserad dryck",
+    "price": 22.67,
+    "priceText": "22.67 SEK",
+    "unitPrice": 22.67,
+    "unitPriceText": "22.67 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/vaxtbaserad-dryck/ikaffe-eko-7394376621666/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1702451135/cloud/310024.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7394376618048",
+    "ean": "7394376618048",
+    "name": "Havredryck iKaffe",
+    "brand": "Oatly",
+    "packageText": "500 ml",
+    "category": "Växtbaserad mjölk",
+    "price": 15.62,
+    "priceText": "15.62 SEK",
+    "unitPrice": 31.24,
+    "unitPriceText": "31.24 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/vegetariskt/mejeriersattning/vaxtbaserad-mjolk/havredryck-ikaffe-7394376618048/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1677882339/cloud/276100.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7350020729539",
+    "ean": "7350020729539",
+    "name": "Havredryck Barista",
+    "brand": "Fazer Aito",
+    "packageText": "1 L",
+    "category": "Växtbaserad dryck",
+    "price": 18.46,
+    "priceText": "18.46 SEK",
+    "unitPrice": 18.46,
+    "unitPriceText": "18.46 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/vaxtbaserad-dryck/havredryck-barista-7350020729539/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1702450122/cloud/309959.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7394376621697",
+    "ean": "7394376621697",
+    "name": "Havredryck iKaffe",
+    "brand": "Oatly",
+    "packageText": "1.5 L",
+    "category": "Kaffemjölk & baristamjölk",
+    "price": 26.45,
+    "priceText": "26.45 SEK",
+    "unitPrice": 17.63,
+    "unitPriceText": "17.63 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/kaffemjolk-baristamjolk/havredryck-ikaffe-7394376621697/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1725842181/cloud/384149.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7311311015205",
+    "ean": "7311311015205",
+    "name": "Kardemumma Malen",
+    "brand": "Santa Maria",
+    "packageText": "28 g",
+    "category": "Kryddor K - P",
+    "price": 36.44,
+    "priceText": "36.44 SEK",
+    "unitPrice": 1301.43,
+    "unitPriceText": "1301.43 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/kryddor-smaksattare/kryddor/kryddor-k-p/kardemumma-malen-7311311015205/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1650612662/cloud/251206.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310865094629",
+    "ean": "7310865094629",
+    "name": "Mjölk Latte Art Eko",
+    "brand": "Arla®",
+    "packageText": "1 L",
+    "category": "Kaffemjölk & baristamjölk",
+    "price": 22.67,
+    "priceText": "22.67 SEK",
+    "unitPrice": 22.67,
+    "unitPriceText": "22.67 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/kaffemjolk-baristamjolk/mjolk-latte-art-eko-7310865094629/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1683529519/cloud/280335.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310050005171",
+    "ean": "7310050005171",
+    "name": "Kaffedryck Macchiato Eko",
+    "brand": "Löfbergs",
+    "packageText": "230 ml",
+    "category": "Kalla kaffedrycker",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 90.3,
+    "unitPriceText": "90.30 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "2 Ice Coffee 34 kr-2 för 34:-",
+    "promotionPrice": 34,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/kaffedryck-macchiato-eko-7310050005171/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1747986793/cloud/483665.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7310050005188",
+    "ean": "7310050005188",
+    "name": "Kaffedryck Espresso Eko",
+    "brand": "Löfbergs",
+    "packageText": "230 ml",
+    "category": "Kalla kaffedrycker",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 90.3,
+    "unitPriceText": "90.30 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "2 Ice Coffee 34 kr-2 för 34:-",
+    "promotionPrice": 34,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/dryck/kaffe/kalla-kaffedrycker/kaffedryck-espresso-eko-7310050005188/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1747986815/cloud/483666.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7622300750053",
+    "ean": "7622300750053",
+    "name": "Choco Moment Mjölkchoklad",
+    "brand": "Marabou",
+    "packageText": "180 G",
+    "category": "Kakor & Kex",
+    "price": 32.13,
+    "priceText": "32.13 SEK",
+    "unitPrice": 178.5,
+    "unitPriceText": "178.50 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Kakor 2 för 49kr-2 för 49:-",
+    "promotionPrice": 49,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/choco-moment-mjolkchoklad-7622300750053/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1638665382/cloud/222451.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711327612242",
+    "ean": "8711327612242",
+    "name": "Glasspinne White Chocolate Strawberry",
+    "brand": "Magnum",
+    "packageText": "100 ml",
+    "category": "Flerpack glass",
+    "price": 28,
+    "priceText": "28.00 SEK",
+    "unitPrice": 280,
+    "unitPriceText": "280.00 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glasspinne-white-chocolate-strawberry-8711327612242/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1706879024/cloud/324656.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "5410126006360",
+    "ean": "5410126006360",
+    "name": "Biscoff Sandwich Cream",
+    "brand": "Lotus",
+    "packageText": "150g",
+    "category": "Kakor & Kex",
+    "price": 17.51,
+    "priceText": "17.51 SEK",
+    "unitPrice": 116.73,
+    "unitPriceText": "116.73 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/biscoff-sandwich-cream-5410126006360/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1702468799/cloud/310297.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "5410471110217",
+    "ean": "5410471110217",
+    "name": "Mandelkakor",
+    "brand": "Jules Destrooper",
+    "packageText": "100 g",
+    "category": "Kakor & Kex",
+    "price": 31.18,
+    "priceText": "31.18 SEK",
+    "unitPrice": 311.8,
+    "unitPriceText": "311.80 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/mandelkakor-5410471110217/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1739791106/cloud/440636.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "5410126006353",
+    "ean": "5410126006353",
+    "name": "Biscoff Sandwich Milk chocolate",
+    "brand": "Lotus",
+    "packageText": "150g",
+    "category": "Kakor & Kex",
+    "price": 17.51,
+    "priceText": "17.51 SEK",
+    "unitPrice": 116.73,
+    "unitPriceText": "116.73 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/biscoff-sandwich-milk-chocolate-5410126006353/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1702459682/cloud/310210.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "6408432087851",
+    "ean": "6408432087851",
+    "name": "Laktosfri Mellanmjölk 1,5%",
+    "brand": "Valio",
+    "packageText": "1.5L",
+    "category": "Laktosfri mjölk",
+    "price": 22.34,
+    "priceText": "22.34 SEK",
+    "unitPrice": 14.89,
+    "unitPriceText": "14.89 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/laktosfri-mjolk/laktosfri-mellanmjolk-1-5-6408432087851/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1747741155/cloud/482324.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7622201636951",
+    "ean": "7622201636951",
+    "name": "Kakor Home Style Chocolate Filled 6-pack",
+    "brand": "Marabou",
+    "packageText": "6 st",
+    "category": "Kakor & Kex",
+    "price": 32.13,
+    "priceText": "32.13 SEK",
+    "unitPrice": 205.96,
+    "unitPriceText": "205.96 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Kakor 2 för 49kr-2 för 49:-",
+    "promotionPrice": 49,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/kakor-home-style-chocolate-filled-6-pack-7622201636951/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1675767252/cloud/273394.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711327549265",
+    "ean": "8711327549265",
+    "name": "Glass Piggelin 10-pack",
+    "brand": "GB Glace",
+    "packageText": "10 st",
+    "category": "Flerpack glass",
+    "price": 43.48,
+    "priceText": "43.48 SEK",
+    "unitPrice": 4.35,
+    "unitPriceText": "4.35 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "Medlemspris-Glass 2 för 65kr-2 för 65:-",
+    "promotionPrice": 65,
+    "medMeraRequired": true,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glass-piggelin-10-pack-8711327549265/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1778053951/cloud/672007.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711327585782",
+    "ean": "8711327585782",
+    "name": "Glasspinnar Mini Double caramel 6-pack",
+    "brand": "Magnum",
+    "packageText": "6 st",
+    "category": "Flerpack glass",
+    "price": 52.01,
+    "priceText": "52.01 SEK",
+    "unitPrice": 8.67,
+    "unitPriceText": "8.67 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "Medlemspris-Glass 2 för 65kr-2 för 65:-",
+    "promotionPrice": 65,
+    "medMeraRequired": true,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glasspinnar-mini-double-caramel-6-pack-8711327585782/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1728387476/cloud/392398.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "6408432202544",
+    "ean": "6408432202544",
+    "name": "Laktosfri Lättmjölk 0,5%",
+    "brand": "Valio",
+    "packageText": "1.5L",
+    "category": "Laktosfri mjölk",
+    "price": 22.34,
+    "priceText": "22.34 SEK",
+    "unitPrice": 14.89,
+    "unitPriceText": "14.89 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/laktosfri-mjolk/laktosfri-lattmjolk-0-5-6408432202544/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1747741103/cloud/482320.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711327549364",
+    "ean": "8711327549364",
+    "name": "Glasspinnar Päron Split 10-pack",
+    "brand": "GB Glace",
+    "packageText": "10 st",
+    "category": "Flerpack glass",
+    "price": 43.48,
+    "priceText": "43.48 SEK",
+    "unitPrice": 4.35,
+    "unitPriceText": "4.35 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "Medlemspris-Glass 2 för 65kr-2 för 65:-",
+    "promotionPrice": 65,
+    "medMeraRequired": true,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glasspinnar-paron-split-10-pack-8711327549364/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1758862384/cloud/523457.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711327622289",
+    "ean": "8711327622289",
+    "name": "Glasspinne Euphoria",
+    "brand": "Magnum",
+    "packageText": "90 ml",
+    "category": "Flerpack glass",
+    "price": 29,
+    "priceText": "29.00 SEK",
+    "unitPrice": 322.22,
+    "unitPriceText": "322.22 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glasspinne-euphoria-8711327622289/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1759340613/cloud/529600.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711327612372",
+    "ean": "8711327612372",
+    "name": "Glasspinne Magnum Classic",
+    "brand": "Magnum",
+    "packageText": "110 ml",
+    "category": "Flerpack glass",
+    "price": 28,
+    "priceText": "28.00 SEK",
+    "unitPrice": 254.55,
+    "unitPriceText": "254.55 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glasspinne-magnum-classic-8711327612372/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1706879610/cloud/324659.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711327480537",
+    "ean": "8711327480537",
+    "name": "Glasspinne Double gold Caramel Billionaire",
+    "brand": "Magnum",
+    "packageText": "85 ml",
+    "category": "Flerpack glass",
+    "price": 29,
+    "priceText": "29.00 SEK",
+    "unitPrice": 341.18,
+    "unitPriceText": "341.18 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glasspinne-double-gold-caramel-billionaire-8711327480537/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1625956400/cloud/217571.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "6408432086212",
+    "ean": "6408432086212",
+    "name": "Laktosfri Mellanmjölk",
+    "brand": "VALIO",
+    "packageText": "1 liter",
+    "category": "Laktosfri mjölk",
+    "price": 18.48,
+    "priceText": "18.48 SEK",
+    "unitPrice": 18.48,
+    "unitPriceText": "18.48 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/laktosfri-mjolk/laktosfri-mellanmjolk-6408432086212/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1747740770/cloud/482293.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "6408432087868",
+    "ean": "6408432087868",
+    "name": "Laktosfri Standardmjölk 3%",
+    "brand": "Valio",
+    "packageText": "1.5L",
+    "category": "Laktosfri mjölk",
+    "price": 22.34,
+    "priceText": "22.34 SEK",
+    "unitPrice": 14.89,
+    "unitPriceText": "14.89 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/laktosfri-mjolk/laktosfri-standardmjolk-3-6408432087868/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1747741086/cloud/482318.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7350028543571",
+    "ean": "7350028543571",
+    "name": "Shake Caffe Latte",
+    "brand": "Naturdiet",
+    "packageText": "330 ml",
+    "category": "Viktminskning",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 77.3,
+    "unitPriceText": "77.30 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/apotek-halsa-tillskott/traning-viktminskning/viktminskning/shake-caffe-latte-7350028543571/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1744287769/cloud/465583.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "5410126806090",
+    "ean": "5410126806090",
+    "name": "Kex Biscoff Biscuits",
+    "brand": "Lotus",
+    "packageText": "140g",
+    "category": "Kakor & Kex",
+    "price": 11.83,
+    "priceText": "11.83 SEK",
+    "unitPrice": 84.5,
+    "unitPriceText": "84.50 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/kex-biscoff-biscuits-5410126806090/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1702468826/cloud/310299.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711327609082",
+    "ean": "8711327609082",
+    "name": "Glasspinnar Mini Classic, almond & white chocolate 6-pack",
+    "brand": "Magnum",
+    "packageText": "6 st",
+    "category": "Flerpack glass",
+    "price": 52.01,
+    "priceText": "52.01 SEK",
+    "unitPrice": 8.67,
+    "unitPriceText": "8.67 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "Medlemspris-Glass 2 för 65kr-2 för 65:-",
+    "promotionPrice": 65,
+    "medMeraRequired": true,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glasspinnar-mini-classic-almond-white-chocolate-6-pack-8711327609082/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1706879380/cloud/324658.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8712100446306",
+    "ean": "8712100446306",
+    "name": "Glasspinne 88:an 6-pack",
+    "brand": "88:an",
+    "packageText": "6 st",
+    "category": "Flerpack glass",
+    "price": 52.01,
+    "priceText": "52.01 SEK",
+    "unitPrice": 8.67,
+    "unitPriceText": "8.67 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "Medlemspris-Glass 2 för 65kr-2 för 65:-",
+    "promotionPrice": 65,
+    "medMeraRequired": true,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glasspinne-88-an-6-pack-8712100446306/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1778054018/cloud/672010.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8712100639739",
+    "ean": "8712100639739",
+    "name": "Glasspinnar Nogger 6-pack",
+    "brand": "Heartbrand",
+    "packageText": "6 st",
+    "category": "Flerpack glass",
+    "price": 52.01,
+    "priceText": "52.01 SEK",
+    "unitPrice": 8.67,
+    "unitPriceText": "8.67 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "Medlemspris-Glass 2 för 65kr-2 för 65:-",
+    "promotionPrice": 65,
+    "medMeraRequired": true,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glasspinnar-nogger-6-pack-8712100639739/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1778054024/cloud/672011.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711327667525",
+    "ean": "8711327667525",
+    "name": "Pinnglass Push-Up",
+    "brand": "Haribo",
+    "packageText": "85 ml",
+    "category": "Flerpack glass",
+    "price": 19,
+    "priceText": "19.00 SEK",
+    "unitPrice": 223.53,
+    "unitPriceText": "223.53 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/pinnglass-push-up-8711327667525/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1738644406/cloud/434585.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7622300336738",
+    "ean": "7622300336738",
+    "name": "Kakor Oreo",
+    "brand": "OREO",
+    "packageText": "154g",
+    "category": "Kakor & Kex",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 122.6,
+    "unitPriceText": "122.60 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Oreo 2 för 30kr-2 för 30:-",
+    "promotionPrice": 30,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/kakor-oreo-7622300336738/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1734698340/cloud/420241.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "6430081490928",
+    "ean": "6430081490928",
+    "name": "Glutenfri Havredryck",
+    "brand": "Oddlygood®",
+    "packageText": "1L",
+    "category": "Växtbaserad dryck",
+    "price": 16.56,
+    "priceText": "16.56 SEK",
+    "unitPrice": 16.56,
+    "unitPriceText": "16.56 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/vaxtbaserad-dryck/glutenfri-havredryck-6430081490928/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1721300530/cloud/374023.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8722700132523",
+    "ean": "8722700132523",
+    "name": "Glass Sandwich 6-pack",
+    "brand": "GB Glace",
+    "packageText": "6x100 ml",
+    "category": "Flerpack glass",
+    "price": 52.01,
+    "priceText": "52.01 SEK",
+    "unitPrice": 8.67,
+    "unitPriceText": "8.67 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "Medlemspris-Glass 2 för 65kr-2 för 65:-",
+    "promotionPrice": 65,
+    "medMeraRequired": true,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glass-sandwich-6-pack-8722700132523/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1715853683/cloud/354972.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7622300721459",
+    "ean": "7622300721459",
+    "name": "Kakor Daim 8-pack",
+    "brand": "MARABOU",
+    "packageText": "184 G",
+    "category": "Kakor & Kex",
+    "price": 32.13,
+    "priceText": "32.13 SEK",
+    "unitPrice": 174.62,
+    "unitPriceText": "174.62 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Kakor 2 för 49kr-2 för 49:-",
+    "promotionPrice": 49,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/kakor-daim-8-pack-7622300721459/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1668167595/cloud/266131.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711327614109",
+    "ean": "8711327614109",
+    "name": "Glasspinne Almond",
+    "brand": "Magnum",
+    "packageText": "100 ml",
+    "category": "Flerpack glass",
+    "price": 28,
+    "priceText": "28.00 SEK",
+    "unitPrice": 280,
+    "unitPriceText": "280.00 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glasspinne-almond-8711327614109/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1706880011/cloud/324661.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7622201636807",
+    "ean": "7622201636807",
+    "name": "Kakor Homestyle Soft Inside 6-pack",
+    "brand": "Marabou",
+    "packageText": "6 st",
+    "category": "Kakor & Kex",
+    "price": 32.13,
+    "priceText": "32.13 SEK",
+    "unitPrice": 205.96,
+    "unitPriceText": "205.96 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Kakor 2 för 49kr-2 för 49:-",
+    "promotionPrice": 49,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/kakor-homestyle-soft-inside-6-pack-7622201636807/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1645053398/cloud/246497.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7350122560627",
+    "ean": "7350122560627",
+    "name": "Laktosfri Kladdkaka Kärleksmums",
+    "brand": "FRÖDINGE",
+    "packageText": "400 g",
+    "category": "Tårta, Paj & Dessert",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 94.53,
+    "unitPriceText": "94.53 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/brod-dessert/tarta-paj-dessert/laktosfri-kladdkaka-karleksmums-7350122560627/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1738888147/cloud/436394.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7622201637699",
+    "ean": "7622201637699",
+    "name": "Kakor Home style Oreo 6-pack",
+    "brand": "Marabou",
+    "packageText": "6 st",
+    "category": "Kakor & Kex",
+    "price": 32.13,
+    "priceText": "32.13 SEK",
+    "unitPrice": 205.96,
+    "unitPriceText": "205.96 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Kakor 2 för 49kr-2 för 49:-",
+    "promotionPrice": 49,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/kakor-home-style-oreo-6-pack-7622201637699/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1686767292/cloud/282390.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7622201501143",
+    "ean": "7622201501143",
+    "name": "Kakor Oreo Remix Raspberry",
+    "brand": "OREO",
+    "packageText": "157g",
+    "category": "Kakor & Kex",
+    "price": 19.4,
+    "priceText": "19.40 SEK",
+    "unitPrice": 123.57,
+    "unitPriceText": "123.57 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Oreo 2 för 30kr-2 för 30:-",
+    "promotionPrice": 30,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/kakor-oreo-remix-raspberry-7622201501143/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1765487234/cloud/581666.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "5410126006377",
+    "ean": "5410126006377",
+    "name": "Biscoff Sandwich Vanilla",
+    "brand": "Lotus",
+    "packageText": "150g",
+    "category": "Kakor & Kex",
+    "price": 17.51,
+    "priceText": "17.51 SEK",
+    "unitPrice": 116.73,
+    "unitPriceText": "116.73 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/biscoff-sandwich-vanilla-5410126006377/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1702468810/cloud/310298.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "6430081491291",
+    "ean": "6430081491291",
+    "name": "Havredryck Barista Nutty vanilla",
+    "brand": "Oddlygood®",
+    "packageText": "1000ml",
+    "category": "Växtbaserad dryck",
+    "price": 21.72,
+    "priceText": "21.72 SEK",
+    "unitPrice": 21.72,
+    "unitPriceText": "21.72 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/vaxtbaserad-dryck/havredryck-barista-nutty-vanilla-6430081491291/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1764546405/cloud/566980.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8719200122932",
+    "ean": "8719200122932",
+    "name": "Laktosfri Vaniljvisp 12%",
+    "brand": "Flora by Milda",
+    "packageText": "2.5dl",
+    "category": "Laktosfri grädde",
+    "price": 11.83,
+    "priceText": "11.83 SEK",
+    "unitPrice": 47.32,
+    "unitPriceText": "47.32 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/gradde/laktosfri-gradde/laktosfri-vaniljvisp-12-8719200122932/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1759374455/cloud/529942.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "5000396020687",
+    "ean": "5000396020687",
+    "name": "Kakor Oreo Mini",
+    "brand": "OREO",
+    "packageText": "115g",
+    "category": "Kakor & Kex",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 221.83,
+    "unitPriceText": "221.83 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Oreo 2 för 30kr-2 för 30:-",
+    "promotionPrice": 30,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/kakor-oreo-mini-5000396020687/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1758381244/cloud/519308.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7622202029998",
+    "ean": "7622202029998",
+    "name": "Choco Brownie",
+    "brand": "Marabou",
+    "packageText": "6 st",
+    "category": "Kakor & Kex",
+    "price": 33.08,
+    "priceText": "33.08 SEK",
+    "unitPrice": 220.53,
+    "unitPriceText": "220.53 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Kakor 2 för 49kr-2 för 49:-",
+    "promotionPrice": 49,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/choco-brownie-7622202029998/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1719379747/cloud/367681.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7622210477439",
+    "ean": "7622210477439",
+    "name": "Kakor Oreo Golden",
+    "brand": "OREO",
+    "packageText": "154g",
+    "category": "Kakor & Kex",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 122.6,
+    "unitPriceText": "122.60 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Oreo 2 för 30kr-2 för 30:-",
+    "promotionPrice": 30,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/kakor-oreo-golden-7622210477439/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1734687499/cloud/420035.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711327611924",
+    "ean": "8711327611924",
+    "name": "Glasspinnar Mini Almond 6-pack",
+    "brand": "Magnum",
+    "packageText": "6 st",
+    "category": "Flerpack glass",
+    "price": 52.01,
+    "priceText": "52.01 SEK",
+    "unitPrice": 8.67,
+    "unitPriceText": "8.67 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "Medlemspris-Glass 2 för 65kr-2 för 65:-",
+    "promotionPrice": 65,
+    "medMeraRequired": true,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glasspinnar-mini-almond-6-pack-8711327611924/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1706878176/cloud/324647.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711327640306",
+    "ean": "8711327640306",
+    "name": "Glass Bonbon Salted caramel & almond 12-pack",
+    "brand": "Magnum",
+    "packageText": "12 st",
+    "category": "Flerpack glass",
+    "price": 52.01,
+    "priceText": "52.01 SEK",
+    "unitPrice": 4.33,
+    "unitPriceText": "4.33 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "Medlemspris-Glass 2 för 65kr-2 för 65:-",
+    "promotionPrice": 65,
+    "medMeraRequired": true,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glass-bonbon-salted-caramel-almond-12-pack-8711327640306/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1721197621/cloud/373519.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7622210137258",
+    "ean": "7622210137258",
+    "name": "Kakor Oreo Double Creme",
+    "brand": "OREO",
+    "packageText": "157 g",
+    "category": "Kakor & Kex",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 120.25,
+    "unitPriceText": "120.25 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Oreo 2 för 30kr-2 för 30:-",
+    "promotionPrice": 30,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/kakor-oreo-double-creme-7622210137258/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1734687904/cloud/420065.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7312220096019",
+    "ean": "7312220096019",
+    "name": "Biscoff",
+    "brand": "Lotus",
+    "packageText": "250g",
+    "category": "Kakor & Kex",
+    "price": 18.46,
+    "priceText": "18.46 SEK",
+    "unitPrice": 73.84,
+    "unitPriceText": "73.84 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/biscoff-7312220096019/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1696845477/cloud/292541.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7622201125660",
+    "ean": "7622201125660",
+    "name": "Oreo Crunchy Bites Dipped",
+    "brand": "OREO",
+    "packageText": "110 G",
+    "category": "Kakor & Kex",
+    "price": 27.4,
+    "priceText": "27.40 SEK",
+    "unitPrice": 249.09,
+    "unitPriceText": "249.09 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/oreo-crunchy-bites-dipped-7622201125660/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1627793839/cloud/219013.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7315361111849",
+    "ean": "7315361111849",
+    "name": "Glutenfri Lattebit 6-pack",
+    "brand": "DELICATO",
+    "packageText": "6st",
+    "category": "Glutenfritt fikabröd",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 141.72,
+    "unitPriceText": "141.72 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/glutenfritt-brod/glutenfritt-fikabrod/glutenfri-lattebit-6-pack-7315361111849/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1667294474/cloud/264902.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7622300589882",
+    "ean": "7622300589882",
+    "name": "Kakor Mjölkchoklad 8-pack",
+    "brand": "MARABOU",
+    "packageText": "8 st",
+    "category": "Kakor & Kex",
+    "price": 32.13,
+    "priceText": "32.13 SEK",
+    "unitPrice": 174.62,
+    "unitPriceText": "174.62 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Kakor 2 för 49kr-2 för 49:-",
+    "promotionPrice": 49,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/kakor-mjolkchoklad-8-pack-7622300589882/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1624290431/222556.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7622210850652",
+    "ean": "7622210850652",
+    "name": "Kakor Choco Whoopies",
+    "brand": "Marabou",
+    "packageText": "7 st",
+    "category": "Kakor & Kex",
+    "price": 32.13,
+    "priceText": "32.13 SEK",
+    "unitPrice": 183.6,
+    "unitPriceText": "183.60 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Kakor 2 för 49kr-2 för 49:-",
+    "promotionPrice": 49,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/kakor-choco-whoopies-7622210850652/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1738588160/cloud/431485.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711327639942",
+    "ean": "8711327639942",
+    "name": "Glass Bonbon Gold caramel billionaire 12-pack",
+    "brand": "Magnum",
+    "packageText": "12 st",
+    "category": "Flerpack glass",
+    "price": 52.01,
+    "priceText": "52.01 SEK",
+    "unitPrice": 4.33,
+    "unitPriceText": "4.33 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "Medlemspris-Glass 2 för 65kr-2 för 65:-",
+    "promotionPrice": 65,
+    "medMeraRequired": true,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glass-bonbon-gold-caramel-billionaire-12-pack-8711327639942/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1721195329/cloud/373459.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "6410222012806",
+    "ean": "6410222012806",
+    "name": "Havredryck Barista Dumle",
+    "brand": "Fazer Aito",
+    "packageText": "1 L",
+    "category": "Växtbaserad dryck",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 20.77,
+    "unitPriceText": "20.77 kr/lit",
+    "unitPriceUnit": "kr/lit",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/vaxtbaserad-dryck/havredryck-barista-dumle-6410222012806/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1758159898/cloud/517824.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "6408432086564",
+    "ean": "6408432086564",
+    "name": "Laktosfri Standardmjölk 3%",
+    "brand": "VALIO",
+    "packageText": "1 L",
+    "category": "Laktosfri mjölk",
+    "price": 18.48,
+    "priceText": "18.48 SEK",
+    "unitPrice": 18.48,
+    "unitPriceText": "18.48 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/mejeri-agg/mjolk/laktosfri-mjolk/laktosfri-standardmjolk-3-6408432086564/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1747741059/cloud/482313.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "7622202029738",
+    "ean": "7622202029738",
+    "name": "Choco Brookie",
+    "brand": "Marabou",
+    "packageText": "6 st",
+    "category": "Kakor & Kex",
+    "price": 33.08,
+    "priceText": "33.08 SEK",
+    "unitPrice": 250.61,
+    "unitPriceText": "250.61 kr/kg",
+    "unitPriceUnit": "kr/kg",
+    "promotionText": "Kakor 2 för 49kr-2 för 49:-",
+    "promotionPrice": 49,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/brod-bageri/fikabrod/kakor-kex/choco-brookie-7622202029738/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1719381881/cloud/367755.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711327640450",
+    "ean": "8711327640450",
+    "name": "Glass Bonbon White chocolate & cookies 12-pack",
+    "brand": "Magnum",
+    "packageText": "12 st",
+    "category": "Flerpack glass",
+    "price": 52.01,
+    "priceText": "52.01 SEK",
+    "unitPrice": 4.33,
+    "unitPriceText": "4.33 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "Medlemspris-Glass 2 för 65kr-2 för 65:-",
+    "promotionPrice": 65,
+    "medMeraRequired": true,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glass-bonbon-white-chocolate-cookies-12-pack-8711327640450/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1721195350/cloud/373461.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
+  },
+  {
+    "code": "8711327343573",
+    "ean": "8711327343573",
+    "name": "Glass Klassiker 18-pack",
+    "brand": "GB Glace",
+    "packageText": "18 st",
+    "category": "Flerpack glass",
+    "price": 135.34,
+    "priceText": "135.34 SEK",
+    "unitPrice": 7.52,
+    "unitPriceText": "7.52 kr/st",
+    "unitPriceUnit": "kr/st",
+    "promotionText": "",
+    "promotionPrice": null,
+    "medMeraRequired": false,
+    "availableOnline": true,
+    "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "productUrl": "https://www.coop.se/handla/varor/frys/glass/flerpack-glass/glass-klassiker-18-pack-8711327343573/",
+    "imageUrl": "http://res.cloudinary.com/coopsverige/image/upload/v1551294610/364941.tiff",
+    "retrievedAt": "2026-05-22T10:32:35.907Z"
   }
 ];

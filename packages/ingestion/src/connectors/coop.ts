@@ -297,7 +297,7 @@ export async function fetchCoopPublicWeeklyServiceAccess(
 export async function fetchCoopProducts(options: FetchCoopProductsOptions = {}): Promise<CoopProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const query = options.query ?? DEFAULT_COOP_SEARCH_QUERY;
-  const maxRows = options.maxRows ?? 150;
+  const maxRows = options.maxRows ?? 1000;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const serviceAccess = options.subscriptionKey
     ? {

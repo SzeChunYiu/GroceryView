@@ -72,6 +72,9 @@ type MatpriskollenApiOffer = {
 export const MATPRISKOLLEN_BASE_URL = 'https://matpriskollen.se';
 export const DEFAULT_MATPRISKOLLEN_LAT = 56.93287;
 export const DEFAULT_MATPRISKOLLEN_LON = 12.54594;
+export const DEFAULT_MATPRISKOLLEN_STORE_LIMIT = 40;
+export const DEFAULT_MATPRISKOLLEN_OFFER_LIMIT_PER_STORE = 200;
+export const DEFAULT_MATPRISKOLLEN_MAX_ROWS = 600;
 export const DEFAULT_MATPRISKOLLEN_GROCERY_STORE_PATTERN = /(willys|lidl|coop|ica|hemk[oö]p|city gross)/i;
 
 export type FetchMatpriskollenOffersOptions = {
@@ -88,7 +91,7 @@ export type FetchMatpriskollenOffersOptions = {
 export function buildMatpriskollenStoresUrl(
   lat = DEFAULT_MATPRISKOLLEN_LAT,
   lon = DEFAULT_MATPRISKOLLEN_LON,
-  limit = 20
+  limit = DEFAULT_MATPRISKOLLEN_STORE_LIMIT
 ): string {
   const url = new URL('/api/v1/stores', MATPRISKOLLEN_BASE_URL);
   url.searchParams.set('lat', String(lat));
@@ -101,7 +104,7 @@ export function buildMatpriskollenStoreOffersUrl(
   storeKey: string,
   lat = DEFAULT_MATPRISKOLLEN_LAT,
   lon = DEFAULT_MATPRISKOLLEN_LON,
-  limit = 200
+  limit = DEFAULT_MATPRISKOLLEN_OFFER_LIMIT_PER_STORE
 ): string {
   const url = new URL(`/api/v1/stores/${encodeURIComponent(storeKey)}/offers`, MATPRISKOLLEN_BASE_URL);
   url.searchParams.set('lat', String(lat));
@@ -116,12 +119,12 @@ export async function fetchMatpriskollenOffers(
   const fetchImpl = options.fetchImpl ?? fetch;
   const lat = options.lat ?? DEFAULT_MATPRISKOLLEN_LAT;
   const lon = options.lon ?? DEFAULT_MATPRISKOLLEN_LON;
-  const storeLimit = options.storeLimit ?? 20;
-  const offerLimitPerStore = options.offerLimitPerStore ?? 200;
+  const storeLimit = options.storeLimit ?? DEFAULT_MATPRISKOLLEN_STORE_LIMIT;
+  const offerLimitPerStore = options.offerLimitPerStore ?? DEFAULT_MATPRISKOLLEN_OFFER_LIMIT_PER_STORE;
   const storeNamePattern = options.storeNamePattern === undefined
     ? DEFAULT_MATPRISKOLLEN_GROCERY_STORE_PATTERN
     : options.storeNamePattern;
-  const maxRows = options.maxRows ?? 150;
+  const maxRows = options.maxRows ?? DEFAULT_MATPRISKOLLEN_MAX_ROWS;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const storeUrl = buildMatpriskollenStoresUrl(lat, lon, storeLimit);
   const storesResponse = await fetchImpl(storeUrl, {
