@@ -2,7 +2,7 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { buildExpiryDealRadar, buildWatchlistAlerts, calculatePersonalGroceryInflation, compareBasketStrategies, planNotifications, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeCategoryDealLeaders, summarizeStoreBasketCoverage, type BasketComparisonInput, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildExpiryDealRadar, buildWatchlistAlerts, calculatePersonalGroceryInflation, compareBasketStrategies, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeCategoryDealLeaders, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
 
 export const products = [
   {
@@ -2749,6 +2749,65 @@ export const pantryPlanner = {
     { label: 'Hold item', value: 'Delay soup until Hemköp receipt confirms shelf price' },
     { label: 'Stock limit', value: 'Two rice bags max to avoid stale inventory' }
   ]
+};
+
+export const pantryReplenishmentInput: {
+  pantry: PantryInventoryItem[];
+  usage: { productId: string; quantityUsed: number; usedAt: string }[];
+  deals: PantryDeal[];
+  now: string;
+  household: HouseholdSnapshot;
+  expiringSoonDays: number;
+} = {
+  now: '2026-05-21T09:00:00.000Z',
+  expiringSoonDays: 4,
+  household: {
+    id: 'vasastan-household',
+    name: 'Vasastan household',
+    weeklyBudget: 650,
+    members: [
+      { userId: 'member-1', displayName: 'Alex' },
+      { userId: 'member-2', displayName: 'Sam' }
+    ],
+    basketItems: [
+      { productId: 'eldorado-basmati-rice-1kg', quantity: 1, addedBy: 'member-1' },
+      { productId: 'bravo-apelsinjuice-1l', quantity: 2, addedBy: 'member-2' }
+    ],
+    watchlistItems: [
+      { productId: 'barilla-spaghetti-1kg', addedBy: 'member-1', targetPrice: 29 },
+      { productId: 'felix-ketchup-1kg', addedBy: 'member-2', targetPrice: 34 }
+    ],
+    sharedFavoriteStoreIds: ['matmissionen-hagersten', 'city-gross-stockholm', 'hemkop-hornstull']
+  },
+  pantry: [
+    { productId: 'eldorado-basmati-rice-1kg', name: 'Eldorado Basmati Rice 1kg', category: 'pantry', quantity: 0.5, unit: 'kg', minimumQuantity: 1, targetQuantity: 2, lastPurchasedAt: '2026-05-09T12:00:00.000Z' },
+    { productId: 'barilla-spaghetti-1kg', name: 'Barilla Spaghetti 1kg', category: 'pantry', quantity: 1, unit: 'pack', minimumQuantity: 2, targetQuantity: 4, lastPurchasedAt: '2026-05-08T12:00:00.000Z' },
+    { productId: 'felix-ketchup-1kg', name: 'Felix Tomatketchup 1kg', category: 'pantry', quantity: 1, unit: 'each', minimumQuantity: 1, targetQuantity: 2, expiresAt: '2026-05-22T12:00:00.000Z', lastPurchasedAt: '2026-04-28T12:00:00.000Z' },
+    { productId: 'zeta-kikartor-380g', name: 'Zeta Kikärtor 380g', category: 'pantry', quantity: 3, unit: 'each', minimumQuantity: 1, targetQuantity: 4, expiresAt: '2026-06-18T12:00:00.000Z', lastPurchasedAt: '2026-05-15T12:00:00.000Z' }
+  ],
+  usage: [
+    { productId: 'eldorado-basmati-rice-1kg', quantityUsed: 0.5, usedAt: '2026-05-20T18:30:00.000Z' },
+    { productId: 'barilla-spaghetti-1kg', quantityUsed: 1, usedAt: '2026-05-19T18:30:00.000Z' }
+  ],
+  deals: [
+    { productId: 'eldorado-basmati-rice-1kg', storeId: 'matmissionen-hagersten', storeName: 'Matmissionen Hägersten', price: 18.9, dealScore: 88 },
+    { productId: 'barilla-spaghetti-1kg', storeId: 'city-gross-stockholm', storeName: 'City Gross Stockholm', price: 27.9, dealScore: 71 },
+    { productId: 'felix-ketchup-1kg', storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 32, dealScore: 76 }
+  ]
+};
+
+const pantryPlan = planPantryReplenishment(pantryReplenishmentInput);
+
+export const pantryReplenishmentPlan = {
+  plan: pantryPlan,
+  replenishment: pantryPlan.replenishment,
+  expiringSoonProductIds: pantryPlan.expiringSoonProductIds,
+  coverage: {
+    visiblePantryItems: pantryReplenishmentInput.pantry.length,
+    dealBackedItems: pantryReplenishmentInput.deals.length,
+    confidence: 'medium',
+    caveat: 'Uses visible pantry fixtures, household basket rows, and current deal rows only; missing authenticated inventory remains excluded.'
+  }
 };
 
 export const nutritionValueBoard = {

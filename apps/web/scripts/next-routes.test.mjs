@@ -47,7 +47,7 @@ describe('verified-data UI', () => {
   });
 
   it('makes unavailable private features fail closed instead of showing fabricated rows', async () => {
-    const featureRoutes = ['scanner','household','account','basket-ideas','coupon-stacks','pantry-planner','price-reports','shopping-trips','privacy'];
+    const featureRoutes = ['scanner','household','account','basket-ideas','coupon-stacks','price-reports','shopping-trips','privacy'];
     const verified = await read('src/lib/verified-data.ts');
     assert.match(verified, /privateFeatureCopy/);
     assert.match(verified, /verifiedSurface/);
@@ -108,6 +108,15 @@ describe('verified-data UI', () => {
     assert.match(source, /dealBasedMeals/);
     assert.match(source, /suggestDealBasedMeals/);
     assert.match(source, /estimatedCostPerServing/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
+  it('surfaces pantry replenishment on the pantry planner route using the real core pantry plan output', async () => {
+    const source = await read('src/app/pantry-planner/page.tsx');
+    assert.match(source, /pantryReplenishmentPlan/);
+    assert.match(source, /planPantryReplenishment/);
+    assert.match(source, /replenishment/);
+    assert.match(source, /expiringSoonProductIds/);
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
