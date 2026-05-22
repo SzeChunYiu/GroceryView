@@ -609,6 +609,46 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1003392',
     storeName: 'ICA Supermarket Fyren',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004097',
+    storeName: 'Maxi ICA Stormarknad Örebro Boglundsängen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003736',
+    storeName: 'Maxi ICA Stormarknad Universitetet',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004364',
+    storeName: 'ICA Kvantum Örebro',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003562',
+    storeName: 'Maxi ICA Stormarknad Kumla',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004235',
+    storeName: 'ICA Odenhallen, Odensbacken',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004335',
+    storeName: 'ICA Supermarket Näsbyhallen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004564',
+    storeName: 'ICA Supermarket Hallsberg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004536',
+    storeName: 'ICA Supermarket Nora',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
