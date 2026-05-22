@@ -2,7 +2,7 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { buildExpiryDealRadar, buildWatchlistAlerts, calculatePersonalGroceryInflation, planNotifications, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeCategoryDealLeaders, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildExpiryDealRadar, buildWatchlistAlerts, calculatePersonalGroceryInflation, compareBasketStrategies, planNotifications, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeCategoryDealLeaders, summarizeStoreBasketCoverage, type BasketComparisonInput, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
 
 export const products = [
   {
@@ -1767,6 +1767,55 @@ export const watchlistAlerts = [
 
 
 
+
+
+export const weeklyBasketOptimizerInput: BasketComparisonInput = {
+  favoriteStoreIds: ['willys-odenplan', 'coop-medborgarplatsen', 'hemkop-hornstull'],
+  items: [
+    {
+      productId: 'zoegas-coffee-450g',
+      quantity: 1,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 49.9 },
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 56.9 },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 54.9 }
+      ]
+    },
+    {
+      productId: 'pagen-lingongrova-500g',
+      quantity: 2,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 36.9 },
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 33.9 }
+      ]
+    },
+    {
+      productId: 'bravo-apelsinjuice-1l',
+      quantity: 2,
+      prices: [
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 25.9 },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 22.9 }
+      ]
+    },
+    {
+      productId: 'garant-ekologisk-tofu-270g',
+      quantity: 3,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 21.9 },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 24.9 }
+      ]
+    }
+  ]
+};
+
+export const weeklyBasketOptimizer = {
+  comparison: compareBasketStrategies(weeklyBasketOptimizerInput),
+  coverage: summarizeStoreBasketCoverage(weeklyBasketOptimizerInput),
+  confidence: {
+    level: 'medium',
+    caveat: 'The optimizer uses visible price rows for favorite stores only; missing store-product prices reduce coverage instead of being estimated.'
+  }
+};
 
 export const watchlistAlertInputs: { favoriteStoreIds: string[]; watchlist: WatchlistItem[]; products: (WatchlistProductSnapshot & { source: string })[] } = {
   favoriteStoreIds: ['willys-odenplan', 'coop-medborgarplatsen', 'hemkop-hornstull'],
