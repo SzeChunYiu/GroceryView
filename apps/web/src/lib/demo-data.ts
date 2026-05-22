@@ -2011,6 +2011,32 @@ export const dealBasedMeals = {
   }
 };
 
+const studentRecipeSteps: Record<string, string[]> = {
+  'Deal bowl': ['Cook the pantry base first so the cheapest shelf item stretches the protein.', 'Pan-fry the deal protein and fold in the vegetable row.', 'Pack one portion now and cool the second portion for tomorrow.'],
+  'Budget pasta': ['Boil half the pasta pack and reserve cooking water.', 'Warm the vegetable deal with the cheapest protein row.', 'Toss together and split into dinner plus lunchbox portions.'],
+  'Protein lunchbox': ['Drain or slice the protein row.', 'Add the pantry deal for bulk without raising spend.', 'Finish with the vegetable deal and keep chilled until lunch.']
+};
+
+export const studentDealRecipes = {
+  persona: 'Students / young singles',
+  title: 'Student deal recipes',
+  servings: 2,
+  maxMealCost: 65,
+  recipes: suggestDealBasedMeals({
+    deals: dealBasedMealInputs.map(({ source: _source, ...deal }) => deal),
+    maxMealCost: 65,
+    servings: 2
+  }).map((suggestion) => ({
+    ...suggestion,
+    ingredients: suggestion.ingredientProductIds.map((productId) => dealBasedMealInputs.find((deal) => deal.productId === productId)).filter(Boolean),
+    cookSteps: studentRecipeSteps[suggestion.title] ?? ['Combine the selected deal ingredients.', 'Cook once and portion into two student meals.', 'Label leftovers with the visible deal source date.']
+  })),
+  coverage: {
+    confidence: 'medium',
+    caveat: 'Recipes are generated from suggestDealBasedMeals using visible deal prices only; prep time, allergens, and pantry spices are not inferred.'
+  }
+};
+
 export const expiryDealRadarReports = [
   {
     id: 'expiry-laxfile-liljeholmen',
