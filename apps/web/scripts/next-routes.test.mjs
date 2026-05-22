@@ -1107,6 +1107,21 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+
+  it('surfaces a Grocery Index market terminal on the homepage without placeholder rows', async () => {
+    const shell = await read('src/components/market-shell.tsx');
+
+    assert.match(shell, /homepageMarketTerminal/);
+    assert.match(shell, /Grocery Index market terminal/);
+    assert.match(shell, /mapChainIndexScores\[0\]/);
+    assert.match(shell, /priceDropMoversBoard\[0\]/);
+    assert.match(shell, /openPriceObservationDepth\.reduce/);
+    assert.match(shell, /sourceCoverage\.map/);
+    assert.match(shell, /No forecast, sponsored boost, or synthetic placeholder row/);
+    assert.match(shell, /Open Grocery Index/);
+    assert.doesNotMatch(shell, /NoVerifiedData|@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
   it('uses a readable global shell and provenance surfaces across the app', async () => {
     const globals = await read('src/app/globals.css');
     const nav = await read('src/components/app-nav.tsx');
