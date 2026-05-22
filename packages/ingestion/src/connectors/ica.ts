@@ -1544,6 +1544,46 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1004579',
     storeName: 'ICA Supermarket Sundbyberg',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004164',
+    storeName: 'ICA Supermarket Esplanad, Sthlm',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004026',
+    storeName: 'ICA Supermarket Kungsholmstorg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003933',
+    storeName: 'ICA Supermarket Ringen, Sthlm',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004134',
+    storeName: 'ICA Supermarket Sabbatsberg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003418',
+    storeName: 'Maxi ICA Stormarknad Lindhagen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003563',
+    storeName: 'ICA Supermarket Väddö',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1135007',
+    storeName: 'ICA Supermarket Älta',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004436',
+    storeName: 'ICA Nära Älvsjö',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
