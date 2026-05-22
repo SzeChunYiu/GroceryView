@@ -4,6 +4,7 @@ import { axfoodProducts } from './axfood-products';
 import { icaReklambladOffers, icaReklambladSource } from './ingested/ica-reklamblad';
 import { mathemProducts, mathemSource } from './ingested/mathem';
 import { openFoodFactsCatalog } from './openfoodfacts-catalog';
+import { lidlStoreOffers, lidlSource } from './ingested/lidl';
 import { matpriskollenOffers } from './ingested/matpriskollen';
 import { categoryLabels, pricedProducts } from './openprices-products';
 import { osmStores } from './osm-stores';
@@ -2142,6 +2143,95 @@ export const loyaltyPricePreferenceContract = {
     'Preferences only tell GroceryView whether to include authenticated loyalty prices after the protected loyalty offer endpoint returns evidence.',
     'Public pages must label authenticated loyalty prices as unavailable until a signed-in account response confirms eligibility.',
     'Disabling a chain preference must hide member-only savings claims for that chain.'
+  ]
+};
+
+const lidlMemberOfferByCode = new Map<string, (typeof lidlStoreOffers)[number]>();
+for (const offer of lidlStoreOffers) {
+  if (!offer.memberOnly) continue;
+  if (!lidlMemberOfferByCode.has(offer.code)) lidlMemberOfferByCode.set(offer.code, offer);
+}
+
+function lidlMemberOfferStoreCount(code: string) {
+  return new Set(lidlStoreOffers.filter((offer) => offer.memberOnly && offer.code === code).map((offer) => offer.storeId)).size;
+}
+
+const lidlMemberOfferRows = [...lidlMemberOfferByCode.values()]
+  .map((offer) => {
+    const savings = typeof offer.regularPrice === 'number' && offer.regularPrice > offer.price ? roundSek(offer.regularPrice - offer.price) : null;
+    return {
+      id: `lidl-${offer.code}`,
+      chain: 'Lidl',
+      productName: offer.brand ? `${offer.brand} ${offer.name}` : offer.name,
+      packageText: offer.packageText,
+      storeScope: `${lidlMemberOfferStoreCount(offer.code)} Lidl stores`,
+      memberPriceLabel: offer.priceText,
+      publicShelfPriceLabel: typeof offer.regularPrice === 'number' ? formatSek(offer.regularPrice) : 'No public shelf price in source',
+      totalMemberSavings: savings,
+      totalMemberSavingsLabel: savings === null ? 'Blocked until public shelf price appears' : formatSek(savings),
+      priceType: 'member' as const,
+      source: lidlSource.source,
+      evidence: `memberOnly=${offer.memberOnly}; sourceUrl=${offer.sourceUrl}`,
+      validTo: offer.validTo.slice(0, 10),
+      pointsEarned: null as number | null,
+      pointsStatus: 'blocked_until_retailer_program_rules',
+      pointEvidence: 'No retailer point ledger or earning rule in the public source; must not estimate loyalty points from SEK spend.'
+    };
+  })
+  .sort((left, right) => (right.totalMemberSavings ?? 0) - (left.totalMemberSavings ?? 0));
+
+const matpriskollenMemberOfferRows = [...matpriskollenOffers]
+  .filter((offer) => offer.requiresMembershipCard)
+  .slice(0, 8)
+  .map((offer) => ({
+    id: `matpriskollen-${offer.code}`,
+    chain: offer.store.split(' ')[0] || 'Matpriskollen store',
+    productName: [offer.brand, offer.name].filter(Boolean).join(' '),
+    packageText: offer.packageText,
+    storeScope: offer.store,
+    memberPriceLabel: offer.priceText,
+    publicShelfPriceLabel: offer.regularPriceText || 'No public shelf price in source',
+    totalMemberSavings: null as number | null,
+    totalMemberSavingsLabel: 'Blocked until public shelf price appears',
+    priceType: 'member' as const,
+    source: 'matpriskollen.se public store/offers JSON API',
+    evidence: `requiresMembershipCard=${offer.requiresMembershipCard}; requiresCoupon=${offer.requiresCoupon}`,
+    validTo: offer.validTo.slice(0, 10),
+    pointsEarned: null as number | null,
+    pointsStatus: 'blocked_until_account_point_ledger',
+    pointEvidence: 'No retailer point ledger or earning rule in the public source; do not infer loyalty points from member-offer price text.'
+  }));
+
+const memberOfferAggregationRows = [...lidlMemberOfferRows.slice(0, 6), ...matpriskollenMemberOfferRows.slice(0, 6)];
+
+export const memberOfferAggregationBoard = {
+  title: 'Member-offer aggregation + points',
+  status: 'public_member_offer_evidence_with_account_points_blocked',
+  priceType: 'member' as const,
+  sourcePredicate: "price_type='member'",
+  sourceCounts: [
+    { source: 'lidlStoreOffers.memberOnly', rows: lidlMemberOfferRows.length },
+    { source: 'matpriskollenOffers.requiresMembershipCard', rows: matpriskollenMemberOfferRows.length }
+  ],
+  totalMemberSavings: roundSek(lidlMemberOfferRows.reduce((sum, row) => sum + (row.totalMemberSavings ?? 0), 0)),
+  totalMemberSavingsLabel: formatSek(lidlMemberOfferRows.reduce((sum, row) => sum + (row.totalMemberSavings ?? 0), 0)),
+  pointsEarned: null as number | null,
+  pointsStatus: 'No anonymous point balances; points stay blocked until a signed-in retailer programme rule and account-bound point ledger are present.',
+  rows: memberOfferAggregationRows,
+  pointLedgerRows: memberOfferAggregationRows.map((row) => ({
+    id: `${row.id}-points`,
+    chain: row.chain,
+    productName: row.productName,
+    priceType: 'member' as const,
+    pointsEarned: row.pointsEarned,
+    pointsStatus: row.pointsStatus,
+    evidence: row.pointEvidence
+  })),
+  guardrails: [
+    'No retailer credentials are stored by GroceryView for member-offer aggregation.',
+    "Member-offer aggregation maps only public memberOnly or requiresMembershipCard evidence to price_type='member'.",
+    'Do not infer or estimate loyalty points from member-offer SEK spend without source earning rules and an account-bound point ledger.',
+    'No anonymous point balances or personalized loyalty balances are rendered in the static snapshot.'
   ]
 };
 
