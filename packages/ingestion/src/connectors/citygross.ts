@@ -77,7 +77,10 @@ export const DEFAULT_CITY_GROSS_PRODUCT_QUERIES = [
   'mjolk',
   'pasta',
   'ris',
-  'smor'
+  'smor',
+  'ost',
+  'kyckling',
+  'yoghurt'
 ] as const;
 
 export type FetchCityGrossStoresOptions = {
@@ -198,10 +201,11 @@ export async function fetchCityGrossProductsForAllStores(
     apiBaseUrl: options.apiBaseUrl
   });
   const rows: CityGrossProduct[] = [];
+  const seen = new Set<string>();
   const queries = options.queries ?? DEFAULT_CITY_GROSS_PRODUCT_QUERIES;
   for (const store of stores) {
     for (const query of queries) {
-      rows.push(...await fetchCityGrossProducts({
+      const products = await fetchCityGrossProducts({
         fetchImpl: options.fetchImpl,
         siteId: store.storeId,
         query,
@@ -209,7 +213,13 @@ export async function fetchCityGrossProductsForAllStores(
         pageSize: options.pageSize,
         retrievedAt: options.retrievedAt,
         apiBaseUrl: options.apiBaseUrl
-      }));
+      });
+      for (const product of products) {
+        const key = `${product.storeId}:${product.code}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        rows.push(product);
+      }
     }
   }
   return rows;

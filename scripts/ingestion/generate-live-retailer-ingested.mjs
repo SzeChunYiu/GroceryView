@@ -10,7 +10,7 @@ import {
 const REPO_ROOT = new URL('../../', import.meta.url);
 const INGESTED_DIR = new URL('apps/web/src/lib/ingested/', REPO_ROOT);
 
-const CITY_GROSS_QUERIES = ['kaffe', 'mjolk', 'pasta', 'ris', 'smor'];
+const CITY_GROSS_QUERIES = ['kaffe'];
 const ICA_REKLAMBLAD_SOURCE_URLS = [
   'https://www.ica.se/erbjudanden/ica-focus-1004247/',
   'https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/',
@@ -31,7 +31,7 @@ const retrievedAt = new Date().toISOString();
 await mkdir(INGESTED_DIR, { recursive: true });
 
 const cityGrossProducts = await fetchCityGrossProductsForAllStores({
-  maxStores: 5,
+  maxStores: 40,
   queries: CITY_GROSS_QUERIES,
   maxRowsPerStore: 24,
   pageSize: 24,
