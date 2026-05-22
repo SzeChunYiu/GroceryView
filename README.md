@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-22 14:11 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-22 16:13 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,7 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**20** store pages, ~**19** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **297**
+- **Shipped `feat:`/`wire:` PRs to date:** **280**
 
 ## 🛒 What shoppers get (consumer value)
 
@@ -42,26 +42,25 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
-- #939 feat(web): add product vs usual signal
-- #938 feat(ingest): expand Axfood weekly discounts
-- #937 feat(api): expose price history evidence
-- #935 feat(ingest): expand City Gross store products
-- #933 feat(ingest): add Coop weekly flyer branches
-- #931 feat(ingest): add Coop weekly flyer branches
-- #930 feat(ingest): refresh OpenFoodFacts barcode enrichment
-- #929 feat(web): add product history range badges
-- #927 feat(seo): add programmatic landing pages
-- #925 feat(ingest): expand Axfood weekly discounts
-- #922 feat(ingest): refresh OpenFoodFacts enrichment evidence
-- #920 feat(ingest): expand Coop weekly flyer discounts
-- #921 feat(seo): add route metadata coverage
-- #918 feat(web): add product price chart timeframes
-- #919 feat(seo): add structured JSON-LD metadata
+- #996 feat(web): add product branch spread gate
+- #986 feat(ingest): expand Overpass Sweden grocery stores
+- #992 feat(ingest): expand CityGross product rows
+- #994 feat(ingest): refresh OpenFoodFacts enrichment metadata
+- #993 feat(web): add store price percentile rank gate
+- #990 feat(ingest): expand Mathem public search rows
+- #989 feat(seo): add dynamic product OG price images
+- #985 feat(ingest): expand Coop product rows
+- #983 feat(api): dedupe chain index prices
+- #982 feat(web): add product cross-chain history overlay gate
+- #981 feat(ingest): refresh OpenFoodFacts barcode enrichment
+- #979 feat(ingest): add ICA per-store promotion rows
+- #978 feat(ingest): register Willys weekly connector
+- #977 feat(ingest): expand Coop weekly flyer branches
+- #976 feat(ingest): add ICA per-store promotion rows
 
 ## 🔄 In progress (open PRs)
 
-- #941 Add consent and session exchange gates
-- #940 feat(ingest): add ICA store promotions for 20 branches
+- #999 feat(ingest): refresh OpenFoodFacts after worker data
 
 ## 📋 To-do (from GOAL.md backlog)
 
