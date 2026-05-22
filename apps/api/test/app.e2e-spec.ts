@@ -9,6 +9,15 @@ import { PostgresQueryExecutorService } from '../src/database/postgres-query-exe
 
 class RecordingPriceHistoryExecutor {
   calls: Array<{ sql: string; params: unknown[] }> = [];
+  watchlistRows: Array<{
+    id: string;
+    product_id: string;
+    product_slug: string;
+    target_price: number | null;
+    alert_deal_score_at: number | null;
+    favorite_stores_only: boolean;
+    allowed_price_types: string[] | null;
+  }> = [];
 
   isConfigured(): boolean {
     return true;
@@ -16,6 +25,85 @@ class RecordingPriceHistoryExecutor {
 
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
     this.calls.push({ sql, params });
+    if (sql.includes('select id::text as product_id, slug as product_slug from products')) {
+      if (params[0] === 'missing-product') return [] as T[];
+      const slug = params[0] === 'milk' ? 'milk' : 'coffee';
+      return [{ product_id: `product-${slug}`, product_slug: slug }] as T[];
+    }
+    if (sql.includes('select watchlist_items.product_id::text')) {
+      return this.watchlistRows.map((row) => ({
+        product_id: row.product_id,
+        product_slug: row.product_slug,
+        target_price: row.target_price,
+        alert_deal_score_at: row.alert_deal_score_at,
+        favorite_stores_only: row.favorite_stores_only,
+        allowed_price_types: row.allowed_price_types
+      })) as T[];
+    }
+    if (sql.includes('insert into watchlist_items')) {
+      const productId = params[1] as string;
+      const productSlug = productId.replace(/^product-/, '');
+      this.watchlistRows.push({
+        id: `watchlist-${this.watchlistRows.length + 1}`,
+        product_id: productId,
+        product_slug: productSlug,
+        target_price: params[2] as number | null,
+        alert_deal_score_at: sql.includes('null') ? null : params[3] as number | null,
+        favorite_stores_only: (sql.includes('null') ? params[3] : params[4]) as boolean,
+        allowed_price_types: (sql.includes('null') ? params[4] : params[5]) as string[] | null
+      });
+      return [] as T[];
+    }
+    if (sql.includes('select watchlist_items.id::text as id')) {
+      const match = this.watchlistRows.find((row) => row.product_slug === params[1] || row.product_id === params[1]);
+      return (match ? [{ id: match.id }] : []) as T[];
+    }
+    if (sql.includes('update watchlist_items')) {
+      const row = this.watchlistRows.find((candidate) => candidate.id === params[0] || candidate.product_slug === params[1] || candidate.product_id === params[1]);
+      if (!row) return [] as T[];
+      if (sql.includes('target_price = $2')) {
+        row.target_price = params[1] as number;
+        row.favorite_stores_only = params[2] as boolean;
+        row.allowed_price_types = params[3] as string[];
+      } else {
+        row.target_price = (params[2] ?? row.target_price) as number | null;
+        row.alert_deal_score_at = (params[3] ?? row.alert_deal_score_at) as number | null;
+        row.favorite_stores_only = (params[4] ?? row.favorite_stores_only) as boolean;
+        row.allowed_price_types = (params[5] ?? row.allowed_price_types) as string[] | null;
+      }
+      return [{ product_slug: row.product_slug }] as T[];
+    }
+    if (sql.includes('delete from watchlist_items')) {
+      const index = this.watchlistRows.findIndex((row) => row.product_slug === params[1] || row.product_id === params[1]);
+      if (index === -1) return [] as T[];
+      const [row] = this.watchlistRows.splice(index, 1);
+      return [{ product_slug: row!.product_slug }] as T[];
+    }
+    if (sql.includes('from favorite_stores')) {
+      return [] as T[];
+    }
+    if (sql.includes('from latest_prices') && sql.includes('latest_prices.price_type')) {
+      return [
+        {
+          product_slug: 'coffee',
+          product_name: 'Zoégas Coffee 450g',
+          store_slug: 'willys-odenplan',
+          store_name: 'Willys Odenplan',
+          price: '49.90',
+          price_type: 'shelf',
+          confidence: '0.9400'
+        },
+        {
+          product_slug: 'coffee',
+          product_name: 'Zoégas Coffee 450g',
+          store_slug: 'lidl-sveavagen',
+          store_name: 'Lidl Sveavagen',
+          price: '54.90',
+          price_type: 'promotion',
+          confidence: '0.8800'
+        }
+      ] as T[];
+    }
     if (sql.includes('latest_prices.price') && sql.includes('products.comparable_unit')) {
       if (params[0] === 'missing-product') return [] as T[];
       return [
@@ -585,14 +673,15 @@ describe('GroceryView API app', () => {
     assert.equal(priceAlerts.body.userId, 'demo');
     assert.equal(priceAlerts.body.alertCount, 1);
     assert.equal(priceAlerts.body.alerts[0].type, 'target_price');
-    assert.equal(priceAlerts.body.demo, true);
+    assert.equal(priceAlerts.body.demo, undefined);
+    assert.equal(priceHistoryExecutor.calls.some((call) => /from latest_prices/i.test(call.sql)), true);
     const createdPriceAlert = await request(app.getHttpServer())
       .post('/users/demo/watchlist/price-alerts')
       .send({ productId: 'coffee', targetPrice: 48, favoriteStoresOnly: false, allowedPriceTypes: ['shelf'] })
       .expect(201);
     assert.equal(createdPriceAlert.body.trackedItemCount, 1);
     assert.equal(createdPriceAlert.body.alertCount, 0);
-    assert.equal(createdPriceAlert.body.demo, true);
+    assert.equal(createdPriceAlert.body.demo, undefined);
     const watchlistUpdate = await request(app.getHttpServer())
       .patch('/users/demo/watchlist/coffee')
       .send({ targetPrice: 48, alertDealScoreAt: 85, favoriteStoresOnly: true, allowedPriceTypes: ['shelf', 'promotion'] })
@@ -602,7 +691,7 @@ describe('GroceryView API app', () => {
     assert.equal(watchlistUpdate.body.item.alertDealScoreAt, 85);
     assert.equal(watchlistUpdate.body.item.favoriteStoresOnly, true);
     assert.deepEqual(watchlistUpdate.body.item.allowedPriceTypes, ['shelf', 'promotion']);
-    assert.equal(watchlistUpdate.body.demo, true);
+    assert.equal(watchlistUpdate.body.demo, undefined);
     await request(app.getHttpServer()).post('/users/demo/watchlist').send({ productId: 'milk', targetPrice: 14 }).expect(201);
     const watchlistRemoval = await request(app.getHttpServer()).delete('/users/demo/watchlist/milk').expect(200);
     assert.equal(watchlistRemoval.body.productId, 'milk');
@@ -611,7 +700,7 @@ describe('GroceryView API app', () => {
       watchlistRemoval.body.watchlist.items.map((item: { productId: string }) => item.productId),
       ['coffee']
     );
-    assert.equal(watchlistRemoval.body.demo, true);
+    assert.equal(watchlistRemoval.body.demo, undefined);
 
     await request(app.getHttpServer())
       .post('/users/demo/basket/items')
@@ -910,9 +999,7 @@ describe('GroceryView API app', () => {
     assert.deepEqual(privacyExport.body.sections.find((section: { name: string }) => section.name === 'favorite_stores')?.records, [
       { storeId: 'willys-odenplan' }
     ]);
-    assert.deepEqual(privacyExport.body.sections.find((section: { name: string }) => section.name === 'watchlist')?.records, [
-      { productId: 'coffee' }
-    ]);
+    assert.deepEqual(privacyExport.body.sections.find((section: { name: string }) => section.name === 'watchlist')?.records, []);
     assert.equal(privacyExport.body.demo, true);
 
     const deletionPlan = await request(app.getHttpServer()).post('/users/demo/privacy/deletion-plan').expect(200);
