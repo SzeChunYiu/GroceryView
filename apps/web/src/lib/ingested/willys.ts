@@ -1,7 +1,7 @@
 // AUTO-GENERATED from public Willys search JSON.
 // Source URL pattern: https://www.willys.se/search?q={query}
-// Retrieved: 2026-05-20T23:54:12.788Z
-// Row count: 75 real product rows fetched from handla.willys.se / willys.se search.
+// Retrieved: 2026-05-22T09:20:01.415Z
+// Row count: 150 real product rows fetched from handla.willys.se / willys.se search.
 // Weekly discount source URL pattern: https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page={page}&size=100
 // Weekly discount source URLs: https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100; https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100; https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100
 // Weekly discount retrieved: 2026-05-22T09:01:43.503Z
@@ -52,10 +52,10 @@ export type WillysIngestedWeeklyDiscount = {
 };
 
 export const willysSource = {
-  source: 'handla.willys.se public search JSON',
-  retrievedAt: '2026-05-20T23:54:12.788Z',
-  rowCount: 75,
-  sourceUrlPattern: 'https://www.willys.se/search?q={query}'
+  "source": "handla.willys.se public search JSON",
+  "retrievedAt": "2026-05-22T09:20:01.415Z",
+  "rowCount": 150,
+  "sourceUrlPattern": "https://www.willys.se/search?q={query}"
 } as const;
 
 
@@ -75,7 +75,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=makaroner",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101205570_ST",
@@ -92,7 +92,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=makaroner",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101205623_ST",
@@ -109,7 +109,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=makaroner",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101301620_ST",
@@ -126,7 +126,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=makaroner",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101216818_ST",
@@ -143,7 +143,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=makaroner",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101302991_ST",
@@ -163,7 +163,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=makaroner",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101240220_ST",
@@ -180,7 +180,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=makaroner",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101152565_ST",
@@ -200,7 +200,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=makaroner",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101301621_ST",
@@ -217,7 +217,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=makaroner",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101300044_ST",
@@ -234,7 +234,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=makaroner",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101233931_ST",
@@ -254,7 +254,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=mjolk",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101205891_ST",
@@ -274,7 +274,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=mjolk",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101233933_ST",
@@ -294,7 +294,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=mjolk",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101276728_ST",
@@ -314,7 +314,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=mjolk",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "100010649_ST",
@@ -334,7 +334,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=mjolk",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101125998_ST",
@@ -354,7 +354,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=mjolk",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101205823_ST",
@@ -374,7 +374,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=mjolk",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101476218_ST",
@@ -394,7 +394,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=mjolk",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "100814852_ST",
@@ -415,7 +415,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=mjolk",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101180932_ST",
@@ -436,7 +436,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=mjolk",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101261204_ST",
@@ -453,7 +453,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=kaffe",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "100002676_ST",
@@ -473,7 +473,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=kaffe",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101677331_ST",
@@ -490,7 +490,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=kaffe",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "100467228_ST",
@@ -510,7 +510,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=kaffe",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101552965_ST",
@@ -530,7 +530,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=kaffe",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101677338_ST",
@@ -547,7 +547,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=kaffe",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "100030869_ST",
@@ -567,7 +567,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=kaffe",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "100002738_ST",
@@ -587,7 +587,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=kaffe",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101759233_ST",
@@ -604,27 +604,24 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=kaffe",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
-    "code": "100467219_ST",
-    "name": "Festivita Extra Mörkrost Bryggkaffe",
-    "brand": "Arvidnordquist",
-    "packageText": "ARVIDNORDQUIST, 500g",
+    "code": "101261197_ST",
+    "name": "El-brygg Mellanrost Bryggkaffe",
+    "brand": "Gevalia",
+    "packageText": "GEVALIA, 450g",
     "category": "",
-    "price": 74.9,
-    "priceText": "74,90 kr",
-    "unitPriceText": "149,80 kr",
+    "price": 70.88,
+    "priceText": "70,88 kr",
+    "unitPriceText": "157,51 kr",
     "unitPriceUnit": "kg",
-    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310760012308_C1R1_s01",
-    "labels": [
-      "rainforest_alliance",
-      "environmental_facet"
-    ],
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711000530207_C1N1_s01",
+    "labels": [],
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=kaffe",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101220577_ST",
@@ -641,7 +638,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=ris",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101234821_ST",
@@ -658,7 +655,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=ris",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101277483_ST",
@@ -675,7 +672,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=ris",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101352143_ST",
@@ -692,7 +689,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=ris",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101352142_ST",
@@ -709,7 +706,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=ris",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101234820_ST",
@@ -726,7 +723,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=ris",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101488798_ST",
@@ -743,7 +740,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=ris",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101262952_ST",
@@ -760,7 +757,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=ris",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101352149_ST",
@@ -777,7 +774,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=ris",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101191742_ST",
@@ -794,7 +791,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=ris",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101240187_ST",
@@ -811,7 +808,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=pasta",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101284620_ST",
@@ -828,7 +825,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=pasta",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101240218_ST",
@@ -845,7 +842,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=pasta",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101284490_ST",
@@ -862,7 +859,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=pasta",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101358836_ST",
@@ -879,7 +876,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=pasta",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101548708_ST",
@@ -896,7 +893,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=pasta",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101332229_ST",
@@ -913,7 +910,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=pasta",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101548687_ST",
@@ -930,24 +927,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=pasta",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
-  },
-  {
-    "code": "101550179_ST",
-    "name": "Conchigle",
-    "brand": "Monte Castello",
-    "packageText": "MONTE CASTELLO, 500g",
-    "category": "",
-    "price": 8.42,
-    "priceText": "8,42 kr",
-    "unitPriceText": "16,84 kr",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612150972_C1N1_s01",
-    "labels": [],
-    "online": true,
-    "outOfStock": false,
-    "sourceUrl": "https://www.willys.se/search?q=pasta",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101548710_ST",
@@ -964,7 +944,24 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=pasta",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101550179_ST",
+    "name": "Conchigle",
+    "brand": "Monte Castello",
+    "packageText": "MONTE CASTELLO, 500g",
+    "category": "",
+    "price": 8.42,
+    "priceText": "8,42 kr",
+    "unitPriceText": "16,84 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612150972_C1N1_s01",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=pasta",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "100050640_ST",
@@ -981,7 +978,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=yoghurt",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101210853_ST",
@@ -998,7 +995,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=yoghurt",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101210865_ST",
@@ -1015,7 +1012,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=yoghurt",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "100986033_ST",
@@ -1032,7 +1029,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=yoghurt",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101210862_ST",
@@ -1049,7 +1046,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=yoghurt",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "100137095_ST",
@@ -1066,7 +1063,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=yoghurt",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101552868_ST",
@@ -1083,7 +1080,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=yoghurt",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101256495_ST",
@@ -1100,7 +1097,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=yoghurt",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101297879_ST",
@@ -1117,7 +1114,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=yoghurt",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101231441_ST",
@@ -1134,7 +1131,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=yoghurt",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "100548542_ST",
@@ -1151,24 +1148,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=brod",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
-  },
-  {
-    "code": "101203170_ST",
-    "name": "Skärgårdskaka Hönö 18-pack",
-    "brand": "Pågen",
-    "packageText": "PÅGEN, 750g",
-    "category": "",
-    "price": 33.97,
-    "priceText": "33,97 kr",
-    "unitPriceText": "45,29 kr",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311070337297_C1L1_s05",
-    "labels": [],
-    "online": true,
-    "outOfStock": false,
-    "sourceUrl": "https://www.willys.se/search?q=brod",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "100168667_ST",
@@ -1185,7 +1165,24 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=brod",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101203170_ST",
+    "name": "Skärgårdskaka Hönö 18-pack",
+    "brand": "Pågen",
+    "packageText": "PÅGEN, 750g",
+    "category": "",
+    "price": 33.97,
+    "priceText": "33,97 kr",
+    "unitPriceText": "45,29 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311070337297_C1L1_s05",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=brod",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101261349_ST",
@@ -1202,7 +1199,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=brod",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101275233_ST",
@@ -1219,7 +1216,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=brod",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "100168649_ST",
@@ -1236,24 +1233,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=brod",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
-  },
-  {
-    "code": "101332489_ST",
-    "name": "Jollekaka Hönö 6-pack",
-    "brand": "Pågen",
-    "packageText": "PÅGEN, 400g",
-    "category": "",
-    "price": 25.45,
-    "priceText": "25,45 kr",
-    "unitPriceText": "63,63 kr",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311070003567_C1L1_s03",
-    "labels": [],
-    "online": true,
-    "outOfStock": false,
-    "sourceUrl": "https://www.willys.se/search?q=brod",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101514279_ST",
@@ -1273,7 +1253,24 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=brod",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101332489_ST",
+    "name": "Jollekaka Hönö 6-pack",
+    "brand": "Pågen",
+    "packageText": "PÅGEN, 400g",
+    "category": "",
+    "price": 25.45,
+    "priceText": "25,45 kr",
+    "unitPriceText": "63,63 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311070003567_C1L1_s03",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=brod",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101275217_ST",
@@ -1290,7 +1287,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=brod",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101332488_ST",
@@ -1307,7 +1304,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=brod",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101230572_KG",
@@ -1324,7 +1321,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=ost",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101511522_ST",
@@ -1341,7 +1338,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=ost",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101511519_ST",
@@ -1358,7 +1355,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=ost",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101817373_ST",
@@ -1375,7 +1372,7 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=ost",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   },
   {
     "code": "101511521_ST",
@@ -1392,10 +1389,1457 @@ export const willysProducts: WillysIngestedProduct[] = [
     "online": true,
     "outOfStock": false,
     "sourceUrl": "https://www.willys.se/search?q=ost",
-    "retrievedAt": "2026-05-20T23:54:12.788Z"
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101428787_KG",
+    "name": "Gaudina 28%",
+    "brand": "Ready Chef",
+    "packageText": "READY CHEF, ca: 1.5kg",
+    "category": "",
+    "price": 66.15,
+    "priceText": "66,15 kr",
+    "unitPriceText": "66,15 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/02399033000001_C1L1_s01",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=ost",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101511518_ST",
+    "name": "Herrgård 6månader 28%",
+    "brand": "Skånemejerier",
+    "packageText": "SKÅNEMEJERIER, 670g",
+    "category": "",
+    "price": 84.9,
+    "priceText": "84,90 kr",
+    "unitPriceText": "126,71 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07393720092763_C1R1_s01",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=ost",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101612918_ST",
+    "name": "Gouda Holland 31%",
+    "brand": "Wernersson Ost",
+    "packageText": "WERNERSSON OST, 480g",
+    "category": "",
+    "price": 56.68,
+    "priceText": "56,68 kr",
+    "unitPriceText": "118,08 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07331494129100_C1R1_s01",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=ost",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101294662_KG",
+    "name": "Gouda 28%",
+    "brand": "Eldorado",
+    "packageText": "ELDORADO, ca: 2.2kg",
+    "category": "",
+    "price": 68.9,
+    "priceText": "68,90 kr",
+    "unitPriceText": "68,90 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/02359761800007_C1L1_s02",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=ost",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101511516_ST",
+    "name": "Grevé Mild 28%",
+    "brand": "Skånemejerier",
+    "packageText": "SKÅNEMEJERIER, 670g",
+    "category": "",
+    "price": 79.9,
+    "priceText": "79,90 kr",
+    "unitPriceText": "119,25 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07393720092749_C1R1_s01",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=ost",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101718037_ST",
+    "name": "Ägg 24p Frigående Inomhus Medium",
+    "brand": "Garant",
+    "packageText": "GARANT, 24p",
+    "category": "",
+    "price": 59.9,
+    "priceText": "59,90 kr",
+    "unitPriceText": "2,50 kr",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043019120_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=agg",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101591614_ST",
+    "name": "Ägg 18p Frigående Inomhus Medium / Large",
+    "brand": "Garant",
+    "packageText": "GARANT, 18p",
+    "category": "",
+    "price": 49.9,
+    "priceText": "49,90 kr",
+    "unitPriceText": "2,77 kr",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043011742_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=agg",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101716176_ST",
+    "name": "Ägg 18p Frigående Utomhus Medium/large",
+    "brand": "Garant",
+    "packageText": "GARANT, 18p",
+    "category": "",
+    "price": 58.9,
+    "priceText": "58,90 kr",
+    "unitPriceText": "3,27 kr",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043018772_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=agg",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101187348_ST",
+    "name": "Ägg 24p Frigående Inomhus Medium",
+    "brand": "Garant",
+    "packageText": "GARANT, 24p",
+    "category": "",
+    "price": 59.9,
+    "priceText": "59,90 kr",
+    "unitPriceText": "2,50 kr",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041072226_C1L1_s02",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=agg",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101146449_ST",
+    "name": "Bruna Ägg 10p Frigående Inomhus Medium/large",
+    "brand": "Garant",
+    "packageText": "GARANT, 10p",
+    "category": "",
+    "price": 31.9,
+    "priceText": "31,90 kr",
+    "unitPriceText": "3,19 kr",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041064337_C1L1_s02",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=agg",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101836357_ST",
+    "name": "Ägg 15p Frigående Inne Medium/large",
+    "brand": "Garant",
+    "packageText": "GARANT, 15p",
+    "category": "",
+    "price": 39.9,
+    "priceText": "39,90 kr",
+    "unitPriceText": "2,66 kr",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043027781_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=agg",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101218667_ST",
+    "name": "Ägg 10p Frigående Utomhus Medium/large",
+    "brand": "Garant",
+    "packageText": "GARANT, 10p",
+    "category": "",
+    "price": 39.9,
+    "priceText": "39,90 kr",
+    "unitPriceText": "3,99 kr",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083434624_C1L1_s05",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=agg",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101717679_ST",
+    "name": "Ägg 6p Frigående Inomhus Large/x-large",
+    "brand": "Garant",
+    "packageText": "GARANT, 6p",
+    "category": "",
+    "price": 19.9,
+    "priceText": "19,90 kr",
+    "unitPriceText": "3,32 kr",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043019069_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=agg",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101479130_ST",
+    "name": "Ägg 15p Frigående Inomhus Medium",
+    "brand": "Garant",
+    "packageText": "GARANT, 15st",
+    "category": "",
+    "price": 39.9,
+    "priceText": "39,90 kr",
+    "unitPriceText": "2,66 kr",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043002436_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=agg",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101716220_ST",
+    "name": "Ägg 6p Frigående Utomhus Medium/large",
+    "brand": "Garant",
+    "packageText": "GARANT, 6p",
+    "category": "",
+    "price": 24.9,
+    "priceText": "24,90 kr",
+    "unitPriceText": "4,15 kr",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043018796_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=agg",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101017249_ST",
+    "name": "Smör Normalsaltat 82%",
+    "brand": "Svenskt Smör",
+    "packageText": "SVENSKT SMÖR, 500g",
+    "category": "",
+    "price": 60.9,
+    "priceText": "60,90 kr",
+    "unitPriceText": "121,80 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=smor",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101017267_ST",
+    "name": "Smör Normalsaltat 82%",
+    "brand": "Svenskt Smör",
+    "packageText": "SVENSKT SMÖR, 250g",
+    "category": "",
+    "price": 37.76,
+    "priceText": "37,76 kr",
+    "unitPriceText": "151,04 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005250_C1L1_s01",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=smor",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101017285_ST",
+    "name": "Smör Osaltat 82%",
+    "brand": "Svenskt Smör",
+    "packageText": "SVENSKT SMÖR, 250g",
+    "category": "",
+    "price": 37.76,
+    "priceText": "37,76 kr",
+    "unitPriceText": "151,04 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005496_C1L1_s01",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=smor",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101214886_ST",
+    "name": "Smör Osaltat 82%",
+    "brand": "Valio",
+    "packageText": "VALIO, 500g",
+    "category": "",
+    "price": 58.9,
+    "priceText": "58,90 kr",
+    "unitPriceText": "117,80 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06408432061240_C1R1_s03",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=smor",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101090926_ST",
+    "name": "Smör Normalsaltat 80%",
+    "brand": "Valio",
+    "packageText": "VALIO, 500g",
+    "category": "",
+    "price": 58.9,
+    "priceText": "58,90 kr",
+    "unitPriceText": "117,80 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06408432061233_C1R1_s03",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=smor",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101214772_ST",
+    "name": "Smör Osaltat 82%",
+    "brand": "Svenskt Smör",
+    "packageText": "SVENSKT SMÖR, 500g",
+    "category": "",
+    "price": 60.9,
+    "priceText": "60,90 kr",
+    "unitPriceText": "121,80 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865561121_C1L1_s02",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=smor",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101017338_ST",
+    "name": "Smör Extra Saltat 81%",
+    "brand": "Svenskt Smör",
+    "packageText": "SVENSKT SMÖR, 500g",
+    "category": "",
+    "price": 60.9,
+    "priceText": "60,90 kr",
+    "unitPriceText": "121,80 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005304_C1L1_s01",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=smor",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101662319_ST",
+    "name": "Margarin Mat & Bak",
+    "brand": "Garant",
+    "packageText": "GARANT, 1kg",
+    "category": "",
+    "price": 30.19,
+    "priceText": "30,19 kr",
+    "unitPriceText": "30,19 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043013890_C1L1_s01",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=smor",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101241828_ST",
+    "name": "Smörstav Normalsaltat 82%",
+    "brand": "Svenskt Smör",
+    "packageText": "SVENSKT SMÖR, 100g",
+    "category": "",
+    "price": 20.72,
+    "priceText": "20,72 kr",
+    "unitPriceText": "207,20 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310860561249_C1L1_s02",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=smor",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101122777_ST",
+    "name": "Smör Extrasaltat 80%",
+    "brand": "Valio",
+    "packageText": "VALIO, 500g",
+    "category": "",
+    "price": 58.9,
+    "priceText": "58,90 kr",
+    "unitPriceText": "117,80 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06408432061264_C1R1_s03",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=smor",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "100150587_KG",
+    "name": "Potatis Fast Klass 1",
+    "brand": "",
+    "packageText": "",
+    "category": "",
+    "price": 11.9,
+    "priceText": "11,90 kr",
+    "unitPriceText": "11,90 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/02359739200006_C1C0_s01",
+    "labels": [
+      "swedish_flag",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=potatis",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101058267_ST",
+    "name": "Potatis Fast Klass 1",
+    "brand": "Garant",
+    "packageText": "GARANT, 2kg",
+    "category": "",
+    "price": 27.9,
+    "priceText": "27,90 kr",
+    "unitPriceText": "13,95 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042006398_C1L1_s02",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=potatis",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101301935_ST",
+    "name": "Potatis Fast Klass 1",
+    "brand": "Garant",
+    "packageText": "GARANT, 900g",
+    "category": "",
+    "price": 14.9,
+    "priceText": "14,90 kr",
+    "unitPriceText": "16,56 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042010128_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=potatis",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "100150541_KG",
+    "name": "Potatis Mjölig Klass 1",
+    "brand": "",
+    "packageText": "",
+    "category": "",
+    "price": 11.9,
+    "priceText": "11,90 kr",
+    "unitPriceText": "11,90 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042005155_C1C0_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=potatis",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101301931_ST",
+    "name": "Potatis Smått&gott Klass 1",
+    "brand": "Garant",
+    "packageText": "GARANT, 900g",
+    "category": "",
+    "price": 18.8,
+    "priceText": "18,80 kr",
+    "unitPriceText": "20,89 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042010081_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=potatis",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101058356_ST",
+    "name": "Potatis Mjölig Klass 1",
+    "brand": "Garant",
+    "packageText": "GARANT, 2kg",
+    "category": "",
+    "price": 27.9,
+    "priceText": "27,90 kr",
+    "unitPriceText": "13,95 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042006404_C1L1_s02",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=potatis",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101302361_ST",
+    "name": "Potatis Delikatess Klass 1",
+    "brand": "Garant",
+    "packageText": "GARANT, 450g",
+    "category": "",
+    "price": 15.9,
+    "priceText": "15,90 kr",
+    "unitPriceText": "35,33 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042010173_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=potatis",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "100225490_ST",
+    "name": "Potatis Fast Klass 2",
+    "brand": "",
+    "packageText": "5 kg",
+    "category": "",
+    "price": 46.9,
+    "priceText": "46,90 kr",
+    "unitPriceText": "9,38 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042005865_C1N1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=potatis",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101301936_ST",
+    "name": "Potatis Mjölig Klass 1",
+    "brand": "Garant",
+    "packageText": "GARANT, 900g",
+    "category": "",
+    "price": 14.9,
+    "priceText": "14,90 kr",
+    "unitPriceText": "16,56 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042010135_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=potatis",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101302358_ST",
+    "name": "Potatis Fast Klass 2",
+    "brand": "Garant",
+    "packageText": "GARANT, 900g",
+    "category": "",
+    "price": 18.8,
+    "priceText": "18,80 kr",
+    "unitPriceText": "20,89 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042010142_C1L1_s01",
+    "labels": [
+      "ecological",
+      "krav",
+      "swedish_flag",
+      "from_sweden",
+      "eu_ecological",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=potatis",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "100254920_KG",
+    "name": "Banan Klass 1",
+    "brand": "",
+    "packageText": "ca: 180g",
+    "category": "",
+    "price": 18.8,
+    "priceText": "18,80 kr",
+    "unitPriceText": "18,80 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042002499_C1N1_s01",
+    "labels": [
+      "rainforest_alliance",
+      "keyhole",
+      "environmental_facet"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=banan",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "100235247_KG",
+    "name": "Banan Eko Klass 1",
+    "brand": "",
+    "packageText": "ca: 170g",
+    "category": "",
+    "price": 21.6,
+    "priceText": "21,60 kr",
+    "unitPriceText": "21,60 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042004714_C1N1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=banan",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101845037_ST",
+    "name": "Fruit Bar Äpple&banan Från 12 Månader",
+    "brand": "Hipp",
+    "packageText": "HIPP, 23g",
+    "category": "",
+    "price": 11.26,
+    "priceText": "11,26 kr",
+    "unitPriceText": "489,57 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04062300482425_C1N1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=banan",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101418692_ST",
+    "name": "Nut Bar Banana Chocolate",
+    "brand": "Dave & Jon's",
+    "packageText": "DAVE & JON'S, 35g",
+    "category": "",
+    "price": 11.26,
+    "priceText": "11,26 kr",
+    "unitPriceText": "321,71 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350054795807_C1N1_s02",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=banan",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101418694_ST",
+    "name": "Banana Dream Proteinbar",
+    "brand": "Barebells",
+    "packageText": "BAREBELLS, 55g",
+    "category": "",
+    "price": 20.72,
+    "priceText": "20,72 kr",
+    "unitPriceText": "376,73 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340001804676_C1N1_s02",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=banan",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101271985_ST",
+    "name": "Banana Pear Mango Från 4 Månader",
+    "brand": "Hipp",
+    "packageText": "HIPP, 100g",
+    "category": "",
+    "price": 12.2,
+    "priceText": "12,20 kr",
+    "unitPriceText": "122,00 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04062300307162_C1N1_s03",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=banan",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101271974_ST",
+    "name": "Apple Banana Strawberries Från 6 Månader",
+    "brand": "Hipp",
+    "packageText": "HIPP, 100g",
+    "category": "",
+    "price": 12.2,
+    "priceText": "12,20 kr",
+    "unitPriceText": "122,00 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04062300307131_C1N1_s03",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=banan",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101259156_ST",
+    "name": "Banana Split Glass",
+    "brand": "Dazzley",
+    "packageText": "DAZZLEY, 0,9l",
+    "category": "",
+    "price": 28.29,
+    "priceText": "28,29 kr",
+    "unitPriceText": "31,43 kr",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041081198_C1L1_s03",
+    "labels": [
+      "rainforest_alliance",
+      "frozen",
+      "environmental_facet"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=banan",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101293110_ST",
+    "name": "Banana Skids",
+    "brand": "Swizzels",
+    "packageText": "SWIZZELS, 18g",
+    "category": "",
+    "price": 5.58,
+    "priceText": "5,58 kr",
+    "unitPriceText": "310,00 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05010478247819_C1N1_s01",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=banan",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101324929_ST",
+    "name": "Banana Toffee Goody Sweet Ovals",
+    "brand": "Bubs",
+    "packageText": "BUBS, 175g",
+    "category": "",
+    "price": 15.99,
+    "priceText": "15,99 kr",
+    "unitPriceText": "91,37 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07393077181509_S01",
+    "labels": [
+      "fairtrade",
+      "fairtrade_facet"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=banan",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101222356_ST",
+    "name": "Innerfilé av Svensk Kyckling Fryst",
+    "brand": "Garant",
+    "packageText": "GARANT, 700g",
+    "category": "",
+    "price": 54.9,
+    "priceText": "54,90 kr",
+    "unitPriceText": "78,43 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083434723_C1C1_s03",
+    "labels": [
+      "swedish_flag",
+      "swedish_bird",
+      "frozen"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=kyckling",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101222270_ST",
+    "name": "Kycklingfilé Svensk Fryst",
+    "brand": "Garant",
+    "packageText": "GARANT, 1kg",
+    "category": "",
+    "price": 85.08,
+    "priceText": "85,08 kr",
+    "unitPriceText": "85,08 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083434716_C1C1_s03",
+    "labels": [
+      "swedish_flag",
+      "swedish_bird",
+      "frozen"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=kyckling",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "100323865_ST",
+    "name": "Kycklingfilé Fryst",
+    "brand": "Kronfågel",
+    "packageText": "KRONFÅGEL, 1kg",
+    "category": "",
+    "price": 94.45,
+    "priceText": "94,45 kr",
+    "unitPriceText": "94,45 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300322544002_C1N1_s04",
+    "labels": [
+      "swedish_flag",
+      "swedish_bird",
+      "frozen"
+    ],
+    "online": true,
+    "outOfStock": true,
+    "sourceUrl": "https://www.willys.se/search?q=kyckling",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101266948_ST",
+    "name": "Kyckling Filé Fryst",
+    "brand": "Eldorado",
+    "packageText": "ELDORADO, 2kg",
+    "category": "",
+    "price": 139,
+    "priceText": "139,00 kr",
+    "unitPriceText": "69,50 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083434976_C1N1_s02",
+    "labels": [
+      "frozen"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=kyckling",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101294827_ST",
+    "name": "Kyckling Innerfilé Fryst",
+    "brand": "Eldorado",
+    "packageText": "ELDORADO, 700g",
+    "category": "",
+    "price": 49.9,
+    "priceText": "49,90 kr",
+    "unitPriceText": "71,29 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083475962_C1N1_s01",
+    "labels": [
+      "frozen"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=kyckling",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101273702_ST",
+    "name": "Kycklingben Fryst",
+    "brand": "Garant",
+    "packageText": "GARANT, 1kg",
+    "category": "",
+    "price": 36.5,
+    "priceText": "36,50 kr",
+    "unitPriceText": "36,50 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083462207_C1N1_s01",
+    "labels": [
+      "swedish_flag",
+      "swedish_bird",
+      "frozen"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=kyckling",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101273506_ST",
+    "name": "Kycklingklubba Fryst",
+    "brand": "Garant",
+    "packageText": "GARANT, 1kg",
+    "category": "",
+    "price": 36.5,
+    "priceText": "36,50 kr",
+    "unitPriceText": "36,50 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083462214_C1N1_s01",
+    "labels": [
+      "swedish_flag",
+      "swedish_bird",
+      "frozen"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=kyckling",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101273579_ST",
+    "name": "Kycklingvingar Fryst",
+    "brand": "Garant",
+    "packageText": "GARANT, 1kg",
+    "category": "",
+    "price": 36.5,
+    "priceText": "36,50 kr",
+    "unitPriceText": "36,50 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083462221_C1N1_s01",
+    "labels": [
+      "swedish_flag",
+      "swedish_bird",
+      "frozen"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=kyckling",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101266950_ST",
+    "name": "Kyckling Filé Fryst",
+    "brand": "Eldorado",
+    "packageText": "ELDORADO, 900g",
+    "category": "",
+    "price": 69.9,
+    "priceText": "69,90 kr",
+    "unitPriceText": "77,67 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083410956_C1C1_s01",
+    "labels": [
+      "keyhole",
+      "frozen"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=kyckling",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101273580_ST",
+    "name": "Kycklinglår Fryst",
+    "brand": "Garant",
+    "packageText": "GARANT, 1kg",
+    "category": "",
+    "price": 36.5,
+    "priceText": "36,50 kr",
+    "unitPriceText": "36,50 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083462238_C1N1_s01",
+    "labels": [
+      "swedish_flag",
+      "swedish_bird",
+      "frozen"
+    ],
+    "online": true,
+    "outOfStock": true,
+    "sourceUrl": "https://www.willys.se/search?q=kyckling",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101222173_ST",
+    "name": "Ketchup Magnum",
+    "brand": "Felix",
+    "packageText": "FELIX, 1,25kg",
+    "category": "",
+    "price": 33.97,
+    "priceText": "33,97 kr",
+    "unitPriceText": "27,18 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240060157_C1N1_s03",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=ketchup",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "100365418_ST",
+    "name": "Tomatketchup",
+    "brand": "Heinz",
+    "packageText": "HEINZ, 1kg",
+    "category": "",
+    "price": 33.02,
+    "priceText": "33,02 kr",
+    "unitPriceText": "33,02 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08715700016504_C1C1_s01",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=ketchup",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101222172_ST",
+    "name": "Ketchup",
+    "brand": "Felix",
+    "packageText": "FELIX, 1kg",
+    "category": "",
+    "price": 31.13,
+    "priceText": "31,13 kr",
+    "unitPriceText": "31,13 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240060072_C1N1_s01",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=ketchup",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101222207_ST",
+    "name": "Ketchup Original",
+    "brand": "Felix",
+    "packageText": "FELIX, 500g",
+    "category": "",
+    "price": 21.67,
+    "priceText": "21,67 kr",
+    "unitPriceText": "43,34 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240060638_C1N1_s02",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=ketchup",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101320762_ST",
+    "name": "Ketchup Mindre Socker&salt",
+    "brand": "Felix",
+    "packageText": "FELIX, 980g",
+    "category": "",
+    "price": 31.7,
+    "priceText": "31,70 kr",
+    "unitPriceText": "32,35 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240060010_C1N1_s02",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=ketchup",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101830535_ST",
+    "name": "Ketchup Mindre Socker & Salt",
+    "brand": "Felix",
+    "packageText": "FELIX, 485g",
+    "category": "",
+    "price": 24.51,
+    "priceText": "24,51 kr",
+    "unitPriceText": "50,54 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07316110002142_C1N1_s01",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=ketchup",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101288271_ST",
+    "name": "Tomatketchup Osötad",
+    "brand": "Felix",
+    "packageText": "FELIX, 970g",
+    "category": "",
+    "price": 38.7,
+    "priceText": "38,70 kr",
+    "unitPriceText": "39,90 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240060058_C1N1_s02",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=ketchup",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101222189_ST",
+    "name": "Hot Chili Ketchup",
+    "brand": "Felix",
+    "packageText": "FELIX, 500g",
+    "category": "",
+    "price": 20.72,
+    "priceText": "20,72 kr",
+    "unitPriceText": "41,44 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240060478_C1N1_s02",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=ketchup",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101261851_ST",
+    "name": "Chilisås Original",
+    "brand": "Felix",
+    "packageText": "FELIX, 570g",
+    "category": "",
+    "price": 28.29,
+    "priceText": "28,29 kr",
+    "unitPriceText": "49,63 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240025231_C1N1_s02",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=ketchup",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101830533_ST",
+    "name": "Tomatketchup Jubileumsflaska",
+    "brand": "Felix",
+    "packageText": "FELIX, 350g",
+    "category": "",
+    "price": 20.72,
+    "priceText": "20,72 kr",
+    "unitPriceText": "59,20 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07316110002371_C1N1_s01",
+    "labels": [],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=ketchup",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "100132321_ST",
+    "name": "Havregryn",
+    "brand": "Axa",
+    "packageText": "AXA, 1,5kg",
+    "category": "",
+    "price": 20.34,
+    "priceText": "20,34 kr",
+    "unitPriceText": "13,56 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130321085_C1N1_s03",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=havregryn",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "100132296_ST",
+    "name": "Havregryn",
+    "brand": "Axa",
+    "packageText": "AXA, 750g",
+    "category": "",
+    "price": 14.1,
+    "priceText": "14,10 kr",
+    "unitPriceText": "18,80 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130321122_C1N1_s03",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=havregryn",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "100132394_ST",
+    "name": "Havregryn",
+    "brand": "Gyllenhamars",
+    "packageText": "GYLLENHAMARS, 1kg",
+    "category": "",
+    "price": 18.83,
+    "priceText": "18,83 kr",
+    "unitPriceText": "18,83 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130321283_C1R1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=havregryn",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101833307_ST",
+    "name": "Havregryn",
+    "brand": "Garant",
+    "packageText": "GARANT, 1,5kg",
+    "category": "",
+    "price": 18.83,
+    "priceText": "18,83 kr",
+    "unitPriceText": "12,55 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043026838_C1L1_s02",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=havregryn",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101758934_ST",
+    "name": "Havregryn Extra Fylliga",
+    "brand": "Axa",
+    "packageText": "AXA, 825g",
+    "category": "",
+    "price": 18.83,
+    "priceText": "18,83 kr",
+    "unitPriceText": "22,82 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130013669_C1R1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=havregryn",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101243803_ST",
+    "name": "Fiberhavregryn",
+    "brand": "Axa",
+    "packageText": "AXA, 1,5kg",
+    "category": "",
+    "price": 25.45,
+    "priceText": "25,45 kr",
+    "unitPriceText": "16,97 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130006128_C1N1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=havregryn",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101308104_ST",
+    "name": "Fiberhavregryn",
+    "brand": "Garant",
+    "packageText": "GARANT, 1,5kg",
+    "category": "",
+    "price": 21.67,
+    "priceText": "21,67 kr",
+    "unitPriceText": "14,45 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083480638_C1L1_s02",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=havregryn",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "100165884_ST",
+    "name": "Fiberhavregryn",
+    "brand": "Gyllenhamars",
+    "packageText": "GYLLENHAMARS, 1kg",
+    "category": "",
+    "price": 22.61,
+    "priceText": "22,61 kr",
+    "unitPriceText": "22,61 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130321238_C1R1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=havregryn",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101700774_ST",
+    "name": "Havregryn Eko",
+    "brand": "Garant Eko",
+    "packageText": "GARANT EKO, 1,5kg",
+    "category": "",
+    "price": 28.29,
+    "priceText": "28,29 kr",
+    "unitPriceText": "18,86 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015597_C1L1_s01",
+    "labels": [
+      "ecological",
+      "krav",
+      "swedish_flag",
+      "from_sweden",
+      "eu_ecological",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=havregryn",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
+  },
+  {
+    "code": "101436925_ST",
+    "name": "Havregryn",
+    "brand": "Garant Eko",
+    "packageText": "GARANT EKO, 750g",
+    "category": "",
+    "price": 18.83,
+    "priceText": "18,83 kr",
+    "unitPriceText": "25,11 kr",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043000685_C1L1_s01",
+    "labels": [
+      "ecological",
+      "krav",
+      "swedish_flag",
+      "from_sweden",
+      "eu_ecological",
+      "keyhole"
+    ],
+    "online": true,
+    "outOfStock": false,
+    "sourceUrl": "https://www.willys.se/search?q=havregryn",
+    "retrievedAt": "2026-05-22T09:20:01.415Z"
   }
 ];
-
 
 export const willysWeeklyDiscountSource = {
   source: "willys.se public Axfood campaign JSON",

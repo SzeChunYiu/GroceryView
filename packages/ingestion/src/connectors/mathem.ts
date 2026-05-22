@@ -71,7 +71,7 @@ export function buildMathemSearchUrl(query: string): string {
 export async function fetchMathemProducts(options: FetchMathemProductsOptions = {}): Promise<MathemProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const queries = options.queries ?? DEFAULT_MATHEM_SEARCH_QUERIES;
-  const maxRows = options.maxRows ?? 75;
+  const maxRows = options.maxRows ?? 150;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: MathemProduct[] = [];
   const seenCodes = new Set<string>();
