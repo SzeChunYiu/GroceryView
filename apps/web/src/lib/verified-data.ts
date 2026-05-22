@@ -1,5 +1,5 @@
 import { COMMODITIES, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planDietarySubstitutionAssistant, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type CommodityPriceObservation, type ProductMatchInput } from '@groceryview/core';
+import { calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type CommodityPriceObservation, type ProductMatchInput } from '@groceryview/core';
 import { axfoodProducts } from './axfood-products';
 import { icaReklambladOffers, icaReklambladSource } from './ingested/ica-reklamblad';
 import { mathemProducts, mathemSource } from './ingested/mathem';
@@ -378,6 +378,48 @@ export const ecoBasketScorecard = {
     'Rows without positive savings or explicit eco evidence are withheld from the cheaper + greener basket.'
   ]
 };
+
+
+export const crowdPriceSubmissionContract = {
+  title: 'Crowd price submissions',
+  status: 'account_gated_intake_contract',
+  sourceRecordType: 'community_report',
+  trustTable: 'community_reporter_trust',
+  protectedEndpoint: '/api/community-price-reports',
+  requiredEvidence: [
+    {
+      field: 'photoEvidence',
+      copy: 'Receipt or shelf-photo evidence with contentType and byteLength before upload.'
+    },
+    {
+      field: 'reportedPrice',
+      copy: 'SEK price exactly as seen on shelf or receipt, never estimated.'
+    },
+    {
+      field: 'productOrCommodity',
+      copy: 'Verified product id or commodity alias candidate for loose meat/veg coverage.'
+    },
+    {
+      field: 'storeEvidence',
+      copy: 'Store id/name and observedAt timestamp from shopper context.'
+    }
+  ],
+  trustControls: planCommunityReportAbuseControls({ reporters: [] }),
+  defaultTrustPolicy: [
+    'Throttle reporters above 20 community reports in 24 hours.',
+    'Require manual review when a reporter has more than 5 unresolved reports.',
+    'Suspend reporting when rejected-report volume is high and acceptance ratio is below 20%.'
+  ],
+  guardrails: [
+    'No anonymous price reports: shopper session and userId are required before any community report is accepted.',
+    'Community price reports enter manual review before they can affect verified prices or loose commodity coverage.',
+    'Photo evidence is stored as private evidence and not rendered publicly in this static snapshot.',
+    'community_reporter_trust throttles, suspends, or requires manual review for risky reporters.'
+  ],
+  reviewWritebacks: ['accept_community_report', 'dismiss_community_report'],
+  nextRuntimeStep: 'Wire the protected runtime endpoint to persist community_report raw_records and enqueue human_review_assignments.'
+};
+
 
 function brandTierForAxfoodProduct(product: (typeof axfoodProducts)[number]): BrandTier {
   const brand = product.brand.toLowerCase();

@@ -1,6 +1,7 @@
-import { NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { PriceReportReviewActions } from '@/components/price-report-review-actions';
 import { routeMetadata } from '@/lib/seo';
+import { crowdPriceSubmissionContract } from '@/lib/verified-data';
 
 export function generateMetadata() {
   return routeMetadata('/price-reports');
@@ -29,6 +30,57 @@ export default function FeaturePage() {
   return (
     <PageShell>
       <NoVerifiedData route={route} title={`${titles[route]} has no private production records in this static snapshot`} />
+      <Card className="mt-6 border-emerald-200 bg-emerald-50/80">
+        <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.24em] text-emerald-800">Account-gated intake</p>
+            <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Crowd price submissions</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-700">
+              {crowdPriceSubmissionContract.title} defines the protected photo + price intake contract for shopper reports that can expand loose meat/veg coverage after manual review.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/80 p-4 text-sm font-bold text-emerald-950">
+            <p>{crowdPriceSubmissionContract.status}</p>
+            <p className="mt-1 text-xs uppercase tracking-[0.18em] text-emerald-700">{crowdPriceSubmissionContract.trustTable}</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+          <div className="rounded-2xl border border-emerald-200 bg-white/80 p-4">
+            <p className="text-sm font-black text-slate-950">Required evidence before submission</p>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {crowdPriceSubmissionContract.requiredEvidence.map((item) => (
+                <div className="rounded-2xl bg-slate-50 p-3" key={item.field}>
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">{item.field}</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-700">{item.copy}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-emerald-200 bg-white/80 p-4">
+            <p className="text-sm font-black text-slate-950">Trust and manual review guardrails</p>
+            <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-700">
+              {crowdPriceSubmissionContract.guardrails.map((guardrail) => (
+                <li key={guardrail}>• {guardrail}</li>
+              ))}
+            </ul>
+            <div className="mt-4 rounded-2xl bg-amber-50 p-3 text-sm leading-6 text-amber-950">
+              <p className="font-black">No anonymous price reports.</p>
+              <p>
+                Submissions to {crowdPriceSubmissionContract.protectedEndpoint} must remain account-bound, include reportedPrice and photoEvidence, and stay out of verified prices until a reviewer writes {crowdPriceSubmissionContract.reviewWritebacks.join(' or ')}.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 rounded-2xl border border-dashed border-emerald-300 bg-white/70 p-4 text-sm leading-6 text-slate-700">
+          <p className="font-black text-slate-950">community_reporter_trust default policy</p>
+          <ul className="mt-2 space-y-1">
+            {crowdPriceSubmissionContract.defaultTrustPolicy.map((policy) => (
+              <li key={policy}>• {policy}</li>
+            ))}
+          </ul>
+          <p className="mt-3 font-semibold text-slate-800">Next runtime step: {crowdPriceSubmissionContract.nextRuntimeStep}</p>
+        </div>
+      </Card>
       <PriceReportReviewActions />
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <TopSpreads limit={5} />
