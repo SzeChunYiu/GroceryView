@@ -13,6 +13,29 @@
 
 Every emitted row includes Coop product id/EAN, product name, brand, package label, category, B2C SEK price, comparative unit price when present, promotion copy when present, source API URL, product URL, image URL, and retrieval timestamp.
 
+## Weekly flyer discount evidence
+
+- Source: Coop public store API current flyer metadata plus public personalization product search promotions
+- Store API URL: https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true
+- Flyer PDF URL: https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna
+- Product search URL: https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1
+- Request body: weekly flyer item queries listed in `DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES`, resultsOptions take 8, empty sort/facets, relatedResultsOptions take 0
+- Required public headers: `storeApiSubscriptionKey` for store metadata and `personalizationApiSubscriptionKey` for product search, both exposed in `window.coopSettings.serviceAccess` on https://www.coop.se/handla/
+- Retrieved: 2026-05-22T08:39:41.000Z
+- Store: 251300, Stora Coop Boländerna, Uppsala
+- Flyer validity: 2026-05-18T00:00:00 through 2026-05-24T23:59:59
+- Real current flyer discount rows fetched: 26
+
+Every weekly discount row includes Coop product id/EAN, product name, brand, package label, ordinary B2C SEK price, offer SEK price, comparative offer price when present, promotion id/copy, MedMera requirement, store/region, validity, flyer URL, store API source URL, product search URL, and retrieval timestamp.
+
+## Sample Weekly Discount Rows
+
+1. 2383471000006 | Laxfilé | Harbour | ordinary 259.32 SEK | offer 149.00 SEK | 149.00 kr/kg | 2026-05-18T00:00:00 to 2026-05-24T23:59:59
+2. 7331044072573 | Kalkonbröstfilé | Ingelsta Kalkon | ordinary 88.96 SEK | offer 76.90 SEK | 192.25 kr/kg | 2026-05-18T00:00:00 to 2026-05-24T23:59:59
+3. 7310074014630 | Pepsi Max 20-pack | Pepsi | ordinary 122.09 SEK | offer 84.00 SEK | 12.73 kr/lit | 2026-05-18T00:00:00 to 2026-05-24T23:59:59
+4. 7622210929525 | Chokladpraliner Hjärta | Marabou | ordinary 67.15 SEK | offer 45.00 SEK | 272.73 kr/kg | 2026-05-18T00:00:00 to 2026-05-24T23:59:59
+5. 7310867561020 | Juice Tropisk | Bravo | ordinary 37.81 SEK | offer 34.00 SEK | 17.00 kr/lit | 2026-05-18T00:00:00 to 2026-05-24T23:59:59
+
 ## Sample Retrieved Rows
 
 1. 7310760012896 | Bryggkaffe Mellanrost | Arvid Nordquist | 500 g | 75.17 SEK | 150.34 kr/kg | https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1
