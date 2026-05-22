@@ -6,7 +6,7 @@ import {
   buildDailyConnectorConfigsFromEnv,
   buildHemkopSearchUrl,
   buildEmaginPdfUrl,
-  buildIcaHandlaUrl,
+  buildIcaStorePromotionsUrl,
   buildMatpriskollenStoreOffersUrl,
   buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
@@ -372,45 +372,86 @@ describe('fetchHemkopProducts', () => {
 });
 
 describe('fetchIcaProducts', () => {
-  it('fetches public ICA handla product cards with source provenance', async () => {
+  it('fetches ICA store-scoped promotion products with source provenance', async () => {
     const requestedUrls: string[] = [];
-    const html = `
-      <a title="Pasta Gnocchi Färsk 400g ICA" href="/produkt/2118838" class="product-link" data-name="Pasta Gnocchi Färsk 400g ICA" data-index="24" data-categories="[&#34;Färdigmat &#38; Såser&#34;,&#34;Färsk pasta&#34;]" data-price="0">
-        <img src="https://assets.icanet.se/image/upload/cs_srgb/t_product_medium_v1/ul98v6ybpfgb1z7127y9.webp" alt="Pasta Gnocchi Färsk 400g ICA">
-      </a>`;
+    const payload = {
+      productGroups: [{
+        type: 'ON_OFFER',
+        decoratedProducts: [{
+          productId: 'ff3ce59d-323e-42ae-b433-26953b77c7e7',
+          retailerProductId: '2077461',
+          name: 'Babyplommontomater 500g Klass 1 ICA',
+          brand: 'ICA',
+          packSizeDescription: '0.5kg',
+          countryOfOrigin: 'Marocko',
+          price: { amount: 37.9, currency: 'SEK' },
+          unitPrice: { price: { amount: 75.8, currency: 'SEK' }, unit: 'fop.price.per.kg' },
+          promoPrice: { amount: 28, currency: 'SEK' },
+          promoUnitPrice: { price: { amount: 56, currency: 'SEK' }, unit: 'fop.price.per.kg' },
+          promotions: [{ description: '28 kr/st' }],
+          image: { src: 'https://handlaprivatkund.ica.se/images-v3/example/300x300.jpg' }
+        }]
+      }]
+    };
     const fetchImpl: typeof fetch = async (url) => {
       requestedUrls.push(String(url));
-      return new Response(html, { status: 200, headers: { 'content-type': 'text/html' } });
+      return Response.json(payload);
     };
 
     const rows = await fetchIcaProducts({
-      paths: ['/kategori/306'],
       fetchImpl,
-      retrievedAt: '2026-05-21T01:05:00.000Z'
+      retrievedAt: '2026-05-22T08:28:14.000Z',
+      maxRows: 1
     });
 
-    assert.equal(requestedUrls[0], buildIcaHandlaUrl('/kategori/306'));
+    assert.equal(requestedUrls[0], buildIcaStorePromotionsUrl('1004599', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 1));
     assert.deepEqual(rows, [{
-      code: '2118838',
-      name: 'Pasta Gnocchi Färsk 400g ICA',
-      brand: '',
-      categories: ['Färdigmat & Såser', 'Färsk pasta'],
-      imageUrl: 'https://assets.icanet.se/image/upload/cs_srgb/t_product_medium_v1/ul98v6ybpfgb1z7127y9.webp',
-      productUrl: 'https://handla.ica.se/produkt/2118838',
-      dataPrice: '0',
-      sourceUrl: buildIcaHandlaUrl('/kategori/306'),
-      retrievedAt: '2026-05-21T01:05:00.000Z'
+      code: '2077461',
+      productId: 'ff3ce59d-323e-42ae-b433-26953b77c7e7',
+      retailerProductId: '2077461',
+      name: 'Babyplommontomater 500g Klass 1 ICA',
+      brand: 'ICA',
+      categories: ['ON_OFFER'],
+      imageUrl: 'https://handlaprivatkund.ica.se/images-v3/example/300x300.jpg',
+      productUrl: 'https://handlaprivatkund.ica.se/stores/1004599/products/2077461/details',
+      packageSize: '0.5kg',
+      countryOfOrigin: 'Marocko',
+      price: 37.9,
+      priceCurrency: 'SEK',
+      unitPrice: 75.8,
+      unitPriceCurrency: 'SEK',
+      unitPriceUnit: 'fop.price.per.kg',
+      promoPrice: 28,
+      promoPriceCurrency: 'SEK',
+      promoUnitPrice: 56,
+      promoUnitPriceCurrency: 'SEK',
+      promoUnitPriceUnit: 'fop.price.per.kg',
+      promotionDescription: '28 kr/st',
+      storeAccountId: '1004599',
+      storeName: 'ICA Kvantum Kungsholmen',
+      regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d',
+      sourceUrl: buildIcaStorePromotionsUrl('1004599', '6ae1c52a-99a8-4b19-9464-dd01274df39d', 1),
+      retrievedAt: '2026-05-22T08:28:14.000Z'
     }]);
   });
 
-  it('deduplicates products across ICA handla pages', async () => {
-    const html = '<a title="Same product" href="/produkt/1" class="product-link" data-name="Same product" data-categories="[]" data-price="0"><img src="/image.webp"></a>';
-    const fetchImpl: typeof fetch = async () => new Response(html, { status: 200 });
+  it('deduplicates repeated ICA store products', async () => {
+    const product = {
+      productId: 'product-1',
+      retailerProductId: 'retailer-1',
+      name: 'Same product',
+      price: { amount: 10, currency: 'SEK' }
+    };
+    const fetchImpl: typeof fetch = async () => Response.json({
+      productGroups: [
+        { type: 'ON_OFFER', decoratedProducts: [product] },
+        { type: 'ON_OFFER', decoratedProducts: [product] }
+      ]
+    });
 
     const rows = await fetchIcaProducts({
-      paths: ['/', '/kategori/1'],
       fetchImpl,
-      retrievedAt: '2026-05-21T01:05:00.000Z'
+      retrievedAt: '2026-05-22T08:28:14.000Z'
     });
 
     assert.equal(rows.length, 1);

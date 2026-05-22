@@ -1,29 +1,27 @@
-# ICA handla ingestion evidence
+# ICA ingestion evidence
 
-- Source: handla.ica.se public product-card HTML
-- Source URL pattern: https://handla.ica.se/{path}
-- Retrieved: 2026-05-21T00:58:33.537Z
-- Source paths used: /, /kategori/627, /kategori/1, /kategori/4942, /kategori/256
-- Real rows fetched: 75
+- Source: ICA public store-scoped promotions JSON
+- Source URL: https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=100&maxPageSize=100
+- Retrieved: 2026-05-22T08:30:38.928Z
+- Store: 1004599 ICA Kvantum Kungsholmen
+- Region ID: 6ae1c52a-99a8-4b19-9464-dd01274df39d
+- Real rows fetched: 100
 - Connector: packages/ingestion/src/connectors/ica.ts
 - Web wire: apps/web/src/lib/ingested/ica.ts
 
-Every emitted row includes an ICA product id, product name, brand when present, category labels when present, product URL, image URL, source page URL, and retrieval timestamp. The public cards omit price or expose data-price as 0 until a store is selected, so this ingest is product-card/catalog evidence rather than live priced SEK evidence.
+Every emitted row came from the live promotions response for the selected ICA store and includes the exact source URL plus retrieval timestamp. Rows preserve store account, region, ordinary price, unit price, promo price fields when ICA returned them, and product detail URLs.
 
 ## Sample Retrieved Rows
 
-1. 1203222 | Ägg Frigående M 15-p ICA | unknown | Mejeri & Ost | https://handla.ica.se/
-2. 1214490 | Blåbär 125g Klass 1 ICA | unknown | Frukt & Grönt | https://handla.ica.se/
-3. 1302239 | Pesto Tomat 185g ICA | unknown | Skafferi | https://handla.ica.se/
-4. 1328390 | Vatten Kolsyrad Citron 33cl 12-p Loka | unknown | Dryck | https://handla.ica.se/
-5. 1343305 | Pannkakor fryst 800g Kungsörnen | unknown | Fryst | https://handla.ica.se/
-6. 1371787 | Toalettpapper 6-p Miljömärkt ICA | unknown | Städ, Tvätt & Papper | https://handla.ica.se/
-7. 1382097 | Päron i korg 1kg Klass 2 ICA | unknown | Frukt & Grönt | https://handla.ica.se/
-8. 1382628 | Basilika Ekologisk 1-p KRAV Klass 1 ICA I | unknown | Frukt & Grönt | https://handla.ica.se/
-9. 1396763 | Sallatsmix Finbladig Spröd Sköljd 65g ICA | unknown | Grill | https://handla.ica.se/
-10. 1422163 | Lantskinka Rökt 120g ICA | unknown | Kött, Chark & Fågel | https://handla.ica.se/
-11. 1441052 | Granola Kakao & hallon 450g Pauluns | unknown | Skafferi | https://handla.ica.se/
-12. 1478802 | Majskakor Chiafrö & havssalt Glutenfri 130g Friggs | unknown | Bröd & Kakor | https://handla.ica.se/
-13. 1487595 | Krögarpytt klassisk Fryst 1,5kg Felix | unknown | Fryst | https://handla.ica.se/
-14. 1489303 | Skivade Rödbetor 710g Felix | unknown | Skafferi | https://handla.ica.se/
-15. 1508096 | Bryggkaffe Mon Amie 450g Zoegas | unknown | Dryck | https://handla.ica.se/
+1. 2077461 | Babyplommontomater 500g Klass 1 ICA | price=37.9 SEK | promo=28 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=100&maxPageSize=100
+2. 2142371 | Ätmogen Avokado 3-pack Klass 1 ICA | price=40.6 SEK | promo=25 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=100&maxPageSize=100
+3. 1024181 | Falukorv Klassikern 800g Scan | price=39.7 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=100&maxPageSize=100
+4. 1319139 | Röd spetsig paprika 200g Klass 1 ICA | price=19.9 SEK | promo=15 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=100&maxPageSize=100
+5. 1131301 | Druvor Crimson Röda kärnfria 500g Klass 1  ICA | price=40.6 SEK | promo=28 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=100&maxPageSize=100
+6. 2014681 | Majs 3-p 480g Green Giant | price=28.6 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=100&maxPageSize=100
+7. 1201853 | Juice Apelsin 1l God Morgon® | price=27.4 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=100&maxPageSize=100
+8. 2092056 | Yoghurt Grekisk Naturell 10% 1000g Salakis | price=40.7 SEK | promo=25 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=100&maxPageSize=100
+9. 2161610 | Hamburgare 8-p 720g ICA | price=78.3 SEK | promo=70 SEK | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=100&maxPageSize=100
+10. 2014811 | Glassbåtar 6-p Sia Glass | price=49.2 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=100&maxPageSize=100
+11. 2016864 | Läsk 1,5l Trocadero Zero | price=18.9 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=100&maxPageSize=100
+12. 1477716 | Skinka Strimlad Rökt 180g ICA | price=22.2 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1004599/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=100&maxPageSize=100
