@@ -933,6 +933,23 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a high-protein deal finder from real deal and nutrition rankings', async () => {
+    const source = await read('src/app/nutrition-value/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+
+    assert.match(demo, /highProteinDealFinder/);
+    assert.match(demo, /rankDealOpportunities/);
+    assert.match(demo, /rankNutritionPerKrona/);
+    assert.match(demo, /proteinPer10Sek/);
+    assert.match(demo, /minProteinPer10Sek/);
+    assert.match(source, /highProteinDealFinder/);
+    assert.match(source, /High-protein deal finder/);
+    assert.match(source, /proteinPer10Sek/);
+    assert.match(source, /dealScore/);
+    assert.match(source, /visible deal rows and package nutrition labels/i);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces a halal kosher and ethnic aisle finder from verified category rows', async () => {
     const source = await read('src/app/categories/page.tsx');
     const verified = await read('src/lib/verified-data.ts');

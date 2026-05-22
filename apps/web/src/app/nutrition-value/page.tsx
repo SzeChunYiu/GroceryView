@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { healthMacroOptimizer, nutritionPerKrona } from '@/lib/demo-data';
+import { healthMacroOptimizer, highProteinDealFinder, nutritionPerKrona } from '@/lib/demo-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -62,6 +62,43 @@ export default function NutritionValuePage() {
             </Link>
           ))}
         </div>
+      </Card>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-emerald-800">{highProteinDealFinder.persona}</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">High-protein deal finder</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Ranks current deal rows only after rankDealOpportunities and rankNutritionPerKrona agree they clear the deal-score and protein-per-krona thresholds. The board uses visible deal rows and package nutrition labels; missing labels stay out.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white px-4 py-3 text-right shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">minProteinPer10Sek</p>
+            <p className="text-3xl font-black text-emerald-950">{highProteinDealFinder.minProteinPer10Sek}g</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          {highProteinDealFinder.rows.map((row) => (
+            <Link className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm hover:border-emerald-700" href={`/products/${row.productId}`} key={`${row.productId}-${row.storeId}`}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{row.trainingUse}</p>
+                  <h3 className="mt-2 text-lg font-black text-slate-950">{row.productName}</h3>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">{row.storeName} · {formatSek(row.currentPrice)}</p>
+                </div>
+                <p className="rounded-full bg-emerald-100 px-3 py-1 text-sm font-black text-emerald-950">dealScore {row.dealScore}</p>
+              </div>
+              <div className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
+                <p className="rounded-2xl bg-emerald-50 p-3 font-semibold text-emerald-950">proteinPer10Sek {row.proteinPer10Sek.toFixed(2)}g</p>
+                <p className="rounded-2xl bg-slate-50 p-3 font-semibold text-slate-700">Drop {formatSek(row.priceDrop)}</p>
+                <p className={`rounded-2xl p-3 font-semibold ${row.saltWarning ? 'bg-amber-50 text-amber-950' : 'bg-emerald-50 text-emerald-950'}`}>{row.saltWarning ? 'Salt warning' : 'Salt ok'}</p>
+              </div>
+              <p className="mt-3 text-xs font-semibold leading-5 text-slate-500">{row.source}</p>
+            </Link>
+          ))}
+        </div>
+        <p className="mt-4 rounded-2xl bg-white p-3 text-sm font-bold text-emerald-950">{highProteinDealFinder.coverage.caveat}</p>
       </Card>
 
       <Card className="mt-6">
