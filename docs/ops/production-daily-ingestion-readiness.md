@@ -71,12 +71,12 @@ Use this emitted JSON only for local `ops:validate-production-env` checks or one
 
 ## Validate values before relying on cron
 
-Run from an environment that has the real values loaded. The workflow does this automatically; for a local operator check, export the generated connector JSON first:
+Run from an environment that has the real values loaded. The workflow does this automatically; for a local operator check, write the generated connector JSON to a file and pass the file path so large all-store configs do not overflow process environment limits:
 
 ```bash
-GROCERYVIEW_DAILY_CONNECTORS_JSON=$(npm run --silent ops:daily-connectors)
-export GROCERYVIEW_DAILY_CONNECTORS_JSON
-npm run ops:validate-production-env
+npm run --silent ops:daily-connectors > /tmp/groceryview-daily-connectors.json
+GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=/tmp/groceryview-daily-connectors.json \
+  npm run ops:validate-production-env
 ```
 
 This fails closed unless:

@@ -1,7 +1,9 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 const scriptPath = new URL('../../scripts/ops/validate-production-env.mjs', import.meta.url);
 const script = readFileSync(scriptPath, 'utf8');
@@ -54,6 +56,42 @@ describe('production env value validation script', () => {
       coverageProductCount: 1,
       coverageStoreCount: 6
     });
+  });
+
+
+  it('accepts daily connector config by file path to avoid oversized process environments', async () => {
+    const { validateProductionEnv } = await import(scriptPath);
+    const chains = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'];
+    const connectorPath = join(mkdtempSync(join(tmpdir(), 'groceryview-connectors-')), 'connectors.json');
+    writeFileSync(connectorPath, JSON.stringify(chains.map((chainId) => ({
+      connectorId: `${chainId}-normalized-json`,
+      chainId,
+      sourceType: 'official_api',
+      endpointUrl: `https://sources.example.test/${chainId}/products.json`,
+      parserVersion: 'normalized-json-v1',
+      robotsTxtStatus: 'not_applicable',
+      legalReviewStatus: 'approved',
+      hasDataAgreement: true,
+      stores: [{ storeId: `${chainId}-odenplan`, name: `${chainId} Odenplan`, address: 'Odenplan', city: 'Stockholm' }]
+    }))));
+
+    assert.equal(validateProductionEnv({
+      AUTH_SECRET: 'test-auth-secret',
+      DATABASE_URL: 'postgres://example/groceryview',
+      PUBLIC_WEB_URL: 'https://groceryview.example',
+      NOTIFICATION_WEBHOOK_SECRET: 'test-notification-webhook-secret',
+      BILLING_WEBHOOK_SECRET: 'test-billing-webhook-secret',
+      METRICS_TOKEN: 'test-metrics-token',
+      GROCERYVIEW_SERVER_URL: 'https://api.groceryview.example',
+      GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE: connectorPath,
+      CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
+        targetProducts: ['coffee'],
+        targetCategories: ['coffee'],
+        targetChains: chains,
+        targetStores: chains.map((chainId) => `${chainId}-odenplan`),
+        requireEveryProductInEveryStore: true
+      })
+    }).status, 'ready');
   });
 
   it('fails closed when required env values are missing', () => {
