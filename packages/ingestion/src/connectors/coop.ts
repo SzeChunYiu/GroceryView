@@ -150,6 +150,17 @@ export const DEFAULT_COOP_DEVICE = 'desktop';
 export const DEFAULT_COOP_API_VERSION = 'v1';
 export const DEFAULT_COOP_STORE_API_VERSION = 'v5';
 export const DEFAULT_COOP_SEARCH_QUERY = 'kaffe';
+export const DEFAULT_COOP_PRODUCT_QUERIES = [
+  DEFAULT_COOP_SEARCH_QUERY,
+  'mjölk',
+  'pasta',
+  'kyckling',
+  'smör',
+  'yoghurt',
+  'banan',
+  'ris',
+  'fisk'
+] as const;
 export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [
   DEFAULT_COOP_STORE_ID,
   '252700',
@@ -287,6 +298,12 @@ export type FetchCoopProductsOptions = {
   subscriptionKey?: string;
   personalizationApiUrl?: string;
   retrievedAt?: string;
+};
+
+export type FetchCoopProductCatalogOptions = Omit<FetchCoopProductsOptions, 'query' | 'maxRows'> & {
+  queries?: readonly string[];
+  maxRows?: number;
+  maxRowsPerQuery?: number;
 };
 
 export type FetchCoopProductsForAllStoresOptions = Omit<FetchCoopProductsOptions, 'storeId' | 'query' | 'maxRows'> & {
@@ -558,6 +575,47 @@ export async function fetchCoopProducts(options: FetchCoopProductsOptions = {}):
   return rows;
 }
 
+export async function fetchCoopProductCatalog(
+  options: FetchCoopProductCatalogOptions = {}
+): Promise<CoopProduct[]> {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const queries = options.queries ?? DEFAULT_COOP_PRODUCT_QUERIES;
+  const maxRows = options.maxRows ?? Number.POSITIVE_INFINITY;
+  const maxRowsPerQuery = options.maxRowsPerQuery ?? 1000;
+  const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const serviceAccess = options.subscriptionKey
+    ? {
+        personalizationApiUrl: options.personalizationApiUrl ?? COOP_PERSONALIZATION_API_URL,
+        personalizationApiSubscriptionKey: options.subscriptionKey,
+        personalizationApiVersion: options.apiVersion ?? DEFAULT_COOP_API_VERSION
+      }
+    : await fetchCoopPublicServiceAccess(fetchImpl);
+
+  const rows: CoopProduct[] = [];
+  const seenCodes = new Set<string>();
+  for (const query of queries) {
+    const products = await fetchCoopProducts({
+      fetchImpl,
+      query,
+      maxRows: maxRowsPerQuery,
+      storeId: options.storeId,
+      device: options.device,
+      apiVersion: serviceAccess.personalizationApiVersion,
+      subscriptionKey: serviceAccess.personalizationApiSubscriptionKey,
+      personalizationApiUrl: serviceAccess.personalizationApiUrl,
+      retrievedAt
+    });
+    for (const product of products) {
+      if (seenCodes.has(product.code)) continue;
+      seenCodes.add(product.code);
+      rows.push(product);
+      if (rows.length >= maxRows) return rows;
+    }
+  }
+
+  return rows;
+}
+
 export async function fetchCoopProductsForAllStores(
   options: FetchCoopProductsForAllStoresOptions = {}
 ): Promise<CoopStoreProduct[]> {
@@ -571,7 +629,7 @@ export async function fetchCoopProductsForAllStores(
     retrievedAt: options.retrievedAt
   });
   const rows: CoopStoreProduct[] = [];
-  const queries = options.queries ?? [DEFAULT_COOP_SEARCH_QUERY];
+  const queries = options.queries ?? DEFAULT_COOP_PRODUCT_QUERIES;
   for (const store of stores) {
     for (const query of queries) {
       const products = await fetchCoopProducts({
