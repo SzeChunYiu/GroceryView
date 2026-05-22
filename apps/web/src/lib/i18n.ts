@@ -9,6 +9,7 @@ import {
   normalizeLocale,
   resolveLocaleFromAcceptLanguage,
   supportedLocales,
+  type BlockedLocaleRoute,
   type SupportedLocale
 } from './i18n-routing';
 
@@ -61,6 +62,7 @@ export {
   normalizeLocale,
   resolveLocaleFromAcceptLanguage,
   supportedLocales,
+  type BlockedLocaleRoute,
   type SupportedLocale
 };
 

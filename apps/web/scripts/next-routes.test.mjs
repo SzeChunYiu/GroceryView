@@ -2337,4 +2337,34 @@ ${seo}`;
     assert.doesNotMatch(svMessages, /machine translated/i);
     assert.match(i18n, /Arabic and Somali remain blocked until native-quality translations are reviewed/);
   });
+
+  it('ships locale-routed public entry points with blocked immigrant-language routes', async () => {
+    const routing = await read('src/lib/i18n-routing.ts');
+    const middleware = await read('src/middleware.ts');
+    const switcher = await read('src/components/language-preference-switcher.tsx');
+    const localeHome = await read('src/components/locale-home-page.tsx');
+    const svRoute = await read('src/app/sv/page.tsx');
+    const enRoute = await read('src/app/en/page.tsx');
+    const arRoute = await read('src/app/ar/page.tsx');
+    const soRoute = await read('src/app/so/page.tsx');
+
+    assert.match(routing, /routedLocales = \['sv', 'en'\]/);
+    assert.match(routing, /blockedLocaleRoutes = \['ar', 'so'\]/);
+    assert.match(routing, /localeRoutePrefix/);
+    assert.match(middleware, /x-groceryview-locale-route/);
+    assert.match(middleware, /localeFromPathname/);
+    assert.match(middleware, /blockedLocaleRoutes/);
+    assert.match(switcher, /href=\{`\/\$\{language\.locale\}`\}/);
+    assert.match(localeHome, /MarketShell/);
+    assert.match(localeHome, /alternates/);
+    assert.match(localeHome, /languages/);
+    assert.match(localeHome, /\/sv/);
+    assert.match(localeHome, /\/en/);
+    assert.match(localeHome, /Native-quality translation review required/);
+    assert.match(localeHome, /No machine-translated prices/);
+    assert.match(svRoute, /locale=\"sv\"/);
+    assert.match(enRoute, /locale=\"en\"/);
+    assert.match(arRoute, /BlockedLocalePage/);
+    assert.match(soRoute, /BlockedLocalePage/);
+  });
 });
