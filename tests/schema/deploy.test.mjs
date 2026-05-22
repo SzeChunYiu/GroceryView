@@ -17,6 +17,9 @@ describe('deployment manifest', () => {
       'PUBLIC_WEB_URL',
       'NOTIFICATION_WEBHOOK_SECRET',
       'BILLING_WEBHOOK_SECRET',
+      'STRIPE_SECRET_KEY',
+      'STRIPE_PRICE_PREMIUM_MONTHLY',
+      'STRIPE_PRICE_PREMIUM_YEARLY',
       'METRICS_TOKEN',
       'CATALOG_COVERAGE_TARGETS_JSON'
     ]);

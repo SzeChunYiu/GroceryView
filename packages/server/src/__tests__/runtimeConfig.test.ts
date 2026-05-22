@@ -231,6 +231,9 @@ describe('runtime config', () => {
       PUBLIC_WEB_URL: 'https://groceryview.example',
       NOTIFICATION_WEBHOOK_SECRET: 'webhook-secret',
       BILLING_WEBHOOK_SECRET: 'billing-webhook-secret',
+      STRIPE_SECRET_KEY: 'sk_test_runtime',
+      STRIPE_PRICE_PREMIUM_MONTHLY: 'price_monthly_runtime',
+      STRIPE_PRICE_PREMIUM_YEARLY: 'price_yearly_runtime',
       METRICS_TOKEN: 'metrics-token',
       CATALOG_COVERAGE_TARGETS_JSON: JSON.stringify({
         targetProducts: ['coffee'],
@@ -248,6 +251,11 @@ describe('runtime config', () => {
       publicWebUrl: 'https://groceryview.example',
       notificationWebhookSecret: 'webhook-secret',
       billingWebhookSecret: 'billing-webhook-secret',
+      stripeSecretKey: 'sk_test_runtime',
+      stripePriceIds: {
+        premium_monthly: 'price_monthly_runtime',
+        premium_yearly: 'price_yearly_runtime'
+      },
       metricsToken: 'metrics-token',
       catalogCoverageTargets: {
         targetProducts: ['coffee'],
@@ -405,6 +413,58 @@ describe('runtime config', () => {
       headers: { 'x-groceryview-metrics-token': 'metrics-secret' }
     }));
     assert.equal(metricsRoute.status, 503);
+  });
+
+  it('creates runtime billing checkout sessions through the Stripe-compatible API without leaking secrets', async () => {
+    const calls: Array<{ url: string; init?: RequestInit }> = [];
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
+      calls.push({ url: String(url), init });
+      return new Response(JSON.stringify({
+        id: 'cs_live_runtime_bridge',
+        url: 'https://checkout.stripe.com/c/pay/cs_live_runtime_bridge'
+      }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' }
+      });
+    }) as typeof fetch;
+
+    try {
+      const handle = createRuntimeHttpHandler({
+        NODE_ENV: 'development',
+        AUTH_SECRET: 'runtime-auth-secret',
+        PUBLIC_WEB_URL: 'https://groceryview.example',
+        STRIPE_SECRET_KEY: 'sk_test_runtime_secret',
+        STRIPE_PRICE_PREMIUM_MONTHLY: 'price_monthly_runtime'
+      });
+      const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'runtime-auth-secret');
+
+      const response = await handle(new Request('http://localhost/api/billing/checkout-sessions?userId=user-1', {
+        method: 'POST',
+        headers: { authorization: `Bearer ${token}` },
+        body: JSON.stringify({ plan: 'premium_monthly' })
+      }));
+      const responseBody = await response.json();
+
+      assert.equal(response.status, 201);
+      assert.deepEqual(responseBody, {
+        provider: 'stripe_compatible',
+        sessionId: 'cs_live_runtime_bridge',
+        checkoutUrl: 'https://checkout.stripe.com/c/pay/cs_live_runtime_bridge',
+        plan: 'premium_monthly'
+      });
+      assert.equal(calls.length, 1);
+      assert.equal(calls[0]?.url, 'https://api.stripe.com/v1/checkout/sessions');
+      assert.match(calls[0]?.init?.headers instanceof Headers ? calls[0].init.headers.get('authorization') ?? '' : '', /^Basic /);
+      const encodedBody = calls[0]?.init?.body as URLSearchParams;
+      assert.equal(encodedBody.get('mode'), 'subscription');
+      assert.equal(encodedBody.get('line_items[0][price]'), 'price_monthly_runtime');
+      assert.equal(encodedBody.get('client_reference_id'), 'user-1');
+      assert.equal(encodedBody.get('success_url'), 'https://groceryview.example/account?checkout=success&plan=premium_monthly');
+      assert.equal(JSON.stringify(responseBody).includes('sk_test_runtime_secret'), false);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
   });
 
   it('wires repository-backed runtime sinks into account access and billing webhooks', async () => {

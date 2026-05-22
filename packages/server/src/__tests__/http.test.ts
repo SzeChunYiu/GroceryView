@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createHmac } from 'node:crypto';
 import { createGroceryViewApi, type BasketImportReviewItem } from '@groceryview/api';
+import { createSessionToken } from '@groceryview/auth';
 import { createHttpHandler } from '../index.js';
 
 async function json(response: Response) {
@@ -1433,6 +1434,77 @@ describe('createHttpHandler', () => {
       enforcementReasons: string[];
     };
     assert.deepEqual(missing.enforcementReasons, ['missing_subscription_entitlement']);
+  });
+
+  it('creates account-bound billing checkout sessions through the configured provider', async () => {
+    const createdRequests: unknown[] = [];
+    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'checkout-secret');
+    const handle = createHttpHandler(undefined, {
+      authSecret: 'checkout-secret',
+      runtimeConfig: {
+        nodeEnv: 'test',
+        port: 3000,
+        publicWebUrl: 'https://groceryview.example'
+      },
+      billingCheckoutPriceIds: { premium_yearly: 'price_yearly_123' },
+      billingCheckoutProvider: {
+        async createCheckoutSession(request) {
+          createdRequests.push(request);
+          return {
+            sessionId: 'cs_test_account_bound',
+            checkoutUrl: 'https://checkout.stripe.example/session/cs_test_account_bound'
+          };
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/checkout-sessions?userId=user-1', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'content-type': 'application/json'
+      },
+      body: JSON.stringify({ plan: 'premium_yearly' })
+    }));
+
+    assert.equal(response.status, 201);
+    assert.deepEqual(await json(response), {
+      provider: 'stripe_compatible',
+      sessionId: 'cs_test_account_bound',
+      checkoutUrl: 'https://checkout.stripe.example/session/cs_test_account_bound',
+      plan: 'premium_yearly'
+    });
+    assert.deepEqual(createdRequests, [{
+      customerReference: 'user-1',
+      priceId: 'price_yearly_123',
+      successUrl: 'https://groceryview.example/account?checkout=success&plan=premium_yearly',
+      cancelUrl: 'https://groceryview.example/account?checkout=cancel&plan=premium_yearly',
+      metadata: { plan: 'premium_yearly' }
+    }]);
+    assert.equal(JSON.stringify(createdRequests).includes('checkout-secret'), false);
+  });
+
+  it('fails billing checkout sessions closed without provider configuration', async () => {
+    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'checkout-secret');
+    const handle = createHttpHandler(undefined, {
+      authSecret: 'checkout-secret',
+      runtimeConfig: {
+        nodeEnv: 'test',
+        port: 3000,
+        publicWebUrl: 'https://groceryview.example'
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/checkout-sessions?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}` },
+      body: JSON.stringify({ plan: 'premium_monthly' })
+    }));
+
+    assert.equal(response.status, 503);
+    assert.deepEqual(await json(response), {
+      error: 'Subscription checkout requires configured billing provider and price id.'
+    });
   });
 
   it('uses the runtime repository for account-bound basket import review persistence when configured', async () => {
