@@ -276,7 +276,13 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [
   '245040',
   '086804',
   '083700',
-  '105860'
+  '105860',
+  '105760',
+  '105740',
+  '105710',
+  '105830',
+  '105630',
+  '105810'
 ] as const;
 export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Färsk laxfilé Harbour',
@@ -306,11 +312,12 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'NIVEA Q10 Energy',
   'Bravo Juice Tropisk'
 ];
+const COOP_LUND_STADION_FLYER_STORE_IDS = ['105860', '105760', '105740', '105710', '105830', '105630', '105810'] as const;
 export const DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS: readonly CoopFlyerOfferHint[] = [
   {
     query: 'Färsk laxfilé Harbour',
     code: '2383471000006',
-    storeIds: ['105860'],
+    storeIds: COOP_LUND_STADION_FLYER_STORE_IDS,
     offerPrice: 149,
     offerUnitPrice: 149,
     offerUnitPriceText: '149.00 kr/kg',
@@ -320,7 +327,7 @@ export const DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS: readonly CoopFlyerOfferHint[
   {
     query: 'Mini vattenmelon',
     code: '2317342100007',
-    storeIds: ['105860'],
+    storeIds: COOP_LUND_STADION_FLYER_STORE_IDS,
     offerPrice: 20,
     offerUnitPrice: 20,
     offerUnitPriceText: '20.00 kr/kg',
@@ -330,7 +337,7 @@ export const DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS: readonly CoopFlyerOfferHint[
   {
     query: 'Hushållsost Arla',
     code: '2340375400004',
-    storeIds: ['105860'],
+    storeIds: COOP_LUND_STADION_FLYER_STORE_IDS,
     offerPrice: 74.9,
     offerUnitPrice: 74.9,
     offerUnitPriceText: '74.90 kr/kg',
@@ -340,7 +347,7 @@ export const DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS: readonly CoopFlyerOfferHint[
   {
     query: 'Svenskt smör Arla 500 g',
     code: '7310865005168',
-    storeIds: ['105860'],
+    storeIds: COOP_LUND_STADION_FLYER_STORE_IDS,
     offerPrice: 45,
     offerUnitPrice: 90,
     offerUnitPriceText: '90.00 kr/kg',
@@ -350,7 +357,7 @@ export const DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS: readonly CoopFlyerOfferHint[
   {
     query: 'Bacon Scan 3-pack',
     code: '7300206718000',
-    storeIds: ['105860'],
+    storeIds: COOP_LUND_STADION_FLYER_STORE_IDS,
     offerPrice: 37.9,
     offerUnitPrice: 90.24,
     offerUnitPriceText: '90.24 kr/kg',
@@ -359,7 +366,7 @@ export const DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS: readonly CoopFlyerOfferHint[
   {
     query: 'Torskryggfilé Royal Greenland 3-pack',
     code: '5740301203124',
-    storeIds: ['105860'],
+    storeIds: COOP_LUND_STADION_FLYER_STORE_IDS,
     offerPrice: 119,
     offerUnitPrice: 317.33,
     offerUnitPriceText: '317.33 kr/kg',
