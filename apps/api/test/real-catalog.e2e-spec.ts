@@ -215,6 +215,16 @@ describe('real catalog API endpoints', () => {
     assert.equal('demo' in response.body, false);
     assert.match(database.calls[0]?.sql ?? '', /from products/i);
     assert.match(database.calls[0]?.sql ?? '', /latest_prices/i);
+    assert.match(database.calls[0]?.sql ?? '', /from latest_prices filter_prices/i);
+    assert.ok((database.calls[0]?.sql ?? '').indexOf('from latest_prices filter_prices') < (database.calls[0]?.sql ?? '').indexOf('limit $9'));
+  });
+
+  it('rejects contradictory faceted price ranges before querying the catalog', async () => {
+    await request(app.getHttpServer())
+      .get('/products/search/faceted?minPrice=20&maxPrice=10')
+      .expect(400);
+
+    assert.equal(database.calls.length, 0);
   });
 
   it('compares posted and saved baskets from persisted latest prices', async () => {
