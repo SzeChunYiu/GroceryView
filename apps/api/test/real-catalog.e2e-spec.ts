@@ -87,6 +87,33 @@ const priceRows = [
   }
 ];
 
+const unpricedProductRows = [
+  {
+    product_id: 'product-oats',
+    slug: 'havregryn-1kg',
+    canonical_name: 'Havregryn 1 kg',
+    brand: 'Axa',
+    category_path: ['Pantry', 'Breakfast'],
+    package_size: '1',
+    package_unit: 'kg',
+    comparable_unit: 'kg',
+    image_url: null,
+    observation_id: null,
+    price: null,
+    unit_price: null,
+    currency: null,
+    price_type: null,
+    confidence: null,
+    observed_at: null,
+    chain_id: null,
+    chain_slug: null,
+    chain_name: null,
+    store_id: null,
+    store_slug: null,
+    store_name: null
+  }
+];
+
 const productRows = [
   {
     id: 'product-milk',
@@ -299,9 +326,13 @@ class FakePostgresQueryExecutorService {
     if (sql.includes('from weekly_baskets')) return [{ product_id: 'product-milk', quantity: '2' }] as T[];
     if (sql.includes('where (products.id::text = any($1::text[]) or products.slug = any($1::text[]))')) {
       const [productRefs, storeSlugs] = params as [string[], string[] | null];
-      return priceRows
+      const rows = [
+        ...priceRows.filter((row) => productRefs.includes(row.product_id) || productRefs.includes(row.slug)),
+        ...unpricedProductRows.filter((row) => productRefs.includes(row.product_id) || productRefs.includes(row.slug))
+      ];
+      return rows
         .filter((row) => productRefs.includes(row.product_id) || productRefs.includes(row.slug))
-        .filter((row) => storeSlugs === null || storeSlugs.includes(row.store_slug)) as T[];
+        .filter((row) => row.store_slug === null || storeSlugs === null || storeSlugs.includes(row.store_slug)) as T[];
     }
     if (sql.includes('latest_prices.observation_id') && sql.includes('products.canonical_name as product_name')) {
       if (params[0] === 'missing-product') return [] as T[];
@@ -467,6 +498,30 @@ describe('real catalog API endpoints', () => {
       ]
     );
     assert.match(partial.body.strategies[1].warnings[0], /without estimating missing prices/i);
+
+    const unpriced = await request(app.getHttpServer())
+      .post('/baskets/compare')
+      .send({
+        storeSlugs: ['coop-odenplan'],
+        items: [
+          { productId: 'product-milk', quantity: 2 },
+          { productId: 'product-oats', quantity: 1 }
+        ]
+      })
+      .expect(200);
+
+    const missing = unpriced.body.strategies[0].assignments.find(
+      (assignment: { productId: string; slug: string; productName: string; lineTotal: number | null; priceLabel: string }) =>
+        assignment.productId === 'product-oats'
+    );
+    assert.ok(missing);
+    assert.equal(missing.slug, 'havregryn-1kg');
+    assert.equal(missing.productName, 'Havregryn 1 kg');
+    assert.equal(missing.lineTotal, null);
+    assert.equal(missing.priceLabel, 'missing_price');
+    assert.equal(unpriced.body.evidence.latestPriceCount, 1);
+    assert.match(database.calls.at(-1)?.sql ?? '', /latest_prices\.price_type in \('shelf', 'online', 'member', 'promotion'\)/i);
+    assert.match(database.calls.at(-1)?.sql ?? '', /from stores selected_stores/i);
   });
 
   it('serves product price history from persisted observation rows', async () => {

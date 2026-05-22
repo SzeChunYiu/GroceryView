@@ -325,6 +325,37 @@ describe('createGroceryViewApi', () => {
     assert.match(report.strategies[1]?.warnings[0] ?? '', /without estimating missing prices/i);
   });
 
+  it('keeps catalog metadata for real basket products that lack selected-store latest prices', () => {
+    const report = buildRealBasketComparison({
+      selectedStoreSlugs: ['coop-odenplan'],
+      items: [
+        { productId: 'product-milk', quantity: 2 },
+        { productId: 'product-oats', quantity: 1 }
+      ],
+      latestPrices: [
+        ...realRows,
+        {
+          productId: 'product-oats',
+          slug: 'havregryn-1kg',
+          canonicalName: 'Havregryn 1 kg',
+          brand: 'Axa',
+          categoryPath: ['Pantry', 'Breakfast'],
+          packageSize: 1,
+          packageUnit: 'kg',
+          comparableUnit: 'kg'
+        }
+      ]
+    });
+
+    const missing = report.strategies[0]?.assignments.find((assignment) => assignment.productId === 'product-oats');
+    assert.equal(missing?.slug, 'havregryn-1kg');
+    assert.equal(missing?.productName, 'Havregryn 1 kg');
+    assert.equal(missing?.lineTotal, null);
+    assert.equal(missing?.priceLabel, 'missing_price');
+    assert.deepEqual(report.missingProductIds, ['product-oats']);
+    assert.equal(report.evidence.latestPriceCount, realRows.length);
+  });
+
   it('builds latest product price rows from persisted latest price inputs', () => {
     const prices = buildProductLatestPrices([
       {

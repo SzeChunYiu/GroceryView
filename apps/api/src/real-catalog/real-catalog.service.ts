@@ -314,11 +314,19 @@ export class RealCatalogService {
              stores.name as store_name
       from products
       left join latest_prices on latest_prices.product_id = products.id
+        and latest_prices.price_type in ('shelf', 'online', 'member', 'promotion')
+        and (
+          $2::text[] is null
+          or exists (
+            select 1
+            from stores selected_stores
+            where selected_stores.id = latest_prices.store_id
+              and selected_stores.slug = any($2::text[])
+          )
+        )
       left join chains on chains.id = latest_prices.chain_id
       left join stores on stores.id = latest_prices.store_id
       where (products.id::text = any($1::text[]) or products.slug = any($1::text[]))
-        and latest_prices.price_type in ('shelf', 'online', 'member', 'promotion')
-        and ($2::text[] is null or stores.slug = any($2::text[]))
       order by products.canonical_name, latest_prices.price nulls last, stores.name nulls last`;
   }
 }
