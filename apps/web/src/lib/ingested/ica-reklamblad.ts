@@ -2,8 +2,8 @@
 // Source URL: https://www.ica.se/erbjudanden/ica-focus-1004247/
 // Flyer URL: https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1
 // Flyer PDF API URL: https://api.e-magin.se/api/pdf/6h3pqb3k
-// Retrieved: 2026-05-21T01:40:54.156Z
-// Row count: 75 real weekly offer rows fetched from ica.se.
+// Retrieved: 2026-05-22T09:30:22.424Z
+// Row count: 77 real weekly offer rows fetched from ica.se.
 
 export type IcaReklambladIngestedOffer = {
   code: string;
@@ -28,13 +28,13 @@ export type IcaReklambladIngestedOffer = {
 };
 
 export const icaReklambladSource = {
-  source: 'ica.se public weekly offers with e-magin reklamblad link',
-  retrievedAt: '2026-05-21T01:40:54.156Z',
-  rowCount: 75,
-  store: 'ICA Focus',
-  sourceUrl: 'https://www.ica.se/erbjudanden/ica-focus-1004247/',
-  flyerUrl: 'https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1',
-  flyerPdfUrl: 'https://api.e-magin.se/api/pdf/6h3pqb3k'
+  "source": "ica.se public weekly offers with e-magin reklamblad link",
+  "retrievedAt": "2026-05-22T09:30:22.424Z",
+  "rowCount": 77,
+  "store": "ICA Focus",
+  "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
+  "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
+  "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k"
 } as const;
 
 export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
@@ -70,7 +70,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310401000374.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003918751",
@@ -93,7 +93,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690656753.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003918752",
@@ -116,7 +116,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690521419.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003918753",
@@ -148,7 +148,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7312690800024.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003918754",
@@ -184,7 +184,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310860007259.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957696",
@@ -209,7 +209,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7392672104104.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957968",
@@ -235,7 +235,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/57540573.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957970",
@@ -258,7 +258,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7311070008708.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957971",
@@ -281,7 +281,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690108863.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "2003087280",
@@ -307,63 +307,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350107990821.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
-  },
-  {
-    "code": "2003433579",
-    "name": "Knatter",
-    "brand": "Brynild",
-    "packageText": "80-100g",
-    "category": "Skafferivaror",
-    "priceText": "2 för 22 kr",
-    "comparisonPrice": "110:00-137:50/kg",
-    "regularPriceText": "Ord.pris 15:09 kr.",
-    "validTo": "2026-05-21T00:00:00",
-    "storeName": "ICA Focus",
-    "storeId": "1735",
-    "availableInStore": true,
-    "availableOnline": false,
-    "eans": [
-      "7041111138438",
-      "7041111138445",
-      "7041111149472",
-      "7041111154209",
-      "7041111154216",
-      "7041111153882",
-      "7041111157330"
-    ],
-    "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-    "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
-    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
-    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7041111138438.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
-  },
-  {
-    "code": "2003433869",
-    "name": "Wellibites",
-    "brand": "Wellibites",
-    "packageText": "70g",
-    "category": "Skafferivaror",
-    "priceText": "2 för 35 kr",
-    "comparisonPrice": "250:00/kg",
-    "regularPriceText": "Ord.pris 26:45 kr.",
-    "validTo": "2026-05-21T00:00:00",
-    "storeName": "ICA Focus",
-    "storeId": "1735",
-    "availableInStore": true,
-    "availableOnline": false,
-    "eans": [
-      "7350101690017",
-      "7350101690000",
-      "7350101690079",
-      "7350101690086",
-      "7350101690093"
-    ],
-    "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
-    "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
-    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
-    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350101690017.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "2003586802",
@@ -392,7 +336,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7314720729015.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "2003660262",
@@ -415,7 +359,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/6408430102068.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "2003697911",
@@ -438,7 +382,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7312720080303.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "2003697917",
@@ -463,7 +407,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350092180245.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "2003697925",
@@ -490,30 +434,30 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350092180023.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
-    "code": "2003698649",
-    "name": "Pommes Chips",
-    "brand": "Felix",
-    "packageText": "600g",
-    "category": "Djupfryst",
-    "priceText": "25 kr/st",
-    "comparisonPrice": "41:67/kg",
-    "regularPriceText": "Ord.pris 31:18 kr. 30dgr.pris 31:18 kr.",
-    "validTo": "2026-06-07T00:00:00",
+    "code": "2003714763",
+    "name": "Apelsinjuice med fruktkött",
+    "brand": "Innocent",
+    "packageText": "1.5 L",
+    "category": "Mejeri",
+    "priceText": "42 kr/+pant",
+    "comparisonPrice": "28:00/lit exkl pant",
+    "regularPriceText": "Ord.pris 56:73 kr.",
+    "validTo": "2026-05-31T00:00:00",
     "storeName": "ICA Focus",
     "storeId": "1735",
     "availableInStore": true,
     "availableOnline": false,
     "eans": [
-      "7316110000698"
+      "5038862130400"
     ],
     "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
-    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7316110000698.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/5038862130400.jpg",
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "2003799412",
@@ -536,7 +480,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310520011770.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "2003808002",
@@ -559,7 +503,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7314720719702.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "2003808012",
@@ -584,7 +528,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310090155539.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "2003811729",
@@ -607,7 +551,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/3168430372481.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "2003822894",
@@ -630,7 +574,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8710449956319.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "2003857883",
@@ -657,7 +601,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7391196001296.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957910",
@@ -685,7 +629,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310865866424.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957911",
@@ -708,7 +652,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7311800971005.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957912",
@@ -744,7 +688,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/3600540784995.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957913",
@@ -767,7 +711,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7300206787006.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957914",
@@ -801,7 +745,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310350106844.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957915",
@@ -829,7 +773,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/3600522287360.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957927",
@@ -852,7 +796,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2092452100009.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957928",
@@ -875,7 +819,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2319100900003.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957929",
@@ -898,7 +842,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318693254079.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957930",
@@ -921,7 +865,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318693555824.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957932",
@@ -944,7 +888,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2092474500009.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957933",
@@ -967,7 +911,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690491958.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957934",
@@ -990,7 +934,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690492313.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957939",
@@ -1015,7 +959,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/5711953207877.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957941",
@@ -1051,7 +995,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7350042720002.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957944",
@@ -1076,7 +1020,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/5707196031836.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957945",
@@ -1101,7 +1045,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8445291628151.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957946",
@@ -1139,7 +1083,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7330797077132.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957947",
@@ -1162,7 +1106,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8001440136924.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957948",
@@ -1185,7 +1129,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690514725.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957949",
@@ -1208,7 +1152,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690166726.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957950",
@@ -1231,7 +1175,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690110002.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957951",
@@ -1258,7 +1202,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8410076420947.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957952",
@@ -1281,7 +1225,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/3254474019274.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957963",
@@ -1304,7 +1248,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2319232100005.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957964",
@@ -1328,7 +1272,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2319277100008.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957965",
@@ -1351,7 +1295,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2320131600008.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957966",
@@ -1374,7 +1318,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2319317900001.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957967",
@@ -1397,7 +1341,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690513452.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957972",
@@ -1424,7 +1368,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2340413400003.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957973",
@@ -1450,7 +1394,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690493808.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957974",
@@ -1473,7 +1417,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/5000184321064.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957975",
@@ -1504,7 +1448,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690164012.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957982",
@@ -1527,7 +1471,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690080176.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957983",
@@ -1554,7 +1498,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690065685.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957986",
@@ -1588,7 +1532,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7613036961806.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957987",
@@ -1619,7 +1563,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310050001975.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957993",
@@ -1695,7 +1639,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7332531093248.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957994",
@@ -1719,7 +1663,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/3574661011295.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957996",
@@ -1752,7 +1696,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8700216664844.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957998",
@@ -1775,7 +1719,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7331210187742.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003957999",
@@ -1798,7 +1742,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7331210187735.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003958000",
@@ -1821,7 +1765,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7331210176388.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003958004",
@@ -1844,7 +1788,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690127086.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003958005",
@@ -1869,7 +1813,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/4000177158227.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003958006",
@@ -1895,7 +1839,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7300328521007.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003958007",
@@ -1919,7 +1863,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/2092318900002.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003958009",
@@ -1943,7 +1887,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7300207071005.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003958010",
@@ -1973,7 +1917,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/8001665128674.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003958011",
@@ -1996,7 +1940,7 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7318690091028.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   },
   {
     "code": "5003958012",
@@ -2025,6 +1969,114 @@ export const icaReklambladOffers: IcaReklambladIngestedOffer[] = [
     "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
     "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
     "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7310070001832.jpg",
-    "retrievedAt": "2026-05-21T01:40:54.156Z"
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
+  },
+  {
+    "code": "5004071575",
+    "name": "Solcellspinne",
+    "brand": "",
+    "packageText": "",
+    "category": "Hem & fritid",
+    "priceText": "2 för 28 kr",
+    "comparisonPrice": "14:00/st",
+    "regularPriceText": "Ord.pris 19:95 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Focus",
+    "storeId": "1735",
+    "availableInStore": true,
+    "availableOnline": true,
+    "eans": [
+      "7331210182464"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7331210182464.jpg",
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
+  },
+  {
+    "code": "5004071576",
+    "name": "Solcellspinne",
+    "brand": "",
+    "packageText": "",
+    "category": "Hem & fritid",
+    "priceText": "6 för 70 kr",
+    "comparisonPrice": "11:67/st",
+    "regularPriceText": "Ord.pris 19:95 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Focus",
+    "storeId": "1735",
+    "availableInStore": true,
+    "availableOnline": true,
+    "eans": [
+      "7331210182464"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7331210182464.jpg",
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
+  },
+  {
+    "code": "5004100191",
+    "name": "Tandborste, barntandkräm",
+    "brand": "Jordan",
+    "packageText": "1-pack, 50 ml",
+    "category": "Hälsa & skönhet",
+    "priceText": "3 för 40 kr",
+    "comparisonPrice": "13:33-266:67/st",
+    "regularPriceText": "Ord.pris 19:95-27:95 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Focus",
+    "storeId": "1735",
+    "availableInStore": true,
+    "availableOnline": true,
+    "eans": [
+      "7038513866304",
+      "7038516220202",
+      "7038516220301",
+      "7038516550422",
+      "7038516550408",
+      "7038516550385",
+      "7038516550361",
+      "7046110063538",
+      "7046110063569",
+      "7046110075562",
+      "7046110071519",
+      "7046110028001",
+      "7046110031643",
+      "7046110054420",
+      "7046110054451",
+      "7046110058695",
+      "7046110058848"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7038513866304.jpg",
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
+  },
+  {
+    "code": "5004100398",
+    "name": "Röd spetspaprika i påse",
+    "brand": "ICA. Nederländerna",
+    "packageText": "200 g",
+    "category": "Frukt & Grönt",
+    "priceText": "15 kr/st",
+    "comparisonPrice": "75:00/kg",
+    "regularPriceText": "Ord.pris 19:95 kr.",
+    "validTo": "2026-05-24T00:00:00",
+    "storeName": "ICA Focus",
+    "storeId": "1735",
+    "availableInStore": true,
+    "availableOnline": true,
+    "eans": [
+      "7330671127243"
+    ],
+    "sourceUrl": "https://www.ica.se/erbjudanden/ica-focus-1004247/",
+    "flyerUrl": "https://www.e-magin.se/latestpaper/6h3pqb3k/paper/1",
+    "flyerPdfUrl": "https://api.e-magin.se/api/pdf/6h3pqb3k",
+    "imageUrl": "https://assets.icanet.se/q_auto,f_auto/c_lpad,h_200,w_200,e_sharpen:70/7330671127243.jpg",
+    "retrievedAt": "2026-05-22T09:30:22.424Z"
   }
 ];

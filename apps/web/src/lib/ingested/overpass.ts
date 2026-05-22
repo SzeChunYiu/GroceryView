@@ -1,7 +1,7 @@
 // AUTO-GENERATED from Overpass API for OpenStreetMap grocery stores in Stockholms län.
 // Source URL: https://overpass-api.de/api/interpreter
-// Retrieved: 2026-05-20T23:42:42.930Z
-// Row count: 60 real OSM rows fetched from overpass-api.de.
+// Retrieved: 2026-05-22T09:31:27.214Z
+// Row count: 120 real OSM rows fetched from overpass-api.de.
 // Source data: © OpenStreetMap contributors, ODbL.
 
 export type OverpassIngestedStore = {
@@ -24,11 +24,11 @@ export type OverpassIngestedStore = {
 };
 
 export const overpassSource = {
-  source: 'overpass-api.de for OSM',
-  retrievedAt: '2026-05-20T23:42:42.930Z',
-  rowCount: 60,
-  sourceUrl: 'https://overpass-api.de/api/interpreter',
-  license: 'ODbL, © OpenStreetMap contributors'
+  "source": "overpass-api.de for OSM",
+  "retrievedAt": "2026-05-22T09:31:27.214Z",
+  "rowCount": 120,
+  "sourceUrl": "https://overpass-api.de/api/interpreter",
+  "license": "ODbL, © OpenStreetMap contributors"
 } as const;
 
 export const overpassStores: OverpassIngestedStore[] = [
@@ -48,7 +48,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/nara/stockholm/ica-karlaplan-1003714/",
     "phone": "+4686624035",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -66,7 +66,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.coop.se/butiker-erbjudanden/coop/coop-erik-dahlbergsgatan/",
     "phone": "+46107418090",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -84,7 +84,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/nara/botkyrka/ica-nara-varsta-1349/start/",
     "phone": "+46 8 53025219",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -102,7 +102,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/nara/sollentuna/ica-nara-norrviken-1213/start/",
     "phone": "+4687541775",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -120,7 +120,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.hemkop.se/butik/4690",
     "phone": "+4687541168",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -138,7 +138,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/supermarket/upplands-vasby/ica-supermarket-format-1139/start/",
     "phone": "+46 8 594 105 50",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -156,7 +156,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -174,7 +174,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/maxi/sollentuna/maxi-ica-stormarknad-haggvik-12313/start/",
     "phone": "+46856256800",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -192,7 +192,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.hemkop.se/butik/4787",
     "phone": "08-6471230",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -210,7 +210,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.hemkop.se/butik/4239",
     "phone": "+46855770750",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -228,7 +228,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/nara/danderyd/ica-nara-klingsta-1205/",
     "phone": "+46 8 755 60 02",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -246,7 +246,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/nara/danderyd/ica-tornet-stocksund-1003862/",
     "phone": "+468851800",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -264,7 +264,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/supermarket/upplands-bro/ica-supermarket-bro-8931/start/",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -282,7 +282,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/kvantum/stockholm/ica-kvantum-bea-livsmedel-1292/start/",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -300,7 +300,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/supermarket/sigtuna/ica-supermarket-sigtuna-1475/start/",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -318,7 +318,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -336,7 +336,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -354,7 +354,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.hemkop.se/butik/4697",
     "phone": "08-7660030",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -372,7 +372,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/nara/stockholm/ica-abrahamsberg-1235/start/",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -390,7 +390,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://garpes.se",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -408,7 +408,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -426,7 +426,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://finnhamn.se/ata/",
     "phone": "+46 8 542 462 12",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -444,7 +444,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -462,7 +462,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -480,7 +480,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -498,7 +498,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.coop.se/butiker-erbjudanden/coop/coop-vastertorp/",
     "phone": "+46 10 741 74 40",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -516,7 +516,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.hemkop.se/butik/4684",
     "phone": "+46 8-97 03 84",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -534,7 +534,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -552,7 +552,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -570,7 +570,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -588,7 +588,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -606,7 +606,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "http://www.7-eleven.se/",
     "phone": "+46-8-7919160",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -624,7 +624,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/supermarket/stockholm/ica-supermarket-esplanad-sthlm-1254/start/",
     "phone": "+46854583831",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -642,7 +642,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -660,7 +660,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/FrontServlet?s=butiker&state=butikssida&butiksid=09736",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -678,7 +678,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.coop.se/butiker-erbjudanden/stora-coop/stora-coop-orminge/",
     "phone": "+46 10-741 94 50",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -696,7 +696,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.coop.se/butiker-erbjudanden/coop/coop-vendelsomalm/",
     "phone": "010-7417600",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -714,7 +714,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -732,7 +732,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/nara/stockholm/ica-gardet-rokubbsgatan-1004714/",
     "phone": "+4686618083",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -750,7 +750,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -768,7 +768,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/nara/lidingo/ica-naset-1004381/",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -786,7 +786,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.coop.se/butiker-erbjudanden/coop/coop-vaxholm/",
     "phone": "010-7417050",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -804,7 +804,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/nara/taby/ica-gribbylund-1196/start/",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -822,7 +822,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.coop.se/butiker-erbjudanden/coop/coop-spanga-torg/",
     "phone": "010-7417731",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -840,7 +840,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.hemkop.se/butik/4234",
     "phone": "+46852400750",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -858,7 +858,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "http://www.7-eleven.se/",
     "phone": "+4686795959",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -876,7 +876,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/nara/stockholm/ica-nara-roslagstull-1003482/",
     "phone": "+468150060",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -894,7 +894,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.hemkop.se/butik/4785",
     "phone": "+4686645533",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -912,7 +912,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -930,7 +930,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -948,7 +948,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "http://www.7-eleven.se/",
     "phone": "+4686960002",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -966,7 +966,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "http://www.7-eleven.se/",
     "phone": "+468295171",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -984,7 +984,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/nara/stockholm/ica-nara-baner-1004414/",
     "phone": "+4686602206",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -1002,7 +1002,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -1020,7 +1020,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.ica.se/butiker/supermarket/stockholm/ica-supermarket-hogalid-15234/start/",
     "phone": "+4686697269",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -1038,7 +1038,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.coop.se/butiker-erbjudanden/stora-coop/stora-coop-stuvsta/",
     "phone": "010-7419560",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -1056,7 +1056,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.coop.se/butiker-erbjudanden/coop-konsum/coop-vasterhaninge-c/",
     "phone": "010-7417810",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -1074,7 +1074,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.coop.se/butiker-erbjudanden/coop-forum/coop-forum-haninge/",
     "phone": "010-7417000",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -1092,7 +1092,7 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "https://www.coop.se/butiker-erbjudanden/coop/coop-jarntorget/",
     "phone": "+46107418570",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   },
   {
     "osmType": "node",
@@ -1110,6 +1110,1086 @@ export const overpassStores: OverpassIngestedStore[] = [
     "website": "",
     "phone": "+46 8 645 35 66",
     "sourceUrl": "https://overpass-api.de/api/interpreter",
-    "retrievedAt": "2026-05-20T23:42:42.930Z"
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 429340749,
+    "name": "7-Eleven",
+    "brand": "7-Eleven",
+    "shop": "convenience",
+    "latitude": 59.3327132,
+    "longitude": 18.0450542,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Fr 06:30-20:00; Sa 09:00-18:00; Su 11:00-16:00",
+    "website": "http://www.7-eleven.se/",
+    "phone": "+4686514717",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 429340750,
+    "name": "7-Eleven",
+    "brand": "7-Eleven",
+    "shop": "convenience",
+    "latitude": 59.331065,
+    "longitude": 18.0305152,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Th 06:30-01:00; Fr 06:30-02:00; Sa 07:00-02:00; Su 08:00-01:00",
+    "website": "http://www.7-eleven.se/",
+    "phone": "+4686506585",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 429340751,
+    "name": "7-Eleven",
+    "brand": "7-Eleven",
+    "shop": "convenience",
+    "latitude": 59.3341806,
+    "longitude": 18.0358569,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Th 06:00-22:00; Fr 06:00-24:00; Sa 09:00-24:00; Su 09:00-20:00",
+    "website": "http://www.7-eleven.se/",
+    "phone": "+4686501860",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 429340752,
+    "name": "7-Eleven",
+    "brand": "7-Eleven",
+    "shop": "convenience",
+    "latitude": 59.3337345,
+    "longitude": 18.0568474,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "24/7",
+    "website": "https://7-eleven.se",
+    "phone": "+468246252",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 429340753,
+    "name": "7-Eleven",
+    "brand": "7-Eleven",
+    "shop": "convenience",
+    "latitude": 59.328467,
+    "longitude": 18.046456,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Fr 06:30-20:00; Sa 09:00-18:00; Su 11:00-17:00",
+    "website": "http://www.7-eleven.se/",
+    "phone": "+4686534140",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 430927877,
+    "name": "ICA Nära Grisslehamns Livs",
+    "brand": "ICA Nära",
+    "shop": "supermarket",
+    "latitude": 60.1004701,
+    "longitude": 18.8074063,
+    "street": "Grisslehamnsvägen",
+    "houseNumber": "691",
+    "postcode": "760 45",
+    "city": "Grisslehamn",
+    "openingHours": "",
+    "website": "https://www.ica.se/butiker/nara/norrtalje/ica-nara-grisslehamns-livs-1449/start/",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 433633924,
+    "name": "ICA Lappkärrsberget",
+    "brand": "ICA Nära",
+    "shop": "supermarket",
+    "latitude": 59.3697507,
+    "longitude": 18.063029,
+    "street": "Professorsslingan",
+    "houseNumber": "15",
+    "postcode": "114 17",
+    "city": "Stockholm",
+    "openingHours": "Mo-Fr 08:00-23:00; Sa-Su 09:00-23:00",
+    "website": "https://www.ica.se/butiker/nara/stockholm/ica-lappkarrsberget-1251/start/",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 433875680,
+    "name": "Coop Storsjövägen",
+    "brand": "Coop",
+    "shop": "supermarket",
+    "latitude": 59.2992874,
+    "longitude": 18.0425,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Su 08:00-22:00",
+    "website": "https://www.coop.se/butiker-erbjudanden/coop/coop-storsjovagen",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 434463045,
+    "name": "ICA S:t Eriksplan",
+    "brand": "ICA Nära",
+    "shop": "convenience",
+    "latitude": 59.3394656,
+    "longitude": 18.0360275,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Fr 07:00-23:00; Sa 08:00-23:00; Su 09:00-23:00",
+    "website": "https://www.ica.se/butiker/nara/stockholm/ica-st-eriksplan-1234/start/",
+    "phone": "+468311043",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 434463046,
+    "name": "Coop Tomtebogatan",
+    "brand": "Coop",
+    "shop": "supermarket",
+    "latitude": 59.341453,
+    "longitude": 18.0359252,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Fr 07:00-22:00; Sa, Su 08:00-22:00",
+    "website": "https://www.coop.se/butiker-erbjudanden/coop/coop-nara-tomtebogatan/",
+    "phone": "+46107418150",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 436368336,
+    "name": "Svartsö Lanthandel",
+    "brand": "Svartsö Lanthandel",
+    "shop": "convenience",
+    "latitude": 59.4380116,
+    "longitude": 18.6570458,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Fr 09:00-17:00; Sa 10:00-17:00; Su 10:00-14:00",
+    "website": "",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 436373621,
+    "name": "Coop Sveavägen 70",
+    "brand": "Coop",
+    "shop": "supermarket",
+    "latitude": 59.3394891,
+    "longitude": 18.0602009,
+    "street": "Sveavägen",
+    "houseNumber": "70",
+    "postcode": "11134",
+    "city": "Stockholm",
+    "openingHours": "Mo-Fr 07:00-23:00; Sa-Su 08:00-23:00",
+    "website": "https://www.coop.se/butiker-erbjudanden/coop/coop-sveavagen/",
+    "phone": "+46107418370",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 440623958,
+    "name": "ICA Supermarket Nykvarn",
+    "brand": "ICA Supermarket",
+    "shop": "supermarket",
+    "latitude": 59.1782996,
+    "longitude": 17.4299097,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "",
+    "website": "https://www.ica.se/butiker/supermarket/nykvarn/ica-supermarket-nykvarn-1365/start/",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 441605736,
+    "name": "Stora Coop Västberga",
+    "brand": "Coop",
+    "shop": "supermarket",
+    "latitude": 59.2937143,
+    "longitude": 18.0046482,
+    "street": "Västbergavägen",
+    "houseNumber": "4",
+    "postcode": "126 30",
+    "city": "Hägersten",
+    "openingHours": "07:00-23:00",
+    "website": "https://www.coop.se/butiker-erbjudanden/stora-coop/stora-coop-vastberga/",
+    "phone": "+46 10-7419520",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 442049898,
+    "name": "ICA Supermarket Årsta",
+    "brand": "ICA Supermarket",
+    "shop": "supermarket",
+    "latitude": 59.2963336,
+    "longitude": 18.0523255,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Su 06:30-23:00",
+    "website": "",
+    "phone": "+46-8-6025120",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 442366355,
+    "name": "ICA Supermarket Enskededalen",
+    "brand": "ICA Supermarket",
+    "shop": "supermarket",
+    "latitude": 59.2852736,
+    "longitude": 18.0931537,
+    "street": "Dalens allé",
+    "houseNumber": "5",
+    "postcode": "121 31",
+    "city": "Enskededalen",
+    "openingHours": "Mo-Fr 07:00-21:00; Sa,Su 08:00-21:00",
+    "website": "http://www.ica.se/butiker/supermarket/stockholm/ica-supermarket-enskededalen-1294/start/",
+    "phone": "+46-8-4480960",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 442682228,
+    "name": "Willys Stockholm Älvsjö",
+    "brand": "Willys",
+    "shop": "supermarket",
+    "latitude": 59.2753,
+    "longitude": 18.0132,
+    "street": "Älvsjö Ängsväg",
+    "houseNumber": "2-6",
+    "postcode": "12530",
+    "city": "Älvsjö",
+    "openingHours": "08:00-22:00",
+    "website": "https://www.willys.se/butik/2219",
+    "phone": "08-4471240",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 443132455,
+    "name": "Furusundsmacken",
+    "brand": "Furusundsmacken",
+    "shop": "convenience",
+    "latitude": 59.6622755,
+    "longitude": 18.9153632,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "",
+    "website": "",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 444359128,
+    "name": "Matvärlden",
+    "brand": "Matvärlden",
+    "shop": "supermarket",
+    "latitude": 59.3940119,
+    "longitude": 17.9030879,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "",
+    "website": "http://www.matvarlden.se/defaulttensta.aspx",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 444564609,
+    "name": "Ritorps Livs",
+    "brand": "Ritorps Livs",
+    "shop": "convenience",
+    "latitude": 59.3769646,
+    "longitude": 18.0064529,
+    "street": "Fläderstigen",
+    "houseNumber": "9",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Fr 09:00-19:00; Sa 11:00-17:00",
+    "website": "",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 444739964,
+    "name": "Stora Coop Södertälje",
+    "brand": "Coop",
+    "shop": "supermarket",
+    "latitude": 59.1874816,
+    "longitude": 17.5745921,
+    "street": "Genetaleden",
+    "houseNumber": "7",
+    "postcode": "151 59",
+    "city": "Södertälje",
+    "openingHours": "07:00-22:00",
+    "website": "https://www.coop.se/butiker-erbjudanden/stora-coop/stora-coop-sodertalje/",
+    "phone": "+46 10-7417350",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 444806296,
+    "name": "Filippinska Asian Market",
+    "brand": "Filippinska Asian Market",
+    "shop": "convenience",
+    "latitude": 59.3363922,
+    "longitude": 18.060617,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Sa 10:00-19:00; Su 10:00-18:00",
+    "website": "",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 444823502,
+    "name": "7-Eleven",
+    "brand": "7-Eleven",
+    "shop": "convenience",
+    "latitude": 59.3311027,
+    "longitude": 18.0578593,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Th 06:00-01:00;Fr 06:00-03:00;Sa 07:00-03:00;Su 07:00-01:00",
+    "website": "http://www.7-eleven.se/",
+    "phone": "+46-8-4112130",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 445081064,
+    "name": "Stadens tobak",
+    "brand": "Stadens tobak",
+    "shop": "convenience",
+    "latitude": 59.3821377,
+    "longitude": 17.9921892,
+    "street": "Fridensborgsvägen",
+    "houseNumber": "45",
+    "postcode": "170 69",
+    "city": "Solna",
+    "openingHours": "",
+    "website": "",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 445302837,
+    "name": "ICA Stjärnköp",
+    "brand": "ICA Supermarket",
+    "shop": "supermarket",
+    "latitude": 59.6161815,
+    "longitude": 17.8291908,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "",
+    "website": "",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 445787267,
+    "name": "ICA Åkermyntan",
+    "brand": "ICA Kvantum",
+    "shop": "supermarket",
+    "latitude": 59.3801887,
+    "longitude": 17.8167354,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Su,PH 08:00-21:00",
+    "website": "",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 445787273,
+    "name": "Lidl",
+    "brand": "Lidl",
+    "shop": "supermarket",
+    "latitude": 59.3804183,
+    "longitude": 17.8169714,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Sa 08:00-20:00; Su 09:00-20:00",
+    "website": "",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 445807901,
+    "name": "Stora Coop Vinsta",
+    "brand": "Coop",
+    "shop": "supermarket",
+    "latitude": 59.3692154,
+    "longitude": 17.8587795,
+    "street": "Siktgatan",
+    "houseNumber": "11C",
+    "postcode": "162 50",
+    "city": "Vällingby",
+    "openingHours": "07:00-22:00",
+    "website": "https://www.coop.se/butiker-erbjudanden/stora-coop/stora-coop-vinsta/",
+    "phone": "+46 10-7419400",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 446002191,
+    "name": "Coop Rådhuset",
+    "brand": "Coop",
+    "shop": "supermarket",
+    "latitude": 59.3316303,
+    "longitude": 18.0449186,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Fr 07:00-22:00; Sa-Su 08:00-22:00",
+    "website": "https://www.coop.se/butiker-erbjudanden/coop/coop-radhuset/",
+    "phone": "+46107418260",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 448199301,
+    "name": "ICA Supermarket Väddö",
+    "brand": "ICA Supermarket",
+    "shop": "supermarket",
+    "latitude": 59.9696314,
+    "longitude": 18.8063138,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Su 08:00-21:00",
+    "website": "https://www.ica.se/butiker/supermarket/norrtalje/ica-supermarket-vaddo-5681/start/",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 449795376,
+    "name": "ICA nära Dalastan",
+    "brand": "ICA Nära",
+    "shop": "supermarket",
+    "latitude": 59.3438926,
+    "longitude": 18.0430968,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Fr 07:00-23:00, Sa,Su 08:00-23:00",
+    "website": "https://www.ica.se/butiker/nara/stockholm/ica-dalastan-1003535/",
+    "phone": "+468342111",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 449884292,
+    "name": "7-Eleven",
+    "brand": "7-Eleven",
+    "shop": "convenience",
+    "latitude": 59.335925,
+    "longitude": 18.069727,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Th 07:00-24:00, Fr 07:00-06:00, Sa 10:00-06:00, Su 10:00-18:00",
+    "website": "http://www.7-eleven.se/",
+    "phone": "+4687917767",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 454221010,
+    "name": "Coop Daglivs",
+    "brand": "Coop",
+    "shop": "supermarket",
+    "latitude": 59.3337873,
+    "longitude": 18.0324376,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Su 08:00-22:00",
+    "website": "https://www.coop.se/butiker-erbjudanden/coop/coop-daglivs/",
+    "phone": "+46107419700",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 455341429,
+    "name": "7-Eleven",
+    "brand": "7-Eleven",
+    "shop": "convenience",
+    "latitude": 59.340127,
+    "longitude": 18.0625929,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Th 07:00-22:00; Fr 07:00-23:00; Sa 09:00-23:00; Su 10:00-19:00",
+    "website": "http://www.7-eleven.se/",
+    "phone": "+46841092558",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 458376710,
+    "name": "ICA Kvantum Flygfyren",
+    "brand": "ICA Kvantum",
+    "shop": "supermarket",
+    "latitude": 59.7521763,
+    "longitude": 18.6940617,
+    "street": "Gustav Adolfs väg",
+    "houseNumber": "55",
+    "postcode": "76142",
+    "city": "Norrtälje",
+    "openingHours": "Mo-Su 07:00-22:00",
+    "website": "",
+    "phone": "+4617675700",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 458709470,
+    "name": "7-Eleven",
+    "brand": "7-Eleven",
+    "shop": "convenience",
+    "latitude": 59.3404714,
+    "longitude": 18.058483,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Th 07:00-23:00, Fr 07:00-02:00, Sa 10:00-02:00, Su 10:00-19:00",
+    "website": "http://www.7-eleven.se/",
+    "phone": "+468328161",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 458888900,
+    "name": "Willys",
+    "brand": "Willys",
+    "shop": "supermarket",
+    "latitude": 59.30463,
+    "longitude": 18.1309923,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Su 08:00-21:00",
+    "website": "",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 458888901,
+    "name": "ICA Kvantum",
+    "brand": "ICA Kvantum",
+    "shop": "supermarket",
+    "latitude": 59.3053953,
+    "longitude": 18.1288674,
+    "street": "Siroccogatan",
+    "houseNumber": "4",
+    "postcode": "131 54",
+    "city": "Nacka",
+    "openingHours": "Mo-Su 07:00-22:00",
+    "website": "https://www.ica.se/butiker/kvantum/",
+    "phone": "+46 8 452 99 00",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 459394022,
+    "name": "Caspian Deli",
+    "brand": "Caspian Deli",
+    "shop": "supermarket",
+    "latitude": 59.406221,
+    "longitude": 17.9380156,
+    "street": "Danmarksgatan",
+    "houseNumber": "52",
+    "postcode": "16440",
+    "city": "Kista",
+    "openingHours": "Mo-Fr 10:00-20:00; Sa 10:00-19:00; Su 11:00-18:00",
+    "website": "",
+    "phone": "+46 73 146 07 32",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 459394023,
+    "name": "Kista Grossen",
+    "brand": "Kista Grossen",
+    "shop": "supermarket",
+    "latitude": 59.4030627,
+    "longitude": 17.9474828,
+    "street": "Torsnäsgatan",
+    "houseNumber": "4-6",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Fr 08:30-20:00; Sa 10:00-20:00; Su 11:00-19:00",
+    "website": "https://www.kistagrossen.com/",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 459776346,
+    "name": "ICA Supermarket",
+    "brand": "ICA Supermarket",
+    "shop": "supermarket",
+    "latitude": 59.3073101,
+    "longitude": 18.0296528,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Fr 07:00-22:00; Sa,Su 08:00-22:00",
+    "website": "https://www.ica.se/butiker/supermarket/stockholm/ica-supermarket-sjovikshallen-1109001/",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 461149694,
+    "name": "Myway",
+    "brand": "Myway",
+    "shop": "convenience",
+    "latitude": 59.2712865,
+    "longitude": 18.0852394,
+    "street": "Victor Balcks väg",
+    "houseNumber": "101",
+    "postcode": "",
+    "city": "",
+    "openingHours": "",
+    "website": "",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 461166949,
+    "name": "Mälarpiratens Livs",
+    "brand": "Mälarpiratens Livs",
+    "shop": "convenience",
+    "latitude": 59.3299159,
+    "longitude": 18.0007865,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Fr 09:00-22:00; Sa-Su 10:00-21:00",
+    "website": "",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 462722792,
+    "name": "ICA Nära Henriksdal",
+    "brand": "ICA Nära",
+    "shop": "supermarket",
+    "latitude": 59.3110883,
+    "longitude": 18.116887,
+    "street": "Henriksdalsringen",
+    "houseNumber": "117",
+    "postcode": "131 32",
+    "city": "Nacka",
+    "openingHours": "Mo-Su 09:00-21:00",
+    "website": "https://www.ica.se/butiker/nara/nacka/ica-nara-henriksdal-1320/start/",
+    "phone": "+4686152600",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 463211146,
+    "name": "Lidl",
+    "brand": "Lidl",
+    "shop": "supermarket",
+    "latitude": 59.3407476,
+    "longitude": 18.0582308,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Su 08:00-22:00",
+    "website": "https://www.lidl.se/",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 466524079,
+    "name": "ICA Nära Gärdet",
+    "brand": "ICA Nära",
+    "shop": "supermarket",
+    "latitude": 59.346649,
+    "longitude": 18.1001204,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Su 07:00-23:00",
+    "website": "https://www.ica.se/butiker/nara/stockholm/ica-gardet-stockholm-1228/start/",
+    "phone": "+4686624353",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 467128515,
+    "name": "ICA Supermarket Vanadis",
+    "brand": "ICA Supermarket",
+    "shop": "supermarket",
+    "latitude": 59.3475762,
+    "longitude": 18.0488944,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Su 07:00-23:00",
+    "website": "https://www.ica.se/butiker/supermarket/stockholm/ica-supermarket-vanadis-1003855/",
+    "phone": "+4684415730",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 468043008,
+    "name": "Maxi ICA Stormarknad Lindhagen",
+    "brand": "Maxi ICA Stormarknad",
+    "shop": "supermarket",
+    "latitude": 59.337221,
+    "longitude": 18.0098203,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "07:00-22:00",
+    "website": "https://www.ica.se/butiker/maxi/stockholm/maxi-ica-stormarknad-lindhagen-13164/start/",
+    "phone": "+46812044400",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 469735872,
+    "name": "Matbutiken",
+    "brand": "Matbutiken",
+    "shop": "convenience",
+    "latitude": 59.3457876,
+    "longitude": 18.0952912,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Fr 08:00-22:00; Sa-Su 09:00-22:00",
+    "website": "",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 470495630,
+    "name": "7-Eleven",
+    "brand": "7-Eleven",
+    "shop": "convenience",
+    "latitude": 59.3318095,
+    "longitude": 18.0600111,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Th 08:00-23:00, Fr 08:00-02:00, Sa 09:00-02:00, Su 10:00-20:00",
+    "website": "http://www.7-eleven.se/",
+    "phone": "+4687912300",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 471034903,
+    "name": "Grantomta",
+    "brand": "Grantomta",
+    "shop": "convenience",
+    "latitude": 59.3171377,
+    "longitude": 18.4681828,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "",
+    "website": "",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 471131391,
+    "name": "7-Eleven",
+    "brand": "7-Eleven",
+    "shop": "convenience",
+    "latitude": 59.3422659,
+    "longitude": 18.0491505,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Th 06:00-24:00;Fr-Sa 06:00-02:00;Su 06:00-24:00",
+    "website": "http://www.7-eleven.se/",
+    "phone": "+46-8-302119",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 471590077,
+    "name": "Coop Bondegatan",
+    "brand": "Coop",
+    "shop": "supermarket",
+    "latitude": 59.3135231,
+    "longitude": 18.0928114,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Fr 07:00-22:00; Sa-Su 09:00-22:00",
+    "website": "https://www.coop.se/butiker-erbjudanden/coop/coop-bondegatan/",
+    "phone": "+46107418130",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 473125665,
+    "name": "ICA Supermarket Favoriten",
+    "brand": "ICA Supermarket",
+    "shop": "supermarket",
+    "latitude": 59.4721209,
+    "longitude": 18.331549,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "",
+    "website": "https://www.ica.se/butiker/supermarket/osteraker/ica-supermarket-favoriten-14996/start/",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 473470763,
+    "name": "7-Eleven",
+    "brand": "7-Eleven",
+    "shop": "convenience",
+    "latitude": 59.3418234,
+    "longitude": 18.0377875,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Th 06:00-23:00; Sa 06:00-01:00; Sa 07:00-01:00; Su 09:00-21:00",
+    "website": "http://www.7-eleven.se/",
+    "phone": "+468301530",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 473470766,
+    "name": "7-Eleven",
+    "brand": "7-Eleven",
+    "shop": "convenience",
+    "latitude": 59.3400099,
+    "longitude": 18.0344374,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Th 06:00-24:00; Fr 06:00-02:00; Sa 07:00-02:00; Su 07:00-22:00",
+    "website": "http://www.7-eleven.se/",
+    "phone": "+468325955",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 473470784,
+    "name": "In & Ut",
+    "brand": "In & Ut",
+    "shop": "convenience",
+    "latitude": 59.3454165,
+    "longitude": 18.0409826,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Fr 07:30-21:00; Sa 11:00-20:00; Su 11:00-18:00",
+    "website": "",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 473573056,
+    "name": "7-Eleven",
+    "brand": "7-Eleven",
+    "shop": "convenience",
+    "latitude": 59.3368087,
+    "longitude": 18.058832,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Th 07:00-23:00; Fr 07:00-24:00; Sa 09:00-24:00; Su 09:00-21:00",
+    "website": "http://www.7-eleven.se/",
+    "phone": "+4684111185",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 475902865,
+    "name": "7-Eleven",
+    "brand": "7-Eleven",
+    "shop": "convenience",
+    "latitude": 59.3352699,
+    "longitude": 18.0678764,
+    "street": "",
+    "houseNumber": "",
+    "postcode": "",
+    "city": "",
+    "openingHours": "Mo-Fr 07:00-22:00; Sa 09:00-24:00; Su 11:00-17:00",
+    "website": "http://www.7-eleven.se/",
+    "phone": "+4684111655",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
+  },
+  {
+    "osmType": "node",
+    "osmId": 478111284,
+    "name": "ICA Kvantum",
+    "brand": "ICA Kvantum",
+    "shop": "supermarket",
+    "latitude": 59.4797303,
+    "longitude": 18.2999234,
+    "street": "Storängstorget",
+    "houseNumber": "4",
+    "postcode": "184 30",
+    "city": "Åkersberga",
+    "openingHours": "",
+    "website": "https://www.ica.se/",
+    "phone": "",
+    "sourceUrl": "https://overpass-api.de/api/interpreter",
+    "retrievedAt": "2026-05-22T09:31:27.214Z"
   }
 ];

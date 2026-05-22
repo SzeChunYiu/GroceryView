@@ -1,7 +1,7 @@
 // AUTO-GENERATED from public Matspar search page __PAGEDATA__.
 // Source URL pattern: https://www.matspar.se/kategori/?q={query}
-// Retrieved: 2026-05-21T01:07:13.735Z
-// Row count: 75 real product rows fetched from matspar.se.
+// Retrieved: 2026-05-22T09:30:18.588Z
+// Row count: 150 real product rows fetched from matspar.se.
 
 export type MatsparIngestedProduct = {
   code: string;
@@ -20,10 +20,10 @@ export type MatsparIngestedProduct = {
 };
 
 export const matsparSource = {
-  source: 'matspar.se public search page __PAGEDATA__',
-  retrievedAt: '2026-05-21T01:07:13.735Z',
-  rowCount: 75,
-  sourceUrlPattern: 'https://www.matspar.se/kategori/?q={query}'
+  "source": "matspar.se public search page __PAGEDATA__",
+  "retrievedAt": "2026-05-22T09:30:18.588Z",
+  "rowCount": 150,
+  "sourceUrlPattern": "https://www.matspar.se/kategori/?q={query}"
 } as const;
 
 export const matsparProducts: MatsparIngestedProduct[] = [
@@ -40,7 +40,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/snabbmakaroner-750-g-kungsornen",
     "imageHash": "6204b6c746fe26cfce7c4246c2f3a29f",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "3351",
@@ -55,7 +55,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/ma-bra-makaroner-fullkorn-800-g-kungsornen",
     "imageHash": "dc99e4147d59cd67d12b23a37d108a45",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "3271",
@@ -70,7 +70,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/idealmakaroner-gammaldags-750g-kungsornen",
     "imageHash": "517f1027d63d2bb1548f267ac2e2153d",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "251722",
@@ -85,7 +85,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/makaroner-1kg-garant-1",
     "imageHash": "3dbfa380f9c200961d381aecd393137c",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "409400",
@@ -100,7 +100,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/makaroner-1kg-ica-2",
     "imageHash": "6d8ae38e9fd6ab3cafc797bb93e5d069",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "245035",
@@ -115,7 +115,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/makaroner-eko-500g-garant-ekologiska",
     "imageHash": "5bdb9d47dcccdf882b08f634374c435a",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "168341",
@@ -130,7 +130,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/makaroner-500g-garant",
     "imageHash": "eff657c280b9fea9a6bf67ca24895bb2",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "224078",
@@ -145,7 +145,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/makaroner-glutenfria-500g-ica",
     "imageHash": "e43aea908b5ab66a19ceb8a756c1ce8b",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "3273",
@@ -160,7 +160,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/gammaldags-idealmakaroner-1300-g-kungsornen",
     "imageHash": "c3ea12ce10a86418566d76d0b5d3c43c",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "156174",
@@ -175,7 +175,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/makaroner-och-ost-middag-206g-missisippi-belle",
     "imageHash": "827e9aca9d01f9dadef5b9475183113a",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "409432",
@@ -190,7 +190,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/snabbmakaroner-1kg-ica-2",
     "imageHash": "1babab130caca9add682470471f8021e",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "3259",
@@ -205,7 +205,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/ekologiska-makaroner-800-g-kungsornen",
     "imageHash": "c8b2326eed4aea6722ad90cb92c62a01",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "246568",
@@ -220,22 +220,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/snabbmakaroner-1kg-garant-1",
     "imageHash": "b1feabda85e3fdfefe781d196b61b641",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "3346",
-    "name": "Idealmakaroner",
-    "brand": "Kungsörnen",
-    "packageText": "1kg",
-    "countryFrom": "Sverige",
-    "price": 23.6,
-    "priceText": "23.60 SEK",
-    "medianPrice": 26.45,
-    "warehousePriceCount": 66,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
-    "productUrl": "https://www.matspar.se/produkt/idealmakaroner-1000-g-kungsornen",
-    "imageHash": "bbd5e27de171962d9886c460d1aeab81",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "3285",
@@ -250,7 +235,22 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/idealmakaroner-1300-g-kungsornen",
     "imageHash": "9d9e656e4a7b7048f716b8337a65bc14",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "3346",
+    "name": "Idealmakaroner",
+    "brand": "Kungsörnen",
+    "packageText": "1kg",
+    "countryFrom": "Sverige",
+    "price": 23.6,
+    "priceText": "23.60 SEK",
+    "medianPrice": 26.45,
+    "warehousePriceCount": 66,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
+    "productUrl": "https://www.matspar.se/produkt/idealmakaroner-1000-g-kungsornen",
+    "imageHash": "bbd5e27de171962d9886c460d1aeab81",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "348226",
@@ -265,7 +265,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/snabbmakaroner-1kg-ica-basic-1",
     "imageHash": "6ae82da93a522a0b6e3ccc52d2e2daf8",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "3272",
@@ -280,7 +280,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/snabbmakaroner-1300-g-kungsornen",
     "imageHash": "3572b118bf53a0c81bd52a128ee2674b",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "425501",
@@ -295,7 +295,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/makaroni-500g-xtra",
     "imageHash": "d3de15dc6a1ccc56a0befb3416e34275",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "152310",
@@ -310,22 +310,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/snabbmakaroner-1kg-monte-castello",
     "imageHash": "9cb16ab6b959d357acbe4599312824d7",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "759652",
-    "name": "Gnocchi 26 Trafilata Al Bronzo",
-    "brand": "La Molisana",
-    "packageText": "500g",
-    "countryFrom": "Italien",
-    "price": 22.24,
-    "priceText": "22.24 SEK",
-    "medianPrice": 22.925,
-    "warehousePriceCount": 2,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
-    "productUrl": "https://www.matspar.se/produkt/gnocchi-26-trafilata-al-bronzo-500g-la-molisana",
-    "imageHash": "c434f8cf72e2b7ad7fbf52a3f0bd33a7",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "524900",
@@ -340,22 +325,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/pasta-farsk-500g-coop",
     "imageHash": "14859e1b422be7ae42c8252a11a839bb",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "487115",
-    "name": "Lasagneplattor",
-    "brand": "Coop",
-    "packageText": "500g",
-    "countryFrom": "Italien",
-    "price": 20.77,
-    "priceText": "20.77 SEK",
-    "medianPrice": 20.77,
-    "warehousePriceCount": 1,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
-    "productUrl": "https://www.matspar.se/produkt/lasagne-500g-coop",
-    "imageHash": "e22535c75c6793a74d5bb39584d928db",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "524898",
@@ -370,7 +340,22 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/ricotta-mushroom-tortelloni-250g-coop",
     "imageHash": "6dfa893f9c148ce45ab10f46dbb16849",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "487115",
+    "name": "Lasagneplattor",
+    "brand": "Coop",
+    "packageText": "500g",
+    "countryFrom": "Italien",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "medianPrice": 20.77,
+    "warehousePriceCount": 1,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
+    "productUrl": "https://www.matspar.se/produkt/lasagne-500g-coop",
+    "imageHash": "e22535c75c6793a74d5bb39584d928db",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "282582",
@@ -385,7 +370,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/pasta-m-gronsaker-185g-lovemade",
     "imageHash": "eafc1e1b583a59037fdf72d22e0a1c15",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "6423",
@@ -400,7 +385,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/tortelloni-kyckl-ba-250-gr-coop",
     "imageHash": "85f18c35d839fe0dd67e86d926fb706e",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "551556",
@@ -415,7 +400,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/farsk-pasta-250g-rana-2",
     "imageHash": "c2999755765df8f8ebe44dffdb955c6c",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "558084",
@@ -430,7 +415,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/pasta-torr-500g-coop-2",
     "imageHash": "2a972ba53a6cd266ee0c919d9c06a377",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "6422",
@@ -445,7 +430,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/tortelloni-solt-tom-250-gr-coop",
     "imageHash": "723a627076ece738366e827dbe33fbd8",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "282581",
@@ -460,7 +445,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/pasta-bolognese-185g-lovemade",
     "imageHash": "c834447918b12f1998c5b98ee1771bd2",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "475454",
@@ -475,7 +460,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/tagliatelle-500g-coop",
     "imageHash": "6a0c583b51b743a8f7940661bffe4d61",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "475499",
@@ -490,7 +475,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/pasta-chitarra-500g-garant-1",
     "imageHash": "665c5abcd62fd5d4577921a36137cf35",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "158266",
@@ -505,7 +490,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/tagliatelle-500g-garofalo",
     "imageHash": "5ea1ab5c9da37a0f342ecb1dfad6292c",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "601274",
@@ -520,7 +505,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/pasta-pastamore-rorpasta-400g-zeta",
     "imageHash": "cff036c501c630de03cecc83862a4ca8",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "513221",
@@ -535,7 +520,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/lasagna-sheets-250g-coop",
     "imageHash": "bccdd725fe7682720b7aea12f7b025f0",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "524901",
@@ -550,7 +535,22 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/ricotta-pesto-tortelloni-250g-coop",
     "imageHash": "64814ccf4e8103b4e457af0dedeb59e3",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "759652",
+    "name": "Gnocchi 26 Trafilata Al Bronzo",
+    "brand": "La Molisana",
+    "packageText": "500g",
+    "countryFrom": "Italien",
+    "price": 22.24,
+    "priceText": "22.24 SEK",
+    "medianPrice": 22.925,
+    "warehousePriceCount": 2,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
+    "productUrl": "https://www.matspar.se/produkt/gnocchi-26-trafilata-al-bronzo-500g-la-molisana",
+    "imageHash": "c434f8cf72e2b7ad7fbf52a3f0bd33a7",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "759657",
@@ -565,112 +565,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/pasta-radiatori-73-trafilata-al-bronzo-500g-la-molisana",
     "imageHash": "dd3ea9bf08061b8208d0ff8799fd7965",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "513428",
-    "name": "Pasta Conchiglie",
-    "brand": "Monte Castello",
-    "packageText": "500g",
-    "countryFrom": "Lettland",
-    "price": 8.42,
-    "priceText": "8.42 SEK",
-    "medianPrice": 9.41,
-    "warehousePriceCount": 3,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
-    "productUrl": "https://www.matspar.se/produkt/pasta-500g-monte-castello",
-    "imageHash": "72d7ff2dff2ea02179045f8e8757d8b0",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "525507",
-    "name": "Pastasås Classico",
-    "brand": "Coop",
-    "packageText": "390g",
-    "countryFrom": "Italien",
-    "price": 21.72,
-    "priceText": "21.72 SEK",
-    "medianPrice": 21.72,
-    "warehousePriceCount": 1,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
-    "productUrl": "https://www.matspar.se/produkt/pasta-sauce-390g-coop",
-    "imageHash": "397aef8d62ac20a23defee393042c68a",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "558293",
-    "name": "Färsk Pasta Bolognese Tortelloni",
-    "brand": "Coop",
-    "packageText": "250g",
-    "countryFrom": "Italien",
-    "price": 30.24,
-    "priceText": "30.24 SEK",
-    "medianPrice": 30.24,
-    "warehousePriceCount": 1,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
-    "productUrl": "https://www.matspar.se/produkt/pasta-farsk-250g-coop-1",
-    "imageHash": "d0a44e681f2b2781483d1fc940d38693",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "558341",
-    "name": "Pasta Amorosi",
-    "brand": "Coop",
-    "packageText": "500g",
-    "countryFrom": "Italien",
-    "price": 12.25,
-    "priceText": "12.25 SEK",
-    "medianPrice": 12.25,
-    "warehousePriceCount": 1,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
-    "productUrl": "https://www.matspar.se/produkt/pasta-torr-500g-coop-3",
-    "imageHash": "b56985ca5aec004d0b398250143a378c",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "513879",
-    "name": "Pasta Paccheri Äggpasta All'uovo",
-    "brand": "Zeta",
-    "packageText": "400g",
-    "countryFrom": "Italien",
-    "price": 34.02,
-    "priceText": "34.02 SEK",
-    "medianPrice": 35.91,
-    "warehousePriceCount": 2,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
-    "productUrl": "https://www.matspar.se/produkt/pasta-paccheri-aggpasta-all-uovo-400g-zeta",
-    "imageHash": "bf301e301b862f2161d9860569c438e1",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "524902",
-    "name": "Tortelloni Ricotta & Prosciutto",
-    "brand": "Coop",
-    "packageText": "250g",
-    "countryFrom": "Italien",
-    "price": 30.24,
-    "priceText": "30.24 SEK",
-    "medianPrice": 30.24,
-    "warehousePriceCount": 1,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
-    "productUrl": "https://www.matspar.se/produkt/ricotta-prosciutto-tortelloni-250g-coop",
-    "imageHash": "0288ece787a03c31d1d40cad0cd59d6f",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "432334",
-    "name": "Pasta Nitka",
-    "brand": "Okruszek",
-    "packageText": "400g",
-    "countryFrom": "Polen",
-    "price": 15.9,
-    "priceText": "15.90 SEK",
-    "medianPrice": 18.45,
-    "warehousePriceCount": 63,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
-    "productUrl": "https://www.matspar.se/produkt/pasta-nitka-400g-okruszek",
-    "imageHash": "b27b2b18a21740d33f04597076e52e5f",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "769411",
@@ -685,7 +580,112 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/pasta-mezzi-rigatoni-eko-500g-anglamark",
     "imageHash": "08a9640f4437090061139487febd3136",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "513428",
+    "name": "Pasta Conchiglie",
+    "brand": "Monte Castello",
+    "packageText": "500g",
+    "countryFrom": "Lettland",
+    "price": 8.42,
+    "priceText": "8.42 SEK",
+    "medianPrice": 9.41,
+    "warehousePriceCount": 3,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
+    "productUrl": "https://www.matspar.se/produkt/pasta-500g-monte-castello",
+    "imageHash": "72d7ff2dff2ea02179045f8e8757d8b0",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "525507",
+    "name": "Pastasås Classico",
+    "brand": "Coop",
+    "packageText": "390g",
+    "countryFrom": "Italien",
+    "price": 21.72,
+    "priceText": "21.72 SEK",
+    "medianPrice": 21.72,
+    "warehousePriceCount": 1,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
+    "productUrl": "https://www.matspar.se/produkt/pasta-sauce-390g-coop",
+    "imageHash": "397aef8d62ac20a23defee393042c68a",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "558293",
+    "name": "Färsk Pasta Bolognese Tortelloni",
+    "brand": "Coop",
+    "packageText": "250g",
+    "countryFrom": "Italien",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "medianPrice": 30.24,
+    "warehousePriceCount": 1,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
+    "productUrl": "https://www.matspar.se/produkt/pasta-farsk-250g-coop-1",
+    "imageHash": "d0a44e681f2b2781483d1fc940d38693",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "558341",
+    "name": "Pasta Amorosi",
+    "brand": "Coop",
+    "packageText": "500g",
+    "countryFrom": "Italien",
+    "price": 12.25,
+    "priceText": "12.25 SEK",
+    "medianPrice": 12.25,
+    "warehousePriceCount": 1,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
+    "productUrl": "https://www.matspar.se/produkt/pasta-torr-500g-coop-3",
+    "imageHash": "b56985ca5aec004d0b398250143a378c",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "513879",
+    "name": "Pasta Paccheri Äggpasta All'uovo",
+    "brand": "Zeta",
+    "packageText": "400g",
+    "countryFrom": "Italien",
+    "price": 34.02,
+    "priceText": "34.02 SEK",
+    "medianPrice": 35.91,
+    "warehousePriceCount": 2,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
+    "productUrl": "https://www.matspar.se/produkt/pasta-paccheri-aggpasta-all-uovo-400g-zeta",
+    "imageHash": "bf301e301b862f2161d9860569c438e1",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "524902",
+    "name": "Tortelloni Ricotta & Prosciutto",
+    "brand": "Coop",
+    "packageText": "250g",
+    "countryFrom": "Italien",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "medianPrice": 30.24,
+    "warehousePriceCount": 1,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
+    "productUrl": "https://www.matspar.se/produkt/ricotta-prosciutto-tortelloni-250g-coop",
+    "imageHash": "0288ece787a03c31d1d40cad0cd59d6f",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "432334",
+    "name": "Pasta Nitka",
+    "brand": "Okruszek",
+    "packageText": "400g",
+    "countryFrom": "Polen",
+    "price": 15.9,
+    "priceText": "15.90 SEK",
+    "medianPrice": 18.45,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
+    "productUrl": "https://www.matspar.se/produkt/pasta-nitka-400g-okruszek",
+    "imageHash": "b27b2b18a21740d33f04597076e52e5f",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "759199",
@@ -700,7 +700,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/pasta-strozzapreti-glutenfri-400g-zeta",
     "imageHash": "704d6637413b04d4626c80adf91b5541",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "559186",
@@ -715,22 +715,22 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/pasta-torr-500g-coop-5",
     "imageHash": "3350f8424575f6147a329a664220c604",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
-    "code": "524903",
-    "name": "Färsk Pasta Fettuccine",
-    "brand": "Coop",
-    "packageText": "500g",
+    "code": "759826",
+    "name": "Pasta Penne Rigate No 49",
+    "brand": "Garant",
+    "packageText": "1kg",
     "countryFrom": "Italien",
-    "price": 32.13,
-    "priceText": "32.13 SEK",
-    "medianPrice": 32.13,
-    "warehousePriceCount": 1,
+    "price": 22.66,
+    "priceText": "22.66 SEK",
+    "medianPrice": 23.11,
+    "warehousePriceCount": 2,
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
-    "productUrl": "https://www.matspar.se/produkt/fettuccine-500g-coop-2",
-    "imageHash": "b292f5649f7a714aa67cc1bab956a18a",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "productUrl": "https://www.matspar.se/produkt/pasta-penne-rigate-no-49-1kg-garant",
+    "imageHash": "16708ec954fee84fa9522e7e166cb19c",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "583408",
@@ -745,7 +745,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=makaroner",
     "productUrl": "https://www.matspar.se/produkt/pasta-torr-1kg-coop-2",
     "imageHash": "ed301b36ec98f114c6c603e5d1bdddd4",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "167565",
@@ -760,7 +760,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/bryggkaffe-mellanrost-450g-gevalia",
     "imageHash": "4818c71712b03a573c9ab8d0f32f9120",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "4302",
@@ -775,7 +775,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/bryggkaffe-gran-dia-mellanmork-500g-arvid-nordquist",
     "imageHash": "f69f3a94c6d46732f410f5f7f9b03717",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "2983",
@@ -790,7 +790,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/bryggkaffe-mellanrost-eko-450g-lofbergs",
     "imageHash": "7e5533d0b934dc1114a546b2d80dd70e",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "479202",
@@ -805,7 +805,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/nya-mellanrost-original-450-g",
     "imageHash": "a4b3695f0287f28bea01c0bfc46243d0",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "593603",
@@ -820,7 +820,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/bryggkaffe-skanerost-morkrost-450g-zoegas",
     "imageHash": "80a49bf7f21f5b403e0218f3d4ceef8e",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "180545",
@@ -835,7 +835,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/bryggkaffe-perfekt-med-mjolk-mellanrost-450g-lofbergs",
     "imageHash": "f247efeaa630de6410472a196dfafa0a",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "4310",
@@ -850,7 +850,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/bryggkaffe-classic-mellanrost-500g-arvid-nordquist",
     "imageHash": "aec1495deac0baa6bdc13e5b32ddc36d",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "4311",
@@ -865,7 +865,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/bryggkaffe-franskrost-extra-mork-500g-arvid-nordquist",
     "imageHash": "04fb204fcfcef0123df982e199cf1505",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "4304",
@@ -880,7 +880,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/wanyama-500-g-arvid-nordquist-classic",
     "imageHash": "e75de62d0480d17ba121671b15fa1532",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "2985",
@@ -895,7 +895,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/kharisma-brygg-450-g-lofbergs",
     "imageHash": "99f339e1e58e514ea8b5359302a63357",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "4312",
@@ -910,22 +910,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/bryggkaffe-mellanmork-svea-500g-arvid-nordquist",
     "imageHash": "6fb3f8d12e70f359ad827fa9817aa834",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "4317",
-    "name": "Kaffebönor Gran Dia Mellanmörk",
-    "brand": "Arvid Nordquist",
-    "packageText": "500g",
-    "countryFrom": "Sverige",
-    "price": 83.75,
-    "priceText": "83.75 SEK",
-    "medianPrice": 95.98,
-    "warehousePriceCount": 67,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
-    "productUrl": "https://www.matspar.se/produkt/kaffebonor-gran-dia-mellanmork-500g-arvid-nordquist",
-    "imageHash": "2c90eb306c88907250e8eb9a0c5b0c75",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "4319",
@@ -940,22 +925,22 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/hela-bonor-mellan-500-g-arvid-nordquist-classic",
     "imageHash": "c6bc132cb5e5616aabaccedae202e4ae",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
-    "code": "9898",
-    "name": "Kaffebönor Jubileum Mellanrost",
-    "brand": "Löfbergs",
-    "packageText": "400g",
+    "code": "4317",
+    "name": "Kaffebönor Gran Dia Mellanmörk",
+    "brand": "Arvid Nordquist",
+    "packageText": "500g",
     "countryFrom": "Sverige",
-    "price": 77.5,
-    "priceText": "77.50 SEK",
-    "medianPrice": 87.01,
-    "warehousePriceCount": 66,
+    "price": 83.75,
+    "priceText": "83.75 SEK",
+    "medianPrice": 95.98,
+    "warehousePriceCount": 67,
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
-    "productUrl": "https://www.matspar.se/produkt/kaffebonor-jubileum-mellanrost-400g-lofbergs",
-    "imageHash": "418d21d368f5e1ac22c8dbb95841929e",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "productUrl": "https://www.matspar.se/produkt/kaffebonor-gran-dia-mellanmork-500g-arvid-nordquist",
+    "imageHash": "2c90eb306c88907250e8eb9a0c5b0c75",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "165837",
@@ -970,37 +955,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/ecologico-mellanrost-425g-gevalia",
     "imageHash": "09776c08697f147bdae0101336b6cdf3",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "589280",
-    "name": "Bryggkaffe Mellanrost Fikastund",
-    "brand": "Zoégas",
-    "packageText": "450g",
-    "countryFrom": "Sverige",
-    "price": 68.9,
-    "priceText": "68.90 SEK",
-    "medianPrice": 71.165,
-    "warehousePriceCount": 4,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
-    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-mellanrost-fikastund-450g-zoegas",
-    "imageHash": "a1c9e77ae54f5541aa50a1fa21de8ab1",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "4301",
-    "name": "Bryggkaffe Extra Mörkrost Festivita",
-    "brand": "Arvid Nordquist",
-    "packageText": "500g",
-    "countryFrom": "Sverige",
-    "price": 67.5,
-    "priceText": "67.50 SEK",
-    "medianPrice": 81.4,
-    "warehousePriceCount": 67,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
-    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-extra-morkrost-festivita-500g-arvid-nordquist",
-    "imageHash": "1b7e0bb60dec902b5056d80769885484",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "177016",
@@ -1015,82 +970,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/hela-kaffebonor-della-casa-fyllig-intensiv-espresso-450g-zoegas",
     "imageHash": "f1fe43477081305f20f3b960cb46fa19",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "7756",
-    "name": "Snabbkaffe Milea Mellanrost Refill",
-    "brand": "Gevalia",
-    "packageText": "200g",
-    "countryFrom": "Europeiska Unionen",
-    "price": 26.45,
-    "priceText": "26.45 SEK",
-    "medianPrice": 26.45,
-    "warehousePriceCount": 1,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
-    "productUrl": "https://www.matspar.se/produkt/snabbkaffe-milea-mellanrost-refill-200g-gevalia",
-    "imageHash": "6b61e8a7f8bf4949d108ee3983e0af0a",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "593587",
-    "name": "Bryggkaffe Intenzo Mörkrost",
-    "brand": "Zoégas",
-    "packageText": "450g",
-    "countryFrom": "Sverige",
-    "price": 68.53,
-    "priceText": "68.53 SEK",
-    "medianPrice": 70.45,
-    "warehousePriceCount": 5,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
-    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-intenzo-morkrost-450g-zoegas",
-    "imageHash": "f2546f45a1b81968a8dd4e110a993a72",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "2984",
-    "name": "Bryggkaffe Jubileum Lätt Mörkrost",
-    "brand": "Löfbergs",
-    "packageText": "450g",
-    "countryFrom": "Sverige",
-    "price": 61.9,
-    "priceText": "61.90 SEK",
-    "medianPrice": 67.58,
-    "warehousePriceCount": 67,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
-    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-jubileum-latt-morkrost-450g-lofbergs",
-    "imageHash": "21545102deeacbee5f112f5c3e7fb982",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "593578",
-    "name": "Bryggkaffe Blue Java Lätt Mörkrost",
-    "brand": "Zoégas",
-    "packageText": "450g",
-    "countryFrom": "Sverige",
-    "price": 68.53,
-    "priceText": "68.53 SEK",
-    "medianPrice": 71.165,
-    "warehousePriceCount": 6,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
-    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-blue-java-latt-morkrost-450g-zoegas",
-    "imageHash": "3a23f17b6e3a59d2fe9edc3295b52269",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
-  },
-  {
-    "code": "1769841",
-    "name": "Bryggkaffe Mörkrot EKO",
-    "brand": "Garant",
-    "packageText": "450g",
-    "countryFrom": "Danmark",
-    "price": 66.2,
-    "priceText": "66.20 SEK",
-    "medianPrice": 67.05,
-    "warehousePriceCount": 2,
-    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
-    "productUrl": "https://www.matspar.se/produkt/kaffe-450g-garant-ekologiska",
-    "imageHash": "47c5da1990a20e05a4b5f44015316753",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "157976",
@@ -1105,22 +985,142 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/bryggkaffe-triple-mountain-skanerost-450g-cafego",
     "imageHash": "bdc45691f0427e0e6c13d75e6839c59d",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
-    "code": "163747",
-    "name": "Bryggkaffe Mellanrost",
-    "brand": "Lindvalls Kaffe",
+    "code": "182207",
+    "name": "Kaffe Gold Malet",
+    "brand": "Grand",
+    "packageText": "500g",
+    "countryFrom": "Serbien",
+    "price": 86.02,
+    "priceText": "86.02 SEK",
+    "medianPrice": 97.47,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/kaffe-gold-malet-500g-grand",
+    "imageHash": "9e493b994bea7339758af71cd1847632",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "589280",
+    "name": "Bryggkaffe Mellanrost Fikastund",
+    "brand": "Zoégas",
     "packageText": "450g",
-    "countryFrom": "",
-    "price": 56.1,
-    "priceText": "56.10 SEK",
-    "medianPrice": 62.985,
+    "countryFrom": "Sverige",
+    "price": 68.9,
+    "priceText": "68.90 SEK",
+    "medianPrice": 71.165,
+    "warehousePriceCount": 4,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-mellanrost-fikastund-450g-zoegas",
+    "imageHash": "a1c9e77ae54f5541aa50a1fa21de8ab1",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "593587",
+    "name": "Bryggkaffe Intenzo Mörkrost",
+    "brand": "Zoégas",
+    "packageText": "450g",
+    "countryFrom": "Sverige",
+    "price": 68.53,
+    "priceText": "68.53 SEK",
+    "medianPrice": 70.45,
+    "warehousePriceCount": 5,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-intenzo-morkrost-450g-zoegas",
+    "imageHash": "f2546f45a1b81968a8dd4e110a993a72",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "2984",
+    "name": "Bryggkaffe Jubileum Lätt Mörkrost",
+    "brand": "Löfbergs",
+    "packageText": "450g",
+    "countryFrom": "Sverige",
+    "price": 61.9,
+    "priceText": "61.90 SEK",
+    "medianPrice": 67.58,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-jubileum-latt-morkrost-450g-lofbergs",
+    "imageHash": "21545102deeacbee5f112f5c3e7fb982",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "593578",
+    "name": "Bryggkaffe Blue Java Lätt Mörkrost",
+    "brand": "Zoégas",
+    "packageText": "450g",
+    "countryFrom": "Sverige",
+    "price": 68.53,
+    "priceText": "68.53 SEK",
+    "medianPrice": 71.165,
+    "warehousePriceCount": 6,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-blue-java-latt-morkrost-450g-zoegas",
+    "imageHash": "3a23f17b6e3a59d2fe9edc3295b52269",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "9898",
+    "name": "Kaffebönor Jubileum Mellanrost",
+    "brand": "Löfbergs",
+    "packageText": "400g",
+    "countryFrom": "Sverige",
+    "price": 77.5,
+    "priceText": "77.50 SEK",
+    "medianPrice": 87.01,
     "warehousePriceCount": 66,
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
-    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-mellanrost-450g-lindvalls-kaffe",
-    "imageHash": "af064fd54ce4fd84a669f2d28b3f4ab8",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "productUrl": "https://www.matspar.se/produkt/kaffebonor-jubileum-mellanrost-400g-lofbergs",
+    "imageHash": "418d21d368f5e1ac22c8dbb95841929e",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "4301",
+    "name": "Bryggkaffe Extra Mörkrost Festivita",
+    "brand": "Arvid Nordquist",
+    "packageText": "500g",
+    "countryFrom": "Sverige",
+    "price": 67.5,
+    "priceText": "67.50 SEK",
+    "medianPrice": 81.4,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-extra-morkrost-festivita-500g-arvid-nordquist",
+    "imageHash": "1b7e0bb60dec902b5056d80769885484",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "7756",
+    "name": "Snabbkaffe Milea Mellanrost Refill",
+    "brand": "Gevalia",
+    "packageText": "200g",
+    "countryFrom": "Europeiska Unionen",
+    "price": 26.45,
+    "priceText": "26.45 SEK",
+    "medianPrice": 26.45,
+    "warehousePriceCount": 1,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/snabbkaffe-milea-mellanrost-refill-200g-gevalia",
+    "imageHash": "6b61e8a7f8bf4949d108ee3983e0af0a",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "1769841",
+    "name": "Bryggkaffe Mörkrot EKO",
+    "brand": "Garant",
+    "packageText": "450g",
+    "countryFrom": "Danmark",
+    "price": 66.2,
+    "priceText": "66.20 SEK",
+    "medianPrice": 67.05,
+    "warehousePriceCount": 2,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/kaffe-450g-garant-ekologiska",
+    "imageHash": "47c5da1990a20e05a4b5f44015316753",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "164105",
@@ -1135,7 +1135,7 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/solid-hela-bonor-450g-arvid-nordquist-selection",
     "imageHash": "6c2cd604f3e5a683ea364f25d1789e3e",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   },
   {
     "code": "7500",
@@ -1150,6 +1150,1131 @@ export const matsparProducts: MatsparIngestedProduct[] = [
     "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
     "productUrl": "https://www.matspar.se/produkt/snabbkaffe-lyx-morkrost-refill-200g-nescafe",
     "imageHash": "04ed4d83ac0ccd48d36652e2966b077a",
-    "retrievedAt": "2026-05-21T01:07:13.735Z"
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "192969",
+    "name": "Bryggkaffe Peru Lätt Mörkrost EKO",
+    "brand": "ICA I Love Eco",
+    "packageText": "450g",
+    "countryFrom": "Sverige",
+    "price": 65.65,
+    "priceText": "65.65 SEK",
+    "medianPrice": 72.28,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-peru-latt-morkrost-eko-450g-ica-i-love-eco",
+    "imageHash": "a583a62941aea8cda341996e4659cfe2",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "208364",
+    "name": "Kokkaffe Zlatna Džezva",
+    "brand": "Vispak",
+    "packageText": "907g",
+    "countryFrom": "Bosnien och Hercegovina",
+    "price": 128.71,
+    "priceText": "128.71 SEK",
+    "medianPrice": 141.76,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/kokkaffe-zlatna-dzezva-907g-vispak",
+    "imageHash": "dde270286d6e023c262a73c5cbd302a2",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "162777",
+    "name": "Bryggkaffe Tricolore",
+    "brand": "Lindvalls Kaffe",
+    "packageText": "450g",
+    "countryFrom": "",
+    "price": 56.1,
+    "priceText": "56.10 SEK",
+    "medianPrice": 64.68,
+    "warehousePriceCount": 64,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-tricolore-450g-lindvalls-kaffe",
+    "imageHash": "aa56432ba9a9a23b7dbf3ea77bdc17fa",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "163747",
+    "name": "Bryggkaffe Mellanrost",
+    "brand": "Lindvalls Kaffe",
+    "packageText": "450g",
+    "countryFrom": "",
+    "price": 56.1,
+    "priceText": "56.10 SEK",
+    "medianPrice": 62.985,
+    "warehousePriceCount": 66,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-mellanrost-450g-lindvalls-kaffe",
+    "imageHash": "af064fd54ce4fd84a669f2d28b3f4ab8",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "202589",
+    "name": "Bryggkaffe Prezzo Grovmalen Mellanrost",
+    "brand": "Löfbergs",
+    "packageText": "450g",
+    "countryFrom": "Sverige",
+    "price": 61.9,
+    "priceText": "61.90 SEK",
+    "medianPrice": 67.58,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-prezzo-grovmalen-mellanrost-450g-lofbergs",
+    "imageHash": "80ad285bb1b0838ff18b5d1f256cb0f7",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "177020",
+    "name": "Kaffebönor Special Edition Summer By Ebba",
+    "brand": "Zoégas",
+    "packageText": "450g",
+    "countryFrom": "Sverige",
+    "price": 85.17,
+    "priceText": "85.17 SEK",
+    "medianPrice": 104.1,
+    "warehousePriceCount": 66,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/kaffebonor-special-edition-summer-by-ebba-450g-zoegas",
+    "imageHash": "85b13dbb954d9684f700c4b5575e0403",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "157977",
+    "name": "Bryggkaffe Volcanic Blend Mörkrost",
+    "brand": "Cafégo",
+    "packageText": "450g",
+    "countryFrom": "",
+    "price": 53.8,
+    "priceText": "53.80 SEK",
+    "medianPrice": 76.55,
+    "warehousePriceCount": 65,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-volcanic-blend-morkrost-450g-cafego",
+    "imageHash": "fb004ec7a55b4ab455aa982dab2ff1ea",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "1733932",
+    "name": "Kaffe, malet",
+    "brand": "Löfbergs",
+    "packageText": "450g",
+    "countryFrom": "Sverige",
+    "price": 61.9,
+    "priceText": "61.90 SEK",
+    "medianPrice": 67.92,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/kaffe-malet-450-g",
+    "imageHash": "a5632a38a6ea361f5b8c72d58cc7d049",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "167426",
+    "name": "Bryggkaffe Premium",
+    "brand": "Lindvalls Kaffe",
+    "packageText": "450g",
+    "countryFrom": "",
+    "price": 67.52,
+    "priceText": "67.52 SEK",
+    "medianPrice": 83.9,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-premium-450g-lindvalls-kaffe",
+    "imageHash": "bc1b5a8a22c37bb95626c4f605df42be",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "163071",
+    "name": "Bryggkaffe Mörkrost",
+    "brand": "Lindvalls Kaffe",
+    "packageText": "450g",
+    "countryFrom": "",
+    "price": 58.35,
+    "priceText": "58.35 SEK",
+    "medianPrice": 58.35,
+    "warehousePriceCount": 1,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-morkrost-450g-lindvalls-kaffe",
+    "imageHash": "9a4a951fd1111b8db3daa47903ffa117",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "193434",
+    "name": "Kokkaffe Mellanrost",
+    "brand": "Lindvalls Kaffe",
+    "packageText": "450g",
+    "countryFrom": "",
+    "price": 58.35,
+    "priceText": "58.35 SEK",
+    "medianPrice": 58.35,
+    "warehousePriceCount": 1,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/kokkaffe-mellanrost-450g-lindvalls-kaffe",
+    "imageHash": "4deb24da027aaeaf62017075266ebbc3",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "162776",
+    "name": "Bryggkaffe Mörkrost Brazil",
+    "brand": "Lindvalls Kaffe",
+    "packageText": "450g",
+    "countryFrom": "",
+    "price": 56.1,
+    "priceText": "56.10 SEK",
+    "medianPrice": 65.98,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-morkrost-brazil-450g-lindvalls-kaffe",
+    "imageHash": "6ff38d7c3695f94f27dd35fd670d3da2",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "7789",
+    "name": "Espressomalet Kaffe Qualità Rossa",
+    "brand": "Lavazza",
+    "packageText": "250g",
+    "countryFrom": "Italien",
+    "price": 57.63,
+    "priceText": "57.63 SEK",
+    "medianPrice": 65.505,
+    "warehousePriceCount": 66,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/espressomalet-kaffe-qualita-rossa-250g-lavazza",
+    "imageHash": "aa777e81c4b061859e2af7a8087c8bcb",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "15248",
+    "name": "Kaffe Malet Espresso Italiano Classico",
+    "brand": "Lavazza",
+    "packageText": "250g",
+    "countryFrom": "Italien",
+    "price": 60.4,
+    "priceText": "60.40 SEK",
+    "medianPrice": 68.76,
+    "warehousePriceCount": 65,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/kaffe-malet-espresso-italiano-classico-250g-lavazza",
+    "imageHash": "72487fbc0844a41a5015413cd07ae0b3",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "168459",
+    "name": "Kokkaffe Mellanrost",
+    "brand": "Gevalia",
+    "packageText": "450g",
+    "countryFrom": "",
+    "price": 70.4,
+    "priceText": "70.40 SEK",
+    "medianPrice": 77.55,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/kokkaffe-mellanrost-450g-gevalia",
+    "imageHash": "28ecacb8761ba86e8f0c82e449682f89",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "760529",
+    "name": "Bryggkaffe Koffeinfri EKO",
+    "brand": "Zoégas",
+    "packageText": "450g",
+    "countryFrom": "Sverige",
+    "price": 78.9,
+    "priceText": "78.90 SEK",
+    "medianPrice": 89.54,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-koffeinfri-eko-450g-zoegas",
+    "imageHash": "0cda3c1f2ae27681387f061d079b9153",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "221616",
+    "name": "Bryggkaffe Qualità Oro",
+    "brand": "Lavazza",
+    "packageText": "340g",
+    "countryFrom": "Italien",
+    "price": 78.51,
+    "priceText": "78.51 SEK",
+    "medianPrice": 81.34,
+    "warehousePriceCount": 4,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-qualita-oro-340g-lavazza",
+    "imageHash": "09c4722300eda8b3be5d3379a076363e",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "202600",
+    "name": "Kokkaffe Mellanrost",
+    "brand": "Löfbergs",
+    "packageText": "450g",
+    "countryFrom": "Sverige",
+    "price": 61.9,
+    "priceText": "61.90 SEK",
+    "medianPrice": 67.58,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/kokkaffe-mellanrost-450g-lofbergs",
+    "imageHash": "8057d0ab60d1e303f1cd4104dc21e31f",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "139355",
+    "name": "Kaffebönor Mörkrost EKO",
+    "brand": "Löfbergs",
+    "packageText": "400g",
+    "countryFrom": "Sverige",
+    "price": 79.49,
+    "priceText": "79.49 SEK",
+    "medianPrice": 80.62,
+    "warehousePriceCount": 4,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/kaffebonor-morkrost-eko-400g-lofbergs",
+    "imageHash": "bcbedbd7ec22fdd0095723eef38147d4",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "139358",
+    "name": "Kaffebönor Mellanrost EKO",
+    "brand": "Löfbergs",
+    "packageText": "400g",
+    "countryFrom": "Sverige",
+    "price": 79,
+    "priceText": "79.00 SEK",
+    "medianPrice": 87.68,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/kaffebonor-mellanrost-eko-400g-lofbergs",
+    "imageHash": "5d1b8e436b871dfc6d441337db0b1ac8",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "167190",
+    "name": "Bryggkaffe El-Brygg Mellanrost",
+    "brand": "Gevalia",
+    "packageText": "450g",
+    "countryFrom": "",
+    "price": 70.4,
+    "priceText": "70.40 SEK",
+    "medianPrice": 77.48,
+    "warehousePriceCount": 64,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=kaffe",
+    "productUrl": "https://www.matspar.se/produkt/bryggkaffe-el-brygg-mellanrost-450g-gevalia",
+    "imageHash": "dc2f38231819d7b7007df6f785b215de",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "333251",
+    "name": "Långkornigt Ris",
+    "brand": "Ben's Original",
+    "packageText": "1kg",
+    "countryFrom": "Belgien",
+    "price": 23.56,
+    "priceText": "23.56 SEK",
+    "medianPrice": 36.54,
+    "warehousePriceCount": 66,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/longgrain-lo-10min-1kg-ben-s-original",
+    "imageHash": "cccb8ed1033fc09fecdb289e317bc4af",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "267172",
+    "name": "Jasminris Quick n' Easy",
+    "brand": "Zeinas",
+    "packageText": "250g",
+    "countryFrom": "Frankrike",
+    "price": 20.7,
+    "priceText": "20.70 SEK",
+    "medianPrice": 25.08,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/jasminris-quick-n-easy-250g-zeinas",
+    "imageHash": "3f1a54b2057815cbf75ff63c1118d78b",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "9310",
+    "name": "Vildrismix BIB",
+    "brand": "Ben's Original",
+    "packageText": "500g",
+    "countryFrom": "Belgien",
+    "price": 33.07,
+    "priceText": "33.07 SEK",
+    "medianPrice": 33.07,
+    "warehousePriceCount": 1,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/vildrismix-bib-500-g-uncle-bens",
+    "imageHash": "8f8678fb46aedba16de1bb3bfee7813f",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "11536",
+    "name": "Fullkornsris",
+    "brand": "ICA",
+    "packageText": "2kg",
+    "countryFrom": "Italien",
+    "price": 49.9,
+    "priceText": "49.90 SEK",
+    "medianPrice": 65.45,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/fullkornsris-2-kg-ica",
+    "imageHash": "c120099ed6b7db601b3dacf09d226ef8",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "11750",
+    "name": "Jasminris",
+    "brand": "ICA",
+    "packageText": "1kg",
+    "countryFrom": "Thailand",
+    "price": 31.6,
+    "priceText": "31.60 SEK",
+    "medianPrice": 34.26,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/jasminris-1000-g-ica",
+    "imageHash": "d04e3036576e81f5e05ee3d28a337ebb",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "10608",
+    "name": "Jasminris",
+    "brand": "ICA",
+    "packageText": "2kg",
+    "countryFrom": "Kambodja",
+    "price": 54,
+    "priceText": "54.00 SEK",
+    "medianPrice": 68.58,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/jasminris-2000-g-ica",
+    "imageHash": "55940a5e43362ce67f8728cd6e84f8bf",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "13295",
+    "name": "Basmatiris",
+    "brand": "ICA",
+    "packageText": "1kg",
+    "countryFrom": "Indien",
+    "price": 34.5,
+    "priceText": "34.50 SEK",
+    "medianPrice": 37.15,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/basmatiris-1kg-ica",
+    "imageHash": "0aad9067065bf5a4627e5decc06623c8",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "512424",
+    "name": "Basmatiris",
+    "brand": "Mahmood",
+    "packageText": "4.5kg",
+    "countryFrom": "Pakistan",
+    "price": 119.23,
+    "priceText": "119.23 SEK",
+    "medianPrice": 157.9,
+    "warehousePriceCount": 65,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/mahmood-sella-4-5kg-sevan",
+    "imageHash": "c7003cdbb91cb3ac23ad0831fecafffb",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "333250",
+    "name": "Jasminris Ben's Original",
+    "brand": "Ben's Original",
+    "packageText": "1kg",
+    "countryFrom": "Nederländerna",
+    "price": 56.68,
+    "priceText": "56.68 SEK",
+    "medianPrice": 75.66,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/jasmin-lo-10min-1kg-ben-s-original",
+    "imageHash": "4a345ae6fb33f57a8379bc24a7bbde45",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "5375",
+    "name": "Råris 10 Min",
+    "brand": "Frebaco Kvarn",
+    "packageText": "600g",
+    "countryFrom": "Sverige",
+    "price": 21.6,
+    "priceText": "21.60 SEK",
+    "medianPrice": 27.43,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/raris-600-g-frebaco-kvarn",
+    "imageHash": "bdac038c917cf57d2a7f65a0a8c2cc4e",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "184986",
+    "name": "Libanesiskt Ris",
+    "brand": "Sevan",
+    "packageText": "900g",
+    "countryFrom": "Sverige",
+    "price": 42.5,
+    "priceText": "42.50 SEK",
+    "medianPrice": 51.02,
+    "warehousePriceCount": 66,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/libanesiskt-ris-900g-sevan",
+    "imageHash": "7d5c57393ef6eec4eb55c49a92b888b1",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "167056",
+    "name": "Runt Ris",
+    "brand": "Sunwhite",
+    "packageText": "10kg",
+    "countryFrom": "Australien",
+    "price": 279.1,
+    "priceText": "279.10 SEK",
+    "medianPrice": 281.035,
+    "warehousePriceCount": 2,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/runt-ris-10kg-sunwhite",
+    "imageHash": "8ce977d58b2f2d32822a40e9a2354092",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "240558",
+    "name": "Jasminris",
+    "brand": "Lotus",
+    "packageText": "5kg",
+    "countryFrom": "Vietnam",
+    "price": 103.15,
+    "priceText": "103.15 SEK",
+    "medianPrice": 105.975,
+    "warehousePriceCount": 2,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/jasminris-5kg-lotus-rice",
+    "imageHash": "c6a5144f97dbdf58ce596ea9bedecc14",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "477584",
+    "name": "Basmatiris Parboiled",
+    "brand": "Abu Kass",
+    "packageText": "2kg",
+    "countryFrom": "Indien",
+    "price": 88.96,
+    "priceText": "88.96 SEK",
+    "medianPrice": 88.96,
+    "warehousePriceCount": 1,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/basmatiris-parboiled-2kg-abu-kass",
+    "imageHash": "2152a1a441d9efd2c68535cbf61e9f60",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "164761",
+    "name": "Ekologiskt basmatiris",
+    "brand": "I love eco",
+    "packageText": "2kg",
+    "countryFrom": "Indien",
+    "price": 80.1,
+    "priceText": "80.10 SEK",
+    "medianPrice": 96.9,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/ekologiskt-basmatiris-2kg-i-love-eco",
+    "imageHash": "8d79a286c91c478454f3e43de1898d68",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "447575",
+    "name": "Express Ris Mexican",
+    "brand": "Ben's Original",
+    "packageText": "220g",
+    "countryFrom": "Storbritannien",
+    "price": 24.51,
+    "priceText": "24.51 SEK",
+    "medianPrice": 24.51,
+    "warehousePriceCount": 1,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/expr-mexican-220g-ben-s-original",
+    "imageHash": "2c078eb1567ff5f83667682205ffd901",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "333249",
+    "name": "Långkornigt Ris 20 Min",
+    "brand": "Ben's Original",
+    "packageText": "1kg",
+    "countryFrom": "Belgien",
+    "price": 31,
+    "priceText": "31.00 SEK",
+    "medianPrice": 36.66,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/longgrain-lo-20min-1kg-ben-s-original",
+    "imageHash": "3499d3c67416c15586575174f912d796",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "333228",
+    "name": "Långkornigt ris 10min",
+    "brand": "Ben's Original",
+    "packageText": "500g",
+    "countryFrom": "Belgien",
+    "price": 32,
+    "priceText": "32.00 SEK",
+    "medianPrice": 39.7,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/longgrain-bib-500g-ben-s-original",
+    "imageHash": "2eabcd3d52088e3786b6a7eafa193ad2",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "447569",
+    "name": "Express Ris Rostad Vitlök",
+    "brand": "Ben's Original",
+    "packageText": "220g",
+    "countryFrom": "Storbritannien",
+    "price": 24.51,
+    "priceText": "24.51 SEK",
+    "medianPrice": 24.51,
+    "warehousePriceCount": 1,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/expr-roastedgarlic-220g-ben-s-original",
+    "imageHash": "ba1172a709b8ddc1d8078f92bf6ca942",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "12485",
+    "name": "Parboiled Ris Långkornigt",
+    "brand": "ICA Basic",
+    "packageText": "2kg",
+    "countryFrom": "Italien",
+    "price": 29.26,
+    "priceText": "29.26 SEK",
+    "medianPrice": 32.9,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/parboiled-ris-langkornigt-2kg-ica-basic",
+    "imageHash": "55b8bdbf75937aa257409e24047579f9",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "333253",
+    "name": "Långkornigt Ris Boil In Bag",
+    "brand": "Ben's Original",
+    "packageText": "1kg",
+    "countryFrom": "Belgien",
+    "price": 45.3,
+    "priceText": "45.30 SEK",
+    "medianPrice": 57.74,
+    "warehousePriceCount": 66,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/longgrain-bib-1kg-ben-s-original",
+    "imageHash": "0b227fe0b761ab07b0f37a62145c6470",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "461224",
+    "name": "Basmati Premium ris",
+    "brand": "Zafaran Sedir",
+    "packageText": "4.5kg",
+    "countryFrom": "Pakistan",
+    "price": 148.2,
+    "priceText": "148.20 SEK",
+    "medianPrice": 179,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/basmati-premium-ris-4-5kg-zafaran-sedir",
+    "imageHash": "dcdd15d4d18c11943b10388b97e23103",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "448494",
+    "name": "Express Ris Jasmin & Basmati",
+    "brand": "Ben's Original",
+    "packageText": "220g",
+    "countryFrom": "Frankrike",
+    "price": 24.51,
+    "priceText": "24.51 SEK",
+    "medianPrice": 25.27,
+    "warehousePriceCount": 2,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/expr-jasm-basm-220g-ben-s-original",
+    "imageHash": "88e377004057799bc5ad8b1e0afce895",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "12707",
+    "name": "Risottoris",
+    "brand": "ICA",
+    "packageText": "1kg",
+    "countryFrom": "Italien",
+    "price": 30.26,
+    "priceText": "30.26 SEK",
+    "medianPrice": 37.78,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/risottoris-1000-g-ica",
+    "imageHash": "",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "233518",
+    "name": "Risottoris Carnaroli Gran Riserva",
+    "brand": "Zeta",
+    "packageText": "700g",
+    "countryFrom": "Italien",
+    "price": 55.7,
+    "priceText": "55.70 SEK",
+    "medianPrice": 65.245,
+    "warehousePriceCount": 64,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/risottoris-carnaroli-gran-riserva-700g-zeta",
+    "imageHash": "64c4a1889e40373877d535b4ce3c3b62",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "233198",
+    "name": "Svenskt Havreris",
+    "brand": "Frebaco Kvarn",
+    "packageText": "1kg",
+    "countryFrom": "Sverige",
+    "price": 28.2,
+    "priceText": "28.20 SEK",
+    "medianPrice": 36.32,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/svenskt-havreris-1-kg",
+    "imageHash": "ddd3ab815ead6b4301a0e33756ae9469",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "14589",
+    "name": "Carnaroliris Risotto",
+    "brand": "Zeta",
+    "packageText": "700g",
+    "countryFrom": "Italien",
+    "price": 49.11,
+    "priceText": "49.11 SEK",
+    "medianPrice": 55.6,
+    "warehousePriceCount": 65,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/carnaroliris-risotto-700g-zeta",
+    "imageHash": "fea4808b392444a1b82155e4a2a859a3",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "7031",
+    "name": "Arborioris",
+    "brand": "Zeta",
+    "packageText": "700g",
+    "countryFrom": "Italien",
+    "price": 36.8,
+    "priceText": "36.80 SEK",
+    "medianPrice": 43.885,
+    "warehousePriceCount": 66,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/arborioris-700g-zeta",
+    "imageHash": "517f40c9d948baffe488d6d68ce5fb68",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "5399",
+    "name": "Avorioris",
+    "brand": "Risenta",
+    "packageText": "1kg",
+    "countryFrom": "Italien",
+    "price": 34.9,
+    "priceText": "34.90 SEK",
+    "medianPrice": 41.69,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/avorioris-1000-g-risenta",
+    "imageHash": "f18e72af573dbf83178146e84fcc3782",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "333263",
+    "name": "Fullkornsris",
+    "brand": "Ben's Original",
+    "packageText": "1kg",
+    "countryFrom": "Belgien",
+    "price": 55.79,
+    "priceText": "55.79 SEK",
+    "medianPrice": 60.995,
+    "warehousePriceCount": 2,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/whgrain-lo-10min-1kg-ben-s-original",
+    "imageHash": "4bf08a1c59270bf8e46db2e9459a7616",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "333226",
+    "name": "Fullkornsris Boil In Bag",
+    "brand": "Ben's Original",
+    "packageText": "500g",
+    "countryFrom": "Belgien",
+    "price": 31.9,
+    "priceText": "31.90 SEK",
+    "medianPrice": 40.36,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/wholegrain-bib-500g-ben-s-original",
+    "imageHash": "acd9919147e955d8846269fc250629f7",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "447577",
+    "name": "Expressris Mediterranean Style",
+    "brand": "Ben's Original",
+    "packageText": "220g",
+    "countryFrom": "Storbritannien",
+    "price": 25.45,
+    "priceText": "25.45 SEK",
+    "medianPrice": 25.45,
+    "warehousePriceCount": 1,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/expressris-mediterranean-style-220g-ben-s-original",
+    "imageHash": "e367c6c10840fa7d9dbb205b061a1263",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "332723",
+    "name": "Matgryn",
+    "brand": "Frebaco Kvarn",
+    "packageText": "1kg",
+    "countryFrom": "Sverige",
+    "price": 28.2,
+    "priceText": "28.20 SEK",
+    "medianPrice": 34.73,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/svenskt-kornris-1-kg",
+    "imageHash": "772135e28d982966d6955a6b420246fb",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "483357",
+    "name": "Boil-in-Bag Jasminris",
+    "brand": "Zeinas",
+    "packageText": "500g",
+    "countryFrom": "Tyskland",
+    "price": 33.02,
+    "priceText": "33.02 SEK",
+    "medianPrice": 35.92,
+    "warehousePriceCount": 5,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/boil-in-bag-jasmin-500g-zeinas",
+    "imageHash": "297afe06f35ff6e7ad8e517e7c2fe897",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "267124",
+    "name": "Basmatiris Quick n' Easy",
+    "brand": "Zeinas",
+    "packageText": "250g",
+    "countryFrom": "Frankrike",
+    "price": 20.34,
+    "priceText": "20.34 SEK",
+    "medianPrice": 25.29,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/basmatiris-quick-n-easy-250g-zeinas",
+    "imageHash": "c59237ae609a1b2b4ba1102fdcdb991c",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "483356",
+    "name": "Boil-in-Bag Basmatiris",
+    "brand": "Zeinas",
+    "packageText": "500g",
+    "countryFrom": "Tyskland",
+    "price": 33.02,
+    "priceText": "33.02 SEK",
+    "medianPrice": 35.92,
+    "warehousePriceCount": 5,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/boil-in-bag-basmatiris-500g-zeinas",
+    "imageHash": "3a89bbdb179c46367f34a937d9780739",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "333266",
+    "name": "Basmatiris",
+    "brand": "Ben's Original",
+    "packageText": "1kg",
+    "countryFrom": "Nederländerna",
+    "price": 66.2,
+    "priceText": "66.20 SEK",
+    "medianPrice": 72.82,
+    "warehousePriceCount": 3,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/basmati-lo-10min-1kg-ben-s-original",
+    "imageHash": "29640b0f1fbd0c864284a561161f0e5b",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "333265",
+    "name": "Jasminris Boil In Bag",
+    "brand": "Ben's Original",
+    "packageText": "1kg",
+    "countryFrom": "Nederländerna",
+    "price": 65.2,
+    "priceText": "65.20 SEK",
+    "medianPrice": 69.04,
+    "warehousePriceCount": 3,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/jasmin-bib-1kg-ben-s-original",
+    "imageHash": "65db53bf61252ad0818b7b0fce1ca1ed",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "251655",
+    "name": "Sushiris",
+    "brand": "Blue Dragon",
+    "packageText": "500g",
+    "countryFrom": "Italien",
+    "price": 39.6,
+    "priceText": "39.60 SEK",
+    "medianPrice": 45.33,
+    "warehousePriceCount": 61,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/sushiris-500g-blue-dragon",
+    "imageHash": "6d89554e0d454437664b7f67180e07ee",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "166266",
+    "name": "Sushiris",
+    "brand": "Spicefield",
+    "packageText": "500g",
+    "countryFrom": "Polen",
+    "price": 29.29,
+    "priceText": "29.29 SEK",
+    "medianPrice": 29.29,
+    "warehousePriceCount": 1,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/sushi-ris-500g-spicefield",
+    "imageHash": "b7cf05696527f1ce3e959dc76168b854",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "1674641",
+    "name": "Basmatiris Boil In Bag",
+    "brand": "Ben's Original",
+    "packageText": "1kg",
+    "countryFrom": "Belgien",
+    "price": 66.15,
+    "priceText": "66.15 SEK",
+    "medianPrice": 68.54,
+    "warehousePriceCount": 2,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/basmatiris-boil-in-bag-1kg-ben-s-original",
+    "imageHash": "02dbe8a2e76e6fe78f121bbc23b06afe",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "333256",
+    "name": "Basmatiris Boil In Bag",
+    "brand": "Ben's Original",
+    "packageText": "500g",
+    "countryFrom": "Nederländerna",
+    "price": 32,
+    "priceText": "32.00 SEK",
+    "medianPrice": 39.7,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/basmati-bib-500g-ben-s-original",
+    "imageHash": "1778e8ca9d0e0da3137fccb0ef573213",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "333223",
+    "name": "Jasmin BIB",
+    "brand": "Ben's Original",
+    "packageText": "500g",
+    "countryFrom": "Nederländerna",
+    "price": 32,
+    "priceText": "32.00 SEK",
+    "medianPrice": 39.7,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/jasmin-bib-500g-ben-s-original",
+    "imageHash": "38bde8f4f87c88f30f940d1707e41929",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "415271",
+    "name": "Ris Parboiled KRAV",
+    "brand": "Saltå kvarn",
+    "packageText": "1kg",
+    "countryFrom": "Italien",
+    "price": 57.6,
+    "priceText": "57.60 SEK",
+    "medianPrice": 65.685,
+    "warehousePriceCount": 64,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/ris-parboiled-krav-1kg",
+    "imageHash": "46ef0745757714d4fa939ef94a89633f",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "447612",
+    "name": "Basmati Saffran Quick n' Easy",
+    "brand": "Zeinas",
+    "packageText": "250g",
+    "countryFrom": "Frankrike",
+    "price": 20.7,
+    "priceText": "20.70 SEK",
+    "medianPrice": 25.08,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/basmati-saffran-quick-n-easy-250g-zeinas",
+    "imageHash": "c78e8a5b2537e9c8fa078544d344ecd9",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "267302",
+    "name": "Basmati & Linser Quick n' Easy",
+    "brand": "Zeinas",
+    "packageText": "250g",
+    "countryFrom": "Frankrike",
+    "price": 20.72,
+    "priceText": "20.72 SEK",
+    "medianPrice": 23.19,
+    "warehousePriceCount": 3,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/basmati-linser-smoky-quick-n-easy-250g-zeinas",
+    "imageHash": "671974eca17e0bd7a071a842b04b55f6",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "12426",
+    "name": "Basmatiris",
+    "brand": "ICA Basic",
+    "packageText": "2kg",
+    "countryFrom": "Nederländerna",
+    "price": 43.4,
+    "priceText": "43.40 SEK",
+    "medianPrice": 46.65,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/basmatiris-2kg-ica-basic",
+    "imageHash": "ed1bff1e1d4dcfab136ed756a64ccf94",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "447558",
+    "name": "Basmatiris",
+    "brand": "ICA Basic",
+    "packageText": "5kg",
+    "countryFrom": "Polen",
+    "price": 103,
+    "priceText": "103.00 SEK",
+    "medianPrice": 118.56,
+    "warehousePriceCount": 63,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=ris",
+    "productUrl": "https://www.matspar.se/produkt/basmatiris-5kg-ica-basic-1",
+    "imageHash": "c09277d7b1d81dc4ea21782064782a83",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "7868",
+    "name": "Pasta Fusilli",
+    "brand": "Barilla",
+    "packageText": "500g",
+    "countryFrom": "Italien",
+    "price": 16,
+    "priceText": "16.00 SEK",
+    "medianPrice": 19.775,
+    "warehousePriceCount": 66,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=pasta",
+    "productUrl": "https://www.matspar.se/produkt/fusilli-500-g-barilla",
+    "imageHash": "96c4c4c8bc14fe875a5506b362224eb5",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "15335",
+    "name": "Pasta Spaghetti",
+    "brand": "Barilla",
+    "packageText": "1.8kg",
+    "countryFrom": "Italien",
+    "price": 30.7,
+    "priceText": "30.70 SEK",
+    "medianPrice": 35.49,
+    "warehousePriceCount": 66,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=pasta",
+    "productUrl": "https://www.matspar.se/produkt/spaghetti-1800-g-barilla",
+    "imageHash": "82664bcd6769849eaef4121de04b0c27",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "19443",
+    "name": "87 Radiatori IGP",
+    "brand": "Garofalo",
+    "packageText": "500g",
+    "countryFrom": "Italien",
+    "price": 15.9,
+    "priceText": "15.90 SEK",
+    "medianPrice": 21.39,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=pasta",
+    "productUrl": "https://www.matspar.se/produkt/radiatori-500gr-garofalo",
+    "imageHash": "7da94a768a54d644788bbe142ff8692f",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "7867",
+    "name": "Pasta Rigatoni",
+    "brand": "Barilla",
+    "packageText": "500g",
+    "countryFrom": "Italien",
+    "price": 16,
+    "priceText": "16.00 SEK",
+    "medianPrice": 19.775,
+    "warehousePriceCount": 66,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=pasta",
+    "productUrl": "https://www.matspar.se/produkt/rigatoni-500-g-barilla",
+    "imageHash": "932da159933abde2a7120b51c7366e59",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "7864",
+    "name": "Pasta Penne Rigate",
+    "brand": "Barilla",
+    "packageText": "500g",
+    "countryFrom": "Italien",
+    "price": 16,
+    "priceText": "16.00 SEK",
+    "medianPrice": 19.705,
+    "warehousePriceCount": 66,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=pasta",
+    "productUrl": "https://www.matspar.se/produkt/penne-rigate-500-g-barilla",
+    "imageHash": "cbf6580b0fa1b877905708809b6c75d3",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
+  },
+  {
+    "code": "15330",
+    "name": "Pasta Fusilli Glutenfri",
+    "brand": "Barilla",
+    "packageText": "400g",
+    "countryFrom": "Italien",
+    "price": 16.9,
+    "priceText": "16.90 SEK",
+    "medianPrice": 18.83,
+    "warehousePriceCount": 67,
+    "sourceUrl": "https://www.matspar.se/kategori/?q=pasta",
+    "productUrl": "https://www.matspar.se/produkt/fusilli-glutenfri-400g-barilla",
+    "imageHash": "ccdd2001f392ef14bd047f3fa50a47c6",
+    "retrievedAt": "2026-05-22T09:30:18.588Z"
   }
 ];

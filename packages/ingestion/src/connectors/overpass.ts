@@ -39,7 +39,7 @@ area["ISO3166-2"="SE-AB"][admin_level=4]->.searchArea;
   way["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
   relation["shop"~"^(supermarket|convenience|grocery)$"](area.searchArea);
 );
-out center tags 60;`;
+out center tags 120;`;
 
 export type FetchOverpassGroceryStoresOptions = {
   fetchImpl?: typeof fetch;

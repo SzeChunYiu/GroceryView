@@ -121,7 +121,7 @@ export async function fetchMatpriskollenOffers(
   const storeNamePattern = options.storeNamePattern === undefined
     ? DEFAULT_MATPRISKOLLEN_GROCERY_STORE_PATTERN
     : options.storeNamePattern;
-  const maxRows = options.maxRows ?? 75;
+  const maxRows = options.maxRows ?? 150;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const storeUrl = buildMatpriskollenStoresUrl(lat, lon, storeLimit);
   const storesResponse = await fetchImpl(storeUrl, {
