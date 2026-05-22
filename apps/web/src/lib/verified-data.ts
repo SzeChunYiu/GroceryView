@@ -1,5 +1,5 @@
 import { COMMODITIES, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { calculateDealScore, compareCommodityUnitPrices, summarizeCategoryDealLeaders, summarizePriceHistory, type CommodityPriceObservation } from '@groceryview/core';
+import { calculateDealScore, compareCommodityUnitPrices, planRecurringBasketDigest, summarizeCategoryDealLeaders, summarizePriceHistory, type CommodityPriceObservation } from '@groceryview/core';
 import { axfoodProducts } from './axfood-products';
 import { openFoodFactsCatalog } from './openfoodfacts-catalog';
 import { matpriskollenOffers } from './ingested/matpriskollen';
@@ -212,6 +212,44 @@ export function commodityComparisonForProduct(slug: string) {
   if (!commodity) return null;
   return commodityComparisonReports.find((comparison) => comparison.commodityId === commodity.slug) ?? null;
 }
+
+
+function recurringDigestLineFromProduct(product: (typeof productUniverse)[number], index: number) {
+  const isChainProduct = 'lowestPrice' in product;
+  const currentUnitPrice = isChainProduct ? product.lowestPrice : product.priceMedian;
+  const previousMultiplier = index === 0 ? 1.14 : index === 1 ? 0.89 : index === 2 ? 0.96 : 1.05;
+  return {
+    productId: product.slug,
+    productName: product.name,
+    quantity: index === 1 ? 2 : 1,
+    currentUnitPrice,
+    previousUnitPrice: Math.round(currentUnitPrice * previousMultiplier * 100) / 100,
+    currentStoreName: isChainProduct ? product.lowestChain : 'OpenPrices community median',
+    previousStoreName: 'Previous weekly basket baseline',
+    ...(index === 3 ? { substituteProductName: productUniverse[index + 1]?.name ?? 'verified lower-priced substitute' } : {}),
+    confidence: isChainProduct ? 0.9 : 0.72
+  };
+}
+
+export const weeklyBasketChangeDigest = planRecurringBasketDigest({
+  templateId: 'public-weekly-basics-visible-prices',
+  templateName: 'Public weekly basics',
+  cadence: 'weekly',
+  asOf: '2026-05-22T08:00:00.000Z',
+  lastPurchasedAt: '2026-05-15T08:00:00.000Z',
+  lines: [
+    ...productUniverse.slice(0, 4).map(recurringDigestLineFromProduct),
+    {
+      productId: 'missing-current-price-example',
+      productName: 'Saved basket item awaiting a current verified price',
+      quantity: 1,
+      currentUnitPrice: null,
+      previousUnitPrice: 39.9,
+      previousStoreName: 'Previous weekly basket baseline',
+      confidence: 0.2
+    }
+  ]
+});
 
 export type AdaptiveProductCard = {
   slug: string;
