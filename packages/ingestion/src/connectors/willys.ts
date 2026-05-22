@@ -559,7 +559,7 @@ export async function fetchWillysProductsForAllStores(
 export async function fetchWillysWeeklyDiscounts(
   options: FetchWillysWeeklyDiscountsOptions = {}
 ): Promise<WillysWeeklyDiscount[]> {
-  const fetchImpl = options.fetchImpl ?? fetch;
+  const fetchImpl = withWillysRequestTimeout(options.fetchImpl ?? fetch);
   const storeIds = options.storeIds && options.storeIds.length > 0
     ? options.storeIds
     : options.storeId
@@ -628,13 +628,35 @@ export async function fetchWillysWeeklyDiscountsForAllStores(
     retrievedAt: options.retrievedAt,
     storeApiUrl: options.storeApiUrl
   });
-  return await fetchWillysWeeklyDiscounts({
-    fetchImpl: options.fetchImpl,
-    storeIds: stores.map((store) => store.storeId),
-    maxRows: options.maxRows ?? stores.length * 300,
-    pageSize: options.pageSize,
-    retrievedAt: options.retrievedAt
-  });
+  const rows: WillysWeeklyDiscount[] = [];
+  const failures: string[] = [];
+  const concurrency = 8;
+  const perStoreMaxRows = Math.min(options.maxRows ?? 300, 300);
+  for (let index = 0; index < stores.length; index += concurrency) {
+    const batch = stores.slice(index, index + concurrency);
+    const settled = await Promise.allSettled(batch.map(async (store) => (
+      await fetchWillysWeeklyDiscounts({
+        fetchImpl: options.fetchImpl,
+        storeIds: [store.storeId],
+        maxRows: perStoreMaxRows,
+        pageSize: options.pageSize,
+        retrievedAt: options.retrievedAt
+      })
+    )));
+    for (let offset = 0; offset < settled.length; offset += 1) {
+      const result = settled[offset]!;
+      if (result.status === 'fulfilled') {
+        rows.push(...result.value);
+      } else {
+        failures.push(`${batch[offset]?.storeId ?? 'unknown'}:${result.reason instanceof Error ? result.reason.message : String(result.reason)}`);
+      }
+    }
+    if (options.maxRows && rows.length >= options.maxRows) {
+      return rows.slice(0, options.maxRows);
+    }
+  }
+  if (rows.length === 0 && failures.length > 0) throw new Error(`Willys all-store weekly discount requests returned no usable branch products: ${failures[0]}`);
+  return rows;
 }
 
 export function normalizeWillysStore(
