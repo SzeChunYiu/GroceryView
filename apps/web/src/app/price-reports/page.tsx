@@ -1,7 +1,7 @@
 import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { PriceReportReviewActions } from '@/components/price-report-review-actions';
 import { routeMetadata } from '@/lib/seo';
-import { crowdPriceSubmissionContract } from '@/lib/verified-data';
+import { commodityMappingReviewPlan, crowdPriceSubmissionContract } from '@/lib/verified-data';
 
 export function generateMetadata() {
   return routeMetadata('/price-reports');
@@ -79,6 +79,52 @@ export default function FeaturePage() {
             ))}
           </ul>
           <p className="mt-3 font-semibold text-slate-800">Next runtime step: {crowdPriceSubmissionContract.nextRuntimeStep}</p>
+        </div>
+      </Card>
+      <Card className="mt-6 border-amber-200 bg-amber-50/80">
+        <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-amber-800">Curator queue</p>
+            <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Commodity mapping review</h2>
+            <p className="mt-3 text-sm leading-6 text-slate-700">
+              Low-confidence maps from loose produce, receipts, and community reports are not shown to shoppers until a curator validates the commodity_mapping task.
+            </p>
+            <p className="mt-3 rounded-2xl bg-white/80 p-3 text-sm font-bold leading-6 text-amber-950">
+              Queue source: human_review_assignments ({commodityMappingReviewPlan.queueTable}). Reporter trust gate: community_reporter_trust ({commodityMappingReviewPlan.trustTable}).
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">Candidates</p>
+              <p className="mt-2 text-3xl font-black text-amber-950">{commodityMappingReviewPlan.candidates.length}</p>
+            </div>
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">Review items</p>
+              <p className="mt-2 text-3xl font-black text-amber-950">{commodityMappingReviewPlan.queue.length}</p>
+            </div>
+            <div className="rounded-2xl bg-white/80 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-amber-800">Assignments</p>
+              <p className="mt-2 text-3xl font-black text-amber-950">{commodityMappingReviewPlan.assignments.length}</p>
+            </div>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-2">
+          {commodityMappingReviewPlan.queue.map((item) => (
+            <div className="rounded-2xl bg-white/80 p-4 text-sm leading-6 text-slate-700" key={item.id}>
+              <p className="font-black text-slate-950">{item.subjectType} · {item.priority}</p>
+              <p className="mt-1">{item.reason}</p>
+              <p className="mt-2 font-semibold text-amber-950">Writebacks: {commodityMappingReviewPlan.reviewWritebacks.join(' or ')}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-5 rounded-2xl bg-white/80 p-4">
+          <p className="text-sm font-black text-slate-950">Review-only guardrails</p>
+          <ul className="mt-3 space-y-2 text-sm leading-6 text-slate-700">
+            {commodityMappingReviewPlan.guardrails.map((guardrail) => (
+              <li key={guardrail}>• {guardrail}</li>
+            ))}
+          </ul>
+          <p className="mt-3 text-sm font-bold text-amber-950">Next runtime step: {commodityMappingReviewPlan.nextRuntimeStep}</p>
         </div>
       </Card>
       <PriceReportReviewActions />

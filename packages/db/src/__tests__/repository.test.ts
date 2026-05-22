@@ -164,6 +164,18 @@ describe('createMemoryRepository', () => {
       status: 'in_progress'
     });
     await repo.saveHumanReviewAssignment({
+      id: 'assignment-review-commodity-map-1-curator-1',
+      reviewId: 'review-commodity-map-1',
+      subjectType: 'commodity_mapping',
+      subjectId: 'commodity-map-1',
+      priority: 'medium',
+      reason: 'Low-confidence loose produce mapping.',
+      assigneeId: 'curator-1',
+      assignedAt: '2026-05-19T10:10:00.000Z',
+      dueAt: '2026-05-19T16:10:00.000Z',
+      status: 'assigned'
+    });
+    await repo.saveHumanReviewAssignment({
       id: 'assignment-review-match-3-moderator-3',
       reviewId: 'review-match-3',
       subjectType: 'product_match',
@@ -178,6 +190,7 @@ describe('createMemoryRepository', () => {
 
     assert.deepEqual((await repo.listOpenHumanReviewAssignments()).map((assignment) => assignment.id), [
       'assignment-review-match-1-moderator-1',
+      'assignment-review-commodity-map-1-curator-1',
       'assignment-review-report-1-moderator-2'
     ]);
   });

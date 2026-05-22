@@ -3177,6 +3177,20 @@ export type CommunityReportReviewCandidate = {
   createdAt: string;
 };
 
+export type CommodityMappingReviewCandidate = {
+  id: string;
+  commodityId: string;
+  commodityName: string;
+  productId: string;
+  productName: string;
+  alias: string;
+  chainLabel: string;
+  sourceConfidence: number;
+  createdAt: string;
+  reporterId?: string;
+  evidence: string[];
+};
+
 export type CommunityReporterActivity = {
   reporterId: string;
   reportsLast24Hours: number;
@@ -3193,7 +3207,7 @@ export type CommunityReportAbuseControl = {
 
 export type HumanReviewQueueItem = {
   id: string;
-  subjectType: 'product_match' | 'community_report';
+  subjectType: 'product_match' | 'community_report' | 'commodity_mapping';
   subjectId: string;
   priority: 'high' | 'medium' | 'low';
   reason: string;
@@ -3202,7 +3216,14 @@ export type HumanReviewQueueItem = {
 export type HumanReviewDecision = 'approve' | 'reject' | 'needs_more_info';
 
 export type HumanReviewWriteback = {
-  action: 'approve_product_match' | 'reject_product_match' | 'accept_community_report' | 'dismiss_community_report' | 'keep_in_review';
+  action:
+    | 'approve_product_match'
+    | 'reject_product_match'
+    | 'accept_community_report'
+    | 'dismiss_community_report'
+    | 'approve_commodity_mapping'
+    | 'reject_commodity_mapping'
+    | 'keep_in_review';
   subjectId: string;
   reviewedByHuman: boolean;
 };
@@ -3274,6 +3295,7 @@ export type HumanReviewAuthorization = {
 export function planHumanReviewQueue(input: {
   productMatches: ProductMatchReviewCandidate[];
   communityReports: CommunityReportReviewCandidate[];
+  commodityMappings?: CommodityMappingReviewCandidate[];
 }): HumanReviewQueueItem[] {
   const queue: HumanReviewQueueItem[] = [];
 
@@ -3296,6 +3318,18 @@ export function planHumanReviewQueue(input: {
       subjectId: report.id,
       priority: report.confidenceScore < 0.3 ? 'high' : 'medium',
       reason: `Community report ${report.reportType} for ${report.productId} has low confidence score ${report.confidenceScore}.`
+    });
+  }
+
+  for (const mapping of input.commodityMappings ?? []) {
+    const sourceConfidence = roundMoney(clamp(mapping.sourceConfidence, 0, 1));
+    if (sourceConfidence >= 0.75) continue;
+    queue.push({
+      id: `review-${mapping.id}`,
+      subjectType: 'commodity_mapping',
+      subjectId: mapping.id,
+      priority: sourceConfidence < 0.45 ? 'high' : 'medium',
+      reason: `Commodity mapping ${mapping.alias} → ${mapping.commodityName} for ${mapping.productId} has source confidence ${sourceConfidence} and must be validated before shopper-facing coverage.`
     });
   }
 
@@ -3499,6 +3533,14 @@ function writebackFor(item: HumanReviewQueueItem, decision: HumanReviewDecision)
   if (item.subjectType === 'product_match') {
     return {
       action: decision === 'approve' ? 'approve_product_match' : 'reject_product_match',
+      subjectId: item.subjectId,
+      reviewedByHuman: true
+    };
+  }
+
+  if (item.subjectType === 'commodity_mapping') {
+    return {
+      action: decision === 'approve' ? 'approve_commodity_mapping' : 'reject_commodity_mapping',
       subjectId: item.subjectId,
       reviewedByHuman: true
     };

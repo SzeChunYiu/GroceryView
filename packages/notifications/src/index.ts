@@ -58,7 +58,7 @@ export type NotificationSuppressionResult = {
 
 export type HumanReviewSlaAssignment = {
   reviewId: string;
-  subjectType: 'product_match' | 'community_report';
+  subjectType: 'product_match' | 'community_report' | 'commodity_mapping';
   priority: 'high' | 'medium' | 'low';
   assigneeId: string;
   dueAt: string;

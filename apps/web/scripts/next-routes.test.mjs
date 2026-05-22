@@ -393,6 +393,29 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(priceReports, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
+  it('surfaces commodity mapping review through human_review_assignments without shopper exposure', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const priceReports = await read('src/app/price-reports/page.tsx');
+    const actions = await read('src/components/price-report-review-actions.tsx');
+    const core = await read('../../packages/core/src/index.ts');
+
+    assert.match(core, /commodity_mapping/);
+    assert.match(core, /approve_commodity_mapping/);
+    assert.match(verified, /commodityMappingReviewPlan/);
+    assert.match(verified, /planHumanReviewQueue/);
+    assert.match(verified, /planHumanReviewAssignments/);
+    assert.match(verified, /human_review_assignments/);
+    assert.match(verified, /community_reporter_trust/);
+    assert.match(priceReports, /Commodity mapping review/);
+    assert.match(priceReports, /low-confidence maps/i);
+    assert.match(priceReports, /not shown to shoppers/i);
+    assert.match(priceReports, /human_review_assignments/);
+    assert.match(priceReports, /community_reporter_trust/);
+    assert.match(actions, /commodity_mapping/);
+    assert.match(actions, /approve_commodity_mapping/);
+    assert.doesNotMatch(priceReports, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
 
   it('surfaces the retailer handoff support matrix contract on the basket ideas route', async () => {
     const verified = await read('src/lib/verified-data.ts');
