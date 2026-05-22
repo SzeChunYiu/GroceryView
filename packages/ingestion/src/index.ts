@@ -3,7 +3,6 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import {
   createPgQueryExecutor,
-  createPostgresPriceObservationWriter,
   createPostgresProductAliasRepository,
   createPostgresSourceRecordWriter,
   type PriceType as DbPriceType,
@@ -2600,6 +2599,9 @@ function dailyPayloadHash(payload: unknown): string {
   return `sha256:${createHash('sha256').update(JSON.stringify(payload)).digest('hex')}`;
 }
 
+type BatchRawRecordIdRow = { ordinal: number; id: string };
+type BatchObservationIdRow = { id: string };
+
 async function upsertDailyChain(executor: QueryExecutor, chainId: string): Promise<string> {
   const slug = normalizeDailySlug(chainId);
   const rows = await executor.query<IdRow>(
@@ -2714,7 +2716,6 @@ async function persistDailyConnectorOutput(input: {
   const { executor, config, result } = input;
   const sourceWriter = createPostgresSourceRecordWriter(executor);
   const aliasRepository = createPostgresProductAliasRepository(executor);
-  const priceWriter = createPostgresPriceObservationWriter(executor);
   const storesBySlug = new Map((config.stores ?? []).map((store) => [normalizeDailySlug(store.storeId), store]));
   const sourceRun = await sourceWriter.createSourceRun({
     sourceType: dbSourceTypeForConnector(config.sourceType),
@@ -2739,6 +2740,7 @@ async function persistDailyConnectorOutput(input: {
   const chainIdsBySlug = new Map<string, string>();
   const storeIdsBySlug = new Map<string, string>();
   const productIdsBySlug = new Map<string, string>();
+  const aliasKeys = new Set<string>();
 
   async function getDailyChainId(chainId: string): Promise<string> {
     const slug = normalizeDailySlug(chainId);
@@ -2767,19 +2769,261 @@ async function persistDailyConnectorOutput(input: {
     return id;
   }
 
-  for (const accepted of result.ingestion.accepted) {
+  async function upsertRawRecordBatch(records: Array<{
+    ordinal: number;
+    recordType: string;
+    externalRef?: string;
+    observedAt?: string;
+    payload: unknown;
+    payloadHash: string;
+    provenance: Record<string, unknown>;
+  }>): Promise<Map<number, string>> {
+    if (records.length === 0) return new Map();
+    const rows = await executor.query<BatchRawRecordIdRow>(
+      `with input as (
+         select *
+         from jsonb_to_recordset($2::jsonb) as x(
+           ordinal int,
+           record_type text,
+           external_ref text,
+           observed_at timestamptz,
+           payload jsonb,
+           payload_hash text,
+           provenance jsonb
+         )
+       ),
+       upserted as (
+         insert into raw_records(
+           source_run_id,
+           record_type,
+           external_ref,
+           observed_at,
+           payload,
+           payload_hash,
+           provenance
+         )
+         select $1, record_type, external_ref, observed_at, payload, payload_hash, provenance
+         from input
+         on conflict (source_run_id, payload_hash) do update set
+           record_type = excluded.record_type,
+           external_ref = excluded.external_ref,
+           observed_at = excluded.observed_at,
+           payload = excluded.payload,
+           provenance = excluded.provenance
+         returning id, payload_hash
+       )
+       select input.ordinal, upserted.id
+       from input
+       join upserted on upserted.payload_hash = input.payload_hash
+       order by input.ordinal`,
+      [sourceRun.sourceRunId, JSON.stringify(records.map((record) => ({
+        ordinal: record.ordinal,
+        record_type: record.recordType,
+        external_ref: record.externalRef ?? null,
+        observed_at: record.observedAt ?? null,
+        payload: record.payload,
+        payload_hash: record.payloadHash,
+        provenance: record.provenance
+      })))]
+    );
+    return new Map(rows.map((row) => [Number(row.ordinal), row.id]));
+  }
+
+  async function insertObservationBatch(observations: Array<{
+    productId: string;
+    chainId: string;
+    storeId?: string;
+    rawRecordId: string;
+    retailerProductRef?: string;
+    priceType: DbPriceType;
+    price: number;
+    regularPrice?: number;
+    unitPrice: number;
+    currency?: string;
+    quantity?: number;
+    quantityUnit?: string;
+    promotionText?: string;
+    promotionStartsOn?: string;
+    promotionEndsOn?: string;
+    memberRequired?: boolean;
+    observedAt: string;
+    validFrom?: string;
+    validUntil?: string;
+    confidence: number;
+    provenance: Record<string, unknown>;
+  }>): Promise<string[]> {
+    if (observations.length === 0) return [];
+    const rows = await executor.query<BatchObservationIdRow>(
+      `with input as (
+         select *
+         from jsonb_to_recordset($1::jsonb) as x(
+           product_id uuid,
+           chain_id uuid,
+           store_id uuid,
+           source_run_id uuid,
+           raw_record_id uuid,
+           retailer_product_ref text,
+           price_type text,
+           price numeric,
+           regular_price numeric,
+           unit_price numeric,
+           currency char(3),
+           quantity numeric,
+           quantity_unit text,
+           promotion_text text,
+           promotion_starts_on date,
+           promotion_ends_on date,
+           member_required boolean,
+           observed_at timestamptz,
+           valid_from timestamptz,
+           valid_until timestamptz,
+           confidence numeric,
+           provenance jsonb
+         )
+       ),
+       inserted as (
+         insert into observations(
+           product_id,
+           chain_id,
+           store_id,
+           source_run_id,
+           raw_record_id,
+           retailer_product_ref,
+           price_type,
+           price,
+           regular_price,
+           unit_price,
+           currency,
+           quantity,
+           quantity_unit,
+           promotion_text,
+           promotion_starts_on,
+           promotion_ends_on,
+           member_required,
+           observed_at,
+           valid_from,
+           valid_until,
+           confidence,
+           provenance
+         )
+         select
+           product_id,
+           chain_id,
+           store_id,
+           source_run_id,
+           raw_record_id,
+           retailer_product_ref,
+           price_type,
+           price,
+           regular_price,
+           unit_price,
+           currency,
+           quantity,
+           quantity_unit,
+           promotion_text,
+           promotion_starts_on,
+           promotion_ends_on,
+           member_required,
+           observed_at,
+           valid_from,
+           valid_until,
+           confidence,
+           provenance
+         from input
+         returning id, product_id, chain_id, store_id, price_type, price, regular_price, unit_price, currency, observed_at, confidence, provenance
+       ),
+       latest_upsert as (
+         insert into latest_prices(
+           product_id,
+           chain_id,
+           store_id,
+           price_type,
+           observation_id,
+           price,
+           regular_price,
+           unit_price,
+           currency,
+           observed_at,
+           confidence,
+           provenance
+         )
+         select
+           product_id,
+           chain_id,
+           store_id,
+           price_type,
+           id,
+           price,
+           regular_price,
+           unit_price,
+           currency,
+           observed_at,
+           confidence,
+           provenance
+         from inserted
+         on conflict (product_id, chain_id, store_id, price_type) do update set
+           observation_id = excluded.observation_id,
+           price = excluded.price,
+           regular_price = excluded.regular_price,
+           unit_price = excluded.unit_price,
+           currency = excluded.currency,
+           observed_at = excluded.observed_at,
+           confidence = excluded.confidence,
+           provenance = excluded.provenance,
+           updated_at = now()
+         where latest_prices.observed_at <= excluded.observed_at
+         returning 1
+       )
+       select id from inserted`,
+      [JSON.stringify(observations.map((observation) => ({
+        product_id: observation.productId,
+        chain_id: observation.chainId,
+        store_id: observation.storeId ?? null,
+        source_run_id: sourceRun.sourceRunId,
+        raw_record_id: observation.rawRecordId,
+        retailer_product_ref: observation.retailerProductRef ?? null,
+        price_type: observation.priceType,
+        price: observation.price,
+        regular_price: observation.regularPrice ?? null,
+        unit_price: observation.unitPrice,
+        currency: observation.currency ?? 'SEK',
+        quantity: observation.quantity ?? null,
+        quantity_unit: observation.quantityUnit ?? null,
+        promotion_text: observation.promotionText ?? null,
+        promotion_starts_on: observation.promotionStartsOn ?? null,
+        promotion_ends_on: observation.promotionEndsOn ?? null,
+        member_required: observation.memberRequired ?? false,
+        observed_at: observation.observedAt,
+        valid_from: observation.validFrom ?? null,
+        valid_until: observation.validUntil ?? null,
+        confidence: observation.confidence,
+        provenance: observation.provenance
+      })))]
+    );
+    return rows.map((row) => row.id);
+  }
+
+  const rawRecordsToUpsert: Parameters<typeof upsertRawRecordBatch>[0] = [];
+  const observationsToInsert: Parameters<typeof insertObservationBatch>[0] = [];
+
+  for (const [ordinal, accepted] of result.ingestion.accepted.entries()) {
     const chainId = await getDailyChainId(accepted.priceObservation.chainId);
     const storeConfig = accepted.priceObservation.storeId ? storesBySlug.get(normalizeDailySlug(accepted.priceObservation.storeId)) : undefined;
     const storeId = storeConfig ? await getDailyStoreId(chainId, storeConfig) : undefined;
     const productId = await getDailyProductId(accepted.product);
-    await aliasRepository.upsertProductAlias({
-      productId,
-      alias: accepted.alias.rawName,
-      normalizedAlias: accepted.alias.rawName.trim().toLowerCase().replace(/\s+/g, ' '),
-      sourceType: 'retailer',
-      sourceRef: result.plan.runKey,
-      matchConfidence: accepted.alias.matchConfidence
-    });
+    const normalizedAlias = accepted.alias.rawName.trim().toLowerCase().replace(/\s+/g, ' ');
+    const aliasKey = `${productId}:${normalizedAlias}:${result.plan.runKey}`;
+    if (!aliasKeys.has(aliasKey)) {
+      aliasKeys.add(aliasKey);
+      await aliasRepository.upsertProductAlias({
+        productId,
+        alias: accepted.alias.rawName,
+        normalizedAlias,
+        sourceType: 'retailer',
+        sourceRef: result.plan.runKey,
+        matchConfidence: accepted.alias.matchConfidence
+      });
+    }
 
     const payload = {
       product: accepted.product,
@@ -2787,8 +3031,15 @@ async function persistDailyConnectorOutput(input: {
       priceObservation: accepted.priceObservation,
       promotionObservation: accepted.promotionObservation
     };
-    const rawRecord = await sourceWriter.upsertRawRecord({
-      sourceRunId: sourceRun.sourceRunId,
+    const rawProvenance = {
+      ...accepted.priceObservation.provenance,
+      chainId: config.chainId,
+      cadence: 'daily',
+      connectorId: config.connectorId,
+      runKey: result.plan.runKey
+    };
+    rawRecordsToUpsert.push({
+      ordinal,
       recordType: 'price',
       externalRef: accepted.priceObservation.retailerProductId ?? accepted.product.id,
       observedAt: accepted.priceObservation.observedAt,
@@ -2797,25 +3048,17 @@ async function persistDailyConnectorOutput(input: {
         runKey: result.plan.runKey,
         productId: accepted.product.id,
         retailerProductId: accepted.priceObservation.retailerProductId ?? null,
+        storeId: accepted.priceObservation.storeId ?? null,
         observedAt: accepted.priceObservation.observedAt,
         price: accepted.priceObservation.price
       }),
-      provenance: {
-        ...accepted.priceObservation.provenance,
-        chainId: config.chainId,
-        cadence: 'daily',
-        connectorId: config.connectorId,
-        runKey: result.plan.runKey
-      }
+      provenance: rawProvenance
     });
-    rawRecordIds.push(rawRecord.rawRecordId);
-
-    const observation = await priceWriter.recordPriceObservation({
+    observationsToInsert.push({
       productId,
       chainId,
       storeId,
-      sourceRunId: sourceRun.sourceRunId,
-      rawRecordId: rawRecord.rawRecordId,
+      rawRecordId: '',
       retailerProductRef: accepted.priceObservation.retailerProductId,
       priceType: dbPriceTypeForIngested(accepted.priceObservation.priceType),
       price: accepted.priceObservation.price,
@@ -2828,16 +3071,18 @@ async function persistDailyConnectorOutput(input: {
       memberRequired: accepted.promotionObservation?.memberOnly ?? false,
       observedAt: accepted.priceObservation.observedAt,
       confidence: accepted.priceObservation.confidenceScore,
-      provenance: {
-        ...accepted.priceObservation.provenance,
-        chainId: config.chainId,
-        cadence: 'daily',
-        connectorId: config.connectorId,
-        runKey: result.plan.runKey
-      }
+      provenance: rawProvenance
     });
-    observationIds.push(observation.observationId);
   }
+
+  const rawRecordIdsByOrdinal = await upsertRawRecordBatch(rawRecordsToUpsert);
+  for (let index = 0; index < observationsToInsert.length; index += 1) {
+    const rawRecordId = rawRecordIdsByOrdinal.get(index);
+    if (!rawRecordId) throw new Error(`Daily ingestion raw record batch did not return an id for accepted record ${index}`);
+    rawRecordIds.push(rawRecordId);
+    observationsToInsert[index]!.rawRecordId = rawRecordId;
+  }
+  observationIds.push(...await insertObservationBatch(observationsToInsert));
 
   await sourceWriter.finishSourceRun({
     sourceRunId: sourceRun.sourceRunId,

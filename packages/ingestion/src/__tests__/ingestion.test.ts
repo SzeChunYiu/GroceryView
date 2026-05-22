@@ -3449,6 +3449,14 @@ class DailyIngestionExecutor implements QueryExecutor {
         created_at: '2026-05-21T00:00:00.000Z'
       }] as T[];
     }
+    if (sql.includes('jsonb_to_recordset') && sql.includes('insert into raw_records')) {
+      const records = JSON.parse(String(params[1])) as Array<{ ordinal: number }>;
+      return records.map((record) => ({ ordinal: record.ordinal, id: `raw-db-${++this.sequence}` })) as T[];
+    }
+    if (sql.includes('jsonb_to_recordset') && sql.includes('insert into observations')) {
+      const observations = JSON.parse(String(params[0])) as unknown[];
+      return observations.map(() => ({ id: `observation-db-${++this.sequence}` })) as T[];
+    }
     if (sql.includes('insert into raw_records')) return [{ id: `raw-db-${++this.sequence}` }] as T[];
     if (sql.includes('insert into observations')) return [{ id: `observation-db-${++this.sequence}` }] as T[];
     if (sql.includes('insert into latest_prices')) return [] as T[];
@@ -3467,6 +3475,12 @@ function dailyConnectorFixture(chainId: string) {
     legalReviewStatus: 'approved' as const,
     hasDataAgreement: true
   };
+}
+
+function firstBatchObservation(executor: DailyIngestionExecutor) {
+  const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+  const observations = JSON.parse(String(observationInsert?.params[0])) as Array<Record<string, unknown>>;
+  return observations[0] ?? {};
 }
 
 describe('daily ingestion runner', () => {
@@ -3576,7 +3590,8 @@ describe('daily ingestion runner', () => {
     const storeInsert = executor.calls.find((call) => call.sql.includes('insert into stores'));
     assert.equal(storeInsert?.params[0], 'willys-odenplan');
     const latestPriceInsert = executor.calls.find((call) => call.sql.includes('insert into latest_prices'));
-    assert.equal(latestPriceInsert?.params[2], 'store-db-2');
+    const observationRows = JSON.parse(String(latestPriceInsert?.params[0])) as Array<{ store_id: string }>;
+    assert.equal(observationRows[0]?.store_id, 'store-db-2');
   });
 
   it('reuses daily chain, store, and product ids while persisting a connector batch', async () => {
@@ -3631,6 +3646,7 @@ describe('daily ingestion runner', () => {
     assert.equal(executor.calls.filter((call) => call.sql.includes('insert into chains')).length, 1);
     assert.equal(executor.calls.filter((call) => call.sql.includes('insert into stores')).length, 1);
     assert.equal(executor.calls.filter((call) => call.sql.includes('insert into products')).length, 1);
+    assert.equal(executor.calls.filter((call) => call.sql.includes('insert into aliases')).length, 1);
   });
 
   it('materializes native Willys all-store weekly offers into daily database observations', async () => {
@@ -3685,10 +3701,10 @@ describe('daily ingestion runner', () => {
       buildWillysStoresUrl({ online: true }),
       buildWillysWeeklyDiscountsUrl('2110', 100, 0)
     ]);
-    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
-    assert.equal(observationInsert?.params[2], 'store-db-2');
-    assert.equal(observationInsert?.params[7], 45);
-    assert.equal(observationInsert?.params[13], 'Max 2 köp/hushåll');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 45);
+    assert.equal(observation.promotion_text, 'Max 2 köp/hushåll');
   });
 
   it('materializes native ICA store promotion prices into daily database observations', async () => {
@@ -3734,10 +3750,10 @@ describe('daily ingestion runner', () => {
     assert.equal(result.acceptedCount, 1);
     assert.equal(requestedUrls.length, 1);
     assert.equal(new URL(requestedUrls[0]).pathname, '/stores/1004599/api/product-listing-pages/v1/pages/promotions');
-    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
-    assert.equal(observationInsert?.params[2], 'store-db-2');
-    assert.equal(observationInsert?.params[7], 44.9);
-    assert.equal(observationInsert?.params[8], 59.9);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 44.9);
+    assert.equal(observation.regular_price, 59.9);
   });
 
   it('materializes native Willys all-store branch product prices into daily database observations', async () => {
@@ -3783,9 +3799,9 @@ describe('daily ingestion runner', () => {
       buildWillysStoresUrl({ online: true }),
       buildWillysSearchUrl('kaffe', '2149')
     ]);
-    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
-    assert.equal(observationInsert?.params[2], 'store-db-2');
-    assert.equal(observationInsert?.params[7], 70.88);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 70.88);
   });
 
   it('materializes native Coop all-store branch product prices into daily database observations', async () => {
@@ -3835,9 +3851,9 @@ describe('daily ingestion runner', () => {
       buildCoopStoreInfoUrl('251300'),
       buildCoopSearchUrl('251300')
     ]);
-    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
-    assert.equal(observationInsert?.params[2], 'store-db-2');
-    assert.equal(observationInsert?.params[7], 19.5);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 19.5);
   });
 
   it('materializes native Hemkop all-store weekly offers into daily database observations', async () => {
@@ -3892,10 +3908,10 @@ describe('daily ingestion runner', () => {
       buildHemkopStoresUrl({ online: true }),
       buildHemkopWeeklyDiscountsUrl('4003', 100, 0)
     ]);
-    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
-    assert.equal(observationInsert?.params[2], 'store-db-2');
-    assert.equal(observationInsert?.params[7], 39.95);
-    assert.equal(observationInsert?.params[13], '39,95 kr/st');
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 39.95);
+    assert.equal(observation.promotion_text, '39,95 kr/st');
   });
 
   it('materializes native Coop all-store weekly offers into daily database observations', async () => {
@@ -3953,10 +3969,10 @@ describe('daily ingestion runner', () => {
       buildCoopStoreInfoUrl('251300'),
       buildCoopSearchUrl('251300')
     ]);
-    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
-    assert.equal(observationInsert?.params[2], 'store-db-2');
-    assert.equal(observationInsert?.params[7], 45);
-    assert.equal(observationInsert?.params[16], true);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 45);
+    assert.equal(observation.member_required, true);
   });
 
   it('materializes native City Gross all-store public product prices into daily database observations', async () => {
@@ -4010,10 +4026,10 @@ describe('daily ingestion runner', () => {
       buildCityGrossStoresUrl(),
       buildCityGrossProductsUrl({ siteId: '21', query: 'kaffe', take: 1, skip: 0 })
     ]);
-    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
-    assert.equal(observationInsert?.params[2], 'store-db-2');
-    assert.equal(observationInsert?.params[7], 31.5);
-    assert.equal(observationInsert?.params[8], 39.9);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 31.5);
+    assert.equal(observation.regular_price, 39.9);
   });
 
   it('materializes native Lidl all-store public offer prices into daily database observations', async () => {
@@ -4068,9 +4084,9 @@ describe('daily ingestion runner', () => {
       buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/'),
       buildLidlOfferPageUrl('/c/veckans-frukt-groent/a10094676')
     ]);
-    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
-    assert.equal(observationInsert?.params[2], 'store-db-2');
-    assert.equal(observationInsert?.params[7], 14.9);
+    const observation = firstBatchObservation(executor);
+    assert.equal(observation.store_id, 'store-db-2');
+    assert.equal(observation.price, 14.9);
   });
 
   it('fails closed before persistence when store-scoped prices omit configured branch metadata', async () => {
