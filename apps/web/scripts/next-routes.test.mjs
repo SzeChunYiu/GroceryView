@@ -226,6 +226,16 @@ describe('verified-data UI', () => {
     assert.match(route, /Cheapest chain near me/);
   });
 
+  it('surfaces a price-by-district heat overlay on the map without branch-price claims', async () => {
+    const route = await read('src/app/map/page.tsx');
+    assert.match(route, /districtHeatOverlay/);
+    assert.match(route, /buildDistrictHeatOverlay/);
+    assert.match(route, /District price heat overlay/);
+    assert.match(route, /district\.averageIndex\.toFixed/);
+    assert.match(route, /district\.coveredStores/);
+    assert.match(route, /chain-index proxy/);
+  });
+
   it('surfaces verified OSM store brand coverage on the homepage', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const shell = await read('src/components/market-shell.tsx');
