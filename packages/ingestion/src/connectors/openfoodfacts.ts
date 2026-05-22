@@ -11,10 +11,41 @@ export type OpenFoodFactsProduct = {
   categories: string[];
   labels: string[];
   nutriscoreGrade: string;
+  nutritionPer100g: OpenFoodFactsNutritionPer100g;
   imageUrl: string;
   productUrl: string;
   sourceUrl: string;
   retrievedAt: string;
+};
+
+export type OpenFoodFactsNutritionPer100g = {
+  energyKj: number | null;
+  energyKcal: number | null;
+  fat: number | null;
+  saturatedFat: number | null;
+  carbohydrates: number | null;
+  sugars: number | null;
+  fiber: number | null;
+  proteins: number | null;
+  salt: number | null;
+  sodium: number | null;
+};
+
+export type OpenFoodFactsRetailerProductCandidate = {
+  chain: 'willys' | 'hemkop' | 'coop' | 'ica' | 'mathem' | 'matspar';
+  productCode: string;
+  name: string;
+  brand: string;
+  packageText: string;
+  barcode?: string;
+  imageUrl?: string;
+  sourceUrl: string;
+  retrievedAt: string;
+};
+
+export type OpenFoodFactsRetailerEnrichment = Omit<OpenFoodFactsProduct, 'code'> & {
+  barcode: string;
+  retailerMatches: OpenFoodFactsRetailerProductCandidate[];
 };
 
 type OpenFoodFactsApiProduct = {
@@ -26,6 +57,7 @@ type OpenFoodFactsApiProduct = {
   categories_tags?: unknown;
   labels_tags?: unknown;
   nutriscore_grade?: unknown;
+  nutriments?: unknown;
   image_front_url?: unknown;
   url?: unknown;
 };
@@ -44,6 +76,7 @@ export const OPENFOODFACTS_FIELDS = [
   'categories_tags',
   'labels_tags',
   'nutriscore_grade',
+  'nutriments',
   'image_front_url',
   'url'
 ] as const;
@@ -124,6 +157,14 @@ export type FetchOpenFoodFactsExportProductsOptions = {
   fetchImpl?: typeof fetch;
   maxRows?: number;
   retrievedAt?: string;
+  swedishOnly?: boolean;
+};
+
+export type FetchOpenFoodFactsRetailerEnrichmentsOptions = {
+  candidates: readonly OpenFoodFactsRetailerProductCandidate[];
+  fetchImpl?: typeof fetch;
+  maxRows?: number;
+  retrievedAt?: string;
 };
 
 export function buildOpenFoodFactsProductUrl(code: string): string {
@@ -182,7 +223,7 @@ export async function fetchOpenFoodFactsExportProducts(options: FetchOpenFoodFac
   }
 
   const wantedCodes = options.codes ? new Set(options.codes) : null;
-  const maxRows = options.maxRows ?? 50;
+  const maxRows = options.maxRows ?? 100;
   const rows: OpenFoodFactsProduct[] = [];
   let headers: string[] | null = null;
 
@@ -201,6 +242,9 @@ export async function fetchOpenFoodFactsExportProducts(options: FetchOpenFoodFac
       if (wantedCodes && !wantedCodes.has(record.code)) {
         continue;
       }
+      if (!wantedCodes && options.swedishOnly === true && !isSwedishOpenFoodFactsExportRecord(record)) {
+        continue;
+      }
 
       const row = normalizeOpenFoodFactsExportRecord(record, retrievedAt);
       if (row) {
@@ -215,6 +259,63 @@ export async function fetchOpenFoodFactsExportProducts(options: FetchOpenFoodFac
   } finally {
     lines.close();
     stream.destroy();
+  }
+
+  return rows;
+}
+
+export async function fetchOpenFoodFactsRetailerEnrichments(
+  options: FetchOpenFoodFactsRetailerEnrichmentsOptions
+): Promise<OpenFoodFactsRetailerEnrichment[]> {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const maxRows = options.maxRows ?? 50;
+  const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const candidatesByBarcode = groupOpenFoodFactsCandidatesByBarcode(options.candidates);
+  const rows: OpenFoodFactsRetailerEnrichment[] = [];
+
+  for (const [barcode, candidates] of candidatesByBarcode) {
+    const sourceUrl = buildOpenFoodFactsProductUrl(barcode);
+    const response = await fetchImpl(sourceUrl, {
+      headers: {
+        accept: 'application/json',
+        'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`OpenFoodFacts enrichment request failed for ${barcode}: ${response.status}`);
+    }
+
+    const payload = await response.json() as OpenFoodFactsApiResponse;
+    const product = payload.product;
+    if (payload.status !== 1 || !product) {
+      continue;
+    }
+
+    const row = normalizeOpenFoodFactsProduct(product, sourceUrl, retrievedAt);
+    if (!row || !hasOpenFoodFactsNutrition(row.nutritionPer100g)) {
+      continue;
+    }
+
+    rows.push({
+      barcode: row.code,
+      name: row.name,
+      brands: row.brands,
+      quantity: row.quantity,
+      categories: row.categories,
+      labels: row.labels,
+      nutriscoreGrade: row.nutriscoreGrade,
+      nutritionPer100g: row.nutritionPer100g,
+      imageUrl: row.imageUrl,
+      productUrl: row.productUrl,
+      sourceUrl: row.sourceUrl,
+      retrievedAt: row.retrievedAt,
+      retailerMatches: candidates
+    });
+
+    if (rows.length >= maxRows) {
+      break;
+    }
   }
 
   return rows;
@@ -239,6 +340,7 @@ export function normalizeOpenFoodFactsProduct(
     categories: asTextArray(product.categories_tags),
     labels: asTextArray(product.labels_tags),
     nutriscoreGrade: asText(product.nutriscore_grade) || 'unknown',
+    nutritionPer100g: normalizeOpenFoodFactsNutrition(product.nutriments),
     imageUrl: asText(product.image_front_url),
     productUrl: asText(product.url) || `https://world.openfoodfacts.org/product/${encodeURIComponent(code)}`,
     sourceUrl,
@@ -251,7 +353,7 @@ export function normalizeOpenFoodFactsExportRecord(
   retrievedAt: string
 ): OpenFoodFactsProduct | null {
   const code = asText(record.code);
-  const name = asText(record.product_name);
+  const name = asText(record.product_name_sv) || asText(record.product_name);
   if (!code || !name) {
     return null;
   }
@@ -264,11 +366,68 @@ export function normalizeOpenFoodFactsExportRecord(
     categories: splitTags(record.categories_tags),
     labels: splitTags(record.labels_tags),
     nutriscoreGrade: asText(record.nutriscore_grade) || 'unknown',
+    nutritionPer100g: normalizeOpenFoodFactsNutrition(record),
     imageUrl: asText(record.image_url),
     productUrl: asText(record.url) || `https://world.openfoodfacts.org/product/${encodeURIComponent(code)}`,
     sourceUrl: `${OPENFOODFACTS_EXPORT_URL}#code=${encodeURIComponent(code)}`,
     retrievedAt
   };
+}
+
+export function isSwedishOpenFoodFactsExportRecord(record: Record<string, string>): boolean {
+  const code = asText(record.code);
+  const name = asText(record.product_name_sv) || asText(record.product_name);
+  if (!/^\d{8,14}$/.test(code) || !name) {
+    return false;
+  }
+
+  const countries = splitTags(record.countries_tags);
+  const languages = splitTags(record.languages_tags || record.lang);
+  return countries.includes('en:sweden') || Boolean(asText(record.product_name_sv)) || languages.includes('en:swedish');
+}
+
+export function extractOpenFoodFactsBarcodeFromAxfoodImageUrl(imageUrl: string): string {
+  const match = imageUrl.match(/\/(0\d{13})(?:_|$)/);
+  if (!match) {
+    return '';
+  }
+  return match[1].replace(/^0(?=\d{13}$)/, '');
+}
+
+function groupOpenFoodFactsCandidatesByBarcode(
+  candidates: readonly OpenFoodFactsRetailerProductCandidate[]
+): Map<string, OpenFoodFactsRetailerProductCandidate[]> {
+  const rows = new Map<string, OpenFoodFactsRetailerProductCandidate[]>();
+  for (const candidate of candidates) {
+    const barcode = candidate.barcode || extractOpenFoodFactsBarcodeFromAxfoodImageUrl(candidate.imageUrl ?? '');
+    if (!/^\d{8,14}$/.test(barcode)) {
+      continue;
+    }
+    const matches = rows.get(barcode) ?? [];
+    matches.push(candidate);
+    rows.set(barcode, matches);
+  }
+  return rows;
+}
+
+function normalizeOpenFoodFactsNutrition(value: unknown): OpenFoodFactsNutritionPer100g {
+  const record = isRecord(value) ? value : {};
+  return {
+    energyKj: numberOrNull(record.energy_100g),
+    energyKcal: numberOrNull(record['energy-kcal_100g']),
+    fat: numberOrNull(record.fat_100g),
+    saturatedFat: numberOrNull(record['saturated-fat_100g']),
+    carbohydrates: numberOrNull(record.carbohydrates_100g),
+    sugars: numberOrNull(record.sugars_100g),
+    fiber: numberOrNull(record.fiber_100g),
+    proteins: numberOrNull(record.proteins_100g),
+    salt: numberOrNull(record.salt_100g),
+    sodium: numberOrNull(record.sodium_100g)
+  };
+}
+
+function hasOpenFoodFactsNutrition(nutrition: OpenFoodFactsNutritionPer100g): boolean {
+  return Object.values(nutrition).some((value) => value !== null);
 }
 
 function parseTsvLine(line: string): string[] {
@@ -286,4 +445,19 @@ function asText(value: unknown): string {
 
 function asTextArray(value: unknown): string[] {
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string' && item.length > 0) : [];
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function numberOrNull(value: unknown): number | null {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null;
+  }
+  if (typeof value === 'string' && value.trim()) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
 }

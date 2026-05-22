@@ -1,813 +1,1696 @@
 // AUTO-GENERATED from the official OpenFoodFacts world data export.
 // Source URL: https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz
-// Retrieved: 2026-05-20T23:35:02.245Z
-// Row count: 50 real product rows fetched from openfoodfacts.org.
+// Retrieved: 2026-05-22T08:25:07.875Z
+// Row count: 40 real barcode+nutrition enrichment rows matched to existing ingested retailer products.
+// Candidate barcode count checked from current Willys/Hemkop/Coop ingested rows: 172. No-match or nutrition-empty products were skipped.
+
+export type OpenFoodFactsNutritionPer100g = {
+  energyKj: number | null;
+  energyKcal: number | null;
+  fat: number | null;
+  saturatedFat: number | null;
+  carbohydrates: number | null;
+  sugars: number | null;
+  fiber: number | null;
+  proteins: number | null;
+  salt: number | null;
+  sodium: number | null;
+};
+
+export type OpenFoodFactsRetailerMatch = {
+  chain: 'willys' | 'hemkop' | 'coop';
+  productCode: string;
+  name: string;
+  brand: string;
+  packageText: string;
+  sourceUrl: string;
+  retrievedAt: string;
+};
 
 export type OpenFoodFactsIngestedProduct = {
-  code: string;
+  barcode: string;
   name: string;
   brands: string;
   quantity: string;
   categories: string[];
   labels: string[];
   nutriscoreGrade: string;
+  nutritionPer100g: OpenFoodFactsNutritionPer100g;
   imageUrl: string;
   productUrl: string;
   sourceUrl: string;
   retrievedAt: string;
+  retailerMatches: OpenFoodFactsRetailerMatch[];
 };
 
 export const openFoodFactsSource = {
-  source: 'openfoodfacts.org world data export',
-  retrievedAt: '2026-05-20T23:35:02.245Z',
-  rowCount: 50,
-  sourceUrl: 'https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz'
+  source: 'openfoodfacts.org world data export barcode nutrition enrichment',
+  retrievedAt: "2026-05-22T08:25:07.875Z",
+  rowCount: 40,
+  candidateBarcodeCount: 172,
+  sourceUrl: "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz"
 } as const;
 
 export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
   {
-    "code": "0089686170269",
-    "name": "Instant Noodle Soup Vegetable Flavour",
-    "brands": "Indomie",
-    "quantity": "5 x 75g",
+    "barcode": "5410673005861",
+    "name": "Pitkäjyväinen riisi, keitetty",
+    "brands": "MARS NORGE AS",
+    "quantity": "",
     "categories": [
       "en:plant-based-foods-and-beverages",
       "en:plant-based-foods",
-      "en:dried-products",
-      "en:meals",
-      "en:pastas",
-      "en:dried-products-to-be-rehydrated",
-      "en:noodles",
-      "en:soups",
-      "en:instant-noodles",
-      "en:nouilles-instantan�es"
+      "en:cereals-and-potatoes",
+      "en:seeds",
+      "en:cereals-and-their-products",
+      "en:cereal-grains",
+      "en:rices",
+      "en:long-grain-rices",
+      "en:parboiled-rices"
     ],
     "labels": [
-      "en:halal"
+      "en:no-gluten",
+      "en:green-dot"
     ],
-    "nutriscoreGrade": "unknown",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/008/968/617/0269/front_fr.3.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/0089686170269/instant-noodle-soup-vegetable-flavour-indomie",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=0089686170269",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "nutriscoreGrade": "b",
+    "nutritionPer100g": {
+      "energyKj": 681.1,
+      "energyKcal": 157,
+      "fat": 0.5,
+      "saturatedFat": 0.1,
+      "carbohydrates": 34,
+      "sugars": 0.5,
+      "fiber": 0.8,
+      "proteins": 4.6,
+      "salt": 0.01,
+      "sodium": 0.004
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/541/067/300/5861/front_fi.18.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/5410673005861/pitkajyvainen-riisi-keitetty-mars-norge-as",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5410673005861",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101352143_ST",
+        "name": "Långkornigt Ris",
+        "brand": "Ben's Original",
+        "packageText": "BEN'S ORIGINAL, 1kg",
+        "sourceUrl": "https://www.hemkop.se/search?q=ris",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      },
+      {
+        "chain": "willys",
+        "productCode": "101352143_ST",
+        "name": "Långkornigt Ris",
+        "brand": "Ben's Original",
+        "packageText": "BEN'S ORIGINAL, 1kg",
+        "sourceUrl": "https://www.willys.se/search?q=ris",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
   },
   {
-    "code": "2000985644952",
-    "name": "Småfranska 10p",
-    "brands": "City Gross",
-    "quantity": "650g",
-    "categories": [
-      "sv:småfranska"
-    ],
-    "labels": [],
-    "nutriscoreGrade": "e",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/200/098/564/4952/front_sv.4.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/2000985644952/smafranska-10p-city-gross",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=2000985644952",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "20645892",
-    "name": "Palmeritas",
-    "brands": "Sol&Mar, sol-mar",
-    "quantity": "180 g",
-    "categories": [
-      "en:snacks",
-      "en:sweet-snacks",
-      "en:biscuits-and-cakes",
-      "en:biscuits-and-crackers",
-      "en:biscuits",
-      "en:flaky-biscuits",
-      "en:palmiers",
-      "en:biscuits-et-gateaux",
-      "en:snacks-sucres"
-    ],
-    "labels": [],
-    "nutriscoreGrade": "e",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/000/002/064/5892/front_en.78.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/20645892/palmeritas-sol-mar",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=20645892",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "4000417108104",
-    "name": "Crispy Cookie",
-    "brands": "Ritter Sport",
-    "quantity": "100g",
-    "categories": [
-      "en:snacks",
-      "en:sweet-snacks",
-      "en:cocoa-and-its-products",
-      "en:chocolates",
-      "en:dark-chocolates"
-    ],
-    "labels": [
-      "en:sustainable",
-      "en:vegetarian",
-      "en:vegan",
-      "en:european-vegetarian-union",
-      "en:european-vegetarian-union-vegan",
-      "en:green-dot",
-      "en:rainforest-alliance",
-      "en:rainforest-alliance-cocoa"
-    ],
-    "nutriscoreGrade": "e",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/400/041/710/8104/front_en.21.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/4000417108104/crispy-cookie-ritter-sport",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4000417108104",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "4056489627821",
-    "name": "Vemondo veganska mandel glasspinnar",
-    "brands": "Bon Gelati, Lidl, Vemondo",
-    "quantity": "216 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:dairy-substitutes",
-      "en:desserts",
-      "en:frozen-foods",
-      "en:frozen-desserts",
-      "en:ice-creams-and-sorbets",
-      "en:plant-based-ice-creams",
-      "sv:växtbaserad-pinnglass"
-    ],
-    "labels": [
-      "en:vegetarian",
-      "en:vegan",
-      "en:rainforest-alliance",
-      "en:rainforest-alliance-cocoa",
-      "sv:v-label-international-vegan"
-    ],
-    "nutriscoreGrade": "e",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/405/648/962/7821/front_sv.27.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/4056489627821/vemondo-veganska-mandel-glasspinnar-bon-gelati",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4056489627821",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "4056489655664",
-    "name": "TK - Beerenmischung",
-    "brands": "Freshona",
+    "barcode": "7310130003530",
+    "name": "Snabb makaroner",
+    "brands": "Kungsörnen, Lantmännen",
     "quantity": "750g",
     "categories": [
       "en:plant-based-foods-and-beverages",
       "en:plant-based-foods",
-      "en:fruits-and-vegetables-based-foods",
-      "en:frozen-foods",
-      "en:fruits-based-foods",
-      "en:frozen-plant-based-foods",
-      "en:fruits",
-      "en:berries",
-      "en:frozen-fruits",
-      "en:frozen-mixed-fruits",
-      "en:frozen-berries",
-      "en:frozen-mixed-berries"
+      "en:cereals-and-potatoes",
+      "en:cereals-and-their-products",
+      "en:pastas",
+      "en:cereal-pastas",
+      "en:durum-wheat-pasta",
+      "en:durum-wheat-macaroni"
     ],
-    "labels": [
-      "en:green-dot",
-      "en:no-added-sugar",
-      "en:nutriscore",
-      "en:nutriscore-grade-a"
-    ],
+    "labels": [],
     "nutriscoreGrade": "a",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/405/648/965/5664/front_en.71.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/4056489655664/tk-beerenmischung-freshona",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4056489655664",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "nutritionPer100g": {
+      "energyKj": 1500,
+      "energyKcal": 360,
+      "fat": 2,
+      "saturatedFat": 0.5,
+      "carbohydrates": 72,
+      "sugars": 0.3,
+      "fiber": 3,
+      "proteins": 11,
+      "salt": 0.01,
+      "sodium": 0.004
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/3530/front_en.3.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310130003530/snabb-makaroner-kungsornen",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130003530",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101205623_ST",
+        "name": "Snabbmakaroner",
+        "brand": "Kungsörnen",
+        "packageText": "KUNGSÖRNEN, 750g",
+        "sourceUrl": "https://www.hemkop.se/search?q=makaroner",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      },
+      {
+        "chain": "willys",
+        "productCode": "101205623_ST",
+        "name": "Snabbmakaroner",
+        "brand": "Kungsörnen",
+        "packageText": "KUNGSÖRNEN, 750g",
+        "sourceUrl": "https://www.willys.se/search?q=makaroner",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
   },
   {
-    "code": "4056489687610",
-    "name": "Boisson au cacao et à l'avoine",
-    "brands": "Vemondo",
-    "quantity": "1l",
+    "barcode": "7310130003547",
+    "name": "Ideal Makaroner",
+    "brands": "Kungsörnen",
+    "quantity": "",
+    "categories": [
+      "en:plant-based-foods-and-beverages",
+      "en:plant-based-foods",
+      "en:pastas"
+    ],
+    "labels": [],
+    "nutriscoreGrade": "a",
+    "nutritionPer100g": {
+      "energyKj": 1509,
+      "energyKcal": 361,
+      "fat": 2,
+      "saturatedFat": 0.5,
+      "carbohydrates": 72,
+      "sugars": 3,
+      "fiber": 3,
+      "proteins": 11,
+      "salt": 0.01,
+      "sodium": 0.004
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/3547/front_sv.6.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310130003547/ideal-makaroner-kungsornen",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130003547",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101205621_ST",
+        "name": "Idealmakaroner Gammaldags",
+        "brand": "Kungsörnen",
+        "packageText": "KUNGSÖRNEN, 750g",
+        "sourceUrl": "https://www.hemkop.se/search?q=makaroner",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      },
+      {
+        "chain": "willys",
+        "productCode": "101205621_ST",
+        "name": "Idealmakaroner Gammaldags",
+        "brand": "Kungsörnen",
+        "packageText": "KUNGSÖRNEN, 750g",
+        "sourceUrl": "https://www.willys.se/search?q=makaroner",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7310130003561",
+    "name": "Gammaldags Ideal makaroner",
+    "brands": "Kungsörnen",
+    "quantity": "1300 g",
+    "categories": [
+      "en:plant-based-foods-and-beverages",
+      "en:plant-based-foods",
+      "en:cereals-and-potatoes",
+      "en:cereals-and-their-products",
+      "en:pastas"
+    ],
+    "labels": [],
+    "nutriscoreGrade": "a",
+    "nutritionPer100g": {
+      "energyKj": 1509,
+      "energyKcal": 360,
+      "fat": 2,
+      "saturatedFat": 0.5,
+      "carbohydrates": 72,
+      "sugars": 3,
+      "fiber": 3,
+      "proteins": 11,
+      "salt": 0.01,
+      "sodium": 0.004
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/3561/front_sv.4.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310130003561/gammaldags-ideal-makaroner-kungsornen",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130003561",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101205570_ST",
+        "name": "Idealmakaroner Gammaldags",
+        "brand": "Kungsörnen",
+        "packageText": "KUNGSÖRNEN, 1,3kg",
+        "sourceUrl": "https://www.hemkop.se/search?q=makaroner",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      },
+      {
+        "chain": "willys",
+        "productCode": "101205570_ST",
+        "name": "Idealmakaroner Gammaldags",
+        "brand": "Kungsörnen",
+        "packageText": "KUNGSÖRNEN, 1,3kg",
+        "sourceUrl": "https://www.willys.se/search?q=makaroner",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7310865018465",
+    "name": "Yoggi Original 2% Jordgubb & Smultron (Yoggi Original 2% Strawberries & Wild strawberries/ European strawberries)",
+    "brands": "Arla Yoggi®",
+    "quantity": "1000gram/ 1 liter",
     "categories": [
       "en:beverages-and-beverages-preparations",
-      "en:plant-based-foods-and-beverages",
       "en:beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:dairy-substitutes",
-      "en:cereals-and-their-products",
-      "en:milk-substitutes",
-      "en:plant-based-beverages",
-      "en:plant-based-milk-alternatives",
-      "en:cereal-based-drinks",
-      "en:oat-based-drinks",
-      "en:cocoa-oat-based-drinks"
+      "en:dairies",
+      "en:fermented-foods",
+      "en:fermented-milk-products",
+      "en:desserts",
+      "en:dairy-desserts",
+      "en:dairy-drinks",
+      "en:fermented-dairy-desserts",
+      "en:fermented-drinks",
+      "en:yogurts",
+      "en:fermented-milk-drinks",
+      "en:drinkable-yogurts"
     ],
     "labels": [
-      "en:vegetarian",
-      "en:organic",
-      "en:eu-organic",
-      "en:non-eu-agriculture",
-      "en:vegan",
-      "de:eg-öko-verordnung",
-      "en:100-vegetable",
-      "en:eu-agriculture",
-      "en:eu-non-eu-agriculture",
-      "en:european-vegetarian-union",
-      "en:european-vegetarian-union-vegan",
-      "en:fsc",
-      "en:fsc-mix",
-      "en:no-lactose",
-      "en:nutriscore",
-      "en:nutriscore-grade-b",
-      "en:rainforest-alliance",
-      "en:rainforest-alliance-cocoa",
-      "de:de-öko-100"
+      "sv:yoggi-arla"
     ],
     "nutriscoreGrade": "e",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/405/648/968/7610/front_en.97.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/4056489687610/boisson-au-cacao-et-a-l-avoine-vemondo",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4056489687610",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "nutritionPer100g": {
+      "energyKj": 340,
+      "energyKcal": 80,
+      "fat": 2,
+      "saturatedFat": 1.3,
+      "carbohydrates": 11,
+      "sugars": 11,
+      "fiber": null,
+      "proteins": 3.3,
+      "salt": 0.1,
+      "sodium": 0.04
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/501/8465/front_fr.4.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865018465/yoggi-original-2-jordgubb-smultron-yoggi-original-2-strawberries-wild-strawberries-european-strawberries-arla-yoggi",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865018465",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "100050640_ST",
+        "name": "Jordgubb Smultron Original Yoghurt 2%",
+        "brand": "Yoggi",
+        "packageText": "YOGGI, 1kg",
+        "sourceUrl": "https://www.hemkop.se/search?q=yoghurt",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      },
+      {
+        "chain": "willys",
+        "productCode": "100050640_ST",
+        "name": "Jordgubb Smultron Original Yoghurt 2%",
+        "brand": "Yoggi",
+        "packageText": "YOGGI, 1kg",
+        "sourceUrl": "https://www.willys.se/search?q=yoghurt",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
   },
   {
-    "code": "4056489767930",
-    "name": "Matriket svenska fiberhavregryn",
-    "brands": "Matriket",
-    "quantity": "1.5 kg",
+    "barcode": "7310865018472",
+    "name": "Yoggi Original Skogsbär",
+    "brands": "Arla, Yoggi",
+    "quantity": "1000 g",
+    "categories": [
+      "en:dairies",
+      "en:fermented-foods",
+      "en:fermented-milk-products",
+      "en:desserts",
+      "en:dairy-desserts",
+      "en:fermented-dairy-desserts",
+      "en:fermented-dairy-desserts-with-fruits",
+      "en:yogurts",
+      "en:fruit-yogurts",
+      "en:yogurt-with-fruits-and-sugar"
+    ],
+    "labels": [
+      "en:fsc",
+      "en:fsc-mix",
+      "en:fsc-c014047"
+    ],
+    "nutriscoreGrade": "c",
+    "nutritionPer100g": {
+      "energyKj": 350,
+      "energyKcal": 80,
+      "fat": 2,
+      "saturatedFat": 1.3,
+      "carbohydrates": 12,
+      "sugars": 11,
+      "fiber": null,
+      "proteins": 3.4,
+      "salt": 0.1,
+      "sodium": 0.04
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/501/8472/front_sv.17.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865018472/yoggi-original-skogsbar-arla",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865018472",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "100137095_ST",
+        "name": "Skogsbär Original Yoghurt 2%",
+        "brand": "Yoggi",
+        "packageText": "YOGGI, 1kg",
+        "sourceUrl": "https://www.hemkop.se/search?q=yoghurt",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      },
+      {
+        "chain": "willys",
+        "productCode": "100137095_ST",
+        "name": "Skogsbär Original Yoghurt 2%",
+        "brand": "Yoggi",
+        "packageText": "YOGGI, 1kg",
+        "sourceUrl": "https://www.willys.se/search?q=yoghurt",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7310865018496",
+    "name": "Yoggi original 2% Samoa",
+    "brands": "yoggi",
+    "quantity": "1000g",
+    "categories": [
+      "en:dairies",
+      "en:fermented-foods",
+      "en:fermented-milk-products",
+      "en:desserts",
+      "en:dairy-desserts",
+      "en:fermented-dairy-desserts",
+      "en:fermented-dairy-desserts-with-fruits",
+      "en:yogurts",
+      "en:fruit-yogurts",
+      "en:fruit-yogurts-with-fruit-chunks"
+    ],
+    "labels": [
+      "en:fsc",
+      "en:fsc-mix",
+      "sv:svensk-mjölk"
+    ],
+    "nutriscoreGrade": "c",
+    "nutritionPer100g": {
+      "energyKj": 317.1,
+      "energyKcal": 79,
+      "fat": 2,
+      "saturatedFat": 1.3,
+      "carbohydrates": 11,
+      "sugars": 11,
+      "fiber": null,
+      "proteins": 3.3,
+      "salt": 0.07,
+      "sodium": 0.028
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/501/8496/front_sv.17.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865018496/yoggi-original-2-samoa",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865018496",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "100986033_ST",
+        "name": "Samoa Original Yoghurt 2%",
+        "brand": "Yoggi",
+        "packageText": "YOGGI, 1kg",
+        "sourceUrl": "https://www.hemkop.se/search?q=yoghurt",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      },
+      {
+        "chain": "willys",
+        "productCode": "100986033_ST",
+        "name": "Samoa Original Yoghurt 2%",
+        "brand": "Yoggi",
+        "packageText": "YOGGI, 1kg",
+        "sourceUrl": "https://www.willys.se/search?q=yoghurt",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7310865088512",
+    "name": "mild yogurt vanilj",
+    "brands": "Arla, Arla Foods",
+    "quantity": "1500 g",
+    "categories": [
+      "en:dairies",
+      "en:fermented-foods",
+      "en:fermented-milk-products",
+      "en:desserts",
+      "en:dairy-desserts",
+      "en:fermented-dairy-desserts",
+      "en:yogurts"
+    ],
+    "labels": [
+      "en:fsc",
+      "en:fsc-mix"
+    ],
+    "nutriscoreGrade": "b",
+    "nutritionPer100g": {
+      "energyKj": 300,
+      "energyKcal": 70,
+      "fat": 2,
+      "saturatedFat": 1.3,
+      "carbohydrates": 8.7,
+      "sugars": 8.7,
+      "fiber": null,
+      "proteins": 3.9,
+      "salt": 0.1,
+      "sodium": 0.04
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/508/8512/front_sv.6.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865088512/mild-yogurt-vanilj-arla",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865088512",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101210853_ST",
+        "name": "Vanilj Mild Yoghurt 2%",
+        "brand": "Arla Ko",
+        "packageText": "ARLA KO, 1,5kg",
+        "sourceUrl": "https://www.hemkop.se/search?q=yoghurt",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      },
+      {
+        "chain": "willys",
+        "productCode": "101210853_ST",
+        "name": "Vanilj Mild Yoghurt 2%",
+        "brand": "Arla Ko",
+        "packageText": "ARLA KO, 1,5kg",
+        "sourceUrl": "https://www.willys.se/search?q=yoghurt",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7311043002191",
+    "name": "Mellanmjölk med längre hållbarhet",
+    "brands": "Garant",
+    "quantity": "1l",
+    "categories": [
+      "en:dairies",
+      "en:milks-liquid-and-powder",
+      "en:milks",
+      "en:pasteurised-products",
+      "en:pasteurised-milks"
+    ],
+    "labels": [
+      "en:fsc",
+      "en:fsc-mix"
+    ],
+    "nutriscoreGrade": "b",
+    "nutritionPer100g": {
+      "energyKj": 195,
+      "energyKcal": 47,
+      "fat": 1.5,
+      "saturatedFat": 1,
+      "carbohydrates": 4.7,
+      "sugars": 4.7,
+      "fiber": null,
+      "proteins": 3.5,
+      "salt": 0.0875,
+      "sodium": 0.035
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2191/front_sv.8.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7311043002191/mellanmjolk-med-langre-hallbarhet-garant",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002191",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101476218_ST",
+        "name": "Mellanmjölk Längre Hållbarhet 1,5%",
+        "brand": "Garant",
+        "packageText": "GARANT, 1l",
+        "sourceUrl": "https://www.hemkop.se/search?q=mjolk",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      },
+      {
+        "chain": "willys",
+        "productCode": "101476218_ST",
+        "name": "Mellanmjölk Längre Hållbarhet 1,5%",
+        "brand": "Garant",
+        "packageText": "GARANT, 1l",
+        "sourceUrl": "https://www.willys.se/search?q=mjolk",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7311043002528",
+    "name": "Basmatiris",
+    "brands": "Garant",
+    "quantity": "1kg",
     "categories": [
       "en:plant-based-foods-and-beverages",
       "en:plant-based-foods",
-      "en:breakfasts",
       "en:cereals-and-potatoes",
+      "en:seeds",
       "en:cereals-and-their-products",
-      "en:breakfast-cereals",
-      "en:flakes",
-      "en:cereal-flakes",
-      "en:rolled-flakes",
-      "en:rolled-oats",
-      "sv:fiberhavregryn"
+      "en:cereal-grains",
+      "en:rices",
+      "en:aromatic-rices",
+      "en:indica-rices",
+      "en:long-grain-rices",
+      "en:basmati-rices"
     ],
-    "labels": [
-      "sv:från-sverige"
-    ],
-    "nutriscoreGrade": "a",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/405/648/976/7930/front_sv.9.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/4056489767930/matriket-svenska-fiberhavregryn",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4056489767930",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "labels": [],
+    "nutriscoreGrade": "b",
+    "nutritionPer100g": {
+      "energyKj": 1504,
+      "energyKcal": 354,
+      "fat": 0.8,
+      "saturatedFat": 0.3,
+      "carbohydrates": 78,
+      "sugars": 0.2,
+      "fiber": 0.5,
+      "proteins": 8.7,
+      "salt": 0,
+      "sodium": 0
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2528/front_en.3.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7311043002528/basmatiris-garant",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002528",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101488798_ST",
+        "name": "Basmatiris",
+        "brand": "Garant",
+        "packageText": "GARANT, 1kg",
+        "sourceUrl": "https://www.hemkop.se/search?q=ris",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      },
+      {
+        "chain": "willys",
+        "productCode": "101488798_ST",
+        "name": "Basmatiris",
+        "brand": "Garant",
+        "packageText": "GARANT, 1kg",
+        "sourceUrl": "https://www.willys.se/search?q=ris",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
   },
   {
-    "code": "5701977550974",
-    "name": "Ekologisk bredbart",
-    "brands": "Naturli'",
+    "barcode": "7311043008346",
+    "name": "Fusilli No 57",
+    "brands": "Garant",
+    "quantity": "500 g",
+    "categories": [
+      "en:plant-based-foods-and-beverages",
+      "en:plant-based-foods",
+      "en:pastas",
+      "en:fusilli"
+    ],
+    "labels": [],
+    "nutriscoreGrade": "a",
+    "nutritionPer100g": {
+      "energyKj": 1488,
+      "energyKcal": 351,
+      "fat": 1.4,
+      "saturatedFat": 0.3,
+      "carbohydrates": 71,
+      "sugars": 2.9,
+      "fiber": 3.1,
+      "proteins": 12,
+      "salt": 0.01,
+      "sodium": 0.004
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/8346/front_sv.15.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7311043008346/fusilli-no-57-garant",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008346",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101548687_ST",
+        "name": "Fusilli",
+        "brand": "Garant",
+        "packageText": "GARANT, 500g",
+        "sourceUrl": "https://www.hemkop.se/search?q=pasta",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      },
+      {
+        "chain": "willys",
+        "productCode": "101548687_ST",
+        "name": "Fusilli",
+        "brand": "Garant",
+        "packageText": "GARANT, 500g",
+        "sourceUrl": "https://www.willys.se/search?q=pasta",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7311043008353",
+    "name": "Gnocchi",
+    "brands": "Garant",
+    "quantity": "",
+    "categories": [],
+    "labels": [],
+    "nutriscoreGrade": "unknown",
+    "nutritionPer100g": {
+      "energyKj": 1558.8,
+      "energyKcal": 351,
+      "fat": 1.4,
+      "saturatedFat": null,
+      "carbohydrates": 71,
+      "sugars": 2.9,
+      "fiber": 12,
+      "proteins": 12,
+      "salt": null,
+      "sodium": null
+    },
+    "imageUrl": "",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7311043008353/gnocchi-garant",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008353",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101548708_ST",
+        "name": "Gnocchi",
+        "brand": "Garant",
+        "packageText": "GARANT, 500g",
+        "sourceUrl": "https://www.hemkop.se/search?q=pasta",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      },
+      {
+        "chain": "willys",
+        "productCode": "101548708_ST",
+        "name": "Gnocchi",
+        "brand": "Garant",
+        "packageText": "GARANT, 500g",
+        "sourceUrl": "https://www.willys.se/search?q=pasta",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7311043008377",
+    "name": "Farfalle",
+    "brands": "Garant",
+    "quantity": "",
+    "categories": [],
+    "labels": [],
+    "nutriscoreGrade": "unknown",
+    "nutritionPer100g": {
+      "energyKj": 1505.4,
+      "energyKcal": 357,
+      "fat": 1.4,
+      "saturatedFat": 0.3,
+      "carbohydrates": 72,
+      "sugars": 3.1,
+      "fiber": 3.2,
+      "proteins": 12,
+      "salt": 0.01,
+      "sodium": 0.004
+    },
+    "imageUrl": "",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7311043008377/farfalle-garant",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008377",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101548710_ST",
+        "name": "Farfalle",
+        "brand": "Garant",
+        "packageText": "GARANT, 500g",
+        "sourceUrl": "https://www.hemkop.se/search?q=pasta",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      },
+      {
+        "chain": "willys",
+        "productCode": "101548710_ST",
+        "name": "Farfalle",
+        "brand": "Garant",
+        "packageText": "GARANT, 500g",
+        "sourceUrl": "https://www.willys.se/search?q=pasta",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
+  },
+  {
+    "barcode": "5410673005847",
+    "name": "Ben's Original",
+    "brands": "Långkornigt",
+    "quantity": "8 x 125 g",
+    "categories": [],
+    "labels": [],
+    "nutriscoreGrade": "unknown",
+    "nutritionPer100g": {
+      "energyKj": 822.4,
+      "energyKcal": 196,
+      "fat": 0.6,
+      "saturatedFat": null,
+      "carbohydrates": 42.5,
+      "sugars": null,
+      "fiber": 1,
+      "proteins": 4.1,
+      "salt": null,
+      "sodium": null
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/541/067/300/5847/front_en.4.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/5410673005847/ben-s-original-langkornigt",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5410673005847",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "willys",
+        "productCode": "101352142_ST",
+        "name": "Långkornigt Ris Boil-in-bag 8x125g",
+        "brand": "Ben's Original",
+        "packageText": "BEN'S ORIGINAL, 1kg",
+        "sourceUrl": "https://www.willys.se/search?q=ris",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
+  },
+  {
+    "barcode": "5900649083097",
+    "name": "Matcha latte",
+    "brands": "Mokate",
+    "quantity": "84g (14g x 6)",
+    "categories": [
+      "en:beverages-and-beverages-preparations",
+      "en:beverages",
+      "en:tea-based-beverages"
+    ],
+    "labels": [],
+    "nutriscoreGrade": "e",
+    "nutritionPer100g": {
+      "energyKj": 1745,
+      "energyKcal": 414,
+      "fat": 11,
+      "saturatedFat": 10,
+      "carbohydrates": 72,
+      "sugars": 61,
+      "fiber": null,
+      "proteins": 6.7,
+      "salt": 0.43,
+      "sodium": 0.172
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/590/064/908/3097/front_en.4.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/5900649083097/matcha-latte-mokate",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5900649083097",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "coop",
+        "productCode": "5900649083097",
+        "name": "Snabbkaffe Matcha Latte 6-pack",
+        "brand": "Mokate",
+        "packageText": "14x6g",
+        "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+        "retrievedAt": "2026-05-21T01:29:42.710Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7310050001975",
+    "name": "Löfbergs jubileum lätt mörkrost",
+    "brands": "Löfbergs",
     "quantity": "450 g",
     "categories": [
       "en:plant-based-foods-and-beverages",
       "en:plant-based-foods",
-      "en:fats",
-      "en:spreads",
-      "en:plant-based-spreads",
-      "en:vegetable-fats",
-      "en:spreadable-fats",
-      "en:margarines",
-      "en:bredbara-palagg",
-      "en:fett",
-      "en:vaxtbaserad-mat",
-      "en:vaxtbaserad-mat-och-dryck"
+      "en:coffees"
+    ],
+    "labels": [
+      "en:rainforest-alliance"
+    ],
+    "nutriscoreGrade": "unknown",
+    "nutritionPer100g": {
+      "energyKj": 1656.4,
+      "energyKcal": 396.6,
+      "fat": 15.4,
+      "saturatedFat": null,
+      "carbohydrates": 40.2,
+      "sugars": null,
+      "fiber": 19.8,
+      "proteins": 14.4,
+      "salt": 0.19,
+      "sodium": 0.074
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/005/000/1975/front_en.3.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310050001975/lofbergs-jubileum-latt-morkrost",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310050001975",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "coop",
+        "productCode": "7310050001975",
+        "name": "Bryggkaffe Jubileum Lätt Mörkrost",
+        "brand": "Löfbergs",
+        "packageText": "450 g",
+        "sourceUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+        "retrievedAt": "2026-05-21T01:29:42.710Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7310130003554",
+    "name": "Snabbmakaroner",
+    "brands": "Kungsörnen, Lantmännen",
+    "quantity": "1300g",
+    "categories": [
+      "en:plant-based-foods-and-beverages",
+      "en:plant-based-foods",
+      "en:cereals-and-potatoes",
+      "en:cereals-and-their-products",
+      "en:pastas",
+      "en:cereal-pastas",
+      "en:durum-wheat-pasta",
+      "en:common-wheat-pasta",
+      "en:durum-wheat-macaroni"
+    ],
+    "labels": [],
+    "nutriscoreGrade": "a",
+    "nutritionPer100g": {
+      "energyKj": 1500,
+      "energyKcal": 360,
+      "fat": 2,
+      "saturatedFat": 0.5,
+      "carbohydrates": 72,
+      "sugars": 3,
+      "fiber": 3,
+      "proteins": 11,
+      "salt": 0.01,
+      "sodium": 0.004
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/3554/front_sv.5.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310130003554/snabbmakaroner-kungsornen",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130003554",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101205598_ST",
+        "name": "Snabbmakaroner",
+        "brand": "Kungsörnen",
+        "packageText": "KUNGSÖRNEN, 1,3kg",
+        "sourceUrl": "https://www.hemkop.se/search?q=makaroner",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7310130003981",
+    "name": "Makaroner",
+    "brands": "Kungsörnen",
+    "quantity": "",
+    "categories": [
+      "en:plant-based-foods-and-beverages",
+      "en:plant-based-foods",
+      "en:pastas"
+    ],
+    "labels": [],
+    "nutriscoreGrade": "a",
+    "nutritionPer100g": {
+      "energyKj": 1509,
+      "energyKcal": 360,
+      "fat": 2,
+      "saturatedFat": 0.5,
+      "carbohydrates": 72,
+      "sugars": 3,
+      "fiber": 3,
+      "proteins": 11,
+      "salt": 0.01,
+      "sodium": 0.004
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/000/3981/front_en.13.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310130003981/makaroner-kungsornen",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130003981",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "willys",
+        "productCode": "101216818_ST",
+        "name": "Idealmakaroner",
+        "brand": "Kungsörnen",
+        "packageText": "KUNGSÖRNEN, 1,3kg",
+        "sourceUrl": "https://www.willys.se/search?q=makaroner",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7310130416170",
+    "name": "Ideal makaroner",
+    "brands": "Kungsörnen, Lantmännen",
+    "quantity": "1000 g",
+    "categories": [
+      "en:plant-based-foods-and-beverages",
+      "en:plant-based-foods",
+      "en:cereals-and-potatoes",
+      "en:cereals-and-their-products",
+      "en:pastas",
+      "en:cereal-pastas",
+      "en:noodles",
+      "en:dry-pastas",
+      "en:durum-wheat-pasta",
+      "en:dry-durum-wheat-pasta",
+      "en:durum-wheat-macaroni"
+    ],
+    "labels": [],
+    "nutriscoreGrade": "a",
+    "nutritionPer100g": {
+      "energyKj": 1485,
+      "energyKcal": 360,
+      "fat": 2,
+      "saturatedFat": 0.5,
+      "carbohydrates": 72,
+      "sugars": 3,
+      "fiber": 6.8,
+      "proteins": 11,
+      "salt": 0.01,
+      "sodium": 0.004
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/041/6170/front_en.26.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310130416170/ideal-makaroner-kungsornen",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130416170",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101300386_ST",
+        "name": "Idealmakaroner",
+        "brand": "Kungsörnen",
+        "packageText": "KUNGSÖRNEN, 1kg",
+        "sourceUrl": "https://www.hemkop.se/search?q=makaroner",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7310130418105",
+    "name": "Makaroner Fullkornspasta",
+    "brands": "Kungsörnen",
+    "quantity": "",
+    "categories": [
+      "en:plant-based-foods-and-beverages",
+      "en:plant-based-foods",
+      "en:cereals-and-potatoes",
+      "en:cereals-and-their-products",
+      "en:pastas",
+      "en:cereal-pastas",
+      "en:dry-pastas",
+      "en:durum-wheat-pasta",
+      "en:whole-durum-wheat-pasta"
+    ],
+    "labels": [],
+    "nutriscoreGrade": "a",
+    "nutritionPer100g": {
+      "energyKj": 1473,
+      "energyKcal": 350,
+      "fat": 2,
+      "saturatedFat": 0.5,
+      "carbohydrates": 65,
+      "sugars": 3,
+      "fiber": 7,
+      "proteins": 14,
+      "salt": 0.01,
+      "sodium": 0.004
+    },
+    "imageUrl": "",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310130418105/makaroner-fullkornspasta-kungsornen",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130418105",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "100044328_ST",
+        "name": "Makaroner Fullkornspasta",
+        "brand": "Kungsörnen",
+        "packageText": "KUNGSÖRNEN, 800g",
+        "sourceUrl": "https://www.hemkop.se/search?q=makaroner",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7310865000361",
+    "name": "Arla mjölk",
+    "brands": "Arla",
+    "quantity": "1.5 l",
+    "categories": [
+      "en:dairies",
+      "en:milks",
+      "en:pasteurised-milks",
+      "en:whole-milks",
+      "en:cow-milks"
+    ],
+    "labels": [
+      "sv:official-sponsor-of-the-swedish-olymic-team"
+    ],
+    "nutriscoreGrade": "b",
+    "nutritionPer100g": {
+      "energyKj": 248.7,
+      "energyKcal": 59,
+      "fat": 3,
+      "saturatedFat": 1.9,
+      "carbohydrates": 4.6,
+      "sugars": 4.6,
+      "fiber": null,
+      "proteins": 3.5,
+      "salt": 0.000225,
+      "sodium": 0.00009
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/500/0361/front_en.7.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865000361/arla-mjolk",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865000361",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "100706158_ST",
+        "name": "Mjölk 3%",
+        "brand": "Arla Ko",
+        "packageText": "ARLA KO, 1,5l",
+        "sourceUrl": "https://www.hemkop.se/search?q=mjolk",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7310865001818",
+    "name": "Mellanmjölk",
+    "brands": "Arla",
+    "quantity": "1.5 l",
+    "categories": [
+      "en:beverages-and-beverages-preparations",
+      "en:beverages",
+      "en:dairies",
+      "en:carbonated-drinks",
+      "en:sodas"
+    ],
+    "labels": [],
+    "nutriscoreGrade": "b",
+    "nutritionPer100g": {
+      "energyKj": 196,
+      "energyKcal": 47,
+      "fat": 1.5,
+      "saturatedFat": 1,
+      "carbohydrates": 4.7,
+      "sugars": 4.7,
+      "fiber": null,
+      "proteins": 3.5,
+      "salt": 0.0875,
+      "sodium": 0.035
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/500/1818/front_en.5.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865001818/mellanmjolk-arla",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865001818",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "100563249_ST",
+        "name": "Mellanmjölk 1,5%",
+        "brand": "Arla Ko",
+        "packageText": "ARLA KO, 1,5l",
+        "sourceUrl": "https://www.hemkop.se/search?q=mjolk",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7310865001825",
+    "name": "Arla Ko Mellanmjölk",
+    "brands": "Arla, Arla Foods, Arla Ko",
+    "quantity": "1 l",
+    "categories": [
+      "en:dairies",
+      "en:milks",
+      "en:pasteurised-milks",
+      "en:cow-milks"
+    ],
+    "labels": [
+      "en:fsc",
+      "en:fsc-mix",
+      "en:fsc-c014047",
+      "sv:svensk-mjölk"
+    ],
+    "nutriscoreGrade": "b",
+    "nutritionPer100g": {
+      "energyKj": 194.9,
+      "energyKcal": 47,
+      "fat": 1.5,
+      "saturatedFat": 1,
+      "carbohydrates": 4.7,
+      "sugars": 4.7,
+      "fiber": null,
+      "proteins": 3.5,
+      "salt": 0.0875,
+      "sodium": 0.035
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/500/1825/front_sv.7.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865001825/arla-ko-mellanmjolk",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865001825",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "100183962_ST",
+        "name": "Mellanmjölk 1,5%",
+        "brand": "Arla Ko",
+        "packageText": "ARLA KO, 1l",
+        "sourceUrl": "https://www.hemkop.se/search?q=mjolk",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7310865066206",
+    "name": "Mild Yoghurt Naturel",
+    "brands": "Arla, Arla Foods, Arla Ko",
+    "quantity": "3 dl",
+    "categories": [
+      "en:dairies",
+      "en:fermented-foods",
+      "en:fermented-milk-products",
+      "en:desserts",
+      "en:dairy-desserts",
+      "en:fermented-dairy-desserts",
+      "en:milks",
+      "en:yogurts",
+      "en:pasteurised-milks"
     ],
     "labels": [
       "en:organic",
-      "en:vegetarian",
       "en:eu-organic",
-      "en:vegan",
-      "en:dk-øko-100",
-      "en:no-milk",
-      "sv:palmoljefri",
-      "sv:producerad-i-danmark"
+      "en:fsc",
+      "en:fsc-mix",
+      "en:se-eko-01",
+      "sv:krav",
+      "en:fsc-c014047",
+      "sv:svensk-mjölk"
     ],
-    "nutriscoreGrade": "d",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/570/197/755/0974/front_sv.5.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/5701977550974/ekologisk-bredbart-naturli",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5701977550974",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "nutriscoreGrade": "b",
+    "nutritionPer100g": {
+      "energyKj": 248.7,
+      "energyKcal": 59,
+      "fat": 3,
+      "saturatedFat": 1.9,
+      "carbohydrates": 4.6,
+      "sugars": 4.6,
+      "fiber": 0,
+      "proteins": 3.5,
+      "salt": 0.0875,
+      "sodium": 0.035
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/506/6206/front_sv.13.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865066206/mild-yoghurt-naturel-arla",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865066206",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "willys",
+        "productCode": "100814852_ST",
+        "name": "Mjölk Eko 3%",
+        "brand": "Arla Ko",
+        "packageText": "ARLA KO, 3dl",
+        "sourceUrl": "https://www.willys.se/search?q=mjolk",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
   },
   {
-    "code": "59032823",
-    "name": "nutella",
-    "brands": "Ferrero,Nutellagg",
-    "quantity": "630 g (42 x 15 g)",
+    "barcode": "7310865070456",
+    "name": "Yoggi original vanilj",
+    "brands": "Arla, Arla Foods, Yoggi",
+    "quantity": "1000 g",
     "categories": [
-      "en:breakfasts",
-      "en:spreads",
-      "en:sweet-spreads",
-      "en:spreadable-fats",
-      "fr:pates-a-tartiner",
-      "en:hazelnut-spreads",
-      "en:chocolate-spreads",
-      "en:cocoa-and-hazelnuts-spreads",
-      "en:confectionary-based-spreads",
-      "en:creme-para-barrar-de-avela",
-      "en:creme-para-barrar-de-avela-e-cacau",
-      "en:pequenos-alomocos"
+      "en:dairies",
+      "en:fermented-foods",
+      "en:fermented-milk-products",
+      "en:desserts",
+      "en:dairy-desserts",
+      "en:fermented-dairy-desserts",
+      "en:yogurts",
+      "en:vanilla-yogurt"
     ],
     "labels": [
-      "en:vegetarian",
-      "en:no-gluten",
-      "fr:triman"
+      "en:fsc",
+      "en:fsc-mix",
+      "en:fsc-c014047",
+      "sv:fsc-c014047"
     ],
-    "nutriscoreGrade": "e",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/000/005/903/2823/front_fr.280.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/59032823/nutella-ferrero",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=59032823",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "nutriscoreGrade": "b",
+    "nutritionPer100g": {
+      "energyKj": 320,
+      "energyKcal": 80,
+      "fat": 2,
+      "saturatedFat": 1.3,
+      "carbohydrates": 11,
+      "sugars": 9.8,
+      "fiber": 0.01555,
+      "proteins": 3.2,
+      "salt": 0.1,
+      "sodium": 0.04
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/507/0456/front_sv.9.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865070456/yoggi-original-vanilj-arla",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865070456",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101024268_ST",
+        "name": "Madagaskar Vanilj Yoghurt 2%",
+        "brand": "Yoggi",
+        "packageText": "YOGGI, 1kg",
+        "sourceUrl": "https://www.hemkop.se/search?q=yoghurt",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
   },
   {
-    "code": "6416453043800",
-    "name": "Halloweenkuulat",
-    "brands": "Fazer",
-    "quantity": "260 g",
+    "barcode": "7310865074522",
+    "name": "FÄRSK SVENSK LANTMJÖLK",
+    "brands": "Arla",
+    "quantity": "1 liter",
     "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:snacks",
-      "en:breakfasts",
-      "en:spreads",
-      "en:sweet-snacks",
-      "en:confectioneries",
-      "en:festive-foods",
-      "en:plant-based-spreads",
-      "en:sweet-spreads",
-      "en:fruit-and-vegetable-preserves",
-      "en:candies",
-      "en:fruit-jellies",
-      "en:halloween-foods-and-drinks"
+      "en:dairies",
+      "en:milks"
     ],
     "labels": [
-      "en:vegetarian",
-      "en:vegan",
-      "en:no-gelatin",
-      "xx:avainlippu"
-    ],
-    "nutriscoreGrade": "e",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/641/645/304/3800/front_fi.4.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/6416453043800/halloweenkuulat-fazer",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6416453043800",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "6431901820321",
-    "name": "Flatbröd",
-    "brands": "Moilas",
-    "quantity": "210 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:frozen-foods",
-      "en:specific-products",
-      "en:cereals-and-their-products",
-      "en:products-for-specific-diets",
-      "en:breads",
-      "en:products-without-gluten",
-      "en:flatbreads",
-      "en:frozen-breads",
-      "en:gluten-free-breads",
-      "en:frozen-flatbreads",
-      "en:gluten-free-flatbreads",
-      "en:frozen-gluten-free-flatbreads"
-    ],
-    "labels": [
-      "en:no-gluten",
-      "en:crossed-grain-trademark"
+      "en:organic",
+      "en:eu-organic",
+      "sv:krav"
     ],
     "nutriscoreGrade": "unknown",
-    "imageUrl": "",
-    "productUrl": "http://world-en.openfoodfacts.org/product/6431901820321/flatbrod-moilas",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6431901820321",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "nutritionPer100g": {
+      "energyKj": 291.4,
+      "energyKcal": 70,
+      "fat": 4.2,
+      "saturatedFat": 2.7,
+      "carbohydrates": 4.6,
+      "sugars": 4.6,
+      "fiber": null,
+      "proteins": 3.4,
+      "salt": null,
+      "sodium": null
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/507/4522/front_en.34.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865074522/farsk-svensk-lantmjolk-arla",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865074522",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "willys",
+        "productCode": "101180932_ST",
+        "name": "Lantmjölk Eko 3,8-4,5%",
+        "brand": "Arla Ko",
+        "packageText": "ARLA KO, 1l",
+        "sourceUrl": "https://www.willys.se/search?q=mjolk",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
   },
   {
-    "code": "6431901840770",
-    "name": "100% Havrebröd",
-    "brands": "Moilas",
-    "quantity": "340 g",
+    "barcode": "7310865088482",
+    "name": "Yoggi Original Vanilj Jordgubb",
+    "brands": "Arla, Arla Foods, Yoggi",
+    "quantity": "1 500 g",
     "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:frozen-foods",
-      "en:cereals-and-their-products",
-      "en:breads",
-      "en:frozen-breads",
-      "en:pre-baked-breads",
-      "en:frozen-pre-baked-breads"
+      "en:dairies",
+      "en:fermented-foods",
+      "en:fermented-milk-products",
+      "en:desserts",
+      "en:dairy-desserts",
+      "en:fermented-dairy-desserts",
+      "en:fermented-dairy-desserts-with-fruits",
+      "en:yogurts",
+      "en:fruit-yogurts",
+      "en:strawberry-yogurts"
     ],
     "labels": [
-      "en:vegetarian",
-      "en:no-gluten",
-      "en:crossed-grain-trademark",
-      "en:source-of-fibre",
-      "en:vegan",
-      "en:high-fibres",
-      "en:keyhole",
-      "en:no-lactose",
-      "sv:bakad-i-finland",
-      "sv:vetefri"
-    ],
-    "nutriscoreGrade": "a",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/643/190/184/0770/front_sv.3.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/6431901840770/100-havrebrod-moilas",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6431901840770",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "6431901840787",
-    "name": "Mörk rund",
-    "brands": "Moilas",
-    "quantity": "240 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:frozen-foods",
-      "en:cereals-and-their-products",
-      "en:breads",
-      "en:frozen-breads"
-    ],
-    "labels": [
-      "en:no-gluten",
-      "en:crossed-grain-trademark",
-      "en:keyhole"
-    ],
-    "nutriscoreGrade": "unknown",
-    "imageUrl": "",
-    "productUrl": "http://world-en.openfoodfacts.org/product/6431901840787/mork-rund-moilas",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6431901840787",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "6431903740627",
-    "name": "Stenugnsbakat Tunnbröd",
-    "brands": "Moilas",
-    "quantity": "210 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:frozen-foods",
-      "en:cereals-and-their-products",
-      "en:breads",
-      "en:frozen-breads"
-    ],
-    "labels": [
-      "en:vegetarian",
-      "en:no-gluten",
-      "en:crossed-grain-trademark",
-      "en:vegan"
+      "en:fsc",
+      "en:fsc-mix",
+      "sv:fsc-c014047",
+      "sv:svensk-mjölk"
     ],
     "nutriscoreGrade": "c",
-    "imageUrl": "",
-    "productUrl": "http://world-en.openfoodfacts.org/product/6431903740627/stenugnsbakat-tunnbrod-moilas",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6431903740627",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "nutritionPer100g": {
+      "energyKj": 340,
+      "energyKcal": 80,
+      "fat": 2,
+      "saturatedFat": 1.3,
+      "carbohydrates": 12,
+      "sugars": 11,
+      "fiber": null,
+      "proteins": 3.3,
+      "salt": 0.1,
+      "sodium": 0.04
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/508/8482/front_sv.4.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865088482/yoggi-original-vanilj-jordgubb-arla",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865088482",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "willys",
+        "productCode": "101210862_ST",
+        "name": "Jordgubb Vanilj Yoghurt 2%",
+        "brand": "Yoggi",
+        "packageText": "YOGGI, 1,5kg",
+        "sourceUrl": "https://www.willys.se/search?q=yoghurt",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
   },
   {
-    "code": "6438207000433",
-    "name": "Eleplant",
-    "brands": "Eleplant",
-    "quantity": "600",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:fats",
-      "en:spreads",
-      "en:plant-based-spreads",
-      "en:vegetable-fats",
-      "en:spreadable-fats",
-      "en:margarines",
-      "sv:bredd",
-      "sv:vegan"
-    ],
-    "labels": [
-      "en:vegetarian",
-      "en:no-gluten",
-      "en:vegan"
-    ],
-    "nutriscoreGrade": "e",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/643/820/700/0433/front_sv.15.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/6438207000433/eleplant",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6438207000433",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7290115203868",
-    "name": "Plant-based nuggets",
-    "brands": "Hälsans Kök,Nestlé",
-    "quantity": "",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:frozen-foods",
-      "en:vegan-products",
-      "en:frozen-plant-based-foods",
-      "en:meat-alternatives",
-      "en:breaded-products",
-      "en:meat-analogues",
-      "en:vegetarian-nuggets",
-      "en:frozen-vegetarian-nuggets",
-      "en:vegan-nuggets",
-      "en:frozen-vegan-nuggets"
-    ],
-    "labels": [
-      "en:made-with-plant-based-ingredients"
-    ],
-    "nutriscoreGrade": "unknown",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/729/011/520/3868/front_en.3.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7290115203868/plant-based-nuggets-halsans-kok",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7290115203868",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7310130007507",
-    "name": "Glutenfria Pannkakor",
-    "brands": "Kungsörnen",
+    "barcode": "7310865088499",
+    "name": "Yoggi Skogsbär",
+    "brands": "Arla",
     "quantity": "",
     "categories": [],
     "labels": [],
     "nutriscoreGrade": "unknown",
+    "nutritionPer100g": {
+      "energyKj": 318.8,
+      "energyKcal": 79,
+      "fat": 2,
+      "saturatedFat": 1.3,
+      "carbohydrates": 11,
+      "sugars": 11,
+      "fiber": null,
+      "proteins": 3.4,
+      "salt": 0.0775,
+      "sodium": 0.031
+    },
     "imageUrl": "",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7310130007507/glutenfria-pannkakor-kungsornen",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130007507",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865088499/yoggi-skogsbar-arla",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865088499",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "willys",
+        "productCode": "101210865_ST",
+        "name": "Skogsbär Original Yoghurt 2%",
+        "brand": "Yoggi",
+        "packageText": "YOGGI, 1,5kg",
+        "sourceUrl": "https://www.willys.se/search?q=yoghurt",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
   },
   {
-    "code": "7310130012044",
-    "name": "Start Granola Naturell",
-    "brands": "Lantmännen",
+    "barcode": "7310865088505",
+    "name": "Mild yoghurt naturell",
+    "brands": "Arla",
+    "quantity": "1500g",
+    "categories": [
+      "en:dairies",
+      "en:fermented-foods",
+      "en:fermented-milk-products",
+      "en:desserts",
+      "en:dairy-desserts",
+      "en:fermented-dairy-desserts",
+      "en:yogurts",
+      "en:plain-fermented-dairy-desserts",
+      "en:plain-yogurts"
+    ],
+    "labels": [],
+    "nutriscoreGrade": "b",
+    "nutritionPer100g": {
+      "energyKj": 233.4,
+      "energyKcal": 60,
+      "fat": 3,
+      "saturatedFat": 1.9,
+      "carbohydrates": 3.8,
+      "sugars": 3.8,
+      "fiber": null,
+      "proteins": 3.4,
+      "salt": 0.1,
+      "sodium": 0.04
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/508/8505/front_en.10.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865088505/mild-yoghurt-naturell-arla",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865088505",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101210850_ST",
+        "name": "Naturell Mild Yoghurt 3%",
+        "brand": "Arla Ko",
+        "packageText": "ARLA KO, 1,5kg",
+        "sourceUrl": "https://www.hemkop.se/search?q=yoghurt",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7310865093363",
+    "name": "Yoggi Mini - Blåbär",
+    "brands": "Arla",
+    "quantity": "1000 g",
+    "categories": [
+      "en:dairies",
+      "en:fermented-foods",
+      "en:fermented-milk-products",
+      "en:desserts",
+      "en:dairy-desserts",
+      "en:fermented-dairy-desserts",
+      "en:fermented-dairy-desserts-with-fruits",
+      "en:yogurts",
+      "en:fruit-yogurts",
+      "en:blueberry-yogurts"
+    ],
+    "labels": [
+      "en:contains-a-source-of-phenylalanine",
+      "en:fsc",
+      "en:fsc-mix",
+      "en:no-added-sugar",
+      "en:fsc-c014047"
+    ],
+    "nutriscoreGrade": "a",
+    "nutritionPer100g": {
+      "energyKj": 139.7,
+      "energyKcal": 36,
+      "fat": 0.1,
+      "saturatedFat": 0.1,
+      "carbohydrates": 4.5,
+      "sugars": 3.9,
+      "fiber": null,
+      "proteins": 3.5,
+      "salt": 0.1,
+      "sodium": 0.04
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/509/3363/front_sv.24.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865093363/yoggi-mini-blabar-arla",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865093363",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "willys",
+        "productCode": "101231441_ST",
+        "name": "Mini Blåbär Yoghurt 0,1%",
+        "brand": "Yoggi",
+        "packageText": "YOGGI, 1kg",
+        "sourceUrl": "https://www.willys.se/search?q=yoghurt",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7310865866424",
+    "name": "Mild Yoghurt Naturell",
+    "brands": "Arla",
     "quantity": "",
     "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:breakfasts",
-      "en:cereals-and-potatoes",
-      "en:cereals-and-their-products",
-      "en:breakfast-cereals",
-      "en:mueslis"
-    ],
-    "labels": [],
-    "nutriscoreGrade": "c",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/013/001/2044/front_en.3.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7310130012044/start-granola-naturell-lantmannen",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310130012044",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7310240072327",
-    "name": "Vegomexicana",
-    "brands": "anamma",
-    "quantity": "211cl",
-    "categories": [
-      "en:meals",
-      "en:pizzas-pies-and-quiches",
-      "en:pizzas"
-    ],
-    "labels": [],
-    "nutriscoreGrade": "c",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/007/2327/front_en.7.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7310240072327/vegomexicana-anamma",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240072327",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7310240073812",
-    "name": "Pommes Chateau",
-    "brands": "Felix",
-    "quantity": "800 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:frozen-foods",
-      "en:chips-and-fries",
-      "en:potatoes-and-their-products",
-      "en:frozen-fried-potatoes",
-      "en:potato-preparations",
-      "xx:pommes-noisettes",
-      "en:frozen-pommes-noisettes"
+      "en:dairies",
+      "en:fermented-foods",
+      "en:fermented-milk-products",
+      "en:desserts",
+      "en:dairy-desserts",
+      "en:fermented-dairy-desserts",
+      "en:yogurts"
     ],
     "labels": [
-      "xx:fran-sverige"
+      "en:fsc"
     ],
     "nutriscoreGrade": "b",
-    "imageUrl": "",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7310240073812/pommes-chateau-felix",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240073812",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "nutritionPer100g": {
+      "energyKj": 233.4,
+      "energyKcal": 58,
+      "fat": 3,
+      "saturatedFat": 1.9,
+      "carbohydrates": 3.7,
+      "sugars": 3.7,
+      "fiber": null,
+      "proteins": 3.5,
+      "salt": 0.0875,
+      "sodium": 0.035
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/586/6424/front_en.3.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865866424/mild-yoghurt-naturell-arla",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865866424",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101288872_ST",
+        "name": "Naturell Mild Yoghurt 3%",
+        "brand": "Arla Ko",
+        "packageText": "ARLA KO, 1kg",
+        "sourceUrl": "https://www.hemkop.se/search?q=yoghurt",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
   },
   {
-    "code": "7310240073843",
-    "name": "Klassiska rösti",
-    "brands": "Felix",
-    "quantity": "750 g",
+    "barcode": "7310865866585",
+    "name": "Mindre Socker Mild Yoghurt Vanilj 1.5% fett",
+    "brands": "Arla",
+    "quantity": "1000 g",
     "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:frozen-foods",
-      "en:potatoes-and-their-products",
-      "en:potato-preparations",
-      "en:rostis",
-      "en:frozen-potato-rostis"
+      "en:dairies",
+      "en:fermented-foods",
+      "en:fermented-milk-products",
+      "en:desserts",
+      "en:dairy-desserts",
+      "en:fermented-dairy-desserts",
+      "en:yogurts",
+      "en:vanilla-yogurt"
     ],
     "labels": [
-      "en:carbon-footprint",
-      "en:low-climate-footprint",
-      "en:made-in-sweden",
-      "en:swedish-potatoes",
-      "xx:fran-sverige"
+      "en:fsc",
+      "en:fsc-mix",
+      "en:fsc-c014047"
     ],
-    "nutriscoreGrade": "c",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/024/007/3843/front_sv.21.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7310240073843/klassiska-rosti-felix",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310240073843",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "nutriscoreGrade": "unknown",
+    "nutritionPer100g": {
+      "energyKj": 230.6,
+      "energyKcal": 57,
+      "fat": 1.5,
+      "saturatedFat": 1,
+      "carbohydrates": 6.2,
+      "sugars": 6.2,
+      "fiber": 0,
+      "proteins": 4.1,
+      "salt": 0.100635,
+      "sodium": 0.03952425
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/586/6585/front_sv.18.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865866585/mindre-socker-mild-yoghurt-vanilj-1-5-fett-arla",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865866585",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101288822_ST",
+        "name": "Vanilj Mild Yoghurt Mindre Socker 1,5%",
+        "brand": "Arla Ko",
+        "packageText": "ARLA KO, 1kg",
+        "sourceUrl": "https://www.hemkop.se/search?q=yoghurt",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
   },
   {
-    "code": "7311041003398",
-    "name": "Vita bönor i tomatsås",
-    "brands": "Eldorado",
-    "quantity": "420 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:legumes-and-their-products",
-      "en:canned-foods",
-      "en:legumes",
-      "en:seeds",
-      "en:canned-plant-based-foods",
-      "en:legume-seeds",
-      "en:pulses",
-      "en:common-beans",
-      "en:prepared-vegetables",
-      "en:canned-legumes",
-      "en:cooked-vegetables",
-      "en:white-beans",
-      "en:canned-common-beans",
-      "en:canned-white-common-beans",
-      "en:cooked-white-beans-in-tomato-sauce"
-    ],
-    "labels": [],
-    "nutriscoreGrade": "b",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/100/3398/front_sv.39.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311041003398/vita-bonor-i-tomatsas-eldorado",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041003398",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311041052327",
-    "name": "Eldorado Sommargrönsaker",
-    "brands": "Axfood, Eldorado",
-    "quantity": "1 kg",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:fruits-and-vegetables-based-foods",
-      "en:vegetables-based-foods",
-      "en:frozen-foods",
-      "en:vegetables",
-      "en:frozen-plant-based-foods",
-      "en:frozen-vegetables",
-      "en:frozen-plant-based-foods-mixes",
-      "en:mixed-vegetables",
-      "en:frozen-mixed-vegetables"
-    ],
-    "labels": [
-      "en:keyhole"
-    ],
-    "nutriscoreGrade": "a",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/105/2327/front_sv.18.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311041052327/eldorado-sommargronsaker-axfood",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041052327",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311041052624",
-    "name": "Urkärnade svarta oliver",
-    "brands": "Eldorado",
-    "quantity": "910 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:pickles",
-      "en:olive-tree-products",
-      "en:plant-based-pickles",
-      "en:olives",
-      "en:black-olives",
-      "en:pitted-olives",
-      "en:black-pitted-olives"
-    ],
-    "labels": [],
-    "nutriscoreGrade": "c",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/105/2624/front_en.4.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311041052624/urkarnade-svarta-oliver-eldorado",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041052624",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311041053508",
-    "name": "Wokmix",
-    "brands": "Eldorado",
-    "quantity": "1 kg",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:fruits-and-vegetables-based-foods",
-      "en:vegetables-based-foods",
-      "en:frozen-foods",
-      "en:vegetables",
-      "en:frozen-plant-based-foods",
-      "en:frozen-vegetables",
-      "en:frozen-plant-based-foods-mixes",
-      "en:mixed-vegetables",
-      "en:frozen-mixed-vegetables",
-      "en:frozen-mixed-vegetables-for-wok"
-    ],
-    "labels": [
-      "en:keyhole"
-    ],
-    "nutriscoreGrade": "a",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/105/3508/front_sv.18.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311041053508/wokmix-eldorado",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041053508",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311041058572",
-    "name": "Klyftpotatis",
-    "brands": "Eldorado",
-    "quantity": "750g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:frozen-foods",
-      "en:chips-and-fries",
-      "en:potatoes-and-their-products",
-      "en:frozen-plant-based-foods",
-      "en:potato-preparations",
-      "en:potatoes",
-      "en:frozen-potatoes",
-      "en:potato-wedges",
-      "en:frozen-potato-wedges"
-    ],
-    "labels": [],
-    "nutriscoreGrade": "b",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/105/8572/front_sv.20.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311041058572/klyftpotatis-eldorado",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041058572",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311041059159",
-    "name": "Garant Pommes strips",
-    "brands": "Garant",
-    "quantity": "1 kg",
-    "categories": [
-      "en:chips-and-fries",
-      "en:frozen-foods",
-      "en:frozen-fried-potatoes",
-      "en:fries",
-      "en:frozen-fries"
-    ],
-    "labels": [],
-    "nutriscoreGrade": "b",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/105/9159/front_sv.19.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311041059159/garant-pommes-strips",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041059159",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311041062654",
-    "name": "Pesto Alla Genovese",
-    "brands": "Garant",
+    "barcode": "7310865877475",
+    "name": "Mini Jordgubb",
+    "brands": "Yoggi",
     "quantity": "",
     "categories": [],
     "labels": [],
     "nutriscoreGrade": "unknown",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/106/2654/front_en.4.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311041062654/pesto-alla-genovese-garant",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041062654",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "nutritionPer100g": {
+      "energyKj": 139.7,
+      "energyKcal": 36,
+      "fat": 0.1,
+      "saturatedFat": 0.1,
+      "carbohydrates": 4.5,
+      "sugars": 3.6,
+      "fiber": null,
+      "proteins": 3.5,
+      "salt": 0.1,
+      "sodium": 0.04
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/086/587/7475/front_en.4.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7310865877475/mini-jordgubb-yoggi",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7310865877475",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "willys",
+        "productCode": "101297879_ST",
+        "name": "Mini Jordgubb Yoghurt 0,1%",
+        "brand": "Yoggi",
+        "packageText": "YOGGI, 1kg",
+        "sourceUrl": "https://www.willys.se/search?q=yoghurt",
+        "retrievedAt": "2026-05-20T23:54:12.788Z"
+      }
+    ]
   },
   {
-    "code": "7311041062661",
-    "name": "Pesto rosso",
+    "barcode": "7311041062692",
+    "name": "Grovt Bröd Lingon",
     "brands": "Garant",
-    "quantity": "",
-    "categories": [],
+    "quantity": "500 g",
+    "categories": [
+      "en:plant-based-foods-and-beverages",
+      "en:plant-based-foods",
+      "en:cereals-and-potatoes",
+      "en:breads"
+    ],
     "labels": [],
-    "nutriscoreGrade": "unknown",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/106/2661/front_en.4.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311041062661/pesto-rosso-garant",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041062661",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "nutriscoreGrade": "c",
+    "nutritionPer100g": {
+      "energyKj": 1051,
+      "energyKcal": 251,
+      "fat": 3.1,
+      "saturatedFat": 0.3,
+      "carbohydrates": 44,
+      "sugars": 9.4,
+      "fiber": 4.8,
+      "proteins": 9.1,
+      "salt": 0.93,
+      "sodium": 0.372
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/106/2692/front_sv.3.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7311041062692/grovt-brod-lingon-garant",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041062692",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101134176_ST",
+        "name": "Lingon Grovt Bröd",
+        "brand": "Garant",
+        "packageText": "GARANT, 500g",
+        "sourceUrl": "https://www.hemkop.se/search?q=brod",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
   },
   {
-    "code": "7311041062746",
+    "barcode": "7311041062746",
     "name": "Fullkornsgott",
     "brands": "Garant",
     "quantity": "700 g",
@@ -822,475 +1705,228 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
     ],
     "labels": [],
     "nutriscoreGrade": "a",
+    "nutritionPer100g": {
+      "energyKj": 1079.6,
+      "energyKcal": 257,
+      "fat": 4.6,
+      "saturatedFat": 0.6,
+      "carbohydrates": 40,
+      "sugars": 3.2,
+      "fiber": 5.3,
+      "proteins": 11,
+      "salt": 0.885,
+      "sodium": 0.354
+    },
     "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/106/2746/front_sv.4.400.jpg",
     "productUrl": "http://world-en.openfoodfacts.org/product/7311041062746/fullkornsgott-garant",
     "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041062746",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101134149_ST",
+        "name": "Fullkornsgott Osötat Bröd Surdeg Lin Och Solrosfrö",
+        "brand": "Garant",
+        "packageText": "GARANT, 700g",
+        "sourceUrl": "https://www.hemkop.se/search?q=brod",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
   },
   {
-    "code": "7311043004256",
-    "name": "Kokosboll",
-    "brands": "Eldorado",
-    "quantity": "240 g",
+    "barcode": "7311041070390",
+    "name": "Mellan Mjölk",
+    "brands": "Axfood, Garant",
+    "quantity": "1L",
     "categories": [
-      "en:snacks",
-      "en:sweet-snacks",
-      "en:biscuits-and-cakes",
-      "en:pastries",
-      "sv:kokosbollar"
+      "en:dairies",
+      "en:milks",
+      "en:semi-skimmed-milks"
     ],
     "labels": [
-      "en:rainforest-alliance",
-      "en:rainforest-alliance-cocoa"
-    ],
-    "nutriscoreGrade": "e",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/4256/front_sv.5.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311043004256/kokosboll-eldorado",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043004256",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311043007677",
-    "name": "Vegansk chokladglass",
-    "brands": "Garant",
-    "quantity": "480 ml / 300 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:dairy-substitutes",
-      "en:desserts",
-      "en:frozen-foods",
-      "en:vegan-products",
-      "en:frozen-desserts",
-      "en:non-dairy-desserts",
-      "en:ice-creams-and-sorbets",
-      "en:plant-based-ice-creams",
-      "en:plant-based-ice-cream-tubs",
-      "en:chocolate-oat-ice-creams",
-      "en:oat-based-ice-creams"
-    ],
-    "labels": [
-      "en:vegetarian",
-      "en:vegan",
-      "en:rainforest-alliance",
-      "en:rainforest-alliance-cocoa",
-      "xx:fran-sverige"
-    ],
-    "nutriscoreGrade": "d",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/7677/front_sv.8.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311043007677/vegansk-chokladglass-garant",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043007677",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311043007837",
-    "name": "pesto rosso con tofu",
-    "brands": "Garant",
-    "quantity": "200 g",
-    "categories": [
-      "en:condiments",
-      "en:sauces",
-      "en:pestos",
-      "en:red-pestos"
-    ],
-    "labels": [
-      "en:vegetarian",
-      "en:vegan"
-    ],
-    "nutriscoreGrade": "d",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/7837/front_sv.8.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311043007837/pesto-rosso-con-tofu-garant",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043007837",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311043008445",
-    "name": "Potatisklyftor",
-    "brands": "Garant",
-    "quantity": "750 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:frozen-foods",
-      "en:chips-and-fries",
-      "en:potatoes-and-their-products",
-      "en:frozen-plant-based-foods",
-      "en:potato-preparations",
-      "en:potatoes",
-      "en:frozen-potatoes",
-      "en:potato-wedges",
-      "en:frozen-potato-wedges"
-    ],
-    "labels": [],
-    "nutriscoreGrade": "b",
-    "imageUrl": "",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311043008445/potatisklyftor-garant",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008445",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311043008841",
-    "name": "Drottningsylt",
-    "brands": "Garant",
-    "quantity": "400 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:breakfasts",
-      "en:spreads",
-      "en:plant-based-spreads",
-      "en:sweet-spreads",
-      "en:fruit-and-vegetable-preserves",
-      "en:jams",
-      "en:berry-jams",
-      "en:mixed-fruit-jams",
-      "en:mixed-berry-jams",
-      "en:queen-s-jam"
-    ],
-    "labels": [
-      "sv:45-bär"
-    ],
-    "nutriscoreGrade": "d",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/8841/front_sv.24.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311043008841/drottningsylt-garant",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008841",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311043011629",
-    "name": "pomodori secchi a cubetti",
-    "brands": "Garant",
-    "quantity": "290 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:fruits-and-vegetables-based-foods",
-      "en:vegetables-based-foods",
-      "en:dried-products",
-      "en:dried-plant-based-foods",
-      "en:tomatoes-and-their-products",
-      "en:dried-vegetables",
-      "en:dried-tomatoes",
-      "en:dried-tomato-in-oil"
-    ],
-    "labels": [],
-    "nutriscoreGrade": "a",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/1629/front_sv.8.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311043011629/pomodori-secchi-a-cubetti-garant",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043011629",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311043012268",
-    "name": "Stark Kebabfeferoni",
-    "brands": "Eldorado",
-    "quantity": "610 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:fruits-and-vegetables-based-foods",
-      "en:vegetable-based-foods-and-beverages",
-      "en:canned-foods",
-      "en:condiments",
-      "en:vegetables-based-foods",
-      "en:canned-plant-based-foods",
-      "en:herbs-and-spices",
-      "en:pickles",
-      "en:canned-vegetables",
-      "en:plant-based-pickles",
-      "en:spices",
-      "en:peppers",
-      "en:pickled-vegetables",
-      "en:pickled-peppers",
-      "en:friggitelli",
-      "en:pickled-friggitelli"
-    ],
-    "labels": [],
-    "nutriscoreGrade": "not-applicable",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/2268/front_sv.6.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311043012268/stark-kebabfeferoni-eldorado",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043012268",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311043014033",
-    "name": "Vegansk Pepparsalami",
-    "brands": "Eldorado",
-    "quantity": "80 g",
-    "categories": [
-      "en:meat-alternatives",
-      "en:meat-analogues",
-      "en:prepared-meat-cuts-substitutes",
-      "sv:vegansk-salami"
-    ],
-    "labels": [
-      "en:vegetarian",
-      "en:vegan"
-    ],
-    "nutriscoreGrade": "d",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/4033/front_sv.5.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311043014033/vegansk-pepparsalami-eldorado",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043014033",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311043014125",
-    "name": "Pommes strips",
-    "brands": "Eldorado",
-    "quantity": "2 kg",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:frozen-foods",
-      "en:chips-and-fries",
-      "en:potatoes-and-their-products",
-      "en:fries",
-      "en:frozen-fried-potatoes",
-      "en:frozen-fries"
-    ],
-    "labels": [],
-    "nutriscoreGrade": "b",
-    "imageUrl": "",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311043014125/pommes-strips-eldorado",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043014125",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311043014132",
-    "name": "Pommes frites",
-    "brands": "Eldorado",
-    "quantity": "2 kg",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:frozen-foods",
-      "en:chips-and-fries",
-      "en:potatoes-and-their-products",
-      "en:fries",
-      "en:frozen-fried-potatoes",
-      "en:frozen-fries"
-    ],
-    "labels": [],
-    "nutriscoreGrade": "unknown",
-    "imageUrl": "",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311043014132/pommes-frites-eldorado",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043014132",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311043018666",
-    "name": "Potatismjöl",
-    "brands": "Garant",
-    "quantity": "500 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:flours",
-      "en:potatoes-and-their-products",
-      "en:potato-flours"
-    ],
-    "labels": [
-      "xx:fran-sverige"
-    ],
-    "nutriscoreGrade": "unknown",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/8666/front_sv.4.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311043018666/potatismjol-garant",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043018666",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311043018734",
-    "name": "Sesamolja",
-    "brands": "Garant",
-    "quantity": "150 ml",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:fats",
-      "en:cereals-and-their-products",
-      "en:vegetable-fats",
-      "en:vegetable-oils",
-      "en:cereal-oils",
-      "en:sesame-oils"
-    ],
-    "labels": [
-      "en:keyhole"
-    ],
-    "nutriscoreGrade": "unknown",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/301/8734/front_sv.7.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311043018734/sesamolja-garant",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043018734",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311043023837",
-    "name": "Klyftpotatis",
-    "brands": "Eldorado",
-    "quantity": "750 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:frozen-foods",
-      "en:chips-and-fries",
-      "en:potatoes-and-their-products",
-      "en:frozen-plant-based-foods",
-      "en:potato-preparations",
-      "en:potatoes",
-      "en:frozen-potatoes",
-      "en:potato-wedges",
-      "en:frozen-potato-wedges"
-    ],
-    "labels": [],
-    "nutriscoreGrade": "b",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/302/3837/front_sv.7.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311043023837/klyftpotatis-eldorado",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043023837",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311070001952",
-    "name": "Rasker Fullkorn",
-    "brands": "Pågen",
-    "quantity": "1100 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:cereals-and-their-products",
-      "en:breads",
-      "en:sliced-breads",
-      "en:wholemeal-breads",
-      "en:wholemeal-sliced-breads"
-    ],
-    "labels": [
-      "en:no-preservatives",
-      "en:keyhole",
-      "xx:svenskt-mjol-fran-egen-kvarn"
-    ],
-    "nutriscoreGrade": "c",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/000/1952/front_sv.34.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311070001952/rasker-fullkorn-pagen",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070001952",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311070008159",
-    "name": "Levain rustikt surdegsbröd",
-    "brands": "Pågen",
-    "quantity": "650 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:breads",
-      "en:sliced-breads"
-    ],
-    "labels": [
-      "xx:svenskt-mjol-fran-egen-kvarn",
-      "sv:osötat"
-    ],
-    "nutriscoreGrade": "e",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/000/8159/front_sv.40.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311070008159/levain-rustikt-surdegsbrod-pagen",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070008159",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
-  },
-  {
-    "code": "7311070008494",
-    "name": "Lantgoda Surdegsbröd",
-    "brands": "Pågen",
-    "quantity": "650 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:breads",
-      "en:sliced-breads",
-      "en:sourdough-breads",
-      "en:sourdough-sliced-breads"
-    ],
-    "labels": [
-      "en:keyhole",
-      "en:no-sweeteners-added",
-      "xx:svenskt-mjol-fran-egen-kvarn",
-      "sv:fullkornsrik",
-      "sv:innehåller-inga-konserveringsmedel"
+      "en:organic",
+      "en:eu-organic",
+      "en:se-eko-01",
+      "sv:krav"
     ],
     "nutriscoreGrade": "b",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/000/8494/front_sv.16.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311070008494/lantgoda-surdegsbrod-pagen",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070008494",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "nutritionPer100g": {
+      "energyKj": 194.9,
+      "energyKcal": 47,
+      "fat": 1.5,
+      "saturatedFat": 1,
+      "carbohydrates": 4.7,
+      "sugars": 4.7,
+      "fiber": null,
+      "proteins": 3.5,
+      "salt": 0.0875,
+      "sodium": 0.035
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/107/0390/front_sv.20.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7311041070390/mellan-mjolk-axfood",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311041070390",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101187327_ST",
+        "name": "Mellanmjölk Ekologisk 1,5%",
+        "brand": "Garant Eko",
+        "packageText": "GARANT EKO, 1l",
+        "sourceUrl": "https://www.hemkop.se/search?q=mjolk",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
   },
   {
-    "code": "7311070008708",
-    "name": "Grötbröd",
-    "brands": "Pågen",
+    "barcode": "7311043002498",
+    "name": "Jasminris, Långkornigt & Aromatiskt, Okokt",
+    "brands": "Garant",
     "quantity": "",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:cereals-and-their-products",
-      "en:breads",
-      "en:sliced-breads",
-      "en:wholemeal-breads",
-      "en:wholemeal-sliced-breads"
-    ],
-    "labels": [
-      "en:no-preservatives",
-      "en:keyhole"
-    ],
-    "nutriscoreGrade": "b",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/000/8708/front_sv.23.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311070008708/grotbrod-pagen",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070008708",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "categories": [],
+    "labels": [],
+    "nutriscoreGrade": "unknown",
+    "nutritionPer100g": {
+      "energyKj": 1464,
+      "energyKcal": 350,
+      "fat": 0.7,
+      "saturatedFat": 0.3,
+      "carbohydrates": 79,
+      "sugars": 0.2,
+      "fiber": 0.5,
+      "proteins": 7.1,
+      "salt": 0,
+      "sodium": 0
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2498/front_sv.6.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7311043002498/jasminris-langkornigt-aromatiskt-okokt-garant",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002498",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101488555_ST",
+        "name": "Jasminris",
+        "brand": "Garant",
+        "packageText": "GARANT, 1kg",
+        "sourceUrl": "https://www.hemkop.se/search?q=ris",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
   },
   {
-    "code": "7311070330090",
-    "name": "Energi Proteinbröd",
-    "brands": "Pågen",
-    "quantity": "700 g",
-    "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:breads",
-      "en:wholemeal-breads"
-    ],
+    "barcode": "7311043002504",
+    "name": "Jasminris",
+    "brands": "GARANT",
+    "quantity": "2 kg",
+    "categories": [],
     "labels": [],
-    "nutriscoreGrade": "a",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/107/033/0090/front_sv.15.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311070330090/energi-proteinbrod-pagen",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311070330090",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "nutriscoreGrade": "unknown",
+    "nutritionPer100g": {
+      "energyKj": 1465,
+      "energyKcal": 350,
+      "fat": 0.7,
+      "saturatedFat": 0.3,
+      "carbohydrates": 79,
+      "sugars": 0.2,
+      "fiber": 0.5,
+      "proteins": 7.1,
+      "salt": 0,
+      "sodium": 0
+    },
+    "imageUrl": "https://images.openfoodfacts.org/images/products/731/104/300/2504/front_sv.4.400.jpg",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7311043002504/jasminris-garant",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043002504",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101488556_ST",
+        "name": "Jasminris",
+        "brand": "Garant",
+        "packageText": "GARANT, 2kg",
+        "sourceUrl": "https://www.hemkop.se/search?q=ris",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
   },
   {
-    "code": "7311311020599",
-    "name": "TORTILLA ORIGINAL",
-    "brands": "Santa Maria",
-    "quantity": "320 g",
+    "barcode": "7311043005727",
+    "name": "feta",
+    "brands": "garant",
+    "quantity": "150g",
     "categories": [
-      "en:plant-based-foods-and-beverages",
-      "en:plant-based-foods",
-      "en:cereals-and-potatoes",
-      "en:breads",
-      "en:flatbreads",
-      "en:white-breads",
-      "en:wheat-breads",
-      "en:wheat-flatbreads"
+      "en:dairies",
+      "en:fermented-foods",
+      "en:fermented-milk-products",
+      "en:cheeses",
+      "en:greek-cheeses",
+      "en:feta"
     ],
     "labels": [],
-    "nutriscoreGrade": "c",
-    "imageUrl": "https://images.openfoodfacts.org/images/products/731/131/102/0599/front_en.65.400.jpg",
-    "productUrl": "http://world-en.openfoodfacts.org/product/7311311020599/tortilla-original-santa-maria",
-    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311311020599",
-    "retrievedAt": "2026-05-20T23:35:02.245Z"
+    "nutriscoreGrade": "d",
+    "nutritionPer100g": {
+      "energyKj": 1143,
+      "energyKcal": 276,
+      "fat": 23,
+      "saturatedFat": 17,
+      "carbohydrates": 0.7,
+      "sugars": 0.7,
+      "fiber": null,
+      "proteins": 17,
+      "salt": 2.3,
+      "sodium": 0.92
+    },
+    "imageUrl": "",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7311043005727/feta-garant",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043005727",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101533198_ST",
+        "name": "Fetaost Block 23%",
+        "brand": "Garant",
+        "packageText": "GARANT, 150g",
+        "sourceUrl": "https://www.hemkop.se/search?q=ost",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7311043008360",
+    "name": "Penne Rigate",
+    "brands": "Garant",
+    "quantity": "",
+    "categories": [],
+    "labels": [],
+    "nutriscoreGrade": "unknown",
+    "nutritionPer100g": {
+      "energyKj": 1487.6,
+      "energyKcal": 351,
+      "fat": 1.4,
+      "saturatedFat": 0.3,
+      "carbohydrates": 71,
+      "sugars": 2.9,
+      "fiber": 3.1,
+      "proteins": 12,
+      "salt": 0.01,
+      "sodium": 0.004
+    },
+    "imageUrl": "",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7311043008360/penne-rigate-garant",
+    "sourceUrl": "https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7311043008360",
+    "retrievedAt": "2026-05-22T08:25:07.875Z",
+    "retailerMatches": [
+      {
+        "chain": "hemkop",
+        "productCode": "101548709_ST",
+        "name": "Penne Rigate",
+        "brand": "Garant",
+        "packageText": "GARANT, 500g",
+        "sourceUrl": "https://www.hemkop.se/search?q=pasta",
+        "retrievedAt": "2026-05-21T00:41:39.516Z"
+      }
+    ]
   }
 ];

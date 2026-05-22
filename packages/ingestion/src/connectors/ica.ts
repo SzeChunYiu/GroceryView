@@ -1,67 +1,162 @@
 export type IcaProduct = {
   code: string;
+  productId: string;
+  retailerProductId: string;
   name: string;
   brand: string;
   categories: string[];
   imageUrl: string;
   productUrl: string;
-  dataPrice: string;
+  packageSize: string;
+  countryOfOrigin: string;
+  price: number | null;
+  priceCurrency: string;
+  unitPrice: number | null;
+  unitPriceCurrency: string;
+  unitPriceUnit: string;
+  promoPrice: number | null;
+  promoPriceCurrency: string;
+  promoUnitPrice: number | null;
+  promoUnitPriceCurrency: string;
+  promoUnitPriceUnit: string;
+  promotionDescription: string;
+  storeAccountId: string;
+  storeName: string;
+  regionId: string;
   sourceUrl: string;
   retrievedAt: string;
 };
 
-export const ICA_HANDLA_BASE_URL = 'https://handla.ica.se';
-
-export const DEFAULT_ICA_HANDLA_PATHS = [
-  '/',
-  '/kategori/1',
-  '/kategori/208',
-  '/kategori/306',
-  '/kategori/557',
-  '/kategori/627',
-  '/kategori/939',
-  '/kategori/1627'
-] as const;
+export const ICA_STORE_BASE_URL = 'https://handlaprivatkund.ica.se';
+export const DEFAULT_ICA_STORE_ACCOUNT_ID = '1004599';
+export const DEFAULT_ICA_STORE_NAME = 'ICA Kvantum Kungsholmen';
+export const DEFAULT_ICA_REGION_ID = '6ae1c52a-99a8-4b19-9464-dd01274df39d';
 
 export type FetchIcaProductsOptions = {
   fetchImpl?: typeof fetch;
-  paths?: readonly string[];
+  storeAccountId?: string;
+  storeName?: string;
+  regionId?: string;
   maxRows?: number;
+  maxPageSize?: number;
   retrievedAt?: string;
 };
 
-export function buildIcaHandlaUrl(path: string): string {
-  return new URL(path, ICA_HANDLA_BASE_URL).toString();
+export function buildIcaStorePromotionsUrl(
+  storeAccountId = DEFAULT_ICA_STORE_ACCOUNT_ID,
+  regionId = DEFAULT_ICA_REGION_ID,
+  maxPageSize = 100
+): string {
+  const url = new URL(`/stores/${storeAccountId}/api/product-listing-pages/v1/pages/promotions`, ICA_STORE_BASE_URL);
+  url.searchParams.set('regionId', regionId);
+  url.searchParams.set('includeAdditionalPageInfo', 'true');
+  url.searchParams.set('maxProductsToDecorate', String(maxPageSize));
+  url.searchParams.set('maxPageSize', String(maxPageSize));
+  return url.toString();
+}
+
+export function buildIcaStoreProductUrl(storeAccountId: string, retailerProductId: string): string {
+  return new URL(`/stores/${storeAccountId}/products/${retailerProductId}/details`, ICA_STORE_BASE_URL).toString();
 }
 
 export async function fetchIcaProducts(options: FetchIcaProductsOptions = {}): Promise<IcaProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
-  const paths = options.paths ?? DEFAULT_ICA_HANDLA_PATHS;
-  const maxRows = options.maxRows ?? 75;
+  const storeAccountId = options.storeAccountId ?? DEFAULT_ICA_STORE_ACCOUNT_ID;
+  const storeName = options.storeName ?? DEFAULT_ICA_STORE_NAME;
+  const regionId = options.regionId ?? DEFAULT_ICA_REGION_ID;
+  const maxRows = options.maxRows ?? 100;
+  const maxPageSize = options.maxPageSize ?? maxRows;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
-  const rows: IcaProduct[] = [];
-  const seenCodes = new Set<string>();
+  const sourceUrl = buildIcaStorePromotionsUrl(storeAccountId, regionId, maxPageSize);
 
-  for (const path of paths) {
-    const sourceUrl = buildIcaHandlaUrl(path);
-    const response = await fetchImpl(sourceUrl, {
-      headers: {
-        accept: 'text/html,application/xhtml+xml',
-        'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
-      }
-    });
-
-    if (!response.ok) {
-      throw new Error(`ICA handla request failed for ${path}: ${response.status}`);
+  const response = await fetchImpl(sourceUrl, {
+    headers: {
+      accept: 'application/json, text/plain, */*',
+      referer: new URL(`/stores/${storeAccountId}`, ICA_STORE_BASE_URL).toString(),
+      'client-route-id': 'PROMOTIONS',
+      'ecom-request-source': 'web',
+      'user-agent': 'GroceryView/0.1'
     }
+  });
 
-    for (const product of parseIcaProductCards(await response.text(), sourceUrl, retrievedAt)) {
-      if (seenCodes.has(product.code)) {
+  if (!response.ok) {
+    throw new Error(`ICA store promotions request failed for ${storeAccountId}: ${response.status}`);
+  }
+
+  return parseIcaStorePromotions(await response.json(), {
+    sourceUrl,
+    retrievedAt,
+    storeAccountId,
+    storeName,
+    regionId,
+    maxRows
+  });
+}
+
+export type ParseIcaStorePromotionsOptions = {
+  sourceUrl: string;
+  retrievedAt: string;
+  storeAccountId: string;
+  storeName: string;
+  regionId: string;
+  maxRows?: number;
+};
+
+export function parseIcaStorePromotions(payload: unknown, options: ParseIcaStorePromotionsOptions): IcaProduct[] {
+  if (!isRecord(payload)) {
+    return [];
+  }
+  const rows: IcaProduct[] = [];
+  const seen = new Set<string>();
+  const productGroups = arrayOfRecords(payload.productGroups);
+
+  for (const group of productGroups) {
+    const groupType = text(group.type);
+    const category = groupType || text(group.name) || 'store_promotions';
+    for (const product of arrayOfRecords(group.decoratedProducts)) {
+      const productId = text(product.productId);
+      const retailerProductId = text(product.retailerProductId);
+      const name = text(product.name);
+      if (!productId || !retailerProductId || !name || seen.has(retailerProductId)) {
         continue;
       }
-      seenCodes.add(product.code);
-      rows.push(product);
-      if (rows.length >= maxRows) {
+      seen.add(retailerProductId);
+      const price = money(product.price);
+      const unitPrice = nestedMoney(product.unitPrice);
+      const promoPrice = money(product.promoPrice);
+      const promoUnitPrice = nestedMoney(product.promoUnitPrice);
+      const promotion = arrayOfRecords(product.promotions)[0];
+
+      rows.push({
+        code: retailerProductId,
+        productId,
+        retailerProductId,
+        name,
+        brand: text(product.brand),
+        categories: [category],
+        imageUrl: imageUrl(product.image),
+        productUrl: buildIcaStoreProductUrl(options.storeAccountId, retailerProductId),
+        packageSize: text(product.packSizeDescription),
+        countryOfOrigin: text(product.countryOfOrigin),
+        price: price.amount,
+        priceCurrency: price.currency,
+        unitPrice: unitPrice.amount,
+        unitPriceCurrency: unitPrice.currency,
+        unitPriceUnit: unitPrice.unit,
+        promoPrice: promoPrice.amount,
+        promoPriceCurrency: promoPrice.currency,
+        promoUnitPrice: promoUnitPrice.amount,
+        promoUnitPriceCurrency: promoUnitPrice.currency,
+        promoUnitPriceUnit: promoUnitPrice.unit,
+        promotionDescription: text(promotion?.description),
+        storeAccountId: options.storeAccountId,
+        storeName: options.storeName,
+        regionId: options.regionId,
+        sourceUrl: options.sourceUrl,
+        retrievedAt: options.retrievedAt
+      });
+
+      if (options.maxRows && rows.length >= options.maxRows) {
         return rows;
       }
     }
@@ -70,62 +165,43 @@ export async function fetchIcaProducts(options: FetchIcaProductsOptions = {}): P
   return rows;
 }
 
-export function parseIcaProductCards(html: string, sourceUrl: string, retrievedAt: string): IcaProduct[] {
-  const rows: IcaProduct[] = [];
-  const cardPattern = /<a([^>]*href="\/produkt\/\d+"[^>]*product-link[^>]*)>([\s\S]*?)<\/a>/g;
-  for (const match of html.matchAll(cardPattern)) {
-    const attributes = match[1];
-    const code = attribute(attributes, 'href').match(/\/produkt\/(\d+)/)?.[1] ?? '';
-    const name = attribute(attributes, 'data-name') || attribute(attributes, 'title');
-    const imageUrl = match[2].match(/<img[^>]+src="([^"]+)"/)?.[1] ?? '';
-    if (!code || !name) {
-      continue;
-    }
-    rows.push({
-      code,
-      name: decodeHtml(name),
-      brand: decodeHtml(attribute(attributes, 'data-brand')),
-      categories: parseCategories(attribute(attributes, 'data-categories')),
-      imageUrl: absoluteIcaUrl(decodeHtml(imageUrl)),
-      productUrl: buildIcaHandlaUrl(`/produkt/${code}`),
-      dataPrice: decodeHtml(attribute(attributes, 'data-price')),
-      sourceUrl,
-      retrievedAt
-    });
-  }
-  return rows;
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
-function attribute(attributes: string, name: string): string {
-  return attributes.match(new RegExp(`${name}="([^"]*)"`))?.[1] ?? '';
+function arrayOfRecords(value: unknown): Array<Record<string, unknown>> {
+  return Array.isArray(value) ? value.filter(isRecord) : [];
 }
 
-function parseCategories(value: string): string[] {
-  const decoded = decodeHtml(value);
-  if (!decoded) {
-    return [];
-  }
-  try {
-    const parsed = JSON.parse(decoded) as unknown;
-    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string') : [];
-  } catch {
-    return [];
-  }
+function text(value: unknown): string {
+  return typeof value === 'string' ? value.trim() : '';
 }
 
-function absoluteIcaUrl(value: string): string {
-  if (!value) {
+function money(value: unknown): { amount: number | null; currency: string } {
+  if (!isRecord(value)) {
+    return { amount: null, currency: '' };
+  }
+  return {
+    amount: typeof value.amount === 'number' ? value.amount : null,
+    currency: text(value.currency)
+  };
+}
+
+function nestedMoney(value: unknown): { amount: number | null; currency: string; unit: string } {
+  if (!isRecord(value)) {
+    return { amount: null, currency: '', unit: '' };
+  }
+  const price = money(value.price);
+  return {
+    amount: price.amount,
+    currency: price.currency,
+    unit: text(value.unit)
+  };
+}
+
+function imageUrl(value: unknown): string {
+  if (!isRecord(value)) {
     return '';
   }
-  return value.startsWith('https://') ? value : new URL(value, ICA_HANDLA_BASE_URL).toString();
-}
-
-function decodeHtml(value: string): string {
-  return value
-    .replace(/&#(\d+);/g, (_, code: string) => String.fromCharCode(Number(code)))
-    .replace(/&quot;/g, '"')
-    .replace(/&#34;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/&amp;/g, '&')
-    .trim();
+  return text(value.src);
 }
