@@ -1,7 +1,7 @@
 // AUTO-GENERATED from public Mathem search page __NEXT_DATA__.
 // Source URL pattern: https://www.mathem.se/se/search/products/?q={query}
-// Retrieved: 2026-05-22T09:20:43.762Z
-// Row count: 150 real product rows fetched from mathem.se search.
+// Retrieved: 2026-05-22T11:10:32.630Z
+// Row count: 300 real product rows fetched from mathem.se search.
 
 export type MathemIngestedProduct = {
   code: string;
@@ -22,9 +22,19 @@ export type MathemIngestedProduct = {
 
 export const mathemSource = {
   "source": "mathem.se public search page __NEXT_DATA__",
-  "retrievedAt": "2026-05-22T09:20:43.762Z",
-  "rowCount": 150,
-  "sourceUrlPattern": "https://www.mathem.se/se/search/products/?q={query}"
+  "retrievedAt": "2026-05-22T11:10:32.630Z",
+  "rowCount": 300,
+  "sourceUrlPattern": "https://www.mathem.se/se/search/products/?q={query}",
+  "sourceUrls": [
+    "https://www.mathem.se/se/search/products/?q=makaroner",
+    "https://www.mathem.se/se/search/products/?q=mjolk",
+    "https://www.mathem.se/se/search/products/?q=kaffe",
+    "https://www.mathem.se/se/search/products/?q=ris",
+    "https://www.mathem.se/se/search/products/?q=pasta",
+    "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "https://www.mathem.se/se/search/products/?q=brod",
+    "https://www.mathem.se/se/search/products/?q=ost"
+  ]
 } as const;
 
 export const mathemProducts: MathemIngestedProduct[] = [
@@ -42,7 +52,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6448-kungsornen-gammaldags-idealmakaroner/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "4793",
@@ -58,7 +68,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4793-kungsornen-gammaldags-idealmakaroner/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "6407",
@@ -74,7 +84,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6407-kungsornen-fullkornspasta-makaroner/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "7223",
@@ -90,7 +100,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7223-kungsornen-makaroner-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5801",
@@ -106,7 +116,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5801-kungsornen-idealmakaroner/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "7237",
@@ -122,7 +132,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7237-kungsornen-snabbmakaroner/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "7919",
@@ -138,7 +148,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7919-kungsornen-idealmakaroner/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5301",
@@ -154,7 +164,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5301-garant-makaroner-glutenfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "65403",
@@ -170,7 +180,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65403-garant-eko-makaroner-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "4065",
@@ -186,7 +196,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4065-kungsornen-snabbmakaroner/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "65174",
@@ -202,7 +212,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65174-garant-pasta-girandole/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "52444",
@@ -218,7 +228,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/52444-mississippi-belle-macaroni-cheese/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "52597",
@@ -234,7 +244,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/52597-barilla-pasta-pipe-rigate/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "7704",
@@ -250,7 +260,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7704-garant-pasta-penne-rigate/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5228",
@@ -266,7 +276,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5228-zeta-pasta-maccaronetti/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "65037",
@@ -282,7 +292,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65037-mino-pipette-glutenfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5959",
@@ -298,7 +308,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5959-barilla-pasta-castellane/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "6716",
@@ -314,7 +324,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6716-rummo-pasta-riccioli/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "63904",
@@ -330,7 +340,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/63904-monte-castello-pasta-penne-rigate/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "65121",
@@ -346,7 +356,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65121-barilla-pasta-mezzi-rigatoni-al-bronzo/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "64237",
@@ -362,7 +372,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64237-macheaven-mac-cheese-cheddar/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5267",
@@ -378,7 +388,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5267-zeta-pasta-penne-rigate/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "9497",
@@ -394,7 +404,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9497-eldorado-mac-n-cheese-glutenfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "8665",
@@ -410,7 +420,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8665-biori-pasta-penne-havreblandning-glutenfri-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "4593",
@@ -426,7 +436,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4593-garant-eko-pasta-penne-rigate-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "64355",
@@ -442,7 +452,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64355-eldorado-snack-pot-macn-cheese/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "62961",
@@ -458,7 +468,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62961-pastificio-liguori-pasta-rigatoni-no-46-igp/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "6342",
@@ -474,7 +484,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6342-kungsornen-linspasta-penne/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "40117",
@@ -490,7 +500,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/40117-garant-pasta-mafalda/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "4049",
@@ -506,7 +516,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4049-knorr-snack-pot-mac-cheese/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "64393",
@@ -522,7 +532,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64393-barilla-pasta-penne-rigate/",
     "available": false,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "6930",
@@ -538,7 +548,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6930-fixa-durkslag-plast-vit/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "4664",
@@ -554,7 +564,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4664-arla-ko-r-farsk-standardmjolk-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "3681",
@@ -570,7 +580,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3681-arla-ko-r-farsk-mellanmjolk-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5128",
@@ -586,7 +596,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5128-arla-r-mellanmjolk-laktosfri-med-lang-hallbarhet-1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "7460",
@@ -602,7 +612,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7460-arla-ko-r-farsk-standardmjolk-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2183",
@@ -618,7 +628,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2183-garant-mellanmjolk-lite-langre-hallbarhet-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5719",
@@ -634,7 +644,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5719-arla-ko-r-standardmjolk-laktosfri-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2331",
@@ -650,7 +660,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2331-garant-standardmjolk-lite-langre-hallbarhet-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5288",
@@ -666,7 +676,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5288-arla-ko-r-mellanmjolk-laktosfri-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2008",
@@ -682,7 +692,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2008-arla-ko-r-farsk-mellanmjolk-15-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2192",
@@ -698,7 +708,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2192-arla-ko-r-mellanmjolk-laktosfri-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "4823",
@@ -714,7 +724,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4823-arla-ko-r-mellanmjolk-15-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "7597",
@@ -730,7 +740,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7597-arla-ko-r-farsk-standardmjolk-3-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "3317",
@@ -746,7 +756,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3317-valio-mellanmjolk-laktosfri-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "3525",
@@ -762,7 +772,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3525-arla-ko-r-farsk-lattmjolk-05/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "3182",
@@ -778,7 +788,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3182-oatly-ikaffe-barista-edition-havredryck-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5589",
@@ -794,7 +804,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5589-arla-ko-r-lattmjolk-laktosfri-05/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5524",
@@ -810,7 +820,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5524-valio-standardmjolk-laktosfri-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "4758",
@@ -826,7 +836,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4758-arla-ko-r-farsk-lantmjolk-38-45-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5004",
@@ -842,7 +852,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5004-valio-mellanmjolk-laktosfri-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "65359",
@@ -858,7 +868,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65359-arla-ko-r-mellanmjolk-lang-hallbarhet-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5116",
@@ -874,7 +884,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5116-oatly-havredryck-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "15042",
@@ -890,7 +900,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/15042-skanemejerier-mjolk-laktosfri-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "20145",
@@ -906,23 +916,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/20145-skanemejerier-mjolk-3-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
-  },
-  {
-    "code": "3547",
-    "name": "Arla Ko® Mellanmjölk 1,5% EKO/KRAV",
-    "brand": "Arla Ko®",
-    "packageText": "3 dl",
-    "price": 9.94,
-    "priceText": "9.94 SEK",
-    "unitPrice": 33.13,
-    "unitPriceText": "33.13 SEK",
-    "unitPriceUnit": "l",
-    "imageUrl": "https://images.mathem.se/prod/local_products/9dfbecd7-c336-42a9-b746-7ff49fdeedff.jpg?fit=bounds&format=auto&optimize=medium&width=136&s=0x0af3b922f44d322efac4cea8aae053d56e54b871",
-    "productUrl": "https://www.mathem.se/se/products/3547-arla-ko-r-mellanmjolk-15-eko-krav/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2804",
@@ -938,7 +932,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2804-arla-ko-r-minimjolk-01-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "3547",
+    "name": "Arla Ko® Mellanmjölk 1,5% EKO/KRAV",
+    "brand": "Arla Ko®",
+    "packageText": "3 dl",
+    "price": 9.94,
+    "priceText": "9.94 SEK",
+    "unitPrice": 33.13,
+    "unitPriceText": "33.13 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9dfbecd7-c336-42a9-b746-7ff49fdeedff.jpg?fit=bounds&format=auto&optimize=medium&width=136&s=0x0af3b922f44d322efac4cea8aae053d56e54b871",
+    "productUrl": "https://www.mathem.se/se/products/3547-arla-ko-r-mellanmjolk-15-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "3311",
@@ -954,23 +964,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3311-garant-standardmjolk-lite-langre-hallbarhet-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
-  },
-  {
-    "code": "16165",
-    "name": "Skånemejerier Färsk Standardmjölk 3%",
-    "brand": "Skånemejerier",
-    "packageText": "1,5 l",
-    "price": 19.95,
-    "priceText": "19.95 SEK",
-    "unitPrice": 13.3,
-    "unitPriceText": "13.30 SEK",
-    "unitPriceUnit": "l",
-    "imageUrl": "https://images.mathem.se/prod/local_products/7e79e877-95c8-49d1-9253-7f6c1ec53e3b.jpg?fit=bounds&format=auto&optimize=medium&width=120&s=0xea4cecdd75a3d9d13188a15351045b8c90f6a4d3",
-    "productUrl": "https://www.mathem.se/se/products/16165-skanemejerier-farsk-standardmjolk-3/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "13977",
@@ -986,39 +980,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/13977-skanemejerier-hjordnara-mellanmjolk-15-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
-    "code": "7495",
-    "name": "Arla Ko® Mellanmjölk Färsk 1,5%",
-    "brand": "Arla Ko®",
-    "packageText": "1 l",
-    "price": 12.5,
-    "priceText": "12.50 SEK",
-    "unitPrice": 12.5,
-    "unitPriceText": "12.50 SEK",
+    "code": "16165",
+    "name": "Skånemejerier Färsk Standardmjölk 3%",
+    "brand": "Skånemejerier",
+    "packageText": "1,5 l",
+    "price": 19.95,
+    "priceText": "19.95 SEK",
+    "unitPrice": 13.3,
+    "unitPriceText": "13.30 SEK",
     "unitPriceUnit": "l",
-    "imageUrl": "https://images.mathem.se/prod/local_products/7f2862c4-c2eb-466f-a55e-7826f70d261c.jpg?fit=bounds&format=auto&optimize=medium&width=111&s=0xb15c30584246349f6776d9c7252c5b1356466033",
-    "productUrl": "https://www.mathem.se/se/products/7495-arla-ko-r-mellanmjolk-farsk-15/",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7e79e877-95c8-49d1-9253-7f6c1ec53e3b.jpg?fit=bounds&format=auto&optimize=medium&width=120&s=0xea4cecdd75a3d9d13188a15351045b8c90f6a4d3",
+    "productUrl": "https://www.mathem.se/se/products/16165-skanemejerier-farsk-standardmjolk-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
-  },
-  {
-    "code": "7744",
-    "name": "Arla Ko® Färsk Lättmjölk 0,5% EKO/KRAV",
-    "brand": "Arla Ko®",
-    "packageText": "1 l",
-    "price": 15,
-    "priceText": "15.00 SEK",
-    "unitPrice": 15,
-    "unitPriceText": "15.00 SEK",
-    "unitPriceUnit": "l",
-    "imageUrl": "https://images.mathem.se/prod/local_products/0463628a-7756-4527-bd47-b6bc8c68aa6e.jpg?fit=bounds&format=auto&optimize=medium&width=110&s=0xcb7785521552d361a4c8a188312e6bcc3e1967b7",
-    "productUrl": "https://www.mathem.se/se/products/7744-arla-ko-r-farsk-lattmjolk-05-eko-krav/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "7508",
@@ -1034,23 +1012,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7508-arla-r-standardmjolk-lang-hallbarhet-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
-    "code": "2495",
-    "name": "Garant Mellan Mjölkdryck Laktosfri 1,5%",
-    "brand": "Garant",
+    "code": "7495",
+    "name": "Arla Ko® Mellanmjölk Färsk 1,5%",
+    "brand": "Arla Ko®",
     "packageText": "1 l",
-    "price": 17.51,
-    "priceText": "17.51 SEK",
-    "unitPrice": 17.51,
-    "unitPriceText": "17.51 SEK",
+    "price": 12.5,
+    "priceText": "12.50 SEK",
+    "unitPrice": 12.5,
+    "unitPriceText": "12.50 SEK",
     "unitPriceUnit": "l",
-    "imageUrl": "https://images.mathem.se/prod/local_products/06327949-4a91-4c11-840e-91772e554797.jpg?fit=bounds&format=auto&optimize=medium&width=112&s=0xf278467ce463a80ee4adb568a018f8fd396523cb",
-    "productUrl": "https://www.mathem.se/se/products/2495-garant-mellan-mjolkdryck-laktosfri-15/",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7f2862c4-c2eb-466f-a55e-7826f70d261c.jpg?fit=bounds&format=auto&optimize=medium&width=111&s=0xb15c30584246349f6776d9c7252c5b1356466033",
+    "productUrl": "https://www.mathem.se/se/products/7495-arla-ko-r-mellanmjolk-farsk-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2337",
@@ -1066,7 +1044,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2337-skanemejerier-latte-del-barista-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7744",
+    "name": "Arla Ko® Färsk Lättmjölk 0,5% EKO/KRAV",
+    "brand": "Arla Ko®",
+    "packageText": "1 l",
+    "price": 15,
+    "priceText": "15.00 SEK",
+    "unitPrice": 15,
+    "unitPriceText": "15.00 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0463628a-7756-4527-bd47-b6bc8c68aa6e.jpg?fit=bounds&format=auto&optimize=medium&width=110&s=0xcb7785521552d361a4c8a188312e6bcc3e1967b7",
+    "productUrl": "https://www.mathem.se/se/products/7744-arla-ko-r-farsk-lattmjolk-05-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "17108",
@@ -1082,7 +1076,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/17108-skanemejerier-farsk-mellanmjolk-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "2495",
+    "name": "Garant Mellan Mjölkdryck Laktosfri 1,5%",
+    "brand": "Garant",
+    "packageText": "1 l",
+    "price": 17.51,
+    "priceText": "17.51 SEK",
+    "unitPrice": 17.51,
+    "unitPriceText": "17.51 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/06327949-4a91-4c11-840e-91772e554797.jpg?fit=bounds&format=auto&optimize=medium&width=112&s=0xf278467ce463a80ee4adb568a018f8fd396523cb",
+    "productUrl": "https://www.mathem.se/se/products/2495-garant-mellan-mjolkdryck-laktosfri-15/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2206",
@@ -1098,7 +1108,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2206-arla-r-baristamjolk-latte-art-26-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2390",
@@ -1114,7 +1124,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2390-garant-latt-mjolkdryck-laktosfri-05/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5150",
@@ -1130,7 +1140,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5150-skanemejerier-mellanmjolk-laktosfri-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "3081",
@@ -1146,7 +1156,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3081-arla-ko-r-lattmjolk-laktosfri-05/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "18850",
@@ -1162,7 +1172,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/18850-skanemejerier-farsk-lattmjolk-05/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "3335",
@@ -1178,23 +1188,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3335-garant-mjolkdryck-laktosfri-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
-  },
-  {
-    "code": "8175",
-    "name": "Skånemejerier Fika Chokladmjölk",
-    "brand": "Skånemejerier",
-    "packageText": "1,5 l",
-    "price": 31.95,
-    "priceText": "31.95 SEK",
-    "unitPrice": 21.3,
-    "unitPriceText": "21.30 SEK",
-    "unitPriceUnit": "l",
-    "imageUrl": "https://images.mathem.se/prod/local_products/4995d43e-1ada-452a-aa8f-96bd400580c6.jpg?fit=bounds&format=auto&optimize=medium&width=118&s=0x6894174fa80cb7259805d8bdd032d2eb7c921e3c",
-    "productUrl": "https://www.mathem.se/se/products/8175-skanemejerier-fika-chokladmjolk/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5376",
@@ -1210,7 +1204,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5376-garant-mjolkdryck-laktosfri-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7384",
+    "name": "Arla Ko® Färsk Lättmjölk 0,5%",
+    "brand": "Arla Ko®",
+    "packageText": "1 l",
+    "price": 11.9,
+    "priceText": "11.90 SEK",
+    "unitPrice": 11.9,
+    "unitPriceText": "11.90 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b865f705-1063-4478-8d22-603570d0d13e.jpg?fit=bounds&format=auto&optimize=medium&width=111&s=0xdf599d524b6ee37e6653d0e107aa3bf1fdfde339",
+    "productUrl": "https://www.mathem.se/se/products/7384-arla-ko-r-farsk-lattmjolk-05/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "62265",
@@ -1226,7 +1236,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62265-lofbergs-bryggkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "64680",
@@ -1242,7 +1252,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64680-zoegas-skanerost-bryggkaffe-morkrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "10830",
@@ -1258,7 +1268,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10830-gevalia-bryggkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "4259",
@@ -1274,7 +1284,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4259-arvid-nordquist-mellan-bryggkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "8967",
@@ -1290,7 +1300,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8967-garant-bryggkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "9293",
@@ -1306,7 +1316,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9293-lofbergs-kaffe-organic-medium-roast-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "11119",
@@ -1322,7 +1332,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11119-zoegas-mollbergs-blandning-bryggkaffe-morkrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "9057",
@@ -1338,7 +1348,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9057-lofbergs-bryggkaffe-kharisma/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "9004",
@@ -1354,7 +1364,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9004-garant-bryggkaffe-morkrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "3749",
@@ -1370,7 +1380,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3749-arvid-nordquist-gran-dia-bryggkaffe-mellanmork/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "4325",
@@ -1386,7 +1396,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4325-arvid-nordquist-eco-bryggkaffe-mellanmork-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "11643",
@@ -1402,7 +1412,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11643-zoegas-hazienda-bryggkaffe-morkrost-eko-krav-fairt/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "23178",
@@ -1418,7 +1428,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/23178-gevalia-kaffe-mellanrost-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "10963",
@@ -1434,7 +1444,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10963-garant-snabbkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "775",
@@ -1450,7 +1460,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/775-lofbergs-kaffe-mellanmork/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "1701",
@@ -1466,7 +1476,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/1701-nescafe-snabbkaffe-lyx-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "8985",
@@ -1482,7 +1492,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8985-lofbergs-bryggkaffe-mellanrost-perfekt-med-mjolk/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "11470",
@@ -1498,7 +1508,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11470-gevalia-snabbkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "64679",
@@ -1514,7 +1524,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64679-zoegas-bryggkaffe-intenzo-morkrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "3849",
@@ -1530,7 +1540,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3849-arvid-nordquist-franskrost-bryggkaffe-extra-mork/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "10408",
@@ -1546,7 +1556,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10408-lindvalls-kaffe-bryggkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "11513",
@@ -1562,7 +1572,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11513-garant-eko-bryggkaffe-mellanrost-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "6568",
@@ -1578,7 +1588,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6568-melitta-kaffefilter-1x4-bruna/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "67884",
@@ -1594,7 +1604,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67884-zoegas-fikastund-bryggkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "11400",
@@ -1610,7 +1620,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11400-nescafe-snabbkaffe-gold-mellanrost-koffeinfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "4348",
@@ -1626,7 +1636,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4348-gevalia-koffeinfritt-kaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "7276",
@@ -1642,7 +1652,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7276-eldorado-snabbkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "6042",
@@ -1658,7 +1668,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6042-eldorado-kaffefilter-1x4-bruna/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "3869",
@@ -1674,7 +1684,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3869-arvid-nordquist-svea-bryggkaffe-mellanmork/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "64678",
@@ -1690,7 +1700,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64678-zoegas-kaffe-blue-java/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "9032",
@@ -1706,7 +1716,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9032-lofbergs-bryggkaffe-jubileumsblandning/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "6688",
@@ -1722,7 +1732,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6688-melitta-kaffefilter-1x4-vit/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "4335",
@@ -1738,7 +1748,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4335-arvid-nordquist-amigas-bryggkaffe-morkrost-eko-kra/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "11479",
@@ -1754,7 +1764,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11479-gevalia-snabbkaffe-mellanrost-gold/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "1479",
@@ -1770,7 +1780,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/1479-zoegas-mollbergs-blandning-hela-kaffebonor/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "11507",
@@ -1786,7 +1796,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11507-garant-eko-bryggkaffe-morkrost-eko-fairtrade/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "9274",
@@ -1802,7 +1812,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9274-lofbergs-next-generation-bryggkaffe-morkrost-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "2190",
@@ -1818,7 +1828,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2190-oddlygood-r-barista-glutenfri-havredryck-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "10423",
@@ -1834,23 +1844,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10423-lindvalls-kaffe-kaffe-tricolore/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
-    "code": "1846",
-    "name": "Kahls Kaffe Espresso 227,3° Hela Kaffebönor",
+    "code": "2624",
+    "name": "Kahls Kaffe Divino Kaffebönor Fairtrade/KRAV",
     "brand": "Kahls Kaffe",
-    "packageText": "1000 g",
-    "price": 320.84,
-    "priceText": "320.84 SEK",
-    "unitPrice": 320.84,
-    "unitPriceText": "320.84 SEK",
+    "packageText": "1 kg",
+    "price": 396.55,
+    "priceText": "396.55 SEK",
+    "unitPrice": 396.55,
+    "unitPriceText": "396.55 SEK",
     "unitPriceUnit": "kg",
-    "imageUrl": "https://images.mathem.se/prod/local_products/9805c453-6b59-47d4-997b-f4da8a72e048.jpg?fit=bounds&format=auto&optimize=medium&width=160&s=0xc523c822c84af797cb6bcdb922eae519a646ff2e",
-    "productUrl": "https://www.mathem.se/se/products/1846-kahls-kaffe-espresso-2273deg-hela-kaffebonor/",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4e01cd7a-a250-4475-87f3-ab614e92c15c.jpg?fit=bounds&format=auto&optimize=medium&width=166&s=0xa1d58a9a5765546a001d7d03105e8d4732c331a7",
+    "productUrl": "https://www.mathem.se/se/products/2624-kahls-kaffe-divino-kaffebonor-fairtrade-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "8535",
@@ -1866,7 +1876,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8535-garant-jasminris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "10427",
@@ -1882,7 +1892,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10427-bens-original-langkornigt-ris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "10475",
@@ -1898,7 +1908,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10475-eldorado-jasminris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "64201",
@@ -1914,7 +1924,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64201-garant-basmatiris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "9055",
@@ -1930,7 +1940,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9055-bens-original-basmatiris-boil-in-bag-4x125g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "11421",
@@ -1946,7 +1956,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11421-eldorado-basmatiris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "11734",
@@ -1962,7 +1972,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11734-garant-eko-basmatiris-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "10701",
@@ -1978,7 +1988,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10701-garant-eko-jasminris-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "8336",
@@ -1994,7 +2004,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8336-garant-langkornigt-ris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "62745",
@@ -2010,7 +2020,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62745-garant-ris-jasmin/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "8114",
@@ -2026,7 +2036,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8114-frebaco-kvarn-raris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "10989",
@@ -2042,7 +2052,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10989-salta-kvarn-svart-ris-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "8888",
@@ -2058,7 +2068,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8888-bens-original-jasminris-boil-in-bag-4x125g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "813",
@@ -2074,7 +2084,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/813-garant-eko-langkornigt-ris-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "7514",
@@ -2090,7 +2100,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7514-felix-risgrot/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "4124",
@@ -2106,7 +2116,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4124-garant-basmatiris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "8578",
@@ -2122,7 +2132,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8578-bens-original-langkornigt-ris-boil-in-bag-4x125g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "4438",
@@ -2138,7 +2148,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4438-bens-original-jasminris-10min/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5901",
@@ -2154,7 +2164,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5901-zeinas-basmatiris-quick-n-easy/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "8290",
@@ -2170,7 +2180,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8290-spicefield-ris-sushi/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "7621",
@@ -2186,7 +2196,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7621-risifrutti-risifrutti-jordgubb/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "62726",
@@ -2202,7 +2212,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62726-garant-ris-basmati-boil-in-bag-4x125g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "4020",
@@ -2218,7 +2228,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4020-bens-original-basmatiris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "10253",
@@ -2234,7 +2244,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10253-garant-fullkornsris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "423",
@@ -2250,7 +2260,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/423-salta-kvarn-rott-raris-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "9320",
@@ -2266,7 +2276,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9320-garant-eko-jasminris-eko-fairtrade/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "7593",
@@ -2282,7 +2292,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7593-risifrutti-risifrutti-hallon/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "62800",
@@ -2298,7 +2308,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62800-garant-ris-jasmin-boil-in-bag-4x125g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5787",
@@ -2314,7 +2324,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5787-eldorado-jasminris-boil-in-bag-4x125g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "5761",
@@ -2330,7 +2340,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5761-zeinas-jasminris-quick-n-easy/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "62777",
@@ -2346,7 +2356,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62777-bens-original-ris-jasmin-boil-in-bag-8x125g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "11105",
@@ -2360,9 +2370,9 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "unitPriceUnit": "kg",
     "imageUrl": "https://images.mathem.se/prod/local_products/fb35ac6e-0473-4535-90e7-325e7c35ba20.jpg?fit=bounds&format=auto&optimize=medium&width=207&s=0x02b59ae7512b546474748db7bc29989e92d4e882",
     "productUrl": "https://www.mathem.se/se/products/11105-garant-ris-langkornigt-10min/",
-    "available": false,
+    "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "65171",
@@ -2378,7 +2388,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65171-garant-basmatiris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "7347",
@@ -2394,7 +2404,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7347-friggs-majskakor-chiafro-havssalt/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "7586",
@@ -2410,7 +2420,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7586-risifrutti-risifrutti-skogsbar/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   },
   {
     "code": "7651",
@@ -2426,6 +2436,2406 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7651-risifrutti-risifrutti-blabar/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T09:20:43.762Z"
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "62670",
+    "name": "Ben's Original Ris Långkornigt Boil-in-Bag 8x125g",
+    "brand": "Ben's Original",
+    "packageText": "1 kg",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 56.74,
+    "unitPriceText": "56.74 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5f14b284-9f8b-4458-9d1a-8f4f0e3c6ac4.jpg?fit=bounds&format=auto&optimize=medium&width=206&s=0xd7a91b7bdc859c5c4c17f35299881556fc752d33",
+    "productUrl": "https://www.mathem.se/se/products/62670-bens-original-ris-langkornigt-boil-in-bag-8x125g/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "63877",
+    "name": "Garant Basmatiris",
+    "brand": "Garant",
+    "packageText": "1000 g",
+    "price": 47.5,
+    "priceText": "47.50 SEK",
+    "unitPrice": 47.5,
+    "unitPriceText": "47.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3eb73c20-a501-4478-9ea9-914d89f5ecde.jpg?fit=bounds&format=auto&optimize=medium&width=200&s=0xca66a200169631700647c5c61807ad94a99820af",
+    "productUrl": "https://www.mathem.se/se/products/63877-garant-basmatiris/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5091",
+    "name": "Garant Majskakor Popcorn",
+    "brand": "Garant",
+    "packageText": "125 g",
+    "price": 20.35,
+    "priceText": "20.35 SEK",
+    "unitPrice": 162.8,
+    "unitPriceText": "162.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d263d8bb-1ae7-4947-87c3-7a603dcc49da.jpg?fit=bounds&format=auto&optimize=medium&width=170&s=0x2720fb16a8b15c71d332592932a9d7299ac8cf8e",
+    "productUrl": "https://www.mathem.se/se/products/5091-garant-majskakor-popcorn/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5070",
+    "name": "Garant Majskakor Ranch",
+    "brand": "Garant",
+    "packageText": "125 g",
+    "price": 20.35,
+    "priceText": "20.35 SEK",
+    "unitPrice": 162.8,
+    "unitPriceText": "162.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2add95ce-f9f0-4b07-8d5d-314f0912e57b.jpg?fit=bounds&format=auto&optimize=medium&width=170&s=0xbb1d2b3651384257b35f1ee9e9b995d4654189a6",
+    "productUrl": "https://www.mathem.se/se/products/5070-garant-majskakor-ranch/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "9975",
+    "name": "Garant Ris Långkornigt 10min",
+    "brand": "Garant",
+    "packageText": "1 kg",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 37.81,
+    "unitPriceText": "37.81 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/83d5ba38-1b71-495f-912b-8df640dd517e.jpg?fit=bounds&format=auto&optimize=medium&width=201&s=0xdfffcc1788b86f48b111ba981fd85cb1586b78e0",
+    "productUrl": "https://www.mathem.se/se/products/9975-garant-ris-langkornigt-10min/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "10727",
+    "name": "Zeta Casa Di Luca Arborio Ris",
+    "brand": "Zeta Casa Di Luca",
+    "packageText": "700 g",
+    "price": 43.95,
+    "priceText": "43.95 SEK",
+    "unitPrice": 62.79,
+    "unitPriceText": "62.79 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ff50c50e-8c16-453e-8f94-e7ffafe4aa6c.jpg?fit=bounds&format=auto&optimize=medium&width=210&s=0xafbe27406f61d9255441d77b3a755fbebe63b95b",
+    "productUrl": "https://www.mathem.se/se/products/10727-zeta-casa-di-luca-arborio-ris/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "4694",
+    "name": "Barilla Pasta Fusilli",
+    "brand": "Barilla",
+    "packageText": "500 g",
+    "price": 16,
+    "priceText": "16.00 SEK",
+    "unitPrice": 32,
+    "unitPriceText": "32.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cbfa853d-a941-4e82-a40a-287f0c15f6e7.jpg?fit=bounds&format=auto&optimize=medium&width=193&s=0xcd9d61780237d8de145461b9f433b37b23a84729",
+    "productUrl": "https://www.mathem.se/se/products/4694-barilla-pasta-fusilli/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "4667",
+    "name": "Barilla Pasta Rigatoni",
+    "brand": "Barilla",
+    "packageText": "500 g",
+    "price": 16,
+    "priceText": "16.00 SEK",
+    "unitPrice": 32,
+    "unitPriceText": "32.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5ffd7a9c-0188-4b84-9840-1a8ee1b97d4d.jpg?fit=bounds&format=auto&optimize=medium&width=190&s=0x0f2140578ea29439e1c200c634af3c252d587bbf",
+    "productUrl": "https://www.mathem.se/se/products/4667-barilla-pasta-rigatoni/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "52103",
+    "name": "Barilla Pasta Farfalle",
+    "brand": "Barilla",
+    "packageText": "500 g",
+    "price": 16,
+    "priceText": "16.00 SEK",
+    "unitPrice": 32,
+    "unitPriceText": "32.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d601ac3f-977a-4298-9a61-4848da621235.jpg?fit=bounds&format=auto&optimize=medium&width=195&s=0x76944b1d925643a89aa09bb5bd4172bdeb89491f",
+    "productUrl": "https://www.mathem.se/se/products/52103-barilla-pasta-farfalle/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7684",
+    "name": "Garant Pasta Fusilli",
+    "brand": "Garant",
+    "packageText": "500 g",
+    "price": 14.67,
+    "priceText": "14.67 SEK",
+    "unitPrice": 29.34,
+    "unitPriceText": "29.34 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8d0407d5-9900-46ad-841d-75cb41a5ed3e.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0xdb13d5a143e92fc38ee09760a28e1fe2027021a9",
+    "productUrl": "https://www.mathem.se/se/products/7684-garant-pasta-fusilli/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "4630",
+    "name": "Barilla Pasta Gnocchi",
+    "brand": "Barilla",
+    "packageText": "500 g",
+    "price": 16,
+    "priceText": "16.00 SEK",
+    "unitPrice": 32,
+    "unitPriceText": "32.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b4bdc6ff-cef4-4f29-9b75-28132b54d7a5.jpg?fit=bounds&format=auto&optimize=medium&width=194&s=0xbe5a0066808ec43e22db69d019cad69f0a76ae9f",
+    "productUrl": "https://www.mathem.se/se/products/4630-barilla-pasta-gnocchi/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7712",
+    "name": "Garant Pasta Gemelli",
+    "brand": "Garant",
+    "packageText": "500 g",
+    "price": 14.67,
+    "priceText": "14.67 SEK",
+    "unitPrice": 29.34,
+    "unitPriceText": "29.34 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cae5ff06-774d-46b8-ac46-ae9106d849a2.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0x0f3578dac548bfa15cecdc92697da3b056af9f08",
+    "productUrl": "https://www.mathem.se/se/products/7712-garant-pasta-gemelli/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "4684",
+    "name": "Barilla Pasta Penne Rigate",
+    "brand": "Barilla",
+    "packageText": "500 g",
+    "price": 16,
+    "priceText": "16.00 SEK",
+    "unitPrice": 32,
+    "unitPriceText": "32.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1f821911-8b90-4cdd-ab69-114cdf7e3a4d.jpg?fit=bounds&format=auto&optimize=medium&width=220&s=0x539debc10b2d10af3bf6dd6c4ec838f11c7fcace",
+    "productUrl": "https://www.mathem.se/se/products/4684-barilla-pasta-penne-rigate/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7700",
+    "name": "Garant Pasta Gnocchi",
+    "brand": "Garant",
+    "packageText": "500 g",
+    "price": 14.67,
+    "priceText": "14.67 SEK",
+    "unitPrice": 29.34,
+    "unitPriceText": "29.34 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f9120dde-d256-4d13-9602-647c2f2cec25.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0x1d6586b5a4238972283e4377fdb7bd90f3241ac5",
+    "productUrl": "https://www.mathem.se/se/products/7700-garant-pasta-gnocchi/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5979",
+    "name": "Garofalo Pasta Mezze Maniche Riga",
+    "brand": "Garofalo",
+    "packageText": "500 g",
+    "price": 22.67,
+    "priceText": "22.67 SEK",
+    "unitPrice": 45.34,
+    "unitPriceText": "45.34 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bec89780-2aac-408a-abf8-4db9dd68050b.jpg?fit=bounds&format=auto&optimize=medium&width=206&s=0xa9a77ee2aca1da4a0b39b8a64200c07e446c87bb",
+    "productUrl": "https://www.mathem.se/se/products/5979-garofalo-pasta-mezze-maniche-riga/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "4612",
+    "name": "Barilla Pasta Girandole",
+    "brand": "Barilla",
+    "packageText": "500 g",
+    "price": 16,
+    "priceText": "16.00 SEK",
+    "unitPrice": 32,
+    "unitPriceText": "32.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c8d2682d-5cd7-4fa9-bfcd-65c5d771fdc1.jpg?fit=bounds&format=auto&optimize=medium&width=194&s=0x96520156055a5153546153eff56110264b5bd70a",
+    "productUrl": "https://www.mathem.se/se/products/4612-barilla-pasta-girandole/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5292",
+    "name": "Zeta Pasta Mezze Maniche",
+    "brand": "Zeta",
+    "packageText": "400 g",
+    "price": 21.29,
+    "priceText": "21.29 SEK",
+    "unitPrice": 53.23,
+    "unitPriceText": "53.23 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/45edf8da-fe5b-4550-9909-6c4400944d70.jpg?fit=bounds&format=auto&optimize=medium&width=196&s=0x36f174ccd2ba436c785756561e8a14dd6b13c08b",
+    "productUrl": "https://www.mathem.se/se/products/5292-zeta-pasta-mezze-maniche/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "52281",
+    "name": "Monte Castello Pasta Fusilli",
+    "brand": "Monte Castello",
+    "packageText": "500 g",
+    "price": 10.88,
+    "priceText": "10.88 SEK",
+    "unitPrice": 21.76,
+    "unitPriceText": "21.76 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/dd4c300b-ee09-48a4-8479-f87bb4464d6c.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0xbd89ff2af1a28421ba749057c25d1b0b100f734d",
+    "productUrl": "https://www.mathem.se/se/products/52281-monte-castello-pasta-fusilli/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "1023",
+    "name": "Zeta Pasta Strozzapreti",
+    "brand": "Zeta",
+    "packageText": "400 g",
+    "price": 21.29,
+    "priceText": "21.29 SEK",
+    "unitPrice": 53.23,
+    "unitPriceText": "53.23 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6c6d30c3-bc2c-4e70-8314-afb78c678f71.jpg?fit=bounds&format=auto&optimize=medium&width=216&s=0xcece26f36124c840a694c5b1b9d6d72c0a162c09",
+    "productUrl": "https://www.mathem.se/se/products/1023-zeta-pasta-strozzapreti/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7697",
+    "name": "Garant Pasta Farfalle",
+    "brand": "Garant",
+    "packageText": "500 g",
+    "price": 14.67,
+    "priceText": "14.67 SEK",
+    "unitPrice": 29.34,
+    "unitPriceText": "29.34 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8a3ec4ac-c797-445e-96df-02ee865e5eb4.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0x5ce4b3fb01a7ee41c1055fbbf543447d125f0870",
+    "productUrl": "https://www.mathem.se/se/products/7697-garant-pasta-farfalle/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5627",
+    "name": "Barilla Pasta Fusilli Glutenfri",
+    "brand": "Barilla",
+    "packageText": "400 g",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 59.03,
+    "unitPriceText": "59.03 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e410caa2-6b41-41ad-912d-cd5a08ccad70.jpg?fit=bounds&format=auto&optimize=medium&width=204&s=0x1881d37b5121ee0bf4ebd2898a0ce58f6fc2caef",
+    "productUrl": "https://www.mathem.se/se/products/5627-barilla-pasta-fusilli-glutenfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5069",
+    "name": "Garant Färsk Pasta Fettuccine",
+    "brand": "Garant",
+    "packageText": "250 g",
+    "price": 20.35,
+    "priceText": "20.35 SEK",
+    "unitPrice": 81.4,
+    "unitPriceText": "81.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b4e32356-ec5a-480d-95fd-eca1a010ff49.jpg?fit=bounds&format=auto&optimize=medium&width=234&s=0x8d6094fe60fd700d9ea8caebf0b231c1f677ed54",
+    "productUrl": "https://www.mathem.se/se/products/5069-garant-farsk-pasta-fettuccine/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7680",
+    "name": "Garant Pasta Fusilli Fullkorn",
+    "brand": "Garant",
+    "packageText": "500 g",
+    "price": 14.67,
+    "priceText": "14.67 SEK",
+    "unitPrice": 29.34,
+    "unitPriceText": "29.34 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0a223a02-53cc-429f-bfe1-4f6007574554.jpg?fit=bounds&format=auto&optimize=medium&width=174&s=0x54005d3097f5d04a74b6290c342d360c505fd07e",
+    "productUrl": "https://www.mathem.se/se/products/7680-garant-pasta-fusilli-fullkorn/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7796",
+    "name": "Zeta Pasta Linguine Casa Di Luca",
+    "brand": "Zeta",
+    "packageText": "800 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 35.44,
+    "unitPriceText": "35.44 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ab9775bc-e980-42a1-9619-64fc8c0eb8f1.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x3df67b87b1d315c495187920db3f269c16cc6431",
+    "productUrl": "https://www.mathem.se/se/products/7796-zeta-pasta-linguine-casa-di-luca/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "4545",
+    "name": "Garant Eko Pasta Fusilli EKO",
+    "brand": "Garant Eko",
+    "packageText": "500 g",
+    "price": 17.51,
+    "priceText": "17.51 SEK",
+    "unitPrice": 35.02,
+    "unitPriceText": "35.02 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ec135d90-ee33-4f7d-9697-968c4e243209.jpg?fit=bounds&format=auto&optimize=medium&width=175&s=0x65022ba0f8e8a61443049d89a7d543bbc74f932a",
+    "productUrl": "https://www.mathem.se/se/products/4545-garant-eko-pasta-fusilli-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5363",
+    "name": "Zeta Pasta Radiatori",
+    "brand": "Zeta",
+    "packageText": "400 g",
+    "price": 21.29,
+    "priceText": "21.29 SEK",
+    "unitPrice": 53.23,
+    "unitPriceText": "53.23 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a54be80a-84a3-4489-a37e-8335acc32b6d.jpg?fit=bounds&format=auto&optimize=medium&width=198&s=0xb3f228f2ac1c072832f505fe9dc5bbb1f3b4205a",
+    "productUrl": "https://www.mathem.se/se/products/5363-zeta-pasta-radiatori/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "9416",
+    "name": "Barilla Spaghetti",
+    "brand": "Barilla",
+    "packageText": "1,8 kg",
+    "price": 30.7,
+    "priceText": "30.70 SEK",
+    "unitPrice": 17.06,
+    "unitPriceText": "17.06 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7125a021-7d33-48a8-8784-ca6df4d644bf.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x8667d9e1334d4928defb517b20a7d0897a428953",
+    "productUrl": "https://www.mathem.se/se/products/9416-barilla-spaghetti/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "6640",
+    "name": "Barilla Pasta Tagliatelle",
+    "brand": "Barilla",
+    "packageText": "500 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 56.7,
+    "unitPriceText": "56.70 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d7967ecc-70bf-4214-8175-d73e682aff09.jpg?fit=bounds&format=auto&optimize=medium&width=234&s=0x703589ca3647f5c2c20ccbb077b778ed2eeea7f9",
+    "productUrl": "https://www.mathem.se/se/products/6640-barilla-pasta-tagliatelle/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5282",
+    "name": "Zeta Pasta Tortiglioni",
+    "brand": "Zeta",
+    "packageText": "400 g",
+    "price": 21.29,
+    "priceText": "21.29 SEK",
+    "unitPrice": 53.23,
+    "unitPriceText": "53.23 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b8e2d30d-dfc9-4c67-8c46-d97ef464a6d6.jpg?fit=bounds&format=auto&optimize=medium&width=198&s=0x89964fc0a2e6dac70a216349c3c2a4a09123a3f5",
+    "productUrl": "https://www.mathem.se/se/products/5282-zeta-pasta-tortiglioni/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "661",
+    "name": "Garant Färsk Pasta Tortelloni Ricotta Spinaci",
+    "brand": "Garant",
+    "packageText": "250 g",
+    "price": 31.18,
+    "priceText": "31.18 SEK",
+    "unitPrice": 124.72,
+    "unitPriceText": "124.72 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c1aecf81-10c1-4f1f-99b5-dfdc611b97cc.jpg?fit=bounds&format=auto&optimize=medium&width=222&s=0x0262a78b20cc0128b07e1af32f9e22ec1d7e7183",
+    "productUrl": "https://www.mathem.se/se/products/661-garant-farsk-pasta-tortelloni-ricotta-spinaci/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "4576",
+    "name": "Garant Eko Pasta Gnocchi EKO",
+    "brand": "Garant Eko",
+    "packageText": "500 g",
+    "price": 17.51,
+    "priceText": "17.51 SEK",
+    "unitPrice": 35.02,
+    "unitPriceText": "35.02 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/810e339c-7231-469a-b867-175e6424ff70.jpg?fit=bounds&format=auto&optimize=medium&width=175&s=0x397be8d02059b2fb3c5682f84788b28da69630eb",
+    "productUrl": "https://www.mathem.se/se/products/4576-garant-eko-pasta-gnocchi-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5224",
+    "name": "Zeta Pasta Fusilli",
+    "brand": "Zeta",
+    "packageText": "400 g",
+    "price": 21.29,
+    "priceText": "21.29 SEK",
+    "unitPrice": 53.23,
+    "unitPriceText": "53.23 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5317f128-8449-44b6-99ed-06fd20d0c129.jpg?fit=bounds&format=auto&optimize=medium&width=198&s=0x3e377094a7a10944e54fee7479125e38065cdbcf",
+    "productUrl": "https://www.mathem.se/se/products/5224-zeta-pasta-fusilli/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "312",
+    "name": "Dagens Pasta Alfredo Fryst",
+    "brand": "Dagens",
+    "packageText": "400 g",
+    "price": 40.65,
+    "priceText": "40.65 SEK",
+    "unitPrice": 101.63,
+    "unitPriceText": "101.63 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6267be96-6388-41bc-8a16-fac398d17ead.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x97ba6c132e1ae1ecfd9f3279b7111ed726caaf86",
+    "productUrl": "https://www.mathem.se/se/products/312-dagens-dagens-pasta-alfredo-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7708",
+    "name": "Garant Pasta Fusilli Tricolore",
+    "brand": "Garant",
+    "packageText": "500 g",
+    "price": 14.67,
+    "priceText": "14.67 SEK",
+    "unitPrice": 29.34,
+    "unitPriceText": "29.34 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d3ef7536-5193-4f69-80e6-a6fa617ffad7.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0x6e6bd9fee95cbd6cf2e928954f660c2fd7bdac19",
+    "productUrl": "https://www.mathem.se/se/products/7708-garant-pasta-fusilli-tricolore/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7236",
+    "name": "Garant Färsk Pasta Tortelloni Pomodoro Mozzarella",
+    "brand": "Garant",
+    "packageText": "250 g",
+    "price": 31.18,
+    "priceText": "31.18 SEK",
+    "unitPrice": 124.72,
+    "unitPriceText": "124.72 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b9ebf3a2-6ee7-4baf-aa85-b0503017658e.jpg?fit=bounds&format=auto&optimize=medium&width=236&s=0x0e07266beac4b3439f21118029882cf5e24b17f2",
+    "productUrl": "https://www.mathem.se/se/products/7236-garant-farsk-pasta-tortelloni-pomodoro-mozzarella/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "65293",
+    "name": "Zeta Pasta Penne Rigate Glutenfri",
+    "brand": "Zeta",
+    "packageText": "400 g",
+    "price": 24.56,
+    "priceText": "24.56 SEK",
+    "unitPrice": 61.4,
+    "unitPriceText": "61.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8ac9484b-9c03-4e93-8480-3351d5aeb003.jpg?fit=bounds&format=auto&optimize=medium&width=227&s=0xe69f080d6748c1b3e40eca7f0a8df1a101314674",
+    "productUrl": "https://www.mathem.se/se/products/65293-zeta-pasta-penne-rigate-glutenfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5173",
+    "name": "Garant Färsk Pasta Pappardelle",
+    "brand": "Garant",
+    "packageText": "250 g",
+    "price": 20.35,
+    "priceText": "20.35 SEK",
+    "unitPrice": 81.4,
+    "unitPriceText": "81.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e70c09b1-55a1-434d-a24d-1b4d3fedc3d6.jpg?fit=bounds&format=auto&optimize=medium&width=231&s=0x87f49f26589b3fa5a0548645efe7058e076cb07c",
+    "productUrl": "https://www.mathem.se/se/products/5173-garant-farsk-pasta-pappardelle/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7705",
+    "name": "Garant Pasta Penne Rigate Fullkorn",
+    "brand": "Garant",
+    "packageText": "500 g",
+    "price": 14.67,
+    "priceText": "14.67 SEK",
+    "unitPrice": 29.34,
+    "unitPriceText": "29.34 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bc0c6c51-396f-4c04-a661-0f8c8e20ef37.jpg?fit=bounds&format=auto&optimize=medium&width=189&s=0xa75bf1d545a2ece4ebe422a6381ba6c1644145d7",
+    "productUrl": "https://www.mathem.se/se/products/7705-garant-pasta-penne-rigate-fullkorn/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "4904",
+    "name": "KUNGSÖRNEN Fusilli Fullkornspasta",
+    "brand": "KUNGSÖRNEN",
+    "packageText": "500 g",
+    "price": 18.5,
+    "priceText": "18.50 SEK",
+    "unitPrice": 37,
+    "unitPriceText": "37.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0930fa11-6ec8-40b7-bdac-b41390409d85.jpg?fit=bounds&format=auto&optimize=medium&width=221&s=0x51e9691a97329766c65abc89002a97561c363f05",
+    "productUrl": "https://www.mathem.se/se/products/4904-kungsornen-fusilli-fullkornspasta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5604",
+    "name": "Barilla Spaghetti Glutenfri",
+    "brand": "Barilla",
+    "packageText": "400 g",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 59.03,
+    "unitPriceText": "59.03 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/77afe5f2-91a9-4cbc-a6de-e0cf3772a0a9.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x33a7b116d1718980690a3e713b7c3daec1a3cc0e",
+    "productUrl": "https://www.mathem.se/se/products/5604-barilla-spaghetti-glutenfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5831",
+    "name": "Barilla Spaghetti",
+    "brand": "Barilla",
+    "packageText": "1000 g",
+    "price": 24.56,
+    "priceText": "24.56 SEK",
+    "unitPrice": 24.56,
+    "unitPriceText": "24.56 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/dc382a29-a053-48a9-a8f6-62cf13e160d5.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x62e2b660a229837dfc6fab23c2103b97ddd0b2cd",
+    "productUrl": "https://www.mathem.se/se/products/5831-barilla-spaghetti/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "6559",
+    "name": "Barilla Pastasås Basilika",
+    "brand": "Barilla",
+    "packageText": "400 g",
+    "price": 20.7,
+    "priceText": "20.70 SEK",
+    "unitPrice": 51.75,
+    "unitPriceText": "51.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6bedb9e3-70d2-47ca-86e3-f6e0e2c7777c.jpg?fit=bounds&format=auto&optimize=medium&width=162&s=0x3b2648a1a09566a6daaeba3d67ba110a4a2f5a98",
+    "productUrl": "https://www.mathem.se/se/products/6559-barilla-pastasas-basilika/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "6641",
+    "name": "Barilla Pasta Cannelloni",
+    "brand": "Barilla",
+    "packageText": "250 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 113.4,
+    "unitPriceText": "113.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5e13d1c5-0674-44b4-98ec-c6acc884f1c9.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc899103e9df8d89fbd966e030f82633bdcfd758e",
+    "productUrl": "https://www.mathem.se/se/products/6641-barilla-pasta-cannelloni/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "8669",
+    "name": "Risberg Gochujang Pasta",
+    "brand": "Risberg",
+    "packageText": "200 g",
+    "price": 40.65,
+    "priceText": "40.65 SEK",
+    "unitPrice": 203.25,
+    "unitPriceText": "203.25 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/21441438-21b1-4459-a7be-fdac02f15304.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x7a54aa0b93c706c91510d27a69372205f5d05360",
+    "productUrl": "https://www.mathem.se/se/products/8669-risberg-gochujang-pasta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "4617",
+    "name": "Arla Ko® Yoghurt Mild 3% Naturell",
+    "brand": "Arla Ko®",
+    "packageText": "1000 g",
+    "price": 19.4,
+    "priceText": "19.40 SEK",
+    "unitPrice": 19.4,
+    "unitPriceText": "19.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8031bb9e-548a-4d6f-aee7-9393499daa5c.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0x52b61c94404f6c68fd001180001c94fabfef4eb0",
+    "productUrl": "https://www.mathem.se/se/products/4617-arla-ko-r-yoghurt-mild-3-naturell/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5168",
+    "name": "Arla Ko® Yoghurt Mild 2% Vanilj",
+    "brand": "Arla Ko®",
+    "packageText": "1000 g",
+    "price": 20.3,
+    "priceText": "20.30 SEK",
+    "unitPrice": 20.3,
+    "unitPriceText": "20.30 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d611b2a1-67cf-49f4-8269-12f186e906d3.jpg?fit=bounds&format=auto&optimize=medium&width=91&s=0x3f501dc6cdf872a100e170bfced1e1120cb569a4",
+    "productUrl": "https://www.mathem.se/se/products/5168-arla-ko-r-yoghurt-mild-2-vanilj/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "8279",
+    "name": "Arla® Grekisk Yoghurt 0% Naturell",
+    "brand": "Arla®",
+    "packageText": "1000 g",
+    "price": 40.22,
+    "priceText": "40.22 SEK",
+    "unitPrice": 40.22,
+    "unitPriceText": "40.22 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/19a3701a-f041-4a0e-af6a-deffa0ad978b.jpg?fit=bounds&format=auto&optimize=medium&width=259&s=0xdb187b2ff8011d7a88e2197be30e71ed6d773482",
+    "productUrl": "https://www.mathem.se/se/products/8279-arla-r-grekisk-yoghurt-0-naturell/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5811",
+    "name": "Arla Ko® Yoghurt Mild 3% Naturell",
+    "brand": "Arla Ko®",
+    "packageText": "1,5 kg",
+    "price": 27.4,
+    "priceText": "27.40 SEK",
+    "unitPrice": 18.27,
+    "unitPriceText": "18.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4f010bcf-4ef2-4c0d-a406-a90370ad58fb.jpg?fit=bounds&format=auto&optimize=medium&width=125&s=0x6429336f986f942e79b7c4556fc74d49e5485ec5",
+    "productUrl": "https://www.mathem.se/se/products/5811-arla-ko-r-yoghurt-mild-3-naturell/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "4745",
+    "name": "Arla Ko® Yoghurt Mild 3,8-4,5% Naturell EKO",
+    "brand": "Arla Ko®",
+    "packageText": "1000 g",
+    "price": 19.9,
+    "priceText": "19.90 SEK",
+    "unitPrice": 19.9,
+    "unitPriceText": "19.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fc855b09-757d-468b-9f36-0e28398d5161.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0x778f20a2b2e182fdb36985d209175d505c9463f3",
+    "productUrl": "https://www.mathem.se/se/products/4745-arla-ko-r-yoghurt-mild-38-45-naturell-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5768",
+    "name": "Yoggi® Yoghurt 2% Jordgubb & Smultron",
+    "brand": "Yoggi®",
+    "packageText": "1000 g",
+    "price": 22.9,
+    "priceText": "22.90 SEK",
+    "unitPrice": 22.9,
+    "unitPriceText": "22.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9b639c55-dd71-46fd-89b0-b162707e8c8d.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0x371b4e00e8ecdb9b0f12cc72ff1b6e2682ddfb3e",
+    "productUrl": "https://www.mathem.se/se/products/5768-yoggi-r-yoghurt-2-jordgubb-smultron/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5813",
+    "name": "Arla Ko® Grekisk Yoghurt Mild 6% Naturell",
+    "brand": "Arla Ko®",
+    "packageText": "1000 g",
+    "price": 24.9,
+    "priceText": "24.90 SEK",
+    "unitPrice": 24.9,
+    "unitPriceText": "24.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bcc5d74b-2357-45e3-b79d-4b942e90bb61.jpg?fit=bounds&format=auto&optimize=medium&width=91&s=0x05084eecee670c06e8c6e5da37d769c7983c1f02",
+    "productUrl": "https://www.mathem.se/se/products/5813-arla-ko-r-grekisk-yoghurt-mild-6-naturell/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "1018",
+    "name": "Larsa Foods Grekisk Yoghurt 0%",
+    "brand": "Larsa Foods",
+    "packageText": "500 g",
+    "price": 25.08,
+    "priceText": "25.08 SEK",
+    "unitPrice": 50.16,
+    "unitPriceText": "50.16 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a712bb0c-7a9a-420e-82f7-a7e7ab1a7b8c.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x17ffa42d3f519dfd14b210fa890082b58768a9e8",
+    "productUrl": "https://www.mathem.se/se/products/1018-larsa-foods-grekisk-yoghurt-0/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "9472",
+    "name": "Salakis Turkisk Yoghurt 10%",
+    "brand": "Salakis",
+    "packageText": "1 kg",
+    "price": 31.5,
+    "priceText": "31.50 SEK",
+    "unitPrice": 31.5,
+    "unitPriceText": "31.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2984184e-7752-4a07-bf74-af2d15fded02.jpg?fit=bounds&format=auto&optimize=medium&width=274&s=0x24d4734677e816fc542a5e22c9753fe64d5604c0",
+    "productUrl": "https://www.mathem.se/se/products/9472-salakis-turkisk-yoghurt-10/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "6309",
+    "name": "Valio Yoghurt Naturell Laktosfri 2,5%",
+    "brand": "Valio",
+    "packageText": "1000 g",
+    "price": 25.08,
+    "priceText": "25.08 SEK",
+    "unitPrice": 25.08,
+    "unitPriceText": "25.08 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/02682cf6-0a23-4368-87e2-eb18fc886e32.jpg?fit=bounds&format=auto&optimize=medium&width=94&s=0x3fc41abfc510967483fc5af99c9e586c311736b9",
+    "productUrl": "https://www.mathem.se/se/products/6309-valio-yoghurt-naturell-laktosfri-25/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7324",
+    "name": "Arla Ko® Yoghurt Mild 2% Vanilj",
+    "brand": "Arla Ko®",
+    "packageText": "1500 g",
+    "price": 29.95,
+    "priceText": "29.95 SEK",
+    "unitPrice": 19.97,
+    "unitPriceText": "19.97 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/feb4172c-b788-4ec5-8f7d-d27f218c66cc.jpg?fit=bounds&format=auto&optimize=medium&width=125&s=0x5cd78e514ab2304133bb269e1858d81af47c5d91",
+    "productUrl": "https://www.mathem.se/se/products/7324-arla-ko-r-yoghurt-mild-2-vanilj/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5839",
+    "name": "Yoggi® Yoghurt 2% Skogsbär",
+    "brand": "Yoggi®",
+    "packageText": "1000 g",
+    "price": 22.9,
+    "priceText": "22.90 SEK",
+    "unitPrice": 22.9,
+    "unitPriceText": "22.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2bab238f-87ba-47df-8115-25c7093198df.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0x9afd3cc4da3d052e5bf55647238cda9ccba3c4c8",
+    "productUrl": "https://www.mathem.se/se/products/5839-yoggi-r-yoghurt-2-skogsbar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "9509",
+    "name": "Larsa Foods Grekisk Yoghurt 10% Naturell",
+    "brand": "Larsa Foods",
+    "packageText": "1000 g",
+    "price": 35.92,
+    "priceText": "35.92 SEK",
+    "unitPrice": 35.92,
+    "unitPriceText": "35.92 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6dd471f4-174e-4307-81a6-92a20ee6c7a7.jpg?fit=bounds&format=auto&optimize=medium&width=274&s=0x02a7d142b4529af468f6dacded31d3326b5cf7f6",
+    "productUrl": "https://www.mathem.se/se/products/9509-larsa-foods-grekisk-yoghurt-10-naturell/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7036",
+    "name": "Arla Ko® Grekisk Yoghurt Laktosfri 6% Naturell",
+    "brand": "Arla Ko®",
+    "packageText": "1000 g",
+    "price": 31.18,
+    "priceText": "31.18 SEK",
+    "unitPrice": 31.18,
+    "unitPriceText": "31.18 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5c43d76c-c425-4b9a-8f28-581a5454dfb2.jpg?fit=bounds&format=auto&optimize=medium&width=91&s=0xd0d4a9d2c0da2e28a4813be7ec20b5d81114f65c",
+    "productUrl": "https://www.mathem.se/se/products/7036-arla-ko-r-grekisk-yoghurt-laktosfri-6-naturell/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "3331",
+    "name": "Salakis Grekisk Yoghurt 0% Laktosfri",
+    "brand": "Salakis",
+    "packageText": "500 g",
+    "price": 26.5,
+    "priceText": "26.50 SEK",
+    "unitPrice": 53,
+    "unitPriceText": "53.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/db4467ee-184b-444d-91fe-99670eedbd2d.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x1cbf456aeeee6ff218bdf3dcc954233674850e99",
+    "productUrl": "https://www.mathem.se/se/products/3331-salakis-grekisk-yoghurt-0-laktosfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5862",
+    "name": "Yoggi® Yoghurt 2% Samoa",
+    "brand": "Yoggi®",
+    "packageText": "1000 g",
+    "price": 22.9,
+    "priceText": "22.90 SEK",
+    "unitPrice": 22.9,
+    "unitPriceText": "22.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6201ef48-fdb2-409a-98ab-6b8376321088.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0x3030ed668ed63919282bbd089fa00762a2cac231",
+    "productUrl": "https://www.mathem.se/se/products/5862-yoggi-r-yoghurt-2-samoa/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7192",
+    "name": "Valio Yoghurt Vanilj Laktosfri 2,1%",
+    "brand": "Valio",
+    "packageText": "1000 g",
+    "price": 30.76,
+    "priceText": "30.76 SEK",
+    "unitPrice": 30.76,
+    "unitPriceText": "30.76 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8bea3fbc-80d9-4483-acc9-cd5616a0976f.jpg?fit=bounds&format=auto&optimize=medium&width=112&s=0xe302bdc49dbc451dd26c17c266c4c852aecabf0d",
+    "productUrl": "https://www.mathem.se/se/products/7192-valio-yoghurt-vanilj-laktosfri-21/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "3585",
+    "name": "Arla Ko® Lättyoghurt Mild 0,5% Naturell",
+    "brand": "Arla Ko®",
+    "packageText": "1000 g",
+    "price": 16.9,
+    "priceText": "16.90 SEK",
+    "unitPrice": 16.9,
+    "unitPriceText": "16.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/46ba84a2-c77d-49ba-816c-6fcf6ee9da40.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0xd3d1690a1802206c2180a537485a3c4951cb8676",
+    "productUrl": "https://www.mathem.se/se/products/3585-arla-ko-r-lattyoghurt-mild-05-naturell/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "2966",
+    "name": "Arla Köket® Grekisk Yoghurt 10%",
+    "brand": "Arla Köket®",
+    "packageText": "1000 g",
+    "price": 38.76,
+    "priceText": "38.76 SEK",
+    "unitPrice": 38.76,
+    "unitPriceText": "38.76 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/eee4153a-35f1-4e7c-bb2c-6d216a270998.jpg?fit=bounds&format=auto&optimize=medium&width=287&s=0xc9d60ad093b85bcbfa26379f473dafb007866cc9",
+    "productUrl": "https://www.mathem.se/se/products/2966-arla-koket-r-grekisk-yoghurt-10/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "8393",
+    "name": "Arla Ko® Turkisk Yoghurt Laktosfri 10%",
+    "brand": "Arla Ko®",
+    "packageText": "1000 g",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 37.81,
+    "unitPriceText": "37.81 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b47ce9d4-78b6-473f-9ddc-eade871842cd.jpg?fit=bounds&format=auto&optimize=medium&width=287&s=0x4dd312e07d7dfd028f756373f466731fac037221",
+    "productUrl": "https://www.mathem.se/se/products/8393-arla-ko-r-turkisk-yoghurt-laktosfri-10/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "8425",
+    "name": "Arla® Grekisk Yoghurt Naturell 10%",
+    "brand": "Arla®",
+    "packageText": "1000 g",
+    "price": 42.12,
+    "priceText": "42.12 SEK",
+    "unitPrice": 42.12,
+    "unitPriceText": "42.12 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/23820670-8ef8-48d5-ab44-6d2e69e0cfc1.jpg?fit=bounds&format=auto&optimize=medium&width=259&s=0xbeac879fcd467e71dcfae80d6ba2fc16a9c982e8",
+    "productUrl": "https://www.mathem.se/se/products/8425-arla-r-grekisk-yoghurt-naturell-10/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "64181",
+    "name": "Yoggi® Yoghurt Körsbär 2%",
+    "brand": "Yoggi®",
+    "packageText": "1000 g",
+    "price": 22.9,
+    "priceText": "22.90 SEK",
+    "unitPrice": 22.9,
+    "unitPriceText": "22.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e0505cb8-dc4f-410c-b9a3-9b783965eef1.jpg?fit=bounds&format=auto&optimize=medium&width=91&s=0xae202b5c0d3316c6e2047bee3bd72274828d8996",
+    "productUrl": "https://www.mathem.se/se/products/64181-yoggi-r-yoghurt-korsbar-2/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "63746",
+    "name": "Arla® Yoghurt Jordgubb 1,8% Familjefavoriter",
+    "brand": "Arla®",
+    "packageText": "1500 g",
+    "price": 29.81,
+    "priceText": "29.81 SEK",
+    "unitPrice": 19.87,
+    "unitPriceText": "19.87 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/70ff89ea-e4ab-476d-9f5b-8405a7796335.jpg?fit=bounds&format=auto&optimize=medium&width=150&s=0x60f8305bbf360460d20d8785966655f30449d98d",
+    "productUrl": "https://www.mathem.se/se/products/63746-arla-r-yoghurt-jordgubb-18-familjefavoriter/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "2893",
+    "name": "Arla Ko® Yoghurt Lätt Mild 0,5% Naturell EKO",
+    "brand": "Arla Ko®",
+    "packageText": "1000 g",
+    "price": 19.9,
+    "priceText": "19.90 SEK",
+    "unitPrice": 19.9,
+    "unitPriceText": "19.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/39ad22f2-078a-43ed-87e1-eabac17c5d1c.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0xa722810f799a547ed571787c057a2fd883b8ad21",
+    "productUrl": "https://www.mathem.se/se/products/2893-arla-ko-r-yoghurt-latt-mild-05-naturell-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5165",
+    "name": "Garant Yoghurt Mild Vanilj 2%",
+    "brand": "Garant",
+    "packageText": "1000 g",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 18.88,
+    "unitPriceText": "18.88 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e0e680df-3b0b-48dd-a5f4-2ed7c06465c5.jpg?fit=bounds&format=auto&optimize=medium&width=111&s=0x67d2c906aa3f332b7f896b9e075117397bf31154",
+    "productUrl": "https://www.mathem.se/se/products/5165-garant-yoghurt-mild-vanilj-2/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5962",
+    "name": "Arla Ko® Mild Yoghurt Jordgubb Lättsockrad 1,5%",
+    "brand": "Arla Ko®",
+    "packageText": "1000 g",
+    "price": 26.97,
+    "priceText": "26.97 SEK",
+    "unitPrice": 26.97,
+    "unitPriceText": "26.97 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d8811de5-6ab9-47c1-aae1-c86aae34011b.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0x6edb41e6eed102ca27bc3b2a88ddd52a425c2b70",
+    "productUrl": "https://www.mathem.se/se/products/5962-arla-ko-r-mild-yoghurt-jordgubb-lattsockrad-15/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "2242",
+    "name": "Yoggi® Yoghurt Laktosfri 2% Skogsbär",
+    "brand": "Yoggi®",
+    "packageText": "1000 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 30.24,
+    "unitPriceText": "30.24 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e093bcb4-ce56-464a-b64b-ecbe2dd72a94.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0x4ea43a5a4ffd56814ad59c5ceab90094567576d7",
+    "productUrl": "https://www.mathem.se/se/products/2242-yoggi-r-yoghurt-laktosfri-2-skogsbar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5931",
+    "name": "Yoggi® Yoghurt Blåbär 2%",
+    "brand": "Yoggi®",
+    "packageText": "1000 g",
+    "price": 22.9,
+    "priceText": "22.90 SEK",
+    "unitPrice": 22.9,
+    "unitPriceText": "22.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e5988356-9799-4596-942e-dea7e6c35bcc.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0xc916d08b7c30d8dbfb73ff54600196e7a7b97e41",
+    "productUrl": "https://www.mathem.se/se/products/5931-yoggi-r-yoghurt-blabar-2/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "4716",
+    "name": "Arla Ko® Yoghurt 3% Naturell",
+    "brand": "Arla Ko®",
+    "packageText": "1000 g",
+    "price": 19.4,
+    "priceText": "19.40 SEK",
+    "unitPrice": 19.4,
+    "unitPriceText": "19.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bcf36882-57ae-4481-bb96-3b90177a6960.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0x3166d8a16ac65653b1fe8789a27c2dbddc2a0852",
+    "productUrl": "https://www.mathem.se/se/products/4716-arla-ko-r-yoghurt-3-naturell/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "64664",
+    "name": "Valio Grekisk Yoghurt Mango Laktosfri",
+    "brand": "Valio",
+    "packageText": "150 g",
+    "price": 13.2,
+    "priceText": "13.20 SEK",
+    "unitPrice": 88,
+    "unitPriceText": "88.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/37b66f27-2aa4-4d00-a63d-b792d296eea2.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x0dc967495323f917d64bc194dd51ef2ea798cf9e",
+    "productUrl": "https://www.mathem.se/se/products/64664-valio-grekisk-yoghurt-mango-laktosfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "2992",
+    "name": "Valio Yoghurt Lätt Naturell Laktosfri 0,4%",
+    "brand": "Valio",
+    "packageText": "1000 g",
+    "price": 25.08,
+    "priceText": "25.08 SEK",
+    "unitPrice": 25.08,
+    "unitPriceText": "25.08 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/acda2241-8d92-41dd-a946-1ee513d2914a.jpg?fit=bounds&format=auto&optimize=medium&width=94&s=0xf0ed91bbc025c8b2e5b5ef50399e3c6af88234dc",
+    "productUrl": "https://www.mathem.se/se/products/2992-valio-yoghurt-latt-naturell-laktosfri-04/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "4657",
+    "name": "Garant Mild Yoghurt Naturell 3%",
+    "brand": "Garant",
+    "packageText": "1000 g",
+    "price": 18.46,
+    "priceText": "18.46 SEK",
+    "unitPrice": 18.46,
+    "unitPriceText": "18.46 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f0e8a6aa-476f-4fc2-9d91-90ff28f560bb.jpg?fit=bounds&format=auto&optimize=medium&width=111&s=0xbef115169ba12d0a754ad1c6c45213492be752a0",
+    "productUrl": "https://www.mathem.se/se/products/4657-garant-mild-yoghurt-naturell-3/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "65696",
+    "name": "Garant Eko Yoghurt Naturell 3.8-4.5% KRAV",
+    "brand": "Garant Eko",
+    "packageText": "1500 g",
+    "price": 27.95,
+    "priceText": "27.95 SEK",
+    "unitPrice": 18.63,
+    "unitPriceText": "18.63 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/49c4c982-faac-4706-8f53-115a5bc21d39.jpg?fit=bounds&format=auto&optimize=medium&width=135&s=0xb8765dfca10edb2c414bc06120b56c93df5582a7",
+    "productUrl": "https://www.mathem.se/se/products/65696-garant-eko-yoghurt-naturell-3-8-4-5-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "2604",
+    "name": "Yoggi® Yoghurt Laktosfri 2,1% Jordgubb & Smultron",
+    "brand": "Yoggi®",
+    "packageText": "1000 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 30.24,
+    "unitPriceText": "30.24 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/775ccdd8-34ae-4708-990b-1ec1c659db37.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0x07f84067d667d3ec34fa6a7e5c641fb5160035ce",
+    "productUrl": "https://www.mathem.se/se/products/2604-yoggi-r-yoghurt-laktosfri-21-jordgubb-smultron/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7343",
+    "name": "Valio Yoghurt Hallon Laktosfri 2,1%",
+    "brand": "Valio",
+    "packageText": "1000 g",
+    "price": 30.76,
+    "priceText": "30.76 SEK",
+    "unitPrice": 30.76,
+    "unitPriceText": "30.76 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a950b3f6-f4a8-44b5-8a87-9d2765ecd377.jpg?fit=bounds&format=auto&optimize=medium&width=94&s=0x4587560aad0ebbbe05328e59632c9e3e47162ddf",
+    "productUrl": "https://www.mathem.se/se/products/7343-valio-yoghurt-hallon-laktosfri-21/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5840",
+    "name": "Arla Ko® Mild Yoghurt Hallon Lättsockrad 1,5%",
+    "brand": "Arla Ko®",
+    "packageText": "1000 g",
+    "price": 26.97,
+    "priceText": "26.97 SEK",
+    "unitPrice": 26.97,
+    "unitPriceText": "26.97 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c50f7941-997b-4c20-a226-8427a9825a9e.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0xf7934369a34c1986476019f957082184d382311d",
+    "productUrl": "https://www.mathem.se/se/products/5840-arla-ko-r-mild-yoghurt-hallon-lattsockrad-15/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7663",
+    "name": "Arla® Grekisk Yoghurt Citron 0,2%",
+    "brand": "Arla®",
+    "packageText": "200 g",
+    "price": 15.1,
+    "priceText": "15.10 SEK",
+    "unitPrice": 75.5,
+    "unitPriceText": "75.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/65050120-c8ce-4414-964b-9c50092bbe16.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x757222797e4443b38d2f5291ace6ba2c191affcf",
+    "productUrl": "https://www.mathem.se/se/products/7663-arla-r-grekisk-yoghurt-citron-02/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "65397",
+    "name": "Garant Yoghurt Jordgubb 2,6%",
+    "brand": "Garant",
+    "packageText": "1000 g",
+    "price": 22.24,
+    "priceText": "22.24 SEK",
+    "unitPrice": 22.24,
+    "unitPriceText": "22.24 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/67ccbe93-118d-457d-98c5-0f1c785ff66e.jpg?fit=bounds&format=auto&optimize=medium&width=112&s=0x52bd15ba854970843da4d70d08396c8b362f564e",
+    "productUrl": "https://www.mathem.se/se/products/65397-garant-yoghurt-jordgubb-26/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5649",
+    "name": "Arla Ko® Yoghurt Mild 1,5% Vanilj Mindre Socker",
+    "brand": "Arla Ko®",
+    "packageText": "1000 g",
+    "price": 24.13,
+    "priceText": "24.13 SEK",
+    "unitPrice": 24.13,
+    "unitPriceText": "24.13 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1136da1a-b5c8-4faa-a20e-cb18e7a91cfa.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0xeaa09cba1fb7519e2812a435496cd08874db5ca0",
+    "productUrl": "https://www.mathem.se/se/products/5649-arla-ko-r-yoghurt-mild-15-vanilj-mindre-socker/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "8522",
+    "name": "Salakis Grekisk Yoghurt 10%",
+    "brand": "Salakis",
+    "packageText": "1000 g",
+    "price": 38.95,
+    "priceText": "38.95 SEK",
+    "unitPrice": 38.95,
+    "unitPriceText": "38.95 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1150771f-b6e4-4620-9879-067c512a3157.jpg?fit=bounds&format=auto&optimize=medium&width=263&s=0x1b5e85741f2c424edb345268d0a0b8d48d8517d4",
+    "productUrl": "https://www.mathem.se/se/products/8522-salakis-grekisk-yoghurt-10/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "9486",
+    "name": "Arla Köket® Turkisk Yoghurt 10%",
+    "brand": "Arla Köket®",
+    "packageText": "1000 g",
+    "price": 36.86,
+    "priceText": "36.86 SEK",
+    "unitPrice": 36.86,
+    "unitPriceText": "36.86 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ccd640b8-33a7-4722-99c9-0065838cbc17.jpg?fit=bounds&format=auto&optimize=medium&width=268&s=0x51fc7beaf7f023c778cc514eafc3c4cdb4c9affd",
+    "productUrl": "https://www.mathem.se/se/products/9486-arla-koket-r-turkisk-yoghurt-10/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "3072",
+    "name": "Garant Turkisk Yoghurt 10%",
+    "brand": "Garant",
+    "packageText": "500 g",
+    "price": 22.24,
+    "priceText": "22.24 SEK",
+    "unitPrice": 44.48,
+    "unitPriceText": "44.48 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/612cfced-e873-4d53-a82d-a8ecdd0bd9dc.jpg?fit=bounds&format=auto&optimize=medium&width=209&s=0xe039bc9cad27e4e4763d12501770347630ab97fc",
+    "productUrl": "https://www.mathem.se/se/products/3072-garant-turkisk-yoghurt-10/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "8067",
+    "name": "Pågen Pågenlimpan",
+    "brand": "Pågen",
+    "packageText": "900 g",
+    "price": 31.4,
+    "priceText": "31.40 SEK",
+    "unitPrice": 34.89,
+    "unitPriceText": "34.89 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fec2f594-dc35-44ac-9379-f246f471f144.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x52145b4137926cc5096dce95d935b4f77c6e0e36",
+    "productUrl": "https://www.mathem.se/se/products/8067-pagen-pagenlimpan/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5664",
+    "name": "Pågen Lingongrova",
+    "brand": "Pågen",
+    "packageText": "500 g",
+    "price": 23.95,
+    "priceText": "23.95 SEK",
+    "unitPrice": 47.9,
+    "unitPriceText": "47.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/07e77a8c-4d98-4632-9f31-32948244bd05.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x12939e6576bca0314e00ab8785af68e8dd7d3917",
+    "productUrl": "https://www.mathem.se/se/products/5664-pagen-lingongrova/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7657",
+    "name": "Liba Bröd Tunnbröd Vitt 4-p",
+    "brand": "Liba Bröd",
+    "packageText": "330 g",
+    "price": 14.15,
+    "priceText": "14.15 SEK",
+    "unitPrice": 42.88,
+    "unitPriceText": "42.88 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/caf3dd86-0986-435b-902d-71eb461c3b72.jpg?fit=bounds&format=auto&optimize=medium&width=249&s=0xfb4039c86c03c3263f2244baec0fbd38062e91de",
+    "productUrl": "https://www.mathem.se/se/products/7657-liba-brod-tunnbrod-vitt-4-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "6134",
+    "name": "Skogaholm Skogaholmslimpa Skivad",
+    "brand": "Skogaholm",
+    "packageText": "775 g",
+    "price": 20,
+    "priceText": "20.00 SEK",
+    "unitPrice": 25.81,
+    "unitPriceText": "25.81 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/66125233-ec70-41f1-9aa3-cefea7ad2895.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc57577e19f36842e874f98dfc2f9dbf9198831e1",
+    "productUrl": "https://www.mathem.se/se/products/6134-skogaholm-skogaholmslimpa-skivad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "8555",
+    "name": "Pågen Levain Råg",
+    "brand": "Pågen",
+    "packageText": "650 g",
+    "price": 35.2,
+    "priceText": "35.20 SEK",
+    "unitPrice": 54.15,
+    "unitPriceText": "54.15 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1ed63484-458a-451e-b2e3-c92ec6b1ad28.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xd156a51dc2f800780da4cd9a388d2c151784b7b8",
+    "productUrl": "https://www.mathem.se/se/products/8555-pagen-levain-rag/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "10025",
+    "name": "Pågen Grötbröd",
+    "brand": "Pågen",
+    "packageText": "780 g",
+    "price": 36.95,
+    "priceText": "36.95 SEK",
+    "unitPrice": 47.37,
+    "unitPriceText": "47.37 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/37bb16cd-6af8-47ea-9331-b0945a6089dd.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x33f6c754aba97f9f0fedd421d9a1154c45383f84",
+    "productUrl": "https://www.mathem.se/se/products/10025-pagen-grotbrod/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "4880",
+    "name": "Pågen Rosta",
+    "brand": "Pågen",
+    "packageText": "450 g",
+    "price": 17.7,
+    "priceText": "17.70 SEK",
+    "unitPrice": 39.33,
+    "unitPriceText": "39.33 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d816bd2d-6a2b-42aa-9268-daf96dd643ba.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdcdf57bc21824c1133ab944eb3b65c49ce1ebc8b",
+    "productUrl": "https://www.mathem.se/se/products/4880-pagen-rosta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "9729",
+    "name": "Pågen Skärgårdskaka Hönö",
+    "brand": "Pågen",
+    "packageText": "18 st",
+    "price": 33.3,
+    "priceText": "33.30 SEK",
+    "unitPrice": 44.4,
+    "unitPriceText": "44.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/167566e1-e088-43e7-9908-78b289e77a75.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xb06a9bbdcf2621e34b1aed31f66d5d6508407ec1",
+    "productUrl": "https://www.mathem.se/se/products/9729-pagen-skargardskaka-hono/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7522",
+    "name": "Eldorado Baguette Mini 6-p",
+    "brand": "Eldorado",
+    "packageText": "300 g",
+    "price": 12.78,
+    "priceText": "12.78 SEK",
+    "unitPrice": 42.6,
+    "unitPriceText": "42.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b13d9900-9c47-4f10-a191-afc98a385359.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xff24fd6d6fce92220bbcf301d7ece31bedef85fb",
+    "productUrl": "https://www.mathem.se/se/products/7522-eldorado-baguette-mini-6-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5494",
+    "name": "Wasa Knäckebröd Delikatess bröd",
+    "brand": "Wasa",
+    "packageText": "270 g",
+    "price": 22.67,
+    "priceText": "22.67 SEK",
+    "unitPrice": 83.96,
+    "unitPriceText": "83.96 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7229d6e1-7446-44e2-8f77-c9922bd67119.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x121bb6eebc0e6df8dfaf0cecd240f69259bed26e",
+    "productUrl": "https://www.mathem.se/se/products/5494-wasa-knackebrod-delikatess-brod/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5876",
+    "name": "Wasa Knäckebröd Sport bröd",
+    "brand": "Wasa",
+    "packageText": "550 g",
+    "price": 24.56,
+    "priceText": "24.56 SEK",
+    "unitPrice": 44.65,
+    "unitPriceText": "44.65 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4472772b-3497-43f4-b9e5-999fc37fe6a3.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xe016020971f9220b4ddadaca56a8605764a7ef33",
+    "productUrl": "https://www.mathem.se/se/products/5876-wasa-knackebrod-sport-brod/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "8698",
+    "name": "Schär Bröd Classic Glutenfri",
+    "brand": "Schär",
+    "packageText": "300 g",
+    "price": 40.65,
+    "priceText": "40.65 SEK",
+    "unitPrice": 135.5,
+    "unitPriceText": "135.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/07d158d8-9633-441a-b850-aac173713d2e.jpg?fit=bounds&format=auto&optimize=medium&width=127&s=0x083a4c97468d52e9a34e3c7d583de0c3ac12a9cc",
+    "productUrl": "https://www.mathem.se/se/products/8698-schar-brod-classic-glutenfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "8786",
+    "name": "Schär Bröd Flerkorn Glutenfri",
+    "brand": "Schär",
+    "packageText": "300 g",
+    "price": 40.65,
+    "priceText": "40.65 SEK",
+    "unitPrice": 135.5,
+    "unitPriceText": "135.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ac998cee-3878-4186-a99a-74e2fc3d14c9.jpg?fit=bounds&format=auto&optimize=medium&width=127&s=0x7b5e08a76c37f1d371557ca1b849bfcd57d0a3d8",
+    "productUrl": "https://www.mathem.se/se/products/8786-schar-brod-flerkorn-glutenfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5461",
+    "name": "Garant Grovt Bröd Lingon",
+    "brand": "Garant",
+    "packageText": "500 g",
+    "price": 18.83,
+    "priceText": "18.83 SEK",
+    "unitPrice": 37.66,
+    "unitPriceText": "37.66 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/661fb341-4e77-463e-b8e4-9ebdeb068b3a.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x19e4f66b29ba2624c802ff5f80e06dac67e15c1f",
+    "productUrl": "https://www.mathem.se/se/products/5461-garant-grovt-brod-lingon/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7063",
+    "name": "Wasa Knäckebröd Krögarens bröd",
+    "brand": "Wasa",
+    "packageText": "330 g",
+    "price": 29.29,
+    "priceText": "29.29 SEK",
+    "unitPrice": 88.76,
+    "unitPriceText": "88.76 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3bd83f2b-4349-4480-a145-76c85a23fcf9.jpg?fit=bounds&format=auto&optimize=medium&width=299&s=0x6a13276ae260706060908dedfd3f6ef4a2802e74",
+    "productUrl": "https://www.mathem.se/se/products/7063-wasa-knackebrod-krogarens-brod/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7735",
+    "name": "Wasa Knäckebröd Husman bröd",
+    "brand": "Wasa",
+    "packageText": "260 g",
+    "price": 15.1,
+    "priceText": "15.10 SEK",
+    "unitPrice": 58.08,
+    "unitPriceText": "58.08 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7990d744-0a2b-4e46-a869-2a4feb6e550e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x70c3105524f5808530b86f6221e62bf03cd62b65",
+    "productUrl": "https://www.mathem.se/se/products/7735-wasa-knackebrod-husman-brod/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5425",
+    "name": "Wasa Knäckebröd Frukost bröd",
+    "brand": "Wasa",
+    "packageText": "240 g",
+    "price": 22.67,
+    "priceText": "22.67 SEK",
+    "unitPrice": 94.46,
+    "unitPriceText": "94.46 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0101d38d-7cd8-4cfc-bb19-dc80575302a0.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x53635658b76a2dc2a4a175311fb0e14eeb44c505",
+    "productUrl": "https://www.mathem.se/se/products/5425-wasa-knackebrod-frukost-brod/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "9868",
+    "name": "Wasa Knäckebröd Delikatess bröd",
+    "brand": "Wasa",
+    "packageText": "540 g",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 70.02,
+    "unitPriceText": "70.02 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/60df2a99-3949-44e6-9f31-756cd410b9fc.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xf65be27a155ea93afecb2513fa3e24df8aa18c1f",
+    "productUrl": "https://www.mathem.se/se/products/9868-wasa-knackebrod-delikatess-brod/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "29",
+    "name": "Wasa Knäckebröd Havre bröd",
+    "brand": "Wasa",
+    "packageText": "300 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 100.8,
+    "unitPriceText": "100.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ddfe50ff-d306-4157-8972-656855c7e61e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdf51edf85001f16961914f3447875cbf9d61bdf6",
+    "productUrl": "https://www.mathem.se/se/products/29-wasa-knackebrod-havre-brod/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7275",
+    "name": "Wasa Knäckebröd Rågi bröd",
+    "brand": "Wasa",
+    "packageText": "550 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 54.98,
+    "unitPriceText": "54.98 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2f68f6d1-2541-44ac-9ef3-acffbff21b33.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x9eba54fe5e14f0862b5205ccf80fccec2d308f4d",
+    "productUrl": "https://www.mathem.se/se/products/7275-wasa-knackebrod-ragi-brod/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "10651",
+    "name": "NyStart! Nystart Bröd Fryst Carbzone",
+    "brand": "NyStart!",
+    "packageText": "450 g",
+    "price": 41.6,
+    "priceText": "41.60 SEK",
+    "unitPrice": 92.44,
+    "unitPriceText": "92.44 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e1d047b6-73a1-4a1e-8f91-c1406e75847d.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x24694f48e67902d7306999a32b01e52efc52df9c",
+    "productUrl": "https://www.mathem.se/se/products/10651-nystart-nystart-brod-fryst-carbzone/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "6497",
+    "name": "Wasa Knäckebröd Delikatess Sesam bröd",
+    "brand": "Wasa",
+    "packageText": "285 g",
+    "price": 27.4,
+    "priceText": "27.40 SEK",
+    "unitPrice": 96.14,
+    "unitPriceText": "96.14 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e4f6f71d-461d-4223-b9d7-cabd93f05b79.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xea0e39f7f3a04c042b44ab2ac090af4bbd80a188",
+    "productUrl": "https://www.mathem.se/se/products/6497-wasa-knackebrod-delikatess-sesam-brod/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "7147",
+    "name": "Wasa Knäckebröd Runda Kanel bröd",
+    "brand": "Wasa",
+    "packageText": "330 g",
+    "price": 29.29,
+    "priceText": "29.29 SEK",
+    "unitPrice": 88.76,
+    "unitPriceText": "88.76 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3df9c76b-fb94-444a-b692-49cdb369effb.jpg?fit=bounds&format=auto&optimize=medium&width=166&s=0x32aff8ca56d3a206c06f7cae9e47c64ef5bbe6b0",
+    "productUrl": "https://www.mathem.se/se/products/7147-wasa-knackebrod-runda-kanel-brod/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "10530",
+    "name": "Low Carb Bröd Fryst Carbzone",
+    "brand": "Low Carb",
+    "packageText": "450 g",
+    "price": 41.6,
+    "priceText": "41.60 SEK",
+    "unitPrice": 92.44,
+    "unitPriceText": "92.44 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3d9ccaf7-26b8-48bf-ba71-acfdf574bc84.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa1477e8869a3306d5ea8e962d1665d83d57f86b5",
+    "productUrl": "https://www.mathem.se/se/products/10530-low-carb-low-carb-brod-fryst-carbzone/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "6376",
+    "name": "Korvbrödsbagarn French Hot Dog Bröd 3-p",
+    "brand": "Korvbrödsbagarn",
+    "packageText": "180 g",
+    "price": 23.5,
+    "priceText": "23.50 SEK",
+    "unitPrice": 130.56,
+    "unitPriceText": "130.56 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/43034eaa-96a7-4ccd-896a-8f986e4ec3c0.jpg?fit=bounds&format=auto&optimize=medium&width=194&s=0xc685ffe5c7b78ab6841b7b5e5f2db15db933e2c7",
+    "productUrl": "https://www.mathem.se/se/products/6376-korvbrodsbagarn-french-hot-dog-brod-3-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "2446",
+    "name": "Wasa Knäckebröd Rågi",
+    "brand": "Wasa",
+    "packageText": "1150 g",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 49.34,
+    "unitPriceText": "49.34 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6690cb95-98d7-4838-bc1d-171f0d01ce3d.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x0585b5d5733f22e2c41593d684389d6dbda0065f",
+    "productUrl": "https://www.mathem.se/se/products/2446-wasa-knackebrod-ragi/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "2943",
+    "name": "Wasa Knäckebröd Havre",
+    "brand": "Wasa",
+    "packageText": "1280 g",
+    "price": 99.38,
+    "priceText": "99.38 SEK",
+    "unitPrice": 77.64,
+    "unitPriceText": "77.64 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8ada1870-946c-4c06-99bf-f87f5fd35ccb.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x12a64e2cf74dcc94589fedaf9124c24c36944c44",
+    "productUrl": "https://www.mathem.se/se/products/2943-wasa-knackebrod-havre/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "3173",
+    "name": "Wasa Knäckebröd Husman",
+    "brand": "Wasa",
+    "packageText": "1100 g",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 51.58,
+    "unitPriceText": "51.58 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/91389961-d4c6-4e43-878b-0ad0e9ac3ed1.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x809bea300e85fb8829e27082f72946a2986d45db",
+    "productUrl": "https://www.mathem.se/se/products/3173-wasa-knackebrod-husman/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "8519",
+    "name": "Bake My Day Stenugnsbröd Skivat",
+    "brand": "Bake My Day",
+    "packageText": "680 g",
+    "price": 41.6,
+    "priceText": "41.60 SEK",
+    "unitPrice": 61.18,
+    "unitPriceText": "61.18 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a1f2c803-681b-4333-bc6e-3b93fd0d4a4b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xb3e433f2422f8f7e3afa4e976b3a8ca30ec505e9",
+    "productUrl": "https://www.mathem.se/se/products/8519-bake-my-day-stenugnsbrod-skivat/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "63594",
+    "name": "Liba Bröd Bagels Sesam 4-p",
+    "brand": "Liba Bröd",
+    "packageText": "300 g",
+    "price": 28.95,
+    "priceText": "28.95 SEK",
+    "unitPrice": 96.5,
+    "unitPriceText": "96.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9066e815-80bd-4cac-b95c-e7756d766121.jpg?fit=bounds&format=auto&optimize=medium&width=185&s=0x3de875e7fcc3cc3f67b7fde1598bef8d48e18e5b",
+    "productUrl": "https://www.mathem.se/se/products/63594-liba-brod-bagels-sesam-4-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "63595",
+    "name": "Liba Bröd Bagels Classic 4-p",
+    "brand": "Liba Bröd",
+    "packageText": "300 g",
+    "price": 28.95,
+    "priceText": "28.95 SEK",
+    "unitPrice": 96.5,
+    "unitPriceText": "96.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4bdd395c-c496-4923-89c1-43bba64302ee.jpg?fit=bounds&format=auto&optimize=medium&width=175&s=0x83264ee7fe95d20391d4ae42fa436cfbf950444c",
+    "productUrl": "https://www.mathem.se/se/products/63595-liba-brod-bagels-classic-4-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "64584",
+    "name": "Liba Bröd Belgiska Våfflor",
+    "brand": "Liba Bröd",
+    "packageText": "200 g",
+    "price": 26.5,
+    "priceText": "26.50 SEK",
+    "unitPrice": 132.5,
+    "unitPriceText": "132.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6ab783f0-faa4-42ea-9a69-486c054a9773.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa55a798df679cd1b862070f96871053a2605d261",
+    "productUrl": "https://www.mathem.se/se/products/64584-liba-brod-belgiska-vafflor/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "11550",
+    "name": "Vika Bröd Knäckebröd Original",
+    "brand": "Vika Bröd",
+    "packageText": "540 g",
+    "price": 72.4,
+    "priceText": "72.40 SEK",
+    "unitPrice": 134.07,
+    "unitPriceText": "134.07 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bf53c853-ce00-419e-9b27-f353a5001304.jpg?fit=bounds&format=auto&optimize=medium&width=288&s=0xc34bee4d17e3e2a9ce66ea07dbb821d376b27f3d",
+    "productUrl": "https://www.mathem.se/se/products/11550-vika-brod-knackebrod-original/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "5595",
+    "name": "Dan Sukker Brödsirap",
+    "brand": "Dan Sukker",
+    "packageText": "750 g",
+    "price": 27.4,
+    "priceText": "27.40 SEK",
+    "unitPrice": 36.53,
+    "unitPriceText": "36.53 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/08f5fbad-93e7-4dab-a1ed-8679fc620bb3.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0x3cf303b7f47317bbd88627cb92a9b4791b7dcff6",
+    "productUrl": "https://www.mathem.se/se/products/5595-dan-sukker-brodsirap/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "38954",
+    "name": "Hans & Gretas Glutenfria Bröd Grov Havrefralla Glutenfri Fryst 4-p",
+    "brand": "Hans & Gretas Glutenfria Bröd",
+    "packageText": "320 g",
+    "price": 41.17,
+    "priceText": "41.17 SEK",
+    "unitPrice": 128.66,
+    "unitPriceText": "128.66 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/27329c9e-301f-468b-ab69-b517e572cca1.jpg?fit=bounds&format=auto&optimize=medium&width=258&s=0xf293f306f5d0646503f95a481b2dcaad1a5e7805",
+    "productUrl": "https://www.mathem.se/se/products/38954-hans-gretas-glutenfria-brod-grov-havrefralla-glute/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "2415",
+    "name": "Schnitzer Baguette Glutenfri EKO",
+    "brand": "Schnitzer",
+    "packageText": "360 g",
+    "price": 61.47,
+    "priceText": "61.47 SEK",
+    "unitPrice": 170.75,
+    "unitPriceText": "170.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/60bd24c4-921d-4deb-89bc-29816398f59e.jpg?fit=bounds&format=auto&optimize=medium&width=196&s=0xecd12f1c7e211a28c1326fefda3f0dd14d85dc7d",
+    "productUrl": "https://www.mathem.se/se/products/2415-schnitzer-baguette-glutenfri-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "66045",
+    "name": "Garant Pane Napoletano",
+    "brand": "Garant",
+    "packageText": "250 g",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 75.52,
+    "unitPriceText": "75.52 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8d9ed1c1-c768-4b36-a838-05484bdd45d3.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xbf9424f3a9ae281cd68bf4eae2e013ea57f2ecd6",
+    "productUrl": "https://www.mathem.se/se/products/66045-garant-pane-napoletano/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "66558",
+    "name": "Schär Fiberbröd Glutenfri",
+    "brand": "Schär",
+    "packageText": "330 g",
+    "price": 40.65,
+    "priceText": "40.65 SEK",
+    "unitPrice": 123.18,
+    "unitPriceText": "123.18 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1f289e35-e066-49ff-83f9-f56c7c4b46fb.jpg?fit=bounds&format=auto&optimize=medium&width=127&s=0x982fbedcb898118f5c552120ca32707648633c88",
+    "productUrl": "https://www.mathem.se/se/products/66558-schar-fiberbrod-glutenfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "64883",
+    "name": "Moilas Mörk Rund Glutenfri Fryst 3-p",
+    "brand": "Moilas",
+    "packageText": "240 g",
+    "price": 37.7,
+    "priceText": "37.70 SEK",
+    "unitPrice": 157.08,
+    "unitPriceText": "157.08 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d4ad3392-093a-43ba-beea-60ce44401a0e.jpg?fit=bounds&format=auto&optimize=medium&width=257&s=0x569ddd2c05ae452b8156915366d67145f00300cc",
+    "productUrl": "https://www.mathem.se/se/products/64883-moilas-mork-rund-glutenfri-fryst-3-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "8627",
+    "name": "Fria Formbröd Havre Glutenfri Fryst",
+    "brand": "Fria",
+    "packageText": "500 g",
+    "price": 38.76,
+    "priceText": "38.76 SEK",
+    "unitPrice": 77.52,
+    "unitPriceText": "77.52 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/92392975-6ba8-47fa-987c-4b1a962e6a61.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xb48042f5e4e4cdde12bfa174f8c341147cc680a9",
+    "productUrl": "https://www.mathem.se/se/products/8627-fria-formbrod-havre-glutenfri-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "68093",
+    "name": "Fria Fiber Toast Glutenfri Fryst",
+    "brand": "Fria",
+    "packageText": "500 g",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 75.62,
+    "unitPriceText": "75.62 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/27407627-e900-4449-9969-dbe72cc55941.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x23f8d565386997c9917e2d8b7f50948aa2e45a97",
+    "productUrl": "https://www.mathem.se/se/products/68093-fria-fiber-toast-glutenfri-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "9678",
+    "name": "Skogaholm Kavring",
+    "brand": "Skogaholm",
+    "packageText": "650 g",
+    "price": 35.92,
+    "priceText": "35.92 SEK",
+    "unitPrice": 55.26,
+    "unitPriceText": "55.26 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9f55f140-d70e-46a7-831d-d209bec62fd8.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x81ca0fcbe0fa9377967ad91cc3540b5b4a957a16",
+    "productUrl": "https://www.mathem.se/se/products/9678-skogaholm-kavring/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "2862",
+    "name": "Arla Ko® Präst® Mellanlagrad 31%",
+    "brand": "Arla Ko®",
+    "packageText": "ca 720 g",
+    "price": 82.08,
+    "priceText": "82.08 SEK",
+    "unitPrice": 114,
+    "unitPriceText": "114.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5a003849-d158-48d2-b783-77923f1e7cc8.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc112af3fffd6aab9eac3800b2171e81f8e2bd843",
+    "productUrl": "https://www.mathem.se/se/products/2862-arla-ko-r-prast-r-mellanlagrad-31/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "24659",
+    "name": "Eldorado Gouda Skivad Ost 28%",
+    "brand": "Eldorado",
+    "packageText": "1 kg",
+    "price": 90.38,
+    "priceText": "90.38 SEK",
+    "unitPrice": 90.38,
+    "unitPriceText": "90.38 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/28f80c8b-ae2f-41c8-aff5-fcfafda45cca.jpg?fit=bounds&format=auto&optimize=medium&width=104&s=0x8005ab170b5fe4852cf37a0632e9dd6d654ac8b2",
+    "productUrl": "https://www.mathem.se/se/products/24659-eldorado-gouda-skivad-ost-28/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "6358",
+    "name": "Arla Köket® Riven Ost Texmex 29% Arla",
+    "brand": "Arla Köket®",
+    "packageText": "150 g",
+    "price": 24.8,
+    "priceText": "24.80 SEK",
+    "unitPrice": 165.33,
+    "unitPriceText": "165.33 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/68c02808-4032-478c-94e4-cf113552daea.jpg?fit=bounds&format=auto&optimize=medium&width=225&s=0x610e5bd933d717b8d546dd27f55c99d83beadfc2",
+    "productUrl": "https://www.mathem.se/se/products/6358-arla-koket-r-riven-ost-texmex-29-arla/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "3386",
+    "name": "Arla Ko® Herrgård® Mild 28%",
+    "brand": "Arla Ko®",
+    "packageText": "ca 730 g",
+    "price": 83.22,
+    "priceText": "83.22 SEK",
+    "unitPrice": 114,
+    "unitPriceText": "114.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c1335843-fc43-484b-8df3-ef2bdd1ff93f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xd39b910cdec1050125fb9ea3205e324f1834bb07",
+    "productUrl": "https://www.mathem.se/se/products/3386-arla-ko-r-herrgard-r-mild-28/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "11375",
+    "name": "Arla® Gräddis 30% Familjefavoriter Skivad Ost",
+    "brand": "Arla®",
+    "packageText": "750 g",
+    "price": 94.6,
+    "priceText": "94.60 SEK",
+    "unitPrice": 126.13,
+    "unitPriceText": "126.13 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3b8e38b3-41fb-4fe0-9a79-c5959fde3d49.jpg?fit=bounds&format=auto&optimize=medium&width=152&s=0x6688f54b42951d70bd7cd9754272287ec4cb9766",
+    "productUrl": "https://www.mathem.se/se/products/11375-arla-r-graddis-30-familjefavoriter-skivad-ost/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "6526",
+    "name": "Arla Köket® Riven Ost Mager 12% Arla",
+    "brand": "Arla Köket®",
+    "packageText": "150 g",
+    "price": 24.8,
+    "priceText": "24.80 SEK",
+    "unitPrice": 165.33,
+    "unitPriceText": "165.33 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5aa9a06c-74be-4b4f-ae50-ca7c0c9facc9.jpg?fit=bounds&format=auto&optimize=medium&width=225&s=0xc3bdb2c7f7a50e86594682444b95b04d9c9eadd9",
+    "productUrl": "https://www.mathem.se/se/products/6526-arla-koket-r-riven-ost-mager-12-arla/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "11348",
+    "name": "Arla® Gouda Familjefavoriter Skivad 28%",
+    "brand": "Arla®",
+    "packageText": "750 g",
+    "price": 79,
+    "priceText": "79.00 SEK",
+    "unitPrice": 105.33,
+    "unitPriceText": "105.33 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/213f9cad-3c28-4d8e-a6d0-579272558c64.jpg?fit=bounds&format=auto&optimize=medium&width=152&s=0x4035e840868a13359aae79b061fc48ceb897c958",
+    "productUrl": "https://www.mathem.se/se/products/11348-arla-r-gouda-familjefavoriter-skivad-28/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "6332",
+    "name": "Eldorado Gouda Skivad Ost 28%",
+    "brand": "Eldorado",
+    "packageText": "200 g",
+    "price": 26.03,
+    "priceText": "26.03 SEK",
+    "unitPrice": 130.15,
+    "unitPriceText": "130.15 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6f09d965-0ccc-48f7-a28a-9324d2f0fde5.jpg?fit=bounds&format=auto&optimize=medium&width=200&s=0x28cbb8019fea7eadd9036fc7a2e7a06efc9820c3",
+    "productUrl": "https://www.mathem.se/se/products/6332-eldorado-gouda-skivad-ost-28/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "9290",
+    "name": "Arla Ko® Herrgård® Skivad 28%",
+    "brand": "Arla Ko®",
+    "packageText": "300 g",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 189.13,
+    "unitPriceText": "189.13 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/035bbc59-4c8c-466c-9a31-b7c55ff763f1.jpg?fit=bounds&format=auto&optimize=medium&width=220&s=0xe667276e1685a546558092a7147c1bbfe97c7dd4",
+    "productUrl": "https://www.mathem.se/se/products/9290-arla-ko-r-herrgard-r-skivad-28/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "11141",
+    "name": "Arla® Riven Ost 24% Arla Familjefavoriter",
+    "brand": "Arla®",
+    "packageText": "500 g",
+    "price": 49,
+    "priceText": "49.00 SEK",
+    "unitPrice": 98,
+    "unitPriceText": "98.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c772398f-ad72-43c2-8873-c1c095b9f7c3.jpg?fit=bounds&format=auto&optimize=medium&width=274&s=0x5cdb66e0ce6a28de9cf73091f4dcdd2dbde6861f",
+    "productUrl": "https://www.mathem.se/se/products/11141-arla-r-riven-ost-24-arla-familjefavoriter/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "2887",
+    "name": "Arla® Hushållsost 26%",
+    "brand": "Arla®",
+    "packageText": "ca 1,1 kg",
+    "price": 125.29,
+    "priceText": "125.29 SEK",
+    "unitPrice": 113.9,
+    "unitPriceText": "113.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/aa508225-bc40-41de-bcfc-b3efa1fa7485.jpg?fit=bounds&format=auto&optimize=medium&width=290&s=0xb22b4d6e59c913c99f01f5d31e901946c8201d8d",
+    "productUrl": "https://www.mathem.se/se/products/2887-arla-r-hushallsost-26/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "9271",
+    "name": "Arla Ko® Präst® Mellanlagrad Skivad 31%",
+    "brand": "Arla Ko®",
+    "packageText": "300 g",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 189.13,
+    "unitPriceText": "189.13 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/94306d84-5812-4d78-ad4e-802d4c8cf352.jpg?fit=bounds&format=auto&optimize=medium&width=220&s=0xb6cc456f8d7a0c9da700788d67b8003322fa888c",
+    "productUrl": "https://www.mathem.se/se/products/9271-arla-ko-r-prast-r-mellanlagrad-skivad-31/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "23380",
+    "name": "Garant Riven Ost Gratäng 23%",
+    "brand": "Garant",
+    "packageText": "150 g",
+    "price": 22.67,
+    "priceText": "22.67 SEK",
+    "unitPrice": 151.13,
+    "unitPriceText": "151.13 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cdae6f87-7afa-4ae7-99bd-3c63417cb437.jpg?fit=bounds&format=auto&optimize=medium&width=221&s=0x612ed485ace17d805c360feacc97abf45fd12d0a",
+    "productUrl": "https://www.mathem.se/se/products/23380-garant-riven-ost-gratang-23/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "2667",
+    "name": "Garant Präst® Mellanlagrad 31%",
+    "brand": "Garant",
+    "packageText": "ca 650 g",
+    "price": 64.5,
+    "priceText": "64.50 SEK",
+    "unitPrice": 99.23,
+    "unitPriceText": "99.23 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/37575f41-45d0-4ed7-8f96-e35ab5c6b37f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x2ab81c714996832ac165fd1edfd3077b7b42ccfe",
+    "productUrl": "https://www.mathem.se/se/products/2667-garant-prast-r-mellanlagrad-31/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "2797",
+    "name": "Arla® Gräddis Ost 30% Familjefavoriter",
+    "brand": "Arla®",
+    "packageText": "ca 1 kg",
+    "price": 89,
+    "priceText": "89.00 SEK",
+    "unitPrice": 89,
+    "unitPriceText": "89.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/857742a0-b2f0-4a04-b8c9-5e8c2577f8f4.jpg?fit=bounds&format=auto&optimize=medium&width=263&s=0x07ba5e591f50da206c6e623bf78dbae4bbe84ae0",
+    "productUrl": "https://www.mathem.se/se/products/2797-arla-r-graddis-ost-30-familjefavoriter/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "2497",
+    "name": "Arla Ko® Grevé® Mild 28%",
+    "brand": "Arla Ko®",
+    "packageText": "ca 667 g",
+    "price": 76.03,
+    "priceText": "76.03 SEK",
+    "unitPrice": 113.99,
+    "unitPriceText": "113.99 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a743d016-0366-4fd5-b693-0da7e2ed6d71.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x2b71b1300f3922edc9996169a4a57095d9e78944",
+    "productUrl": "https://www.mathem.se/se/products/2497-arla-ko-r-greve-r-mild-28/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "11962",
+    "name": "Garant Riven Ost Mozzarella",
+    "brand": "Garant",
+    "packageText": "150 g",
+    "price": 22.67,
+    "priceText": "22.67 SEK",
+    "unitPrice": 151.13,
+    "unitPriceText": "151.13 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9e383ca7-dedc-4f7d-9cb2-4824e5429585.jpg?fit=bounds&format=auto&optimize=medium&width=221&s=0x6d71b2eba9a257b7793f404aa4e4ea5f4b9613b0",
+    "productUrl": "https://www.mathem.se/se/products/11962-garant-riven-ost-mozzarella/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "61511",
+    "name": "Garant Riven Ost Texmex 29%",
+    "brand": "Garant",
+    "packageText": "150 g",
+    "price": 22.67,
+    "priceText": "22.67 SEK",
+    "unitPrice": 151.13,
+    "unitPriceText": "151.13 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/73e4dbd6-d953-4ea7-b1bb-95079d54b1df.jpg?fit=bounds&format=auto&optimize=medium&width=221&s=0xced834e29c00fd5c64332a1e713789ca3b967add",
+    "productUrl": "https://www.mathem.se/se/products/61511-garant-riven-ost-texmex-29/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "11351",
+    "name": "Arla® Port Salut Familjefavoriter Skivad 26%",
+    "brand": "Arla®",
+    "packageText": "750 g",
+    "price": 85,
+    "priceText": "85.00 SEK",
+    "unitPrice": 113.33,
+    "unitPriceText": "113.33 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3c2240a2-da2b-46f5-9b41-ef7fbc93d9f4.jpg?fit=bounds&format=auto&optimize=medium&width=152&s=0x3d993b00c7bb56b991825189eff125a7be268426",
+    "productUrl": "https://www.mathem.se/se/products/11351-arla-r-port-salut-familjefavoriter-skivad-26/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "3155",
+    "name": "Arla® Port Salut Ost 26% Arla Familjefavoriter",
+    "brand": "Arla®",
+    "packageText": "ca 750 g",
+    "price": 65,
+    "priceText": "65.00 SEK",
+    "unitPrice": 86.67,
+    "unitPriceText": "86.67 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a76f0148-2962-49a0-b8b5-31bd7acc441c.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x7ad2c704540de9e5777ef6dfe7d362f923dd9905",
+    "productUrl": "https://www.mathem.se/se/products/3155-arla-r-port-salut-ost-26-arla-familjefavoriter/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "2199",
+    "name": "Garant Herrgård® Mild 28%",
+    "brand": "Garant",
+    "packageText": "ca 730 g",
+    "price": 72.5,
+    "priceText": "72.50 SEK",
+    "unitPrice": 99.32,
+    "unitPriceText": "99.32 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b3ca670e-640d-4acb-8dc5-ab327c0b53a5.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x4a27516c0d7ec21949bd3f6ab834ec1c906f555c",
+    "productUrl": "https://www.mathem.se/se/products/2199-garant-herrgard-r-mild-28/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
+  },
+  {
+    "code": "8825",
+    "name": "Eldorado Gouda Skivad 30%",
+    "brand": "Eldorado",
+    "packageText": "400 g",
+    "price": 46.85,
+    "priceText": "46.85 SEK",
+    "unitPrice": 117.13,
+    "unitPriceText": "117.13 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/618d9c52-d62f-496c-a204-da374f5b6297.jpg?fit=bounds&format=auto&optimize=medium&width=199&s=0x4081ac73ea2d5ded2173ec90bce3ae6b1fb75133",
+    "productUrl": "https://www.mathem.se/se/products/8825-eldorado-gouda-skivad-30/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
+    "retrievedAt": "2026-05-22T11:10:32.630Z"
   }
 ];
