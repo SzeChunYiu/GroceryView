@@ -512,6 +512,7 @@ export const basketImportReviewContract = {
   ],
   shippedBehaviors: [
     'Lists only the signed-in shopper’s open retailer import review rows.',
+    'Persists open and resolved review rows through the PostgreSQL-backed runtime repository when DATABASE_URL is configured.',
     'Keeps unmatched retailer rows stay out of the basket until a signed-in shopper accepts a verified GroceryView product match.',
     'Allows dismissing retailer-only rows without converting them into verified products.',
     'Marks accepted and dismissed rows resolved so they leave the open review queue.'

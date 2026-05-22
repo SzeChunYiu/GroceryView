@@ -105,6 +105,7 @@ describe('verified-data UI', () => {
     assert.match(route, /Account-bound import review/);
     assert.match(route, /unmatched retailer rows stay out of the basket/i);
     assert.match(route, /signed-in shopper accepts/i);
+    assert.match(route, /PostgreSQL-backed runtime repository/i);
     assert.doesNotMatch(route, /NoVerifiedData/);
     assert.match(route, /@\/lib\/demo-data/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);

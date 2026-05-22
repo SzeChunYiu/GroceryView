@@ -208,6 +208,16 @@ Legacy app repository basket lines.
 
 Key columns: `basket_id`, `product_id`, `quantity`, `created_at`.
 
+### `basket_import_review_items`
+
+Account-bound retailer basket import review rows for unmatched bookmarklet, browser extension, or copy/paste rows. These rows are private to `app_users` and stay out of `basket_items` until the signed-in shopper accepts a verified product match or dismisses the row.
+
+Key columns: `user_id`, `review_item_id`, `raw_name`, `quantity`, `reason`, `retailer_id`, `source_kind`, `captured_at`, `status`, `created_at`, `resolved_at`, `resolved_product_id`.
+
+Primary key: `(user_id, review_item_id)`.
+
+Indexes: `basket_import_review_items_open_idx` for account-scoped open queue reads and `basket_import_review_items_retailer_idx` for retailer/capture audits.
+
 ### `human_review_assignments`
 
 Operational queue entries for product-match and community-report review.

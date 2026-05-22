@@ -102,7 +102,7 @@ export default function BasketIdeasPage() {
         <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">Private review queue</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight">Account-bound import review: {basketImportReviewContract.title}</h2>
         <p className="mt-3 text-sm leading-6 text-slate-700">
-          Unmatched retailer rows stay out of the basket until a signed-in shopper accepts a verified GroceryView match through <code className="rounded bg-white/80 px-1 py-0.5 text-cyan-900">{basketImportReviewContract.decisionEndpoint}</code>. The open queue is fetched from <code className="rounded bg-white/80 px-1 py-0.5 text-cyan-900">{basketImportReviewContract.endpoint}</code> and remains account-bound.
+          Unmatched retailer rows stay out of the basket until a signed-in shopper accepts a verified GroceryView match through <code className="rounded bg-white/80 px-1 py-0.5 text-cyan-900">{basketImportReviewContract.decisionEndpoint}</code>. The open queue is fetched from <code className="rounded bg-white/80 px-1 py-0.5 text-cyan-900">{basketImportReviewContract.endpoint}</code>, remains account-bound, and uses the PostgreSQL-backed runtime repository when production persistence is configured.
         </p>
         <div className="mt-4 grid gap-4 md:grid-cols-3">
           <div>
