@@ -21,7 +21,7 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
 - Product search URLs: per-branch `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1`, listed in `apps/web/src/lib/ingested/coop.ts`
 - Request body: weekly flyer item queries listed in `DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES`, resultsOptions take 8, empty sort/facets, relatedResultsOptions take 0
 - Required public headers: `storeApiSubscriptionKey` for store metadata and `personalizationApiSubscriptionKey` for product search, both exposed in `window.coopSettings.serviceAccess` on https://www.coop.se/handla/
-- Retrieved: 2026-05-22T10:38:22.011Z
+- Retrieved: 2026-05-22T11:47:16.202Z
 - Stores:
   - 251300, Stora Coop Boländerna, Uppsala, 26 real discount rows
   - 252700, Stora Coop Bromma, Bromma, 24 real discount rows
@@ -46,8 +46,18 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
   - 133100, Stora Coop Överby, Trollhättan, 22 real discount rows
   - 231900, Stora Coop Östersund, Östersund, 24 real discount rows
   - 030500, Stora Coop Vinsta, Vällingby, 21 real discount rows
+  - 075800, Stora Coop Norremark, Växjö, 24 real discount rows
+  - 022500, Stora Coop Visby, Visby, 25 real discount rows
+  - 201700, Stora Coop Valbo, Valbo, 21 real discount rows
+  - 242200, Stora Coop Storheden, Luleå, 24 real discount rows
+  - 255500, Stora Coop Sisjön, Askim, 24 real discount rows
+  - 253200, Stora Coop Skara, Skara, 26 real discount rows
+  - 252600, Stora Coop Backaplan, Göteborg, 24 real discount rows
+  - 252500, Stora Coop Bäckebol, Hisings Backa, 22 real discount rows
+  - 231300, Stora Coop Sörböle, Skellefteå, 22 real discount rows
+  - 241200, Stora Coop Kiruna, Kiruna, 24 real discount rows
 - Flyer validity: 2026-05-18T00:00:00 through 2026-05-24T23:59:59
-- Real current flyer discount rows fetched: 547
+- Real current flyer discount rows fetched: 783
 
 Every weekly discount row includes Coop product id/EAN, product name, brand, package label, ordinary B2C SEK price, offer SEK price, comparative offer price when present, promotion id/copy, MedMera requirement, store/region, validity, flyer URL, store API source URL, product search URL, and retrieval timestamp.
 
