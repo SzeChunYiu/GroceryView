@@ -1190,6 +1190,37 @@ export const basketImportReviewContract = {
   ]
 };
 
+export const stockoutSubstitutionContract = {
+  endpoint: '/api/basket/substitutions',
+  title: 'Stockout substitutions',
+  status: 'core_planner_contract',
+  corePlanner: 'planStockoutSubstitutionOptions',
+  acceptableSubstitutionPolicy: {
+    allowPrivateLabel: 'shopper-controlled',
+    minimumConfidence: 'medium',
+    maxUnitPriceIncreasePercent: 'shopper-controlled percent cap',
+    blockedCategories: ['baby_formula', 'medical_diet', 'pet_food_sensitive'],
+    dietaryTagsRequired: ['gluten_free', 'lactose_free', 'vegan', 'halal', 'kosher']
+  },
+  requiredInputs: [
+    'signed-in basketLineId, productId, quantity, current line status, and original verified unit price',
+    'candidate product rows with verified in-stock evidence, source timestamp, package size, category, brand tier, and unit price',
+    'shopper substitution preferences including private-label acceptance, blocked categories, price-increase cap, and dietaryTagsRequired',
+    'explicit confirmation from the shopper before any replacement product can be written back to a basket'
+  ],
+  shippedBehaviors: [
+    'Offers only verified in-stock replacements for missing or retailer-unavailable basket lines.',
+    'Keeps replacementAccepted false because substitutions are never auto-accepted.',
+    'Rejects candidates missing dietaryTagsRequired evidence before savings are considered.',
+    'Uses comparable package and category confidence from classifyProductMatch so stockout recovery cannot become fuzzy name matching.'
+  ],
+  blockedInStaticSnapshot: [
+    'No live store inventory or private household basket is bundled with this static build.',
+    'No substitution is claimed as reserved, purchased, or automatically applied.',
+    'No dietary suitability is inferred from browsing behavior or product names when required tags are missing.'
+  ]
+};
+
 export const retailerHandoffContract = {
   endpoint: '/api/basket/handoff/{retailerId}',
   title: 'Retailer handoff support matrix',

@@ -2527,6 +2527,197 @@ export function recommendSmartSwaps(input: SmartSwapInput): SmartSwapRecommendat
   return recommendations.sort((a, b) => b.savingsPercent - a.savingsPercent);
 }
 
+export type StockoutBasketLineStatus = 'available' | 'out_of_stock' | 'missing_price' | 'retailer_unavailable';
+
+export type StockoutBasketLine = {
+  basketLineId: string;
+  productId: string;
+  productName: string;
+  category: string;
+  packageSize: number;
+  packageUnit: string;
+  brandTier: BrandTier;
+  unitPrice: number;
+  requestedQuantity: number;
+  status: StockoutBasketLineStatus;
+};
+
+export type StockoutSubstitutionPolicy = {
+  allowPrivateLabel?: boolean;
+  minimumConfidence?: MatchConfidence;
+  maxUnitPriceIncreasePercent?: number;
+  blockedCategories?: string[];
+  dietaryTagsRequired?: string[];
+};
+
+export type StockoutSubstitutionCandidate = {
+  productId: string;
+  productName: string;
+  category: string;
+  packageSize: number;
+  packageUnit: string;
+  brandTier: BrandTier;
+  unitPrice: number;
+  inStock: boolean;
+  source: string;
+  observedAt: string;
+  dietaryTags?: string[];
+};
+
+export type StockoutSubstitutionOption = {
+  productId: string;
+  productName: string;
+  lineTotal: number;
+  unitPrice: number;
+  priceDeltaPercent: number;
+  confidence: MatchConfidence;
+  qualityRisk: QualityRisk;
+  reason: string;
+  source: string;
+  observedAt: string;
+  replacementAccepted: false;
+};
+
+export type RejectedStockoutSubstitutionCandidate = {
+  productId: string;
+  reason: string;
+};
+
+export type StockoutSubstitutionPlan = {
+  status: 'not_needed' | 'substitution_options' | 'blocked';
+  basketLineId: string;
+  lineStatus: StockoutBasketLineStatus;
+  options: StockoutSubstitutionOption[];
+  rejectedCandidates: RejectedStockoutSubstitutionCandidate[];
+  guardrails: string[];
+};
+
+const matchConfidenceOrder: Record<MatchConfidence, number> = {
+  low: 0,
+  'medium-low': 1,
+  medium: 2,
+  high: 3
+};
+
+function confidenceClearsMinimum(confidence: MatchConfidence, minimum: MatchConfidence): boolean {
+  return matchConfidenceOrder[confidence] >= matchConfidenceOrder[minimum];
+}
+
+function candidateAsMatchInput(candidate: StockoutSubstitutionCandidate): ProductMatchInput {
+  return {
+    id: candidate.productId,
+    brand: candidate.productName,
+    category: candidate.category,
+    packageSize: candidate.packageSize,
+    packageUnit: candidate.packageUnit,
+    brandTier: candidate.brandTier,
+    unitPrice: candidate.unitPrice
+  };
+}
+
+export function planStockoutSubstitutionOptions(input: {
+  basketLine: StockoutBasketLine;
+  candidates: StockoutSubstitutionCandidate[];
+  acceptableSubstitutionPolicy?: StockoutSubstitutionPolicy;
+}): StockoutSubstitutionPlan {
+  const { basketLine } = input;
+  const policy = input.acceptableSubstitutionPolicy ?? {};
+  const rejectedCandidates: RejectedStockoutSubstitutionCandidate[] = [];
+  const guardrails = [
+    'Substitution options are never auto-accepted; the shopper must confirm before a basket line changes.',
+    'Only verified in-stock candidate rows with comparable package evidence can be offered.',
+    'Dietary and blocked-category policies fail closed before price savings are considered.'
+  ];
+
+  if (basketLine.status === 'available') {
+    return {
+      status: 'not_needed',
+      basketLineId: basketLine.basketLineId,
+      lineStatus: basketLine.status,
+      options: [],
+      rejectedCandidates: [],
+      guardrails
+    };
+  }
+
+  const blockedCategories = new Set(policy.blockedCategories ?? []);
+  const dietaryTagsRequired = policy.dietaryTagsRequired ?? [];
+  const minimumConfidence = policy.minimumConfidence ?? 'medium-low';
+  const maxUnitPriceIncreasePercent = policy.maxUnitPriceIncreasePercent ?? 0;
+
+  const sourceMatchInput: ProductMatchInput = {
+    id: basketLine.productId,
+    brand: basketLine.productName,
+    category: basketLine.category,
+    packageSize: basketLine.packageSize,
+    packageUnit: basketLine.packageUnit,
+    brandTier: basketLine.brandTier,
+    unitPrice: basketLine.unitPrice
+  };
+
+  const options: StockoutSubstitutionOption[] = [];
+
+  for (const candidate of input.candidates) {
+    if (!candidate.inStock) {
+      rejectedCandidates.push({ productId: candidate.productId, reason: 'Candidate is not verified in stock.' });
+      continue;
+    }
+    if (blockedCategories.has(candidate.category)) {
+      rejectedCandidates.push({ productId: candidate.productId, reason: 'Candidate category is blocked by shopper policy.' });
+      continue;
+    }
+    if (!policy.allowPrivateLabel && isPrivateLabel(candidate.brandTier)) {
+      rejectedCandidates.push({ productId: candidate.productId, reason: 'Private-label substitutions are not allowed by shopper policy.' });
+      continue;
+    }
+    const candidateTags = new Set(candidate.dietaryTags ?? []);
+    const missingDietaryTags = dietaryTagsRequired.filter((tag) => !candidateTags.has(tag));
+    if (missingDietaryTags.length > 0) {
+      rejectedCandidates.push({ productId: candidate.productId, reason: `Candidate is missing required dietary evidence: ${missingDietaryTags.join(', ')}.` });
+      continue;
+    }
+
+    const match = classifyProductMatch({ source: sourceMatchInput, candidate: candidateAsMatchInput(candidate) });
+    if (match.mode === 'not_recommended') {
+      rejectedCandidates.push({ productId: candidate.productId, reason: match.reason });
+      continue;
+    }
+    if (!confidenceClearsMinimum(match.confidence, minimumConfidence)) {
+      rejectedCandidates.push({ productId: candidate.productId, reason: `Match confidence ${match.confidence} is below required ${minimumConfidence}.` });
+      continue;
+    }
+
+    const priceDeltaPercent = Math.round(((candidate.unitPrice - basketLine.unitPrice) / basketLine.unitPrice) * 10000) / 100;
+    if (priceDeltaPercent > maxUnitPriceIncreasePercent) {
+      rejectedCandidates.push({ productId: candidate.productId, reason: `Unit price increase ${priceDeltaPercent}% exceeds policy limit ${maxUnitPriceIncreasePercent}%.` });
+      continue;
+    }
+
+    options.push({
+      productId: candidate.productId,
+      productName: candidate.productName,
+      unitPrice: candidate.unitPrice,
+      lineTotal: Math.round(candidate.unitPrice * basketLine.requestedQuantity * 100) / 100,
+      priceDeltaPercent,
+      confidence: match.confidence,
+      qualityRisk: match.qualityRisk,
+      reason: match.reason,
+      source: candidate.source,
+      observedAt: candidate.observedAt,
+      replacementAccepted: false
+    });
+  }
+
+  return {
+    status: options.length > 0 ? 'substitution_options' : 'blocked',
+    basketLineId: basketLine.basketLineId,
+    lineStatus: basketLine.status,
+    options: options.sort((a, b) => a.unitPrice - b.unitPrice || matchConfidenceOrder[b.confidence] - matchConfidenceOrder[a.confidence]),
+    rejectedCandidates,
+    guardrails
+  };
+}
+
 export type ComparableCommodityUnit = 'kg' | 'l' | 'st';
 
 export type CommodityPriceObservation = {
