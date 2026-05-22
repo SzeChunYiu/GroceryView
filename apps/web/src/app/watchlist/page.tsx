@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { NotificationInboxActions } from '@/components/notification-inbox-actions';
-import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, watchlistAlertBoard, watchlistAlertInputs, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
+import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, dealHunterNewProductPriceDropAlerts, watchlistAlertBoard, watchlistAlertInputs, weeklyPersonalizedEmailDigest } from '@/lib/demo-data';
 import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -130,6 +130,47 @@ export default function WatchlistPage() {
         <p className="mt-4 rounded-2xl bg-white p-3 text-sm font-black text-indigo-950">{weeklyPersonalizedEmailDigest.coverage.caveat}</p>
       </Card>
 
+
+      <Card className="mt-6 border-amber-200 bg-amber-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">{dealHunterNewProductPriceDropAlerts.persona}</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">New-product & price-drop alerts</h2>
+        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          Deal hunters get priceDropAlerts from buildWatchlistAlerts and newProductSignals from rankDealOpportunities output. A newProductSignals row is not a retailer launch claim; it only means the product newly surfaced in visible ranked deal rows.
+        </p>
+        <div className="mt-4 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-2xl border border-amber-100 bg-white p-4">
+            <h3 className="text-lg font-black text-slate-950">priceDropAlerts</h3>
+            <div className="mt-3 space-y-2">
+              {dealHunterNewProductPriceDropAlerts.priceDropAlerts.map((alert) => (
+                <Link className="block rounded-2xl bg-amber-50 p-3 text-sm font-semibold hover:bg-amber-100" href={`/products/${alert.productId}`} key={`${alert.productId}-${alert.type}`}>
+                  <strong>{alert.productName}</strong><br />{alert.message}<br />
+                  <span className="text-slate-600">{alert.triggerMetric}: {String(alert.triggerValue)} · {alert.source}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-amber-100 bg-white p-4">
+            <h3 className="text-lg font-black text-slate-950">newProductSignals</h3>
+            <div className="mt-3 space-y-2">
+              {dealHunterNewProductPriceDropAlerts.newProductSignals.map((signal) => (
+                <Link className="block rounded-2xl bg-amber-50 p-3 text-sm font-semibold hover:bg-amber-100" href={`/products/${signal.productId}`} key={`${signal.productId}-${signal.storeName}`}>
+                  <strong>{signal.productName}</strong> · {signal.storeName}<br />{formatSek(signal.currentPrice)} · Deal Score {signal.dealScore}<br />
+                  <span className="text-slate-600">sourceConfidence {Math.round(signal.sourceConfidence * 100)}% · {signal.discoverySignal}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          {dealHunterNewProductPriceDropAlerts.plannedNotifications.slice(0, 3).map((notification, index) => (
+            <div className="rounded-2xl bg-white p-4 text-sm font-semibold text-slate-700 shadow-sm" key={`${notification.title}-${index}`}>
+              <p className="font-black text-slate-950">{notification.title}</p>
+              <p className="mt-1">{notification.channel} · {notification.type} · {notification.priority}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mt-4 rounded-2xl bg-white p-3 text-sm font-black text-amber-950">{dealHunterNewProductPriceDropAlerts.coverage.caveat}</p>
+      </Card>
 
       <Card className="mt-6 border-purple-200 bg-purple-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-purple-800">Account watchlist preferences</p>

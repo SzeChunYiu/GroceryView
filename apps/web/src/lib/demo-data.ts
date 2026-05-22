@@ -2186,6 +2186,60 @@ export const weeklyPersonalizedEmailDigest = {
   }
 };
 
+const dealHunterPriceDropEvents = builtWatchlistAlerts.slice(0, 3).map((alert) => ({
+  productId: alert.productId,
+  productName: alert.productName,
+  type: alert.type,
+  severity: alert.severity,
+  message: alert.message,
+  triggerMetric: alert.trigger.metric,
+  triggerValue: alert.trigger.value,
+  source: watchlistAlertInputs.products.find((product) => product.productId === alert.productId)?.source ?? 'visible watchlist price row'
+}));
+
+const dealHunterNewProductSignals = dealOpportunityRail.slice(0, 3).map((deal) => ({
+  productId: deal.productId,
+  productName: deal.productName,
+  storeName: deal.storeName,
+  currentPrice: deal.currentPrice,
+  dealScore: deal.dealScore,
+  sourceConfidence: deal.sourceConfidence,
+  discoverySignal: 'new to the deal-hunter rail from visible ranked deal rows'
+}));
+
+export const dealHunterNewProductPriceDropAlerts = {
+  persona: 'Deal-hunters / foodies',
+  title: 'New-product & price-drop alerts',
+  priceDropAlerts: dealHunterPriceDropEvents,
+  newProductSignals: dealHunterNewProductSignals,
+  plannedNotifications: planNotifications({
+    now: '2026-05-22T10:00:00.000Z',
+    preferences: {
+      channels: ['push', 'email'],
+      enabledTypes: ['target_price', 'stock_up_opportunity', 'weekly_report'],
+      quietHours: { startHour: 22, endHour: 8, timezone: 'Europe/Stockholm' }
+    },
+    events: [
+      ...dealHunterPriceDropEvents.map((event) => ({
+        type: event.type === 'target_price' ? 'target_price' as const : 'stock_up_opportunity' as const,
+        title: event.productName,
+        body: event.message,
+        priority: event.severity === 'urgent' ? 'high' as const : 'normal' as const
+      })),
+      ...dealHunterNewProductSignals.map((event) => ({
+        type: 'weekly_report' as const,
+        title: `New deal signal: ${event.productName}`,
+        body: `${event.storeName} surfaced ${event.productName} at ${event.currentPrice} SEK with Deal Score ${event.dealScore}.`,
+        priority: 'normal' as const
+      }))
+    ]
+  }),
+  coverage: {
+    confidence: 'medium',
+    caveat: 'New-product means newly surfaced in visible ranked deal/watchlist rows, not a retailer launch claim; price drops come from buildWatchlistAlerts trigger evidence only.'
+  }
+};
+
 export const budgetEssentialsWatchlistInputs: { favoriteStoreIds: string[]; watchlist: WatchlistItem[]; products: (WatchlistProductSnapshot & { source: string; essentialCategory: string; weeklyNeed: string })[] } = {
   favoriteStoreIds: ['willys-odenplan', 'tempo-hornstull', 'matmissionen-hagersten', 'hemkop-hornstull'],
   watchlist: [
