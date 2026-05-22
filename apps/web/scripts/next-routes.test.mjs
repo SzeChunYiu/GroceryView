@@ -125,6 +125,21 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces the secure retailer basket transfer preflight contract on the basket ideas route', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/basket-ideas/page.tsx');
+
+    assert.match(verified, /export const retailerBasketTransferContract = /);
+    assert.match(verified, /\/api\/basket\/transfer/);
+    assert.match(route, /retailerBasketTransferContract/);
+    assert.match(route, /Secure basket transfer preflight/);
+    assert.match(route, /block unless capability is verified/i);
+    assert.match(route, /not checkout confirmation/i);
+    assert.doesNotMatch(route, /NoVerifiedData/);
+    assert.match(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
 
   it('surfaces the basket trip-cost optimizer contract on the shopping trips route', async () => {
     const verified = await read('src/lib/verified-data.ts');

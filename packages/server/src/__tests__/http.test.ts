@@ -839,6 +839,21 @@ describe('createHttpHandler', () => {
     assert.match(handoff.unsupportedReasons[1] ?? '', /cannot claim purchase completion/i);
     assert.match(handoff.guardrails[0], /not checkout confirmation/i);
 
+    const transfer = await json(await handle(new Request('http://localhost/api/basket/transfer/willys?userId=user-1'))) as {
+      userId: string;
+      retailerId: string;
+      status: string;
+      canAttemptTransfer: boolean;
+      blockedReasons: string[];
+      guardrails: string[];
+    };
+    assert.equal(transfer.userId, 'user-1');
+    assert.equal(transfer.retailerId, 'willys');
+    assert.equal(transfer.status, 'blocked');
+    assert.equal(transfer.canAttemptTransfer, false);
+    assert.match(transfer.blockedReasons[0] ?? '', /not verified as supported/);
+    assert.match(transfer.guardrails[0] ?? '', /verified retailer capability/);
+
 
     const importExport = await handle(new Request('http://localhost/api/basket/import-export?userId=user-import', {
       method: 'POST',

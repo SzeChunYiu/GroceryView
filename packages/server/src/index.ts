@@ -1829,6 +1829,15 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         if (method === 'GET') return jsonResponse(api.getRetailerHandoffPlan(user, decodeURIComponent(handoffMatch[1])));
       }
 
+      const transferMatch = path.match(/^\/api\/basket\/transfer\/([^/]+)$/);
+      if (transferMatch) {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(api.getRetailerBasketTransferSession(user, decodeURIComponent(transferMatch[1]!)));
+      }
+
       if (path === '/api/basket/trip-cost') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -2181,6 +2190,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/basket/import-review': { get: protectedOperation('Get account-bound retailer basket import review rows.') },
       '/api/basket/import-review/{reviewItemId}/decisions': { post: protectedOperation('Resolve an account-bound retailer basket import review row.') },
       '/api/basket/trip-cost': { get: protectedOperation('Get basket totals ranked by shelf price plus explicit travel, time, delivery, and split-shop costs.') },
+      '/api/basket/transfer/{retailerId}': { get: protectedOperation('Preflight secure retailer basket transfer and block unless capability is verified.') },
       '/api/basket/recurring-digest': { get: protectedOperation('Get recurring basket changes, missing-price blockers, and suggested review actions.') },
       '/api/basket/stores/{storeId}/quote': { get: protectedOperation('Quote the current basket at one store with missing-price labels.') },
       '/api/budget': { patch: protectedOperation('Update budget.') },

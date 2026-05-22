@@ -5,6 +5,7 @@ import {
   planBasketFulfillmentSlots,
   planBasketImportExport,
   planBasketTripCost,
+  planRetailerBasketTransferSession,
   planRetailerHandoff,
   planRecurringBasketDigest,
   summarizeLocalOfferBasket,
@@ -283,6 +284,57 @@ describe('planBasketImportExport', () => {
 
 
 
+
+describe('planRetailerBasketTransferSession', () => {
+  it('gates secure retailer basket transfer to verified supported capabilities', () => {
+    const blocked = planRetailerBasketTransferSession({
+      retailerId: 'willys',
+      retailerName: 'Willys',
+      basketId: 'user-1:current-basket',
+      lines: [{ productId: 'coffee', productName: 'Zoégas Coffee 450g', quantity: 1, productUrl: 'https://www.willys.se/produkt/coffee', matched: true }],
+      support: {
+        productDeepLinks: 'supported',
+        basketTransfer: 'unsupported',
+        copyList: 'supported',
+        retailerAppSearch: 'manual',
+        checkoutConfirmation: 'unsupported'
+      },
+      transferEndpoint: 'https://www.willys.se/api/basket/import',
+      signedPayload: 'signed.payload',
+      shopperSessionPresent: true
+    });
+    assert.equal(blocked.status, 'blocked');
+    assert.equal(blocked.canAttemptTransfer, false);
+    assert.match(blocked.blockedReasons[0] ?? '', /not verified/);
+
+    const ready = planRetailerBasketTransferSession({
+      retailerId: 'verified-retailer',
+      retailerName: 'Verified Retailer',
+      basketId: 'user-1:current-basket',
+      lines: [
+        { productId: 'coffee', productName: 'Zoégas Coffee 450g', quantity: 1, productUrl: 'https://verified-retailer.example/coffee', matched: true },
+        { productId: 'milk', productName: 'Arla Milk 1L', quantity: 2, productUrl: 'https://verified-retailer.example/milk', matched: true }
+      ],
+      support: {
+        productDeepLinks: 'supported',
+        basketTransfer: 'supported',
+        copyList: 'supported',
+        retailerAppSearch: 'supported',
+        checkoutConfirmation: 'unsupported'
+      },
+      transferEndpoint: 'https://transfer.verified-retailer.example/baskets',
+      signedPayload: 'signed.payload',
+      shopperSessionPresent: true
+    });
+
+    assert.equal(ready.status, 'ready');
+    assert.equal(ready.canAttemptTransfer, true);
+    assert.equal(ready.transferLineCount, 2);
+    assert.equal(ready.requiresRetailerConfirmation, true);
+    assert.match(ready.guardrails[0], /verified retailer capability/);
+    assert.match(ready.guardrails[2], /not checkout confirmation/);
+  });
+});
 
 describe('planRetailerHandoff', () => {
   it('plans deep-link and basket-transfer actions with explicit unsupported and confirmation states', () => {

@@ -488,6 +488,29 @@ export const retailerHandoffContract = {
   ]
 };
 
+export const retailerBasketTransferContract = {
+  endpoint: '/api/basket/transfer/{retailerId}',
+  title: 'Secure basket transfer preflight',
+  status: 'implemented_account_api',
+  requiredInputs: [
+    'signed-in userId',
+    'target retailerId from the verified support matrix',
+    'current basket product ids, quantities, verified retailer product matches, and product URLs',
+    'verified retailer basket-transfer capability, endpoint, signed payload, and active shopper retailer session'
+  ],
+  shippedBehaviors: [
+    'Preflights basket transfer and blocks unless capability is verified as supported.',
+    'Requires every basket line to have a verified retailer product match and product URL.',
+    'Returns copy-list and product-link fallback paths through the handoff surface when transfer is blocked.',
+    'Keeps transfer attempts separate from checkout confirmation, payment, delivery booking, and inventory reservation.'
+  ],
+  blockedInStaticSnapshot: [
+    'No retailer currently has verified automatic basket transfer enabled in the public static snapshot.',
+    'No unsupported retailer transfer endpoint is called from GroceryView.',
+    'No basket transfer is described as checkout completion or purchase confirmation.'
+  ]
+};
+
 export const basketTripCostContract = {
   endpoint: '/api/basket/trip-cost',
   title: 'Basket + trip cost optimizer',

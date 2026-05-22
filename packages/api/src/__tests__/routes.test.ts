@@ -1191,6 +1191,20 @@ describe('createGroceryViewApi', () => {
     );
   });
 
+  it('blocks retailer basket transfer sessions unless support is verified', () => {
+    const api = createGroceryViewApi();
+
+    api.addBasketItem('user-1', { productId: 'coffee', quantity: 1 });
+    const report = api.getRetailerBasketTransferSession('user-1', 'willys');
+
+    assert.equal(report.userId, 'user-1');
+    assert.equal(report.retailerId, 'willys');
+    assert.equal(report.status, 'blocked');
+    assert.equal(report.canAttemptTransfer, false);
+    assert.match(report.blockedReasons[0] ?? '', /not verified as supported/);
+    assert.match(report.guardrails[0], /verified retailer capability/);
+  });
+
   it('returns retailer handoff plans with support matrix fallbacks and checkout guardrails', () => {
     const api = createGroceryViewApi();
 
