@@ -17,8 +17,10 @@ import {
   cellCountForScbPxWebQueryFixture,
   confidenceForSource,
   buildWillysSearchUrl,
+  extractOpenFoodFactsBarcodeFromAxfoodImageUrl,
   fetchOpenFoodFactsExportProducts,
   fetchOpenFoodFactsProducts,
+  fetchOpenFoodFactsRetailerEnrichments,
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
   fetchCoopPublicServiceAccess,
@@ -89,6 +91,18 @@ describe('fetchOpenFoodFactsProducts', () => {
           categories_tags: ['en:beverages', 'en:dairy-substitutes'],
           labels_tags: ['en:vegan'],
           nutriscore_grade: 'd',
+          nutriments: {
+            energy_100g: 180,
+            'energy-kcal_100g': 43,
+            fat_100g: 1.5,
+            'saturated-fat_100g': 0.2,
+            carbohydrates_100g: 6.5,
+            sugars_100g: 5.2,
+            fiber_100g: 0.8,
+            proteins_100g: 1,
+            salt_100g: 0.12,
+            sodium_100g: 0.048
+          },
           image_front_url: 'https://images.openfoodfacts.org/images/products/734/008/349/4406/front_sv.11.400.jpg',
           url: 'https://world.openfoodfacts.org/product/7340083494406/havredryck-choklad-eldorado'
         }
@@ -110,6 +124,18 @@ describe('fetchOpenFoodFactsProducts', () => {
       categories: ['en:beverages', 'en:dairy-substitutes'],
       labels: ['en:vegan'],
       nutriscoreGrade: 'd',
+      nutritionPer100g: {
+        energyKj: 180,
+        energyKcal: 43,
+        fat: 1.5,
+        saturatedFat: 0.2,
+        carbohydrates: 6.5,
+        sugars: 5.2,
+        fiber: 0.8,
+        proteins: 1,
+        salt: 0.12,
+        sodium: 0.048
+      },
       imageUrl: 'https://images.openfoodfacts.org/images/products/734/008/349/4406/front_sv.11.400.jpg',
       productUrl: 'https://world.openfoodfacts.org/product/7340083494406/havredryck-choklad-eldorado',
       sourceUrl: buildOpenFoodFactsProductUrl('7340083494406'),
@@ -121,8 +147,8 @@ describe('fetchOpenFoodFactsProducts', () => {
 describe('fetchOpenFoodFactsExportProducts', () => {
   it('streams real product rows from the official OpenFoodFacts TSV export', async () => {
     const tsv = [
-      'code\turl\tproduct_name\tquantity\tbrands\tcategories_tags\tlabels_tags\tnutriscore_grade\timage_url',
-      '7340083494406\thttps://world.openfoodfacts.org/product/7340083494406/havredryck-choklad-eldorado\tHavredryck choklad\t1 l\tEldorado\ten:beverages,en:dairy-substitutes\ten:vegan\td\thttps://images.openfoodfacts.org/images/products/734/008/349/4406/front_sv.11.400.jpg'
+      'code\turl\tproduct_name\tquantity\tbrands\tcategories_tags\tlabels_tags\tnutriscore_grade\tenergy_100g\tenergy-kcal_100g\tfat_100g\tsaturated-fat_100g\tcarbohydrates_100g\tsugars_100g\tfiber_100g\tproteins_100g\tsalt_100g\tsodium_100g\timage_url',
+      '7340083494406\thttps://world.openfoodfacts.org/product/7340083494406/havredryck-choklad-eldorado\tHavredryck choklad\t1 l\tEldorado\ten:beverages,en:dairy-substitutes\ten:vegan\td\t180\t43\t1.5\t0.2\t6.5\t5.2\t0.8\t1\t0.12\t0.048\thttps://images.openfoodfacts.org/images/products/734/008/349/4406/front_sv.11.400.jpg'
     ].join('\n');
     const requestedUrls: string[] = [];
     const fetchImpl: typeof fetch = async (url) => {
@@ -142,7 +168,91 @@ describe('fetchOpenFoodFactsExportProducts', () => {
     assert.equal(rows[0].code, '7340083494406');
     assert.equal(rows[0].name, 'Havredryck choklad');
     assert.deepEqual(rows[0].categories, ['en:beverages', 'en:dairy-substitutes']);
+    assert.equal(rows[0].nutritionPer100g.energyKcal, 43);
+    assert.equal(rows[0].nutritionPer100g.sugars, 5.2);
     assert.equal(rows[0].sourceUrl, `${OPENFOODFACTS_EXPORT_URL}#code=7340083494406`);
+  });
+});
+
+describe('fetchOpenFoodFactsRetailerEnrichments', () => {
+  it('adds barcode nutrition only for matched OpenFoodFacts retailer candidates', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const code = String(url).includes('7310130003547') ? '7310130003547' : '';
+      return new Response(JSON.stringify(code ? {
+        status: 1,
+        product: {
+          code,
+          product_name_sv: 'Ideal Makaroner',
+          brands: 'Kungsörnen',
+          quantity: '750 g',
+          categories_tags: ['en:pastas'],
+          labels_tags: [],
+          nutriscore_grade: 'a',
+          nutriments: {
+            energy_100g: 1509,
+            'energy-kcal_100g': 361,
+            fat_100g: 2,
+            'saturated-fat_100g': 0.5,
+            carbohydrates_100g: 72,
+            sugars_100g: 3,
+            fiber_100g: 3,
+            proteins_100g: 11,
+            salt_100g: 0.01,
+            sodium_100g: 0.004
+          },
+          url: 'https://world.openfoodfacts.org/product/7310130003547/ideal-makaroner-kungsornen'
+        }
+      } : { status: 0 }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchOpenFoodFactsRetailerEnrichments({
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:25:07.875Z',
+      candidates: [
+        {
+          chain: 'willys',
+          productCode: '101205621_ST',
+          name: 'Idealmakaroner Gammaldags',
+          brand: 'Kungsörnen',
+          packageText: 'KUNGSÖRNEN, 750g',
+          imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03',
+          sourceUrl: 'https://www.willys.se/search?q=makaroner',
+          retrievedAt: '2026-05-20T23:54:12.788Z'
+        },
+        {
+          chain: 'hemkop',
+          productCode: '101205621_ST',
+          name: 'Idealmakaroner Gammaldags',
+          brand: 'Kungsörnen',
+          packageText: 'KUNGSÖRNEN, 750g',
+          imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03',
+          sourceUrl: 'https://www.hemkop.se/search?q=makaroner',
+          retrievedAt: '2026-05-21T00:41:39.516Z'
+        },
+        {
+          chain: 'coop',
+          productCode: 'missing',
+          name: 'Missing',
+          brand: '',
+          packageText: '',
+          barcode: '00000000',
+          sourceUrl: 'https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1',
+          retrievedAt: '2026-05-21T01:29:42.710Z'
+        }
+      ]
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildOpenFoodFactsProductUrl('7310130003547'),
+      buildOpenFoodFactsProductUrl('00000000')
+    ]);
+    assert.equal(extractOpenFoodFactsBarcodeFromAxfoodImageUrl('https://assets.axfood.se/image/upload/f_auto,t_200/07310130003547_C1R1_s03'), '7310130003547');
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].barcode, '7310130003547');
+    assert.equal(rows[0].nutritionPer100g.energyKcal, 361);
+    assert.deepEqual(rows[0].retailerMatches.map((match) => match.chain), ['willys', 'hemkop']);
   });
 });
 
