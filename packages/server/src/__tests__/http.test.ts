@@ -1507,6 +1507,104 @@ describe('createHttpHandler', () => {
     });
   });
 
+  it('creates account-bound billing portal sessions from persisted provider customers', async () => {
+    const createdRequests: unknown[] = [];
+    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'portal-secret');
+    const handle = createHttpHandler(undefined, {
+      authSecret: 'portal-secret',
+      runtimeConfig: {
+        nodeEnv: 'test',
+        port: 3000,
+        publicWebUrl: 'https://groceryview.example'
+      },
+      now: new Date('2026-05-22T00:00:00.000Z'),
+      subscriptionEntitlementRepository: {
+        async getSubscriptionEntitlement(userId) {
+          if (userId !== 'user-1') return null;
+          return {
+            userId,
+            tier: 'premium',
+            plan: 'premium_monthly',
+            status: 'active',
+            currentPeriodEndsAt: '2026-06-22T00:00:00.000Z',
+            provider: 'stripe_compatible',
+            providerCustomerId: 'cus_portal_123',
+            providerSubscriptionId: 'sub_portal_123',
+            updatedAt: '2026-05-22T00:00:00.000Z'
+          };
+        }
+      },
+      billingPortalProvider: {
+        async createPortalSession(request) {
+          createdRequests.push(request);
+          return {
+            sessionId: 'bps_test_account_bound',
+            portalUrl: 'https://billing.stripe.example/session/bps_test_account_bound'
+          };
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/portal-sessions?userId=user-1', {
+      method: 'POST',
+      headers: {
+        authorization: `Bearer ${token}`,
+        'content-type': 'application/json'
+      }
+    }));
+
+    assert.equal(response.status, 201);
+    assert.deepEqual(await json(response), {
+      provider: 'stripe_compatible',
+      sessionId: 'bps_test_account_bound',
+      portalUrl: 'https://billing.stripe.example/session/bps_test_account_bound'
+    });
+    assert.deepEqual(createdRequests, [{
+      customerReference: 'cus_portal_123',
+      returnUrl: 'https://groceryview.example/account?billing=return'
+    }]);
+  });
+
+  it('fails billing portal sessions closed without provider customer evidence', async () => {
+    const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'portal-secret');
+    const handle = createHttpHandler(undefined, {
+      authSecret: 'portal-secret',
+      runtimeConfig: {
+        nodeEnv: 'test',
+        port: 3000,
+        publicWebUrl: 'https://groceryview.example'
+      },
+      subscriptionEntitlementRepository: {
+        async getSubscriptionEntitlement(userId) {
+          return {
+            userId,
+            tier: 'premium',
+            plan: 'premium_monthly',
+            status: 'active',
+            currentPeriodEndsAt: '2026-06-22T00:00:00.000Z',
+            provider: 'stripe_compatible',
+            updatedAt: '2026-05-22T00:00:00.000Z'
+          };
+        }
+      },
+      billingPortalProvider: {
+        async createPortalSession() {
+          throw new Error('should not call provider without customer evidence');
+        }
+      }
+    });
+
+    const response = await handle(new Request('http://localhost/api/billing/portal-sessions?userId=user-1', {
+      method: 'POST',
+      headers: { authorization: `Bearer ${token}` }
+    }));
+
+    assert.equal(response.status, 503);
+    assert.deepEqual(await json(response), {
+      error: 'Billing portal requires an active provider customer for this account.'
+    });
+  });
+
   it('uses the runtime repository for account-bound basket import review persistence when configured', async () => {
     const api = createGroceryViewApi();
     const savedRows: Array<{ userId: string; items: Array<{ reviewItemId: string; rawName: string; status: string }> }> = [];
