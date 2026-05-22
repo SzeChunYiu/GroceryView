@@ -1619,6 +1619,11 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1004707',
     storeName: 'ICA Supermarket Lindvallen',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003939',
+    storeName: 'ICA Supermarket Hedemyrs',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
