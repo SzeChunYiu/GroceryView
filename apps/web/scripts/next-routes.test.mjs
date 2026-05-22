@@ -283,6 +283,32 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
   });
 
+  it('surfaces busy-professional saved basket auto-reorder planning without anonymous checkout', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const account = await read('src/app/account/page.tsx');
+    const actions = await read('src/components/account-mutation-actions.tsx');
+
+    assert.match(verified, /export const savedBasketAutoReorderPlanner = /);
+    assert.match(verified, /planRecurringBasketDigest/);
+    assert.match(verified, /autoReorderDecision/);
+    assert.match(verified, /missingCurrentPrice|missing-price blockers/);
+    assert.match(account, /savedBasketAutoReorderPlanner/);
+    assert.match(account, /Saved basket auto-reorder/);
+    assert.match(account, /signed-in shopper confirmation/i);
+    assert.match(account, /not automatic purchase/i);
+    assert.match(account, /missing-price blockers/i);
+    assert.match(actions, /Plan auto-reorder/);
+    assert.match(actions, /\/api\/basket\/recurring-digest\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /templateId/);
+    assert.match(actions, /templateName/);
+    assert.match(actions, /cadence=weekly/);
+    assert.match(actions, /method: 'GET'/);
+    assert.match(actions, /Auto-reorder plan prepared for the signed-in account/);
+    assert.match(actions, /No anonymous auto-reorder/);
+    assert.doesNotMatch(actions, /checkout|purchaseNow|retailerSessionToken/);
+    assert.doesNotMatch(account, /@\/lib\/demo-data/);
+  });
+
 
   it('ships signed-in ad disclosure controls without anonymous sponsored-ranking state', async () => {
     const account = await read('src/app/account/page.tsx');

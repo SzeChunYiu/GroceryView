@@ -1066,6 +1066,51 @@ export const weeklyBasketChangeDigest = planRecurringBasketDigest({
   ]
 });
 
+export const savedBasketAutoReorderPlanner = {
+  persona: 'Busy professionals',
+  title: 'Saved basket auto-reorder',
+  corePlanner: 'planRecurringBasketDigest',
+  endpoint: '/api/basket/recurring-digest',
+  templateId: weeklyBasketChangeDigest.templateId,
+  templateName: weeklyBasketChangeDigest.templateName,
+  cadence: weeklyBasketChangeDigest.cadence,
+  asOf: weeklyBasketChangeDigest.asOf,
+  autoReorderDecision: {
+    status: weeklyBasketChangeDigest.changeSummary.missingCurrentPrice > 0 ? 'review_required' : 'ready_for_signed_in_confirmation',
+    label: weeklyBasketChangeDigest.changeSummary.missingCurrentPrice > 0
+      ? 'Review missing-price blockers before reordering'
+      : 'Ready for signed-in shopper confirmation',
+    comparableCurrentTotal: weeklyBasketChangeDigest.comparableCurrentTotal,
+    comparablePreviousTotal: weeklyBasketChangeDigest.comparablePreviousTotal,
+    comparableDelta: weeklyBasketChangeDigest.comparableDelta,
+    priceDownLines: weeklyBasketChangeDigest.changeSummary.priceDown,
+    priceUpLines: weeklyBasketChangeDigest.changeSummary.priceUp,
+    missingPriceBlockerCount: weeklyBasketChangeDigest.changeSummary.missingCurrentPrice
+  },
+  reviewLines: weeklyBasketChangeDigest.lines.slice(0, 4).map((line) => ({
+    productId: line.productId,
+    productName: line.productName,
+    changeType: line.changeType,
+    recommendedAction: line.recommendedAction,
+    currentUnitPrice: line.currentUnitPrice,
+    previousUnitPrice: line.previousUnitPrice,
+    confidence: line.confidence
+  })),
+  missingPriceBlockers: weeklyBasketChangeDigest.lines
+    .filter((line) => line.changeType === 'missing_current_price' || line.currentUnitPrice === null)
+    .map((line) => ({
+      productId: line.productId,
+      productName: line.productName,
+      blocker: 'Missing current verified price; do not prepare retailer handoff until this line has evidence.'
+    })),
+  guardrails: [
+    'Requires a signed-in shopper confirmation before any recurring basket plan is saved.',
+    'The plan is not automatic purchase, payment, or retailer order placement.',
+    'Suggested substitutes stay review-only and never rewrite a saved recurring basket automatically.',
+    'Missing-price blockers remain visible and stop any handoff preparation until verified prices return.'
+  ]
+};
+
 export type AdaptiveProductCard = {
   slug: string;
   name: string;
