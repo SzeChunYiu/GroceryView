@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import {
   categoryQualityMatrix,
+  commodityIngestionClassifierEvidence,
   formatPct,
   snapshot,
   sourceClaimLedger,
@@ -57,6 +58,45 @@ export default function DataSourcesPage() {
               </p>
             </section>
           ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-lime-200 bg-lime-50/60">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-lime-800">feat(commodity)</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">
+              Loose-item ingestion classifier · {commodityIngestionClassifierEvidence.title}
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              No-barcode, sold-by-weight rows now classify as product_kind='commodity' ({commodityIngestionClassifierEvidence.example.productKindColumn}), resolve {commodityIngestionClassifierEvidence.example.commodityId}, and carry unit price, variant, is_organic, and origin_country into the ingestion contract.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-lime-900 shadow-sm">
+            {commodityIngestionClassifierEvidence.taxonomyCount} commodities · {commodityIngestionClassifierEvidence.stapleCount} staples
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2">
+          <section className="rounded-2xl border border-lime-100 bg-white p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">Example mapped row</p>
+            <p className="mt-2 font-black text-slate-950">{commodityIngestionClassifierEvidence.example.rawName}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {Object.values(commodityIngestionClassifierEvidence.example).slice(1).map((value) => (
+                <span className="rounded-full bg-lime-100 px-3 py-1 text-xs font-black text-lime-950" key={value}>
+                  {value}
+                </span>
+              ))}
+            </div>
+          </section>
+          <section className="rounded-2xl border border-amber-100 bg-white p-4">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Confidence guardrail</p>
+            <p className="mt-2 text-sm font-bold leading-6 text-amber-950">{commodityIngestionClassifierEvidence.sourceConfidencePolicy}</p>
+            <ul className="mt-3 space-y-2 text-sm font-semibold leading-6 text-slate-700">
+              {commodityIngestionClassifierEvidence.guardrails.map((guardrail) => (
+                <li key={guardrail}>• {guardrail}</li>
+              ))}
+            </ul>
+          </section>
         </div>
       </Card>
 

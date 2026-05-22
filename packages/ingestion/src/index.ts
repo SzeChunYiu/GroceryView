@@ -9,6 +9,7 @@ import {
   type QueryExecutor,
   type SourceRunRecord
 } from '@groceryview/db';
+import { COMMODITIES, findCommodity, type Commodity } from '@groceryview/catalog';
 import {
   fetchCityGrossProductsForAllStores,
   type CityGrossProduct
@@ -2209,7 +2210,14 @@ export type RetailerProductInput = {
   canonicalName: string;
   productId: string;
   categoryId: string;
+  barcode?: string;
+  productKind?: 'branded' | 'commodity';
+  commodityId?: string;
   brand?: string;
+  variant?: string;
+  isOrganic?: boolean;
+  originCountry?: string;
+  soldByWeight?: boolean;
   packageSize: number;
   packageUnit: string;
   price: number;
@@ -2243,6 +2251,11 @@ export type IngestedProduct = {
   canonicalName: string;
   brand?: string;
   categoryId: string;
+  productKind: 'branded' | 'commodity';
+  commodityId?: string;
+  variant?: string;
+  isOrganic: boolean;
+  originCountry?: string;
   packageSize: number;
   packageUnit: string;
   comparableUnit: string;
@@ -2311,6 +2324,7 @@ function validateInput(input: RetailerProductInput): void {
   if (!input.parserVersion.trim()) throw new Error('parserVersion is required.');
   if (!input.rawSnapshotRef.trim()) throw new Error('rawSnapshotRef is required.');
   if (Number.isNaN(Date.parse(input.observedAt))) throw new Error('observedAt must be an ISO date.');
+  if (input.originCountry !== undefined && !/^[a-z]{2}$/i.test(input.originCountry)) throw new Error('originCountry must be an ISO-3166 alpha-2 code.');
 }
 
 function priceTypeForSource(input: RetailerProductInput, hasPromotion: boolean): PriceType {
@@ -2325,9 +2339,65 @@ function priceTypeForSource(input: RetailerProductInput, hasPromotion: boolean):
   return 'estimated';
 }
 
+const normalizeSearchText = (value: string): string => value
+  .toLowerCase()
+  .normalize('NFD')
+  .replace(/\p{Diacritic}/gu, '')
+  .replace(/[^a-z0-9]+/g, ' ')
+  .trim();
+
+function commodityTerms(commodity: Commodity): string[] {
+  return [
+    commodity.slug.replace(/-/g, ' '),
+    commodity.nameSv,
+    commodity.nameEn,
+    ...(commodity.variants ?? [])
+  ].map(normalizeSearchText).filter(Boolean);
+}
+
+function categoryHintsMatch(input: RetailerProductInput, commodity: Commodity): boolean {
+  const category = normalizeSearchText(input.categoryId);
+  return commodity.categoryPath
+    .map(normalizeSearchText)
+    .some((hint) => hint.length > 0 && (category.includes(hint) || hint.includes(category)));
+}
+
+function resolveCommodity(input: RetailerProductInput): Commodity | null {
+  if (input.commodityId) {
+    const explicit = findCommodity(input.commodityId);
+    if (!explicit) throw new Error(`Unknown commodityId: ${input.commodityId}`);
+    return explicit;
+  }
+
+  const haystack = normalizeSearchText(`${input.rawName} ${input.canonicalName} ${input.categoryId}`);
+  return COMMODITIES.find((commodity) => {
+    const hasNameMatch = commodityTerms(commodity).some((term) => term.length > 0 && haystack.includes(term));
+    return hasNameMatch && (categoryHintsMatch(input, commodity) || input.soldByWeight === true || input.productKind === 'commodity');
+  }) ?? null;
+}
+
+function classifyRetailerProduct(input: RetailerProductInput): {
+  productKind: 'branded' | 'commodity';
+  commodityId?: string;
+  matchConfidence: number;
+} {
+  const sourceConfidence = confidenceForSource(input.sourceType);
+  const requiresCommodityResolution = input.productKind === 'commodity' || input.soldByWeight === true || input.commodityId !== undefined;
+  if (!requiresCommodityResolution) return { productKind: 'branded', matchConfidence: sourceConfidence };
+
+  const commodity = resolveCommodity(input);
+  if (!commodity) throw new Error(`Could not resolve commodity mapping for ${input.rawName}.`);
+  return {
+    productKind: 'commodity',
+    commodityId: commodity.slug,
+    matchConfidence: Math.min(sourceConfidence, 0.68)
+  };
+}
+
 export function ingestRetailerProduct(input: RetailerProductInput): IngestionOutput {
   validateInput(input);
-  const confidence = confidenceForSource(input.sourceType);
+  const classification = classifyRetailerProduct(input);
+  const confidence = classification.matchConfidence;
   const normalized = normalizeUnitPrice(input);
   const hasPromotion = input.regularPrice !== undefined && input.regularPrice > input.price;
   const priceType = priceTypeForSource(input, hasPromotion);
@@ -2346,6 +2416,11 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       canonicalName: input.canonicalName,
       brand: input.brand,
       categoryId: input.categoryId,
+      productKind: classification.productKind,
+      commodityId: classification.commodityId,
+      variant: input.variant,
+      isOrganic: input.isOrganic ?? (/\b(eko|ekologisk|organic)\b/i.test(input.rawName) || /\b(eko|ekologisk|organic)\b/i.test(input.canonicalName)),
+      originCountry: input.originCountry?.toUpperCase(),
       packageSize: input.packageSize,
       packageUnit: input.packageUnit,
       comparableUnit: normalized.comparableUnit
