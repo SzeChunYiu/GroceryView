@@ -33,6 +33,60 @@ function median(values: number[]) {
   return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
 }
 
+function unitAmountFromPackage(packageText: string): { amount: number; unit: 'kg' | 'l' | 'st'; packageLabel: string } | null {
+  const normalized = packageText.replace(',', '.').toLowerCase();
+  const multiplied = normalized.match(/(\d+)\s*x\s*(\d+(?:\.\d+)?)\s*(kg|g|l|ml|cl|st)\b/);
+  if (multiplied) {
+    const count = Number(multiplied[1]);
+    const each = Number(multiplied[2]);
+    const unit = multiplied[3];
+    if (Number.isFinite(count) && Number.isFinite(each) && count > 0 && each > 0) {
+      if (unit === 'kg') return { amount: count * each, unit: 'kg', packageLabel: multiplied[0] };
+      if (unit === 'g') return { amount: (count * each) / 1000, unit: 'kg', packageLabel: multiplied[0] };
+      if (unit === 'l') return { amount: count * each, unit: 'l', packageLabel: multiplied[0] };
+      if (unit === 'cl') return { amount: (count * each) / 100, unit: 'l', packageLabel: multiplied[0] };
+      if (unit === 'ml') return { amount: (count * each) / 1000, unit: 'l', packageLabel: multiplied[0] };
+      return { amount: count * each, unit: 'st', packageLabel: multiplied[0] };
+    }
+  }
+
+  const matches = [...normalized.matchAll(/(\d+(?:\.\d+)?)\s*(kg|g|l|ml|cl|st)\b/g)];
+  const match = matches.at(-1);
+  if (!match) return null;
+  const value = Number(match[1]);
+  const unit = match[2];
+  if (!Number.isFinite(value) || value <= 0) return null;
+  if (unit === 'kg') return { amount: value, unit: 'kg', packageLabel: match[0] };
+  if (unit === 'g') return { amount: value / 1000, unit: 'kg', packageLabel: match[0] };
+  if (unit === 'l') return { amount: value, unit: 'l', packageLabel: match[0] };
+  if (unit === 'cl') return { amount: value / 100, unit: 'l', packageLabel: match[0] };
+  if (unit === 'ml') return { amount: value / 1000, unit: 'l', packageLabel: match[0] };
+  return { amount: value, unit: 'st', packageLabel: match[0] };
+}
+
+export function normalizeComparableUnitPrice(totalPrice: number, packageText: string) {
+  const packageAmount = unitAmountFromPackage(packageText);
+  if (!packageAmount || !Number.isFinite(totalPrice) || totalPrice <= 0) return null;
+  return {
+    packageLabel: packageAmount.packageLabel,
+    unitLabel: `kr/${packageAmount.unit}`,
+    unitPrice: totalPrice / packageAmount.amount,
+    unitSortPrice: totalPrice / packageAmount.amount
+  };
+}
+
+function adaptiveProductKind(category: string) {
+  return ['frukt-och-gront', 'produce'].includes(category) ? 'commodity' as const : 'branded' as const;
+}
+
+function cheapestUnitBadge(unitPrice: number | null, peerUnitPrices: number[], unitLabel: string) {
+  if (unitPrice === null || peerUnitPrices.length < 2) return null;
+  const average = peerUnitPrices.reduce((sum, value) => sum + value, 0) / peerUnitPrices.length;
+  if (!Number.isFinite(average) || average <= unitPrice) return null;
+  const advantage = ((average - unitPrice) / average) * 100;
+  return `cheapest-per-unit · 🟢 -${formatPct(advantage)}/${unitLabel.replace('kr/', '')} vs chain avg`;
+}
+
 function dailyObservedPricePoints(product: (typeof pricedProducts)[number]) {
   const pricesByDate = product.observations.reduce<Record<string, number[]>>((ledger, observation) => {
     if (!observation.date || !Number.isFinite(observation.price)) return ledger;
@@ -51,6 +105,50 @@ export const matchedChainProducts = axfoodProducts.filter((product) => product.i
 export const topChainSpreads = [...matchedChainProducts].sort((a, b) => b.spreadPct - a.spreadPct).slice(0, 18);
 export const freshestOpenPrices = [...pricedProducts].sort((a, b) => b.lastObservedAt.localeCompare(a.lastObservedAt)).slice(0, 18);
 export const productUniverse = [...topChainSpreads, ...freshestOpenPrices].slice(0, 36);
+export type AdaptiveProductCard = {
+  slug: string;
+  name: string;
+  brand: string;
+  productKind: 'branded' | 'commodity';
+  totalPriceLabel: string;
+  unitPriceLabel: string;
+  packageLabel: string;
+  sourceLabel: string;
+  confidenceLabel: string;
+  totalSortPrice: number;
+  unitSortPrice: number | null;
+  defaultCompareMode: 'total' | 'unit';
+  cheapestUnitBadge: string | null;
+};
+export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((product) => {
+  const isChainProduct = 'lowestPrice' in product;
+  const totalPrice = isChainProduct ? product.lowestPrice : product.priceMedian;
+  const packageText = isChainProduct ? product.subline : product.quantity;
+  const normalizedUnit = normalizeComparableUnitPrice(totalPrice, packageText);
+  const productKind = adaptiveProductKind(product.category);
+  const peerUnitPrices = isChainProduct && normalizedUnit
+    ? Object.values(product.chains)
+      .map((row) => row.price === null ? null : normalizeComparableUnitPrice(row.price, packageText)?.unitPrice ?? null)
+      .filter((value): value is number => typeof value === 'number' && Number.isFinite(value))
+    : [];
+
+  return {
+    slug: product.slug,
+    name: product.name,
+    brand: isChainProduct ? product.brand : product.brands || 'Brand not reported',
+    productKind,
+    totalPriceLabel: formatSek(totalPrice),
+    unitPriceLabel: normalizedUnit ? `${formatSek(normalizedUnit.unitPrice)} / ${normalizedUnit.unitLabel.replace('kr/', '')}` : 'Unit price not reported',
+    packageLabel: normalizedUnit?.packageLabel || packageText || 'Package size not reported',
+    sourceLabel: isChainProduct ? `${product.lowestChain} lowest · ${formatPct(product.spreadPct)} spread` : `OpenPrices · ${product.observationCount.toLocaleString('sv-SE')} observations`,
+    confidenceLabel: normalizedUnit ? `Derived from observed price + package size (${normalizedUnit.unitLabel})` : 'No synthetic unit prices: package quantity missing',
+    totalSortPrice: totalPrice,
+    unitSortPrice: normalizedUnit?.unitSortPrice ?? null,
+    defaultCompareMode: productKind === 'commodity' ? 'unit' : 'total',
+    cheapestUnitBadge: normalizedUnit ? cheapestUnitBadge(normalizedUnit.unitPrice, peerUnitPrices, normalizedUnit.unitLabel) : null
+  };
+});
+export const homepageAdaptiveProductCards = adaptiveProductCards.slice(0, 6);
 export const immigrantFamiliarBrandSearch = productUniverse
   .map((product) => {
     const isChainProduct = 'lowestPrice' in product;
