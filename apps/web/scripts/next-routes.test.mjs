@@ -418,6 +418,23 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces online delivery versus in-store totals including explicit fees', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/shopping-trips/page.tsx');
+
+    assert.match(verified, /planBasketTripCost/);
+    assert.match(verified, /export const deliveryVsInStoreComparison/);
+    assert.match(verified, /deliveryFee/);
+    assert.match(verified, /pricedBasketTotal/);
+    assert.match(route, /deliveryVsInStoreComparison/);
+    assert.match(route, /Online delivery vs in-store total/);
+    assert.match(route, /effectiveTotal/);
+    assert.match(route, /not a retailer reservation/i);
+    assert.match(route, /NoVerifiedData/);
+    assert.doesNotMatch(route, /@\/lib\/demo-data/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
   it('surfaces the recurring basket digest product contract on the weekly basket route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/weekly-basket/page.tsx');
