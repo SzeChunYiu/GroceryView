@@ -15,7 +15,7 @@ function normalizeChainId(value) {
 export function buildCatalogCoverageTargets(rows) {
   const targetProducts = uniqueSorted(rows.products.map((row) => row.id));
   const targetCategories = uniqueSorted(rows.products.map((row) => row.category_id ?? 'uncategorized'));
-  const targetStores = uniqueSorted(rows.stores.map((row) => row.id));
+  const targetStores = uniqueSorted(rows.stores.map((row) => row.slug ?? row.external_ref ?? row.id));
   const observedChains = uniqueSorted(rows.chains.map((row) => normalizeChainId(row.id)));
   const missingRequiredChains = requiredDailyChainIds.filter((chainId) => !observedChains.includes(chainId));
   if (missingRequiredChains.length > 0) {
@@ -36,11 +36,9 @@ async function readCatalogRows(databaseUrl) {
   const client = new Client({ connectionString: databaseUrl });
   await client.connect();
   try {
-    const [products, stores, chains] = await Promise.all([
-      client.query(`select id, coalesce(category_path[1], 'uncategorized') as category_id from products order by id`),
-      client.query('select id from stores order by id'),
-      client.query('select slug as id from chains order by slug')
-    ]);
+    const products = await client.query(`select id, coalesce(category_path[1], 'uncategorized') as category_id from products order by id`);
+    const stores = await client.query('select slug, external_ref, id from stores order by slug');
+    const chains = await client.query('select slug as id from chains order by slug');
     return { products: products.rows, stores: stores.rows, chains: chains.rows };
   } finally {
     await client.end();
