@@ -187,6 +187,7 @@ describe('fetchOpenFoodFactsRetailerEnrichments', () => {
     const fetchImpl: typeof fetch = async (url) => {
       requestedUrls.push(String(url));
       const code = String(url).includes('7310130003547') ? '7310130003547' : '';
+      const status = code ? 200 : 404;
       return new Response(JSON.stringify(code ? {
         status: 1,
         product: {
@@ -211,7 +212,7 @@ describe('fetchOpenFoodFactsRetailerEnrichments', () => {
           },
           url: 'https://world.openfoodfacts.org/product/7310130003547/ideal-makaroner-kungsornen'
         }
-      } : { status: 0 }), { status: 200, headers: { 'content-type': 'application/json' } });
+      } : { status: 0 }), { status, headers: { 'content-type': 'application/json' } });
     };
 
     const rows = await fetchOpenFoodFactsRetailerEnrichments({

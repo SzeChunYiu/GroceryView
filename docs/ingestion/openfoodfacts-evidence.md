@@ -1,25 +1,26 @@
 # OpenFoodFacts ingestion evidence
 
 - Source: official OpenFoodFacts world data export
-- Source URL: https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz
-- Retrieved: 2026-05-20T23:35:02.245Z
-- Real rows fetched: 50
+- Source URL: https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz
+- Retrieved: 2026-05-22T09:07:37.774Z
+- Candidate barcode count checked from current Willys/Hemkop/Coop ingested rows: 277
+- Real rows fetched: 147 barcode+nutrition rows matched to existing ingested retailer products
 - Connector: packages/ingestion/src/connectors/openfoodfacts.ts
 - Web wire: apps/web/src/lib/ingested/openfoodfacts.ts
 
-The interactive OpenFoodFacts search endpoints returned temporary-unavailable HTML during probing, and per-product API requests began returning HTTP 429 before 50 rows. The official data export linked from https://world.openfoodfacts.org/data streamed successfully, so this iteration uses that public export. Every emitted row includes its exact export source marker in `sourceUrl` and a product URL.
+The direct product API returned HTTP 429 during the 2026-05-22 probe. The official OpenFoodFacts export URL under `world.openfoodfacts.org/data` streamed successfully, so this iteration uses that public export. Candidate barcodes came only from current Willys/Hemkop/Coop ingested rows: Coop `ean` fields and Axfood EANs embedded in Willys/Hemkop image URLs. No-match and nutrition-empty products were skipped. Every emitted row includes its exact export source marker in `sourceUrl`, a product URL, and the retailer rows it matched by barcode.
 
 ## Sample Retrieved Rows
 
-1. 0089686170269 | Instant Noodle Soup Vegetable Flavour | Indomie | https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=0089686170269
-2. 2000985644952 | Småfranska 10p | City Gross | https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=2000985644952
-3. 20645892 | Palmeritas | Sol&Mar, sol-mar | https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=20645892
-4. 4000417108104 | Crispy Cookie | Ritter Sport | https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4000417108104
-5. 4056489627821 | Vemondo veganska mandel glasspinnar | Bon Gelati, Lidl, Vemondo | https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4056489627821
-6. 4056489655664 | TK - Beerenmischung | Freshona | https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4056489655664
-7. 4056489687610 | Boisson au cacao et à l'avoine | Vemondo | https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4056489687610
-8. 4056489767930 | Matriket svenska fiberhavregryn | Matriket | https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4056489767930
-9. 5701977550974 | Ekologisk bredbart | Naturli' | https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5701977550974
-10. 59032823 | nutella | Ferrero,Nutellagg | https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=59032823
-11. 6416453043800 | Halloweenkuulat | Fazer | https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6416453043800
-12. 6431901820321 | Flatbröd | Moilas | https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6431901820321
+1. 3415581520927 | Fruit Collection | Häagen-Dazs | https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=3415581520927
+2. 3523230062633 | Chèvre | Soignon | https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=3523230062633
+3. 4016241051035 | Mild Kvarg Vanilj | Arla | https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4016241051035
+4. 4770513127216 | Kycklingbröst filé | TOP CHOICE POULTRY | https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=4770513127216
+5. 5000112637939 | Coca-Cola Zero Sugar | Coca-Cola | https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5000112637939
+6. 5059319023229 | Frosties | Kellogg's, Kellogg's - KELLOG Company | https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5059319023229
+7. 5410673005847 | Ben's Original | Långkornigt | https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5410673005847
+8. 5410673005861 | Pitkäjyväinen riisi, keitetty | MARS NORGE AS | https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5410673005861
+9. 5740301203124 | Torskrygg | Royal Greenland | https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5740301203124
+10. 5900649083097 | Matcha latte | Mokate | https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=5900649083097
+11. 6408432088933 | Valio Vanilj Original Slät | Valio, Valio Oy | https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=6408432088933
+12. 7300200630001 | Nötspett - Svartpeppar | Scan | https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7300200630001

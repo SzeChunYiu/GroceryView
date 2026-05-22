@@ -81,7 +81,7 @@ export const OPENFOODFACTS_FIELDS = [
   'url'
 ] as const;
 
-export const OPENFOODFACTS_EXPORT_URL = 'https://static.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz';
+export const OPENFOODFACTS_EXPORT_URL = 'https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz';
 
 export const DEFAULT_OPENFOODFACTS_CODES = [
   '7340083494406',
@@ -222,7 +222,7 @@ export async function fetchOpenFoodFactsExportProducts(options: FetchOpenFoodFac
   }
 
   const wantedCodes = options.codes ? new Set(options.codes) : null;
-  const maxRows = options.maxRows ?? 50;
+  const maxRows = options.maxRows ?? 75;
   const rows: OpenFoodFactsProduct[] = [];
   let headers: string[] | null = null;
 
@@ -264,7 +264,7 @@ export async function fetchOpenFoodFactsRetailerEnrichments(
   options: FetchOpenFoodFactsRetailerEnrichmentsOptions
 ): Promise<OpenFoodFactsRetailerEnrichment[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
-  const maxRows = options.maxRows ?? 50;
+  const maxRows = options.maxRows ?? 75;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const candidatesByBarcode = groupOpenFoodFactsCandidatesByBarcode(options.candidates);
   const rows: OpenFoodFactsRetailerEnrichment[] = [];
@@ -278,6 +278,9 @@ export async function fetchOpenFoodFactsRetailerEnrichments(
       }
     });
 
+    if (response.status === 404) {
+      continue;
+    }
     if (!response.ok) {
       throw new Error(`OpenFoodFacts enrichment request failed for ${barcode}: ${response.status}`);
     }
