@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { expiryDealRadar, expiryDealRadarReports, kidsSnackLunchboxDeals, singlePortionDealFinder } from '@/lib/demo-data';
-import { flyerValidityCalendar, offerExpiryReminderBoard } from '@/lib/verified-data';
+import { digitalCatalogueOfferBoard, flyerValidityCalendar, offerExpiryReminderBoard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -25,6 +25,38 @@ export default function DealsPage() {
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
         This page calls buildExpiryDealRadar with visible product rows plus timestamped expiry-sticker reports. Expired and stale evidence stays visible as coverage context, but it is not promoted as an active deal.
       </p>
+
+      <Card className="mt-6 border-orange-200 bg-orange-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-800">Flyer / digital-catalog ingestion</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">ICA e-magin catalogue offers</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              These rows come from the generated ICA public weekly-offer export. The UI keeps retailer priceText, comparisonPrice, regularPriceText, sourceUrl, and flyerPdfUrl visible instead of pretending every flyer row has a computed checkout saving.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white p-4 text-right shadow-sm">
+            <p className="text-4xl font-black text-orange-900">{digitalCatalogueOfferBoard.offerCount.toLocaleString('sv-SE')}</p>
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-slate-500">real weekly offer rows</p>
+            <p className="mt-2 text-xs font-semibold text-slate-600">{digitalCatalogueOfferBoard.storeCount} ICA stores · {digitalCatalogueOfferBoard.flyerCount} flyer PDFs</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 lg:grid-cols-3">
+          {digitalCatalogueOfferBoard.sampleOffers.slice(0, 3).map((offer) => (
+            <a className="rounded-2xl border border-orange-100 bg-white p-4 shadow-sm hover:border-orange-600" href={offer.sourceUrl} key={offer.code}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-800">{offer.storeName}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{offer.productName}</h3>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{offer.evidenceLabel}</p>
+              <p className="mt-3 text-2xl font-black text-orange-900">{offer.priceText}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-700">{offer.comparisonPrice}</p>
+              <p className="mt-2 text-xs font-bold text-slate-500">validTo {offer.validTo.slice(0, 10)} · flyerPdfUrl retained</p>
+            </a>
+          ))}
+        </div>
+        <p className="mt-4 rounded-2xl bg-white/80 p-3 text-sm font-bold text-orange-950">
+          {digitalCatalogueOfferBoard.guardrails[1]}
+        </p>
+      </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
         <Card>
