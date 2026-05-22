@@ -418,6 +418,52 @@ back most of these.
   monthly averages, not forecast (content + SEO + eco).
 - `feat(eco):` carbon/eco score per basket ("cheaper + greener").
 
+## Multi-vertical expansion — local price-intelligence engine (operator 2026-05-22)
+
+The core model (`observations` = item × location × price × time, cross-vendor matching,
+indices, history, per-branch geo/heatmap, map) is **vertical-agnostic**. Groceries is
+vertical #1. **Discipline: win Swedish groceries first**, then fuel (#2), then pharmacy
+(#3). Each vertical has incumbents — the edge is the same terminal UX + per-location geo
++ history, not being first. Umbrella positioning is a "local price terminal"; the
+`GroceryView` name does not stretch to fuel/pharmacy (branding decision deferred).
+
+### `feat(domain):` multi-vertical foundation — add NOW (cheap, future-proofs the engine)
+- Add `domain` (`grocery | fuel | pharmacy | …`) to chains/operators, products/items,
+  and observations; default existing rows to `grocery`. Vertical-scoped routes
+  (`/fuel`, `/pharmacy`) reuse the terminal/map/history/chart components.
+- Matching stays per-domain: grocery = EAN + commodity; fuel = grade; pharmacy = EAN.
+
+### `feat(fuel):` vertical #2 — fuel (best engine fit; map + history showcase)
+- **Items** = grades: 95 (E10/E5), 98, Diesel, HVO100, E85, AdBlue (~6, tiny catalog).
+- **Locations** = stations w/ coordinates: Circle K, OKQ8, Preem, St1, Ingo, Tanka,
+  Qstar, Shell + unmanned. Station locations via OSM `amenity=fuel` (reuse the Overpass
+  connector) — `unit_price` n/a; price is per litre by grade.
+- **Data sources** (RE per-operator like grocery): operator sites/apps; fuel prices are
+  less openly published than groceries → **crowd submissions** (reuse
+  `community_reporter_trust`) are first-class, same lesson as loose produce.
+- **Features (reuse engine):** cheapest station near me (map + price heatmap = the hero),
+  per-grade price per station, history charts + "vs usual", operator/region price index,
+  "notify when 95 < X near me" alerts.
+
+### `feat(pharmacy):` vertical #3 — pharmacy OTC (reuses EAN matching; Apohem already queued)
+- **Scope OTC + supplements + health & beauty only.** Prescription drugs are
+  price-regulated (högkostnadsskydd) → no comparison value. Price-compare only; no
+  medical advice; mind health-claim regulation.
+- **Items** = OTC products (have EAN → reuse the branded matching path).
+- **Locations/operators** = Apotek Hjärtat, Kronans Apotek, Apoteket, Apotea, Apohem
+  (Apohem already in `docs/ingestion-targets.md`); online + physical.
+- **Data sources:** online pharmacy catalogs (scrapeable like grocery online stores),
+  EAN match cross-pharmacy.
+- **Features:** cheapest pharmacy per product, online vs in-store, history, alerts.
+
+### Future verticals (vision — after the above; not active backlog)
+- **Hardware / bygg** (Bauhaus, Byggmax) — big-ticket, low competition; maybe.
+- **Beauty / pet / baby** (Lyko etc.) — EAN-matched, adjacent; maybe.
+- **Electricity (elpris)** — huge consumer interest but a *different* model (public hourly
+  spot + provider contracts, not stations); evaluate as a separate index product.
+- **Skip:** alcohol (Systembolaget monopoly = one national price in SE); electronics
+  (Prisjakt/PriceRunner own it — saturated).
+
 ## Updated by operator only
 
 The CEO MUST NOT edit this file. Only the operator (user or main Claude Code
