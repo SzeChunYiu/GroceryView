@@ -33,7 +33,7 @@ Implement the research finding for browser extension or bookmarklet basket impor
 | Full workspace tests | Pass | `rtk git diff --check && rtk npm test` |
 | Build | Pass | `rtk npm run build` |
 | Typecheck | Pass | `rtk npm run typecheck` |
-| PR and merge | Pending | Product PR not created yet. |
+| PR and merge | Pass | Product PR #766 merged to `main` at 2026-05-22T09:39:43Z with merge commit `7d8e491e3ff0996a2c8ecd406000568999bfd93e`; CI and release validation passed. |
 
 ## Code-review graph note
 
