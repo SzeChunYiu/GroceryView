@@ -1384,6 +1384,106 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1004590',
     storeName: 'ICA Kvantum Nässjö',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003842',
+    storeName: 'ICA Supermarket Ugglebo',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004340',
+    storeName: 'Maxi ICA Stormarknad Oskarshamn',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003531',
+    storeName: 'ICA Kvantum Oxelösund',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003474',
+    storeName: 'ICA Supermarket Robertsfors',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004689',
+    storeName: 'ICA Supermarket Salem',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003585',
+    storeName: 'ICA Kvantum Åkrahallen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003806',
+    storeName: 'ICA Nära Nyplan',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004503',
+    storeName: 'ICA Supermarket Björksätra',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003396',
+    storeName: 'Maxi ICA Stormarknad Sandviken',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003463',
+    storeName: 'ICA Supermarket Simrishamn',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004002',
+    storeName: 'ICA Kvantum Skellefteå',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003910',
+    storeName: 'Maxi ICA Stormarknad Skellefteå',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003746',
+    storeName: 'ICA Nära Blomman',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004080',
+    storeName: 'Maxi ICA Stormarknad Skövde',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004092',
+    storeName: 'ICA Supermarket Sollebrunn',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004238',
+    storeName: 'ICA Kvantum Sollefteå',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004420',
+    storeName: 'ICA Nära Strandhallen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003417',
+    storeName: 'ICA Kvantum Liljeholmen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003425',
+    storeName: 'ICA Kvantum Värtan',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003988',
+    storeName: 'ICA Supermarket Aptiten',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
