@@ -1817,6 +1817,53 @@ export const weeklyBasketOptimizer = {
   }
 };
 
+export const familyBulkUnitPriceComparison = {
+  persona: 'Families with kids',
+  title: 'Family-pack unit prices',
+  rows: [
+    {
+      productId: 'pagen-lingongrova-500g',
+      productName: 'Pågen Lingongrova bread',
+      standardPack: '500g shelf loaf',
+      familyPack: '2 × 500g lunchbox bundle',
+      storeName: 'Coop Medborgarplatsen',
+      standardUnitPrice: 67.8,
+      bulkUnitPrice: 61.9,
+      comparableUnit: 'SEK/kg',
+      unitSavingsPercent: 9,
+      source: 'visible weekly basket bread rows at Coop and Willys'
+    },
+    {
+      productId: 'bravo-apelsinjuice-1l',
+      productName: 'Bravo Apelsinjuice',
+      standardPack: '1L carton',
+      familyPack: '2L breakfast bundle',
+      storeName: 'Hemköp Hornstull',
+      standardUnitPrice: 25.9,
+      bulkUnitPrice: 22.9,
+      comparableUnit: 'SEK/l',
+      unitSavingsPercent: 12,
+      source: 'visible weekly basket juice rows across Coop and Hemköp'
+    },
+    {
+      productId: 'garant-ekologisk-tofu-270g',
+      productName: 'Garant Ekologisk Tofu',
+      standardPack: '270g pack',
+      familyPack: '3 × 270g dinner bundle',
+      storeName: 'Willys Odenplan',
+      standardUnitPrice: 92.22,
+      bulkUnitPrice: 81.11,
+      comparableUnit: 'SEK/kg',
+      unitSavingsPercent: 12,
+      source: 'visible weekly basket tofu rows across Willys and Hemköp'
+    }
+  ],
+  coverage: {
+    confidence: 'medium',
+    caveat: 'Compares visible package rows and family-sized bundles only; missing club-card multi-buy prices are not estimated.'
+  }
+};
+
 export const studentBasicsInput: BasketComparisonInput = {
   favoriteStoreIds: ['willys-odenplan', 'coop-medborgarplatsen', 'hemkop-hornstull'],
   items: [

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { weeklyBasketOptimizer } from '@/lib/demo-data';
+import { familyBulkUnitPriceComparison, weeklyBasketOptimizer } from '@/lib/demo-data';
 import { recurringBasketDigestContract } from '@/lib/verified-data';
 
 function formatSek(value: number) {
@@ -79,6 +79,29 @@ export default function WeeklyBasketPage() {
           The account API exposes <code className="rounded bg-white/80 px-1 py-0.5 font-bold">{recurringBasketDigestContract.endpoint}</code> for recurring weekly baskets; it still guards private user-owned rows while this public optimizer uses visible fixture prices.
         </p>
         <p className="mt-2 text-sm font-semibold text-emerald-900">Shipped behaviours include missing-price blockers, substitutes, and price-up/down classifications.</p>
+      </Card>
+
+      <Card className="mt-6 border-blue-200 bg-blue-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-blue-800">{familyBulkUnitPriceComparison.persona}</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Family-pack unit prices</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          This family board compares standard package rows against visible family-sized bundles using comparable units, so bulkUnitPrice wins only when the package math is present.
+        </p>
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          {familyBulkUnitPriceComparison.rows.map((row) => (
+            <Link className="rounded-2xl border border-blue-200 bg-white p-4 hover:border-blue-700" href={`/products/${row.productId}`} key={row.productId}>
+              <p className="text-lg font-black text-slate-950">{row.productName}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{row.familyPack} at {row.storeName}</p>
+              <div className="mt-3 grid gap-2 text-sm text-slate-700">
+                <p className="rounded-2xl bg-blue-50 p-3 font-semibold">Bulk {formatSek(row.bulkUnitPrice)} / {row.comparableUnit.replace('SEK/', '')}</p>
+                <p className="rounded-2xl bg-slate-50 p-3 font-semibold">Standard {formatSek(row.standardUnitPrice)} / {row.comparableUnit.replace('SEK/', '')}</p>
+                <p className="rounded-2xl bg-emerald-50 p-3 font-black text-emerald-900">{row.unitSavingsPercent}% unit savings</p>
+              </div>
+              <p className="mt-3 text-xs font-semibold text-slate-600">{row.source}</p>
+            </Link>
+          ))}
+        </div>
+        <p className="mt-4 text-sm font-semibold text-slate-700">{familyBulkUnitPriceComparison.coverage.caveat}</p>
       </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">

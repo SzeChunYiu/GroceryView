@@ -140,6 +140,15 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces a family bulk unit-price comparison from visible package rows', async () => {
+    const source = await read('src/app/weekly-basket/page.tsx');
+    assert.match(source, /familyBulkUnitPriceComparison/);
+    assert.match(source, /Family-pack unit prices/);
+    assert.match(source, /unitSavingsPercent/);
+    assert.match(source, /bulkUnitPrice/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
 
 
 
