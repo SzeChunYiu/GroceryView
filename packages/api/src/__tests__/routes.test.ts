@@ -12,6 +12,7 @@ import {
   buildRealChainPriceIndices,
   buildRealBasketComparison,
   createGroceryViewApi,
+  productPriceHistoryEndpoint,
   productPriceHistoryPriceTypes,
   validatePriceObservationDto,
   type RealCatalogSearchPriceRow
@@ -91,6 +92,13 @@ describe('createGroceryViewApi', () => {
 
   it('builds product price-history reports from persisted observation inputs', () => {
     assert.deepEqual(productPriceHistoryPriceTypes, ['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated']);
+    assert.deepEqual(productPriceHistoryEndpoint, {
+      method: 'GET',
+      controllerPath: 'products/:productId',
+      actionPath: 'price-history',
+      path: '/products/:productId/price-history',
+      queryParams: ['priceType', 'chain', 'store', 'sourceRun', 'minConfidence', 'from', 'to', 'limit']
+    });
 
     const report = buildProductPriceHistoryReport([
       {

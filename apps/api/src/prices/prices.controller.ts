@@ -4,7 +4,7 @@ import { groceryApi } from '../demo-data.js';
 import { CheapestNowService } from './cheapest-now.service.js';
 import { LatestPricesService } from './latest-prices.service.js';
 import { PriceHistoryService, type ProductPriceHistoryFilter } from './price-history.service.js';
-import { productPriceHistoryPriceTypes, type ProductPriceHistoryPriceType } from '@groceryview/api';
+import { productPriceHistoryEndpoint, productPriceHistoryPriceTypes, type ProductPriceHistoryPriceType } from '@groceryview/api';
 
 @ApiTags('prices')
 @Controller('products/:productId')
@@ -31,7 +31,7 @@ export class PricesController {
     return prices;
   }
 
-  @Get('price-history')
+  @Get(productPriceHistoryEndpoint.actionPath)
   @ApiOkResponse({ description: 'Persisted product price observations over time' })
   async priceHistoryReport(
     @Param('productId') productId: string,
