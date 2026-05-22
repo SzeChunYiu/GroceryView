@@ -16,6 +16,7 @@ import {
   formatSek,
   freshestOpenPrices,
   homepageAdaptiveProductCards,
+  localeFormattingShowcase,
   memberOfferAggregationBoard,
   openPriceObservationDepth,
   priceDropMoversBoard,
@@ -271,6 +272,29 @@ export function MarketShell() {
               </p>
             </div>
           ))}
+        </div>
+        <div className="mt-4 rounded-3xl border border-amber-200 bg-white p-4">
+          <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">Locale-aware price formatting</p>
+              <h3 className="mt-2 text-xl font-black tracking-tight text-slate-950">Multi-currency display follows observation currency</h3>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+                SEK · NOK · DKK · EUR · ISK are formatter-ready, but only currencies present on observed price rows render money; the rest stay blocked instead of converting or inventing values.
+                No currency conversion or fake price is displayed for currencies missing from observations.currency.
+              </p>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-2 md:grid-cols-5">
+            {localeFormattingShowcase.map((row) => (
+              <div className="rounded-2xl border border-amber-100 bg-amber-50 p-3" key={row.currency}>
+                <p className="text-lg font-black text-slate-950">{row.currency}</p>
+                <p className="mt-1 text-sm font-bold text-amber-950">{row.moneyLabel}</p>
+                <p className="mt-1 text-xs font-semibold text-slate-600">{row.unitPriceLabel}</p>
+                <p className="mt-1 text-xs font-semibold text-slate-500">{row.dateLabel}</p>
+                <p className="mt-2 text-[0.65rem] font-black uppercase tracking-[0.12em] text-amber-800">{row.guardrail}</p>
+              </div>
+            ))}
+          </div>
         </div>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {immigrantMultilingualUi.guardrails.map((guardrail) => (
