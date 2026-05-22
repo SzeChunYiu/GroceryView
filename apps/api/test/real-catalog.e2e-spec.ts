@@ -251,7 +251,7 @@ describe('real catalog API endpoints', () => {
     const posted = await request(app.getHttpServer())
       .post('/baskets/compare')
       .send({
-        storeSlugs: ['willys-hemma-stockholm-torsplan', 'coop-odenplan'],
+        storeSlugs: [' willys-hemma-stockholm-torsplan ', '', 'coop-odenplan'],
         items: [
           { productId: 'product-milk', quantity: 2 },
           { productId: 'product-butter', quantity: 1 }
@@ -266,6 +266,7 @@ describe('real catalog API endpoints', () => {
       latestPriceCount: 3,
       sourceTables: ['products', 'latest_prices', 'stores']
     });
+    assert.deepEqual(database.calls[0]?.params[1], ['willys-hemma-stockholm-torsplan', 'coop-odenplan']);
 
     const saved = await request(app.getHttpServer())
       .get('/users/user-1/basket/compare?stores=willys-hemma-stockholm-torsplan')
