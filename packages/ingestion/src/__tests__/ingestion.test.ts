@@ -5,6 +5,7 @@ import {
   buildCoopSearchUrl,
   buildDailyConnectorConfigsFromEnv,
   buildHemkopSearchUrl,
+  buildHemkopWeeklyDiscountsUrl,
   buildEmaginPdfUrl,
   buildIcaStorePromotionsUrl,
   buildMatpriskollenStoreOffersUrl,
@@ -17,6 +18,7 @@ import {
   cellCountForScbPxWebQueryFixture,
   confidenceForSource,
   buildWillysSearchUrl,
+  buildWillysWeeklyDiscountsUrl,
   extractOpenFoodFactsBarcodeFromAxfoodImageUrl,
   fetchOpenFoodFactsExportProducts,
   fetchOpenFoodFactsProducts,
@@ -26,12 +28,14 @@ import {
   fetchCoopPublicServiceAccess,
   fetchCoopProducts,
   fetchHemkopProducts,
+  fetchHemkopWeeklyDiscounts,
   fetchIcaProducts,
   fetchIcaReklambladOffers,
   fetchMathemProducts,
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
   fetchWillysProducts,
+  fetchWillysWeeklyDiscounts,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -478,6 +482,78 @@ describe('fetchHemkopProducts', () => {
     });
 
     assert.equal(rows.length, 1);
+  });
+});
+
+describe('fetchHemkopWeeklyDiscounts', () => {
+  it('fetches public Hemkop Axfood weekly discount rows with promotion provenance', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify({
+        results: [{
+          manufacturer: 'Arla',
+          name: 'Svenskt smör',
+          priceNoUnit: '62.41',
+          googleAnalyticsCategory: 'mejeri-ost-och-agg|smor',
+          displayVolume: '500g',
+          image: { url: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01' },
+          labels: ['swedish_flag'],
+          potentialPromotions: [{
+            code: '2500298172',
+            mainProductCode: '101017249_ST',
+            name: 'Svenskt smör',
+            brands: ['Arla'],
+            campaignType: 'LOYALTY',
+            promotionType: 'MixMatchPricePromotion',
+            price: 39.95,
+            cartLabel: '39,95 kr/st',
+            comparePrice: '79,90/kg',
+            savePrice: 'Spara 22,46 kr',
+            weightVolume: '500g',
+            conditionLabel: '',
+            redeemLimitLabel: 'Max 3 köp',
+            startDate: '18/05-2026',
+            endDate: '24/05-2026',
+            validUntil: 1779659999000
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchHemkopWeeklyDiscounts({
+      storeId: '4003',
+      maxRows: 1,
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildHemkopWeeklyDiscountsUrl('4003', 1));
+    assert.deepEqual(rows, [{
+      code: '2500298172',
+      productCode: '101017249_ST',
+      name: 'Svenskt smör',
+      brand: 'Arla',
+      storeId: '4003',
+      campaignType: 'LOYALTY',
+      promotionType: 'MixMatchPricePromotion',
+      price: 39.95,
+      priceText: '39,95 kr/st',
+      comparePriceText: '79,90/kg',
+      regularPriceText: '62.41',
+      savePriceText: 'Spara 22,46 kr',
+      packageText: '500g',
+      conditionText: '',
+      redeemLimitText: 'Max 3 köp',
+      startDate: '18/05-2026',
+      endDate: '24/05-2026',
+      validUntil: '2026-05-24T21:59:59.000Z',
+      category: 'mejeri-ost-och-agg|smor',
+      imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01',
+      labels: ['swedish_flag'],
+      sourceUrl: buildHemkopWeeklyDiscountsUrl('4003', 1),
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    }]);
   });
 });
 
@@ -1008,6 +1084,78 @@ describe('fetchWillysProducts', () => {
     });
 
     assert.equal(rows.length, 1);
+  });
+});
+
+describe('fetchWillysWeeklyDiscounts', () => {
+  it('fetches public Willys Axfood weekly discount rows with promotion provenance', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify({
+        results: [{
+          manufacturer: null,
+          name: 'Grön sparris 250g',
+          priceNoUnit: '34.9',
+          googleAnalyticsCategory: 'frukt-och-gront|gronsaker',
+          displayVolume: 'Styck',
+          image: { url: 'https://assets.axfood.se/image/upload/f_auto,t_200/07311042002680_C1N0_s01' },
+          labels: ['keyhole'],
+          potentialPromotions: [{
+            code: '2500306014',
+            mainProductCode: '100771309_ST',
+            name: 'Grön sparris 250g',
+            brands: null,
+            campaignType: 'LOYALTY',
+            promotionType: 'MixMatchPricePromotion',
+            price: 29.9,
+            cartLabel: '29,90/st ',
+            comparePrice: '119:60 kr/kg',
+            savePrice: 'Spara 5,00 kr',
+            weightVolume: 'Styck',
+            conditionLabel: null,
+            redeemLimitLabel: 'Max 5 köp',
+            startDate: '20/05-2026',
+            endDate: '24/05-2026',
+            validUntil: 1779659999000
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysWeeklyDiscounts({
+      storeId: '2110',
+      maxRows: 1,
+      fetchImpl,
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildWillysWeeklyDiscountsUrl('2110', 1));
+    assert.deepEqual(rows, [{
+      code: '2500306014',
+      productCode: '100771309_ST',
+      name: 'Grön sparris 250g',
+      brand: '',
+      storeId: '2110',
+      campaignType: 'LOYALTY',
+      promotionType: 'MixMatchPricePromotion',
+      price: 29.9,
+      priceText: '29,90/st',
+      comparePriceText: '119:60 kr/kg',
+      regularPriceText: '34.9',
+      savePriceText: 'Spara 5,00 kr',
+      packageText: 'Styck',
+      conditionText: '',
+      redeemLimitText: 'Max 5 köp',
+      startDate: '20/05-2026',
+      endDate: '24/05-2026',
+      validUntil: '2026-05-24T21:59:59.000Z',
+      category: 'frukt-och-gront|gronsaker',
+      imageUrl: 'https://assets.axfood.se/image/upload/f_auto,t_200/07311042002680_C1N0_s01',
+      labels: ['keyhole'],
+      sourceUrl: buildWillysWeeklyDiscountsUrl('2110', 1),
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    }]);
   });
 });
 

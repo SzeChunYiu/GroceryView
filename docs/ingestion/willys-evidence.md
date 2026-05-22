@@ -10,6 +10,25 @@
 
 Every emitted row includes a Willys product code, name, SEK price fields, source search URL, and retrieval timestamp.
 
+## Weekly Discount Rows
+
+- Source: willys.se public Axfood offline campaign JSON
+- Source URL: https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+- Retrieved: 2026-05-22T08:28:04.861Z
+- Store id: 2110
+- Validity window in retrieved rows: 18/05-2026 through 24/05-2026, with weekend rows starting 20/05-2026
+- Real weekly discount rows fetched and wired: 43
+
+Every weekly discount row includes an Axfood promotion code, product code, product name, campaign type, promotion price text, compare price text when present, regular price text when present, save-price text when present, validity dates, source URL, and retrieval timestamp.
+
+### Sample Weekly Discount Rows
+
+1. 2500306014 | 100771309_ST | Grön sparris 250g | 29,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+2. 2500306996 | 101844500_ST | Lyxrosor 12-pack | 99,00/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+3. 2500303258 | 100271983_ST | Mozzarella | 2 för 20,00 | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+4. 2500298388 | 101842099_ST | Hushållspapper 12-pack, toalettpapper 18-pack | 59,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+5. 2500301201 | 101291227_ST | Läsk 6-pack | Välj & blanda! 3 för 89,00 +pant | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+
 ## Sample Retrieved Rows
 
 1. 101205621_ST | Idealmakaroner Gammaldags | Kungsörnen | 12,20 kr | https://www.willys.se/search?q=makaroner
@@ -27,3 +46,24 @@ Every emitted row includes a Willys product code, name, SEK price fields, source
 13. 101233933_ST | Mellanmjölk Längre Hållbarhet 1,5% | Garant | 16,70 kr | https://www.willys.se/search?q=mjolk
 14. 101276728_ST | Mjölk Längre Hållbarhet 3% | Garant | 12,20 kr | https://www.willys.se/search?q=mjolk
 15. 100010649_ST | Mjölk Färsk 3% | Falköpings | 18,90 kr | https://www.willys.se/search?q=mjolk
+
+## Willys weekly discounts 2026-05-22
+
+- Source: Willys public Axfood campaign JSON
+- Source URL: https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+- Retrieved: 2026-05-22T08:28:04.861Z
+- Store ID: 2110
+- Real discount rows fetched: 43
+- Web wire: apps/web/src/lib/ingested/willys.ts
+
+Sample rows:
+1. 2500306014 | Grön sparris 250g | 29,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+2. 2500306996 | Lyxrosor 12-pack | 99,00/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+3. 2500303258 | Mozzarella | 2 för 20,00 | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+4. 2500298388 | Hushållspapper 12-pack, toalettpapper 18-pack | 59,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+5. 2500301201 | Läsk 6-pack | Välj & blanda! 3 för 89,00 +pant | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+6. 2500297764 | Crunchy fries | 2 för 35,00 | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+7. 2500308130 | Kycklingbröstfilé | 39,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+8. 2500298073 | Smör | 39,90/st | 18/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+9. 2500298184 | Klassikerlåda 18-pack | 79,90/st | 18/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
+10. 2500297334 | Kaptenens favoriter | 49,90/st | 18/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=50
