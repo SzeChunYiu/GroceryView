@@ -416,6 +416,16 @@ describe('verified-data UI', () => {
     assert.match(source, /premiumGapPercent/);
   });
 
+  it('refines the chain index with matched-basket observations on the 100-centred scale', async () => {
+    const source = await read('src/app/chain-index/page.tsx');
+    assert.match(source, /buildMatchedBasketChainPriceObservations/);
+    assert.match(source, /matchedBasketRefinedIndex/);
+    assert.match(source, /matchedBasketObservations/);
+    assert.match(source, /Refined matched-basket index/);
+    assert.match(source, /overallIndex\.toFixed/);
+    assert.match(source, /100-centred/);
+  });
+
   it('surfaces verified catalogue savings on its own route', async () => {
     const route = await read('src/app/catalogue-savings/page.tsx');
 
