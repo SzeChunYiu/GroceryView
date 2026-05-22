@@ -4,6 +4,7 @@ import {
   assertPriceObservationDto,
   buildFacetedProductSearch,
   buildFlyerOfferReport,
+  buildProductLatestPrices,
   buildProductCheapestNowReport,
   buildProductPriceHistoryReport,
   buildRealBasketComparison,
@@ -181,6 +182,58 @@ describe('createGroceryViewApi', () => {
     ]);
     assert.deepEqual(report.missingProductIds, ['product-missing']);
     assert.match(report.strategies[0]?.warnings[0] ?? '', /missing persisted latest_prices/i);
+  });
+
+  it('builds latest product price rows from persisted latest price inputs', () => {
+    const prices = buildProductLatestPrices([
+      {
+        observationId: 'obs-milk-willys',
+        productId: 'product-milk',
+        productSlug: 'standardmjolk-1l',
+        productName: 'Standardmjolk 3% 1 l',
+        storeSlug: 'willys-hemma-stockholm-torsplan',
+        storeName: 'Willys Hemma Stockholm Torsplan',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        price: 14.9,
+        unitPrice: 14.9,
+        currency: 'SEK',
+        priceType: 'shelf',
+        confidence: 0.94,
+        observedAt: '2026-05-21T09:00:00.000Z',
+        provenance: { sourceType: 'retailer_api', sourceRunId: 'run-willys' }
+      },
+      {
+        observationId: 'obs-milk-coop',
+        productId: 'product-milk',
+        productSlug: 'standardmjolk-1l',
+        productName: 'Standardmjolk 3% 1 l',
+        storeSlug: 'coop-odenplan',
+        storeName: 'Coop Odenplan',
+        chainSlug: 'coop',
+        chainName: 'Coop',
+        price: 15.5,
+        unitPrice: 15.5,
+        currency: 'SEK',
+        priceType: 'promotion',
+        confidence: 0.73,
+        observedAt: '2026-05-21T08:00:00.000Z',
+        provenance: { sourceType: 'retailer_page' }
+      },
+      {
+        productId: 'product-milk',
+        productSlug: 'standardmjolk-1l',
+        productName: 'Standardmjolk 3% 1 l'
+      }
+    ]);
+
+    assert.deepEqual(prices.map((row) => [row.observationId, row.storeId, row.price, row.confidence, row.sourceType]), [
+      ['obs-milk-willys', 'willys-hemma-stockholm-torsplan', 14.9, 'high', 'retailer_api'],
+      ['obs-milk-coop', 'coop-odenplan', 15.5, 'low', 'retailer_page']
+    ]);
+    assert.equal(prices[0]?.productId, 'standardmjolk-1l');
+    assert.equal(prices[0]?.confidenceScore, 0.94);
+    assert.deepEqual(prices[0]?.provenance, { sourceType: 'retailer_api', sourceRunId: 'run-willys' });
   });
 
   it('builds cheapest-now reports from persisted latest price rows', () => {

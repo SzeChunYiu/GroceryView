@@ -25,6 +25,45 @@ class RecordingPriceHistoryExecutor {
 
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
     this.calls.push({ sql, params });
+    if (sql.includes('latest_prices.observation_id') && sql.includes('products.canonical_name as product_name')) {
+      if (params[0] === 'missing-product') return [] as T[];
+      return [
+        {
+          product_id: 'product-coffee',
+          product_slug: 'coffee',
+          product_name: 'Zoégas Coffee 450g',
+          observation_id: 'obs-latest-coffee-willys',
+          store_slug: 'willys-odenplan',
+          store_name: 'Willys Odenplan',
+          chain_slug: 'willys',
+          chain_name: 'Willys',
+          price: '49.90',
+          unit_price: '110.89',
+          currency: 'SEK',
+          price_type: 'shelf',
+          confidence: '0.9400',
+          observed_at: '2026-05-21T09:00:00.000Z',
+          provenance: { sourceType: 'retailer_api', sourceRunId: 'run-latest-willys' }
+        },
+        {
+          product_id: 'product-coffee',
+          product_slug: 'coffee',
+          product_name: 'Zoégas Coffee 450g',
+          observation_id: 'obs-latest-coffee-lidl',
+          store_slug: 'lidl-sveavagen',
+          store_name: 'Lidl Sveavagen',
+          chain_slug: 'lidl',
+          chain_name: 'Lidl',
+          price: '54.90',
+          unit_price: '122.00',
+          currency: 'SEK',
+          price_type: 'promotion',
+          confidence: '0.8200',
+          observed_at: '2026-05-21T08:00:00.000Z',
+          provenance: { sourceType: 'retailer_page', sourceRunId: 'run-latest-lidl' }
+        }
+      ] as T[];
+    }
     if (sql.includes('select id::text as product_id, slug as product_slug from products')) {
       if (params[0] === 'missing-product') return [] as T[];
       const slug = params[0] === 'milk' ? 'milk' : 'coffee';
@@ -501,6 +540,34 @@ describe('GroceryView API app', () => {
     const prices = await request(app.getHttpServer()).get('/products/coffee/prices').expect(200);
     assert.equal(prices.body[0].currency, 'SEK');
     assert.equal(prices.body[0].confidence, 'high');
+    assert.deepEqual(
+      prices.body.map((price: { observationId: string; storeId: string; price: number; priceType: string; sourceType: string }) => ({
+        observationId: price.observationId,
+        storeId: price.storeId,
+        price: price.price,
+        priceType: price.priceType,
+        sourceType: price.sourceType
+      })),
+      [
+        {
+          observationId: 'obs-latest-coffee-willys',
+          storeId: 'willys-odenplan',
+          price: 49.9,
+          priceType: 'shelf',
+          sourceType: 'retailer_api'
+        },
+        {
+          observationId: 'obs-latest-coffee-lidl',
+          storeId: 'lidl-sveavagen',
+          price: 54.9,
+          priceType: 'promotion',
+          sourceType: 'retailer_page'
+        }
+      ]
+    );
+    assert.equal(prices.body[0].demo, undefined);
+    assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /from products/i);
+    assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /latest_prices/i);
 
     const priceHistory = await request(app.getHttpServer())
       .get('/products/bryggkaffe-450g/price-history?priceType=shelf&limit=5')
@@ -1027,6 +1094,7 @@ describe('GroceryView API app', () => {
     await request(app.getHttpServer()).get('/products/missing-product/deal-score').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/equivalents').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/history').expect(404);
+    await request(app.getHttpServer()).get('/products/missing-product/prices').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/cheapest-now').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/price-history').expect(404);
     await request(app.getHttpServer()).patch('/users/demo/watchlist/missing-product').send({ targetPrice: 48 }).expect(404);

@@ -156,6 +156,16 @@ class FakePostgresQueryExecutorService {
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
     this.calls.push({ sql, params });
     if (sql.includes('from weekly_baskets')) return [{ product_id: 'product-milk', quantity: '2' }] as T[];
+    if (sql.includes('latest_prices.observation_id') && sql.includes('products.canonical_name as product_name')) {
+      if (params[0] === 'missing-product') return [] as T[];
+      return priceRows
+        .filter((row) => row.product_id === 'product-milk')
+        .map((row) => ({
+          ...row,
+          product_slug: row.slug,
+          product_name: row.canonical_name
+        })) as T[];
+    }
     if (sql.includes('from observations')) return priceHistoryRows as T[];
     if (sql.includes('where slug = $1 or id::text = $1')) return productRows as T[];
     return priceRows as T[];
@@ -260,5 +270,41 @@ describe('real catalog API endpoints', () => {
     ]);
     assert.match(observationsQuery?.sql ?? '', /from observations/i);
     assert.match(observationsQuery?.sql ?? '', /observed_at >=/i);
+  });
+
+  it('serves latest product prices from persisted latest price rows', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/products/standardmjolk-1l/prices')
+      .expect(200);
+
+    assert.deepEqual(
+      response.body.map((row: { observationId: string; productId: string; storeId: string; price: number; confidence: string }) => ({
+        observationId: row.observationId,
+        productId: row.productId,
+        storeId: row.storeId,
+        price: row.price,
+        confidence: row.confidence
+      })),
+      [
+        {
+          observationId: 'obs-milk-willys',
+          productId: 'standardmjolk-1l',
+          storeId: 'willys-hemma-stockholm-torsplan',
+          price: 14.9,
+          confidence: 'high'
+        },
+        {
+          observationId: 'obs-milk-coop',
+          productId: 'standardmjolk-1l',
+          storeId: 'coop-odenplan',
+          price: 15.5,
+          confidence: 'high'
+        }
+      ]
+    );
+    assert.equal('demo' in response.body[0], false);
+    assert.match(database.calls.at(-1)?.sql ?? '', /from products/i);
+    assert.match(database.calls.at(-1)?.sql ?? '', /latest_prices/i);
+    assert.deepEqual(database.calls.at(-1)?.params, ['standardmjolk-1l']);
   });
 });
