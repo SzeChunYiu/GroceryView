@@ -256,6 +256,36 @@ describe('createGroceryViewApi', () => {
     });
   });
 
+  it('keeps real partial single-store basket quotes visible without estimating missing prices', () => {
+    const report = buildRealBasketComparison({
+      selectedStoreSlugs: ['coop-odenplan'],
+      items: [
+        { productId: 'product-milk', quantity: 2 },
+        { productId: 'product-butter', quantity: 1 }
+      ],
+      latestPrices: realRows
+    });
+
+    assert.equal(report.strategies[1]?.id, 'all_at_one_store');
+    assert.equal(report.strategies[1]?.total, null);
+    assert.deepEqual(report.strategies[1]?.assignments.map((assignment) => ({
+      productId: assignment.productId,
+      storeSlug: assignment.storeSlug,
+      lineTotal: assignment.lineTotal,
+      priceLabel: assignment.priceLabel
+    })), [
+      {
+        productId: 'product-milk',
+        storeSlug: 'coop-odenplan',
+        lineTotal: 31,
+        priceLabel: 'verified_latest_price'
+      },
+      { productId: 'product-butter', storeSlug: 'coop-odenplan', lineTotal: null, priceLabel: 'missing_price' }
+    ]);
+    assert.deepEqual(report.strategies[1]?.missingProductIds, ['product-butter']);
+    assert.match(report.strategies[1]?.warnings[0] ?? '', /without estimating missing prices/i);
+  });
+
   it('builds latest product price rows from persisted latest price inputs', () => {
     const prices = buildProductLatestPrices([
       {

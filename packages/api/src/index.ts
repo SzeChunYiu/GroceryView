@@ -1476,7 +1476,7 @@ export function buildRealBasketComparison(input: RealBasketCompareInput): RealBa
   });
 
   const storeSlugs = selectedStoreSlugs.length > 0 ? selectedStoreSlugs : normalizedList(input.latestPrices.map((row) => row.storeSlug ?? ''));
-  const completeStoreQuotes = storeSlugs
+  const singleStoreQuotes = storeSlugs
     .map((storeSlug) => {
       const assignments = items.map((item) => {
         const product = productNames.get(item.productId);
@@ -1502,18 +1502,25 @@ export function buildRealBasketComparison(input: RealBasketCompareInput): RealBa
         storeSlug,
         assignments,
         missingProductIds: assignments.filter((assignment) => assignment.priceLabel === 'missing_price').map((assignment) => assignment.productId),
+        pricedItemCount: assignments.filter((assignment) => assignment.lineTotal !== null).length,
+        knownTotal: money(assignments.reduce((sum, assignment) => sum + (assignment.lineTotal ?? 0), 0)),
         total: assignments.every((assignment) => assignment.lineTotal !== null)
           ? money(assignments.reduce((sum, assignment) => sum + (assignment.lineTotal ?? 0), 0))
           : null
       };
     })
-    .filter((quote) => quote.total !== null)
-    .sort((a, b) => (a.total ?? Number.POSITIVE_INFINITY) - (b.total ?? Number.POSITIVE_INFINITY));
+    .sort(
+      (a, b) =>
+        Number(b.total !== null) - Number(a.total !== null) ||
+        b.pricedItemCount - a.pricedItemCount ||
+        a.knownTotal - b.knownTotal ||
+        a.storeSlug.localeCompare(b.storeSlug)
+    );
 
   const cheapestTotal = cheapestAssignments.every((assignment) => assignment.lineTotal !== null)
     ? money(cheapestAssignments.reduce((sum, assignment) => sum + (assignment.lineTotal ?? 0), 0))
     : null;
-  const bestSingleStore = completeStoreQuotes[0];
+  const bestSingleStore = singleStoreQuotes[0];
 
   return {
     userId: input.userId ?? null,
@@ -1540,9 +1547,10 @@ export function buildRealBasketComparison(input: RealBasketCompareInput): RealBa
         storeCount: bestSingleStore ? 1 : 0,
         assignments: bestSingleStore?.assignments ?? [],
         missingProductIds: bestSingleStore?.missingProductIds ?? items.map((item) => item.productId),
-        warnings: bestSingleStore
-          ? ['Single-store quote uses persisted latest_prices rows only.']
-          : ['No selected store has persisted prices for every basket item.']
+        warnings:
+          bestSingleStore && bestSingleStore.missingProductIds.length === 0
+            ? ['Single-store quote uses persisted latest_prices rows only.']
+            : ['No selected store has persisted prices for every basket item; priced lines are shown without estimating missing prices.']
       }
     ],
     missingProductIds,
