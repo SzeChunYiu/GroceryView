@@ -164,6 +164,12 @@ class FakePostgresQueryExecutorService {
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
     this.calls.push({ sql, params });
     if (sql.includes('from weekly_baskets')) return [{ product_id: 'product-milk', quantity: '2' }] as T[];
+    if (sql.includes('where (products.id::text = any($1::text[]) or products.slug = any($1::text[]))')) {
+      const [productRefs, storeSlugs] = params as [string[], string[] | null];
+      return priceRows
+        .filter((row) => productRefs.includes(row.product_id) || productRefs.includes(row.slug))
+        .filter((row) => storeSlugs === null || storeSlugs.includes(row.store_slug)) as T[];
+    }
     if (sql.includes('latest_prices.observation_id') && sql.includes('products.canonical_name as product_name')) {
       if (params[0] === 'missing-product') return [] as T[];
       return priceRows
@@ -277,11 +283,43 @@ describe('real catalog API endpoints', () => {
     assert.equal(saved.body.itemCount, 1);
     assert.deepEqual(saved.body.evidence, {
       basketSource: 'weekly_baskets',
-      latestPriceCount: 3,
+      latestPriceCount: 1,
       sourceTables: ['weekly_baskets', 'basket_items', 'products', 'latest_prices', 'stores']
     });
     assert.match(database.calls.find((call) => call.sql.includes('from weekly_baskets'))?.sql ?? '', /join basket_items/i);
     assert.match(database.calls.find((call) => call.sql.includes('from weekly_baskets'))?.sql ?? '', /order by week_start desc, id desc\s+limit 1/i);
+
+    const partial = await request(app.getHttpServer())
+      .post('/baskets/compare')
+      .send({
+        storeSlugs: ['coop-odenplan'],
+        items: [
+          { productId: 'product-milk', quantity: 2 },
+          { productId: 'product-butter', quantity: 1 }
+        ]
+      })
+      .expect(200);
+
+    assert.equal(partial.body.strategies[1].id, 'all_at_one_store');
+    assert.equal(partial.body.strategies[1].total, null);
+    assert.deepEqual(
+      partial.body.strategies[1].assignments.map((assignment: { productId: string; storeSlug: string; lineTotal: number | null; priceLabel: string }) => ({
+        productId: assignment.productId,
+        storeSlug: assignment.storeSlug,
+        lineTotal: assignment.lineTotal,
+        priceLabel: assignment.priceLabel
+      })),
+      [
+        {
+          productId: 'product-milk',
+          storeSlug: 'coop-odenplan',
+          lineTotal: 31,
+          priceLabel: 'verified_latest_price'
+        },
+        { productId: 'product-butter', storeSlug: 'coop-odenplan', lineTotal: null, priceLabel: 'missing_price' }
+      ]
+    );
+    assert.match(partial.body.strategies[1].warnings[0], /without estimating missing prices/i);
   });
 
   it('serves product price history from persisted observation rows', async () => {
