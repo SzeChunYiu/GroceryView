@@ -128,6 +128,9 @@ export class RealCatalogService {
       maxPrice: numberQuery(query.maxPrice, 'maxPrice'),
       limit: limitQuery(query.limit)
     };
+    if (filters.minPrice !== undefined && filters.maxPrice !== undefined && filters.minPrice > filters.maxPrice) {
+      throw new BadRequestException('minPrice must be less than or equal to maxPrice.');
+    }
     const categories = filters.categories ?? [];
     const brands = filters.brands ?? [];
     const chains = filters.chains ?? [];
@@ -209,6 +212,21 @@ export class RealCatalogService {
           )
           and ($2::text[] is null or exists (select 1 from unnest(products.category_path) category where lower(category) = any($2::text[])))
           and ($3::text[] is null or lower(coalesce(products.brand, '')) = any($3::text[]))
+          and (
+            ($4::text[] is null and $5::text[] is null and $6::text[] is null and $7::numeric is null and $8::numeric is null)
+            or exists (
+              select 1
+              from latest_prices filter_prices
+              left join chains filter_chains on filter_chains.id = filter_prices.chain_id
+              left join stores filter_stores on filter_stores.id = filter_prices.store_id
+              where filter_prices.product_id = products.id
+                and ($4::text[] is null or filter_chains.slug = any($4::text[]))
+                and ($5::text[] is null or filter_stores.slug = any($5::text[]))
+                and ($6::text[] is null or filter_prices.price_type = any($6::text[]))
+                and ($7::numeric is null or filter_prices.price >= $7::numeric)
+                and ($8::numeric is null or filter_prices.price <= $8::numeric)
+            )
+          )
         order by products.canonical_name, products.slug
         limit $9
       )

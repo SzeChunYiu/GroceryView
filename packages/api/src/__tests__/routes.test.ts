@@ -149,6 +149,30 @@ describe('createGroceryViewApi', () => {
     assert.deepEqual(result.evidence.sourceTables, ['products', 'latest_prices', 'chains', 'stores']);
   });
 
+  it('keeps unpriced catalog rows unpriced in faceted search responses', () => {
+    const result = buildFacetedProductSearch({
+      rows: [
+        ...realRows,
+        {
+          productId: 'product-oats',
+          slug: 'havregryn-1kg',
+          canonicalName: 'Havregryn 1 kg',
+          brand: 'Axa',
+          categoryPath: ['Pantry', 'Breakfast'],
+          packageSize: 1,
+          packageUnit: 'kg',
+          comparableUnit: 'kg'
+        }
+      ],
+      filters: { query: 'havre', limit: 10 }
+    });
+
+    const oats = result.products.find((product) => product.productId === 'product-oats');
+    assert.equal(oats?.cheapestPrice, null);
+    assert.deepEqual(oats?.currentPrices, []);
+    assert.equal(result.evidence.latestPriceCount, realRows.length);
+  });
+
   it('builds basket comparisons from latest price rows without estimated fallback prices', () => {
     const report = buildRealBasketComparison({
       userId: 'user-1',
