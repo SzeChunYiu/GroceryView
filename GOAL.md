@@ -396,6 +396,14 @@ Operator directive: **drop price forecasting** (nobody can predict price); expre
   branches" stat.
 - Regional / district / city price statistics (consumer-org-survey-style numbers).
 - "Cheapest branch near me" highlight; basket-cost heatmap by area.
+- **Store price-percentile rank** (operator-requested 2026-05-22) — for the user's
+  nearest store / favourite store, show where it sits on price vs cohorts: *"Willys
+  Odenplan is in the 18th percentile (cheaper than 82%) of stores in your kommun, and
+  the 25th percentile nationally."* Computed per product / basket / overall index over
+  the per-branch `observations`; cohorts = kommun (municipality) and national. A factual
+  percentile (no prediction), with coverage/confidence shown. Needs a `kommun` field on
+  stores (derive from coords/postcode if absent). Surfaces on the store page + a
+  "your store vs everyone" badge.
 - Every figure traces to real per-branch data + a confidence/coverage indicator.
 
 ## Additional feature backlog — not yet planned (operator 2026-05-22)
