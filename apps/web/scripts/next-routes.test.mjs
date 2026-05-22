@@ -283,6 +283,29 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
   });
 
+  it('ships account billing controls for signed-in checkout and subscription management', async () => {
+    const account = await read('src/app/account/page.tsx');
+    const billingActions = await read('src/components/account-billing-actions.tsx');
+
+    assert.match(account, /AccountBillingActions/);
+    assert.match(billingActions, /'use client'/);
+    assert.match(billingActions, /sessionStorage\.getItem\('groceryview:accessToken'/);
+    assert.match(billingActions, /sessionStorage\.getItem\('groceryview:userId'/);
+    assert.match(billingActions, /Authorization: `Bearer \$\{accessToken\}`/);
+    assert.match(billingActions, /\/api\/account\/subscription-access\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(billingActions, /\/api\/billing\/checkout-sessions\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(billingActions, /\/api\/billing\/portal-sessions\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(billingActions, /premium_monthly/);
+    assert.match(billingActions, /premium_yearly/);
+    assert.match(billingActions, /checkoutUrl/);
+    assert.match(billingActions, /portalUrl/);
+    assert.match(billingActions, /window\.location\.assign/);
+    assert.match(billingActions, /Sign in first/);
+    assert.match(billingActions, /No anonymous billing sessions/);
+    assert.doesNotMatch(billingActions, /STRIPE_SECRET_KEY|sk_test|clientSecret/);
+    assert.doesNotMatch(billingActions, /localStorage\.setItem\('groceryview:userId'/);
+  });
+
   it('surfaces busy-professional saved basket auto-reorder planning without anonymous checkout', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const account = await read('src/app/account/page.tsx');
