@@ -1160,6 +1160,22 @@ describe('verified-data UI', () => {
     assert.match(sitemap, /entry\('\/seasonal-calendar'/);
   });
 
+  it('surfaces an eco-conscious sustainable-brand filter from verified label evidence', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/categories/page.tsx');
+
+    assert.match(verified, /export const sustainableBrandFilter/);
+    assert.match(verified, /openFoodFactsCatalog/);
+    assert.match(verified, /ecoEvidenceForProduct/);
+    assert.match(verified, /evidenceLabels/);
+    assert.match(route, /sustainableBrandFilter/);
+    assert.match(route, /Sustainable-brand filter/);
+    assert.match(route, /verified label evidence/i);
+    assert.match(route, /not a carbon claim/i);
+    assert.match(route, /evidenceLabels/);
+    assert.doesNotMatch(route, /NoVerifiedData/);
+  });
+
   it('surfaces a cheaper and greener basket scorecard without fabricated carbon data', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const source = await read('src/app/savings-dashboard/page.tsx');

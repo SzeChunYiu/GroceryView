@@ -577,6 +577,50 @@ export const ecoBasketScorecard = {
 };
 
 
+export const sustainableBrandFilter = {
+  persona: 'Eco-conscious',
+  title: 'Sustainable-brand filter',
+  sourceSummary: {
+    axfoodRows: axfoodProducts.length,
+    openFoodFactsRows: openFoodFactsCatalog.length,
+    carbonKgCo2e: null as number | null
+  },
+  rows: axfoodProducts
+    .map((product) => {
+      const { catalogProduct, evidence, explicitEvidenceCount } = ecoEvidenceForProduct(product);
+      const evidenceLabels = [
+        ...product.labels,
+        ...(catalogProduct?.labels ?? []),
+        ...(catalogProduct?.categories ?? [])
+      ]
+        .filter((label) => explicitEcoLabelNeedles.some((needle) => normalizedEcoEvidence(label).includes(needle)))
+        .slice(0, 6);
+      if (evidence.length === 0 || evidenceLabels.length === 0) return null;
+      return {
+        slug: product.slug,
+        productName: product.name,
+        brand: product.brand,
+        categorySlug: product.category,
+        lowestChain: product.lowestChain,
+        lowestPrice: product.lowestPrice,
+        spreadPct: product.spreadPct,
+        evidenceLabels: [...new Set(evidenceLabels)],
+        evidenceSummary: evidence,
+        confidence: catalogProduct ? 'medium_openfoodfacts_and_retailer_label' : 'medium_retailer_label',
+        filterScore: clamp(50 + (evidence.length * 10) + Math.min(20, explicitEvidenceCount * 2) + Math.min(10, product.inChains.length * 2), 0, 100),
+        guardrail: 'Verified label evidence only; this is not a carbon claim and does not infer lifecycle impact.'
+      };
+    })
+    .filter((row): row is NonNullable<typeof row> => row !== null)
+    .sort((a, b) => b.filterScore - a.filterScore || b.spreadPct - a.spreadPct)
+    .slice(0, 8),
+  guardrails: [
+    'Sustainable-brand filter rows require explicit retailer or OpenFoodFacts label/category evidence.',
+    'The filter displays lowest visible chain price and spread, but does not turn labels into carbon-impact estimates.',
+    'Rows without verified label evidence are withheld instead of being inferred from brand names or category browsing.'
+  ]
+};
+
 export const crowdPriceSubmissionContract = {
   title: 'Crowd price submissions',
   status: 'account_gated_intake_contract',
