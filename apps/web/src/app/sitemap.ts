@@ -27,6 +27,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entry('/categories', 0.8, 'daily'),
     entry('/stores', 0.75, 'weekly'),
     entry('/map', 0.75, 'daily'),
+    entry('/cookies', 0.68, 'weekly'),
     entry('/data-sources', 0.65, 'weekly'),
     entry('/openprices-depth', 0.65, 'daily'),
     entry('/store-coverage', 0.65, 'weekly'),
