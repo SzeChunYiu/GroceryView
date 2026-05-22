@@ -2523,6 +2523,37 @@ export const nutritionPerKrona = {
   }
 };
 
+const macroProteinRanks = rankNutritionPerKrona(nutritionPerKronaInputs, 'protein');
+const macroCalorieRanks = rankNutritionPerKrona(nutritionPerKronaInputs, 'calories');
+const macroFiberRanks = rankNutritionPerKrona(nutritionPerKronaInputs, 'fiber');
+
+export const healthMacroOptimizer = {
+  persona: 'Health & fitness',
+  title: 'Macro optimizer',
+  macroTargets: [
+    { metric: 'protein', target: 'maximize grams per 10 SEK', topProductId: macroProteinRanks[0]?.productId ?? '', valuePer10Sek: macroProteinRanks[0]?.valuePer10Sek ?? 0 },
+    { metric: 'calories', target: 'budget calories per 10 SEK', topProductId: macroCalorieRanks[0]?.productId ?? '', valuePer10Sek: macroCalorieRanks[0]?.valuePer10Sek ?? 0 },
+    { metric: 'fiber', target: 'maximize fiber per 10 SEK', topProductId: macroFiberRanks[0]?.productId ?? '', valuePer10Sek: macroFiberRanks[0]?.valuePer10Sek ?? 0 }
+  ],
+  topProtein: macroProteinRanks[0],
+  topCalories: macroCalorieRanks[0],
+  topFiber: macroFiberRanks[0],
+  rows: nutritionPerKronaInputs.map((product) => ({
+    productId: product.productId,
+    name: product.name,
+    price: product.price,
+    proteinPer10Sek: macroProteinRanks.find((row) => row.productId === product.productId)?.valuePer10Sek ?? 0,
+    caloriesPer10Sek: macroCalorieRanks.find((row) => row.productId === product.productId)?.valuePer10Sek ?? 0,
+    fiberPer10Sek: macroFiberRanks.find((row) => row.productId === product.productId)?.valuePer10Sek ?? 0,
+    sugarPerPackage: product.nutritionPerPackage.sugarGrams,
+    saltGrams: product.nutritionPerPackage.saltGrams,
+    source: product.source
+  })),
+  coverage: {
+    caveat: 'Macro optimization reuses only visible prices and package nutrition-label fixtures; missing macro labels are excluded instead of estimated.'
+  }
+};
+
 export const householdSavings = {
   weeklyTotal: '813.20 SEK',
   vsLastWeek: '-78.10 SEK',
