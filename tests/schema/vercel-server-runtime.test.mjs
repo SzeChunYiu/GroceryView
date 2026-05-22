@@ -19,6 +19,7 @@ describe('Vercel server runtime wrapper', () => {
     assert.equal(config.buildCommand, 'npm run build -w @groceryview/server');
     assert.equal(config.installCommand, 'npm ci');
     assert.equal(config.framework, null);
+    assert.equal(config.outputDirectory, '.');
     assert.deepEqual(config.rewrites, [{ source: '/api/:path*', destination: '/api/[...path]' }]);
   });
 });
