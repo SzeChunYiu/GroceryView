@@ -14,7 +14,6 @@ GitHub Actions / deployment must have these names configured:
 - `NOTIFICATION_WEBHOOK_SECRET`
 - `BILLING_WEBHOOK_SECRET`
 - `METRICS_TOKEN`
-- `GROCERYVIEW_DAILY_CONNECTORS_JSON`
 - `GROCERYVIEW_SERVER_URL`
 - `CATALOG_COVERAGE_TARGETS_JSON`
 
@@ -45,7 +44,7 @@ Every `targetStores[]` entry must also appear in the matching daily connector
 `stores[]` metadata, otherwise ingestion cannot prove that product prices are
 branch-scoped before it writes `latest_prices`.
 
-## Export live Coop/Willys branch metadata
+## Export live branch metadata and connector config
 
 Branch ids are fetched from public/native store catalogs where available:
 
@@ -62,26 +61,27 @@ Generate connector-ready `stores[]` snippets:
 npm run ops:daily-connector-stores > /tmp/daily-connector-stores.json
 ```
 
-Generate the complete native daily connector JSON for
-`GROCERYVIEW_DAILY_CONNECTORS_JSON`:
+The daily ingestion workflow generates `GROCERYVIEW_DAILY_CONNECTORS_JSON` directly from the native connector exporter, so it is not a GitHub secret. To inspect the same generated config locally, run:
 
 ```bash
-npm run ops:daily-connectors > /tmp/groceryview-daily-connectors.json
+npm run --silent ops:daily-connectors > /tmp/groceryview-daily-connectors.json
 ```
 
-Use the emitted JSON as the `GROCERYVIEW_DAILY_CONNECTORS_JSON` secret/value.
+Use this emitted JSON only for local `ops:validate-production-env` checks or one-off operator debugging when the workflow is not available.
 
 ## Validate values before relying on cron
 
-Run from an environment that has the real values loaded:
+Run from an environment that has the real values loaded. The workflow does this automatically; for a local operator check, export the generated connector JSON first:
 
 ```bash
+GROCERYVIEW_DAILY_CONNECTORS_JSON=$(npm run --silent ops:daily-connectors)
+export GROCERYVIEW_DAILY_CONNECTORS_JSON
 npm run ops:validate-production-env
 ```
 
 This fails closed unless:
 
-- daily connector JSON has all six required chains: `ica`, `willys`, `coop`, `hemkop`, `lidl`, `city_gross`
+- generated daily connector JSON has all six required chains: `ica`, `willys`, `coop`, `hemkop`, `lidl`, `city_gross`
 - every store-scoped connector lists the branch metadata it can emit in `stores[]`
 - catalog `targetStores[]` are covered by daily connector `stores[]`
 - catalog coverage targets have non-empty product/category/chain/store arrays
