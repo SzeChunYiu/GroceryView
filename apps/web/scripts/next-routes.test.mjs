@@ -158,6 +158,23 @@ describe('verified-data UI', () => {
   });
 
 
+
+  it('surfaces receipt-fed commodity alias growth without exposing private receipts', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const scanner = await read('src/app/scanner/page.tsx');
+
+    assert.match(verified, /planReceiptAliasGrowth/);
+    assert.match(verified, /receiptFedAliasGrowthPlan/);
+    assert.match(verified, /chain label \+ kr \+ weight/);
+    assert.match(verified, /create_commodity_alias_candidate/);
+    assert.match(scanner, /receiptFedAliasGrowthPlan/);
+    assert.match(scanner, /Receipt-fed commodity alias growth/);
+    assert.match(scanner, /chain label \+ kr \+ weight/);
+    assert.match(scanner, /human review/i);
+    assert.match(scanner, /No private receipt images/);
+    assert.doesNotMatch(scanner, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
   it('ships signed-in privacy request controls without destructive anonymous actions', async () => {
     const privacy = await read('src/app/privacy/page.tsx');
     const actions = await read('src/components/privacy-request-actions.tsx');

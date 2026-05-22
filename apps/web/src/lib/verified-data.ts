@@ -1,5 +1,6 @@
 import { COMMODITIES, STAPLE_BASKET, type Commodity, type ComparableUnit } from '@groceryview/catalog';
 import { calculateChainPriceIndex, calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planCommunityReportAbuseControls, planDietarySubstitutionAssistant, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type ChainPriceObservation, type CommodityPriceObservation, type ProductMatchInput } from '@groceryview/core';
+import { planReceiptAliasGrowth } from '@groceryview/scanning';
 import { axfoodProducts } from './axfood-products';
 import { icaReklambladOffers, icaReklambladSource } from './ingested/ica-reklamblad';
 import { mathemProducts, mathemSource } from './ingested/mathem';
@@ -1745,6 +1746,37 @@ export const keyMetrics = [
   { label: 'Sweden stores', value: osmStores.length.toLocaleString('sv-SE'), detail: 'Physical stores from the Sweden-wide OSM Overpass extract.' },
   { label: 'Categories with data', value: categorySummaries.length.toLocaleString('sv-SE'), detail: 'Categories containing at least one verified product row.' }
 ];
+
+const receiptAliasGrowth = planReceiptAliasGrowth({
+  receipts: [
+    {
+      scanId: 'receipt-alias-growth-example',
+      chainLabel: 'Willys Odenplan',
+      observedAt: '2026-05-22T10:00:00.000Z',
+      rows: [
+        { rawName: 'Banan 0,82 kg', itemTotal: 19.35, confidence: 0.86 },
+        { rawName: 'Gurka 1 st', itemTotal: 12.9, confidence: 0.74 },
+        { rawName: 'SMUDGED ROW', itemTotal: 8, confidence: 0.42 }
+      ]
+    }
+  ]
+});
+
+export const receiptFedAliasGrowthPlan = {
+  title: 'Receipt-fed commodity alias growth',
+  status: receiptAliasGrowth.status,
+  sourceLabel: 'packages/scanning planReceiptAliasGrowth',
+  evidenceRequirement: 'chain label + kr + weight',
+  reviewAction: 'create_commodity_alias_candidate',
+  candidates: receiptAliasGrowth.candidates,
+  rejectedRows: receiptAliasGrowth.rejectedRows,
+  guardrails: [
+    ...receiptAliasGrowth.guardrails,
+    'No private receipt images are rendered in the static scanner page.',
+    'Human review must accept an alias candidate before it can grow commodity coverage.'
+  ],
+  nextRuntimeStep: 'Persist accepted receipt alias candidates into product_aliases with reviewer id and source receipt metadata.'
+};
 
 export const unavailablePanels = [
   {

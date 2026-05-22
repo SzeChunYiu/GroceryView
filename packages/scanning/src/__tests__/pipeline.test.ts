@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildScanProviderReadinessReport, planScanReviewWorkItems, prepareScanUploadTicket, processScanUpload } from '../index.js';
+import { buildScanProviderReadinessReport, planReceiptAliasGrowth, planScanReviewWorkItems, prepareScanUploadTicket, processScanUpload } from '../index.js';
 
 describe('buildScanProviderReadinessReport', () => {
   it('fails closed when barcode or receipt OCR providers are missing credentials or health checks', () => {
@@ -336,5 +336,82 @@ describe('planScanReviewWorkItems', () => {
         ]),
       /barcode confidence must be a number between 0 and 1/
     );
+  });
+});
+
+describe('planReceiptAliasGrowth', () => {
+  it('plans receipt-fed commodity alias candidates from chain label, kr, and weight evidence', () => {
+    const plan = planReceiptAliasGrowth({
+      receipts: [
+        {
+          scanId: 'receipt-commodity-1',
+          chainLabel: 'Willys Odenplan',
+          observedAt: '2026-05-22T10:00:00.000Z',
+          rows: [
+            { rawName: 'Banan 0,82 kg', itemTotal: 19.35, confidence: 0.86 },
+            { rawName: 'Gurka 1 st', itemTotal: 12.9, confidence: 0.74 },
+            { rawName: 'SMUDGED ROW', itemTotal: 8, confidence: 0.42 }
+          ]
+        }
+      ]
+    });
+
+    assert.equal(plan.status, 'review_required');
+    assert.deepEqual(plan.candidates.map((candidate) => ({
+      id: candidate.id,
+      normalizedAlias: candidate.normalizedAlias,
+      chainLabel: candidate.chainLabel,
+      comparableUnit: candidate.comparableUnit,
+      quantity: candidate.quantity,
+      unitPrice: candidate.unitPrice,
+      priority: candidate.priority,
+      reviewAction: candidate.reviewAction
+    })), [
+      {
+        id: 'alias-receipt-commodity-1-banan',
+        normalizedAlias: 'banan',
+        chainLabel: 'Willys Odenplan',
+        comparableUnit: 'kg',
+        quantity: 0.82,
+        unitPrice: 23.6,
+        priority: 'medium',
+        reviewAction: 'create_commodity_alias_candidate'
+      },
+      {
+        id: 'alias-receipt-commodity-1-gurka',
+        normalizedAlias: 'gurka',
+        chainLabel: 'Willys Odenplan',
+        comparableUnit: 'st',
+        quantity: 1,
+        unitPrice: 12.9,
+        priority: 'high',
+        reviewAction: 'create_commodity_alias_candidate'
+      }
+    ]);
+    assert.deepEqual(plan.rejectedRows, [
+      { scanId: 'receipt-commodity-1', rawName: 'SMUDGED ROW', reason: 'receipt_row_confidence_below_threshold' }
+    ]);
+    assert.match(plan.summary, /2 alias candidates/);
+  });
+
+  it('fails closed when receipt alias growth lacks chain or quantity evidence', () => {
+    const plan = planReceiptAliasGrowth({
+      receipts: [
+        {
+          scanId: 'receipt-commodity-2',
+          chainLabel: '',
+          observedAt: '2026-05-22T10:00:00.000Z',
+          rows: [
+            { rawName: 'Tomat', itemTotal: 18, confidence: 0.91 }
+          ]
+        }
+      ]
+    });
+
+    assert.equal(plan.status, 'blocked');
+    assert.deepEqual(plan.candidates, []);
+    assert.deepEqual(plan.rejectedRows, [
+      { scanId: 'receipt-commodity-2', rawName: 'Tomat', reason: 'chain_label_required' }
+    ]);
   });
 });
