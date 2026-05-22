@@ -16,23 +16,30 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
 ## Weekly flyer discount evidence
 
 - Source: Coop public store API current flyer metadata plus public personalization product search promotions
-- Store API URLs:
-  - https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true
-  - https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true
-- Flyer PDF URLs:
-  - https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna
-  - https://dr.coop.se/Butik/Stora-Coop-Bromma
-- Product search URLs:
-  - https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1
-  - https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1
+- Store API URLs: per-branch `https://proxy.api.coop.se/external/store/stores/<storeId>?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true`, listed in `apps/web/src/lib/ingested/coop.ts`
+- Flyer PDF URLs: per-branch `https://dr.coop.se/Butik/<store-slug>`, listed in `apps/web/src/lib/ingested/coop.ts`
+- Product search URLs: per-branch `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1`, listed in `apps/web/src/lib/ingested/coop.ts`
 - Request body: weekly flyer item queries listed in `DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES`, resultsOptions take 8, empty sort/facets, relatedResultsOptions take 0
 - Required public headers: `storeApiSubscriptionKey` for store metadata and `personalizationApiSubscriptionKey` for product search, both exposed in `window.coopSettings.serviceAccess` on https://www.coop.se/handla/
-- Retrieved: 2026-05-22T09:05:19.000Z
+- Retrieved: 2026-05-22T09:40:13.630Z
 - Stores:
   - 251300, Stora Coop Boländerna, Uppsala, 26 real discount rows
   - 252700, Stora Coop Bromma, Bromma, 24 real discount rows
+  - 256600, Stora Coop Västberga, Hägersten, 24 real discount rows
+  - 255700, Stora Coop Häggvik, Sollentuna, 22 real discount rows
+  - 015700, Stora Coop Danderyd, Danderyd, 24 real discount rows
+  - 015810, Stora Coop Sundby Park, Sundbyberg, 25 real discount rows
+  - 015350, Stora Coop Huddinge, Huddinge, 23 real discount rows
+  - 026000, Stora Coop Märsta, Märsta, 25 real discount rows
+  - 015220, Stora Coop Stuvsta, Huddinge, 24 real discount rows
+  - 016141, Stora Coop Orminge, Saltsjö-Boo, 23 real discount rows
+  - 255400, Stora Coop Värmdö, Gustavsberg, 24 real discount rows
+  - 250800, Stora Coop Södertälje, Södertälje, 24 real discount rows
+  - 015400, Stora Coop Åkersberga, Åkersberga, 22 real discount rows
+  - 015470, Stora Coop Arninge, Täby, 25 real discount rows
+  - 250400, Stora Coop Haninge, Haninge, 25 real discount rows
 - Flyer validity: 2026-05-18T00:00:00 through 2026-05-24T23:59:59
-- Real current flyer discount rows fetched: 50
+- Real current flyer discount rows fetched: 360
 
 Every weekly discount row includes Coop product id/EAN, product name, brand, package label, ordinary B2C SEK price, offer SEK price, comparative offer price when present, promotion id/copy, MedMera requirement, store/region, validity, flyer URL, store API source URL, product search URL, and retrieval timestamp.
 
