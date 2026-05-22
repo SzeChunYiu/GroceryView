@@ -2576,10 +2576,10 @@ export function buildDailyConnectorConfigsFromEnv(env: DailyIngestionEnv): Daily
   };
 }
 
-export function buildDailyIngestionPostgresPoolConfig(databaseUrl: string): { connectionString: string; options: string } {
+export function buildDailyIngestionPostgresPoolConfig(databaseUrl: string): { connectionString: string; max: number } {
   return {
     connectionString: databaseUrl,
-    options: '-c default_transaction_read_only=off'
+    max: 1
   };
 }
 
@@ -3299,10 +3299,11 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
 
 export async function runDailyIngestionFromEnv(env: DailyIngestionEnv = process.env): Promise<DailyIngestionRunResult> {
   const { databaseUrl, connectors } = buildDailyConnectorConfigsFromEnv(env);
-  const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; options?: string }) => { query(text: string, values: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void> } };
+  const pg = requireForDailyIngestion('pg') as { Pool?: new (config: { connectionString: string; max?: number }) => { query(text: string, values?: unknown[]): Promise<{ rows: unknown[] }>; end(): Promise<void> } };
   if (!pg.Pool) throw new Error('pg Pool export is not available.');
   const pool = new pg.Pool(buildDailyIngestionPostgresPoolConfig(databaseUrl));
   try {
+    await pool.query('set default_transaction_read_only=off');
     return await runDailyIngestion({
       executor: createPgQueryExecutor(pool),
       requestedAt: new Date().toISOString(),

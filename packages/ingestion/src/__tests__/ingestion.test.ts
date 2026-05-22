@@ -3707,7 +3707,7 @@ describe('daily ingestion runner', () => {
       buildDailyIngestionPostgresPoolConfig('postgres://user:secret@example/groceryview'),
       {
         connectionString: 'postgres://user:secret@example/groceryview',
-        options: '-c default_transaction_read_only=off'
+        max: 1
       }
     );
   });
