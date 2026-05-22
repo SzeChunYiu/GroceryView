@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, mealPrepBulkBuyOptimizer, oneTapBasketOptimizer, savedBasketAutoReorderPlan, weeklyBasketOptimizer } from '@/lib/demo-data';
+import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, mealPrepBulkBuyOptimizer, multiWeekStockUpList, oneTapBasketOptimizer, savedBasketAutoReorderPlan, weeklyBasketOptimizer } from '@/lib/demo-data';
 import { recurringBasketDigestContract, weeklyBasketChangeDigest } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -342,6 +342,44 @@ export default function WeeklyBasketPage() {
               ))}
             </ul>
           </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-orange-200 bg-orange-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-orange-800">{multiWeekStockUpList.persona}</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Multi-week stock-up list</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              This planningWeeks view blocks price outlook claims. No price forecast is shown; each observedHistoryWindow comes from visible package math and changed basket rows that shoppers should review before restocking.
+            </p>
+          </div>
+          <p className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-orange-950 shadow-sm">
+            planningWeeks {multiWeekStockUpList.planningWeeks}
+          </p>
+        </div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          {multiWeekStockUpList.rows.map((row) => (
+            <Link className="rounded-2xl border border-orange-200 bg-white p-4 hover:border-orange-700" href={`/products/${row.productId}`} key={row.productId}>
+              <p className="text-lg font-black text-slate-950">{row.productName}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{row.storeName} · {row.planningWeeks} week plan</p>
+              <div className="mt-3 grid gap-2 text-sm text-slate-700">
+                <p className="rounded-2xl bg-orange-50 p-3 font-semibold">observedHistoryWindow: {row.observedHistoryWindow}</p>
+                <p className="rounded-2xl bg-white p-3 font-semibold">planned servings {row.plannedServings} · unit savings {row.unitSavingsPercent}%</p>
+                <p className="rounded-2xl bg-emerald-50 p-3 font-black text-emerald-900">{formatSek(row.currentBulkUnitPrice)} current bulk unit</p>
+              </div>
+              <p className="mt-3 text-sm font-black text-orange-950">reviewTrigger: {row.reviewTrigger}</p>
+              <p className="mt-2 text-xs font-semibold leading-5 text-slate-600">{row.stockUpDecision}</p>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-3 lg:grid-cols-[0.8fr_1fr]">
+          <p className="rounded-2xl bg-white p-4 text-sm font-black text-orange-950">{multiWeekStockUpList.noForecastReason}</p>
+          <ul className="grid gap-2 text-sm font-semibold text-slate-700 md:grid-cols-2">
+            {multiWeekStockUpList.coverageGuardrails.map((guardrail) => (
+              <li className="rounded-2xl bg-white p-3" key={guardrail}>{guardrail}</li>
+            ))}
+          </ul>
         </div>
       </Card>
 

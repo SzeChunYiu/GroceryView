@@ -2025,6 +2025,34 @@ export const mealPrepBulkBuyOptimizer = {
   }
 };
 
+export const multiWeekStockUpList = {
+  persona: 'Meal-preppers / large households',
+  title: 'Multi-week stock-up list',
+  planningWeeks: 3,
+  noForecastReason: 'No price forecast: the list only combines visible bulk unit prices, observed basket-change signals, and shopper storage limits.',
+  rows: mealPrepBulkBuyOptimizer.rows.map((row, index) => ({
+    productId: row.productId,
+    productName: row.productName,
+    storeName: row.storeName,
+    planningWeeks: [3, 2, 4][index] ?? 2,
+    plannedServings: row.freezerPortions + row.paybackMeals,
+    observedHistoryWindow: 'visible weekly basket rows plus changed-since-last-shop digest, no projected shelf price',
+    currentBulkUnitPrice: row.bulkUnitPrice,
+    unitSavingsPercent: row.unitSavingsPercent,
+    reviewTrigger: row.unitSavingsPercent >= 10
+      ? 'Review after the planned servings are used or when a new visible unit-price row arrives'
+      : 'Review before buying more because the observed unit spread is small',
+    stockUpDecision: row.stockUpDecision,
+    source: row.coverageEvidence
+  })),
+  coverageGuardrails: [
+    'No price forecast is displayed; every row is a present-tense stock-up plan from visible package math.',
+    'PlanningWeeks is a household usage horizon, not a price outlook.',
+    'reviewTrigger tells shoppers when to re-check observed prices before buying again.',
+    'Rows stay advisory until account-owned pantry, freezer, and expiry data confirm the storage limits.'
+  ]
+};
+
 export const studentBasicsInput: BasketComparisonInput = {
   favoriteStoreIds: ['willys-odenplan', 'coop-medborgarplatsen', 'hemkop-hornstull'],
   items: [

@@ -628,6 +628,22 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a multi-week stock-up list with forecast claims blocked', async () => {
+    const demo = await read('src/lib/demo-data.ts');
+    const source = await read('src/app/weekly-basket/page.tsx');
+
+    assert.match(demo, /export const multiWeekStockUpList = /);
+    assert.match(demo, /observedHistoryWindow/);
+    assert.match(demo, /noForecastReason/);
+    assert.match(demo, /reviewTrigger/);
+    assert.match(source, /multiWeekStockUpList/);
+    assert.match(source, /Multi-week stock-up list/);
+    assert.match(source, /planningWeeks/);
+    assert.match(source, /No price forecast/);
+    assert.match(source, /observedHistoryWindow/);
+    assert.doesNotMatch(source, /future price prediction|forecasted price/i);
+  });
+
   it('surfaces a budget stretch-krona basket optimizer using real basket strategy output', async () => {
     const source = await read('src/app/weekly-basket/page.tsx');
     const demo = await read('src/lib/demo-data.ts');
