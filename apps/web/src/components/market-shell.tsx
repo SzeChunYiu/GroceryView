@@ -1,19 +1,21 @@
 import Link from 'next/link';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
+import { ProductPriceCards } from './product-price-cards';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
 import {
   chainSavingsLedger,
   chainCategoryCoverage,
   categoryQualityMatrix,
   categorySummaries,
+  dataFreshnessBadges,
   featuredStores,
   formatPct,
   formatSek,
   freshestOpenPrices,
+  homepageAdaptiveProductCards,
   openPriceObservationDepth,
   priceDropMoversBoard,
   privateFeatureCopy,
-  productUniverse,
   snapshot,
   sourceClaimLedger,
   sourceCoverage,
@@ -24,13 +26,13 @@ import {
 } from '@/lib/verified-data';
 
 const featureReadinessQueue = Object.entries(privateFeatureCopy).slice(0, 6);
-const productUniverseRail = productUniverse.slice(0, 6);
 const homepageClaimLedger = sourceClaimLedger.slice(0, 3);
 const homepageSourceReadiness = sourceReadinessMatrix.slice(0, 3);
 const homepageChainSavings = chainSavingsLedger.slice(0, 2);
 const homepageRouteMap = sourceRouteMap.slice(0, 3);
 const homepageFreshOpenPrices = freshestOpenPrices.slice(3, 9);
 const homepageMapChainIndex = mapChainIndexScores.slice(0, 3);
+const homepageSourceCoverageNames = sourceCoverage.map((source) => source.name);
 const elderlyAccessibilityMode = {
   persona: 'Elderly / seniors',
   title: 'Large-text high-contrast mode',
@@ -135,29 +137,13 @@ export function MarketShell() {
             Chain spread rows and OpenPrices observations are shown together, with every card linking to a verified product page.
           </p>
         </div>
-        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {productUniverseRail.map((product) => {
-            const brand = 'brands' in product ? product.brands : product.brand;
-            const priceSignal =
-              'priceMedian' in product
-                ? `Median ${formatSek(product.priceMedian)} · ${product.observationCount.toLocaleString('sv-SE')} observations`
-                : `${product.lowestChain} lowest · ${formatPct(product.spreadPct)} spread`;
-            const sourceSignal =
-              'lastObservedAt' in product ? `OpenPrices ${product.lastObservedAt}` : 'Willys/Hemkop chain match';
-
-            return (
-              <Link
-                className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
-                href={`/products/${product.slug}`}
-                key={product.slug}
-              >
-                <p className="font-black text-slate-950">{product.name}</p>
-                <p className="mt-1 text-sm text-slate-600">{brand || 'Brand not reported'}</p>
-                <p className="mt-3 font-black text-emerald-800">{priceSignal}</p>
-                <p className="mt-2 text-sm font-semibold text-slate-600">{sourceSignal}</p>
-              </Link>
-            );
-          })}
+        <div className="mt-5">
+          <ProductPriceCards
+            cards={homepageAdaptiveProductCards}
+            eyebrow="Product-card display"
+            title="Homepage cards show pack price and jämförpris"
+            intro="The homepage now uses the same adaptive total/per-unit card model as the product catalogue, with no hidden actual price."
+          />
         </div>
       </Card>
 
@@ -316,19 +302,20 @@ export function MarketShell() {
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
             <Eyebrow>Freshness board</Eyebrow>
-            <h2 className="mt-2 text-2xl font-black tracking-tight">Snapshot ages that gate every homepage claim</h2>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Data freshness badges that gate every homepage claim</h2>
           </div>
           <Link className="text-sm font-bold text-emerald-800 underline decoration-emerald-300 underline-offset-4" href="/data-sources">
-            Review source notes
+            Review {homepageSourceCoverageNames.length} source notes
           </Link>
         </div>
-        <div className="mt-5 grid gap-3 lg:grid-cols-3">
-          {sourceCoverage.map((source) => (
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={source.name}>
-              <p className="text-sm font-black text-slate-950">{source.name}</p>
-              <p className="mt-2 text-2xl font-black text-emerald-800">{source.freshness}</p>
-              <p className="mt-2 text-sm font-semibold text-slate-700">{source.coverage}</p>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{source.caveat}</p>
+        <div className="mt-5 grid gap-3 lg:grid-cols-4">
+          {dataFreshnessBadges.map((badge) => (
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4" key={badge.sourceKind}>
+              <p className="text-sm font-black text-slate-950">{badge.sourceName}</p>
+              <p className="mt-2 text-2xl font-black text-emerald-800">{badge.freshnessLabel}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{badge.coverageLabel}</p>
+              <p className="mt-3 rounded-xl bg-white p-3 text-sm font-black text-slate-700">{badge.confidenceBadge}</p>
+              <p className="mt-3 text-sm leading-6 text-slate-600">{badge.caveat}</p>
             </div>
           ))}
         </div>
