@@ -613,6 +613,27 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
 
+  it('surfaces category deal leaders on the homepage and category route using the real core summarizer', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+    const category = await read('src/app/categories/[slug]/page.tsx');
+
+    assert.match(verified, /summarizeCategoryDealLeaders/);
+    assert.match(verified, /calculateDealScore/);
+    assert.match(verified, /export const categoryDealLeaders = /);
+    assert.match(verified, /minimumSourceConfidence/);
+    assert.match(shell, /categoryDealLeaders\.slice/);
+    assert.match(shell, /Today.s best deals/);
+    assert.match(shell, /leader\.signal/);
+    assert.match(shell, /sourceConfidence/);
+    assert.match(category, /categoryDealLeaders\.filter/);
+    assert.match(category, /Category deal leaders/);
+    assert.match(category, /leader\.signal/);
+    assert.match(category, /No category deal leader/);
+    assert.doesNotMatch(shell, /@\/lib\/demo-data/);
+    assert.doesNotMatch(category, /@\/components\/sample-data/);
+  });
+
   it('surfaces product smart swaps using the real core recommendation engine', async () => {
     const source = await read('src/app/products/[slug]/page.tsx');
 

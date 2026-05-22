@@ -1,4 +1,4 @@
-import { summarizePriceHistory } from '@groceryview/core';
+import { calculateDealScore, summarizeCategoryDealLeaders, summarizePriceHistory } from '@groceryview/core';
 import { axfoodProducts } from './axfood-products';
 import { openFoodFactsCatalog } from './openfoodfacts-catalog';
 import { categoryLabels, pricedProducts } from './openprices-products';
@@ -32,6 +32,8 @@ function median(values: number[]) {
   const middle = Math.floor(sorted.length / 2);
   return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
 }
+
+const clamp = (value: number, min: number, max: number): number => Math.min(max, Math.max(min, value));
 
 function unitAmountFromPackage(packageText: string): { amount: number; unit: 'kg' | 'l' | 'st'; packageLabel: string } | null {
   const normalized = packageText.replace(',', '.').toLowerCase();
@@ -105,6 +107,38 @@ export const matchedChainProducts = axfoodProducts.filter((product) => product.i
 export const topChainSpreads = [...matchedChainProducts].sort((a, b) => b.spreadPct - a.spreadPct).slice(0, 18);
 export const freshestOpenPrices = [...pricedProducts].sort((a, b) => b.lastObservedAt.localeCompare(a.lastObservedAt)).slice(0, 18);
 export const productUniverse = [...topChainSpreads, ...freshestOpenPrices].slice(0, 36);
+const requiredChainCoverageForDealLeader = 2;
+export const categoryDealLeaders = summarizeCategoryDealLeaders({
+  candidates: matchedChainProducts.map((product) => {
+    const pricedRows = chainPriceRows(product);
+    const sourceConfidence = clamp(pricedRows.length / requiredChainCoverageForDealLeader, 0, 1);
+    const crossChainSpreadPercentile = clamp(100 - product.spreadPct * 2, 0, 100);
+    const dealScore = calculateDealScore({
+      currentCityPercentile: crossChainSpreadPercentile,
+      knownPromoHistoryPercentile: crossChainSpreadPercentile,
+      equivalentUnitPricePercentile: pricedRows.length > 1 ? 0 : 50,
+      discountDepthPercent: product.spreadPct,
+      sourceConfidence
+    });
+
+    return {
+      productId: product.slug,
+      productName: product.name,
+      category: product.category,
+      storeName: product.lowestChain === 'hemkop' ? 'Hemköp' : product.lowestChain === 'willys' ? 'Willys' : product.lowestChain,
+      price: product.lowestPrice,
+      dealScore,
+      sourceConfidence
+    };
+  }),
+  minimumSourceConfidence: 0.75
+}).map((leader) => ({
+  ...leader,
+  categoryLabel: labelFromSlug(leader.category),
+  productSlug: leader.productId,
+  confidenceLabel: `${Math.round(leader.sourceConfidence * 100)}% sourceConfidence from matched chain rows`,
+  caveat: 'Category deal leader is selected from verified Willys/Hemkop matched catalogue rows; no unobserved promo history is inferred.'
+}));
 export type AdaptiveProductCard = {
   slug: string;
   name: string;

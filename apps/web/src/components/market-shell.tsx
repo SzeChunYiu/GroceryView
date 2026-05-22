@@ -5,6 +5,7 @@ import { mapChainIndexScores } from '@/lib/map-chain-index';
 import {
   chainSavingsLedger,
   chainCategoryCoverage,
+  categoryDealLeaders,
   categoryQualityMatrix,
   categorySummaries,
   dataFreshnessBadges,
@@ -33,6 +34,7 @@ const homepageRouteMap = sourceRouteMap.slice(0, 3);
 const homepageFreshOpenPrices = freshestOpenPrices.slice(3, 9);
 const homepageMapChainIndex = mapChainIndexScores.slice(0, 3);
 const homepageSourceCoverageNames = sourceCoverage.map((source) => source.name);
+const homepageCategoryDealLeaders = categoryDealLeaders.slice(0, 6);
 const elderlyAccessibilityMode = {
   persona: 'Elderly / seniors',
   title: 'Large-text high-contrast mode',
@@ -125,6 +127,34 @@ export function MarketShell() {
           </div>
         </div>
         <p className="mt-4 text-base font-semibold text-slate-200">{elderlyAccessibilityMode.evidence}</p>
+      </Card>
+
+      <Card className="mt-6 border-emerald-200 bg-emerald-50">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Deal leader strip</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Today's best deals by category</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-emerald-950">
+            Each row is selected by summarizeCategoryDealLeaders after calculateDealScore scores verified Willys/Hemkop matched rows. No hidden promotion history is invented.
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {homepageCategoryDealLeaders.map((leader) => (
+            <Link
+              className="rounded-2xl border border-emerald-200 bg-white p-4 hover:border-emerald-700"
+              href={`/products/${leader.productSlug}`}
+              key={leader.productSlug}
+            >
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-emerald-800">{leader.categoryLabel}</p>
+              <p className="mt-2 text-lg font-black text-slate-950">{leader.productName}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-700">{leader.signal}</p>
+              <p className="mt-3 rounded-xl bg-emerald-50 p-3 text-xs font-black text-emerald-950">
+                {leader.storeName} · sourceConfidence {formatPct(leader.sourceConfidence * 100)}
+              </p>
+            </Link>
+          ))}
+        </div>
       </Card>
 
       <Card className="mt-6">
