@@ -1050,6 +1050,24 @@ ${seo}`;
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
 
+  it('surfaces a private-label dupe finder using the real smart-swap engine', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+    const compare = await read('src/app/compare/page.tsx');
+
+    assert.match(verified, /recommendSmartSwaps/);
+    assert.match(verified, /privateLabelDupeFinder/);
+    assert.match(verified, /budget_private_label/);
+    assert.match(verified, /standard_private_label/);
+    assert.match(verified, /nationalBrand/);
+    assert.match(shell, /Private-label dupe finder/);
+    assert.match(shell, /privateLabelDupeFinder\.topDupes/);
+    assert.match(compare, /privateLabelDupeFinder/);
+    assert.match(compare, /No brand-name row is paired with a private label unless recommendSmartSwaps clears/);
+    assert.doesNotMatch(shell, /@\/lib\/demo-data/);
+    assert.doesNotMatch(compare, /@\/components\/sample-data/);
+  });
+
   it('surfaces observed 52-week-low price history badges without overclaiming missing history', async () => {
     const source = await read('src/app/products/[slug]/page.tsx');
 

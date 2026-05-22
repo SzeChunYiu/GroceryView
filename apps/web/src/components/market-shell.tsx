@@ -17,6 +17,7 @@ import {
   homepageAdaptiveProductCards,
   openPriceObservationDepth,
   priceDropMoversBoard,
+  privateLabelDupeFinder,
   privateFeatureCopy,
   snapshot,
   sourceClaimLedger,
@@ -155,6 +156,51 @@ export function MarketShell() {
           </div>
         </div>
         <p className="mt-4 text-base font-semibold text-slate-200">{elderlyAccessibilityMode.evidence}</p>
+      </Card>
+
+      <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <Eyebrow>feat(dupe) / private label</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Private-label dupe finder</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              The homepage now calls recommendSmartSwaps over visible Axfood rows to find brand-name products with cheaper private-label equivalents. Every dupe needs same-category, comparable package-size, and lower unit-price evidence before it appears.
+            </p>
+          </div>
+          <div className="grid min-w-[18rem] grid-cols-3 gap-2 text-center">
+            <p className="rounded-2xl bg-white p-3 shadow-sm">
+              <span className="block text-2xl font-black text-fuchsia-900">{privateLabelDupeFinder.sourceProductCount}</span>
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">brand rows</span>
+            </p>
+            <p className="rounded-2xl bg-white p-3 shadow-sm">
+              <span className="block text-2xl font-black text-fuchsia-900">{privateLabelDupeFinder.privateLabelProductCount}</span>
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">dupes</span>
+            </p>
+            <p className="rounded-2xl bg-white p-3 shadow-sm">
+              <span className="block text-2xl font-black text-fuchsia-900">{privateLabelDupeFinder.categoryCount}</span>
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">categories</span>
+            </p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {privateLabelDupeFinder.topDupes.slice(0, 4).map((dupe) => (
+            <Link className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm hover:border-fuchsia-700" href={`/products/${dupe.dupeSlug}`} key={`${dupe.sourceSlug}-${dupe.dupeSlug}`}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-fuchsia-800">Save {formatPct(dupe.savingsPercent)} per unit</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{dupe.privateLabelBrand} for {dupe.nationalBrand}</h3>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{dupe.dupeName} · {dupe.dupePackage} · {dupe.cheapestChain}</p>
+              <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+                <p className="rounded-xl bg-fuchsia-50 p-3 font-black text-fuchsia-950">Dupe {formatSek(dupe.dupeUnitPrice)} {dupe.unitLabel}</p>
+                <p className="rounded-xl bg-slate-50 p-3 font-black text-slate-950">Brand {formatSek(dupe.sourceUnitPrice)} {dupe.unitLabel}</p>
+              </div>
+              <p className="mt-3 text-xs font-bold text-slate-500">name evidence {dupe.nameEvidence.join(', ')} · confidence {dupe.confidence} · qualityRisk {dupe.qualityRisk}</p>
+            </Link>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-2 md:grid-cols-3">
+          {privateLabelDupeFinder.guardrails.map((guardrail) => (
+            <p className="rounded-2xl bg-white p-3 text-xs font-bold uppercase tracking-[0.14em] text-fuchsia-950" key={guardrail}>{guardrail}</p>
+          ))}
+        </div>
       </Card>
 
       <Card className="mt-6">

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, formatPct, formatSek, matchedChainProducts } from '@/lib/verified-data';
+import { browserExtensionOverlayContract, budgetLowestPriceRadar, chainPriceRows, chainSavingsLedger, commodityComparisons, formatPct, formatSek, matchedChainProducts, privateLabelDupeFinder } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -67,6 +67,32 @@ export default function ComparePage() {
                 <p className="rounded-xl bg-rose-50 p-3 font-black text-rose-950">Gap {formatSek(item.priceGap)}</p>
               </div>
               <p className="mt-3 text-xs font-semibold text-slate-500">{item.evidenceLabel} · {formatPct(item.spreadPct)}</p>
+            </Link>
+          ))}
+        </div>
+      </Card>
+      <Card className="mt-6 border-fuchsia-200 bg-fuchsia-50/70">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-fuchsia-800">feat(dupe) / private label</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{privateLabelDupeFinder.title}</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              No brand-name row is paired with a private label unless recommendSmartSwaps clears same-category, package-size, lower unit-price, and private-label preference checks. The board shows dupes, not ingredient identity claims.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-fuchsia-900 shadow-sm">{privateLabelDupeFinder.topDupes.length} verified dupes</p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {privateLabelDupeFinder.topDupes.map((dupe) => (
+            <Link className="rounded-2xl border border-fuchsia-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-fuchsia-700" href={`/products/${dupe.dupeSlug}`} key={`${dupe.sourceSlug}-${dupe.dupeSlug}`}>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-fuchsia-800">{dupe.privateLabelTier.replaceAll('_', ' ')}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{dupe.privateLabelBrand} dupe for {dupe.nationalBrand}</h3>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{dupe.sourceName} → {dupe.dupeName}</p>
+              <div className="mt-4 grid grid-cols-2 gap-2 text-sm">
+                <p className="rounded-xl bg-fuchsia-50 p-3 font-black text-fuchsia-950">Save {formatPct(dupe.savingsPercent)}</p>
+                <p className="rounded-xl bg-slate-50 p-3 font-black text-slate-950">{formatSek(dupe.dupeUnitPrice)} {dupe.unitLabel}</p>
+              </div>
+              <p className="mt-3 text-xs font-semibold text-slate-500">name evidence {dupe.nameEvidence.join(', ')} · confidence {dupe.confidence} · {dupe.reason}</p>
             </Link>
           ))}
         </div>
