@@ -454,6 +454,16 @@ describe('fetchOpenFoodFactsExportRetailerEnrichments', () => {
       retrievedAt: '2026-05-22T09:54:39.728Z',
       candidates: [
         {
+          chain: 'citygross',
+          productCode: '100002667_ST',
+          name: 'Ideal Makaroner',
+          brand: 'Kungsörnen',
+          packageText: '750G',
+          barcode: '7310130003547',
+          sourceUrl: 'https://www.citygross.se/api/v1/Loop54/products?Q=pasta&skip=0&take=24&siteId=21',
+          retrievedAt: '2026-05-22T12:36:27.185Z'
+        },
+        {
           chain: 'willys',
           productCode: '101205621_ST',
           name: 'Idealmakaroner Gammaldags',
@@ -492,7 +502,8 @@ describe('fetchOpenFoodFactsExportRetailerEnrichments', () => {
     assert.equal(rows[0].barcode, '7310130003547');
     assert.equal(rows[0].sourceUrl, `${OPENFOODFACTS_EXPORT_URL}#code=7310130003547`);
     assert.equal(rows[0].nutritionPer100g.energyKcal, 361);
-    assert.deepEqual(rows[0].retailerMatches.map((match) => match.productCode), ['101205621_ST']);
+    assert.deepEqual(rows[0].retailerMatches.map((match) => match.chain), ['citygross', 'willys']);
+    assert.deepEqual(rows[0].retailerMatches.map((match) => match.productCode), ['100002667_ST', '101205621_ST']);
   });
 });
 
@@ -535,6 +546,16 @@ describe('fetchOpenFoodFactsRetailerEnrichments', () => {
       retrievedAt: '2026-05-22T08:25:07.875Z',
       candidates: [
         {
+          chain: 'citygross',
+          productCode: '100002667_ST',
+          name: 'Ideal Makaroner',
+          brand: 'Kungsörnen',
+          packageText: '750G',
+          barcode: '7310130003547',
+          sourceUrl: 'https://www.citygross.se/api/v1/Loop54/products?Q=pasta&skip=0&take=24&siteId=21',
+          retrievedAt: '2026-05-22T12:36:27.185Z'
+        },
+        {
           chain: 'willys',
           productCode: '101205621_ST',
           name: 'Idealmakaroner Gammaldags',
@@ -575,7 +596,7 @@ describe('fetchOpenFoodFactsRetailerEnrichments', () => {
     assert.equal(rows.length, 1);
     assert.equal(rows[0].barcode, '7310130003547');
     assert.equal(rows[0].nutritionPer100g.energyKcal, 361);
-    assert.deepEqual(rows[0].retailerMatches.map((match) => match.chain), ['willys', 'hemkop']);
+    assert.deepEqual(rows[0].retailerMatches.map((match) => match.chain), ['citygross', 'willys', 'hemkop']);
   });
 });
 
