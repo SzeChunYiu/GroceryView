@@ -1484,6 +1484,66 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1003988',
     storeName: 'ICA Supermarket Aptiten',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004324',
+    storeName: 'ICA Nära Riksten',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004509',
+    storeName: 'ICA Nära Söråker',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004195',
+    storeName: 'ICA Supermarket Vimmerby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003971',
+    storeName: 'ICA Supermarket Kärra',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003604',
+    storeName: 'Maxi ICA Stormarknad Trollhättan',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003475',
+    storeName: 'ICA Supermarket Speceritjänst',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003424',
+    storeName: 'Maxi ICA Stormarknad Värmdö',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003816',
+    storeName: 'ICA Tor Center',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003911',
+    storeName: 'ICA Nära Kilafors',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003787',
+    storeName: 'ICA Supermarket Ystad',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003384',
+    storeName: 'ICA Supermarket Anderstorp',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004579',
+    storeName: 'ICA Supermarket Sundbyberg',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
