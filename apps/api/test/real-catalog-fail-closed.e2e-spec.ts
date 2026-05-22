@@ -47,6 +47,7 @@ describe('real catalog API fail-closed behavior', () => {
     await request(app.getHttpServer()).get('/indices/chains').expect(503);
     await request(app.getHttpServer()).get('/indices/categories').expect(503);
     await request(app.getHttpServer()).get('/indices/brands').expect(503);
+    await request(app.getHttpServer()).get('/products/standardmjolk-1l/cheapest-now').expect(503);
     await request(app.getHttpServer())
       .post('/baskets/compare')
       .send({ items: [{ productId: 'standardmjolk-1l', quantity: 1 }] })
