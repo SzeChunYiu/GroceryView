@@ -1932,6 +1932,34 @@ export const commodityIngestionClassifierEvidence = {
   ]
 };
 
+export const publicApiDirectory = {
+  title: 'Public price/nutrition API',
+  openApiPath: '/api/openapi.json',
+  status: 'public_read_api',
+  examples: [
+    {
+      label: 'Product terminal',
+      path: '/api/products/{id}/terminal',
+      supports: 'current quote, price history summary, deal score, spread, cheapest-now row, and chart-ready price points'
+    },
+    {
+      label: 'Product price-history',
+      path: '/api/products/{id}/history',
+      supports: 'observed price history with provenance, price type, source confidence, and no synthetic forecast rows'
+    },
+    {
+      label: 'Nutrition per krona',
+      path: '/api/nutrition/value',
+      supports: 'nutrition per krona rankings for protein, calories, fiber, sugar, and salt warning guardrails'
+    }
+  ],
+  guardrails: [
+    'All listed endpoints are unauthenticated public read endpoints in the OpenAPI document.',
+    'Account, basket, watchlist, privacy, and human-review APIs stay bearer-auth protected.',
+    'Prices and nutrition values are served with provenance/guardrails; missing data remains absent instead of filled with estimates.'
+  ]
+};
+
 export const chainSavingsLedger = Object.values(
   matchedChainProducts.reduce<Record<string, {
     chain: string;

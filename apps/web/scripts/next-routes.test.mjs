@@ -2072,6 +2072,23 @@ ${seo}`;
     assert.match(route, /origin_country/);
   });
 
+  it('surfaces public price and nutrition API documentation on the data sources route', async () => {
+    const server = await read('../../packages/server/src/index.ts');
+    const route = await read('src/app/data-sources/page.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+
+    assert.match(server, /\/api\/openapi\.json/);
+    assert.match(server, /\/api\/products\/\{id\}\/terminal/);
+    assert.match(server, /\/api\/nutrition\/value/);
+    assert.match(verified, /export const publicApiDirectory/);
+    assert.match(verified, /price-history/);
+    assert.match(verified, /nutrition per krona/i);
+    assert.match(route, /Public price\/nutrition API/);
+    assert.match(route, /\/api\/openapi\.json/);
+    assert.match(route, /\/api\/products\/\{id\}\/terminal/);
+    assert.match(route, /\/api\/nutrition\/value/);
+  });
+
   it('surfaces verified OSM coverage on the store coverage route', async () => {
     const route = await read('src/app/store-coverage/page.tsx');
 
