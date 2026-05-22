@@ -28,6 +28,21 @@ class RecordingQueryExecutor implements QueryExecutor {
       allowed_price_types: ['shelf', 'promotion']
     }
   ];
+  basketImportReviewRows: unknown[] = [
+    {
+      review_item_id: 'review-1',
+      raw_name: 'Retailer-only bakery bun',
+      quantity: '3.000',
+      reason: 'No verified GroceryView product match.',
+      retailer_id: 'willys',
+      source_kind: 'bookmarklet',
+      captured_at: '2026-05-22T09:35:00.000Z',
+      status: 'open',
+      created_at: '2026-05-22T09:35:00.000Z',
+      resolved_at: null,
+      resolved_product_id: null
+    }
+  ];
   productRows: unknown[] = [
     {
       id: 'product-1',
@@ -343,6 +358,16 @@ class RecordingQueryExecutor implements QueryExecutor {
     if (sql.includes('from aliases')) return this.aliasRows as T[];
     if (sql.includes('from subscription_entitlements')) return this.subscriptionEntitlementRows as T[];
     if (sql.includes('from watchlist_items')) return this.watchlistRows as T[];
+    if (sql.includes('from basket_import_review_items')) return this.basketImportReviewRows as T[];
+    if (sql.includes('update basket_import_review_items')) {
+      return [{
+        ...this.basketImportReviewRows[0] as Record<string, unknown>,
+        status: params[2],
+        resolved_at: params[3],
+        resolved_product_id: params[4],
+        quantity: params[5] ?? '3.000'
+      }] as T[];
+    }
     if (sql.includes('select store_id')) return [{ store_id: 'willys-odenplan' }] as T[];
     if (sql.includes('select weekly_budget')) return [{ weekly_budget: '800', monthly_budget: '3200' }] as T[];
     if (sql.includes('insert into weekly_baskets')) return this.basketId === undefined ? ([] as T[]) : ([{ id: this.basketId }] as T[]);
@@ -484,6 +509,66 @@ describe('createPostgresRepository', () => {
       /Weekly basket was not returned for user: user-1/
     );
     assert.equal(executor.calls.some((call) => call.sql.includes('insert into basket_items')), false);
+  });
+
+  it('persists and resolves account-bound basket import review rows with parameterized queries', async () => {
+    const executor = new RecordingQueryExecutor();
+    const repo = createPostgresRepository(executor);
+
+    await repo.saveBasketImportReviewItems('user-1', [
+      {
+        reviewItemId: 'review-1',
+        rawName: 'Retailer-only bakery bun',
+        quantity: 3,
+        reason: 'No verified GroceryView product match.',
+        retailerId: 'willys',
+        sourceKind: 'bookmarklet',
+        capturedAt: '2026-05-22T09:35:00.000Z',
+        status: 'open',
+        createdAt: '2026-05-22T09:35:00.000Z'
+      }
+    ]);
+
+    const insertCall = executor.calls.find((call) => call.sql.includes('insert into basket_import_review_items'));
+    assert.match(insertCall?.sql ?? '', /user_id, review_item_id, raw_name/);
+    assert.deepEqual(insertCall?.params, [
+      'user-1',
+      'review-1',
+      'Retailer-only bakery bun',
+      3,
+      'No verified GroceryView product match.',
+      'willys',
+      'bookmarklet',
+      '2026-05-22T09:35:00.000Z',
+      'open',
+      '2026-05-22T09:35:00.000Z',
+      null,
+      null
+    ]);
+
+    assert.deepEqual(await repo.listOpenBasketImportReviewItems('user-1'), [
+      {
+        reviewItemId: 'review-1',
+        rawName: 'Retailer-only bakery bun',
+        quantity: 3,
+        reason: 'No verified GroceryView product match.',
+        retailerId: 'willys',
+        sourceKind: 'bookmarklet',
+        capturedAt: '2026-05-22T09:35:00.000Z',
+        status: 'open',
+        createdAt: '2026-05-22T09:35:00.000Z'
+      }
+    ]);
+
+    const resolved = await repo.resolveBasketImportReviewItem('user-1', 'review-1', {
+      status: 'dismissed',
+      resolvedAt: '2026-05-22T09:36:00.000Z'
+    });
+
+    assert.equal(resolved.status, 'dismissed');
+    assert.equal(resolved.resolvedAt, '2026-05-22T09:36:00.000Z');
+    const updateCall = executor.calls.find((call) => call.sql.includes('update basket_import_review_items'));
+    assert.deepEqual(updateCall?.params, ['user-1', 'review-1', 'dismissed', '2026-05-22T09:36:00.000Z', null, null]);
   });
 
   it('persists and reads subscription entitlements with parameterized billing identifiers', async () => {

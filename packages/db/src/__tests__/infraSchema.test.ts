@@ -14,13 +14,14 @@ const sourceRunsOfficialApiMigration = readFileSync(join(repoRoot, 'infra/db/mig
 const receiptUploadsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/007_receipt_uploads.sql'), 'utf8').toLowerCase();
 const householdPlansMigration = readFileSync(join(repoRoot, 'infra/db/migrations/008_household_plans.sql'), 'utf8').toLowerCase();
 const retailerSourcePoliciesMigration = readFileSync(join(repoRoot, 'infra/db/migrations/009_retailer_source_policies.sql'), 'utf8').toLowerCase();
+const basketImportReviewsMigration = readFileSync(join(repoRoot, 'infra/db/migrations/010_basket_import_reviews.sql'), 'utf8').toLowerCase();
 const migrationsDir = join(repoRoot, 'infra/db/migrations');
 const allMigrations = readdirSync(migrationsDir)
   .filter((entry) => entry.endsWith('.sql'))
   .sort()
   .map((entry) => readFileSync(join(migrationsDir, entry), 'utf8').toLowerCase())
   .join('\n');
-const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}`;
+const repositoryMigrations = `${repositoryMigration}\n${entitlementMigration}\n${alertRulesMigration}\n${pantryInventoryMigration}\n${receiptUploadsMigration}\n${householdPlansMigration}\n${basketImportReviewsMigration}`;
 const sourcePolicyTables = ['retailer_source_policies'];
 const migrationVerifier = readFileSync(join(repoRoot, 'infra/db/scripts/verify-migrations.sh'), 'utf8').toLowerCase();
 const schemaDoc = readFileSync(join(repoRoot, 'infra/db/SCHEMA.md'), 'utf8').toLowerCase();
@@ -49,6 +50,7 @@ const repositoryTables = [
   'watchlist_items',
   'weekly_baskets',
   'basket_items',
+  'basket_import_review_items',
   'human_review_assignments',
   'human_reviewers',
   'community_reporter_trust',
@@ -175,6 +177,10 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(repositoryTableDefinition('watchlist_items'), /allowed_price_types text\[\] not null default array\['shelf'\]::text\[\]/);
     assert.match(repositoryTableDefinition('watchlist_items'), /allowed_price_types <@ array\['shelf', 'member', 'promotion', 'estimated'\]::text\[\]/);
     assert.match(tableDefinition('watchlists'), /allowed_price_types text\[\] not null default array\['shelf'\]::text\[\]/);
+    assert.match(repositoryTableDefinition('basket_import_review_items'), /user_id text not null references app_users\(id\) on delete cascade/);
+    assert.match(repositoryTableDefinition('basket_import_review_items'), /review_item_id text not null/);
+    assert.match(repositoryTableDefinition('basket_import_review_items'), /status text not null check \(status in \('open', 'accepted', 'dismissed'\)\)/);
+    assert.match(repositoryTableDefinition('basket_import_review_items'), /primary key \(user_id, review_item_id\)/);
     assert.match(repositoryTableDefinition('pantry_items'), /user_id text not null references app_users\(id\) on delete cascade/);
     assert.match(repositoryTableDefinition('pantry_items'), /category text not null check/);
     assert.match(repositoryTableDefinition('pantry_items'), /quantity numeric\(12, 3\) not null check \(quantity >= 0\)/);
@@ -198,6 +204,7 @@ describe('infra/db PostgreSQL schema contract', () => {
   it('indexes repository workflow lookups used by adapters and workers', () => {
     assert.match(repositoryMigration, /watchlist_items_user_idx on watchlist_items \(user_id, id\)/);
     assert.match(repositoryMigration, /weekly_baskets_user_week_idx on weekly_baskets \(user_id, week_start desc\)/);
+    assert.match(basketImportReviewsMigration, /basket_import_review_items_open_idx on basket_import_review_items \(user_id, status, created_at, review_item_id\)/);
     assert.match(repositoryMigration, /human_review_assignments_open_idx on human_review_assignments \(status, due_at, id\)/);
     assert.match(entitlementMigration, /subscription_entitlements_status_idx on subscription_entitlements \(status, updated_at desc\)/);
     assert.match(repositoryMigration, /notification_tasks_due_idx on notification_tasks \(status, send_at, id\)/);

@@ -100,6 +100,36 @@ class RepositorySmokeQueryExecutor implements QueryExecutor {
     if (sql.includes('from basket_items')) {
       return [{ product_id: 'postgres-probe-grocery-run-42', quantity: '2' }] as T[];
     }
+    if (sql.includes('from basket_import_review_items')) {
+      return [{
+        review_item_id: 'postgres-probe-basket-import-review-run-42',
+        raw_name: 'Postgres Probe Unmatched Retailer Row',
+        quantity: '1.000',
+        reason: 'PostgreSQL integration smoke probe.',
+        retailer_id: 'willys',
+        source_kind: 'bookmarklet',
+        captured_at: '2026-05-20T00:00:00.000Z',
+        status: 'open',
+        created_at: '2026-05-20T00:00:00.000Z',
+        resolved_at: null,
+        resolved_product_id: null
+      }] as T[];
+    }
+    if (sql.includes('update basket_import_review_items')) {
+      return [{
+        review_item_id: 'postgres-probe-basket-import-review-run-42',
+        raw_name: 'Postgres Probe Unmatched Retailer Row',
+        quantity: '1.000',
+        reason: 'PostgreSQL integration smoke probe.',
+        retailer_id: 'willys',
+        source_kind: 'bookmarklet',
+        captured_at: '2026-05-20T00:00:00.000Z',
+        status: 'dismissed',
+        created_at: '2026-05-20T00:00:00.000Z',
+        resolved_at: '2026-05-20T00:00:00.000Z',
+        resolved_product_id: null
+      }] as T[];
+    }
     if (sql.includes('from subscription_entitlements')) {
       return [
         {
@@ -281,6 +311,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
     assert.equal(report.status, 'blocked');
     assert.deepEqual(report.blockers, [
       'missing_table:alert_rules',
+      'missing_table:basket_import_review_items',
       'missing_table:basket_items',
       'missing_table:chains',
       'missing_table:community_reporter_trust',
@@ -313,6 +344,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       'missing_migration:007_receipt_uploads',
       'missing_migration:008_household_plans',
       'missing_migration:009_retailer_source_policies',
+      'missing_migration:010_basket_import_reviews',
       'repository_check_fail:human_review_assignment_round_trip',
       'repository_check_not_run:notification_suppression_round_trip'
     ]);
@@ -345,6 +377,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
       evidence: [
         'table:alert_rules',
         'table:app_users',
+        'table:basket_import_review_items',
         'table:basket_items',
         'table:chains',
         'table:community_reporter_trust',
@@ -380,6 +413,7 @@ describe('buildPostgresIntegrationReadinessReport', () => {
         'migration:007_receipt_uploads',
         'migration:008_household_plans',
         'migration:009_retailer_source_policies',
+        'migration:010_basket_import_reviews',
         'repository_check:favorite_store_round_trip',
         'repository_check:human_review_assignment_round_trip',
         'repository_check:notification_suppression_round_trip',
@@ -577,6 +611,7 @@ describe('buildPostgresRepositorySmokeProbes', () => {
       'user_budget_round_trip',
       'user_subscription_entitlement_round_trip',
       'grocery_user_state_round_trip',
+      'basket_import_review_round_trip',
       'human_review_assignment_round_trip',
       'notification_suppression_round_trip',
       'alert_rule_round_trip',
@@ -594,6 +629,7 @@ describe('buildPostgresRepositorySmokeProbes', () => {
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-subscription-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-store-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-grocery-run-42')), true);
+    assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-basket-import-review-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-assignment-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-suppression-run-42')), true);
     assert.equal(executor.calls.some((call) => call.params.includes('postgres-probe-alert-run-42')), true);
