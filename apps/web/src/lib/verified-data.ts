@@ -1,5 +1,5 @@
 import { COMMODITIES, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { calculateDealScore, compareCommodityUnitPrices, planRecurringBasketDigest, summarizeCategoryDealLeaders, summarizePriceHistory, type CommodityPriceObservation } from '@groceryview/core';
+import { calculateDealScore, compareCommodityUnitPrices, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type CommodityPriceObservation, type ProductMatchInput } from '@groceryview/core';
 import { axfoodProducts } from './axfood-products';
 import { icaReklambladOffers, icaReklambladSource } from './ingested/ica-reklamblad';
 import { openFoodFactsCatalog } from './openfoodfacts-catalog';
@@ -112,6 +112,162 @@ export const matchedChainProducts = axfoodProducts.filter((product) => product.i
 export const topChainSpreads = [...matchedChainProducts].sort((a, b) => b.spreadPct - a.spreadPct).slice(0, 18);
 export const freshestOpenPrices = [...pricedProducts].sort((a, b) => b.lastObservedAt.localeCompare(a.lastObservedAt)).slice(0, 18);
 export const productUniverse = [...topChainSpreads, ...freshestOpenPrices].slice(0, 36);
+
+function brandTierForAxfoodProduct(product: (typeof axfoodProducts)[number]): BrandTier {
+  const brand = product.brand.toLowerCase();
+  const labels = product.labels.map((label) => label.toLowerCase());
+  const isRetailerPrivateLabel =
+    brand.includes('garant') ||
+    brand.includes('eldorado') ||
+    brand.includes('ica') ||
+    brand.includes('coop') ||
+    brand.includes('änglamark') ||
+    brand.includes('x-tra');
+  if ((brand.includes('garant eko') || brand.includes('änglamark')) || (isRetailerPrivateLabel && (labels.includes('ecological') || labels.includes('eu_ecological')))) return 'organic_private_label';
+  if (brand.includes('eldorado') || brand.includes('x-tra') || brand.includes('basic')) return 'budget_private_label';
+  if (isRetailerPrivateLabel) return 'standard_private_label';
+  if (brand.includes('willys') || brand.includes('lidl') || brand.includes('city gross')) return 'discount_chain_label';
+  return 'national';
+}
+
+function privateLabelDupeMatchInput(product: (typeof axfoodProducts)[number]): (ProductMatchInput & { unitPrice: number }) | null {
+  const packageAmount = unitAmountFromPackage(product.subline);
+  const unitPrice = normalizeComparableUnitPrice(product.lowestPrice, product.subline);
+  if (!packageAmount || !unitPrice) return null;
+  const packageSize = packageAmount.unit === 'kg'
+    ? packageAmount.amount * 1000
+    : packageAmount.unit === 'l'
+      ? packageAmount.amount * 1000
+      : packageAmount.amount;
+  const packageUnit = packageAmount.unit === 'kg' ? 'g' : packageAmount.unit === 'l' ? 'ml' : 'piece';
+  return {
+    id: product.slug,
+    brand: product.brand,
+    category: product.category,
+    packageSize,
+    packageUnit,
+    brandTier: brandTierForAxfoodProduct(product),
+    unitPrice: unitPrice.unitPrice
+  };
+}
+
+const privateLabelDupeProductBySlug = new Map(axfoodProducts.map((product) => [product.slug, product]));
+const privateLabelDupeInputs = axfoodProducts
+  .map((product) => ({ product, input: privateLabelDupeMatchInput(product) }))
+  .filter((row): row is { product: (typeof axfoodProducts)[number]; input: ProductMatchInput & { unitPrice: number } } => row.input !== null);
+
+const privateLabelBrandTiers: BrandTier[] = ['standard_private_label', 'budget_private_label', 'organic_private_label', 'discount_chain_label'];
+const dupeStopwords = new Set([
+  'eko',
+  'ekologisk',
+  'klass',
+  'stor',
+  'liten',
+  'färsk',
+  'svensk',
+  'naturell',
+  'original',
+  'extra',
+  'tobaksfritt',
+  'snus',
+  'portion',
+  'white',
+  'mini',
+  'maxi',
+  'fryst',
+  'frysta',
+  'pack',
+  'mild',
+  'mellan',
+  'skivat',
+  'skivad',
+  'havssalt',
+  'ekologiskt'
+]);
+
+function normalizedDupeTokens(product: (typeof axfoodProducts)[number]) {
+  return new Set(
+    product.name
+      .normalize('NFKD')
+      .replace(/\p{Diacritic}/gu, '')
+      .toLowerCase()
+      .split(/[^a-z0-9åäö]+/i)
+      .filter((token) => token.length >= 4 && !dupeStopwords.has(token))
+  );
+}
+
+function hasPrivateLabelDupeNameEvidence(source: (typeof axfoodProducts)[number], candidate: (typeof axfoodProducts)[number]) {
+  const sourceTokens = normalizedDupeTokens(source);
+  const candidateTokens = normalizedDupeTokens(candidate);
+  return [...sourceTokens].some((token) => candidateTokens.has(token));
+}
+
+const privateLabelDupeRows = privateLabelDupeInputs
+  .filter(({ input }) => input.brandTier === 'national' || input.brandTier === 'premium')
+  .flatMap(({ product: sourceProduct, input: source }) => {
+    const candidates = privateLabelDupeInputs
+      .filter(({ product, input }) =>
+        product.slug !== sourceProduct.slug &&
+        input.category === source.category &&
+        input.unitPrice < source.unitPrice &&
+        privateLabelBrandTiers.includes(input.brandTier) &&
+        hasPrivateLabelDupeNameEvidence(sourceProduct, product)
+      )
+      .map(({ input }) => input);
+
+    return recommendSmartSwaps({
+      source,
+      candidates,
+      acceptPrivateLabel: 'yes',
+      minimumSavingsPercent: 5,
+      privateLabelPreference: {
+        acceptedTiers: privateLabelBrandTiers,
+        blockedCategories: ['baby_formula', 'medical_diet']
+      }
+    }).flatMap((swap) => {
+      const dupeProduct = privateLabelDupeProductBySlug.get(swap.productId);
+      if (!dupeProduct) return [];
+      const sourceUnit = normalizeComparableUnitPrice(sourceProduct.lowestPrice, sourceProduct.subline);
+      const dupeUnit = normalizeComparableUnitPrice(dupeProduct.lowestPrice, dupeProduct.subline);
+      if (!sourceUnit || !dupeUnit) return [];
+      return [{
+        sourceSlug: sourceProduct.slug,
+        sourceName: sourceProduct.name,
+        nationalBrand: sourceProduct.brand,
+        sourcePrice: sourceProduct.lowestPrice,
+        sourceUnitPrice: sourceUnit.unitPrice,
+        sourcePackage: sourceUnit.packageLabel,
+        dupeSlug: dupeProduct.slug,
+        dupeName: dupeProduct.name,
+        privateLabelBrand: dupeProduct.brand,
+        privateLabelTier: brandTierForAxfoodProduct(dupeProduct),
+        dupePrice: dupeProduct.lowestPrice,
+        dupeUnitPrice: dupeUnit.unitPrice,
+        dupePackage: dupeUnit.packageLabel,
+        unitLabel: sourceUnit.unitLabel,
+        cheapestChain: chainDisplayName(dupeProduct.lowestChain),
+        nameEvidence: [...normalizedDupeTokens(sourceProduct)].filter((token) => normalizedDupeTokens(dupeProduct).has(token)),
+        savingsPercent: swap.savingsPercent,
+        confidence: swap.confidence,
+        qualityRisk: swap.qualityRisk,
+        reason: swap.reason
+      }];
+    });
+  })
+  .sort((left, right) => right.savingsPercent - left.savingsPercent || left.sourceName.localeCompare(right.sourceName, 'sv'));
+
+export const privateLabelDupeFinder = {
+  title: 'Private-label dupe finder',
+  topDupes: privateLabelDupeRows.slice(0, 8),
+  sourceProductCount: new Set(privateLabelDupeRows.map((row) => row.sourceSlug)).size,
+  privateLabelProductCount: new Set(privateLabelDupeRows.map((row) => row.dupeSlug)).size,
+  categoryCount: new Set(privateLabelDupeRows.map((row) => privateLabelDupeProductBySlug.get(row.sourceSlug)?.category).filter(Boolean)).size,
+  guardrails: [
+    'Calls recommendSmartSwaps before any brand-name row is paired with a private label.',
+    'Requires same category, comparable package size, lower verified unit price, and accepted private-label tier.',
+    'Does not claim ingredient identity, nutrition equivalence, stock, or account-specific loyalty eligibility.'
+  ]
+};
 
 const commodityAliasMatchers: Record<string, RegExp[]> = {
   tomato: [/tomat/i],
