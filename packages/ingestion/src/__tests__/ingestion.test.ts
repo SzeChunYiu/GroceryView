@@ -51,6 +51,8 @@ import {
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
+  GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL,
+  GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
   ingestRetailerProduct,
   locatorFixturesCanAffectDealScore,
   normalizeUnitPrice,
@@ -2797,6 +2799,125 @@ describe('daily ingestion runner', () => {
     assert.equal(storeInsert?.params[0], 'willys-odenplan');
     const latestPriceInsert = executor.calls.find((call) => call.sql.includes('insert into latest_prices'));
     assert.equal(latestPriceInsert?.params[2], 'store-db-2');
+  });
+
+  it('materializes native Willys all-store weekly offers into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T12:00:00.000Z',
+      connectors: [{
+        connectorId: 'willys-weekly-all-stores',
+        chainId: 'willys',
+        sourceType: 'flyer_campaign',
+        endpointUrl: GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
+        parserVersion: 'willys-weekly-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '2110', name: 'Willys Kungsbacka Hede', address: 'Tölöleden 3', city: 'Kungsbacka' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url).includes('/axfood/rest/store')) {
+          return new Response(JSON.stringify([
+            { storeId: '2110', name: 'Willys Kungsbacka Hede', address: { line1: 'Tölöleden 3', town: 'Kungsbacka' } }
+          ]), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({
+          pagination: { numberOfPages: 1 },
+          results: [{
+            name: 'Smör Normalsaltat',
+            manufacturer: 'Arla',
+            googleAnalyticsCategory: 'Dairy',
+            displayVolume: '500g',
+            priceNoUnit: '61.45',
+            potentialPromotions: [{
+              code: 'willys-promo-2110',
+              mainProductCode: '7310865005168',
+              name: 'Smör Normalsaltat',
+              brands: ['Arla'],
+              price: 45,
+              cartLabel: '45 kr/st',
+              conditionLabel: 'Max 2 köp/hushåll'
+            }]
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildWillysStoresUrl({ online: true }),
+      buildWillysWeeklyDiscountsUrl('2110', 100, 0)
+    ]);
+    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+    assert.equal(observationInsert?.params[2], 'store-db-2');
+    assert.equal(observationInsert?.params[7], 45);
+    assert.equal(observationInsert?.params[13], 'Max 2 köp/hushåll');
+  });
+
+  it('materializes native Coop all-store weekly offers into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T12:05:00.000Z',
+      connectors: [{
+        connectorId: 'coop-weekly-all-stores',
+        chainId: 'coop',
+        sourceType: 'flyer_campaign',
+        endpointUrl: `${GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL}?subscriptionKey=public-test-key&storeApiSubscriptionKey=public-store-test-key&productQueries=Svenskt%20sm%C3%B6r%20Arla%20500%20g`,
+        parserVersion: 'coop-weekly-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '251300', name: 'Stora Coop Boländerna', address: 'Rapsgatan 1b', city: 'Uppsala' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url) === buildCoopStoresUrl()) {
+          return new Response(JSON.stringify({
+            stores: [{ ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', conceptName: 'Stora Coop', address: 'Rapsgatan 1b', city: 'Uppsala' }]
+          }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        if (String(url).includes('/stores/251300')) {
+          return new Response(JSON.stringify({
+            ledgerAccountNumber: '251300',
+            name: 'Stora Coop Boländerna',
+            city: 'Uppsala',
+            flyers: [{ startDate: '2026-05-18T00:00:00', stopDate: '2026-05-24T23:59:59', current: true, pdfExists: true, pdfUrl: 'https://dr.coop.se/butik/251300' }]
+          }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({
+          results: {
+            items: [{
+              id: 'coop-catalog-promo',
+              ean: '7310865005168',
+              name: 'Smör Normalsaltat',
+              manufacturerName: 'Arla',
+              packageSizeInformation: '500g',
+              salesPriceData: { b2cPrice: 61.45 },
+              onlinePromotions: [{ id: 'promo', message: 'Smör 45 kr/st', priceData: { b2cPrice: 45 }, medMeraRequired: true }]
+            }]
+          }
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildCoopStoresUrl(),
+      buildCoopStoreInfoUrl('251300'),
+      buildCoopSearchUrl('251300')
+    ]);
+    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+    assert.equal(observationInsert?.params[2], 'store-db-2');
+    assert.equal(observationInsert?.params[7], 45);
+    assert.equal(observationInsert?.params[16], true);
   });
 
   it('fails closed before persistence when store-scoped prices omit configured branch metadata', async () => {

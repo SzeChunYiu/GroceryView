@@ -9,6 +9,14 @@ import {
   type QueryExecutor,
   type SourceRunRecord
 } from '@groceryview/db';
+import {
+  fetchCoopWeeklyDiscountsForAllStores,
+  type CoopWeeklyDiscount
+} from './connectors/coop.js';
+import {
+  fetchWillysWeeklyDiscountsForAllStores,
+  type WillysWeeklyDiscount
+} from './connectors/willys.js';
 
 export * from './connectors/openfoodfacts.js';
 export * from './connectors/overpass.js';
@@ -1534,6 +1542,139 @@ export async function fetchRetailerConnectorSnapshot(
   };
 }
 
+type ParsedPackageQuantity = {
+  packageSize: number;
+  packageUnit: string;
+};
+
+function parseNativePackageText(value: string): ParsedPackageQuantity {
+  const match = value.match(/(\d+(?:[,.]\d+)?)\s*(kg|g|gram|l|liter|ml|st|styck|pcs|piece|pack)\b/i);
+  if (!match) return { packageSize: 1, packageUnit: 'piece' };
+  const unit = match[2].toLowerCase();
+  const packageUnit = unit === 'st' || unit === 'styck' || unit === 'pack' ? 'piece' : unit === 'liter' ? 'l' : unit === 'gram' ? 'g' : unit;
+  return { packageSize: Number(match[1].replace(',', '.')), packageUnit };
+}
+
+function nativePriceFromText(value: string): number | undefined {
+  const match = value.match(/(\d+(?:[,.]\d+)?)/);
+  if (!match) return undefined;
+  const parsed = Number(match[1].replace(',', '.'));
+  return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+function dailyNativeNumberParam(url: URL, name: string): number | undefined {
+  const value = url.searchParams.get(name);
+  if (value === null || value.trim() === '') return undefined;
+  const parsed = Number(value);
+  if (!Number.isInteger(parsed) || parsed < 1) throw new Error(`${name} must be a positive integer.`);
+  return parsed;
+}
+
+function dailyNativeStringListParam(url: URL, name: string): string[] | undefined {
+  const value = url.searchParams.get(name);
+  if (value === null || value.trim() === '') return undefined;
+  return value.split(',').map((part) => part.trim()).filter(Boolean);
+}
+
+function willysWeeklyDiscountToDailyItem(row: WillysWeeklyDiscount): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  const regularPrice = nativePriceFromText(row.regularPriceText);
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `willys-${stableKeyPart(row.productCode || row.code)}`,
+    categoryId: stableKeyPart(row.category || 'weekly-offers'),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    regularPrice: regularPrice !== undefined && regularPrice > row.price ? regularPrice : undefined,
+    promoText: row.conditionText || row.priceText || undefined,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+function coopWeeklyDiscountToDailyItem(row: CoopWeeklyDiscount): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `coop-${stableKeyPart(row.ean || row.code)}`,
+    categoryId: 'weekly-offers',
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.offerPrice,
+    regularPrice: row.ordinaryPrice > row.offerPrice ? row.ordinaryPrice : undefined,
+    promoText: row.offerMechanicText || row.offerPriceText || undefined,
+    memberOnly: row.medMeraRequired,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+function dailyNativeSnapshotResult(input: {
+  plan: RetailerConnectorRunPlan;
+  retrievedAt: string;
+  items: RetailerConnectorParsedProduct[];
+}): RetailerConnectorFetchResult {
+  const body = JSON.stringify({ items: input.items });
+  const contentHash = contentHashFor(body);
+  const refHash = contentHash.replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '');
+  return {
+    statusCode: 200,
+    body,
+    contentType: 'application/json',
+    retrievedAt: input.retrievedAt,
+    sourceUrl: input.plan.provenance.sourceUrl,
+    rawSnapshotRef: `raw://daily-native/${stableKeyPart(input.plan.sourceRunId)}/${refHash}`,
+    contentHash
+  };
+}
+
+export async function fetchDailyConnectorSnapshot(
+  plan: RetailerConnectorRunPlan,
+  options: FetchRetailerConnectorSnapshotOptions = {}
+): Promise<RetailerConnectorFetchResult> {
+  const sourceUrl = plan.provenance.sourceUrl;
+  if (sourceUrl === GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchWillysWeeklyDiscountsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      pageSize: dailyNativeNumberParam(url, 'pageSize'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(willysWeeklyDiscountToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchCoopWeeklyDiscountsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRows: dailyNativeNumberParam(url, 'maxRows'),
+      productQueries: dailyNativeStringListParam(url, 'productQueries'),
+      includeStoreDetails: url.searchParams.get('includeStoreDetails') === 'true',
+      subscriptionKey: url.searchParams.get('subscriptionKey') ?? undefined,
+      storeApiSubscriptionKey: url.searchParams.get('storeApiSubscriptionKey') ?? undefined,
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(coopWeeklyDiscountToDailyItem) });
+  }
+
+  return await fetchRetailerConnectorSnapshot(plan, options);
+}
+
 export async function runRetailerConnector(input: RetailerConnectorRunInput): Promise<RetailerConnectorRunResult> {
   const plan = planRetailerConnectorRun(input);
   const baseResult = {
@@ -2101,6 +2242,9 @@ export const requiredDailyIngestionChainIds = [
   'city_gross'
 ] as const;
 
+export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/willys/weekly-offers/all-stores';
+export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
+
 const requireForDailyIngestion = createRequire(import.meta.url);
 
 function parseDailyStoreConfigs(value: unknown, path: string): DailyIngestionStoreConfig[] | undefined {
@@ -2446,7 +2590,7 @@ export async function runDailyIngestion(input: DailyIngestionRunInput): Promise<
     const runConfig = { ...config, requestedAt: input.requestedAt };
     const result = await runRetailerConnector({
       ...runConfig,
-      fetcher: (plan) => fetchRetailerConnectorSnapshot(plan, {
+      fetcher: (plan) => fetchDailyConnectorSnapshot(plan, {
         retrievedAt: input.requestedAt,
         rawSnapshotRefPrefix: 'raw://daily-ingestion',
         fetchImpl: input.fetchImpl,
