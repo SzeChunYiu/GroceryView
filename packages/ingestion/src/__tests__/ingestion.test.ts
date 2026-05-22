@@ -3579,6 +3579,60 @@ describe('daily ingestion runner', () => {
     assert.equal(latestPriceInsert?.params[2], 'store-db-2');
   });
 
+  it('reuses daily chain, store, and product ids while persisting a connector batch', async () => {
+    const executor = new DailyIngestionExecutor();
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-21T03:17:00.000Z',
+      connectors: [
+        {
+          connectorId: 'willys-normalized-json',
+          chainId: 'willys',
+          sourceType: 'official_api',
+          endpointUrl: 'https://sources.example.test/willys/products.json',
+          parserVersion: 'normalized-json-v1',
+          robotsTxtStatus: 'not_applicable',
+          legalReviewStatus: 'approved',
+          hasDataAgreement: true,
+          stores: [{ storeId: '2110', name: 'Willys Kungsbacka Hede', address: 'Tölöleden 3', city: 'Kungsbacka' }]
+        }
+      ],
+      fetchImpl: async () => new Response(JSON.stringify({
+        items: [
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-zoegas-450-a',
+            rawName: 'Zoégas Skånerost 450g',
+            canonicalName: 'Zoégas Coffee 450g',
+            productId: 'zoegas-coffee-450g',
+            categoryId: 'coffee',
+            brand: 'Zoégas',
+            packageSize: 450,
+            packageUnit: 'g',
+            price: 49.9
+          },
+          {
+            storeId: '2110',
+            retailerProductId: 'wil-zoegas-450-b',
+            rawName: 'Zoégas Skånerost 450g',
+            canonicalName: 'Zoégas Coffee 450g',
+            productId: 'zoegas-coffee-450g',
+            categoryId: 'coffee',
+            brand: 'Zoégas',
+            packageSize: 450,
+            packageUnit: 'g',
+            price: 48.9
+          }
+        ]
+      }), { status: 200, headers: { 'content-type': 'application/json' } })
+    });
+
+    assert.equal(result.acceptedCount, 2);
+    assert.equal(executor.calls.filter((call) => call.sql.includes('insert into chains')).length, 1);
+    assert.equal(executor.calls.filter((call) => call.sql.includes('insert into stores')).length, 1);
+    assert.equal(executor.calls.filter((call) => call.sql.includes('insert into products')).length, 1);
+  });
+
   it('materializes native Willys all-store weekly offers into daily database observations', async () => {
     const executor = new DailyIngestionExecutor();
     const requestedUrls: string[] = [];

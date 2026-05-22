@@ -1184,6 +1184,106 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1003785',
     storeName: 'ICA Supermarket Vaggeryd',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004704',
+    storeName: 'Maxi ICA Stormarknad Karlskoga',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003404',
+    storeName: 'ICA Supermarket Skåre',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003986',
+    storeName: 'ICA Supermarket Kil',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004227',
+    storeName: 'ICA Kvantum Kiruna',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004395',
+    storeName: 'ICA Kvantum Klippan',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004054',
+    storeName: 'ICA Supermarket Kramfors',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004299',
+    storeName: 'Maxi ICA Stormarknad Kristinehamn',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003679',
+    storeName: 'ICA Supermarket Skeppet, Kungshamn',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004588',
+    storeName: 'ICA Kvantum Kvissleby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004375',
+    storeName: 'Maxi ICA Stormarknad Köping',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004688',
+    storeName: 'ICA Supermarket Laxå',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004437',
+    storeName: 'ICA Kvantum Lidingö',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004493',
+    storeName: 'ICA Nära Rudboda',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003833',
+    storeName: 'ICA Supermarket Käppala',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004186',
+    storeName: 'ICA Kvantum Hjertberg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004695',
+    storeName: 'ICA Supermarket Margretelund',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004318',
+    storeName: 'ICA Nära Likenäs Allköp',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004424',
+    storeName: 'ICA Supermarket Lindesberg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004102',
+    storeName: 'Maxi ICA Stormarknad Ljungby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004558',
+    storeName: 'ICA Supermarket Ljungskile',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
