@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { LanguagePreferenceSwitcher } from '@/components/language-preference-switcher';
 import { Activity, BarChart3, Database, Map, PackageSearch, Store, Tags } from 'lucide-react';
 
 const navItems = [
@@ -25,7 +26,9 @@ export function AppNav() {
             <span className="block text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Verified grocery intelligence</span>
           </span>
         </Link>
-        <div className="flex gap-2 overflow-x-auto pb-1 lg:justify-end lg:pb-0">
+        <div className="flex flex-col gap-3 lg:items-end">
+          <LanguagePreferenceSwitcher />
+          <div className="flex gap-2 overflow-x-auto pb-1 lg:justify-end lg:pb-0">
           {navItems.map((item) => {
             const Icon = item.icon;
             return (
@@ -35,6 +38,7 @@ export function AppNav() {
               </Link>
             );
           })}
+          </div>
         </div>
       </nav>
     </header>

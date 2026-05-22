@@ -981,6 +981,31 @@ describe('verified-data UI', () => {
     assert.match(nextConfig, /images\.openfoodfacts\.org/);
   });
 
+
+  it('ships a persisted language preference switcher with RTL and browser-language detection', async () => {
+    const nav = await read('src/components/app-nav.tsx');
+    const switcher = await read('src/components/language-preference-switcher.tsx');
+    const i18n = await read('src/lib/i18n.ts');
+
+    assert.match(nav, /LanguagePreferenceSwitcher/);
+    assert.match(switcher, /'use client'/);
+    assert.match(switcher, /localStorage\.getItem\('groceryview:locale'/);
+    assert.match(switcher, /localStorage\.setItem\('groceryview:locale'/);
+    assert.match(switcher, /navigator\.languages/);
+    assert.match(switcher, /document\.documentElement\.lang/);
+    assert.match(switcher, /document\.documentElement\.dir/);
+    assert.match(switcher, /Arabic/);
+    assert.match(switcher, /Somali/);
+    assert.match(switcher, /dir: 'rtl'/);
+    assert.match(switcher, /No prices or product names are machine-translated/);
+    assert.match(i18n, /supportedLocales/);
+    assert.match(i18n, /currency: 'SEK'/);
+    assert.match(i18n, /sv-SE/);
+    assert.match(i18n, /ar-SE/);
+    assert.match(i18n, /so-SE/);
+    assert.doesNotMatch(switcher, /demo-data|sample-data|mock session/i);
+  });
+
   it('surfaces immigrant multilingual UI access in the public shell', async () => {
     const source = await read('src/components/market-shell.tsx');
     assert.match(source, /immigrantMultilingualUi/);
