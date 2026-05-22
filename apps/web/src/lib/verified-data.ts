@@ -1,4 +1,5 @@
 import { axfoodProducts } from './axfood-products';
+import { openFoodFactsCatalog } from './openfoodfacts-catalog';
 import { categoryLabels, pricedProducts } from './openprices-products';
 import { osmStores } from './osm-stores';
 
@@ -6,6 +7,7 @@ export const snapshot = {
   retrievedLabel: '20-21 May 2026',
   axfoodSource: 'Willys and Hemköp public search endpoints',
   openPricesSource: 'OpenPrices / Open Food Facts SEK observations',
+  openFoodFactsCatalogSource: 'OpenFoodFacts Sweden metadata catalog',
   osmSource: 'OpenStreetMap Overpass Sweden extract'
 };
 
@@ -70,6 +72,21 @@ export const immigrantImageFirstBrowsing = productUniverse
     };
   })
   .slice(0, 10);
+
+
+export const openFoodFactsCatalogSummary = {
+  products: openFoodFactsCatalog.length,
+  brands: new Set(openFoodFactsCatalog.map((product) => product.brands).filter(Boolean)).size,
+  categories: new Set(openFoodFactsCatalog.flatMap((product) => product.categories)).size,
+  labelledProducts: openFoodFactsCatalog.filter((product) => product.labels.length > 0).length,
+  imagedProducts: openFoodFactsCatalog.filter((product) => product.imageUrl).length,
+  latestRetrieved: openFoodFactsCatalog.reduce((latest, product) => product.retrievedDate > latest ? product.retrievedDate : latest, '')
+};
+
+export const openFoodFactsCatalogPreview = [...openFoodFactsCatalog]
+  .filter((product) => product.name && product.brands)
+  .sort((a, b) => (b.labels.length - a.labels.length) || a.name.localeCompare(b.name, 'sv'))
+  .slice(0, 12);
 
 export const storeUniverse = osmStores;
 export const featuredStores = [...osmStores]
@@ -330,6 +347,14 @@ export const sourceCoverage = [
     caveat: 'Community observations; every row shows observation count and latest date.'
   },
   {
+    name: 'OpenFoodFacts metadata catalog',
+    source: snapshot.openFoodFactsCatalogSource,
+    rows: openFoodFactsCatalog.length,
+    coverage: `${openFoodFactsCatalogSummary.brands.toLocaleString('sv-SE')} brands · ${openFoodFactsCatalogSummary.categories.toLocaleString('sv-SE')} category tags`,
+    freshness: openFoodFactsCatalogSummary.latestRetrieved || 'Not reported',
+    caveat: 'Metadata-only product catalog; GroceryView prices are not inferred from these rows.'
+  },
+  {
     name: 'Sweden store directory',
     source: snapshot.osmSource,
     rows: osmStores.length,
@@ -345,7 +370,7 @@ export const sourceReadinessMatrix = sourceCoverage.map((source) => {
   const primaryRoute =
     source.name === 'Sweden store directory'
       ? '/stores'
-      : source.name === 'OpenPrices SEK observations'
+      : source.name === 'OpenPrices SEK observations' || source.name === 'OpenFoodFacts metadata catalog'
         ? '/products'
         : '/compare';
 
@@ -366,7 +391,9 @@ export const sourceRouteMap = sourceReadinessMatrix.map((source) => {
       ? ['/stores', '/map', '/data-sources']
       : source.name === 'OpenPrices SEK observations'
         ? ['/products', '/categories', '/data-sources']
-        : ['/compare', '/chain-index', '/data-sources'];
+        : source.name === 'OpenFoodFacts metadata catalog'
+          ? ['/products', '/data-sources']
+          : ['/compare', '/chain-index', '/data-sources'];
 
   return {
     name: source.name,
@@ -381,7 +408,7 @@ export const sourceClaimLedger = sourceCoverage.map((source) => {
   const route =
     source.name === 'Sweden store directory'
       ? '/stores'
-      : source.name === 'OpenPrices SEK observations'
+      : source.name === 'OpenPrices SEK observations' || source.name === 'OpenFoodFacts metadata catalog'
         ? '/products'
         : '/compare';
   const allowedClaim =
@@ -389,13 +416,17 @@ export const sourceClaimLedger = sourceCoverage.map((source) => {
       ? 'Verified Sweden store locations, brands, formats, districts, and address coverage.'
       : source.name === 'OpenPrices SEK observations'
         ? 'Observed community price medians, observation counts, product codes, and latest sighting dates.'
-        : 'Chain-wide Willys and Hemkop catalogue prices and same-product spread comparisons.';
+        : source.name === 'OpenFoodFacts metadata catalog'
+          ? 'Metadata-only Swedish product names, brands, quantities, category tags, labels, package images, and OFF product URLs.'
+          : 'Chain-wide Willys and Hemkop catalogue prices and same-product spread comparisons.';
   const blockedClaim =
     source.name === 'Sweden store directory'
       ? 'Branch-level prices, inventory, opening hours, or promotion availability.'
       : source.name === 'OpenPrices SEK observations'
         ? 'Guaranteed current shelf price, store-specific availability, or member-only offer state.'
-        : 'Per-branch shelf prices, stock status, authenticated loyalty prices, or checkout totals.';
+        : source.name === 'OpenFoodFacts metadata catalog'
+          ? 'Current prices, store availability, nutrition completeness, or verified retailer assortment.'
+          : 'Per-branch shelf prices, stock status, authenticated loyalty prices, or checkout totals.';
 
   return {
     name: source.name,
