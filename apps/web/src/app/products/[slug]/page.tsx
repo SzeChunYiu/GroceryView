@@ -36,6 +36,11 @@ const timeframeWindows = [
   { label: '1Y', rangeDays: 365, rangeLabel: 'last 365 days' },
   { label: 'ALL', rangeDays: undefined, rangeLabel: 'all observed points' }
 ] as const;
+const historyWindowDefinitions = [
+  { label: '30-day', rangeDays: 30, title: 'Observed 30-day low/high' },
+  { label: '90-day', rangeDays: 90, title: 'Observed 90-day low/high' },
+  { label: '365-day', rangeDays: 365, title: 'Observed 365-day low/high' }
+] as const;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -286,6 +291,90 @@ function priceHistoryBadgeFor(product: NonNullable<ReturnType<typeof findProduct
   };
 }
 
+function priceHistoryRangeBadgesFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  const emptyWindows = historyWindowDefinitions.map((window) => ({
+    ...window,
+    observationCount: 0,
+    lowValueLabel: 'Not reported',
+    highValueLabel: 'Not reported',
+    lowObservedAt: null as string | null,
+    highObservedAt: null as string | null,
+    canClaimLowestInWindow: false,
+    claimLabel: 'observed range withheld',
+    detailCopy: 'No dated observation tape is available for this range.'
+  }));
+
+  if ('lowestPrice' in product || product.observations.length === 0) {
+    return {
+      available: false,
+      caveat: 'Lowest/highest range badges are withheld because this source has no dated OpenPrices observation tape.',
+      windows: emptyWindows
+    };
+  }
+
+  const latest = latestObservationFor(product);
+  const latestObservedAt = latest?.date ?? product.lastObservedAt;
+  const latestTime = Date.parse(`${latestObservedAt}T00:00:00.000Z`);
+  const observations = product.observations
+    .map((observation) => ({
+      observedAt: observation.date,
+      observedTime: Date.parse(`${observation.date}T00:00:00.000Z`),
+      price: observation.price
+    }))
+    .filter((observation) => Number.isFinite(observation.observedTime))
+    .sort((a, b) => a.observedTime - b.observedTime);
+
+  const windows = historyWindowDefinitions.map((window) => {
+    const windowStart = latestTime - window.rangeDays * 24 * 60 * 60 * 1000;
+    const windowPoints = observations.filter((observation) => observation.observedTime >= windowStart && observation.observedTime <= latestTime);
+
+    if (windowPoints.length === 0) {
+      return {
+        ...window,
+        observationCount: 0,
+        lowValueLabel: 'Not reported',
+        highValueLabel: 'Not reported',
+        lowObservedAt: null,
+        highObservedAt: null,
+        canClaimLowestInWindow: false,
+        claimLabel: 'observed range withheld',
+        detailCopy: 'No dated OpenPrices observations fall inside this range.'
+      };
+    }
+
+    const lowPoint = windowPoints.reduce((best, point) => (point.price < best.price ? point : best));
+    const highPoint = windowPoints.reduce((best, point) => (point.price > best.price ? point : best));
+    const disclosure = summarizePriceHistoryConfidence({
+      rangeDays: window.rangeDays,
+      firstObservedAt: `${windowPoints[0]!.observedAt}T00:00:00.000Z`,
+      lastObservedAt: `${windowPoints.at(-1)!.observedAt}T00:00:00.000Z`,
+      observationCount: windowPoints.length,
+      sourceTypesIncluded: ['online'],
+      expectedSourceTypes: ['shelf', 'online', 'flyer'],
+      productScopeKnown: true,
+      storeScopeKnown: false
+    });
+
+    return {
+      ...window,
+      observationCount: windowPoints.length,
+      lowValueLabel: formatSek(lowPoint.price),
+      highValueLabel: formatSek(highPoint.price),
+      lowObservedAt: lowPoint.observedAt,
+      highObservedAt: highPoint.observedAt,
+      canClaimLowestInWindow: disclosure.canClaimLowestInWindow,
+      claimLabel: disclosure.canClaimLowestInWindow ? `lowest in observed ${window.rangeDays}-day window` : 'observed range only',
+      detailCopy: disclosure.detailCopy
+    };
+  });
+
+  return {
+    available: windows.some((window) => window.observationCount > 0),
+    caveat: 'Every low/high badge is calculated only from dated OpenPrices observations. Missing shelf, flyer, and member prices keep claims labelled as observed ranges.',
+    windows
+  };
+}
+
 function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduct>>): PriceChartTerminalModel {
   const emptyWindows: PriceChartTerminalWindow[] = timeframeWindows.map((window) => ({
     label: window.label,
@@ -372,6 +461,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const dealVerdict = dealScoreVerdictFor(product);
   const smartSwaps = smartSwapRecommendationsFor(product);
   const priceHistoryBadge = priceHistoryBadgeFor(product);
+  const priceHistoryRangeBadges = priceHistoryRangeBadgesFor(product);
   const priceChartTerminal = priceChartTerminalFor(product);
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
   const productJsonLd = productJsonLdFor(product);
@@ -476,6 +566,44 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
         <p className="mt-4 text-xs font-semibold text-slate-500">{smartSwaps.caveat}</p>
       </Card>
       <PriceChartTerminal chart={priceChartTerminal} />
+      <Card className="mt-6 border-indigo-200 bg-indigo-50/70">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-indigo-700">Historic range tape</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Lowest / highest in 30 / 90 / 365 days</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Calls summarizePriceHistoryConfidence for every range before rendering a low/high claim. The badges are factual observations, not forecasts.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-indigo-900">{priceHistoryRangeBadges.windows.length} windows</p>
+        </div>
+        {priceHistoryRangeBadges.available ? (
+          <div className="mt-5 grid gap-3 lg:grid-cols-3">
+            {priceHistoryRangeBadges.windows.map((window) => (
+              <div className="rounded-2xl bg-white/90 p-4 shadow-sm" key={window.label}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-700">{window.title}</p>
+                <div className="mt-3 grid gap-2">
+                  <p className="text-sm font-bold text-slate-600">
+                    Low: <span className="text-lg font-black text-emerald-800">{window.lowValueLabel}</span>
+                    {window.lowObservedAt ? ` · ${window.lowObservedAt}` : ''}
+                  </p>
+                  <p className="text-sm font-bold text-slate-600">
+                    High: <span className="text-lg font-black text-rose-800">{window.highValueLabel}</span>
+                    {window.highObservedAt ? ` · ${window.highObservedAt}` : ''}
+                  </p>
+                  <p className="rounded-xl bg-indigo-50 p-3 text-xs font-black uppercase tracking-[0.14em] text-indigo-900">
+                    {window.observationCount} points · canClaimLowestInWindow {String(window.canClaimLowestInWindow)}
+                  </p>
+                </div>
+                <p className="mt-3 text-xs font-semibold leading-5 text-slate-600">{window.claimLabel} · {window.detailCopy}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">{priceHistoryRangeBadges.caveat}</p>
+        )}
+        <p className="mt-4 text-xs font-semibold text-slate-500">{priceHistoryRangeBadges.caveat}</p>
+      </Card>
       <Card className="mt-6 border-sky-200 bg-sky-50/70">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
