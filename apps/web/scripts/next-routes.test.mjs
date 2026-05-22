@@ -796,6 +796,22 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a freezer batch-cook planner from real deal meal output', async () => {
+    const source = await read('src/app/meal-planner/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+
+    assert.match(demo, /freezerBatchCookPlanner/);
+    assert.match(demo, /suggestDealBasedMeals/);
+    assert.match(demo, /freezerPortions/);
+    assert.match(demo, /batchCookSteps/);
+    assert.match(source, /freezerBatchCookPlanner/);
+    assert.match(source, /Freezer batch-cook planner/);
+    assert.match(source, /freezerPortions/);
+    assert.match(source, /batchCookSteps/);
+    assert.match(source, /visible deal prices/i);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces an account-safe dietary substitution assistant on the meal planner route', async () => {
     const route = await read('src/app/meal-planner/page.tsx');
     const verified = await read('src/lib/verified-data.ts');
