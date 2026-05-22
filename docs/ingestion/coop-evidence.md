@@ -23,12 +23,13 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
 - Product search URLs: per-branch `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1`, listed in `apps/web/src/lib/ingested/coop.ts`
 - Request body: weekly flyer item queries listed in `DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES`, resultsOptions take 8, empty sort/facets, relatedResultsOptions take 0
 - Required public headers: `storeApiSubscriptionKey` for store metadata and `personalizationApiSubscriptionKey` for product search, both exposed in `window.coopSettings.serviceAccess` on https://www.coop.se/handla/
-- Retrieved: 2026-05-22T18:46:18.919Z for 14 added Stora Coop Karlskoga rows; previous retained rows retrieved 2026-05-22T15:07:27.837Z, 2026-05-22T16:05:03.230Z, 2026-05-22T16:55:10.087Z, 2026-05-22T16:34:51.000Z, 2026-05-22T18:13:24.527Z
+- Retrieved: 2026-05-22T19:36:22.255Z for 501 added rows across 26 Coop branches; previous retained rows retrieved 2026-05-22T15:07:27.837Z, 2026-05-22T16:05:03.230Z, 2026-05-22T16:55:10.087Z, 2026-05-22T16:34:51.000Z, 2026-05-22T18:13:24.527Z, 2026-05-22T18:46:18.919Z
 - Added this iteration: 015320 Coop Västerhaninge Centrum; 245200 Coop Haparanda; 163900 Coop Sunne; 163500 Coop Hagfors; 136251 Coop Hunnebostrand; 135220 Coop Kungshamn; 205150 Coop Sandviken; 066452 Coop Torup; 075220 Coop Sävsjö; 086811 Coop Högsby; 165500 Coop Sysslebäck; 196311 Coop Sollerön; 235160 Coop Byske; 235180 Coop Norsjö; 235200 Coop Malå
 - Added this iteration (worker B follow-up): 235300 Coop Tärnaby; 235380 Coop Burträsk; 235420 Coop Nordmaling; 235430 Coop Storuman; 235480 Coop Robertsfors; 235920 Coop Hammarstrand; 235960 Coop Åre; 235980 Coop Järpen; 236030 Coop Bjurholm; 235600 Coop Kramfors; 235900 Coop Strömsund; 235410 Coop Vännäs; 235510 Coop Ånge; 135030 Coop Lysekil
 - Added this iteration (worker B second follow-up): 074400 Coop Tranås; 245040 Coop Älvsbyn; 086804 Coop Kolberga; 083700 Coop Flanaden
 - Added this iteration (worker B third follow-up): 105860 Stora Coop Stadion. Flyer PDF offer prices were verified from `https://dr.coop.se/Butik/Stora-Coop-Stadion`; ordinary prices came from the store-scoped product search URL listed in `apps/web/src/lib/ingested/coop.ts`.
 - Added this iteration (worker B fourth follow-up): 163120 Stora Coop Karlskoga. Current flyer hash matched the already-ingested Värmland Stora Coop flyer group; ordinary prices came from the store-scoped product search URL listed in apps/web/src/lib/ingested/coop.ts.
+- Added this iteration (worker B fifth follow-up): 055500 Coop Stenbärsvägen Nyköping; 075600 Coop Kristinedal; 135040 Coop Älvängen; 235610 Coop Sollefteå; 165250 Coop Charlottenberg; 196170 Coop Sälen; 195520 Coop Rättvik; 195070 Coop Orsa; 195040 Coop Säter; 185261 Coop Skinnskatteberg; 184400 Coop Fagersta; 035440 Coop Tierp; 035400 Stora Coop Östhammar; 156000 Coop Änghagen Lidköping; 155550 Coop Vipans Gränd Skövde; 155000 Coop Sydport Mariestad; 154900 Coop Tidaholm; 154000 Coop Falköping; 126406 Coop Gamlestaden; 126350 Coop Eriksberg; 123000 Coop Stenungsund; 030760 Coop Tyresö Centrum; 185010 Coop Pilgatan Västerås; 106433 Coop Simrishamn; 035000 Coop Daglivs; 133700 Coop Kronhjorten. Coop product search returned promotion objects with ordinary and offer prices for these store-scoped branches; current flyer URLs and validity came from the public store API.
 - Stores:
   - 251300, Stora Coop Boländerna, Uppsala, 26 real discount rows
   - 252700, Stora Coop Bromma, Bromma, 24 real discount rows
@@ -141,8 +142,34 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
   - 105630, Stora Coop Burlöv, Arlöv, 4 real discount rows
   - 105810, Coop Forum Jägersro, Malmö, 6 real discount rows
   - 163120, Stora Coop Karlskoga, Karlskoga, 14 real discount rows
+  - 055500, Coop Stenbärsvägen Nyköping, Nyköping, 21 real discount rows
+  - 075600, Coop Kristinedal, Jönköping, 18 real discount rows
+  - 135040, Coop Älvängen, Älvängen, 21 real discount rows
+  - 235610, Coop Sollefteå, Sollefteå, 18 real discount rows
+  - 165250, Coop Charlottenberg, Charlottenberg, 17 real discount rows
+  - 196170, Coop Sälen, Sälen, 15 real discount rows
+  - 195520, Coop Rättvik, Rättvik, 19 real discount rows
+  - 195070, Coop Orsa, Orsa, 19 real discount rows
+  - 195040, Coop Säter, Säter, 16 real discount rows
+  - 185261, Coop Skinnskatteberg, Skinnskatteberg, 18 real discount rows
+  - 184400, Coop Fagersta, Fagersta, 19 real discount rows
+  - 035440, Coop Tierp, Tierp, 18 real discount rows
+  - 035400, Stora Coop Östhammar, Östhammar, 18 real discount rows
+  - 156000, Coop Änghagen Lidköping, Lidköping, 20 real discount rows
+  - 155550, Coop Vipans Gränd Skövde, Skövde, 21 real discount rows
+  - 155000, Coop Sydport Mariestad, Mariestad, 22 real discount rows
+  - 154900, Coop Tidaholm, Tidaholm, 22 real discount rows
+  - 154000, Coop Falköping, Falköping, 18 real discount rows
+  - 126406, Coop Gamlestaden, Göteborg, 16 real discount rows
+  - 126350, Coop Eriksberg, Göteborg, 22 real discount rows
+  - 123000, Coop Stenungsund, Stenungsund, 20 real discount rows
+  - 030760, Coop Tyresö Centrum, Tyresö, 21 real discount rows
+  - 185010, Coop Pilgatan Västerås, Västerås, 21 real discount rows
+  - 106433, Coop Simrishamn, Simrishamn, 20 real discount rows
+  - 035000, Coop Daglivs, Stockholm, 21 real discount rows
+  - 133700, Coop Kronhjorten, Trollhättan, 20 real discount rows
 - Flyer validity: 2026-05-18T00:00:00 through 2026-05-24T23:59:59
-- Real current flyer discount rows fetched: 2234
+- Real current flyer discount rows fetched: 2735
 
 Every weekly discount row includes Coop product id/EAN, product name, brand, package label, ordinary B2C SEK price, offer SEK price, comparative offer price when present, promotion id/copy, MedMera requirement, store/region, validity, flyer URL, store API source URL, product search URL, and retrieval timestamp.
 
