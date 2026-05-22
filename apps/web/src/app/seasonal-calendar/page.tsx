@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { seasonalProduceCalendar } from '@/lib/verified-data';
+import { localSeasonalPicks, seasonalProduceCalendar } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -61,6 +61,64 @@ export default function SeasonalCalendarPage() {
             </Link>
           ))}
         </div>
+      </Card>
+
+      <Card className="mt-6 border-lime-200 bg-lime-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-lime-800">{localSeasonalPicks.persona} evidence</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Local & seasonal picks</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Local means originEvidence from an explicit Swedish-origin label. Seasonal means seasonalEvidence from
+              historicalMonthlyAverage rows. No carbon or harvest claim is inferred from either signal.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-lime-900 shadow-sm">
+            {localSeasonalPicks.status.replaceAll('_', ' ')}
+          </div>
+        </div>
+
+        <div className="mt-5 grid gap-5 xl:grid-cols-[1fr_1fr]">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-lime-800">originEvidence · explicit Swedish-origin label</p>
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
+              {localSeasonalPicks.localOriginRows.map((row) => (
+                <Link className="rounded-2xl border border-lime-200 bg-white p-4 shadow-sm hover:border-lime-700" href={`/products/${row.slug}`} key={row.slug}>
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-lime-800">{row.lowestChain} · {row.lowestPriceLabel}</p>
+                  <h3 className="mt-2 text-lg font-black text-slate-950">{row.productName}</h3>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">{row.brand} · {row.categoryLabel}</p>
+                  <ul className="mt-3 space-y-2 text-xs font-bold text-slate-700">
+                    {row.originEvidence.map((evidence) => (
+                      <li className="rounded-xl bg-lime-100 p-3 text-lime-950" key={evidence}>{evidence}</li>
+                    ))}
+                  </ul>
+                  <p className="mt-3 rounded-xl bg-slate-50 p-3 text-xs font-semibold leading-5 text-slate-700">{row.claimBoundary}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">seasonalEvidence · historical monthly price rows</p>
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
+              {localSeasonalPicks.seasonalEvidenceRows.map((row) => (
+                <Link className="rounded-2xl border border-emerald-200 bg-white p-4 shadow-sm hover:border-emerald-700" href={`/products/${row.slug}`} key={row.slug}>
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-emerald-800">{row.bestBuyMonth} · {row.confidenceLabel}</p>
+                  <h3 className="mt-2 text-lg font-black text-slate-950">{row.productName}</h3>
+                  <p className="mt-3 rounded-xl bg-emerald-100 p-3 text-sm font-black text-emerald-950">historicalMonthlyAverage {row.historicalMonthlyAverageLabel}</p>
+                  <p className="mt-3 rounded-xl bg-slate-50 p-3 text-xs font-semibold leading-5 text-slate-700">{row.seasonalEvidence}</p>
+                  <p className="mt-3 rounded-xl bg-slate-50 p-3 text-xs font-semibold leading-5 text-slate-700">{row.claimBoundary}</p>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <ul className="mt-5 grid gap-3 text-sm font-semibold leading-6 text-slate-700 md:grid-cols-2">
+          {localSeasonalPicks.guardrails.map((guardrail) => (
+            <li className="rounded-2xl bg-white p-4" key={guardrail}>• {guardrail}</li>
+          ))}
+        </ul>
       </Card>
 
       <Card className="mt-6">

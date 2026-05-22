@@ -1236,6 +1236,23 @@ describe('verified-data UI', () => {
     assert.match(sitemap, /entry\('\/seasonal-calendar'/);
   });
 
+  it('surfaces eco-conscious local and seasonal picks without origin or carbon invention', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/seasonal-calendar/page.tsx');
+
+    assert.match(verified, /export const localSeasonalPicks = /);
+    assert.match(verified, /Swedish origin label/);
+    assert.match(verified, /historicalMonthlyAverage/);
+    assert.match(verified, /from_sweden|swedish_flag/);
+    assert.match(route, /localSeasonalPicks/);
+    assert.match(route, /Local & seasonal picks/);
+    assert.match(route, /originEvidence/);
+    assert.match(route, /seasonalEvidence/);
+    assert.match(route, /No carbon or harvest claim/);
+    assert.match(route, /explicit Swedish-origin label/i);
+    assert.doesNotMatch(route, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
   it('surfaces an eco-conscious sustainable-brand filter from verified label evidence', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/categories/page.tsx');
