@@ -2,9 +2,9 @@
 
 - Source: official OpenFoodFacts world data export
 - Source URL: https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz
-- Retrieved: 2026-05-22T09:37:14.621Z
-- Candidate barcode count checked from current Willys/Hemkop/Coop ingested rows: 784
-- Real rows fetched: 403 barcode+nutrition rows matched to existing ingested retailer products
+- Retrieved: 2026-05-22T09:54:39.728Z
+- Candidate barcode count checked from current Willys/Hemkop/Coop ingested rows: 786
+- Real rows fetched: 404 barcode+nutrition rows matched to existing ingested retailer products
 - Connector: packages/ingestion/src/connectors/openfoodfacts.ts
 - Web wire: apps/web/src/lib/ingested/openfoodfacts.ts
 
