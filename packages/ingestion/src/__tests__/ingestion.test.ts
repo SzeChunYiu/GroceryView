@@ -5,6 +5,8 @@ import {
   buildCoopSearchUrl,
   buildCoopStoreInfoUrl,
   buildCoopStoresUrl,
+  buildCityGrossProductsUrl,
+  buildCityGrossStoresUrl,
   buildDailyConnectorConfigsFromEnv,
   DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS,
   DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS,
@@ -32,6 +34,9 @@ import {
   fetchOpenFoodFactsRetailerEnrichments,
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
+  fetchCityGrossProducts,
+  fetchCityGrossProductsForAllStores,
+  fetchCityGrossStores,
   fetchCoopPublicServiceAccess,
   fetchCoopProducts,
   fetchCoopStores,
@@ -54,6 +59,7 @@ import {
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
+  GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL,
   GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
@@ -1494,6 +1500,141 @@ describe('fetchMatpriskollenOffers', () => {
     });
 
     assert.equal(rows.length, 1);
+  });
+});
+
+describe('fetchCityGrossProducts', () => {
+  it('fetches City Gross public store metadata from PageData stores', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify([{
+        data: {
+          id: 3094,
+          type: 'StorePage',
+          storeName: 'Borås',
+          siteId: 21,
+          url: '/butiker/boras/',
+          storeLocation: { coordinates: '57.7141742,12.866981900000042' }
+        }
+      }]), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const stores = await fetchCityGrossStores({
+      fetchImpl,
+      maxRows: 1,
+      retrievedAt: '2026-05-22T12:40:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [buildCityGrossStoresUrl()]);
+    assert.deepEqual(stores, [{
+      storeId: '21',
+      name: 'Borås',
+      address: '',
+      city: 'Borås',
+      latitude: 57.7141742,
+      longitude: 12.866981900000042,
+      sourceUrl: buildCityGrossStoresUrl(),
+      url: 'https://www.citygross.se/butiker/boras/',
+      retrievedAt: '2026-05-22T12:40:00.000Z'
+    }]);
+  });
+
+  it('fetches City Gross public product prices for a branch', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      return new Response(JSON.stringify({
+        items: [{
+          id: '100001971_ST',
+          gtin: '24000124962',
+          name: 'Pear Halves In Juice',
+          brand: 'DEL MONTE',
+          category: 'Desserter & glasstillbehör',
+          descriptiveSize: '415/230G',
+          url: '/matvaror/skafferiet/del-monte-pear-halves-in-juice-p100001971_ST',
+          images: [{ url: '24000124962_C1N1.jpg' }],
+          productStoreDetails: {
+            prices: {
+              currentPrice: { price: 31.5, unit: 'PCE', comparativePrice: 136.96, comparativePriceUnit: 'KGM' },
+              ordinaryPrice: { price: 39.9, unit: 'PCE' }
+            },
+            hasDiscount: true
+          }
+        }],
+        totalCount: 1
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCityGrossProducts({
+      fetchImpl,
+      siteId: '21',
+      query: 'kaffe',
+      maxRows: 1,
+      retrievedAt: '2026-05-22T12:41:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [buildCityGrossProductsUrl({ siteId: '21', query: 'kaffe', take: 1, skip: 0 })]);
+    assert.deepEqual(rows, [{
+      code: '100001971_ST',
+      gtin: '24000124962',
+      name: 'Pear Halves In Juice',
+      brand: 'DEL MONTE',
+      category: 'Desserter & glasstillbehör',
+      packageText: '415/230G',
+      storeId: '21',
+      price: 31.5,
+      regularPrice: 39.9,
+      unitPrice: 136.96,
+      unitPriceUnit: 'KGM',
+      priceText: '31.50 SEK',
+      productUrl: 'https://www.citygross.se/matvaror/skafferiet/del-monte-pear-halves-in-juice-p100001971_ST',
+      imageUrl: 'https://www.citygross.se/images/24000124962_C1N1.jpg',
+      sourceUrl: buildCityGrossProductsUrl({ siteId: '21', query: 'kaffe', take: 1, skip: 0 }),
+      retrievedAt: '2026-05-22T12:41:00.000Z'
+    }]);
+  });
+
+  it('can expand City Gross product prices across the live store catalog', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/PageData/stores')) {
+        return new Response(JSON.stringify([
+          { data: { storeName: 'Borås', siteId: 21, url: '/butiker/boras/', storeLocation: { coordinates: '57.7141742,12.8669819' } } },
+          { data: { storeName: 'Bromma', siteId: 22, url: '/butiker/bromma/', storeLocation: { coordinates: '59.351,17.946' } } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const siteId = new URL(String(url)).searchParams.get('siteId') ?? 'unknown';
+      return new Response(JSON.stringify({
+        items: [{
+          id: `citygross-product-${siteId}`,
+          name: `City Gross product ${siteId}`,
+          brand: 'Garant',
+          category: 'Pantry',
+          descriptiveSize: '500 g',
+          productStoreDetails: {
+            prices: { currentPrice: { price: siteId === '21' ? 10 : 11, unit: 'PCE' } }
+          }
+        }],
+        totalCount: 1
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCityGrossProductsForAllStores({
+      fetchImpl,
+      maxStores: 2,
+      maxRowsPerStore: 1,
+      queries: ['kaffe'],
+      retrievedAt: '2026-05-22T12:42:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCityGrossStoresUrl(),
+      buildCityGrossProductsUrl({ siteId: '21', query: 'kaffe', take: 1, skip: 0 }),
+      buildCityGrossProductsUrl({ siteId: '22', query: 'kaffe', take: 1, skip: 0 })
+    ]);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['21', 10], ['22', 11]]);
   });
 });
 
@@ -3070,6 +3211,63 @@ describe('daily ingestion runner', () => {
     assert.equal(observationInsert?.params[2], 'store-db-2');
     assert.equal(observationInsert?.params[7], 45);
     assert.equal(observationInsert?.params[16], true);
+  });
+
+  it('materializes native City Gross all-store public product prices into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T12:45:00.000Z',
+      connectors: [{
+        connectorId: 'city-gross-public-products-all-stores',
+        chainId: 'city_gross',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL}?queries=kaffe&maxStores=1&maxRowsPerStore=1`,
+        parserVersion: 'citygross-products-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '21', name: 'City Gross Borås', address: 'City Gross Borås', city: 'Borås' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url).includes('/PageData/stores')) {
+          return new Response(JSON.stringify([
+            { data: { storeName: 'City Gross Borås', siteId: 21, url: '/butiker/boras/', storeLocation: { coordinates: '57.7141742,12.8669819' } } }
+          ]), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({
+          items: [{
+            id: '100001971_ST',
+            gtin: '24000124962',
+            name: 'Pear Halves In Juice',
+            brand: 'DEL MONTE',
+            category: 'Desserter',
+            descriptiveSize: '415/230G',
+            productStoreDetails: {
+              prices: {
+                currentPrice: { price: 31.5, unit: 'PCE', comparativePrice: 136.96, comparativePriceUnit: 'KGM' },
+                ordinaryPrice: { price: 39.9, unit: 'PCE' }
+              },
+              hasDiscount: true
+            }
+          }],
+          totalCount: 1
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildCityGrossStoresUrl(),
+      buildCityGrossProductsUrl({ siteId: '21', query: 'kaffe', take: 1, skip: 0 })
+    ]);
+    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+    assert.equal(observationInsert?.params[2], 'store-db-2');
+    assert.equal(observationInsert?.params[7], 31.5);
+    assert.equal(observationInsert?.params[8], 39.9);
   });
 
   it('fails closed before persistence when store-scoped prices omit configured branch metadata', async () => {

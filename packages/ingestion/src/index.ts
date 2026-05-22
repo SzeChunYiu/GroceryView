@@ -10,6 +10,10 @@ import {
   type SourceRunRecord
 } from '@groceryview/db';
 import {
+  fetchCityGrossProductsForAllStores,
+  type CityGrossProduct
+} from './connectors/citygross.js';
+import {
   fetchCoopWeeklyDiscountsForAllStores,
   type CoopWeeklyDiscount
 } from './connectors/coop.js';
@@ -24,6 +28,7 @@ import {
 
 export * from './connectors/openfoodfacts.js';
 export * from './connectors/overpass.js';
+export * from './connectors/citygross.js';
 export * from './connectors/coop.js';
 export * from './connectors/hemkop.js';
 export * from './connectors/ica.js';
@@ -1645,6 +1650,27 @@ function coopWeeklyDiscountToDailyItem(row: CoopWeeklyDiscount): RetailerConnect
   };
 }
 
+function cityGrossProductToDailyItem(row: CityGrossProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `citygross-${stableKeyPart(row.gtin || row.code)}`,
+    categoryId: stableKeyPart(row.category || 'city-gross-products'),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    regularPrice: row.regularPrice !== null && row.regularPrice > row.price ? row.regularPrice : undefined,
+    promoText: row.regularPrice !== null && row.regularPrice > row.price ? 'City Gross discounted public price' : undefined,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
 function dailyNativeSnapshotResult(input: {
   plan: RetailerConnectorRunPlan;
   retrievedAt: string;
@@ -1709,6 +1735,20 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(coopWeeklyDiscountToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchCityGrossProductsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
+      pageSize: dailyNativeNumberParam(url, 'pageSize'),
+      queries: dailyNativeStringListParam(url, 'queries'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(cityGrossProductToDailyItem) });
   }
 
   return await fetchRetailerConnectorSnapshot(plan, options);
@@ -2284,6 +2324,7 @@ export const requiredDailyIngestionChainIds = [
 export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/willys/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/hemkop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
+export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
 
 const requireForDailyIngestion = createRequire(import.meta.url);
 

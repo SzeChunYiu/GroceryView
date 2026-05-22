@@ -5,7 +5,7 @@ function toDailyStoreConfig(store) {
   return {
     storeId: store.storeId,
     name: store.name,
-    address: store.address,
+    address: store.address || store.name,
     city: store.city,
     countryCode: store.countryCode ?? 'SE',
     ...(store.latitude === null || store.latitude === undefined ? {} : { latitude: store.latitude }),
@@ -50,22 +50,32 @@ export async function printDailyConnectorStores({ fetchers, selfTest = false } =
       city: 'Krylbo',
       latitude: 60.1307271,
       longitude: 16.213442
+    }],
+    fetchCityGrossStores: async () => [{
+      storeId: '21',
+      name: 'City Gross Borås',
+      address: '',
+      city: 'Borås',
+      latitude: 57.7141742,
+      longitude: 12.8669819
     }]
   } : await loadStoreFetchers());
 
-  const [willysStores, hemkopStores, coopStores] = await Promise.all([
+  const [willysStores, hemkopStores, coopStores, cityGrossStores] = await Promise.all([
     source.fetchWillysStores({ online: true }),
     source.fetchHemkopStores({ online: true }),
-    source.fetchCoopStores()
+    source.fetchCoopStores(),
+    source.fetchCityGrossStores()
   ]);
 
   return {
     generatedAt: new Date().toISOString(),
-    supportedChains: ['willys', 'hemkop', 'coop'],
+    supportedChains: ['willys', 'hemkop', 'coop', 'city_gross'],
     storesByChain: {
       willys: willysStores.map(toDailyStoreConfig),
       hemkop: hemkopStores.map(toDailyStoreConfig),
-      coop: coopStores.map(toDailyStoreConfig)
+      coop: coopStores.map(toDailyStoreConfig),
+      city_gross: cityGrossStores.map(toDailyStoreConfig)
     }
   };
 }
