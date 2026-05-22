@@ -565,6 +565,54 @@ describe('compareBasketStrategies', () => {
     assert.equal(result.savingsVsBestSingleStore, 2);
     assert.equal(result.splitStoreCount, 2);
   });
+
+  it('counts member prices only for enabled loyalty stores and discloses excluded member rows', () => {
+    const result = compareBasketStrategies({
+      favoriteStoreIds: ['willys-odenplan', 'coop-medborgarplatsen'],
+      enabledMemberStoreIds: ['willys-odenplan'],
+      items: [
+        {
+          productId: 'coffee',
+          quantity: 1,
+          prices: [
+            { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 59.9, priceType: 'shelf' },
+            { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 49.9, priceType: 'member' },
+            { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 55.9, priceType: 'shelf' },
+            { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 45.9, priceType: 'member' }
+          ]
+        },
+        {
+          productId: 'bread',
+          quantity: 2,
+          prices: [
+            { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 36.9, priceType: 'shelf' },
+            { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 34.9, priceType: 'member' },
+            { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 33.9, priceType: 'shelf' },
+            { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 31.9, priceType: 'member' }
+          ]
+        }
+      ]
+    });
+
+    assert.equal(result.cheapestByProduct.total, 117.7);
+    assert.deepEqual(result.cheapestByProduct.assignments.map((assignment) => ({
+      productId: assignment.productId,
+      storeId: assignment.storeId,
+      priceType: assignment.priceType,
+      memberSavings: assignment.memberSavings ?? 0
+    })), [
+      { productId: 'coffee', storeId: 'willys-odenplan', priceType: 'member', memberSavings: 10 },
+      { productId: 'bread', storeId: 'coop-medborgarplatsen', priceType: 'shelf', memberSavings: 0 }
+    ]);
+    assert.equal(result.bestSingleStore?.storeId, 'willys-odenplan');
+    assert.equal(result.bestSingleStore?.total, 119.7);
+    assert.equal(result.memberSavingsTotal, 10);
+    assert.deepEqual(result.memberPriceStoreIds, ['willys-odenplan']);
+    assert.deepEqual(result.excludedMemberPriceProductIds, [
+      'coffee@coop-medborgarplatsen',
+      'bread@coop-medborgarplatsen'
+    ]);
+  });
 });
 
 describe('summarizeStoreBasketCoverage', () => {

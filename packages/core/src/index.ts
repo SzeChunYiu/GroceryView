@@ -273,6 +273,7 @@ export type BasketInputItem = {
 
 export type BasketComparisonInput = {
   favoriteStoreIds: string[];
+  enabledMemberStoreIds?: string[];
   items: BasketInputItem[];
 };
 
@@ -323,6 +324,8 @@ export type BasketAssignment = {
   quantity: number;
   unitPrice: number;
   lineTotal: number;
+  priceType: WatchlistPriceType;
+  memberSavings?: number;
 };
 
 export type BasketStrategy = {
@@ -344,6 +347,9 @@ export type BasketComparisonResult = {
   savingsVsBestSingleStore: number;
   splitStoreCount: number;
   missingProductIds: string[];
+  memberSavingsTotal: number;
+  memberPriceStoreIds: string[];
+  excludedMemberPriceProductIds: string[];
 };
 
 export type StoreBasketCoverage = {
@@ -1112,18 +1118,41 @@ export type RecurringBasketDigest = {
 
 export function compareBasketStrategies(input: BasketComparisonInput): BasketComparisonResult {
   const favoriteSet = new Set(input.favoriteStoreIds);
+  const enabledMemberSet = new Set(input.enabledMemberStoreIds ?? []);
   const missingProductIds: string[] = [];
+  const excludedMemberPriceProductIds = new Set<string>();
   const assignments: BasketAssignment[] = [];
   const storeTotals = new Map<string, SingleStoreOption>();
+  const memberPriceStoreIds = new Set<string>();
+  let memberSavingsTotal = 0;
 
   for (const item of input.items) {
-    const eligiblePrices = item.prices.filter((price) => favoriteSet.has(price.storeId));
+    const favoritePrices = item.prices.filter((price) => favoriteSet.has(price.storeId));
+    const eligiblePrices = favoritePrices.filter((price) => {
+      if (price.priceType !== 'member') return true;
+      const isEnabled = enabledMemberSet.has(price.storeId);
+      if (!isEnabled) excludedMemberPriceProductIds.add(`${item.productId}@${price.storeId}`);
+      return isEnabled;
+    });
     if (eligiblePrices.length === 0) {
       missingProductIds.push(item.productId);
       continue;
     }
 
+    const bestEligibleByStore = new Map<string, StorePrice>();
     for (const price of eligiblePrices) {
+      const current = bestEligibleByStore.get(price.storeId);
+      if (!current || price.price < current.price) bestEligibleByStore.set(price.storeId, price);
+    }
+
+    const shelfBaselineByStore = new Map<string, StorePrice>();
+    for (const price of favoritePrices) {
+      if (price.priceType === 'member') continue;
+      const current = shelfBaselineByStore.get(price.storeId);
+      if (!current || price.price < current.price) shelfBaselineByStore.set(price.storeId, price);
+    }
+
+    for (const price of bestEligibleByStore.values()) {
       const current = storeTotals.get(price.storeId) ?? {
         storeId: price.storeId,
         storeName: price.storeName,
@@ -1135,16 +1164,27 @@ export function compareBasketStrategies(input: BasketComparisonInput): BasketCom
       storeTotals.set(price.storeId, current);
     }
 
-    const cheapest = eligiblePrices.reduce((best, candidate) =>
+    const cheapest = [...bestEligibleByStore.values()].reduce((best, candidate) =>
       candidate.price < best.price ? candidate : best
     );
+    const priceType = cheapest.priceType ?? 'shelf';
+    const shelfBaseline = shelfBaselineByStore.get(cheapest.storeId);
+    const memberSavings = priceType === 'member' && shelfBaseline && shelfBaseline.price > cheapest.price
+      ? roundMoney((shelfBaseline.price - cheapest.price) * item.quantity)
+      : undefined;
+    if (priceType === 'member') {
+      memberPriceStoreIds.add(cheapest.storeId);
+      memberSavingsTotal = roundMoney(memberSavingsTotal + (memberSavings ?? 0));
+    }
     assignments.push({
       productId: item.productId,
       storeId: cheapest.storeId,
       storeName: cheapest.storeName,
       quantity: item.quantity,
       unitPrice: cheapest.price,
-      lineTotal: roundMoney(cheapest.price * item.quantity)
+      lineTotal: roundMoney(cheapest.price * item.quantity),
+      priceType,
+      memberSavings
     });
   }
 
@@ -1161,7 +1201,10 @@ export function compareBasketStrategies(input: BasketComparisonInput): BasketCom
     bestSingleStore,
     savingsVsBestSingleStore: bestSingleStore ? roundMoney(bestSingleStore.total - cheapestByProduct.total) : 0,
     splitStoreCount: new Set(assignments.map((assignment) => assignment.storeId)).size,
-    missingProductIds
+    missingProductIds,
+    memberSavingsTotal,
+    memberPriceStoreIds: [...memberPriceStoreIds].sort(),
+    excludedMemberPriceProductIds: [...excludedMemberPriceProductIds]
   };
 }
 
