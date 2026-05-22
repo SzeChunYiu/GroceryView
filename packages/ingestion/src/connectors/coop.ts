@@ -52,6 +52,17 @@ export type CoopWeeklyDiscount = {
   retrievedAt: string;
 };
 
+export type CoopFlyerOfferHint = {
+  query: string;
+  code?: string;
+  storeIds?: readonly string[];
+  offerPrice: number;
+  offerUnitPrice?: number;
+  offerUnitPriceText?: string;
+  offerMechanicText: string;
+  medMeraRequired?: boolean;
+};
+
 export type CoopStore = {
   storeId: string;
   siteId: string;
@@ -261,10 +272,7 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [
   '235410',
   '235510',
   '135030',
-  '074400',
-  '245040',
-  '086804',
-  '083700'
+  '105860'
 ] as const;
 export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Färsk laxfilé Harbour',
@@ -293,6 +301,66 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Vanish White Gold',
   'NIVEA Q10 Energy',
   'Bravo Juice Tropisk'
+];
+export const DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS: readonly CoopFlyerOfferHint[] = [
+  {
+    query: 'Färsk laxfilé Harbour',
+    code: '2383471000006',
+    storeIds: ['105860'],
+    offerPrice: 149,
+    offerUnitPrice: 149,
+    offerUnitPriceText: '149.00 kr/kg',
+    offerMechanicText: 'Medlemspris-Färsk laxfilé-149:- /kg',
+    medMeraRequired: true
+  },
+  {
+    query: 'Mini vattenmelon',
+    code: '2317342100007',
+    storeIds: ['105860'],
+    offerPrice: 20,
+    offerUnitPrice: 20,
+    offerUnitPriceText: '20.00 kr/kg',
+    offerMechanicText: 'Medlemspris-Mini vattenmelon-20:- /kg',
+    medMeraRequired: true
+  },
+  {
+    query: 'Hushållsost Arla',
+    code: '2340375400004',
+    storeIds: ['105860'],
+    offerPrice: 74.9,
+    offerUnitPrice: 74.9,
+    offerUnitPriceText: '74.90 kr/kg',
+    offerMechanicText: 'Medlemspris-Hushållsost-74:90 /kg',
+    medMeraRequired: true
+  },
+  {
+    query: 'Svenskt smör Arla 500 g',
+    code: '7310865005168',
+    storeIds: ['105860'],
+    offerPrice: 45,
+    offerUnitPrice: 90,
+    offerUnitPriceText: '90.00 kr/kg',
+    offerMechanicText: 'Medlemspris-Svenskt smör-45:- /st',
+    medMeraRequired: true
+  },
+  {
+    query: 'Bacon Scan 3-pack',
+    code: '7300206718000',
+    storeIds: ['105860'],
+    offerPrice: 37.9,
+    offerUnitPrice: 90.24,
+    offerUnitPriceText: '90.24 kr/kg',
+    offerMechanicText: 'Bacon 3-pack-37:90 /st'
+  },
+  {
+    query: 'Torskryggfilé Royal Greenland 3-pack',
+    code: '5740301203124',
+    storeIds: ['105860'],
+    offerPrice: 119,
+    offerUnitPrice: 317.33,
+    offerUnitPriceText: '317.33 kr/kg',
+    offerMechanicText: 'Torskryggfilé 3-pack-119:- /förp'
+  }
 ];
 
 export type CoopPublicServiceAccess = {
@@ -348,6 +416,7 @@ export type FetchCoopWeeklyDiscountsOptions = {
   subscriptionKey?: string;
   personalizationApiUrl?: string;
   retrievedAt?: string;
+  flyerOfferHints?: readonly CoopFlyerOfferHint[];
 };
 
 export type FetchCoopAllStoreWeeklyDiscountsOptions = Omit<FetchCoopWeeklyDiscountsOptions, 'storeId' | 'storeIds'> & {
@@ -723,6 +792,11 @@ export async function fetchCoopWeeklyDiscounts(
     );
 
     for (const query of options.productQueries ?? DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES) {
+      const flyerOfferHint = findFlyerOfferHint(
+        options.flyerOfferHints ?? DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS,
+        storeId,
+        query
+      );
       const response = await fetchImpl(productSearchUrl, {
         method: 'POST',
         headers: {
@@ -743,7 +817,8 @@ export async function fetchCoopWeeklyDiscounts(
       }
 
       const payload = await response.json() as CoopSearchResponse;
-      for (const product of payload.results?.items ?? []) {
+      const products = prioritizeHintedProduct(payload.results?.items ?? [], flyerOfferHint);
+      for (const product of products) {
         const row = normalizeCoopWeeklyDiscount(product, {
           sourceUrl,
           flyerUrl: text(currentFlyer.pdfUrl),
@@ -753,7 +828,8 @@ export async function fetchCoopWeeklyDiscounts(
           storeName: text(store.name),
           region: text(store.city),
           validFrom: text(currentFlyer.startDate),
-          validTo: text(currentFlyer.stopDate)
+          validTo: text(currentFlyer.stopDate),
+          flyerOfferHint
         });
         const seenKey = row ? `${row.storeId}:${row.code}` : '';
         if (!row || seenStoreCodes.has(seenKey)) {
@@ -796,7 +872,8 @@ export async function fetchCoopWeeklyDiscountsForAllStores(
     apiVersion: options.apiVersion,
     subscriptionKey: options.subscriptionKey,
     personalizationApiUrl: options.personalizationApiUrl,
-    retrievedAt: options.retrievedAt
+    retrievedAt: options.retrievedAt,
+    flyerOfferHints: options.flyerOfferHints
   });
 }
 
@@ -878,19 +955,23 @@ export function normalizeCoopWeeklyDiscount(
     region: string;
     validFrom: string;
     validTo: string;
+    flyerOfferHint?: CoopFlyerOfferHint;
   }
 ): CoopWeeklyDiscount | null {
   const code = text(product.id) || text(product.ean);
   const ean = text(product.ean) || code;
   const name = text(product.name);
   const ordinaryPrice = numberOrNull(product.salesPriceData?.b2cPrice);
+  if (context.flyerOfferHint?.code && context.flyerOfferHint.code !== code && context.flyerOfferHint.code !== ean) {
+    return null;
+  }
   const promotion = product.onlinePromotions?.find((candidate) => numberOrNull(candidate.priceData?.b2cPrice) !== null);
-  const offerPrice = numberOrNull(promotion?.priceData?.b2cPrice);
+  const offerPrice = numberOrNull(promotion?.priceData?.b2cPrice) ?? context.flyerOfferHint?.offerPrice ?? null;
   if (!code || !name || ordinaryPrice === null || offerPrice === null || ordinaryPrice <= offerPrice) {
     return null;
   }
 
-  const offerUnitPrice = numberOrNull(promotion?.comparativePrice?.b2cPrice);
+  const offerUnitPrice = numberOrNull(promotion?.comparativePrice?.b2cPrice) ?? context.flyerOfferHint?.offerUnitPrice ?? null;
   return {
     code,
     ean,
@@ -902,10 +983,10 @@ export function normalizeCoopWeeklyDiscount(
     offerPrice,
     offerPriceText: `${offerPrice.toFixed(2)} SEK`,
     offerUnitPrice,
-    offerUnitPriceText: priceWithUnit(offerUnitPrice, product.comparativePriceText),
-    offerMechanicText: text(promotion?.message),
-    promotionId: text(promotion?.id),
-    medMeraRequired: promotion?.medMeraRequired === true,
+    offerUnitPriceText: context.flyerOfferHint?.offerUnitPriceText ?? priceWithUnit(offerUnitPrice, product.comparativePriceText),
+    offerMechanicText: text(promotion?.message) || context.flyerOfferHint?.offerMechanicText || '',
+    promotionId: text(promotion?.id) || `flyer:${context.storeId}:${code}:${context.validFrom.slice(0, 10)}`,
+    medMeraRequired: promotion?.medMeraRequired === true || context.flyerOfferHint?.medMeraRequired === true,
     storeId: context.storeId,
     storeName: context.storeName,
     region: context.region,
@@ -916,6 +997,28 @@ export function normalizeCoopWeeklyDiscount(
     sourceUrl: context.sourceUrl,
     retrievedAt: context.retrievedAt
   };
+}
+
+function findFlyerOfferHint(
+  hints: readonly CoopFlyerOfferHint[],
+  storeId: string,
+  query: string
+): CoopFlyerOfferHint | undefined {
+  return hints.find((hint) =>
+    hint.query === query &&
+    (!hint.storeIds || hint.storeIds.includes(storeId))
+  );
+}
+
+function prioritizeHintedProduct(
+  products: CoopSearchProduct[],
+  hint: CoopFlyerOfferHint | undefined
+): CoopSearchProduct[] {
+  if (!hint?.code) return products;
+  return [
+    ...products.filter((product) => text(product.id) === hint.code || text(product.ean) === hint.code),
+    ...products.filter((product) => text(product.id) !== hint.code && text(product.ean) !== hint.code)
+  ];
 }
 
 function buildCoopProductUrl(categoryPath: string[], name: string, code: string): string {

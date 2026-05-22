@@ -822,6 +822,67 @@ describe('fetchCoopWeeklyDiscounts', () => {
     assert.equal(rows[1]?.flyerUrl, 'https://dr.coop.se/Butik/Stora-Coop-Bromma');
   });
 
+  it('uses scoped flyer offer hints when the product API omits promotion objects', async () => {
+    const fetchImpl: typeof fetch = async (url) => {
+      if (String(url).includes('/stores/')) {
+        return new Response(JSON.stringify({
+          ledgerAccountNumber: '105860',
+          name: 'Stora Coop Stadion',
+          city: 'Malmö',
+          flyers: [{
+            startDate: '2026-05-18T00:00:00',
+            stopDate: '2026-05-24T23:59:59',
+            current: true,
+            pdfExists: true,
+            pdfUrl: 'https://dr.coop.se/Butik/Stora-Coop-Stadion',
+            isHemmaBilaga: false
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+
+      return new Response(JSON.stringify({
+        results: {
+          items: [{
+            id: '2383471000006',
+            ean: '2383471000006',
+            name: 'Laxfilé',
+            manufacturerName: 'Harbour',
+            packageSizeInformation: '1450 gram/bit ungefärlig vikt',
+            salesPriceData: { b2cPrice: 269 },
+            comparativePriceText: 'kr/kg',
+            onlinePromotions: []
+          }]
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopWeeklyDiscounts({
+      storeIds: ['105860'],
+      productQueries: ['Färsk laxfilé Harbour'],
+      flyerOfferHints: [{
+        query: 'Färsk laxfilé Harbour',
+        code: '2383471000006',
+        storeIds: ['105860'],
+        offerPrice: 149,
+        offerUnitPrice: 149,
+        offerUnitPriceText: '149.00 kr/kg',
+        offerMechanicText: 'Medlemspris-Färsk laxfilé-149:- /kg',
+        medMeraRequired: true
+      }],
+      fetchImpl,
+      subscriptionKey: 'public-test-key',
+      storeApiSubscriptionKey: 'public-store-test-key',
+      retrievedAt: '2026-05-22T16:55:10.087Z'
+    });
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]?.ordinaryPrice, 269);
+    assert.equal(rows[0]?.offerPrice, 149);
+    assert.equal(rows[0]?.promotionId, 'flyer:105860:2383471000006:2026-05-18');
+    assert.equal(rows[0]?.medMeraRequired, true);
+    assert.equal(rows[0]?.flyerUrl, 'https://dr.coop.se/Butik/Stora-Coop-Stadion');
+  });
+
   it('can expand Coop weekly discounts across the live store catalog', async () => {
     const requestedUrls: string[] = [];
     const fetchImpl: typeof fetch = async (url) => {
