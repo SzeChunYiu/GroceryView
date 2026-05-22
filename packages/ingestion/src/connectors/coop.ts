@@ -121,7 +121,25 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Toalettpapper 24-pack Coop',
   'Bacon Scan 3-pack',
   'Grekisk yoghurt Arla Köket 1000 g',
-  'Olivolja Monini 750'
+  'Olivolja Monini 750',
+  'Kalkonbröstfilé Ingelsta',
+  'Danish Crown fläskfilé',
+  'Coop stekfläsk',
+  'Kycklingbröstfilé Guldfågeln mango chili',
+  'Lövbiff fransyska Coop',
+  'Torskryggfilé Royal Greenland 3-pack',
+  'Fläskkarré Dalsjöfors eld rök',
+  'Pepsi Max 20-pack',
+  'Grillkorv Scan tunt skinn',
+  'Lök Gul Eko Änglamark',
+  'Rabarber',
+  'Fazer Lantbröd Havssalt',
+  'Pågen Lingongrova Special',
+  'Engelmanns Salami Milano',
+  'Marabou Chokladpraliner Hjärta',
+  'Vanish White Gold',
+  'NIVEA Q10 Energy',
+  'Bravo Juice Tropisk'
 ];
 
 export type CoopPublicServiceAccess = {
