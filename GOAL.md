@@ -200,6 +200,63 @@ analytics items, pick the next unbuilt persona feature; tag PRs `feat(persona):`
 
 Cross-cutting (every persona benefits, already engine-backed): cross-chain/branch price comparison, price-movement charts (the stock index), Buy/Wait deal signals, personal grocery inflation, watchlist alerts, store map. Each persona is a different *lens* on the same engine — surface the right view for the right person.
 
+## Competitor distillation — real grocery rivals (worldwide)
+
+Full teardown lives in [`COMPETITIVE-ANALYSIS.md`](COMPETITIVE-ANALYSIS.md)
+(verified 2026-05-22, 12 markets). The strategic conclusion that drives the
+backlog below:
+
+- **Every rival worldwide is a list-and-alert utility — none is a terminal.**
+  Matpriskollen (SE), Prej (DK), Kassalapp (NO), Trolley (UK), Reprice (FR),
+  Super Save (PT), the six Australian apps: all do barcode + list + alert +
+  basic history. The charted/indexed/Buy-Wait *terminal* (our north-star above)
+  is unoccupied across the entire field. That is the wedge — and it is portable
+  to every market.
+- **There is no empty developed market.** Sweden, all Nordics, UK, DE, ES, FR,
+  PT, PL and Australia are all taken. Geography is the wrong axis; product
+  differentiation is the right one. Win Sweden on the terminal UX first.
+
+### Steal-list — strong rival features NOT yet in our backlog (one feature = one PR)
+Tag these `feat(steal):`. Same hard rules as every backlog item (real data +
+confidence, reach a driver file, build/typecheck pass).
+
+1. **Browser extension overlay** — show the cheaper alternative *inline on the
+   retailer's own site* (ICA/Coop/Willys online), the way Trolley (UK) and
+   WhichGrocer/GroceryWise (AU) do. Our biggest missing acquisition channel.
+2. **Public price/nutrition API** — documented read API over our DB
+   (Kassalapp's model): developer ecosystem + backlinks + data moat.
+3. **Loyalty-adjusted basket comparison** — the explicitly *unsolved* problem in
+   the UK. No competitor compares a full basket with member pricing factored in.
+   Whoever cracks member-price-aware comparison owns a feature nobody has.
+4. **Split-shop / cheapest-route basket optimizer** — "buy these at Willys,
+   these at Lidl, save X." We already have `compareBasketStrategies` in core;
+   surface it on `/weekly-basket`.
+5. **Flyer / digital-catalog ingestion** — promo coverage pure scraping misses
+   (Blix, Mattilbud, Tańszy Koszyk start from the weekly flyer).
+
+## Market-entry sequencing (Nordic + beyond)
+
+Ranked by *(white space × prize × ease)*, NOT by map adjacency. Detail +
+per-rival feature gaps in [`COMPETITIVE-ANALYSIS.md`](COMPETITIVE-ANALYSIS.md).
+
+1. **Sweden (home) — win first.** Beat Matpriskollen on terminal UX before
+   spreading. A decisively better product in one market validates the wedge.
+2. **Iceland — cheap proof-of-concept.** Genuine white space (only a 74-product
+   state/union tool, no real consumer product). Tiny prize (~380k, 3 chains) but
+   low cost to dominate and a clean case study against zero consumer rival.
+3. **Norway — the real expansion prize.** ~5.5M switch-willing shoppers, and
+   **Kassalapp's open API is a data shortcut** — build the terminal on richer
+   data than we have at home.
+4. **Denmark — only if the terminal decisively beats Prej** (strong incumbent:
+   21+ chains, price history, alarms, barcode matching already shipped).
+5. **Finland — last, NOT first.** Product gap is real but the S-/K-group
+   duopoly *self-defends* with a first-party comparator built into the loyalty
+   app shoppers open daily — a behavioural moat, the hardest kind to dislodge.
+
+> Operator note (2026-05-22): the "Finland + Iceland first" instinct is half
+> right. Iceland yes (white space); Finland is one of the *hardest* entries, not
+> the easiest. Lead with Sweden→Iceland→Norway.
+
 ## Updated by operator only
 
 The CEO MUST NOT edit this file. Only the operator (user or main Claude Code
