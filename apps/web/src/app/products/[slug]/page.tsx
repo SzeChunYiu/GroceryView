@@ -1,6 +1,13 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { calculateDealScore, recommendSmartSwaps, scoreBand, type BrandTier } from '@groceryview/core';
+import {
+  calculateDealScore,
+  recommendSmartSwaps,
+  scoreBand,
+  summarizePriceHistory,
+  summarizePriceHistoryConfidence,
+  type BrandTier
+} from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { pricedProducts } from '@/lib/openprices-products';
@@ -168,6 +175,47 @@ function smartSwapRecommendationsFor(product: NonNullable<ReturnType<typeof find
   };
 }
 
+function priceHistoryBadgeFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  if ('lowestPrice' in product || product.observations.length === 0) {
+    return {
+      available: false,
+      summary: null,
+      disclosure: null,
+      legalCopy: 'observed low only',
+      headline: '52-week-low badge withheld',
+      detail: 'This source has no dated price tape, so the product page does not claim a 52-week low.'
+    };
+  }
+
+  const points = product.observations.map((observation) => ({
+    observedAt: `${observation.date}T00:00:00.000Z`,
+    price: observation.price,
+    storeId: 'openprices-community'
+  }));
+  const summary = summarizePriceHistory(points);
+  const orderedDates = [...product.observations].map((observation) => observation.date).sort((a, b) => a.localeCompare(b));
+  const disclosure = summarizePriceHistoryConfidence({
+    rangeDays: 365,
+    firstObservedAt: `${orderedDates[0]}T00:00:00.000Z`,
+    lastObservedAt: summary.latestObservedAt,
+    observationCount: summary.observedCount,
+    sourceTypesIncluded: ['online'],
+    expectedSourceTypes: ['shelf', 'online', 'flyer'],
+    productScopeKnown: true,
+    storeScopeKnown: false
+  });
+  const legalCopy = disclosure.canClaimLowestInWindow ? 'lowest in observed 365-day window' : 'observed low only';
+
+  return {
+    available: true,
+    summary,
+    disclosure,
+    legalCopy,
+    headline: summary.isNewLow && disclosure.canClaimLowestInWindow ? 'New 52-week low observed' : 'Observed price-history badge',
+    detail: disclosure.detailCopy
+  };
+}
+
 export function generateStaticParams() {
   return [...axfoodProducts.slice(0, 40), ...pricedProducts.slice(0, 40)].map((product) => ({ slug: product.slug }));
 }
@@ -179,6 +227,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const isChain = 'lowestPrice' in product;
   const dealVerdict = dealScoreVerdictFor(product);
   const smartSwaps = smartSwapRecommendationsFor(product);
+  const priceHistoryBadge = priceHistoryBadgeFor(product);
   return (
     <PageShell>
       <Eyebrow>{isChain ? 'Axfood chain product' : 'OpenPrices product'}</Eyebrow>
@@ -258,6 +307,41 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm font-bold text-amber-950">{smartSwaps.caveat}</p>
         )}
         <p className="mt-4 text-xs font-semibold text-slate-500">{smartSwaps.caveat}</p>
+      </Card>
+      <Card className="mt-6 border-sky-200 bg-sky-50/70">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-sky-700">Price tape</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">52-week-low badge</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Calls summarizePriceHistory and summarizePriceHistoryConfidence before showing a low-price claim; missing shelf or flyer evidence falls back to observed low only.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-sky-900">{priceHistoryBadge.legalCopy}</p>
+        </div>
+        {priceHistoryBadge.available && priceHistoryBadge.summary && priceHistoryBadge.disclosure ? (
+          <div className="mt-5 grid gap-3 md:grid-cols-4">
+            <div className="rounded-2xl bg-white/85 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">Badge</p>
+              <p className="mt-2 text-lg font-black text-slate-950">{priceHistoryBadge.headline}</p>
+            </div>
+            <div className="rounded-2xl bg-white/85 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">Latest</p>
+              <p className="mt-2 text-lg font-black text-slate-950">{formatSek(priceHistoryBadge.summary.latestPrice)}</p>
+            </div>
+            <div className="rounded-2xl bg-white/85 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">Observed low</p>
+              <p className="mt-2 text-lg font-black text-slate-950">{formatSek(priceHistoryBadge.summary.lowestPrice)}</p>
+            </div>
+            <div className="rounded-2xl bg-white/85 p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-700">Claim gate</p>
+              <p className="mt-2 text-lg font-black text-slate-950">canClaimLowestInWindow {String(priceHistoryBadge.disclosure.canClaimLowestInWindow)}</p>
+            </div>
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-slate-700">{priceHistoryBadge.detail}</p>
+        )}
+        <p className="mt-4 text-xs font-semibold text-slate-500">{priceHistoryBadge.detail}</p>
       </Card>
       {isChain ? (
         <Card className="mt-6">

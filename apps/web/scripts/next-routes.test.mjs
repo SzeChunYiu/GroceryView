@@ -626,6 +626,19 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
 
+  it('surfaces observed 52-week-low price history badges without overclaiming missing history', async () => {
+    const source = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(source, /summarizePriceHistory/);
+    assert.match(source, /summarizePriceHistoryConfidence/);
+    assert.match(source, /priceHistoryBadgeFor/);
+    assert.match(source, /52-week-low badge/);
+    assert.match(source, /observed low only/);
+    assert.match(source, /canClaimLowestInWindow/);
+    assert.doesNotMatch(source, /@\/lib\/demo-data/);
+    assert.doesNotMatch(source, /@\/components\/sample-data/);
+  });
+
   it('surfaces verified catalogue savings on the compare route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/compare/page.tsx');
