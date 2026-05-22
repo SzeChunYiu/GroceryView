@@ -1,14 +1,17 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { elderlyFixedIncomeBudgetTracker, elderlyStaplesStabilityTracker, personalGroceryInflation, savingsDashboard, studentWeeklyBudgetTracker } from '@/lib/demo-data';
+import { ecoBasketScorecard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
   return routeMetadata('/savings-dashboard');
 }
 
-function formatSek(value: number) {
-  return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
+function formatSek(value: number | null | undefined) {
+  return typeof value === 'number' && Number.isFinite(value)
+    ? new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value)
+    : 'Not reported';
 }
 
 function formatSignedSek(value: number) {
@@ -87,6 +90,51 @@ export default function SavingsDashboardPage() {
           )}
         </Card>
       </div>
+
+      <Card className="mt-6 border-lime-200 bg-lime-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-lime-800">{ecoBasketScorecard.persona}</p>
+        <h2 className="mt-2 text-2xl font-black">Cheaper + greener basket</h2>
+        <p className="mt-2 text-sm font-semibold leading-6 text-slate-700">
+          This scorecard surfaces labelled products that are cheaper than their same-category Axfood average while keeping the environmental claim honest: carbon data unavailable, so GroceryView shows label evidence, savings, and confidence instead of fabricating kg CO2e.
+        </p>
+        <div className="mt-4 grid gap-3 md:grid-cols-3">
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Average ecoScore</p>
+            <p className="mt-2 text-3xl font-black text-lime-900">{ecoBasketScorecard.averageEcoScore ?? 'Not reported'}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">label-evidence score, not emissions</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Basket savings</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{formatSek(ecoBasketScorecard.totalEstimatedSavingsVsCategoryAverage)}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">vs same-category observed prices</p>
+          </div>
+          <div className="rounded-2xl bg-white p-4">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-slate-500">Carbon</p>
+            <p className="mt-2 text-3xl font-black text-slate-950">{ecoBasketScorecard.sourceSummary.carbonKgCo2e ?? 'Unavailable'}</p>
+            <p className="mt-1 text-sm font-semibold text-slate-600">carbon data unavailable, not estimated</p>
+          </div>
+        </div>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          {ecoBasketScorecard.rows.map((row) => (
+            <Link className="rounded-2xl border border-lime-200 bg-white p-4 hover:border-lime-700" href={`/products/${row.slug}`} key={row.slug}>
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="font-black text-slate-950">{row.name}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">{row.brand} · {row.lowestChain} · confidence: {row.confidence}</p>
+                </div>
+                <p className="rounded-full bg-lime-100 px-3 py-1 text-sm font-black text-lime-950">ecoScore {row.ecoScore}</p>
+              </div>
+              <p className="mt-3 text-sm font-bold text-slate-700">{formatSek(row.currentPrice)} current · {formatSek(row.estimatedSavingsVsCategoryAverage)} below category average</p>
+              <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-lime-800">Evidence</p>
+              <p className="mt-1 text-sm text-slate-700">{row.evidence.join(' · ')}</p>
+              <p className="mt-2 text-xs font-semibold text-slate-500">{row.guardrail}</p>
+            </Link>
+          ))}
+        </div>
+        <ul className="mt-4 list-disc space-y-1 pl-5 text-sm font-semibold text-slate-700">
+          {ecoBasketScorecard.guardrails.map((guardrail) => <li key={guardrail}>{guardrail}</li>)}
+        </ul>
+      </Card>
 
       <Card className="mt-6 border-indigo-200 bg-indigo-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-indigo-800">{elderlyFixedIncomeBudgetTracker.persona}</p>

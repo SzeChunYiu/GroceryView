@@ -283,6 +283,102 @@ export const deliveryVsInStoreComparison = {
   engineGuardrails: [...deliveryVsInStoreDeliveryPlan.guardrails, ...deliveryVsInStoreInStorePlan.guardrails]
 };
 
+const openFoodFactsEcoEvidenceByCode = new Map(openFoodFactsCatalog.map((product) => [product.code, product]));
+const explicitEcoLabelNeedles = [
+  'ecological',
+  'organic',
+  'fairtrade',
+  'msc',
+  'sustainable',
+  'carbon',
+  'from_sweden',
+  'swedish_flag',
+  'eu_ecological'
+];
+
+function normalizedEcoEvidence(value: string) {
+  return value.normalize('NFKD').replace(/\p{Diacritic}/gu, '').toLowerCase();
+}
+
+function ecoEvidenceForProduct(product: (typeof axfoodProducts)[number]) {
+  const catalogProduct = openFoodFactsEcoEvidenceByCode.get(product.code);
+  const evidencePool = [
+    ...product.labels,
+    ...(catalogProduct?.labels ?? []),
+    ...(catalogProduct?.categories ?? [])
+  ];
+  const normalizedEvidence = evidencePool.map(normalizedEcoEvidence);
+  const evidence = [
+    normalizedEvidence.some((label) => label.includes('ecological') || label.includes('organic') || label.includes('eu_ecological')) ? 'organic/ecological label' : null,
+    normalizedEvidence.some((label) => label.includes('fairtrade')) ? 'Fairtrade label' : null,
+    normalizedEvidence.some((label) => label.includes('msc') || label.includes('sustainable')) ? 'sustainability label' : null,
+    normalizedEvidence.some((label) => label.includes('from_sweden') || label.includes('swedish_flag')) ? 'Swedish origin label' : null,
+    normalizedEvidence.some((label) => label.includes('carbon')) ? 'carbon-footprint label present' : null
+  ].filter((value): value is string => value !== null);
+  const explicitEvidenceCount = normalizedEvidence.filter((label) => explicitEcoLabelNeedles.some((needle) => label.includes(needle))).length;
+  return {
+    catalogProduct,
+    evidence: [...new Set(evidence)],
+    explicitEvidenceCount
+  };
+}
+
+function categoryAverageLowestPrice(category: string) {
+  const prices = axfoodProducts
+    .filter((product) => product.category === category && Number.isFinite(product.lowestPrice) && product.lowestPrice > 0)
+    .map((product) => product.lowestPrice);
+  return prices.length > 0 ? roundSek(prices.reduce((sum, price) => sum + price, 0) / prices.length) : null;
+}
+
+const ecoBasketRows = axfoodProducts
+  .map((product) => {
+    const { catalogProduct, evidence, explicitEvidenceCount } = ecoEvidenceForProduct(product);
+    const categoryAveragePrice = categoryAverageLowestPrice(product.category);
+    const estimatedSavingsVsCategoryAverage = categoryAveragePrice !== null ? roundSek(categoryAveragePrice - product.lowestPrice) : null;
+    const carbonKgCo2e = null as number | null;
+    if (evidence.length === 0 || estimatedSavingsVsCategoryAverage === null || estimatedSavingsVsCategoryAverage <= 0) return null;
+    return {
+      slug: product.slug,
+      name: product.name,
+      brand: product.brand,
+      category: product.category,
+      lowestChain: product.lowestChain,
+      currentPrice: product.lowestPrice,
+      categoryAveragePrice,
+      estimatedSavingsVsCategoryAverage,
+      evidence,
+      catalogLabels: catalogProduct?.labels ?? [],
+      catalogCategories: catalogProduct?.categories.slice(0, 4) ?? [],
+      carbonKgCo2e,
+      ecoScore: clamp(45 + (evidence.length * 12) + Math.min(18, explicitEvidenceCount * 3), 0, 100),
+      confidence: catalogProduct ? 'medium_openfoodfacts_and_retailer_label' : 'medium_retailer_label',
+      guardrail: 'ecoScore is a label-evidence score; carbon data unavailable for this row.'
+    };
+  })
+  .filter((row): row is NonNullable<typeof row> => row !== null)
+  .sort((a, b) => b.ecoScore - a.ecoScore || b.estimatedSavingsVsCategoryAverage - a.estimatedSavingsVsCategoryAverage)
+  .slice(0, 6);
+
+export const ecoBasketScorecard = {
+  title: 'Cheaper + greener basket',
+  persona: 'Eco-conscious',
+  status: 'visible_label_evidence_scorecard',
+  sourceSummary: {
+    axfoodRows: axfoodProducts.length,
+    openFoodFactsRows: openFoodFactsCatalog.length,
+    carbonKgCo2e: null as number | null
+  },
+  rows: ecoBasketRows,
+  averageEcoScore: ecoBasketRows.length > 0 ? roundSek(ecoBasketRows.reduce((sum, row) => sum + row.ecoScore, 0) / ecoBasketRows.length) : null,
+  totalEstimatedSavingsVsCategoryAverage: roundSek(ecoBasketRows.reduce((sum, row) => sum + row.estimatedSavingsVsCategoryAverage, 0)),
+  guardrails: [
+    'carbon data unavailable: no kg CO2e value is fabricated or inferred from category labels.',
+    'ecoScore uses only visible retailer labels and OpenFoodFacts label/category evidence.',
+    'Savings compare each labelled row against actual same-category Axfood lowest-price rows.',
+    'Rows without positive savings or explicit eco evidence are withheld from the cheaper + greener basket.'
+  ]
+};
+
 function brandTierForAxfoodProduct(product: (typeof axfoodProducts)[number]): BrandTier {
   const brand = product.brand.toLowerCase();
   const labels = product.labels.map((label) => label.toLowerCase());

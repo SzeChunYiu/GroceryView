@@ -857,6 +857,21 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a cheaper and greener basket scorecard without fabricated carbon data', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const source = await read('src/app/savings-dashboard/page.tsx');
+
+    assert.match(verified, /export const ecoBasketScorecard/);
+    assert.match(verified, /openFoodFactsCatalog/);
+    assert.match(verified, /ecoScore/);
+    assert.match(verified, /carbonKgCo2e/);
+    assert.match(source, /ecoBasketScorecard/);
+    assert.match(source, /Cheaper \+ greener basket/);
+    assert.match(source, /carbon data unavailable/i);
+    assert.match(source, /confidence/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces a student weekly budget tracker using the real core budget summary', async () => {
     const source = await read('src/app/savings-dashboard/page.tsx');
     assert.match(source, /studentWeeklyBudgetTracker/);
