@@ -61,6 +61,26 @@ function medianFor(values: number[]) {
   return sorted.length % 2 === 0 ? (sorted[midpoint - 1]! + sorted[midpoint]!) / 2 : sorted[midpoint]!;
 }
 
+function quantileFor(values: number[], quantile: number) {
+  const sorted = [...values].filter((value) => Number.isFinite(value)).sort((a, b) => a - b);
+  if (sorted.length === 0) return null;
+  if (sorted.length === 1) return sorted[0]!;
+  const position = (sorted.length - 1) * clamp(quantile, 0, 1);
+  const lowerIndex = Math.floor(position);
+  const upperIndex = Math.ceil(position);
+  const lowerValue = sorted[lowerIndex]!;
+  const upperValue = sorted[upperIndex]!;
+  return lowerValue + (upperValue - lowerValue) * (position - lowerIndex);
+}
+
+function standardDeviationFor(values: number[]) {
+  const finite = values.filter((value) => Number.isFinite(value));
+  if (finite.length === 0) return null;
+  const mean = finite.reduce((sum, value) => sum + value, 0) / finite.length;
+  const variance = finite.reduce((sum, value) => sum + (value - mean) ** 2, 0) / finite.length;
+  return Math.sqrt(variance);
+}
+
 function latestObservationFor(product: (typeof pricedProducts)[number]) {
   return [...product.observations].sort((a, b) => b.date.localeCompare(a.date))[0];
 }
@@ -452,6 +472,107 @@ function priceVsUsualSignalFor(product: NonNullable<ReturnType<typeof findProduc
   };
 }
 
+function priceTypicalRangeBandFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  if ('lowestPrice' in product || product.observations.length < 5) {
+    return {
+      available: false,
+      title: 'Not enough dated observations',
+      rangePositionLabel: 'typical range withheld',
+      typicalRangeLabel: 'Not reported',
+      volatilityBandLabel: 'Not reported',
+      volatilityPercentLabel: 'Not reported',
+      currentPriceLabel: 'Not reported',
+      medianPriceLabel: 'Not reported',
+      observationCount: 0,
+      detail: "Not enough dated observations exist to calculate a typical range or volatility band from the product's own observed 1-year price tape."
+    };
+  }
+
+  const latest = latestObservationFor(product);
+  const latestObservedAt = latest?.date ?? product.lastObservedAt;
+  const latestTime = Date.parse(`${latestObservedAt}T00:00:00.000Z`);
+  const oneYearAgo = latestTime - 365 * 24 * 60 * 60 * 1000;
+  const windowPoints = product.observations
+    .map((observation) => ({
+      observedAt: observation.date,
+      observedTime: Date.parse(`${observation.date}T00:00:00.000Z`),
+      price: observation.price
+    }))
+    .filter((observation) => Number.isFinite(observation.observedTime) && observation.observedTime >= oneYearAgo && observation.observedTime <= latestTime)
+    .sort((a, b) => a.observedTime - b.observedTime);
+
+  if (!latest || windowPoints.length < 5) {
+    return {
+      available: false,
+      title: 'Not enough dated observations',
+      rangePositionLabel: 'typical range withheld',
+      typicalRangeLabel: 'Not reported',
+      volatilityBandLabel: 'Not reported',
+      volatilityPercentLabel: 'Not reported',
+      currentPriceLabel: latest ? formatSek(latest.price) : 'Not reported',
+      medianPriceLabel: 'Not reported',
+      observationCount: windowPoints.length,
+      detail: 'Not enough dated observations fall inside the 1-year window, so GroceryView does not render a typical range or volatility band.'
+    };
+  }
+
+  const prices = windowPoints.map((point) => point.price);
+  const typicalLow = quantileFor(prices, 0.25);
+  const typicalHigh = quantileFor(prices, 0.75);
+  const medianPrice = medianFor(prices);
+  const standardDeviation = standardDeviationFor(prices);
+  const observedLow = Math.min(...prices);
+  const observedHigh = Math.max(...prices);
+
+  if (typicalLow === null || typicalHigh === null || medianPrice === null || standardDeviation === null) {
+    return {
+      available: false,
+      title: 'Not enough dated observations',
+      rangePositionLabel: 'typical range withheld',
+      typicalRangeLabel: 'Not reported',
+      volatilityBandLabel: 'Not reported',
+      volatilityPercentLabel: 'Not reported',
+      currentPriceLabel: latest ? formatSek(latest.price) : 'Not reported',
+      medianPriceLabel: 'Not reported',
+      observationCount: windowPoints.length,
+      detail: 'The dated observation tape could not produce finite range statistics, so GroceryView withholds the typical range.'
+    };
+  }
+
+  const volatilityLow = clamp(medianPrice - standardDeviation, observedLow, observedHigh);
+  const volatilityHigh = clamp(medianPrice + standardDeviation, observedLow, observedHigh);
+  const volatilityPercent = medianPrice > 0 ? clamp((standardDeviation / medianPrice) * 100, 0, 999) : 0;
+  const currentPrice = latest.price;
+  const rangePositionLabel = currentPrice < typicalLow
+    ? `${formatPct(((typicalLow - currentPrice) / typicalLow) * 100)} below usual range`
+    : currentPrice > typicalHigh
+      ? `${formatPct(((currentPrice - typicalHigh) / typicalHigh) * 100)} above usual range`
+      : 'inside usual range';
+  const disclosure = summarizePriceHistoryConfidence({
+    rangeDays: 365,
+    firstObservedAt: `${windowPoints[0]!.observedAt}T00:00:00.000Z`,
+    lastObservedAt: `${windowPoints.at(-1)!.observedAt}T00:00:00.000Z`,
+    observationCount: windowPoints.length,
+    sourceTypesIncluded: ['online'],
+    expectedSourceTypes: ['shelf', 'online', 'flyer'],
+    productScopeKnown: true,
+    storeScopeKnown: false
+  });
+
+  return {
+    available: true,
+    title: 'Typical range / volatility band',
+    rangePositionLabel,
+    typicalRangeLabel: `${formatSek(typicalLow)}–${formatSek(typicalHigh)}`,
+    volatilityBandLabel: `${formatSek(volatilityLow)}–${formatSek(volatilityHigh)}`,
+    volatilityPercentLabel: formatPct(volatilityPercent),
+    currentPriceLabel: formatSek(currentPrice),
+    medianPriceLabel: formatSek(medianPrice),
+    observationCount: windowPoints.length,
+    detail: `Current price is ${rangePositionLabel}; usually ${formatSek(typicalLow)}–${formatSek(typicalHigh)} from the middle 50% of the product's own observed 1-year price tape. Volatility band uses median ± one standard deviation (${formatPct(volatilityPercent)}). No forecast or seasonal prediction is shown. ${disclosure.detailCopy}`
+  };
+}
+
 function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduct>>): PriceChartTerminalModel {
   const emptyWindows: PriceChartTerminalWindow[] = timeframeWindows.map((window) => ({
     label: window.label,
@@ -540,6 +661,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const priceHistoryBadge = priceHistoryBadgeFor(product);
   const priceHistoryRangeBadges = priceHistoryRangeBadgesFor(product);
   const priceVsUsualSignal = priceVsUsualSignalFor(product);
+  const typicalRangeBand = priceTypicalRangeBandFor(product);
   const priceChartTerminal = priceChartTerminalFor(product);
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
   const productJsonLd = productJsonLdFor(product);
@@ -670,6 +792,33 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-amber-950">{priceVsUsualSignal.detail}</p>
         )}
         <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{priceVsUsualSignal.detail}</p>
+      </Card>
+      <Card className="mt-6 overflow-hidden border-violet-200 bg-violet-50/80">
+        <div className="grid gap-5 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-violet-800">typical range tape</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Typical range / volatility band</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Uses only dated OpenPrices observations for this product. The usual range is the middle 50% of the product&apos;s own observed 1-year price tape; the volatility band is median ± one standard deviation.
+            </p>
+          </div>
+          <div className="rounded-[2rem] bg-slate-950 p-5 text-right text-white shadow-sm">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-violet-300">{typicalRangeBand.title}</p>
+            <p className="mt-2 text-3xl font-black">{typicalRangeBand.rangePositionLabel}</p>
+            <p className="mt-1 text-xs font-semibold text-slate-300">{typicalRangeBand.observationCount} observed points</p>
+          </div>
+        </div>
+        {typicalRangeBand.available ? (
+          <div className="mt-5 grid gap-3 md:grid-cols-4">
+            <p className="rounded-2xl bg-white/90 p-4 text-sm font-bold text-slate-700">Current: <span className="block text-lg font-black text-slate-950">{typicalRangeBand.currentPriceLabel}</span></p>
+            <p className="rounded-2xl bg-white/90 p-4 text-sm font-bold text-slate-700">Typical range: <span className="block text-lg font-black text-slate-950">{typicalRangeBand.typicalRangeLabel}</span></p>
+            <p className="rounded-2xl bg-white/90 p-4 text-sm font-bold text-slate-700">Volatility band: <span className="block text-lg font-black text-slate-950">{typicalRangeBand.volatilityBandLabel}</span></p>
+            <p className="rounded-2xl bg-white/90 p-4 text-sm font-bold text-slate-700">volatilityPercentLabel <span className="block text-lg font-black text-violet-900">{typicalRangeBand.volatilityPercentLabel}</span></p>
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-amber-950">{typicalRangeBand.detail}</p>
+        )}
+        <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{typicalRangeBand.detail}</p>
       </Card>
       <Card className="mt-6 border-indigo-200 bg-indigo-50/70">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">

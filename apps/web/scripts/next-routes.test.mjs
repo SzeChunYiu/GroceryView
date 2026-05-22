@@ -700,6 +700,24 @@ ${seo}`;
     assert.doesNotMatch(source, /@\/components\/sample-data/);
   });
 
+  it('surfaces a factual typical price range and volatility band from observed history', async () => {
+    const source = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(source, /priceTypicalRangeBandFor/);
+    assert.match(source, /quantileFor/);
+    assert.match(source, /typicalRangeLabel/);
+    assert.match(source, /volatilityBandLabel/);
+    assert.match(source, /volatilityPercentLabel/);
+    assert.match(source, /Typical range \/ volatility band/);
+    assert.match(source, /middle 50%/);
+    assert.match(source, /usually/);
+    assert.match(source, /product's own observed 1-year price tape/);
+    assert.match(source, /No forecast or seasonal prediction is shown/);
+    assert.match(source, /Not enough dated observations/);
+    assert.doesNotMatch(source, /@\/lib\/demo-data/);
+    assert.doesNotMatch(source, /@\/components\/sample-data/);
+  });
+
   it('surfaces product multi-timeframe price charts using the real core chart adapter and lightweight-charts', async () => {
     const product = await read('src/app/products/[slug]/page.tsx');
     const chart = await read('src/components/price-chart-terminal.tsx');
