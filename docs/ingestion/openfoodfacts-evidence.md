@@ -2,21 +2,22 @@
 
 - Source: official OpenFoodFacts world data export
 - Source URL: https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz
-- Retrieved: 2026-05-22T10:35:19.826Z
-- Candidate barcode count checked from current Willys/Hemkop/Coop/ICA reklamblad ingested rows: 1113
+- Retrieved: 2026-05-22T10:42:43.672Z
+- Candidate barcode count checked from committed Willys/Hemkop/Coop/ICA reklamblad ingested rows: 1115
 - ICA reklamblad candidate barcode count: 346
-- Real rows fetched: 539 barcode+nutrition rows matched to existing ingested retailer products
+- Real rows fetched: 540 barcode+nutrition rows matched to existing ingested retailer products
+- ICA-matched emitted rows: 143
 - Connector: packages/ingestion/src/connectors/openfoodfacts.ts
 - Web wire: apps/web/src/lib/ingested/openfoodfacts.ts
 
-The direct product API returned HTTP 429 during the 2026-05-22 probe. The official OpenFoodFacts export URL under `world.openfoodfacts.org/data` streamed successfully, so this iteration uses that public export. Candidate barcodes came only from committed `origin/main` Willys/Hemkop/Coop/ICA reklamblad ingested rows: Coop `ean` fields, ICA reklamblad `eans` fields, and Axfood EANs embedded in Willys/Hemkop image URLs. No-match and nutrition-empty products were skipped. Every emitted row includes its exact export source marker in `sourceUrl`, a product URL, and the retailer rows it matched by barcode.
+The official OpenFoodFacts export URL under `world.openfoodfacts.org/data` streamed successfully, so this iteration uses that public export. Candidate barcodes came only from committed Willys/Hemkop/Coop/ICA reklamblad ingested rows: Coop `ean` fields, ICA reklamblad `eans` fields, and Axfood EANs embedded in Willys/Hemkop image URLs. No-match and nutrition-empty products were skipped. Every emitted row includes its exact export source marker in `sourceUrl`, a product URL, and the retailer rows it matched by barcode.
 
 ## Verification
 
-- Verified: 2026-05-22T10:38:52Z
+- Verified: 2026-05-22T10:45:38Z
 - Export join path: `fetchOpenFoodFactsExportRetailerEnrichments`
 - Unit coverage: `fetchOpenFoodFactsExportRetailerEnrichments` joins only retailer candidate barcodes from the export and skips nutrition-empty rows.
-- Artifact audit: `rowCount` 539 equals 539 emitted barcode rows; all 539 barcodes are unique; `candidateBarcodeCount` 1113 equals the 1113 unique usable committed Willys/Hemkop/Coop/ICA reklamblad candidate barcodes; `icaReklambladCandidateBarcodeCount` 346 equals the 346 unique usable ICA reklamblad EANs; emitted match chains are coop, hemkop, ica, willys; every emitted barcode appears in those committed candidates; zero emitted rows have empty nutrition; zero emitted rows use a source outside `https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=...`.
+- Artifact audit: `rowCount` 540 equals 540 emitted barcode rows; all 540 barcodes are unique; `candidateBarcodeCount` 1115 equals the 1115 unique usable committed Willys/Hemkop/Coop/ICA reklamblad candidate barcodes; `icaReklambladCandidateBarcodeCount` 346 equals the 346 unique usable ICA reklamblad EANs; emitted match chains are coop, hemkop, ica, willys; every emitted barcode appears in those committed candidates; zero emitted rows have empty nutrition; zero emitted rows use a source outside `https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=...`.
 
 ## Sample Retrieved Rows
 
