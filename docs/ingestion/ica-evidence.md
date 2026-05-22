@@ -2,16 +2,17 @@
 
 - Source: ICA public store-scoped promotions JSON
 - Store locator source: https://handla.ica.se/api/store/v1?groupby=citygroup&customerType=B2C
-- Store locator retrieved: 2026-05-22T18:53:34.000Z
+- Store locator retrieved: 2026-05-22T20:33:47.000Z
 - Region ID: 6ae1c52a-99a8-4b19-9464-dd01274df39d
-- Real rows fetched: 92967
-- Stores fetched: 315
+- Real rows fetched: 92968
+- Stores fetched: 316
 - Connector: packages/ingestion/src/connectors/ica.ts
 - Web wire: apps/web/src/lib/ingested/ica.ts
 - Live verification: 1 newly added source URL returned HTTP 200 parseable public promotions JSON via `curl -A "GroceryView/0.1"` on 2026-05-22; the wired source row count is recorded below.
 
 ## Source URLs
 
+- Source URL (1004707 ICA Supermarket Lindvallen, retrieved 2026-05-22T20:35:37.680Z, rows 1): https://handlaprivatkund.ica.se/stores/1004707/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=1&maxPageSize=1
 - Source URL (1004563 ICA Kvantum Säffle, retrieved 2026-05-22T19:11:43.000Z, rows 1): https://handlaprivatkund.ica.se/stores/1004563/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=1&maxPageSize=1
 
 - Source URL (1004251 ICA Nära Sälen, retrieved 2026-05-22T19:37:53.105Z, rows 1): https://handlaprivatkund.ica.se/stores/1004251/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=1&maxPageSize=1
