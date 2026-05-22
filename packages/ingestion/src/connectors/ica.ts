@@ -984,6 +984,106 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1003423',
     storeName: 'Maxi ICA Stormarknad Sundsvall',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003884',
+    storeName: 'ICA Kvantum Götene',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '00966',
+    storeName: 'ICA Supermarket Matkassen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003648',
+    storeName: 'ICA Supermarket Söndrum',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003781',
+    storeName: 'Maxi ICA Stormarknad Flygstaden',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003925',
+    storeName: 'Maxi ICA Stormarknad Högskolan',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003960',
+    storeName: 'ICA Supermarket Skutan',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004009',
+    storeName: 'ICA Supermarket Högbyhallen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003453',
+    storeName: 'ICA Supermarket Pärlan',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003931',
+    storeName: 'ICA Supermarket Hofors',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003996',
+    storeName: 'ICA Supermarket Hovmantorp',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003430',
+    storeName: 'Maxi ICA Stormarknad Flemingsberg',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003414',
+    storeName: 'Maxi ICA Stormarknad Hudiksvall',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004554',
+    storeName: 'ICA Supermarket Telefonplan',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003949',
+    storeName: 'Maxi ICA Stormarknad Härnösand',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003545',
+    storeName: 'Maxi ICA Stormarknad Hässleholm',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003951',
+    storeName: 'ICA Kvantum Höganäs',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003395',
+    storeName: 'ICA Supermarket Höör',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003446',
+    storeName: 'ICA Supermarket Jämjö',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003750',
+    storeName: 'ICA Nära Järbo',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004514',
+    storeName: 'ICA Supermarket Järvsö',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 

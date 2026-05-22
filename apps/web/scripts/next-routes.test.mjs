@@ -891,6 +891,63 @@ ${seo}`;
     assert.doesNotMatch(productRoute, /@\/lib\/demo-data|@\/components\/sample-data/);
   });
 
+  it('ships a fail-closed CMP with Google Consent Mode v2 defaults and audit logging', async () => {
+    const layout = await read('src/app/layout.tsx');
+    const cmp = await read('src/components/consent-manager.tsx');
+
+    assert.match(layout, /ConsentManager/);
+    assert.match(cmp, /'use client'/);
+    assert.match(cmp, /IAB TCF v2\.2/);
+    assert.match(cmp, /accept all/i);
+    assert.match(cmp, /reject all/i);
+    assert.match(cmp, /manage/i);
+    assert.match(cmp, /necessary/);
+    assert.match(cmp, /analytics/);
+    assert.match(cmp, /ads/);
+    assert.match(cmp, /personalisation/);
+    assert.match(cmp, /window\.dataLayer/);
+    assert.match(cmp, /function gtag/);
+    assert.match(cmp, /gtag\('consent', 'default'/);
+    assert.match(cmp, /analytics_storage: 'denied'/);
+    assert.match(cmp, /ad_storage: 'denied'/);
+    assert.match(cmp, /ad_user_data: 'denied'/);
+    assert.match(cmp, /ad_personalization: 'denied'/);
+    assert.match(cmp, /gtag\('consent', 'update'/);
+    assert.match(cmp, /allow_ad_personalization_signals/);
+    assert.match(cmp, /non-personalised/);
+    assert.match(cmp, /CONSENT_POLICY_VERSION/);
+    assert.match(cmp, /groceryview:consent:audit/);
+    assert.match(cmp, /new Date\(\)\.toISOString\(\)/);
+    assert.match(cmp, /policyVersion/);
+    assert.match(cmp, /timestamp/);
+    assert.match(cmp, /\/privacy/);
+  });
+
+
+  it('wires login to the production auth session exchange without mock accounts', async () => {
+    const login = await read('src/app/login/page.tsx');
+    const server = await read('../../packages/server/src/index.ts');
+
+    assert.match(login, /LoginSessionExchange/);
+    assert.match(login, /\/api\/auth\/session/);
+    assert.match(login, /verified auth provider assertion/i);
+    assert.match(login, /No test account/);
+    assert.match(login, /source timestamps from authenticated storage/);
+
+    const exchange = await read('src/components/login-session-exchange.tsx');
+    assert.match(exchange, /'use client'/);
+    assert.match(exchange, /fetch\('\/api\/auth\/session'/);
+    assert.match(exchange, /provider: 'magic_link'/);
+    assert.match(exchange, /sessionStorage\.setItem\('groceryview:accessToken'/);
+    assert.match(exchange, /sessionStorage\.setItem\('groceryview:userId'/);
+    assert.match(exchange, /Authorization: `Bearer \$\{session\.accessToken\}`/);
+    assert.match(exchange, /validCode/);
+    assert.match(exchange, /Session established/);
+    assert.doesNotMatch(exchange, /test account|mock session|demo-data|sample-data/i);
+    assert.match(server, /Auth session exchange is not configured/);
+    assert.match(server, /createSessionToken/);
+  });
+
   it('ships crawlable sitemap and robots metadata from verified route drivers', async () => {
     const sitemap = await read('src/app/sitemap.ts');
     const robots = await read('src/app/robots.ts');
