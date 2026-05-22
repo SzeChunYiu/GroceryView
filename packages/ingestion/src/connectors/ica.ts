@@ -1084,6 +1084,106 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1004514',
     storeName: 'ICA Supermarket Järvsö',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004348',
+    storeName: 'Maxi ICA Stormarknad Kalmar',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004523',
+    storeName: 'ICA Supermarket Berga Centrum, Kalmar',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003977',
+    storeName: 'ICA Supermarket Smedby, Kalmar',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003696',
+    storeName: 'ICA Supermarket Lindsdal',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004441',
+    storeName: 'ICA Skansen',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003661',
+    storeName: 'ICA Kvantum Nybro',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004194',
+    storeName: 'ICA Nära Ålem',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004057',
+    storeName: 'Maxi ICA Stormarknad Kristianstad',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004334',
+    storeName: 'ICA Kvantum Kristianstad',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003905',
+    storeName: 'ICA Kvantum Åhus',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004346',
+    storeName: 'Maxi ICA Stormarknad Olofström',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003794',
+    storeName: 'ICA Supermarket Osby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003966',
+    storeName: 'ICA Supermarket Perstorp',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004362',
+    storeName: 'ICA Supermarket Cityhallen Karlskrona',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004028',
+    storeName: 'Maxi ICA Stormarknad Karlskrona',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003513',
+    storeName: 'Maxi ICA Stormarknad Ronneby',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004376',
+    storeName: 'ICA Supermarket Lammhult',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004237',
+    storeName: 'ICA Nära Ryd',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003597',
+    storeName: 'ICA Supermarket Mullsjö',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003785',
+    storeName: 'ICA Supermarket Vaggeryd',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
