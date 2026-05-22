@@ -1,8 +1,8 @@
 // AUTO-GENERATED from public Mathem search page __NEXT_DATA__.
 // Source URL pattern: https://www.mathem.se/se/search/products/?q={query}
-// Source URLs: https://www.mathem.se/se/search/products/?q=makaroner; https://www.mathem.se/se/search/products/?q=mjolk; https://www.mathem.se/se/search/products/?q=kaffe; https://www.mathem.se/se/search/products/?q=ris; https://www.mathem.se/se/search/products/?q=pasta; https://www.mathem.se/se/search/products/?q=yoghurt; https://www.mathem.se/se/search/products/?q=brod; https://www.mathem.se/se/search/products/?q=ost; https://www.mathem.se/se/search/products/?q=agg; https://www.mathem.se/se/search/products/?q=smor; https://www.mathem.se/se/search/products/?q=potatis; https://www.mathem.se/se/search/products/?q=banan; https://www.mathem.se/se/search/products/?q=kyckling; https://www.mathem.se/se/search/products/?q=ketchup; https://www.mathem.se/se/search/products/?q=havregryn
-// Retrieved: 2026-05-22T11:29:14.829Z
-// Row count: 600 real product rows fetched from mathem.se search.
+// Source URLs: https://www.mathem.se/se/search/products/?q=makaroner; https://www.mathem.se/se/search/products/?q=mjolk; https://www.mathem.se/se/search/products/?q=kaffe; https://www.mathem.se/se/search/products/?q=ris; https://www.mathem.se/se/search/products/?q=pasta; https://www.mathem.se/se/search/products/?q=yoghurt; https://www.mathem.se/se/search/products/?q=brod; https://www.mathem.se/se/search/products/?q=ost; https://www.mathem.se/se/search/products/?q=agg; https://www.mathem.se/se/search/products/?q=smor; https://www.mathem.se/se/search/products/?q=potatis; https://www.mathem.se/se/search/products/?q=banan; https://www.mathem.se/se/search/products/?q=kyckling; https://www.mathem.se/se/search/products/?q=ketchup; https://www.mathem.se/se/search/products/?q=havregryn; https://www.mathem.se/se/search/products/?q=lax; https://www.mathem.se/se/search/products/?q=notfars; https://www.mathem.se/se/search/products/?q=flask; https://www.mathem.se/se/search/products/?q=tomat; https://www.mathem.se/se/search/products/?q=gurka; https://www.mathem.se/se/search/products/?q=apelsin; https://www.mathem.se/se/search/products/?q=apple; https://www.mathem.se/se/search/products/?q=choklad; https://www.mathem.se/se/search/products/?q=chips; https://www.mathem.se/se/search/products/?q=juice; https://www.mathem.se/se/search/products/?q=cola; https://www.mathem.se/se/search/products/?q=te; https://www.mathem.se/se/search/products/?q=mjol; https://www.mathem.se/se/search/products/?q=socker; https://www.mathem.se/se/search/products/?q=olja; https://www.mathem.se/se/search/products/?q=glass; https://www.mathem.se/se/search/products/?q=blabar; https://www.mathem.se/se/search/products/?q=jordgubbar; https://www.mathem.se/se/search/products/?q=korv; https://www.mathem.se/se/search/products/?q=falukorv; https://www.mathem.se/se/search/products/?q=fisk; https://www.mathem.se/se/search/products/?q=rakor; https://www.mathem.se/se/search/products/?q=morot; https://www.mathem.se/se/search/products/?q=lok; https://www.mathem.se/se/search/products/?q=vitlok
+// Retrieved: 2026-05-22T14:07:06.694Z
+// Row count: 1542 real product rows fetched from mathem.se search.
 
 export type MathemIngestedProduct = {
   code: string;
@@ -23,8 +23,8 @@ export type MathemIngestedProduct = {
 
 export const mathemSource = {
   "source": "mathem.se public search page __NEXT_DATA__",
-  "retrievedAt": "2026-05-22T11:29:14.829Z",
-  "rowCount": 600,
+  "retrievedAt": "2026-05-22T14:07:06.694Z",
+  "rowCount": 1542,
   "sourceUrlPattern": "https://www.mathem.se/se/search/products/?q={query}",
   "sourceUrls": [
     "https://www.mathem.se/se/search/products/?q=makaroner",
@@ -41,7 +41,32 @@ export const mathemSource = {
     "https://www.mathem.se/se/search/products/?q=banan",
     "https://www.mathem.se/se/search/products/?q=kyckling",
     "https://www.mathem.se/se/search/products/?q=ketchup",
-    "https://www.mathem.se/se/search/products/?q=havregryn"
+    "https://www.mathem.se/se/search/products/?q=havregryn",
+    "https://www.mathem.se/se/search/products/?q=lax",
+    "https://www.mathem.se/se/search/products/?q=notfars",
+    "https://www.mathem.se/se/search/products/?q=flask",
+    "https://www.mathem.se/se/search/products/?q=tomat",
+    "https://www.mathem.se/se/search/products/?q=gurka",
+    "https://www.mathem.se/se/search/products/?q=apelsin",
+    "https://www.mathem.se/se/search/products/?q=apple",
+    "https://www.mathem.se/se/search/products/?q=choklad",
+    "https://www.mathem.se/se/search/products/?q=chips",
+    "https://www.mathem.se/se/search/products/?q=juice",
+    "https://www.mathem.se/se/search/products/?q=cola",
+    "https://www.mathem.se/se/search/products/?q=te",
+    "https://www.mathem.se/se/search/products/?q=mjol",
+    "https://www.mathem.se/se/search/products/?q=socker",
+    "https://www.mathem.se/se/search/products/?q=olja",
+    "https://www.mathem.se/se/search/products/?q=glass",
+    "https://www.mathem.se/se/search/products/?q=blabar",
+    "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "https://www.mathem.se/se/search/products/?q=korv",
+    "https://www.mathem.se/se/search/products/?q=falukorv",
+    "https://www.mathem.se/se/search/products/?q=fisk",
+    "https://www.mathem.se/se/search/products/?q=rakor",
+    "https://www.mathem.se/se/search/products/?q=morot",
+    "https://www.mathem.se/se/search/products/?q=lok",
+    "https://www.mathem.se/se/search/products/?q=vitlok"
   ]
 } as const;
 
@@ -60,7 +85,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6448-kungsornen-gammaldags-idealmakaroner/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4793",
@@ -76,7 +101,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4793-kungsornen-gammaldags-idealmakaroner/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6407",
@@ -92,7 +117,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6407-kungsornen-fullkornspasta-makaroner/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7223",
@@ -108,7 +133,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7223-kungsornen-makaroner-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5801",
@@ -124,7 +149,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5801-kungsornen-idealmakaroner/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7237",
@@ -140,7 +165,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7237-kungsornen-snabbmakaroner/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7919",
@@ -156,7 +181,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7919-kungsornen-idealmakaroner/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5301",
@@ -172,7 +197,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5301-garant-makaroner-glutenfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65403",
@@ -188,7 +213,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65403-garant-eko-makaroner-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4065",
@@ -204,7 +229,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4065-kungsornen-snabbmakaroner/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65174",
@@ -220,7 +245,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65174-garant-pasta-girandole/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "52444",
@@ -236,7 +261,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/52444-mississippi-belle-macaroni-cheese/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "52597",
@@ -252,7 +277,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/52597-barilla-pasta-pipe-rigate/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7704",
@@ -268,7 +293,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7704-garant-pasta-penne-rigate/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5228",
@@ -284,7 +309,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5228-zeta-pasta-maccaronetti/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65037",
@@ -300,7 +325,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65037-mino-pipette-glutenfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5959",
@@ -316,7 +341,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5959-barilla-pasta-castellane/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6716",
@@ -332,7 +357,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6716-rummo-pasta-riccioli/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "63904",
@@ -348,7 +373,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/63904-monte-castello-pasta-penne-rigate/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65121",
@@ -364,7 +389,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65121-barilla-pasta-mezzi-rigatoni-al-bronzo/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64237",
@@ -380,7 +405,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64237-macheaven-mac-cheese-cheddar/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5267",
@@ -396,7 +421,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5267-zeta-pasta-penne-rigate/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9497",
@@ -412,7 +437,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9497-eldorado-mac-n-cheese-glutenfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8665",
@@ -428,7 +453,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8665-biori-pasta-penne-havreblandning-glutenfri-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4593",
@@ -444,23 +469,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4593-garant-eko-pasta-penne-rigate-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "64355",
-    "name": "Eldorado Snack Pot Mac'n Cheese",
-    "brand": "Eldorado",
-    "packageText": "70 g",
-    "price": 14.15,
-    "priceText": "14.15 SEK",
-    "unitPrice": 202.14,
-    "unitPriceText": "202.14 SEK",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://images.mathem.se/prod/local_products/4e0f7591-ca30-4a85-8dc1-cb5f891f4e81.jpg?fit=bounds&format=auto&optimize=medium&width=268&s=0x9cb16cd722e150e41229ec5eafba3a9cc27213e7",
-    "productUrl": "https://www.mathem.se/se/products/64355-eldorado-snack-pot-macn-cheese/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62961",
@@ -476,7 +485,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62961-pastificio-liguori-pasta-rigatoni-no-46-igp/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64355",
+    "name": "Eldorado Snack Pot Mac'n Cheese",
+    "brand": "Eldorado",
+    "packageText": "70 g",
+    "price": 14.15,
+    "priceText": "14.15 SEK",
+    "unitPrice": 202.14,
+    "unitPriceText": "202.14 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4e0f7591-ca30-4a85-8dc1-cb5f891f4e81.jpg?fit=bounds&format=auto&optimize=medium&width=268&s=0x9cb16cd722e150e41229ec5eafba3a9cc27213e7",
+    "productUrl": "https://www.mathem.se/se/products/64355-eldorado-snack-pot-macn-cheese/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6342",
@@ -492,7 +517,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6342-kungsornen-linspasta-penne/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "40117",
@@ -508,7 +533,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/40117-garant-pasta-mafalda/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4049",
@@ -524,7 +549,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4049-knorr-snack-pot-mac-cheese/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64393",
@@ -540,7 +565,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64393-barilla-pasta-penne-rigate/",
     "available": false,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6930",
@@ -556,7 +581,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6930-fixa-durkslag-plast-vit/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=makaroner",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4664",
@@ -572,7 +597,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4664-arla-ko-r-farsk-standardmjolk-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3681",
@@ -588,7 +613,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3681-arla-ko-r-farsk-mellanmjolk-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5128",
@@ -604,7 +629,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5128-arla-r-mellanmjolk-laktosfri-med-lang-hallbarhet-1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7460",
@@ -620,7 +645,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7460-arla-ko-r-farsk-standardmjolk-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2183",
@@ -636,7 +661,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2183-garant-mellanmjolk-lite-langre-hallbarhet-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5719",
@@ -652,7 +677,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5719-arla-ko-r-standardmjolk-laktosfri-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2331",
@@ -668,7 +693,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2331-garant-standardmjolk-lite-langre-hallbarhet-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5288",
@@ -684,7 +709,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5288-arla-ko-r-mellanmjolk-laktosfri-15/",
     "available": false,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2008",
@@ -700,7 +725,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2008-arla-ko-r-farsk-mellanmjolk-15-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2192",
@@ -716,7 +741,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2192-arla-ko-r-mellanmjolk-laktosfri-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4823",
@@ -732,7 +757,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4823-arla-ko-r-mellanmjolk-15-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7597",
@@ -748,7 +773,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7597-arla-ko-r-farsk-standardmjolk-3-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3317",
@@ -764,7 +789,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3317-valio-mellanmjolk-laktosfri-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3525",
@@ -780,7 +805,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3525-arla-ko-r-farsk-lattmjolk-05/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3182",
@@ -794,9 +819,9 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "unitPriceUnit": "l",
     "imageUrl": "https://images.mathem.se/prod/local_products/22ab4c8a-f02d-4342-9d94-cc90c16b0d3b.jpg?fit=bounds&format=auto&optimize=medium&width=220&s=0xc21c42f7d850098db53bde50287abd10df4c1e8f",
     "productUrl": "https://www.mathem.se/se/products/3182-oatly-ikaffe-barista-edition-havredryck-3/",
-    "available": true,
+    "available": false,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5589",
@@ -812,7 +837,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5589-arla-ko-r-lattmjolk-laktosfri-05/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5524",
@@ -828,7 +853,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5524-valio-standardmjolk-laktosfri-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4758",
@@ -844,7 +869,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4758-arla-ko-r-farsk-lantmjolk-38-45-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5004",
@@ -860,7 +885,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5004-valio-mellanmjolk-laktosfri-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65359",
@@ -876,7 +901,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65359-arla-ko-r-mellanmjolk-lang-hallbarhet-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5116",
@@ -892,7 +917,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5116-oatly-havredryck-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "15042",
@@ -908,7 +933,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/15042-skanemejerier-mjolk-laktosfri-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "20145",
@@ -924,7 +949,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/20145-skanemejerier-mjolk-3-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2804",
@@ -940,7 +965,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2804-arla-ko-r-minimjolk-01-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3547",
@@ -956,7 +981,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3547-arla-ko-r-mellanmjolk-15-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3311",
@@ -972,7 +997,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3311-garant-standardmjolk-lite-langre-hallbarhet-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "13977",
@@ -988,7 +1013,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/13977-skanemejerier-hjordnara-mellanmjolk-15-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "16165",
@@ -1004,7 +1029,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/16165-skanemejerier-farsk-standardmjolk-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7508",
@@ -1020,7 +1045,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7508-arla-r-standardmjolk-lang-hallbarhet-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7495",
@@ -1036,7 +1061,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7495-arla-ko-r-mellanmjolk-farsk-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2337",
@@ -1052,7 +1077,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2337-skanemejerier-latte-del-barista-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7744",
@@ -1068,7 +1093,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7744-arla-ko-r-farsk-lattmjolk-05-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "17108",
@@ -1080,11 +1105,11 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "unitPrice": 12.33,
     "unitPriceText": "12.33 SEK",
     "unitPriceUnit": "l",
-    "imageUrl": "https://images.mathem.se/prod/local_products/70a1c17e-c719-462c-ae6e-070a9fd6cffb.jpg?fit=bounds&format=auto&optimize=medium&width=120&s=0xd80aa2583343c8bb3e6c96717f60a4b173cb2662",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9c0b6ada-3377-406b-80f6-941f1bbd1cc1.jpg?fit=bounds&format=auto&optimize=medium&width=120&s=0x18732d0ff3805a8e6b27c37a7fe180b7bb3fe4cd",
     "productUrl": "https://www.mathem.se/se/products/17108-skanemejerier-farsk-mellanmjolk-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2495",
@@ -1100,7 +1125,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2495-garant-mellan-mjolkdryck-laktosfri-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2206",
@@ -1116,7 +1141,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2206-arla-r-baristamjolk-latte-art-26-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2390",
@@ -1132,7 +1157,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2390-garant-latt-mjolkdryck-laktosfri-05/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5150",
@@ -1148,7 +1173,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5150-skanemejerier-mellanmjolk-laktosfri-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3081",
@@ -1164,23 +1189,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3081-arla-ko-r-lattmjolk-laktosfri-05/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "18850",
-    "name": "Skånemejerier Färsk Lättmjölk 0,5%",
-    "brand": "Skånemejerier",
-    "packageText": "1,5 l",
-    "price": 19.5,
-    "priceText": "19.50 SEK",
-    "unitPrice": 13,
-    "unitPriceText": "13.00 SEK",
-    "unitPriceUnit": "l",
-    "imageUrl": "https://images.mathem.se/prod/local_products/9612db70-09c2-4be1-89df-5ab65407b710.jpg?fit=bounds&format=auto&optimize=medium&width=122&s=0x76413d128d18e7b08954b85c05434c24359f97d2",
-    "productUrl": "https://www.mathem.se/se/products/18850-skanemejerier-farsk-lattmjolk-05/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3335",
@@ -1196,7 +1205,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3335-garant-mjolkdryck-laktosfri-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "18850",
+    "name": "Skånemejerier Färsk Lättmjölk 0,5%",
+    "brand": "Skånemejerier",
+    "packageText": "1,5 l",
+    "price": 19.5,
+    "priceText": "19.50 SEK",
+    "unitPrice": 13,
+    "unitPriceText": "13.00 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8599e96d-4a8d-47e7-a4b1-75e3a2b82695.jpg?fit=bounds&format=auto&optimize=medium&width=122&s=0x060961fcbd4786dd9c3d072f537c93b50df65ba5",
+    "productUrl": "https://www.mathem.se/se/products/18850-skanemejerier-farsk-lattmjolk-05/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5376",
@@ -1212,7 +1237,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5376-garant-mjolkdryck-laktosfri-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7384",
@@ -1228,7 +1253,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7384-arla-ko-r-farsk-lattmjolk-05/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjolk",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62265",
@@ -1244,7 +1269,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62265-lofbergs-bryggkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64680",
@@ -1260,7 +1285,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64680-zoegas-skanerost-bryggkaffe-morkrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10830",
@@ -1276,7 +1301,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10830-gevalia-bryggkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4259",
@@ -1292,7 +1317,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4259-arvid-nordquist-mellan-bryggkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8967",
@@ -1308,7 +1333,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8967-garant-bryggkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9293",
@@ -1324,7 +1349,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9293-lofbergs-kaffe-organic-medium-roast-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11119",
@@ -1340,7 +1365,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11119-zoegas-mollbergs-blandning-bryggkaffe-morkrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9057",
@@ -1356,7 +1381,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9057-lofbergs-bryggkaffe-kharisma/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9004",
@@ -1372,7 +1397,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9004-garant-bryggkaffe-morkrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3749",
@@ -1388,7 +1413,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3749-arvid-nordquist-gran-dia-bryggkaffe-mellanmork/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4325",
@@ -1404,7 +1429,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4325-arvid-nordquist-eco-bryggkaffe-mellanmork-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11643",
@@ -1420,7 +1445,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11643-zoegas-hazienda-bryggkaffe-morkrost-eko-krav-fairt/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "23178",
@@ -1436,7 +1461,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/23178-gevalia-kaffe-mellanrost-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10963",
@@ -1452,7 +1477,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10963-garant-snabbkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "775",
@@ -1468,7 +1493,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/775-lofbergs-kaffe-mellanmork/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "1701",
@@ -1484,7 +1509,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/1701-nescafe-snabbkaffe-lyx-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8985",
@@ -1500,7 +1525,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8985-lofbergs-bryggkaffe-mellanrost-perfekt-med-mjolk/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11470",
@@ -1516,7 +1541,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11470-gevalia-snabbkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64679",
@@ -1532,7 +1557,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64679-zoegas-bryggkaffe-intenzo-morkrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3849",
@@ -1548,7 +1573,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3849-arvid-nordquist-franskrost-bryggkaffe-extra-mork/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10408",
@@ -1564,7 +1589,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10408-lindvalls-kaffe-bryggkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11513",
@@ -1580,7 +1605,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11513-garant-eko-bryggkaffe-mellanrost-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6568",
@@ -1596,7 +1621,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6568-melitta-kaffefilter-1x4-bruna/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67884",
@@ -1612,7 +1637,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67884-zoegas-fikastund-bryggkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11400",
@@ -1628,7 +1653,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11400-nescafe-snabbkaffe-gold-mellanrost-koffeinfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4348",
@@ -1644,7 +1669,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4348-gevalia-koffeinfritt-kaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7276",
@@ -1660,7 +1685,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7276-eldorado-snabbkaffe-mellanrost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6042",
@@ -1676,7 +1701,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6042-eldorado-kaffefilter-1x4-bruna/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3869",
@@ -1692,7 +1717,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3869-arvid-nordquist-svea-bryggkaffe-mellanmork/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64678",
@@ -1708,7 +1733,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64678-zoegas-kaffe-blue-java/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9032",
@@ -1724,7 +1749,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9032-lofbergs-bryggkaffe-jubileumsblandning/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6688",
@@ -1740,7 +1765,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6688-melitta-kaffefilter-1x4-vit/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4335",
@@ -1756,7 +1781,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4335-arvid-nordquist-amigas-bryggkaffe-morkrost-eko-kra/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11479",
@@ -1772,7 +1797,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11479-gevalia-snabbkaffe-mellanrost-gold/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "1479",
@@ -1788,7 +1813,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/1479-zoegas-mollbergs-blandning-hela-kaffebonor/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11507",
@@ -1804,7 +1829,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11507-garant-eko-bryggkaffe-morkrost-eko-fairtrade/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9274",
@@ -1820,7 +1845,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9274-lofbergs-next-generation-bryggkaffe-morkrost-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2190",
@@ -1836,7 +1861,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2190-oddlygood-r-barista-glutenfri-havredryck-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10423",
@@ -1852,7 +1877,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10423-lindvalls-kaffe-kaffe-tricolore/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2624",
@@ -1868,7 +1893,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2624-kahls-kaffe-divino-kaffebonor-fairtrade-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kaffe",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8535",
@@ -1884,7 +1909,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8535-garant-jasminris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10427",
@@ -1900,7 +1925,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10427-bens-original-langkornigt-ris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10475",
@@ -1916,7 +1941,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10475-eldorado-jasminris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64201",
@@ -1932,7 +1957,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64201-garant-basmatiris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9055",
@@ -1948,7 +1973,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9055-bens-original-basmatiris-boil-in-bag-4x125g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11421",
@@ -1964,7 +1989,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11421-eldorado-basmatiris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11734",
@@ -1980,7 +2005,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11734-garant-eko-basmatiris-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10701",
@@ -1996,7 +2021,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10701-garant-eko-jasminris-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8336",
@@ -2012,7 +2037,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8336-garant-langkornigt-ris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62745",
@@ -2028,7 +2053,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62745-garant-ris-jasmin/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8114",
@@ -2044,7 +2069,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8114-frebaco-kvarn-raris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10989",
@@ -2060,7 +2085,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10989-salta-kvarn-svart-ris-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8888",
@@ -2076,7 +2101,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8888-bens-original-jasminris-boil-in-bag-4x125g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "813",
@@ -2092,7 +2117,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/813-garant-eko-langkornigt-ris-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7514",
@@ -2108,7 +2133,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7514-felix-risgrot/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4124",
@@ -2124,7 +2149,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4124-garant-basmatiris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8578",
@@ -2140,7 +2165,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8578-bens-original-langkornigt-ris-boil-in-bag-4x125g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4438",
@@ -2156,7 +2181,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4438-bens-original-jasminris-10min/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5901",
@@ -2172,7 +2197,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5901-zeinas-basmatiris-quick-n-easy/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8290",
@@ -2188,7 +2213,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8290-spicefield-ris-sushi/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7621",
@@ -2204,7 +2229,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7621-risifrutti-risifrutti-jordgubb/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62726",
@@ -2220,7 +2245,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62726-garant-ris-basmati-boil-in-bag-4x125g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4020",
@@ -2236,7 +2261,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4020-bens-original-basmatiris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10253",
@@ -2252,7 +2277,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10253-garant-fullkornsris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "423",
@@ -2268,7 +2293,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/423-salta-kvarn-rott-raris-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9320",
@@ -2284,7 +2309,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9320-garant-eko-jasminris-eko-fairtrade/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7593",
@@ -2300,7 +2325,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7593-risifrutti-risifrutti-hallon/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62800",
@@ -2316,7 +2341,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62800-garant-ris-jasmin-boil-in-bag-4x125g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5787",
@@ -2332,7 +2357,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5787-eldorado-jasminris-boil-in-bag-4x125g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5761",
@@ -2348,7 +2373,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5761-zeinas-jasminris-quick-n-easy/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62777",
@@ -2364,7 +2389,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62777-bens-original-ris-jasmin-boil-in-bag-8x125g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11105",
@@ -2380,7 +2405,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11105-garant-ris-langkornigt-10min/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65171",
@@ -2396,7 +2421,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65171-garant-basmatiris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7347",
@@ -2412,7 +2437,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7347-friggs-majskakor-chiafro-havssalt/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7586",
@@ -2428,7 +2453,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7586-risifrutti-risifrutti-skogsbar/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7651",
@@ -2444,7 +2469,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7651-risifrutti-risifrutti-blabar/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62670",
@@ -2460,7 +2485,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62670-bens-original-ris-langkornigt-boil-in-bag-8x125g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "63877",
@@ -2476,7 +2501,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/63877-garant-basmatiris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5091",
@@ -2492,7 +2517,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5091-garant-majskakor-popcorn/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5070",
@@ -2508,7 +2533,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5070-garant-majskakor-ranch/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9975",
@@ -2524,7 +2549,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9975-garant-ris-langkornigt-10min/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10727",
@@ -2540,7 +2565,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10727-zeta-casa-di-luca-arborio-ris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ris",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4694",
@@ -2556,7 +2581,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4694-barilla-pasta-fusilli/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4667",
@@ -2572,7 +2597,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4667-barilla-pasta-rigatoni/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "52103",
@@ -2588,7 +2613,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/52103-barilla-pasta-farfalle/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7684",
@@ -2604,7 +2629,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7684-garant-pasta-fusilli/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4630",
@@ -2620,7 +2645,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4630-barilla-pasta-gnocchi/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7712",
@@ -2636,7 +2661,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7712-garant-pasta-gemelli/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4684",
@@ -2652,7 +2677,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4684-barilla-pasta-penne-rigate/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7700",
@@ -2668,7 +2693,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7700-garant-pasta-gnocchi/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5979",
@@ -2684,7 +2709,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5979-garofalo-pasta-mezze-maniche-riga/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4612",
@@ -2700,7 +2725,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4612-barilla-pasta-girandole/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5292",
@@ -2716,7 +2741,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5292-zeta-pasta-mezze-maniche/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "52281",
@@ -2732,7 +2757,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/52281-monte-castello-pasta-fusilli/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "1023",
@@ -2748,7 +2773,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/1023-zeta-pasta-strozzapreti/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7697",
@@ -2764,7 +2789,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7697-garant-pasta-farfalle/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5627",
@@ -2780,7 +2805,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5627-barilla-pasta-fusilli-glutenfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5069",
@@ -2796,7 +2821,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5069-garant-farsk-pasta-fettuccine/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7680",
@@ -2812,7 +2837,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7680-garant-pasta-fusilli-fullkorn/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7796",
@@ -2828,7 +2853,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7796-zeta-pasta-linguine-casa-di-luca/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4545",
@@ -2844,7 +2869,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4545-garant-eko-pasta-fusilli-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5363",
@@ -2860,7 +2885,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5363-zeta-pasta-radiatori/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9416",
@@ -2876,7 +2901,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9416-barilla-spaghetti/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6640",
@@ -2892,7 +2917,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6640-barilla-pasta-tagliatelle/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5282",
@@ -2908,7 +2933,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5282-zeta-pasta-tortiglioni/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "661",
@@ -2924,7 +2949,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/661-garant-farsk-pasta-tortelloni-ricotta-spinaci/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4576",
@@ -2940,7 +2965,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4576-garant-eko-pasta-gnocchi-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5224",
@@ -2956,7 +2981,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5224-zeta-pasta-fusilli/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "312",
@@ -2972,7 +2997,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/312-dagens-dagens-pasta-alfredo-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7708",
@@ -2988,7 +3013,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7708-garant-pasta-fusilli-tricolore/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7236",
@@ -3004,7 +3029,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7236-garant-farsk-pasta-tortelloni-pomodoro-mozzarella/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65293",
@@ -3020,7 +3045,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65293-zeta-pasta-penne-rigate-glutenfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5173",
@@ -3036,7 +3061,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5173-garant-farsk-pasta-pappardelle/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7705",
@@ -3052,7 +3077,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7705-garant-pasta-penne-rigate-fullkorn/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4904",
@@ -3068,7 +3093,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4904-kungsornen-fusilli-fullkornspasta/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5604",
@@ -3084,7 +3109,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5604-barilla-spaghetti-glutenfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5831",
@@ -3100,7 +3125,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5831-barilla-spaghetti/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6559",
@@ -3116,7 +3141,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6559-barilla-pastasas-basilika/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6641",
@@ -3132,7 +3157,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6641-barilla-pasta-cannelloni/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8669",
@@ -3148,7 +3173,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8669-risberg-gochujang-pasta/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=pasta",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4617",
@@ -3164,7 +3189,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4617-arla-ko-r-yoghurt-mild-3-naturell/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5168",
@@ -3180,7 +3205,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5168-arla-ko-r-yoghurt-mild-2-vanilj/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8279",
@@ -3196,7 +3221,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8279-arla-r-grekisk-yoghurt-0-naturell/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5811",
@@ -3212,7 +3237,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5811-arla-ko-r-yoghurt-mild-3-naturell/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4745",
@@ -3228,7 +3253,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4745-arla-ko-r-yoghurt-mild-38-45-naturell-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5768",
@@ -3244,7 +3269,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5768-yoggi-r-yoghurt-2-jordgubb-smultron/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5813",
@@ -3260,7 +3285,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5813-arla-ko-r-grekisk-yoghurt-mild-6-naturell/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "1018",
@@ -3276,7 +3301,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/1018-larsa-foods-grekisk-yoghurt-0/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9472",
@@ -3292,7 +3317,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9472-salakis-turkisk-yoghurt-10/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6309",
@@ -3308,7 +3333,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6309-valio-yoghurt-naturell-laktosfri-25/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7324",
@@ -3324,7 +3349,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7324-arla-ko-r-yoghurt-mild-2-vanilj/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5839",
@@ -3340,7 +3365,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5839-yoggi-r-yoghurt-2-skogsbar/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9509",
@@ -3356,7 +3381,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9509-larsa-foods-grekisk-yoghurt-10-naturell/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7036",
@@ -3372,7 +3397,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7036-arla-ko-r-grekisk-yoghurt-laktosfri-6-naturell/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3331",
@@ -3388,7 +3413,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3331-salakis-grekisk-yoghurt-0-laktosfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5862",
@@ -3404,7 +3429,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5862-yoggi-r-yoghurt-2-samoa/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7192",
@@ -3420,7 +3445,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7192-valio-yoghurt-vanilj-laktosfri-21/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3585",
@@ -3436,7 +3461,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3585-arla-ko-r-lattyoghurt-mild-05-naturell/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2966",
@@ -3450,9 +3475,9 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "unitPriceUnit": "kg",
     "imageUrl": "https://images.mathem.se/prod/local_products/eee4153a-35f1-4e7c-bb2c-6d216a270998.jpg?fit=bounds&format=auto&optimize=medium&width=287&s=0xc9d60ad093b85bcbfa26379f473dafb007866cc9",
     "productUrl": "https://www.mathem.se/se/products/2966-arla-koket-r-grekisk-yoghurt-10/",
-    "available": true,
+    "available": false,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8393",
@@ -3468,7 +3493,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8393-arla-ko-r-turkisk-yoghurt-laktosfri-10/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8425",
@@ -3484,7 +3509,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8425-arla-r-grekisk-yoghurt-naturell-10/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64181",
@@ -3500,7 +3525,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64181-yoggi-r-yoghurt-korsbar-2/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "63746",
@@ -3516,7 +3541,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/63746-arla-r-yoghurt-jordgubb-18-familjefavoriter/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2893",
@@ -3532,7 +3557,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2893-arla-ko-r-yoghurt-latt-mild-05-naturell-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5165",
@@ -3548,7 +3573,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5165-garant-yoghurt-mild-vanilj-2/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5962",
@@ -3564,7 +3589,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5962-arla-ko-r-mild-yoghurt-jordgubb-lattsockrad-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2242",
@@ -3580,7 +3605,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2242-yoggi-r-yoghurt-laktosfri-2-skogsbar/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5931",
@@ -3596,7 +3621,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5931-yoggi-r-yoghurt-blabar-2/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4716",
@@ -3612,7 +3637,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4716-arla-ko-r-yoghurt-3-naturell/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64664",
@@ -3628,7 +3653,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64664-valio-grekisk-yoghurt-mango-laktosfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2992",
@@ -3644,7 +3669,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2992-valio-yoghurt-latt-naturell-laktosfri-04/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4657",
@@ -3660,7 +3685,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4657-garant-mild-yoghurt-naturell-3/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65696",
@@ -3676,7 +3701,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65696-garant-eko-yoghurt-naturell-3-8-4-5-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2604",
@@ -3692,7 +3717,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2604-yoggi-r-yoghurt-laktosfri-21-jordgubb-smultron/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7343",
@@ -3708,7 +3733,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7343-valio-yoghurt-hallon-laktosfri-21/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5840",
@@ -3724,23 +3749,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5840-arla-ko-r-mild-yoghurt-hallon-lattsockrad-15/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "65397",
-    "name": "Garant Yoghurt Jordgubb 2,6%",
-    "brand": "Garant",
-    "packageText": "1000 g",
-    "price": 22.24,
-    "priceText": "22.24 SEK",
-    "unitPrice": 22.24,
-    "unitPriceText": "22.24 SEK",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://images.mathem.se/prod/local_products/67ccbe93-118d-457d-98c5-0f1c785ff66e.jpg?fit=bounds&format=auto&optimize=medium&width=112&s=0x52bd15ba854970843da4d70d08396c8b362f564e",
-    "productUrl": "https://www.mathem.se/se/products/65397-garant-yoghurt-jordgubb-26/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7663",
@@ -3756,7 +3765,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7663-arla-r-grekisk-yoghurt-citron-02/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65397",
+    "name": "Garant Yoghurt Jordgubb 2,6%",
+    "brand": "Garant",
+    "packageText": "1000 g",
+    "price": 22.24,
+    "priceText": "22.24 SEK",
+    "unitPrice": 22.24,
+    "unitPriceText": "22.24 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/67ccbe93-118d-457d-98c5-0f1c785ff66e.jpg?fit=bounds&format=auto&optimize=medium&width=112&s=0x52bd15ba854970843da4d70d08396c8b362f564e",
+    "productUrl": "https://www.mathem.se/se/products/65397-garant-yoghurt-jordgubb-26/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5649",
@@ -3772,7 +3797,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5649-arla-ko-r-yoghurt-mild-15-vanilj-mindre-socker/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8522",
@@ -3788,7 +3813,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8522-salakis-grekisk-yoghurt-10/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9486",
@@ -3804,7 +3829,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9486-arla-koket-r-turkisk-yoghurt-10/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3072",
@@ -3820,7 +3845,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3072-garant-turkisk-yoghurt-10/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=yoghurt",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8067",
@@ -3836,7 +3861,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8067-pagen-pagenlimpan/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5664",
@@ -3852,7 +3877,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5664-pagen-lingongrova/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7657",
@@ -3868,7 +3893,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7657-liba-brod-tunnbrod-vitt-4-p/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6134",
@@ -3884,7 +3909,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6134-skogaholm-skogaholmslimpa-skivad/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8555",
@@ -3900,7 +3925,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8555-pagen-levain-rag/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10025",
@@ -3916,7 +3941,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10025-pagen-grotbrod/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4880",
@@ -3932,7 +3957,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4880-pagen-rosta/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9729",
@@ -3948,7 +3973,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9729-pagen-skargardskaka-hono/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7522",
@@ -3964,7 +3989,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7522-eldorado-baguette-mini-6-p/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5494",
@@ -3980,7 +4005,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5494-wasa-knackebrod-delikatess-brod/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5876",
@@ -3996,7 +4021,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5876-wasa-knackebrod-sport-brod/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8698",
@@ -4012,7 +4037,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8698-schar-brod-classic-glutenfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8786",
@@ -4028,7 +4053,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8786-schar-brod-flerkorn-glutenfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5461",
@@ -4044,7 +4069,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5461-garant-grovt-brod-lingon/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7063",
@@ -4060,7 +4085,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7063-wasa-knackebrod-krogarens-brod/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5425",
@@ -4076,7 +4101,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5425-wasa-knackebrod-frukost-brod/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7735",
@@ -4092,7 +4117,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7735-wasa-knackebrod-husman-brod/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9868",
@@ -4108,7 +4133,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9868-wasa-knackebrod-delikatess-brod/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "29",
@@ -4124,7 +4149,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/29-wasa-knackebrod-havre-brod/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7275",
@@ -4138,9 +4163,9 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "unitPriceUnit": "kg",
     "imageUrl": "https://images.mathem.se/prod/local_products/2f68f6d1-2541-44ac-9ef3-acffbff21b33.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x9eba54fe5e14f0862b5205ccf80fccec2d308f4d",
     "productUrl": "https://www.mathem.se/se/products/7275-wasa-knackebrod-ragi-brod/",
-    "available": false,
+    "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10651",
@@ -4156,7 +4181,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10651-nystart-nystart-brod-fryst-carbzone/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6497",
@@ -4172,7 +4197,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6497-wasa-knackebrod-delikatess-sesam-brod/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7147",
@@ -4188,7 +4213,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7147-wasa-knackebrod-runda-kanel-brod/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10530",
@@ -4204,7 +4229,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10530-low-carb-low-carb-brod-fryst-carbzone/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6376",
@@ -4220,7 +4245,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6376-korvbrodsbagarn-french-hot-dog-brod-3-p/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2446",
@@ -4236,7 +4261,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2446-wasa-knackebrod-ragi/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2943",
@@ -4252,7 +4277,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2943-wasa-knackebrod-havre/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3173",
@@ -4268,7 +4293,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3173-wasa-knackebrod-husman/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8519",
@@ -4284,7 +4309,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8519-bake-my-day-stenugnsbrod-skivat/",
     "available": false,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "63594",
@@ -4300,7 +4325,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/63594-liba-brod-bagels-sesam-4-p/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "63595",
@@ -4316,7 +4341,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/63595-liba-brod-bagels-classic-4-p/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64584",
@@ -4332,7 +4357,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64584-liba-brod-belgiska-vafflor/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11550",
@@ -4348,7 +4373,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11550-vika-brod-knackebrod-original/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5595",
@@ -4364,7 +4389,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5595-dan-sukker-brodsirap/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "38954",
@@ -4380,7 +4405,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/38954-hans-gretas-glutenfria-brod-grov-havrefralla-glute/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2415",
@@ -4396,7 +4421,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2415-schnitzer-baguette-glutenfri-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "66045",
@@ -4412,7 +4437,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/66045-garant-pane-napoletano/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "66558",
@@ -4428,7 +4453,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/66558-schar-fiberbrod-glutenfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64883",
@@ -4444,39 +4469,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64883-moilas-mork-rund-glutenfri-fryst-3-p/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "68093",
-    "name": "Fria Fiber Toast Glutenfri Fryst",
-    "brand": "Fria",
-    "packageText": "500 g",
-    "price": 37.81,
-    "priceText": "37.81 SEK",
-    "unitPrice": 75.62,
-    "unitPriceText": "75.62 SEK",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://images.mathem.se/prod/local_products/27407627-e900-4449-9969-dbe72cc55941.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x23f8d565386997c9917e2d8b7f50948aa2e45a97",
-    "productUrl": "https://www.mathem.se/se/products/68093-fria-fiber-toast-glutenfri-fryst/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "9678",
-    "name": "Skogaholm Kavring",
-    "brand": "Skogaholm",
-    "packageText": "650 g",
-    "price": 35.92,
-    "priceText": "35.92 SEK",
-    "unitPrice": 55.26,
-    "unitPriceText": "55.26 SEK",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://images.mathem.se/prod/local_products/9f55f140-d70e-46a7-831d-d209bec62fd8.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x81ca0fcbe0fa9377967ad91cc3540b5b4a957a16",
-    "productUrl": "https://www.mathem.se/se/products/9678-skogaholm-kavring/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8627",
@@ -4492,7 +4485,39 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8627-fria-formbrod-havre-glutenfri-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68093",
+    "name": "Fria Fiber Toast Glutenfri Fryst",
+    "brand": "Fria",
+    "packageText": "500 g",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 75.62,
+    "unitPriceText": "75.62 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/27407627-e900-4449-9969-dbe72cc55941.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x23f8d565386997c9917e2d8b7f50948aa2e45a97",
+    "productUrl": "https://www.mathem.se/se/products/68093-fria-fiber-toast-glutenfri-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9678",
+    "name": "Skogaholm Kavring",
+    "brand": "Skogaholm",
+    "packageText": "650 g",
+    "price": 35.92,
+    "priceText": "35.92 SEK",
+    "unitPrice": 55.26,
+    "unitPriceText": "55.26 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9f55f140-d70e-46a7-831d-d209bec62fd8.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x81ca0fcbe0fa9377967ad91cc3540b5b4a957a16",
+    "productUrl": "https://www.mathem.se/se/products/9678-skogaholm-kavring/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=brod",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2862",
@@ -4508,7 +4533,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2862-arla-ko-r-prast-r-mellanlagrad-31/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "24659",
@@ -4524,7 +4549,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/24659-eldorado-gouda-skivad-ost-28/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6358",
@@ -4540,7 +4565,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6358-arla-koket-r-riven-ost-texmex-29-arla/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3386",
@@ -4556,7 +4581,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3386-arla-ko-r-herrgard-r-mild-28/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11375",
@@ -4572,7 +4597,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11375-arla-r-graddis-30-familjefavoriter-skivad-ost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6526",
@@ -4588,7 +4613,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6526-arla-koket-r-riven-ost-mager-12-arla/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11348",
@@ -4604,7 +4629,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11348-arla-r-gouda-familjefavoriter-skivad-28/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6332",
@@ -4620,7 +4645,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6332-eldorado-gouda-skivad-ost-28/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9290",
@@ -4636,7 +4661,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9290-arla-ko-r-herrgard-r-skivad-28/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11141",
@@ -4652,7 +4677,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11141-arla-r-riven-ost-24-arla-familjefavoriter/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2887",
@@ -4668,7 +4693,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2887-arla-r-hushallsost-26/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9271",
@@ -4684,7 +4709,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9271-arla-ko-r-prast-r-mellanlagrad-skivad-31/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "23380",
@@ -4700,7 +4725,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/23380-garant-riven-ost-gratang-23/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2667",
@@ -4716,7 +4741,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2667-garant-prast-r-mellanlagrad-31/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2797",
@@ -4732,7 +4757,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2797-arla-r-graddis-ost-30-familjefavoriter/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2497",
@@ -4748,7 +4773,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2497-arla-ko-r-greve-r-mild-28/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11962",
@@ -4764,7 +4789,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11962-garant-riven-ost-mozzarella/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "61511",
@@ -4780,7 +4805,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/61511-garant-riven-ost-texmex-29/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11351",
@@ -4796,7 +4821,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11351-arla-r-port-salut-familjefavoriter-skivad-26/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3155",
@@ -4812,7 +4837,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3155-arla-r-port-salut-ost-26-arla-familjefavoriter/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2199",
@@ -4828,7 +4853,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2199-garant-herrgard-r-mild-28/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8825",
@@ -4844,7 +4869,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8825-eldorado-gouda-skivad-30/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2444",
@@ -4860,7 +4885,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2444-kvibille-r-cheddar-32-6m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5785",
@@ -4876,7 +4901,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5785-eldorado-riven-ost-gouda-29/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11961",
@@ -4892,7 +4917,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11961-garant-riven-ost-pizza-25/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9353",
@@ -4908,7 +4933,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9353-wastgota-kloster-r-munkens-svarta-31-skivad/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "63748",
@@ -4924,7 +4949,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/63748-arla-r-gotene-hushallsost-skivad-ost-26/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7278",
@@ -4940,7 +4965,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7278-arla-ko-r-prast-r-skivad-31/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "45612",
@@ -4956,7 +4981,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/45612-arla-r-humlan-skivad-ost-eko-krav-33/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10565",
@@ -4972,7 +4997,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10565-arla-r-graddis-familjefavoriter-skivad-30/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6440",
@@ -4988,7 +5013,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6440-arla-koket-r-riven-ost-pizza-32-arla/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6375",
@@ -5004,7 +5029,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6375-president-hamburgerost-cheddar-18/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10798",
@@ -5020,7 +5045,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10798-wernerssons-riven-ost-28/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "23545",
@@ -5036,7 +5061,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/23545-arla-r-ost-mild-kramig-skivad-17/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8105",
@@ -5052,7 +5077,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8105-allerum-prast-r-riven-lagrad-12m-35/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "66051",
@@ -5068,7 +5093,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/66051-garant-eko-riven-ost-eko-27/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4219",
@@ -5084,7 +5109,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4219-allerum-herrgard-r-lagrad-12m-28/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11222",
@@ -5100,7 +5125,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11222-arla-r-mozzarella-riven-21-arla-familjefavoriter/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65666",
@@ -5116,7 +5141,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65666-frischgold-riven-ost-pizzamix/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6030",
@@ -5132,7 +5157,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6030-zeta-feta-23/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62453",
@@ -5148,7 +5173,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62453-lyckans-ost-mjukost-rakor/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62294",
@@ -5164,7 +5189,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62294-lyckans-ost-mjukost-skinka/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ost",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10969",
@@ -5180,7 +5205,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10969-kronagg-agg-frigaende-m-l/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8674",
@@ -5196,7 +5221,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8674-kronagg-agg-frigaende-eko-m-l-650g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10117",
@@ -5212,7 +5237,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10117-kronagg-agg-frigaende-l-798g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "12936",
@@ -5228,7 +5253,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/12936-kronagg-agg-frigaende-m-l/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4825",
@@ -5244,7 +5269,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4825-kronagg-agg-frigaende-m-348g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2229",
@@ -5260,7 +5285,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2229-kronagg-agg-frigaende-eko-m-l-1060g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5923",
@@ -5276,7 +5301,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5923-kronagg-agg-frigaende-eko-m-l-379g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9551",
@@ -5292,7 +5317,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9551-kronagg-agg-frigaende-inomhus-s-762g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10170",
@@ -5308,7 +5333,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10170-kronagg-agg-frigaende-utomhus-m-l-530g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3044",
@@ -5324,7 +5349,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3044-kronagg-agg-eko-frigaende-m-l-795g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8358",
@@ -5340,7 +5365,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8358-kronagg-agg-frigaende-m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10236",
@@ -5356,7 +5381,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10236-kronagg-agg-stora-700g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8469",
@@ -5372,7 +5397,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8469-kronagg-agg-frigaende-guldgula-m-l-650g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3700",
@@ -5388,7 +5413,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3700-kronagg-agg-bris-frigaende-inomhus-s-305g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8366",
@@ -5404,7 +5429,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8366-kronagg-gardsagg-bruna-m-l-530g/",
     "available": false,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10380",
@@ -5420,7 +5445,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10380-kronagg-agg-frigaende-inomhus-m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8848",
@@ -5436,7 +5461,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8848-kronagg-agg-frigaende-utomhus-sojafritt-foder-m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64191",
@@ -5452,7 +5477,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64191-garant-pasta-tagliatelle-agg/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62380",
@@ -5468,7 +5493,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62380-good-baguette-agg-rakor/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62192",
@@ -5484,7 +5509,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62192-severin-aggkokare-vit-1-6-agg/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9049",
@@ -5500,7 +5525,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9049-eldorado-pannkakor-12-p/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6119",
@@ -5516,7 +5541,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6119-kavli-amerikansk-dressing-pepper/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62459",
@@ -5532,7 +5557,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62459-fixa-ballongvisp/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5982",
@@ -5548,23 +5573,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5982-garant-majonnas/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "67649",
-    "name": "Duni Servett Bunnies & Eggs 3-lags 33x33cm",
-    "brand": "Duni",
-    "packageText": "20 st",
-    "price": 20,
-    "priceText": "20.00 SEK",
-    "unitPrice": 1,
-    "unitPriceText": "1.00 SEK",
-    "unitPriceUnit": "st",
-    "imageUrl": "https://images.mathem.se/prod/local_products/1ba3ab30-7f21-400d-9e00-57bbd88bd347.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x7b1bcf8a0bc27af6f6b547f9fb2e09afbe324c46",
-    "productUrl": "https://www.mathem.se/se/products/67649-duni-servett-bunnies-eggs-3-lags-33x33cm/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "48554",
@@ -5580,7 +5589,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/48554-hedlundgruppen-paskagg-30cm-osorterade-motiv/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67649",
+    "name": "Duni Servett Bunnies & Eggs 3-lags 33x33cm",
+    "brand": "Duni",
+    "packageText": "20 st",
+    "price": 20,
+    "priceText": "20.00 SEK",
+    "unitPrice": 1,
+    "unitPriceText": "1.00 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1ba3ab30-7f21-400d-9e00-57bbd88bd347.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x7b1bcf8a0bc27af6f6b547f9fb2e09afbe324c46",
+    "productUrl": "https://www.mathem.se/se/products/67649-duni-servett-bunnies-eggs-3-lags-33x33cm/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7740",
@@ -5596,7 +5621,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7740-spicefield-aggnudlar/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67522",
@@ -5612,7 +5637,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67522-zeta-gran-amore-italiensk-hardost/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8231",
@@ -5628,23 +5653,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8231-kavli-smorgaspickles/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "64368",
-    "name": "Santa Maria Äggnudlar",
-    "brand": "Santa Maria",
-    "packageText": "250 g",
-    "price": 16.56,
-    "priceText": "16.56 SEK",
-    "unitPrice": 66.24,
-    "unitPriceText": "66.24 SEK",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://images.mathem.se/prod/local_products/e21d97c5-ff3a-4335-b008-361bdd2a0bba.jpg?fit=bounds&format=auto&optimize=medium&width=195&s=0xbaad8081bf04e872702c209f79a88db29df4180a",
-    "productUrl": "https://www.mathem.se/se/products/64368-santa-maria-aggnudlar/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "68377",
@@ -5660,7 +5669,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/68377-korvbrodsbagarn-hamburgerbrod-brioche-4-p/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64368",
+    "name": "Santa Maria Äggnudlar",
+    "brand": "Santa Maria",
+    "packageText": "250 g",
+    "price": 16.56,
+    "priceText": "16.56 SEK",
+    "unitPrice": 66.24,
+    "unitPriceText": "66.24 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e21d97c5-ff3a-4335-b008-361bdd2a0bba.jpg?fit=bounds&format=auto&optimize=medium&width=195&s=0xbaad8081bf04e872702c209f79a88db29df4180a",
+    "productUrl": "https://www.mathem.se/se/products/64368-santa-maria-aggnudlar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10793",
@@ -5676,7 +5701,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10793-uprena-spansk-tortilla-med-lok/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "66066",
@@ -5692,7 +5717,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/66066-gooh-tortelloni-ricotta-spenat/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "68257",
@@ -5708,7 +5733,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/68257-semper-klammis-pasta-butternutpumpa-sotpotatis-6m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "68404",
@@ -5724,7 +5749,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/68404-polar-seafood-blinier-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "68265",
@@ -5740,39 +5765,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/68265-semper-spaghetti-bolognese-8m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "10906",
-    "name": "Frödinge Ostkaka",
-    "brand": "Frödinge",
-    "packageText": "600 g",
-    "price": 54.42,
-    "priceText": "54.42 SEK",
-    "unitPrice": 90.7,
-    "unitPriceText": "90.70 SEK",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://images.mathem.se/prod/local_products/a97ecb76-339c-4c1c-b629-10c1798b0aac.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xfdd85ae61893e9962bf62b48e96ffbf3819eca10",
-    "productUrl": "https://www.mathem.se/se/products/10906-frodinge-ostkaka/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "66011",
-    "name": "Eldorado Brownie 4-p",
-    "brand": "Eldorado",
-    "packageText": "180 g",
-    "price": 22.24,
-    "priceText": "22.24 SEK",
-    "unitPrice": 123.56,
-    "unitPriceText": "123.56 SEK",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://images.mathem.se/prod/local_products/be806ec3-40e8-4a69-a54b-1507f5d87490.jpg?fit=bounds&format=auto&optimize=medium&width=269&s=0xa40f435c60788a11ef8c615a11679b37bf759982",
-    "productUrl": "https://www.mathem.se/se/products/66011-eldorado-brownie-4-p/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4003",
@@ -5788,7 +5781,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4003-kungsornen-raggmunk-frysta-12-p/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11289",
@@ -5804,7 +5797,55 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11289-smalandskraftan-kokt-rimmad-torskrygg-msc/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10906",
+    "name": "Frödinge Ostkaka",
+    "brand": "Frödinge",
+    "packageText": "600 g",
+    "price": 54.42,
+    "priceText": "54.42 SEK",
+    "unitPrice": 90.7,
+    "unitPriceText": "90.70 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a97ecb76-339c-4c1c-b629-10c1798b0aac.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xfdd85ae61893e9962bf62b48e96ffbf3819eca10",
+    "productUrl": "https://www.mathem.se/se/products/10906-frodinge-ostkaka/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66011",
+    "name": "Eldorado Brownie 4-p",
+    "brand": "Eldorado",
+    "packageText": "180 g",
+    "price": 22.24,
+    "priceText": "22.24 SEK",
+    "unitPrice": 123.56,
+    "unitPriceText": "123.56 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/be806ec3-40e8-4a69-a54b-1507f5d87490.jpg?fit=bounds&format=auto&optimize=medium&width=269&s=0xa40f435c60788a11ef8c615a11679b37bf759982",
+    "productUrl": "https://www.mathem.se/se/products/66011-eldorado-brownie-4-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7044",
+    "name": "MACKAYS Lemon Curd",
+    "brand": "MACKAYS",
+    "packageText": "340 g",
+    "price": 32.13,
+    "priceText": "32.13 SEK",
+    "unitPrice": 94.5,
+    "unitPriceText": "94.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bcf78681-56b8-43f3-9172-64e8ba1fb008.jpg?fit=bounds&format=auto&optimize=medium&width=180&s=0x72c293792a65961fb7eafc979a5ddb00127ec4e4",
+    "productUrl": "https://www.mathem.se/se/products/7044-mackays-lemon-curd/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10593",
@@ -5820,23 +5861,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10593-hagges-chokladkaka-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "3501",
-    "name": "Almondy Mandeltårta Glutenfri Fryst",
-    "brand": "Almondy",
-    "packageText": "400 g",
-    "price": 59.15,
-    "priceText": "59.15 SEK",
-    "unitPrice": 147.88,
-    "unitPriceText": "147.88 SEK",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://images.mathem.se/prod/local_products/ed44feef-b3d9-4b1c-ba40-cd32f3d5febe.jpg?fit=bounds&format=auto&optimize=medium&width=298&s=0x34fe455fc72573ecb9a8cbbc3144f9729a6bcb49",
-    "productUrl": "https://www.mathem.se/se/products/3501-almondy-mandeltarta-glutenfri-fryst/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=agg",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9246",
@@ -5852,7 +5877,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9246-svenskt-smor-fran-arla-smor-normalsaltat-82/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9680",
@@ -5868,7 +5893,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9680-svenskt-smor-fran-arla-smor-normalsaltat-82/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "38843",
@@ -5884,7 +5909,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/38843-bregott-r-smor-raps-normalsaltat-75/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2557",
@@ -5900,7 +5925,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2557-garant-smor-normalsaltat-82/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "13613",
@@ -5916,7 +5941,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/13613-svenskt-smor-fran-arla-smor-osaltat-82/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "40068",
@@ -5932,7 +5957,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/40068-bregott-r-smor-raps-extrasaltat-75/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "39066",
@@ -5948,7 +5973,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/39066-bregott-r-normalsaltat-smor-raps-75/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11212",
@@ -5964,7 +5989,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11212-svenskt-smor-fran-arla-smor-normalsaltat-laktosfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10159",
@@ -5980,7 +6005,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10159-svenskt-smor-fran-arla-smor-normalsaltat-82-eko-kr/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11417",
@@ -5996,7 +6021,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11417-svenskt-smor-fran-arla-smor-normalsaltat-82-eko-kr/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9282",
@@ -6012,7 +6037,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9282-valio-smor-normalsaltat-80/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "18038",
@@ -6028,7 +6053,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/18038-svenskt-smor-fran-arla-smor-extrasaltat-81/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "19329",
@@ -6044,7 +6069,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/19329-skanemejerier-svenskt-smor-normalsaltat-82/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "39000",
@@ -6060,7 +6085,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/39000-bregott-r-mellan-smor-raps-57/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62503",
@@ -6076,7 +6101,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62503-bregott-r-smor-raps-extrasaltat-75/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "40025",
@@ -6092,7 +6117,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/40025-bregott-r-smor-raps-mellan-57/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62505",
@@ -6108,7 +6133,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62505-bregott-r-smor-raps-mellan-57/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9240",
@@ -6124,7 +6149,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9240-beillvaire-smor-croquant-med-noirmoutier-havssalt/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "45350",
@@ -6140,7 +6165,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/45350-bregott-r-smor-raps-normalsaltat-75/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "40063",
@@ -6156,7 +6181,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/40063-bregott-r-mindre-smor-raps-mindre-40/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "38782",
@@ -6172,23 +6197,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/38782-bregott-r-smor-raps-normalsaltat-laktosfri-70/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "9687",
-    "name": "Svenskt Smör från Arla Smör Osaltat 82%",
-    "brand": "Svenskt Smör från Arla",
-    "packageText": "250 g",
-    "price": 35,
-    "priceText": "35.00 SEK",
-    "unitPrice": 140,
-    "unitPriceText": "140.00 SEK",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://images.mathem.se/prod/local_products/661ea48e-83a8-40a9-937b-e14486c84aab.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x8819ff95adf91ea3468745ff6e748ae4fcf8e783",
-    "productUrl": "https://www.mathem.se/se/products/9687-svenskt-smor-fran-arla-smor-osaltat-82/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62501",
@@ -6204,7 +6213,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62501-bregott-r-smor-raps-normalsaltat-laktosfri-70/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9687",
+    "name": "Svenskt Smör från Arla Smör Osaltat 82%",
+    "brand": "Svenskt Smör från Arla",
+    "packageText": "250 g",
+    "price": 35,
+    "priceText": "35.00 SEK",
+    "unitPrice": 140,
+    "unitPriceText": "140.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/661ea48e-83a8-40a9-937b-e14486c84aab.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x8819ff95adf91ea3468745ff6e748ae4fcf8e783",
+    "productUrl": "https://www.mathem.se/se/products/9687-svenskt-smor-fran-arla-smor-osaltat-82/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "39023",
@@ -6220,7 +6245,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/39023-bregott-r-smor-raps-normalsaltat-70-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62502",
@@ -6236,7 +6261,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62502-bregott-r-smor-raps-normalsaltat-70-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64800",
@@ -6252,7 +6277,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64800-butter-smor-tryffel/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64797",
@@ -6268,7 +6293,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64797-butter-smor-black-garlic/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64799",
@@ -6284,7 +6309,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64799-butter-smor-roasted-garlic/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7290",
@@ -6300,7 +6325,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7290-pop-bakery-smordeg-med-smor/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "39958",
@@ -6316,7 +6341,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/39958-friggs-majskaka-smor-havssalt/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65395",
@@ -6332,7 +6357,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65395-garant-smor-raps-extrasaltat-75/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64798",
@@ -6348,23 +6373,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64798-butter-smor-cafe-de-paris/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "7074",
-    "name": "Estrella Chips Brynt Smör & Chili",
-    "brand": "Estrella",
-    "packageText": "275 g",
-    "price": 27.3,
-    "priceText": "27.30 SEK",
-    "unitPrice": 99.27,
-    "unitPriceText": "99.27 SEK",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://images.mathem.se/prod/local_products/d2f3d266-9036-481e-833c-db618e71380a.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0xbf9506f9f250f885f4802eeed3268129dbe4ecda",
-    "productUrl": "https://www.mathem.se/se/products/7074-estrella-chips-brynt-smor-chili/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "68193",
@@ -6380,7 +6389,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/68193-kladesholmen-sill-brynt-smor-msc/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7074",
+    "name": "Estrella Chips Brynt Smör & Chili",
+    "brand": "Estrella",
+    "packageText": "275 g",
+    "price": 27.3,
+    "priceText": "27.30 SEK",
+    "unitPrice": 99.27,
+    "unitPriceText": "99.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d2f3d266-9036-481e-833c-db618e71380a.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0xbf9506f9f250f885f4802eeed3268129dbe4ecda",
+    "productUrl": "https://www.mathem.se/se/products/7074-estrella-chips-brynt-smor-chili/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67349",
@@ -6396,7 +6421,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67349-flora-flora-med-smor-normalsaltat-70/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10882",
@@ -6412,7 +6437,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10882-valio-smor-osaltat-82/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7935",
@@ -6428,23 +6453,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7935-gardschips-chips-brynt-smor-havssalt/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "1609",
-    "name": "Valio Smör Eila Laktosfri 80%",
-    "brand": "Valio",
-    "packageText": "500 g",
-    "price": 68.62,
-    "priceText": "68.62 SEK",
-    "unitPrice": 137.24,
-    "unitPriceText": "137.24 SEK",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://images.mathem.se/prod/local_products/62abcb2e-827a-43d0-9205-0a11d3165b0c.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x6c9126323aca51cdda83dbd6bfbaa7483fa03060",
-    "productUrl": "https://www.mathem.se/se/products/1609-valio-smor-eila-laktosfri-80/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "68334",
@@ -6460,7 +6469,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/68334-finn-crisp-snacks-brynt-smor-havssalt/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "1609",
+    "name": "Valio Smör Eila Laktosfri 80%",
+    "brand": "Valio",
+    "packageText": "500 g",
+    "price": 68.62,
+    "priceText": "68.62 SEK",
+    "unitPrice": 137.24,
+    "unitPriceText": "137.24 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/62abcb2e-827a-43d0-9205-0a11d3165b0c.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x6c9126323aca51cdda83dbd6bfbaa7483fa03060",
+    "productUrl": "https://www.mathem.se/se/products/1609-valio-smor-eila-laktosfri-80/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7797",
@@ -6476,7 +6501,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7797-gardschips-chips-brynt-smor-rodlok/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6465",
@@ -6492,7 +6517,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6465-valio-smor-gardsgoda-normalsaltat-75/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6326",
@@ -6508,7 +6533,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6326-arla-koket-r-smor-rapsolja-flytande-80/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=smor",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3838",
@@ -6524,7 +6549,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3838-potatis-delikatess-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3718",
@@ -6540,7 +6565,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3718-potatis-kok-fast-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6752",
@@ -6556,7 +6581,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6752-potatis-kok-fast-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4032",
@@ -6572,7 +6597,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4032-potatis-kok-fast-eko-klass2/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3832",
@@ -6588,7 +6613,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3832-potatis-mos-mjolig-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4315",
@@ -6604,7 +6629,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4315-potatis-fast-klass2/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3923",
@@ -6620,7 +6645,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3923-potatis-amandine-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4451",
@@ -6636,7 +6661,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4451-potatis-kok-fast-eko-klass2/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6804",
@@ -6652,7 +6677,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6804-potatis-mos-mjolig-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "21128",
@@ -6668,7 +6693,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/21128-farskpotatis-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7556",
@@ -6684,7 +6709,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7556-bakpotatis-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6141",
@@ -6700,7 +6725,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6141-potatis-mos-mjolig-eko-klass2/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7623",
@@ -6716,7 +6741,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7623-sydgront-potatis-delikatess-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4454",
@@ -6732,7 +6757,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4454-sotpotatis-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4672",
@@ -6748,7 +6773,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4672-gurka-svensk-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4191",
@@ -6764,7 +6789,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4191-potatis-mos-klass2/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7590",
@@ -6780,7 +6805,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7590-potatis-kok-fast-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5870",
@@ -6796,7 +6821,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5870-potatis-mandel-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5330",
@@ -6812,7 +6837,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5330-eldorado-potatis-hel/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6387",
@@ -6828,7 +6853,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6387-potatis-kok-fast-save-me-klass2/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6275",
@@ -6844,7 +6869,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6275-potatis-sparris-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67591",
@@ -6860,7 +6885,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67591-potatis-fast-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7892",
@@ -6876,7 +6901,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7892-peka-potatisgratang/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7634",
@@ -6892,7 +6917,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7634-potatis-mos-mjolig-450g-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9195",
@@ -6908,7 +6933,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9195-sotpotatis-eko-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11178",
@@ -6924,7 +6949,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11178-felix-potatisbullar-frysta/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6825",
@@ -6940,7 +6965,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6825-aviko-fries-super-crunch-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5955",
@@ -6956,7 +6981,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5955-rydbergs-potatissallad/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "61548",
@@ -6972,7 +6997,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/61548-magnihill-potatis-skivad-fryst-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "66423",
@@ -6988,7 +7013,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/66423-felix-pommes-chips-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "68003",
@@ -7004,7 +7029,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/68003-rydbergs-potatissallad-original/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10281",
@@ -7020,7 +7045,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10281-felix-potatisbullar-frysta/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8756",
@@ -7036,7 +7061,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8756-felix-potatiskroketter-frysta/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "63876",
@@ -7052,7 +7077,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/63876-garant-potatisklyftor-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6728",
@@ -7068,7 +7093,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6728-aviko-pommes-frites-tunna-super-crunch-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6573",
@@ -7084,7 +7109,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6573-garant-pommes-strips-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "12380",
@@ -7100,7 +7125,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/12380-eldorado-potatisbullar-frysta/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6921",
@@ -7116,7 +7141,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6921-peka-kryddig-kulpotatis/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4379",
@@ -7132,7 +7157,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4379-lok-rod-styck-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3391",
@@ -7148,7 +7173,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3391-peka-potatisgratang/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67825",
@@ -7164,7 +7189,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67825-lecora-dillstuvad-potatis/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6598",
@@ -7180,7 +7205,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6598-kelda-r-potatis-purjoloksoppa/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=potatis",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "63122",
@@ -7196,7 +7221,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/63122-daily-greens-bananklase-eko-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4155",
@@ -7212,7 +7237,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4155-daily-greens-banan-eko-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "63351",
@@ -7228,7 +7253,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/63351-daily-greens-bananklase-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3831",
@@ -7244,7 +7269,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3831-daily-greens-bananklase-eko-fairtrade-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2796",
@@ -7260,7 +7285,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2796-valio-yo-ghurt-banan-vanilj-01/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4073",
@@ -7276,7 +7301,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4073-semper-grot-jordgubb-banan-blabar-6m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "66192",
@@ -7292,7 +7317,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/66192-arla-r-yoghurt-banan-18-familjefavoriter/",
     "available": false,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62979",
@@ -7308,7 +7333,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62979-valio-yoghurt-vanilj-banan-22/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67573",
@@ -7324,7 +7349,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67573-frukost-frystorkad-banan/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4216",
@@ -7340,7 +7365,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4216-semper-grotklammis-apple-banan-kanel-6m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64697",
@@ -7356,7 +7381,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64697-actimel-drickyoghurt-jordgubb-banan-8x100g/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9907",
@@ -7372,7 +7397,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9907-garant-smoothie-jordgubb-banan/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9439",
@@ -7388,7 +7413,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9439-garant-frukt-barmix-smoothie-jordgubb-banan-blabar/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10067",
@@ -7404,7 +7429,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10067-garant-smoothie-banan-mango-passionsfrukt/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7442",
@@ -7420,7 +7445,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7442-minstingen-klammis-jordgubbe-banan-6m-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67790",
@@ -7436,7 +7461,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67790-yalla-r-yoghurt-squeeze-banan/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4291",
@@ -7452,7 +7477,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4291-minstingen-majssnacks-banan-mango-10m-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4457",
@@ -7468,7 +7493,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4457-semper-grotklammis-paron-mango-banan-apple-6m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3131",
@@ -7484,7 +7509,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3131-barebells-proteinbar-banana-dream/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3977",
@@ -7500,7 +7525,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3977-semper-grot-apple-persika-banan-6m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7406",
@@ -7516,7 +7541,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7406-minstingen-klammis-banan-mango-sotpotatis-6m-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2361",
@@ -7532,23 +7557,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2361-propud-proteinmilkshake-caramel-glazed-bananas/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "5290",
-    "name": "Glockengold Fruktdryck Multivitamin",
-    "brand": "Glockengold",
-    "packageText": "2 l",
-    "price": 24.13,
-    "priceText": "24.13 SEK",
-    "unitPrice": 12.07,
-    "unitPriceText": "12.07 SEK",
-    "unitPriceUnit": "l",
-    "imageUrl": "https://images.mathem.se/prod/local_products/8d80d342-23ef-4387-8d78-9e60e5769d0e.jpg?fit=bounds&format=auto&optimize=medium&width=152&s=0xf0456c02ffdf600508f6c973e8df98195942999c",
-    "productUrl": "https://www.mathem.se/se/products/5290-glockengold-fruktdryck-multivitamin/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3782",
@@ -7564,7 +7573,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3782-semper-pure-mango-banan-5m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5290",
+    "name": "Glockengold Fruktdryck Multivitamin",
+    "brand": "Glockengold",
+    "packageText": "2 l",
+    "price": 24.13,
+    "priceText": "24.13 SEK",
+    "unitPrice": 12.07,
+    "unitPriceText": "12.07 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8d80d342-23ef-4387-8d78-9e60e5769d0e.jpg?fit=bounds&format=auto&optimize=medium&width=152&s=0xf0456c02ffdf600508f6c973e8df98195942999c",
+    "productUrl": "https://www.mathem.se/se/products/5290-glockengold-fruktdryck-multivitamin/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67916",
@@ -7580,7 +7605,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67916-healthyco-banan-kakaokram/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "66001",
@@ -7596,7 +7621,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/66001-danone-yopro-protein-drickyoghurt-banan-utan-tills/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4298",
@@ -7612,7 +7637,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4298-semper-grot-paron-aprikos-banan-6m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67329",
@@ -7628,7 +7653,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67329-eldorado-drickyoghurt-paron-banan-laktosfri-08/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65211",
@@ -7644,7 +7669,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65211-nestle-grot-paron-banan-6m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5315",
@@ -7660,7 +7685,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5315-bubs-goody-banana-toffee-fairtrade/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5609",
@@ -7676,7 +7701,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5609-lok-bananschalotten-klass1/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7627",
@@ -7692,7 +7717,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7627-nestle-klampase-smoothie-apple-banan-jordgubb-6m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "12324",
@@ -7708,7 +7733,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/12324-start-start-choc-go-bananas/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4408",
@@ -7724,7 +7749,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4408-nestle-fruktstang-blabar-12m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62263",
@@ -7740,7 +7765,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62263-carletti-skumbananer/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "66501",
@@ -7756,7 +7781,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/66501-castus-havrebites-banan/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64315",
@@ -7772,23 +7797,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64315-farsking-granola-kakao-banan/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "67760",
-    "name": "Garant Smoothie Jordgubb & Banan",
-    "brand": "Garant",
-    "packageText": "250 ml",
-    "price": 16.04,
-    "priceText": "16.04 SEK",
-    "unitPrice": 64.16,
-    "unitPriceText": "64.16 SEK",
-    "unitPriceUnit": "l",
-    "imageUrl": "https://images.mathem.se/prod/local_products/9c95f825-fa27-46e2-8438-9ab7c5f9ab0d.jpg?fit=bounds&format=auto&optimize=medium&width=106&s=0xd6139292911f4c9e7424a1ebc28804d06d409cfd",
-    "productUrl": "https://www.mathem.se/se/products/67760-garant-smoothie-jordgubb-banan/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3935",
@@ -7804,7 +7813,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3935-semper-smoothie-apple-banan-6m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67760",
+    "name": "Garant Smoothie Jordgubb & Banan",
+    "brand": "Garant",
+    "packageText": "250 ml",
+    "price": 16.04,
+    "priceText": "16.04 SEK",
+    "unitPrice": 64.16,
+    "unitPriceText": "64.16 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9c95f825-fa27-46e2-8438-9ab7c5f9ab0d.jpg?fit=bounds&format=auto&optimize=medium&width=106&s=0xd6139292911f4c9e7424a1ebc28804d06d409cfd",
+    "productUrl": "https://www.mathem.se/se/products/67760-garant-smoothie-jordgubb-banan/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65212",
@@ -7820,7 +7845,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65212-nestle-grot-apple-banan-6m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "35016",
@@ -7836,23 +7861,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/35016-semper-smoothie-banan-jordgubb-12m/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
-    "code": "3821",
-    "name": "Semper Fullkornsvälling Banan & Katrinplommon +18M",
-    "brand": "Semper",
-    "packageText": "725 g",
-    "price": 85,
-    "priceText": "85.00 SEK",
-    "unitPrice": 117.24,
-    "unitPriceText": "117.24 SEK",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://images.mathem.se/prod/local_products/86bd8e9c-9a1f-4251-9136-4606cf196a2d.jpg?fit=bounds&format=auto&optimize=medium&width=248&s=0x460f7957f5526f9c4e6d60c601699e777b417d4c",
-    "productUrl": "https://www.mathem.se/se/products/3821-semper-fullkornsvalling-banan-katrinplommon-18m/",
+    "code": "4679",
+    "name": "Yalla® Drickyoghurt Mango, Banan & Apelsin 0,5%",
+    "brand": "Yalla®",
+    "packageText": "350 ml",
+    "price": 19.4,
+    "priceText": "19.40 SEK",
+    "unitPrice": 55.43,
+    "unitPriceText": "55.43 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ef121801-fc72-4099-8086-7f71bb0cc838.jpg?fit=bounds&format=auto&optimize=medium&width=119&s=0x672457a12adbf36ca1a14a5dda7be442e6b7f913",
+    "productUrl": "https://www.mathem.se/se/products/4679-yalla-r-drickyoghurt-mango-banan-apelsin-05/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=banan",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11670",
@@ -7868,7 +7893,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11670-garant-kyckling-brostfile-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "1702",
@@ -7884,7 +7909,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/1702-kronfagel-kyckling-brostfile/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "63432",
@@ -7900,7 +7925,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/63432-kronfagel-kyckling-minutfile/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2608",
@@ -7916,7 +7941,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2608-kronfagel-kyckling-larfile/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2513",
@@ -7932,7 +7957,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2513-garant-innerfile-av-svensk-kyckling-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "63430",
@@ -7948,7 +7973,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/63430-kronfagel-kyckling-minutstrimlor/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3827",
@@ -7964,7 +7989,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3827-kronfagel-kycklingfile-fryst/",
     "available": false,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2391",
@@ -7980,7 +8005,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2391-eldorado-kycklingbrostfile-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "66315",
@@ -7996,7 +8021,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/66315-kronfagel-kycklinginnerfile-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10758",
@@ -8012,7 +8037,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10758-guldfageln-lagat-klart-kycklingbrostfile-grillkryd/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8781",
@@ -8028,7 +8053,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8781-kronfagel-kycklingklubbor-morade-frysta/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "63433",
@@ -8044,7 +8069,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/63433-kronfagel-kyckling-larfile-minutstrimlor/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64351",
@@ -8060,7 +8085,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64351-garant-kyckling-grillad/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "66273",
@@ -8076,7 +8101,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/66273-kronfagel-atklar-kyckling-classic-skivad/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "63429",
@@ -8090,9 +8115,9 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "unitPriceUnit": "kg",
     "imageUrl": "https://images.mathem.se/prod/local_products/f2bbd855-6766-469c-922b-a8d44cf931f9.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x86b5dc7114c60cb4a0dc8410ec946c41679cac19",
     "productUrl": "https://www.mathem.se/se/products/63429-kronfagel-kyckling-sma-fina-innerfileer/",
-    "available": false,
+    "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3929",
@@ -8108,7 +8133,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3929-reko-kycklingbrostfile-fryst-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2662",
@@ -8124,7 +8149,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2662-guldfageln-kycklingbrostfile/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3385",
@@ -8140,7 +8165,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3385-guldfageln-kycklingbrostfile-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10085",
@@ -8156,7 +8181,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10085-kronfagel-kycklingben-frysta/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "1929",
@@ -8172,7 +8197,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/1929-bjarefagel-bjarekyckling-hel-farsk/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "12164",
@@ -8188,7 +8213,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/12164-eldorado-kycklingkebab-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3857",
@@ -8204,7 +8229,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3857-kronfagel-kycklingfars-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3082",
@@ -8220,7 +8245,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3082-bosarp-kycklinginnerfile-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3395",
@@ -8236,7 +8261,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3395-kronfagel-kycklingsteak/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4220",
@@ -8252,7 +8277,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4220-reko-kycklinglarfile-eko-krav-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10780",
@@ -8268,7 +8293,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10780-guldfageln-lagat-klart-grillad-skivad-kycklingbros/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "26935",
@@ -8284,7 +8309,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/26935-eldorado-kycklinggrillkorv/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2866",
@@ -8300,7 +8325,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2866-bjarefagel-bjarekyckling-brostfile-farska/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "63431",
@@ -8314,9 +8339,9 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "unitPriceUnit": "kg",
     "imageUrl": "https://images.mathem.se/prod/local_products/d2d656f7-a37b-4ac2-9f85-39544a04434b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdf738d7c60cfee2c757b093bfdc9a4e28f96e82d",
     "productUrl": "https://www.mathem.se/se/products/63431-kronfagel-tarnad-kycklingbrostfile-minutbitar/",
-    "available": false,
+    "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62925",
@@ -8332,7 +8357,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62925-guldfageln-farsk-kyckling-hel/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2959",
@@ -8348,7 +8373,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2959-kronfagel-kyckling-brostfile/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6745",
@@ -8364,7 +8389,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6745-dafgards-kyckling-jacob-fryst/",
     "available": false,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4469",
@@ -8380,7 +8405,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4469-reko-kycklingben-fryst-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9024",
@@ -8396,7 +8421,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9024-guldfageln-drumsticks-grillkryddad-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3441",
@@ -8412,7 +8437,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3441-guldfageln-farsk-majskyckling-brostfile-4-p/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "66275",
@@ -8428,7 +8453,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/66275-kronfagel-atklar-kyckling-bbq-tarnad/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4021",
@@ -8444,7 +8469,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4021-reko-kycklingvingar-fryst-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "64755",
@@ -8460,7 +8485,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/64755-kronfagel-atklar-kyckling-ceasar-skivad/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "2300",
@@ -8476,7 +8501,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/2300-guldfageln-tacokyckling-fryst/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4392",
@@ -8492,7 +8517,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4392-reko-kyckling-hel-fryst-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "66311",
@@ -8508,7 +8533,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/66311-kronfagel-kyckling-minutbitar-fryst/",
     "available": false,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "66314",
@@ -8524,7 +8549,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/66314-kronfagel-kyckling-minutstrimlor-fryst/",
     "available": false,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=kyckling",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9308",
@@ -8540,7 +8565,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9308-heinz-ketchup/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8536",
@@ -8556,7 +8581,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8536-felix-ketchup/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6480",
@@ -8572,7 +8597,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6480-felix-ketchup/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5536",
@@ -8588,7 +8613,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5536-heinz-ketchup/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10297",
@@ -8604,7 +8629,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10297-felix-ketchup-osotad/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "8462",
@@ -8620,7 +8645,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/8462-felix-ketchup-mindre-socker-salt/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "10061",
@@ -8636,7 +8661,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/10061-heinz-ketchup-mindre-socker-salt/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9584",
@@ -8652,7 +8677,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9584-felix-ketchup/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9706",
@@ -8668,7 +8693,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9706-heinz-ketchup-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67341",
@@ -8684,7 +8709,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67341-felix-ketchup-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9351",
@@ -8700,7 +8725,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9351-heinz-ketchup-utan-tillsatt-socker-salt/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7274",
@@ -8716,7 +8741,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7274-felix-ketchup-osotad/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "68582",
@@ -8732,7 +8757,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/68582-heinz-ketchup/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67340",
@@ -8748,7 +8773,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67340-felix-ketchup-mindre-socker-salt/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6396",
@@ -8764,7 +8789,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6396-felix-ketchup-hot-chilli/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67344",
@@ -8780,7 +8805,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67344-felix-ketchup-jubileum/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67856",
@@ -8796,7 +8821,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67856-hela-ketchup-spicy/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6599",
@@ -8812,7 +8837,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6599-johnnys-senap-sotstark/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5028",
@@ -8828,7 +8853,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5028-mutti-tomatpure/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67806",
@@ -8844,7 +8869,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67806-hela-ketchup-original/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9644",
@@ -8860,7 +8885,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9644-hellmanns-majonnas-real/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5918",
@@ -8876,7 +8901,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5918-kavli-majonnas-akta/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65716",
@@ -8892,7 +8917,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65716-heinz-chilisas/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67385",
@@ -8908,7 +8933,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67385-heinz-chilisas/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6843",
@@ -8924,7 +8949,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6843-johnnys-senap-grovstark/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4935",
@@ -8940,7 +8965,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4935-slotts-senap-original/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5838",
@@ -8956,7 +8981,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5838-kavli-citronmajonnas/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5677",
@@ -8972,7 +8997,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5677-kavli-lattmajonnas/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6561",
@@ -8988,7 +9013,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6561-max-hamburgerdressing-original/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67384",
@@ -9004,7 +9029,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67384-heinz-hp-sauce/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7961",
@@ -9020,7 +9045,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7961-heinz-worcestershire-sauce/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "66101",
@@ -9036,7 +9061,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/66101-lohmanders-favoritsas/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5789",
@@ -9052,7 +9077,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5789-felix-tomatpure/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "1073",
@@ -9068,7 +9093,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/1073-eldorado-tomatpure/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65833",
@@ -9084,7 +9109,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65833-mino-tomatpure/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9709",
@@ -9100,7 +9125,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9709-heinz-mayo/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "62390",
@@ -9116,7 +9141,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/62390-johan-jureskog-selection-hamburgerdressing/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7173",
@@ -9132,7 +9157,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7173-santa-maria-pizza-sauce/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9878",
@@ -9148,7 +9173,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9878-franks-red-hot-sauce/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "39059",
@@ -9164,7 +9189,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/39059-garant-chilisas/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67481",
@@ -9180,7 +9205,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67481-santa-maria-bbq-sauce-original/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "68097",
@@ -9196,7 +9221,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/68097-farmers-chefs-hamburger-dressing/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=ketchup",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7075",
@@ -9212,7 +9237,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7075-axa-havregryn/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4978",
@@ -9228,7 +9253,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4978-garant-eko-havregryn-eko-krav/",
     "available": false,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5988",
@@ -9244,7 +9269,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5988-gyllenhammars-havregryn/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7794",
@@ -9260,7 +9285,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7794-garant-eko-havregryn-glutenfria-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4848",
@@ -9276,7 +9301,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4848-axa-havregryn/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "3758",
@@ -9292,7 +9317,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/3758-axa-fiberhavregryn/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "47859",
@@ -9308,7 +9333,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/47859-garant-havregryn/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6520",
@@ -9324,7 +9349,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6520-garant-havregryn-fiber/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65691",
@@ -9340,7 +9365,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65691-garant-eko-havregryn-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7759",
@@ -9356,7 +9381,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7759-salta-kvarn-havregryn-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "7052",
@@ -9372,7 +9397,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/7052-salta-kvarn-fina-havregryn-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5411",
@@ -9388,7 +9413,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5411-axa-fiberhavregryn-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "9545",
@@ -9404,7 +9429,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/9545-salta-kvarn-fiber-havregryn-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6605",
@@ -9420,7 +9445,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6605-gyllenhammars-fiberhavregryn/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "4906",
@@ -9436,7 +9461,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/4906-gyllenhammars-havregryn-eko-krav/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65616",
@@ -9452,7 +9477,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65616-axa-havregryn-extra-fyllig/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6092",
@@ -9468,7 +9493,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6092-frebaco-kvarn-havre-steel-cut/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "5812",
@@ -9484,7 +9509,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/5812-axa-sportgryn/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6824",
@@ -9500,7 +9525,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6824-frebaco-kvarn-havre-quinoa-grot-eko/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "68715",
@@ -9516,7 +9541,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/68715-start-start-russin/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "11453",
@@ -9532,23 +9557,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/11453-gille-gillebollar/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "62790",
-    "name": "Garant Granola Kokos & Quinoa",
-    "brand": "Garant",
-    "packageText": "425 g",
-    "price": 42.54,
-    "priceText": "42.54 SEK",
-    "unitPrice": 100.09,
-    "unitPriceText": "100.09 SEK",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://images.mathem.se/prod/local_products/b3b35475-87f7-40be-828c-f63547f946de.jpg?fit=bounds&format=auto&optimize=medium&width=163&s=0xd5dd262f8f6d0c836aa29b566d8cb70582ec213e",
-    "productUrl": "https://www.mathem.se/se/products/62790-garant-granola-kokos-quinoa/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "68522",
@@ -9564,7 +9573,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/68522-fazer-havregryning/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62790",
+    "name": "Garant Granola Kokos & Quinoa",
+    "brand": "Garant",
+    "packageText": "425 g",
+    "price": 42.54,
+    "priceText": "42.54 SEK",
+    "unitPrice": 100.09,
+    "unitPriceText": "100.09 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b3b35475-87f7-40be-828c-f63547f946de.jpg?fit=bounds&format=auto&optimize=medium&width=163&s=0xd5dd262f8f6d0c836aa29b566d8cb70582ec213e",
+    "productUrl": "https://www.mathem.se/se/products/62790-garant-granola-kokos-quinoa/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "6266",
@@ -9580,7 +9605,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/6266-axa-grynblandning/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "66547",
@@ -9596,23 +9621,7 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/66547-schar-powerknacke-glutenfri/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
-  },
-  {
-    "code": "66061",
-    "name": "Gille Kolarulle",
-    "brand": "Gille",
-    "packageText": "180 g",
-    "price": 28.35,
-    "priceText": "28.35 SEK",
-    "unitPrice": 157.5,
-    "unitPriceText": "157.50 SEK",
-    "unitPriceUnit": "kg",
-    "imageUrl": "https://images.mathem.se/prod/local_products/f3d69eef-631a-4684-8b30-1733859e5a76.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x419f85271f8a466d3656629c49e8c68b5250d6b2",
-    "productUrl": "https://www.mathem.se/se/products/66061-gille-kolarulle/",
-    "available": true,
-    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "65615",
@@ -9628,7 +9637,23 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/65615-axa-musli-original/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66061",
+    "name": "Gille Kolarulle",
+    "brand": "Gille",
+    "packageText": "180 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 157.5,
+    "unitPriceText": "157.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f3d69eef-631a-4684-8b30-1733859e5a76.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x419f85271f8a466d3656629c49e8c68b5250d6b2",
+    "productUrl": "https://www.mathem.se/se/products/66061-gille-kolarulle/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   },
   {
     "code": "67851",
@@ -9644,6 +9669,15078 @@ export const mathemProducts: MathemIngestedProduct[] = [
     "productUrl": "https://www.mathem.se/se/products/67851-mixwell-granola-protein-choco/",
     "available": true,
     "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
-    "retrievedAt": "2026-05-22T11:29:14.829Z"
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9193",
+    "name": "AXA Musli Gold Berries",
+    "brand": "AXA",
+    "packageText": "725 g",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 78.26,
+    "unitPriceText": "78.26 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/67695d40-03e5-44e8-b89c-4df2a00637b2.jpg?fit=bounds&format=auto&optimize=medium&width=197&s=0x2e3a115509ab671559979330c49f53fd4343a7b5",
+    "productUrl": "https://www.mathem.se/se/products/9193-axa-musli-gold-berries/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2823",
+    "name": "Delicato Pärlboll Styckförpackad 25-p",
+    "brand": "Delicato",
+    "packageText": "1450 g",
+    "price": 169.41,
+    "priceText": "169.41 SEK",
+    "unitPrice": 116.83,
+    "unitPriceText": "116.83 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/47f6c2db-8777-4f1d-a011-037a8785b2c1.jpg?fit=bounds&format=auto&optimize=medium&width=298&s=0xd5396b58f121463d4656e37ac2570a944a51660f",
+    "productUrl": "https://www.mathem.se/se/products/2823-delicato-parlboll-styckforpackad-25-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8912",
+    "name": "Garant Müsli Tropisk Glutenfri",
+    "brand": "Garant",
+    "packageText": "450 g",
+    "price": 39.7,
+    "priceText": "39.70 SEK",
+    "unitPrice": 88.22,
+    "unitPriceText": "88.22 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ba7bfe3c-4afa-4d0c-ac53-be81ce033032.jpg?fit=bounds&format=auto&optimize=medium&width=124&s=0x4ac0bf4c0740fde638f5a60fa9f27815b73c50cb",
+    "productUrl": "https://www.mathem.se/se/products/8912-garant-musli-tropisk-glutenfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7169",
+    "name": "Fazer Havrerundel",
+    "brand": "Fazer",
+    "packageText": "450 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 67.2,
+    "unitPriceText": "67.20 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4cd860d0-c9bf-43a9-896f-e1a013dc5ed2.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x769d86525fb9303477f429aa1ea4d4155086be5a",
+    "productUrl": "https://www.mathem.se/se/products/7169-fazer-havrerundel/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6350",
+    "name": "Delicato Pärlboll 6-p",
+    "brand": "Delicato",
+    "packageText": "240 g",
+    "price": 29.29,
+    "priceText": "29.29 SEK",
+    "unitPrice": 122.04,
+    "unitPriceText": "122.04 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/27dbeb73-0b26-4dee-9278-410942e3fa71.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdc98c5a0deaf1becfc569146fa41d251d1021a39",
+    "productUrl": "https://www.mathem.se/se/products/6350-delicato-parlboll-6-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4951",
+    "name": "Eldorado Punschrulle 6-p",
+    "brand": "Eldorado",
+    "packageText": "180 g",
+    "price": 19.4,
+    "priceText": "19.40 SEK",
+    "unitPrice": 107.78,
+    "unitPriceText": "107.78 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/39e918b7-ddd1-4637-b3e1-ee53d7ae2ec9.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x171991ad9917d29a35482cf9623aa9555132f4c5",
+    "productUrl": "https://www.mathem.se/se/products/4951-eldorado-punschrulle-6-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10411",
+    "name": "AXA Musli Gold Nut",
+    "brand": "AXA",
+    "packageText": "640 g",
+    "price": 52.95,
+    "priceText": "52.95 SEK",
+    "unitPrice": 82.73,
+    "unitPriceText": "82.73 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f3684498-c1f0-47aa-9bcf-b90a40478dab.jpg?fit=bounds&format=auto&optimize=medium&width=196&s=0x3f3fb9f87103bceee8f02ccdce2b5b5558c547ab",
+    "productUrl": "https://www.mathem.se/se/products/10411-axa-musli-gold-nut/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2753",
+    "name": "Ewalie Granola Nötter Glutenfri",
+    "brand": "Ewalie",
+    "packageText": "425 g",
+    "price": 78.51,
+    "priceText": "78.51 SEK",
+    "unitPrice": 184.73,
+    "unitPriceText": "184.73 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6b6baae3-8dd9-4a8a-a2a3-7d178fff74d5.jpg?fit=bounds&format=auto&optimize=medium&width=238&s=0x51ec50246602b30598420d7f8b4e72c29718c688",
+    "productUrl": "https://www.mathem.se/se/products/2753-ewalie-granola-notter-glutenfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "770",
+    "name": "Chelsie's Jordgubbsgranola Glutenfri EKO",
+    "brand": "Chelsie's",
+    "packageText": "400 g",
+    "price": 70.93,
+    "priceText": "70.93 SEK",
+    "unitPrice": 177.33,
+    "unitPriceText": "177.33 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cca9b530-2e57-4fa6-92d0-476e7275ea09.jpg?fit=bounds&format=auto&optimize=medium&width=154&s=0xb5cc3a8940063345dafe907f6954a03133c6b9ae",
+    "productUrl": "https://www.mathem.se/se/products/770-chelsies-jordgubbsgranola-glutenfri-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2831",
+    "name": "Ewalie Müsli Choklad Glutenfri",
+    "brand": "Ewalie",
+    "packageText": "445 g",
+    "price": 70.93,
+    "priceText": "70.93 SEK",
+    "unitPrice": 159.39,
+    "unitPriceText": "159.39 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/73b3b8aa-1576-47b5-8da8-167cb319cfd6.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x3cc7b65b3eb2fabe6ee6c8086e0a303417d240a3",
+    "productUrl": "https://www.mathem.se/se/products/2831-ewalie-musli-choklad-glutenfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65451",
+    "name": "Urban Deli Granola Hallon & Kardemumma Glutenfri EKO",
+    "brand": "Urban Deli",
+    "packageText": "425 g",
+    "price": 70.93,
+    "priceText": "70.93 SEK",
+    "unitPrice": 166.89,
+    "unitPriceText": "166.89 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e9560d9f-76a4-4c8f-8b4f-adb07c970275.jpg?fit=bounds&format=auto&optimize=medium&width=206&s=0x82e6ecab9797b3fe4c593b2da8ddd6e2c56a561c",
+    "productUrl": "https://www.mathem.se/se/products/65451-urban-deli-granola-hallon-kardemumma-glutenfri-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9978",
+    "name": "AXA Musli Frukt",
+    "brand": "AXA",
+    "packageText": "750 g",
+    "price": 42.12,
+    "priceText": "42.12 SEK",
+    "unitPrice": 56.16,
+    "unitPriceText": "56.16 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fb4120a1-3219-472b-a247-22af34a4de88.jpg?fit=bounds&format=auto&optimize=medium&width=197&s=0x9efb44e40f21d60d80dea7251f156ac70ba4e162",
+    "productUrl": "https://www.mathem.se/se/products/9978-axa-musli-frukt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10231",
+    "name": "AXA Granola Naturell",
+    "brand": "AXA",
+    "packageText": "500 g",
+    "price": 42.54,
+    "priceText": "42.54 SEK",
+    "unitPrice": 85.08,
+    "unitPriceText": "85.08 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c1b37487-61a9-44ce-9baf-2eb2da06abaf.jpg?fit=bounds&format=auto&optimize=medium&width=176&s=0x4fefef489ff6be209f300f96cd2b4a2019c56705",
+    "productUrl": "https://www.mathem.se/se/products/10231-axa-granola-naturell/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=havregryn",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "61919",
+    "name": "Lillängshamnens Laxfilé Fryst 4x125g",
+    "brand": "Lillängshamnens",
+    "packageText": "500 g",
+    "price": 94.3,
+    "priceText": "94.30 SEK",
+    "unitPrice": 188.6,
+    "unitPriceText": "188.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9a4f7094-ce76-4ecb-93d3-f7a36355cf34.jpg?fit=bounds&format=auto&optimize=medium&width=149&s=0x341e2a2f5f77a1a1ec9f4a8deb6fb4bb97c8a8e6",
+    "productUrl": "https://www.mathem.se/se/products/61919-lillangshamnens-laxfile-fryst-4x125g/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "61594",
+    "name": "Lillängshamnens Laxfilé Fryst 4x100g",
+    "brand": "Lillängshamnens",
+    "packageText": "400 g",
+    "price": 65,
+    "priceText": "65.00 SEK",
+    "unitPrice": 162.5,
+    "unitPriceText": "162.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/df9a6a82-b564-49c6-ac51-6f8f5b635723.jpg?fit=bounds&format=auto&optimize=medium&width=149&s=0x09ad32f0027aada6ad064a79f0928078771c9384",
+    "productUrl": "https://www.mathem.se/se/products/61594-lillangshamnens-laxfile-fryst-4x100g/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62923",
+    "name": "Lillängshamnens Färsk Laxfilé",
+    "brand": "Lillängshamnens",
+    "packageText": "500 g",
+    "price": 122.09,
+    "priceText": "122.09 SEK",
+    "unitPrice": 244.18,
+    "unitPriceText": "244.18 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d2a06fe1-1277-408d-ad84-1da5c7a57e61.jpg?fit=bounds&format=auto&optimize=medium&width=217&s=0xd54b85a6f388b781f254bba8b937e479c9c72c58",
+    "productUrl": "https://www.mathem.se/se/products/62923-lillangshamnens-farsk-laxfile/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66467",
+    "name": "Falkenbergs lax Färsk Laxfilé ASC",
+    "brand": "Falkenbergs lax",
+    "packageText": "500 g",
+    "price": 141.02,
+    "priceText": "141.02 SEK",
+    "unitPrice": 282.04,
+    "unitPriceText": "282.04 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/432f8f7e-878c-47c7-bcab-df036be3d730.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x1d1e5a09f81dd8a424910df8cfbcfb4ef433ff15",
+    "productUrl": "https://www.mathem.se/se/products/66467-falkenbergs-lax-farsk-laxfile-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11404",
+    "name": "Falkenbergs Lax Kallrökt Laxfilé Skivad ASC",
+    "brand": "Falkenbergs Lax",
+    "packageText": "150 g",
+    "price": 70.93,
+    "priceText": "70.93 SEK",
+    "unitPrice": 472.87,
+    "unitPriceText": "472.87 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c93ece66-0fae-426b-997d-63f9b9efcd72.jpg?fit=bounds&format=auto&optimize=medium&width=206&s=0xd396bedf323ee3f6ef7fa0cc02e9f474c84edad6",
+    "productUrl": "https://www.mathem.se/se/products/11404-falkenbergs-lax-kallrokt-laxfile-skivad-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3948",
+    "name": "Korshags Kallrökt Lax Skivad ASC",
+    "brand": "Korshags",
+    "packageText": "300 g",
+    "price": 138.18,
+    "priceText": "138.18 SEK",
+    "unitPrice": 460.6,
+    "unitPriceText": "460.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5eac2882-653c-41db-ab9b-0997bd5e9ee1.jpg?fit=bounds&format=auto&optimize=medium&width=207&s=0x3c937b17f617d33141c66ece22031b5bfec516d5",
+    "productUrl": "https://www.mathem.se/se/products/3948-korshags-kallrokt-lax-skivad-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66402",
+    "name": "Findus Premium Laxfilé Fryst ASC 2x125g",
+    "brand": "Findus",
+    "packageText": "250 g",
+    "price": 82.95,
+    "priceText": "82.95 SEK",
+    "unitPrice": 331.8,
+    "unitPriceText": "331.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e599a52b-177e-4e5a-a62d-e1d7c9f9578e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x9ffa276931c8c93dcad41bca42f1eb34539ea74c",
+    "productUrl": "https://www.mathem.se/se/products/66402-findus-premium-laxfile-fryst-asc-2x125g/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65847",
+    "name": "Lillängshamnens Laxfilé Kallrökt Skivad",
+    "brand": "Lillängshamnens",
+    "packageText": "150 g",
+    "price": 51.58,
+    "priceText": "51.58 SEK",
+    "unitPrice": 343.87,
+    "unitPriceText": "343.87 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2fea00ea-9998-4c11-a519-89f218d05534.jpg?fit=bounds&format=auto&optimize=medium&width=200&s=0x2c1112863774128d50aceee92c6b6cb15dab56fc",
+    "productUrl": "https://www.mathem.se/se/products/65847-lillangshamnens-laxfile-kallrokt-skivad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11491",
+    "name": "Korshags Varmrökt Lax Citronpeppar ASC",
+    "brand": "Korshags",
+    "packageText": "125 g",
+    "price": 64.83,
+    "priceText": "64.83 SEK",
+    "unitPrice": 518.64,
+    "unitPriceText": "518.64 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d9a27fb3-1b86-442a-986b-d979a01fa1ae.jpg?fit=bounds&format=auto&optimize=medium&width=156&s=0x556c9ac951a129663f600d23b5f862771ae1de76",
+    "productUrl": "https://www.mathem.se/se/products/11491-korshags-varmrokt-lax-citronpeppar-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11471",
+    "name": "Korshags Varmrökt Lax Naturell ASC",
+    "brand": "Korshags",
+    "packageText": "125 g",
+    "price": 64.83,
+    "priceText": "64.83 SEK",
+    "unitPrice": 518.64,
+    "unitPriceText": "518.64 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/411839a5-f54c-4e3b-bd02-0e8f67cd28a0.jpg?fit=bounds&format=auto&optimize=medium&width=156&s=0x9eec0c3c633f9c83b425f8cfd5d1d2ae18e99679",
+    "productUrl": "https://www.mathem.se/se/products/11471-korshags-varmrokt-lax-naturell-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65575",
+    "name": "Korshags Kallrökt Lax Skivad Uppfödd på Land ASC",
+    "brand": "Korshags",
+    "packageText": "150 g",
+    "price": 75.67,
+    "priceText": "75.67 SEK",
+    "unitPrice": 504.47,
+    "unitPriceText": "504.47 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/db36f6a2-5100-4066-8fb7-6600f2f18ed2.jpg?fit=bounds&format=auto&optimize=medium&width=273&s=0x6efabd622943d689a44c1f8a2a14252e4b210f4d",
+    "productUrl": "https://www.mathem.se/se/products/65575-korshags-kallrokt-lax-skivad-uppfodd-pa-land-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11398",
+    "name": "Falkenbergs Lax Gravad Laxfilé Skivad ASC",
+    "brand": "Falkenbergs Lax",
+    "packageText": "150 g",
+    "price": 70.93,
+    "priceText": "70.93 SEK",
+    "unitPrice": 472.87,
+    "unitPriceText": "472.87 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fe4ea443-3c92-4ee2-95d5-70ccd583ab47.jpg?fit=bounds&format=auto&optimize=medium&width=207&s=0x3b774637d7191bdd6c6e9f26436703fe62e104d7",
+    "productUrl": "https://www.mathem.se/se/products/11398-falkenbergs-lax-gravad-laxfile-skivad-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11046",
+    "name": "Korshags Kallrökt Lax Skivad EKO/KRAV",
+    "brand": "Korshags",
+    "packageText": "100 g",
+    "price": 61.47,
+    "priceText": "61.47 SEK",
+    "unitPrice": 614.7,
+    "unitPriceText": "614.70 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/88fb0d65-2c79-49c4-a950-cc15a09bcaf9.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x269bb24117ad9e0808c3d3f6e4b6f7c56c844804",
+    "productUrl": "https://www.mathem.se/se/products/11046-korshags-kallrokt-lax-skivad-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4039",
+    "name": "Korshags Gravad Lax Skivad ASC",
+    "brand": "Korshags",
+    "packageText": "300 g",
+    "price": 138.18,
+    "priceText": "138.18 SEK",
+    "unitPrice": 460.6,
+    "unitPriceText": "460.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1c0eaab6-83ef-4c0b-8996-fd7a569342a9.jpg?fit=bounds&format=auto&optimize=medium&width=207&s=0xdfaca50ebbe174e77423d3841a1481440272f1c0",
+    "productUrl": "https://www.mathem.se/se/products/4039-korshags-gravad-lax-skivad-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64741",
+    "name": "Korshags Pinfärsk Lax ASC",
+    "brand": "Korshags",
+    "packageText": "450 g",
+    "price": 188.34,
+    "priceText": "188.34 SEK",
+    "unitPrice": 418.53,
+    "unitPriceText": "418.53 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3806d229-3b57-4fbd-b2c3-652bc5d3d182.jpg?fit=bounds&format=auto&optimize=medium&width=250&s=0x0673912f19cdde59e3064369fc643c5a4022ef70",
+    "productUrl": "https://www.mathem.se/se/products/64741-korshags-pinfarsk-lax-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4280",
+    "name": "Korshags Varmrökt Lax Citronpeppar EKO/KRAV",
+    "brand": "Korshags",
+    "packageText": "125 g",
+    "price": 69.99,
+    "priceText": "69.99 SEK",
+    "unitPrice": 559.92,
+    "unitPriceText": "559.92 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7a924ce7-a772-4f31-802f-75101440eff9.jpg?fit=bounds&format=auto&optimize=medium&width=156&s=0x7a442c8a19640bd00c06ded4f8af12d0368c327d",
+    "productUrl": "https://www.mathem.se/se/products/4280-korshags-varmrokt-lax-citronpeppar-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3918",
+    "name": "Falkenbergs Lax Varmrökt Laxfilé Citronpeppar ASC",
+    "brand": "Falkenbergs Lax",
+    "packageText": "ca 450 g",
+    "price": 183.61,
+    "priceText": "183.61 SEK",
+    "unitPrice": 408.02,
+    "unitPriceText": "408.02 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cb7bee06-6736-4d57-aa4d-49b74a79f441.jpg?fit=bounds&format=auto&optimize=medium&width=254&s=0x083e44b3714b6245c41df237fa4d81ab231d6236",
+    "productUrl": "https://www.mathem.se/se/products/3918-falkenbergs-lax-varmrokt-laxfile-citronpeppar-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63364",
+    "name": "Korshags Varmrökt Lax Dubbelfilé ASC",
+    "brand": "Korshags",
+    "packageText": "ca 300 g",
+    "price": 131.55,
+    "priceText": "131.55 SEK",
+    "unitPrice": 438.5,
+    "unitPriceText": "438.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/68741bf5-5b78-42d9-94cf-c85175e0641f.jpg?fit=bounds&format=auto&optimize=medium&width=157&s=0xce5579ded31e1920b0808ba835574b8b86c8e29c",
+    "productUrl": "https://www.mathem.se/se/products/63364-korshags-varmrokt-lax-dubbelfile-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6678",
+    "name": "Abba Middagsklart Citronsås för Ugnsbakad Lax",
+    "brand": "Abba",
+    "packageText": "250 g",
+    "price": 29.29,
+    "priceText": "29.29 SEK",
+    "unitPrice": 117.16,
+    "unitPriceText": "117.16 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/207122cb-f602-4b27-bc4f-cb145b82dde3.jpg?fit=bounds&format=auto&optimize=medium&width=163&s=0xd6b2a260b6a18ef1f2950c3df3661ed57a33d9a5",
+    "productUrl": "https://www.mathem.se/se/products/6678-abba-middagsklart-citronsas-for-ugnsbakad-lax/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68155",
+    "name": "Lillängshamnens Sushilax ASC",
+    "brand": "Lillängshamnens",
+    "packageText": "180 g",
+    "price": 85,
+    "priceText": "85.00 SEK",
+    "unitPrice": 472.22,
+    "unitPriceText": "472.22 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/407be1dc-e6ff-4b18-9784-66677ef9da1f.jpg?fit=bounds&format=auto&optimize=medium&width=217&s=0x259cd99e0b86fbaa21e7e3ca5aa4a7ba4269a7a7",
+    "productUrl": "https://www.mathem.se/se/products/68155-lillangshamnens-sushilax-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "61561",
+    "name": "Lillängshamnens Laxfilé Varmrökt",
+    "brand": "Lillängshamnens",
+    "packageText": "250 g",
+    "price": 103.16,
+    "priceText": "103.16 SEK",
+    "unitPrice": 412.64,
+    "unitPriceText": "412.64 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bf21002a-5e5a-46b0-bd3d-6ed6d8db40f0.jpg?fit=bounds&format=auto&optimize=medium&width=217&s=0xf0781846fa9988949a6e5c25641c0b0c02fc89ef",
+    "productUrl": "https://www.mathem.se/se/products/61561-lillangshamnens-laxfile-varmrokt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65576",
+    "name": "Korshags Gravad Lax Skivad Uppfödd på Land ASC",
+    "brand": "Korshags",
+    "packageText": "150 g",
+    "price": 75.67,
+    "priceText": "75.67 SEK",
+    "unitPrice": 504.47,
+    "unitPriceText": "504.47 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/db774685-e5c0-497a-aaea-64d9fffbcf0d.jpg?fit=bounds&format=auto&optimize=medium&width=276&s=0xe82cd6dfec2b56de018f392b953d2cec5b8858d2",
+    "productUrl": "https://www.mathem.se/se/products/65576-korshags-gravad-lax-skivad-uppfodd-pa-land-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11036",
+    "name": "Korshags Gravad Lax Skivad EKO/KRAV",
+    "brand": "Korshags",
+    "packageText": "100 g",
+    "price": 61.47,
+    "priceText": "61.47 SEK",
+    "unitPrice": 614.7,
+    "unitPriceText": "614.70 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9bca48f5-10d5-41e6-891c-f6e1287de071.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x45c67929bf1a7acc20891514251c1c2c5b8df30a",
+    "productUrl": "https://www.mathem.se/se/products/11036-korshags-gravad-lax-skivad-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6676",
+    "name": "Abba Middagsklart Citron & Dillsås för Ugnsbakad Lax",
+    "brand": "Abba",
+    "packageText": "250 g",
+    "price": 29.29,
+    "priceText": "29.29 SEK",
+    "unitPrice": 117.16,
+    "unitPriceText": "117.16 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/22dace23-b23d-436a-b789-b545d2f5a28f.jpg?fit=bounds&format=auto&optimize=medium&width=163&s=0xef0add4c0b6132b5a9c610440986422de15f4f3e",
+    "productUrl": "https://www.mathem.se/se/products/6676-abba-middagsklart-citron-dillsas-for-ugnsbakad-lax/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65515",
+    "name": "Korshags Kallrökt Lax Skivad ASC",
+    "brand": "Korshags",
+    "packageText": "100 g",
+    "price": 50.11,
+    "priceText": "50.11 SEK",
+    "unitPrice": 501.1,
+    "unitPriceText": "501.10 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8fff68a8-520c-4ef1-8873-afbb598bcac3.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xbc6bc8a0372523199f7068c60822b59dffc2b3d3",
+    "productUrl": "https://www.mathem.se/se/products/65515-korshags-kallrokt-lax-skivad-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65846",
+    "name": "Lillängshamnens Laxfilé Gravad Skivad",
+    "brand": "Lillängshamnens",
+    "packageText": "150 g",
+    "price": 51.58,
+    "priceText": "51.58 SEK",
+    "unitPrice": 343.87,
+    "unitPriceText": "343.87 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/95e7b469-9e53-44f8-a124-4904480f2e40.jpg?fit=bounds&format=auto&optimize=medium&width=200&s=0xc9137e59a4c8c569e4e195a7c43299ba08018240",
+    "productUrl": "https://www.mathem.se/se/products/65846-lillangshamnens-laxfile-gravad-skivad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68031",
+    "name": "Korshags Laxfilé med Skinn Uppfödd på Land ASC Fryst 4x125g",
+    "brand": "Korshags",
+    "packageText": "500 g",
+    "price": 141.02,
+    "priceText": "141.02 SEK",
+    "unitPrice": 282.04,
+    "unitPriceText": "282.04 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d8b3a738-dc4a-4cfd-8bfc-536dd325f4b1.jpg?fit=bounds&format=auto&optimize=medium&width=214&s=0x5a00ca692dd886e10284d5bb6473b6324893c84d",
+    "productUrl": "https://www.mathem.se/se/products/68031-korshags-laxfile-med-skinn-uppfodd-pa-land-asc-fry/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3819",
+    "name": "Falkenbergs Lax Kallrökt Laxfilé ASC",
+    "brand": "Falkenbergs Lax",
+    "packageText": "ca 400 g",
+    "price": 146.7,
+    "priceText": "146.70 SEK",
+    "unitPrice": 366.75,
+    "unitPriceText": "366.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8399b658-dffc-487e-bffc-4858e87b9972.jpg?fit=bounds&format=auto&optimize=medium&width=238&s=0xaa30360c09be41a9066df5cf8c3876bd7c469295",
+    "productUrl": "https://www.mathem.se/se/products/3819-falkenbergs-lax-kallrokt-laxfile-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64740",
+    "name": "Korshags Pinfärsk Lax ASC",
+    "brand": "Korshags",
+    "packageText": "250 g",
+    "price": 112.63,
+    "priceText": "112.63 SEK",
+    "unitPrice": 450.52,
+    "unitPriceText": "450.52 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3a85c38c-480c-4a66-ba9e-b5f689bc310a.jpg?fit=bounds&format=auto&optimize=medium&width=250&s=0xadc78862ea74d611865ccc7e491f43bae08e24c5",
+    "productUrl": "https://www.mathem.se/se/products/64740-korshags-pinfarsk-lax-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67958",
+    "name": "Eldorado Varmrökt Salladslax ASC",
+    "brand": "Eldorado",
+    "packageText": "150 g",
+    "price": 48.5,
+    "priceText": "48.50 SEK",
+    "unitPrice": 323.33,
+    "unitPriceText": "323.33 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5cb8d03c-ba0c-4957-ba06-fb1f42f63c00.jpg?fit=bounds&format=auto&optimize=medium&width=245&s=0x906fcf273042a96078b57cd76a2f403e9b275016",
+    "productUrl": "https://www.mathem.se/se/products/67958-eldorado-varmrokt-salladslax-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8337",
+    "name": "Dafgårds Lax & Räkpaj Fryst",
+    "brand": "Dafgårds",
+    "packageText": "240 g",
+    "price": 34.97,
+    "priceText": "34.97 SEK",
+    "unitPrice": 145.71,
+    "unitPriceText": "145.71 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c0bc2f88-d200-4036-96c5-5109a0ce281b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xffcca59cbd63571e6100a97e647df6bdbfb53b7a",
+    "productUrl": "https://www.mathem.se/se/products/8337-dafgards-lax-rakpaj-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "45457",
+    "name": "Omega Laxbitar Fryst",
+    "brand": "Omega",
+    "packageText": "300 g",
+    "price": 47.27,
+    "priceText": "47.27 SEK",
+    "unitPrice": 157.57,
+    "unitPriceText": "157.57 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/461fad89-e7c7-42c4-b033-88386de3fd14.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xcbcfa72915577b57152afa3d2463617e9c80fa94",
+    "productUrl": "https://www.mathem.se/se/products/45457-omega-laxbitar-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63033",
+    "name": "Lillängshamnens Lax Kallrökt",
+    "brand": "Lillängshamnens",
+    "packageText": "300 g",
+    "price": 112.63,
+    "priceText": "112.63 SEK",
+    "unitPrice": 375.43,
+    "unitPriceText": "375.43 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b5f10575-b646-48bb-acbe-77ff6238bd59.jpg?fit=bounds&format=auto&optimize=medium&width=232&s=0xa3bbad8a8081cae3cfd1a7f6e5949dc1c92e5c85",
+    "productUrl": "https://www.mathem.se/se/products/63033-lillangshamnens-lax-kallrokt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11463",
+    "name": "Korshags Varmrökt Lax Lime & Basilika ASC",
+    "brand": "Korshags",
+    "packageText": "125 g",
+    "price": 64.83,
+    "priceText": "64.83 SEK",
+    "unitPrice": 518.64,
+    "unitPriceText": "518.64 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8fac0ef3-a0c3-43f3-9f8d-e9be6cbb3933.jpg?fit=bounds&format=auto&optimize=medium&width=156&s=0xdf781b234dd7304a77c5414ac75c44515746f0af",
+    "productUrl": "https://www.mathem.se/se/products/11463-korshags-varmrokt-lax-lime-basilika-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68152",
+    "name": "Lillängshamnens Pokébowl-Lax Orginal ASC",
+    "brand": "Lillängshamnens",
+    "packageText": "220 g",
+    "price": 85,
+    "priceText": "85.00 SEK",
+    "unitPrice": 386.36,
+    "unitPriceText": "386.36 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/49b59dd3-e4fb-4fa8-bbd1-0995520bdbb7.jpg?fit=bounds&format=auto&optimize=medium&width=160&s=0x98a6b65aafbaf740f015efa2ca2037c15849ae28",
+    "productUrl": "https://www.mathem.se/se/products/68152-lillangshamnens-pokebowl-lax-orginal-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64739",
+    "name": "Korshags Varmrökt Lax Chili & Sesam ASC",
+    "brand": "Korshags",
+    "packageText": "125 g",
+    "price": 64.83,
+    "priceText": "64.83 SEK",
+    "unitPrice": 518.64,
+    "unitPriceText": "518.64 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a2066d56-3eb3-4b12-aa4e-10c989fe2a88.jpg?fit=bounds&format=auto&optimize=medium&width=156&s=0x094e057d5d9e9d5006a4c0e25e12f4288d323328",
+    "productUrl": "https://www.mathem.se/se/products/64739-korshags-varmrokt-lax-chili-sesam-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68151",
+    "name": "Lillängshamnens Färsk Laxfilé",
+    "brand": "Lillängshamnens",
+    "packageText": "360 g",
+    "price": 103.16,
+    "priceText": "103.16 SEK",
+    "unitPrice": 286.56,
+    "unitPriceText": "286.56 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/86d78bd9-471d-4d48-b293-e0192a90c3d9.jpg?fit=bounds&format=auto&optimize=medium&width=217&s=0xd537ba7e3973f7908b804273f9e0987849dd8e0d",
+    "productUrl": "https://www.mathem.se/se/products/68151-lillangshamnens-farsk-laxfile/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3084",
+    "name": "FRØYA Lax Backloin 1/1",
+    "brand": "FRØYA",
+    "packageText": "ca 380 g",
+    "price": 207.27,
+    "priceText": "207.27 SEK",
+    "unitPrice": 545.45,
+    "unitPriceText": "545.45 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/576ec3c5-9ae9-482e-97a8-387d7965f01f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x072388ec638255860616046b562c82d1e7045c39",
+    "productUrl": "https://www.mathem.se/se/products/3084-froya-lax-backloin-1-1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67672",
+    "name": "Lillängshamnens Varmrökt Laxfilé Honung",
+    "brand": "Lillängshamnens",
+    "packageText": "400 g",
+    "price": 141.02,
+    "priceText": "141.02 SEK",
+    "unitPrice": 352.55,
+    "unitPriceText": "352.55 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9219f487-1f40-4dc7-a430-1570ff7a1dd4.jpg?fit=bounds&format=auto&optimize=medium&width=217&s=0x027640a6c8f91b35c9f0e4dbae464235fcabf1e3",
+    "productUrl": "https://www.mathem.se/se/products/67672-lillangshamnens-varmrokt-laxfile-honung/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66050",
+    "name": "Garant Torskrygg Fryst MSC 3x140g",
+    "brand": "Garant",
+    "packageText": "420 g",
+    "price": 122.09,
+    "priceText": "122.09 SEK",
+    "unitPrice": 290.69,
+    "unitPriceText": "290.69 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c1d4b0e3-ae48-417d-bfe6-52286cefb010.jpg?fit=bounds&format=auto&optimize=medium&width=230&s=0x31ac4fe28cb211cdd79e72b742fc9f39b79e7298",
+    "productUrl": "https://www.mathem.se/se/products/66050-garant-torskrygg-fryst-msc-3x140g/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4188",
+    "name": "Falkenbergs Lax Gravad Laxfilé ASC",
+    "brand": "Falkenbergs Lax",
+    "packageText": "ca 400 g",
+    "price": 146.7,
+    "priceText": "146.70 SEK",
+    "unitPrice": 366.75,
+    "unitPriceText": "366.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7596597f-459e-44c6-a043-db99aa826443.jpg?fit=bounds&format=auto&optimize=medium&width=252&s=0xb23b48aa74323c91318af3e60e82e25359d5955c",
+    "productUrl": "https://www.mathem.se/se/products/4188-falkenbergs-lax-gravad-laxfile-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4024",
+    "name": "Korshags Kallrökt Lax Delibit ASC",
+    "brand": "Korshags",
+    "packageText": "300 g",
+    "price": 127.77,
+    "priceText": "127.77 SEK",
+    "unitPrice": 425.9,
+    "unitPriceText": "425.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4debe1d4-ede2-437f-ac11-f86e813c98a9.jpg?fit=bounds&format=auto&optimize=medium&width=250&s=0x5b0a7f6411a4336651061793546a70e86cb62f94",
+    "productUrl": "https://www.mathem.se/se/products/4024-korshags-kallrokt-lax-delibit-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lax",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67701",
+    "name": "Smak av Gotland Nötfärs 12%",
+    "brand": "Smak av Gotland",
+    "packageText": "1000 g",
+    "price": 158.22,
+    "priceText": "158.22 SEK",
+    "unitPrice": 158.22,
+    "unitPriceText": "158.22 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/03fe7807-50f6-42be-bc9f-9473b89ccf87.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x08634b081f83496c2ad3ac0c026c964430548468",
+    "productUrl": "https://www.mathem.se/se/products/67701-smak-av-gotland-notfars-12/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "1195",
+    "name": "Scan Nötfärs 12%",
+    "brand": "Scan",
+    "packageText": "500 g",
+    "price": 91.5,
+    "priceText": "91.50 SEK",
+    "unitPrice": 183,
+    "unitPriceText": "183.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/44a7987b-c043-40d9-9b7a-44e2e769c8d2.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa43317d68b5570859d241e8749db536c86cd3ed8",
+    "productUrl": "https://www.mathem.se/se/products/1195-scan-notfars-12/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68205",
+    "name": "Smak av Svea Nötfärs 12%",
+    "brand": "Smak av Svea",
+    "packageText": "500 g",
+    "price": 90.5,
+    "priceText": "90.50 SEK",
+    "unitPrice": 181,
+    "unitPriceText": "181.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1e2e11d3-e646-46fa-bff9-6a7c6993e2e3.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdbb858f740a4886d7733afbca22ed504b23c8f2b",
+    "productUrl": "https://www.mathem.se/se/products/68205-smak-av-svea-notfars-12/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "33234",
+    "name": "Garant Nötfärs 5%",
+    "brand": "Garant",
+    "packageText": "500 g",
+    "price": 92.5,
+    "priceText": "92.50 SEK",
+    "unitPrice": 185,
+    "unitPriceText": "185.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a07c9b8e-bc8c-4be7-a891-c829f40836c4.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa6b9c1c6a6d78dcd3b82096fa8406be603b181f7",
+    "productUrl": "https://www.mathem.se/se/products/33234-garant-notfars-5/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63400",
+    "name": "Smak av Gotland Nötfärs 12%",
+    "brand": "Smak av Gotland",
+    "packageText": "500 g",
+    "price": 91.5,
+    "priceText": "91.50 SEK",
+    "unitPrice": 183,
+    "unitPriceText": "183.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/03fbc22e-2f7b-4dda-b155-8f736a02ffa3.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xceac3c2e1024d28cf697abab4e6f442034e3cbfd",
+    "productUrl": "https://www.mathem.se/se/products/63400-smak-av-gotland-notfars-12/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2239",
+    "name": "Scan Nötfärs 12%",
+    "brand": "Scan",
+    "packageText": "ca 1000 g",
+    "price": 159,
+    "priceText": "159.00 SEK",
+    "unitPrice": 159,
+    "unitPriceText": "159.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e698a560-ca71-47f5-88de-e3d82efd3391.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x8941db8149c3df9094b505ffcc11a9994e46c471",
+    "productUrl": "https://www.mathem.se/se/products/2239-scan-notfars-12/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "33300",
+    "name": "Garant Nötfärs Svensk 12%",
+    "brand": "Garant",
+    "packageText": "ca 1 kg",
+    "price": 156,
+    "priceText": "156.00 SEK",
+    "unitPrice": 156,
+    "unitPriceText": "156.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/68fbe7a2-e745-4e9d-b330-1aa9c3fe247c.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x14e3ab7cfe25c039b678b6160b0f23620756606a",
+    "productUrl": "https://www.mathem.se/se/products/33300-garant-notfars-svensk-12/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63404",
+    "name": "Smak av SVEA Nötfärs 12% EKO/KRAV",
+    "brand": "Smak av SVEA",
+    "packageText": "500 g",
+    "price": 113,
+    "priceText": "113.00 SEK",
+    "unitPrice": 226,
+    "unitPriceText": "226.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/174893b5-5339-4d42-a88d-27da5a7c468b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x7de41f70a2633b081bd0e05bc49f7ea59c810fab",
+    "productUrl": "https://www.mathem.se/se/products/63404-smak-av-svea-notfars-12-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65913",
+    "name": "Scan Nötfärs 12% Vakuumförpackad",
+    "brand": "Scan",
+    "packageText": "1000 g",
+    "price": 159,
+    "priceText": "159.00 SEK",
+    "unitPrice": 159,
+    "unitPriceText": "159.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/719e2240-8948-4dc3-8de9-e3195c27348c.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x2e512cbbd2193646a86982acc408d40649c5d40e",
+    "productUrl": "https://www.mathem.se/se/products/65913-scan-notfars-12-vakuumforpackad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2787",
+    "name": "Scan Nötfärs 12% EKO/KRAV",
+    "brand": "Scan",
+    "packageText": "400 g",
+    "price": 91.5,
+    "priceText": "91.50 SEK",
+    "unitPrice": 228.75,
+    "unitPriceText": "228.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2fd3a42e-571e-475b-9b66-676cd96de775.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x1af18afada7520a76b261d871716a4c6e8418b16",
+    "productUrl": "https://www.mathem.se/se/products/2787-scan-notfars-12-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "27401",
+    "name": "Qibbla Halal Nötfärs Import 14% Fryst",
+    "brand": "Qibbla Halal",
+    "packageText": "750 g",
+    "price": 118.3,
+    "priceText": "118.30 SEK",
+    "unitPrice": 157.73,
+    "unitPriceText": "157.73 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0e28147e-a485-411d-ac62-f6e27294f2b4.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x22b310db15b365875affd0483f3a65582d6c7380",
+    "productUrl": "https://www.mathem.se/se/products/27401-qibbla-halal-notfars-import-14-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4386",
+    "name": "Mjau Våtfoder Nötfärs i Gelé",
+    "brand": "Mjau",
+    "packageText": "380 g",
+    "price": 18.95,
+    "priceText": "18.95 SEK",
+    "unitPrice": 49.87,
+    "unitPriceText": "49.87 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f6dea598-0f49-4d78-bfde-32762d2571ee.jpg?fit=bounds&format=auto&optimize=medium&width=227&s=0x54038d1d05c38dbd3a4462ab4ef20d6856a072e0",
+    "productUrl": "https://www.mathem.se/se/products/4386-mjau-vatfoder-notfars-i-gele/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "12377",
+    "name": "Garant Nöt & Grönt 6,2%",
+    "brand": "Garant",
+    "packageText": "500 g",
+    "price": 60.95,
+    "priceText": "60.95 SEK",
+    "unitPrice": 121.9,
+    "unitPriceText": "121.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/25685947-e53d-4864-a597-56894e0997ed.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xb0eb79e4c2c141776f1d9ab6c50c6f7d802462c7",
+    "productUrl": "https://www.mathem.se/se/products/12377-garant-not-gront-62/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2939",
+    "name": "Garant Högrevsfärs 13%",
+    "brand": "Garant",
+    "packageText": "500 g",
+    "price": 105,
+    "priceText": "105.00 SEK",
+    "unitPrice": 210,
+    "unitPriceText": "210.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c9e36dc7-3aab-49e8-93c8-3443d0f49ade.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xf897bfe484ca65cef9ce8ef2f5713497be71ba52",
+    "productUrl": "https://www.mathem.se/se/products/2939-garant-hogrevsfars-13/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64417",
+    "name": "Scan Blandfärs 20%",
+    "brand": "Scan",
+    "packageText": "400 g",
+    "price": 59.5,
+    "priceText": "59.50 SEK",
+    "unitPrice": 148.75,
+    "unitPriceText": "148.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4d9b77e4-093c-4302-ae4c-42fbe1869a10.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xfdebfba350b8bb81667c344bbf18a10bfdeca7c1",
+    "productUrl": "https://www.mathem.se/se/products/64417-scan-blandfars-20/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65914",
+    "name": "Scan Blandfärs 18% Vakuumförpackad",
+    "brand": "Scan",
+    "packageText": "1000 g",
+    "price": 114,
+    "priceText": "114.00 SEK",
+    "unitPrice": 114,
+    "unitPriceText": "114.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/349e6515-a67a-49d7-bb5d-042d2e967793.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x5400d28f7620eef41ff62a4f74ff5a84492bdac4",
+    "productUrl": "https://www.mathem.se/se/products/65914-scan-blandfars-18-vakuumforpackad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66778",
+    "name": "Backup Svenska Köttbullar med Gräddsås Fryst 2 portioner",
+    "brand": "Backup",
+    "packageText": "2 portioner, 500 g",
+    "price": 131.55,
+    "priceText": "131.55 SEK",
+    "unitPrice": 263.1,
+    "unitPriceText": "263.10 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a7de1ede-7c5b-4c8b-81ea-0537270eb2cf.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x03aa81450ba22190789d2d01e5378b0affc74004",
+    "productUrl": "https://www.mathem.se/se/products/66778-backup-svenska-kottbullar-med-graddsas-fryst-2-por/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63401",
+    "name": "Smak av Gotland Högrevsfärs med Oxbringa 20%",
+    "brand": "Smak av Gotland",
+    "packageText": "500 g",
+    "price": 123,
+    "priceText": "123.00 SEK",
+    "unitPrice": 246,
+    "unitPriceText": "246.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4caef77a-139a-4a2a-b875-daa9a0be403a.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x2c2c45ac81011f43bba05a25f2c95bf6fcbda2a3",
+    "productUrl": "https://www.mathem.se/se/products/63401-smak-av-gotland-hogrevsfars-med-oxbringa-20/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68204",
+    "name": "Smak av Svea Blandfärs 21%",
+    "brand": "Smak av Svea",
+    "packageText": "500 g",
+    "price": 66.5,
+    "priceText": "66.50 SEK",
+    "unitPrice": 133,
+    "unitPriceText": "133.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a2446f97-2d68-4663-b609-d3344ce97545.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x08d4cdf5e7bf7a9c5618a9ead4010d2166f2c872",
+    "productUrl": "https://www.mathem.se/se/products/68204-smak-av-svea-blandfars-21/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10990",
+    "name": "Scan Blandfärs 20%",
+    "brand": "Scan",
+    "packageText": "500 g",
+    "price": 70.5,
+    "priceText": "70.50 SEK",
+    "unitPrice": 141,
+    "unitPriceText": "141.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e64c2212-b80d-4e3c-8cc2-6ea1f4b88b0e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa73b05c4b504586284caa02a6ab8dea71be0c084",
+    "productUrl": "https://www.mathem.se/se/products/10990-scan-blandfars-20/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66786",
+    "name": "Backup Italienska Köttbullar Fryst 2 portioner",
+    "brand": "Backup",
+    "packageText": "2 portioner, 500 g",
+    "price": 131.55,
+    "priceText": "131.55 SEK",
+    "unitPrice": 263.1,
+    "unitPriceText": "263.10 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/21845a47-0b5d-425c-b172-f43b727a9ae6.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x9d0d44f4b8e6dccf9afb0c72120f7a719dca3819",
+    "productUrl": "https://www.mathem.se/se/products/66786-backup-italienska-kottbullar-fryst-2-portioner/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11529",
+    "name": "Garant Färska Hamburgare EKO/KRAV",
+    "brand": "Garant",
+    "packageText": "452 g",
+    "price": 89.95,
+    "priceText": "89.95 SEK",
+    "unitPrice": 199,
+    "unitPriceText": "199.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1cc4297f-42fe-40b5-9862-425a31d8679a.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x7e148bae48e214247e0b05d129247f6ebff54b5a",
+    "productUrl": "https://www.mathem.se/se/products/11529-garant-farska-hamburgare-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10605",
+    "name": "Scan Nötköttbullar Frysta EKO",
+    "brand": "Scan",
+    "packageText": "400 g",
+    "price": 52.95,
+    "priceText": "52.95 SEK",
+    "unitPrice": 132.38,
+    "unitPriceText": "132.38 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3cfdf9da-ef35-40b6-8dde-8fd7fb149424.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdf5e64d74d6d2414deda428d66d5056445673bb7",
+    "productUrl": "https://www.mathem.se/se/products/10605-scan-notkottbullar-frysta-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3032",
+    "name": "Gorby´s Pirog Original Fryst 10-p",
+    "brand": "Gorby´s",
+    "packageText": "1400 g",
+    "price": 99.38,
+    "priceText": "99.38 SEK",
+    "unitPrice": 70.99,
+    "unitPriceText": "70.99 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5b572235-4ab7-4ace-b368-1d8cd77286fb.jpg?fit=bounds&format=auto&optimize=medium&width=205&s=0x82b2dfb475e2d458c783a47c634a17b6acb96501",
+    "productUrl": "https://www.mathem.se/se/products/3032-gorbys-pirog-original-fryst-10-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62387",
+    "name": "Findus Pasta Bolognese Fryst",
+    "brand": "Findus",
+    "packageText": "1100 g",
+    "price": 81.35,
+    "priceText": "81.35 SEK",
+    "unitPrice": 73.95,
+    "unitPriceText": "73.95 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cc5a2738-a5ea-4159-b846-02344a161332.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdf7fc01490fd1ffac7740274b2e6ec448029e0da",
+    "productUrl": "https://www.mathem.se/se/products/62387-findus-pasta-bolognese-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8298",
+    "name": "Dafgårds Tacopaj Fryst",
+    "brand": "Dafgårds",
+    "packageText": "240 g",
+    "price": 34.97,
+    "priceText": "34.97 SEK",
+    "unitPrice": 145.71,
+    "unitPriceText": "145.71 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a0d448d5-4002-4613-b382-88c0447664e5.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x0b74c3cce583807d93e710b7d2f104064c0081af",
+    "productUrl": "https://www.mathem.se/se/products/8298-dafgards-tacopaj-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11455",
+    "name": "Köttkultur Smashburgare 300g",
+    "brand": "Köttkultur",
+    "packageText": "320 g",
+    "price": 74.72,
+    "priceText": "74.72 SEK",
+    "unitPrice": 233.5,
+    "unitPriceText": "233.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cb11b2ec-c566-485c-b395-72739ce59e69.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc12421f56455aed6a294bca046c29dea363d66f8",
+    "productUrl": "https://www.mathem.se/se/products/11455-kottkultur-smashburgare-300g/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "1907",
+    "name": "Scan Svensk Hamburgare EKO/KRAV Fryst",
+    "brand": "Scan",
+    "packageText": "360 g",
+    "price": 66.2,
+    "priceText": "66.20 SEK",
+    "unitPrice": 183.89,
+    "unitPriceText": "183.89 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/61ac7c22-a181-4ed2-ae28-8320367ce4ff.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x6b5a3d17c0fa5ec003537e24e057f5fdea65492c",
+    "productUrl": "https://www.mathem.se/se/products/1907-scan-svensk-hamburgare-eko-krav-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9360",
+    "name": "Dafgårds Spagetti Bolognese Fryst",
+    "brand": "Dafgårds",
+    "packageText": "400 g",
+    "price": 27.2,
+    "priceText": "27.20 SEK",
+    "unitPrice": 68,
+    "unitPriceText": "68.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/18737118-a02e-42d9-b4a0-3af788f3916b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xfc180c30faebaf5746efe15bbf8a0be17da4195d",
+    "productUrl": "https://www.mathem.se/se/products/9360-dafgards-spagetti-bolognese-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2922",
+    "name": "Scan Utvald Högrevsburgare",
+    "brand": "Scan",
+    "packageText": "452 g",
+    "price": 104,
+    "priceText": "104.00 SEK",
+    "unitPrice": 230.09,
+    "unitPriceText": "230.09 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3deea66c-57f7-4605-8727-4bc51ffaa898.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x0db4afbcf57c176c4d7be3e29a2d5d8194be3cf9",
+    "productUrl": "https://www.mathem.se/se/products/2922-scan-utvald-hogrevsburgare/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63177",
+    "name": "Garant Hamburgare Original",
+    "brand": "Garant",
+    "packageText": "452 g",
+    "price": 68.5,
+    "priceText": "68.50 SEK",
+    "unitPrice": 151.55,
+    "unitPriceText": "151.55 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/51561999-4fd9-4775-b3c3-aaeb0b74f9d8.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x5f1ba6c111e64d294165e3955795f8e81e83cd52",
+    "productUrl": "https://www.mathem.se/se/products/63177-garant-hamburgare-original/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65015",
+    "name": "Farmers & Chefs Formbar Färs Växtbaserad Fryst",
+    "brand": "Farmers & Chefs",
+    "packageText": "400 g",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 141.85,
+    "unitPriceText": "141.85 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cd34059a-0220-4dd6-b213-cbd040f5e3a0.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xcb7ad8073854f273e1ee262369d282134ef2be28",
+    "productUrl": "https://www.mathem.se/se/products/65015-farmers-chefs-formbar-fars-vaxtbaserad-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65621",
+    "name": "BE-KIND Nötbar Peanut Butter",
+    "brand": "BE-KIND",
+    "packageText": "50 g",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 472.2,
+    "unitPriceText": "472.20 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/20eca4b2-58e6-4df5-850d-d3fa95cfaf2c.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa9b9ea7cef6cabf615d0b9dc02182d063cd0cbf7",
+    "productUrl": "https://www.mathem.se/se/products/65621-be-kind-notbar-peanut-butter/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8763",
+    "name": "Svenska Färsodlarna Vegobullar Svenskodlade Frysta",
+    "brand": "Svenska Färsodlarna",
+    "packageText": "260 g",
+    "price": 34.03,
+    "priceText": "34.03 SEK",
+    "unitPrice": 130.88,
+    "unitPriceText": "130.88 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fe3a6e04-b06b-4a3f-b1c0-f23785b18eaf.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xaa898ff6d7d5b59cdf67f3f0e08e4027b4f1b542",
+    "productUrl": "https://www.mathem.se/se/products/8763-svenska-farsodlarna-vegobullar-svenskodlade-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3464",
+    "name": "Scan Blandfärs 20%",
+    "brand": "Scan",
+    "packageText": "ca 1000 g",
+    "price": 114,
+    "priceText": "114.00 SEK",
+    "unitPrice": 114,
+    "unitPriceText": "114.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5f5752e4-30b7-4b63-8c03-0b5a9a75c563.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x3130dc5f896f99c9ed2fd5f6dccf1f52792512a5",
+    "productUrl": "https://www.mathem.se/se/products/3464-scan-blandfars-20/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63654",
+    "name": "Färsking Granola Naturell",
+    "brand": "Färsking",
+    "packageText": "375 g",
+    "price": 44.43,
+    "priceText": "44.43 SEK",
+    "unitPrice": 118.48,
+    "unitPriceText": "118.48 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3f3a8650-d3fd-4786-a4b3-ac090c61711d.jpg?fit=bounds&format=auto&optimize=medium&width=224&s=0xe2047f372d3b3d20fc674cb79d9104b29dd19ed5",
+    "productUrl": "https://www.mathem.se/se/products/63654-farsking-granola-naturell/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6546",
+    "name": "Såklart Universalspray Oparfymerad",
+    "brand": "Såklart",
+    "packageText": "500 ml",
+    "price": 27.5,
+    "priceText": "27.50 SEK",
+    "unitPrice": 55,
+    "unitPriceText": "55.00 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/599311f3-1025-4283-afb9-b68908626f9b.jpg?fit=bounds&format=auto&optimize=medium&width=122&s=0xaab5d18acd6ab4e1caeaa6ca00363ef2fefcadda",
+    "productUrl": "https://www.mathem.se/se/products/6546-saklart-universalspray-oparfymerad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3192",
+    "name": "BE-KIND Nötbar Mörk Choklad & Havssalt",
+    "brand": "BE-KIND",
+    "packageText": "40 g",
+    "price": 23.19,
+    "priceText": "23.19 SEK",
+    "unitPrice": 579.75,
+    "unitPriceText": "579.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/30559cad-eef8-46d5-a28a-4afc444a5c11.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x16b4bc39350340aa92434d2329b401d3a60db8d9",
+    "productUrl": "https://www.mathem.se/se/products/3192-be-kind-notbar-mork-choklad-havssalt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66385",
+    "name": "Quorn Färs Fryst",
+    "brand": "Quorn",
+    "packageText": "600 g",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 94.57,
+    "unitPriceText": "94.57 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7eb78555-85f3-4f5a-90bd-18e1c68728da.jpg?fit=bounds&format=auto&optimize=medium&width=275&s=0x071af00375bf39e8798bc4871c5f341e71abb9f2",
+    "productUrl": "https://www.mathem.se/se/products/66385-quorn-fars-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3657",
+    "name": "Look o Look Flying Saucers",
+    "brand": "Look o Look",
+    "packageText": "20 g",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 944,
+    "unitPriceText": "944.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/26621186-bd35-4a6e-bda2-927a13c383a1.jpg?fit=bounds&format=auto&optimize=medium&width=118&s=0x41672f44361b26a15dcb26d52d076863fa521023",
+    "productUrl": "https://www.mathem.se/se/products/3657-look-o-look-flying-saucers/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6552",
+    "name": "Dafgårds Farfars Delikatessköttbullar Fryst",
+    "brand": "Dafgårds",
+    "packageText": "400 g",
+    "price": 27.2,
+    "priceText": "27.20 SEK",
+    "unitPrice": 68,
+    "unitPriceText": "68.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a7526e9d-5cd1-4b87-a2b0-8f9f32ba98de.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x607943c72e901511791f0ef091ef87074eb97fba",
+    "productUrl": "https://www.mathem.se/se/products/6552-dafgards-farfars-delikatesskottbullar-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5283",
+    "name": "Dig No-Bake Coconut M*lk Chocolate Cookie EKO",
+    "brand": "Dig",
+    "packageText": "30 g",
+    "price": 25.08,
+    "priceText": "25.08 SEK",
+    "unitPrice": 836,
+    "unitPriceText": "836.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ea7899f4-c6bb-4747-9956-a0616b942031.jpg?fit=bounds&format=auto&optimize=medium&width=252&s=0x89d6e1081d3224c2272df27a612084a0aa4f56eb",
+    "productUrl": "https://www.mathem.se/se/products/5283-dig-no-bake-coconut-m-lk-chocolate-cookie-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=notfars",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10136",
+    "name": "Knorr Ärtsoppa Vegetarisk utan Fläsk",
+    "brand": "Knorr",
+    "packageText": "530 g",
+    "price": 40.65,
+    "priceText": "40.65 SEK",
+    "unitPrice": 78.93,
+    "unitPriceText": "78.93 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d37f140a-5921-40d8-ba1c-69075c8964a4.jpg?fit=bounds&format=auto&optimize=medium&width=166&s=0xaf6432ab9a537b4bcecebb379b85dd8d9c2605ec",
+    "productUrl": "https://www.mathem.se/se/products/10136-knorr-artsoppa-vegetarisk-utan-flask/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7699",
+    "name": "Felix Ärtsoppa med Fläsk",
+    "brand": "Felix",
+    "packageText": "500 g",
+    "price": 16.04,
+    "priceText": "16.04 SEK",
+    "unitPrice": 32.08,
+    "unitPriceText": "32.08 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4228f1bc-dd21-4779-a4c5-ced831f150b5.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x2cb60e8fd45cc9130967262de04c6f5e50d0d2a5",
+    "productUrl": "https://www.mathem.se/se/products/7699-felix-artsoppa-med-flask/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65378",
+    "name": "Eldorado Snabbnudlar Fläsk",
+    "brand": "Eldorado",
+    "packageText": "85 g",
+    "price": 4.68,
+    "priceText": "4.68 SEK",
+    "unitPrice": 55.06,
+    "unitPriceText": "55.06 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a207281f-6556-434f-aec3-ce3bda892e38.jpg?fit=bounds&format=auto&optimize=medium&width=218&s=0x6bc792d74873e0a05ae6f12125c029cf99ac4e94",
+    "productUrl": "https://www.mathem.se/se/products/65378-eldorado-snabbnudlar-flask/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63181",
+    "name": "Garant Grytbitar Fläsk",
+    "brand": "Garant",
+    "packageText": "ca 600 g",
+    "price": 51.06,
+    "priceText": "51.06 SEK",
+    "unitPrice": 85.1,
+    "unitPriceText": "85.10 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e337ac18-734c-4eec-82d7-ff834081bec6.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x9bb6c7ba06aeba94c3d93e9faa7200ce4df40625",
+    "productUrl": "https://www.mathem.se/se/products/63181-garant-grytbitar-flask/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4927",
+    "name": "Nyhléns Hugosons Pitepalt med Fläsk",
+    "brand": "Nyhléns Hugosons",
+    "packageText": "330 g",
+    "price": 29.29,
+    "priceText": "29.29 SEK",
+    "unitPrice": 88.76,
+    "unitPriceText": "88.76 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2e130c24-6711-4c79-83e0-fcadbaffc434.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x437c55c934df747218469199cfa2c4eab26e9a82",
+    "productUrl": "https://www.mathem.se/se/products/4927-nyhlens-hugosons-pitepalt-med-flask/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6654",
+    "name": "Per i Viken Varmrökt Fläsk Skivad",
+    "brand": "Per i Viken",
+    "packageText": "100 g",
+    "price": 29.95,
+    "priceText": "29.95 SEK",
+    "unitPrice": 299.5,
+    "unitPriceText": "299.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/63b912e7-e5f6-42a5-b0c2-c4edb9aac9d9.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc9871ec23b0c3e5da987fdfee6eee66ca2b709ab",
+    "productUrl": "https://www.mathem.se/se/products/6654-per-i-viken-varmrokt-flask-skivad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4980",
+    "name": "Nyhléns Hugosons Kroppkakor med Fläsk",
+    "brand": "Nyhléns Hugosons",
+    "packageText": "330 g",
+    "price": 29.29,
+    "priceText": "29.29 SEK",
+    "unitPrice": 88.76,
+    "unitPriceText": "88.76 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9dc31721-f33e-41f9-9715-f2eefa08e8c1.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x532e181481d6f96205f470662d45ab0d60a2d1cc",
+    "productUrl": "https://www.mathem.se/se/products/4980-nyhlens-hugosons-kroppkakor-med-flask/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68065",
+    "name": "Bibigo Soppdumplings Fläsk & Grönsaker Fryst",
+    "brand": "Bibigo",
+    "packageText": "560 g",
+    "price": 103.16,
+    "priceText": "103.16 SEK",
+    "unitPrice": 184.21,
+    "unitPriceText": "184.21 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/032f6645-3124-49e5-9585-449f88d172e3.jpg?fit=bounds&format=auto&optimize=medium&width=230&s=0xc0f120fd5fd31f800c36b413a364ad75d88764cc",
+    "productUrl": "https://www.mathem.se/se/products/68065-bibigo-soppdumplings-flask-gronsaker-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "61544",
+    "name": "Beijing8 Dumpling Fläsk & Sishuan Fryst 10-p",
+    "brand": "Beijing8",
+    "packageText": "200 g",
+    "price": 50.11,
+    "priceText": "50.11 SEK",
+    "unitPrice": 250.55,
+    "unitPriceText": "250.55 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/50e80f26-2bed-4d4d-bec0-a41de8623813.jpg?fit=bounds&format=auto&optimize=medium&width=288&s=0xa0f3bac2b85ef5445fd6d574e396213244378426",
+    "productUrl": "https://www.mathem.se/se/products/61544-beijing8-dumpling-flask-sishuan-fryst-10-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "12391",
+    "name": "Gudruns Fläskkorv Kokt",
+    "brand": "Gudruns",
+    "packageText": "300 g",
+    "price": 27.5,
+    "priceText": "27.50 SEK",
+    "unitPrice": 91.67,
+    "unitPriceText": "91.67 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a85ac38d-e139-4ab1-bb90-723ad68ea743.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x333a843bd0af5244568ce88eca18bbba50333917",
+    "productUrl": "https://www.mathem.se/se/products/12391-gudruns-flaskkorv-kokt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67981",
+    "name": "Scan Fläsksida Benfri Utan Svål",
+    "brand": "Scan",
+    "packageText": "ca 1500 g",
+    "price": 154,
+    "priceText": "154.00 SEK",
+    "unitPrice": 102.67,
+    "unitPriceText": "102.67 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/72054ed6-136a-437a-b832-c1a53acf4d99.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x4c207f9b722381e718ad3df18f38811df7072340",
+    "productUrl": "https://www.mathem.se/se/products/67981-scan-flasksida-benfri-utan-sval/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66789",
+    "name": "Backup Fläskfilé med Pepparsås Fryst 2 portioner",
+    "brand": "Backup",
+    "packageText": "2 portioner, 500 g",
+    "price": 146.7,
+    "priceText": "146.70 SEK",
+    "unitPrice": 293.4,
+    "unitPriceText": "293.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e9f18048-6578-4597-bcf3-5e7e0780a62a.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x1481cd7d4bc51610c9fef8af91fe6aa058ba31a2",
+    "productUrl": "https://www.mathem.se/se/products/66789-backup-flaskfile-med-pepparsas-fryst-2-portioner/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "33245",
+    "name": "Scan Grillklar Flintastek Original",
+    "brand": "Scan",
+    "packageText": "ca 940 g",
+    "price": 64.95,
+    "priceText": "64.95 SEK",
+    "unitPrice": 69.1,
+    "unitPriceText": "69.10 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b9ecf5b1-9aa0-48e2-bc28-c5a3749db7c5.jpg?fit=bounds&format=auto&optimize=medium&width=238&s=0x482037d6b8474d5c57f4fc0bc748efffae29f4d2",
+    "productUrl": "https://www.mathem.se/se/products/33245-scan-grillklar-flintastek-original/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63669",
+    "name": "No Name Dressingsflaska 0,34L",
+    "brand": "No Name",
+    "packageText": "1 st",
+    "price": 29.95,
+    "priceText": "29.95 SEK",
+    "unitPrice": 29.95,
+    "unitPriceText": "29.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/13b22a10-ec09-4682-9cc9-aca284fd7064.jpg?fit=bounds&format=auto&optimize=medium&width=91&s=0x69a4dabeafe445fa651f97c18de6f9828f06592d",
+    "productUrl": "https://www.mathem.se/se/products/63669-no-name-dressingsflaska-034l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "40386",
+    "name": "Fixa Förvaringsburk  0,5l",
+    "brand": "Fixa",
+    "packageText": "1 st",
+    "price": 26.95,
+    "priceText": "26.95 SEK",
+    "unitPrice": 26.95,
+    "unitPriceText": "26.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5c616322-b0d3-4519-8af9-a9ad3ed3ced4.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x0dde9e01fd31dac118bc14dcae2dfca220520096",
+    "productUrl": "https://www.mathem.se/se/products/40386-fixa-forvaringsburk-05l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63668",
+    "name": "No Name Dressingsflaska 0,68L",
+    "brand": "No Name",
+    "packageText": "1 st",
+    "price": 64.95,
+    "priceText": "64.95 SEK",
+    "unitPrice": 64.95,
+    "unitPriceText": "64.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ced51b48-856c-4f04-acca-73f8c5672c28.jpg?fit=bounds&format=auto&optimize=medium&width=76&s=0x52b4b04fcc66f4fc7d96191cffc96245232fc4a1",
+    "productUrl": "https://www.mathem.se/se/products/63668-no-name-dressingsflaska-068l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4883",
+    "name": "Fixa Flaskborste med Skumgummi 50mm",
+    "brand": "Fixa",
+    "packageText": "1 st",
+    "price": 19.95,
+    "priceText": "19.95 SEK",
+    "unitPrice": 19.95,
+    "unitPriceText": "19.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/62e3a12b-4671-49c8-a60f-00430446a8dc.jpg?fit=bounds&format=auto&optimize=medium&width=40&s=0x9b04a103b9564ddf468652921a163d4dbdef56e3",
+    "productUrl": "https://www.mathem.se/se/products/4883-fixa-flaskborste-med-skumgummi-50mm/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64526",
+    "name": "Fixa Glasmatlåda med Lock Rund 0,2L",
+    "brand": "Fixa",
+    "packageText": "1 st",
+    "price": 32.95,
+    "priceText": "32.95 SEK",
+    "unitPrice": 32.95,
+    "unitPriceText": "32.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bda2c54d-2e8b-4a87-9758-569d8e934a98.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x34d5180478025382310f6a0d08c628bad80006c4",
+    "productUrl": "https://www.mathem.se/se/products/64526-fixa-glasmatlada-med-lock-rund-02l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "40307",
+    "name": "Fixa Förvaringsburk  1,2l",
+    "brand": "Fixa",
+    "packageText": "1 st",
+    "price": 33.95,
+    "priceText": "33.95 SEK",
+    "unitPrice": 33.95,
+    "unitPriceText": "33.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1084a8d7-6818-41ce-9e20-0a904aacb4e4.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x917362c6895d3cb77976ac53481af442dfac0b74",
+    "productUrl": "https://www.mathem.se/se/products/40307-fixa-forvaringsburk-12l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62343",
+    "name": "Fixa Glasmatlåda med Lock 1L",
+    "brand": "Fixa",
+    "packageText": "1000 ml",
+    "price": 59.95,
+    "priceText": "59.95 SEK",
+    "unitPrice": 59.95,
+    "unitPriceText": "59.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1455b3f5-3224-4327-b556-99d2a2851b41.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x5009665c1eb9ab75bef3f54377ecd4b085d6124b",
+    "productUrl": "https://www.mathem.se/se/products/62343-fixa-glasmatlada-med-lock-1l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62371",
+    "name": "Fixa Glasmatlåda med Lock 0,4L",
+    "brand": "Fixa",
+    "packageText": "370 ml",
+    "price": 39.5,
+    "priceText": "39.50 SEK",
+    "unitPrice": 39.5,
+    "unitPriceText": "39.50 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cf5640cb-e9c9-47a8-aa9b-2cad9251b43f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x91417751bef33324c6179fd6e0e6a072c74da9a1",
+    "productUrl": "https://www.mathem.se/se/products/62371-fixa-glasmatlada-med-lock-04l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5658",
+    "name": "Hedlundgruppen Presentpåse Flaska Marmor med Guldfolie",
+    "brand": "Hedlundgruppen",
+    "packageText": "1 st",
+    "price": 24.95,
+    "priceText": "24.95 SEK",
+    "unitPrice": 24.95,
+    "unitPriceText": "24.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ba1a3267-5d2e-4d9a-bba0-79f258573d71.jpg?fit=bounds&format=auto&optimize=medium&width=116&s=0xb3953a5748bde4586209a56efe40141c107963a2",
+    "productUrl": "https://www.mathem.se/se/products/5658-hedlundgruppen-presentpase-flaska-marmor-med-guldf/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "40471",
+    "name": "Fixa Förvaringsburk 0,9L",
+    "brand": "Fixa",
+    "packageText": "12 g",
+    "price": 29.95,
+    "priceText": "29.95 SEK",
+    "unitPrice": 29.95,
+    "unitPriceText": "29.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/00f16207-b329-4e48-8d9d-c1183ea5a7d1.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xb03eec373ba372665acd1299427ff799ab7b685f",
+    "productUrl": "https://www.mathem.se/se/products/40471-fixa-forvaringsburk-09l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62285",
+    "name": "Fixa Glasmatlåda med Lock 0,6L",
+    "brand": "Fixa",
+    "packageText": "600 ml",
+    "price": 49.95,
+    "priceText": "49.95 SEK",
+    "unitPrice": 49.95,
+    "unitPriceText": "49.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/95f0563d-d9a7-43c2-907c-fb0d766d58f9.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x40b379d2a96c6c26df266cc9ae7be414b8d7a4e8",
+    "productUrl": "https://www.mathem.se/se/products/62285-fixa-glasmatlada-med-lock-06l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64525",
+    "name": "Fixa Glasmatlåda med Lock Rund 0,6L",
+    "brand": "Fixa",
+    "packageText": "600 ml",
+    "price": 47.95,
+    "priceText": "47.95 SEK",
+    "unitPrice": 47.95,
+    "unitPriceText": "47.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/767fdfb5-b429-4f84-a138-c3d2872409ce.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x90aeb131c4e816ed779748ba9c8d45cde5e2a787",
+    "productUrl": "https://www.mathem.se/se/products/64525-fixa-glasmatlada-med-lock-rund-06l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63976",
+    "name": "Minstingen Dinapp +4M",
+    "brand": "Minstingen",
+    "packageText": "2 st",
+    "price": 23.96,
+    "priceText": "23.96 SEK",
+    "unitPrice": 11.98,
+    "unitPriceText": "11.98 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/83710a26-862d-4b1c-bbdc-654e90eb9eea.jpg?fit=bounds&format=auto&optimize=medium&width=196&s=0x23f763ef516595a81f1b79215682f1217d0d978e",
+    "productUrl": "https://www.mathem.se/se/products/63976-minstingen-dinapp-4m/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68141",
+    "name": "Hedlundgruppen Presentpåse Flaska Tulpaner",
+    "brand": "Hedlundgruppen",
+    "packageText": "1 st",
+    "price": 24.95,
+    "priceText": "24.95 SEK",
+    "unitPrice": 24.95,
+    "unitPriceText": "24.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c9890194-bb4c-43d8-9aeb-b8cedd3f263b.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0x60a2bd391b3b0cf0dca33261d77853654ed1de6c",
+    "productUrl": "https://www.mathem.se/se/products/68141-hedlundgruppen-presentpase-flaska-tulpaner/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "16943",
+    "name": "MAM Anti-Colic Diflaska Osorterade Färger",
+    "brand": "MAM",
+    "packageText": "1 st",
+    "price": 69.95,
+    "priceText": "69.95 SEK",
+    "unitPrice": 69.95,
+    "unitPriceText": "69.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e4dcff49-1232-40c7-bf57-5474557aa36a.jpg?fit=bounds&format=auto&optimize=medium&width=123&s=0x79031336ac0a552bf5f6d351d1c8d81a4bcc0d4e",
+    "productUrl": "https://www.mathem.se/se/products/16943-mam-anti-colic-diflaska-osorterade-farger/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64604",
+    "name": "Märta Glasburk med Lock 1,03L",
+    "brand": "Märta",
+    "packageText": "1 st",
+    "price": 39.95,
+    "priceText": "39.95 SEK",
+    "unitPrice": 39.95,
+    "unitPriceText": "39.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f051344f-04e5-4449-b2c7-e3bea62f270d.jpg?fit=bounds&format=auto&optimize=medium&width=233&s=0x35d57bb8fe30674df77f7b1bc063ef996dca08e3",
+    "productUrl": "https://www.mathem.se/se/products/64604-marta-glasburk-med-lock-103l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62249",
+    "name": "SmartStore Matförvaring Earl Grey 0,8L",
+    "brand": "SmartStore",
+    "packageText": "1 st",
+    "price": 21.95,
+    "priceText": "21.95 SEK",
+    "unitPrice": 21.95,
+    "unitPriceText": "21.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e9e1a5cf-c1c0-4a92-93fb-f0a92154f259.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x06898e4b992ca15b6b4261b4e442bcdf9174be32",
+    "productUrl": "https://www.mathem.se/se/products/62249-smartstore-matforvaring-earl-grey-08l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65797",
+    "name": "Star Nutrition Shaker Vit",
+    "brand": "Star Nutrition",
+    "packageText": "1 st",
+    "price": 44.95,
+    "priceText": "44.95 SEK",
+    "unitPrice": 44.95,
+    "unitPriceText": "44.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d08a5fec-2b7e-4e09-86b5-0f8b60f73dfe.jpg?fit=bounds&format=auto&optimize=medium&width=185&s=0xdb72f013a3c4f21f7ff5ce050b839c945989814c",
+    "productUrl": "https://www.mathem.se/se/products/65797-star-nutrition-shaker-vit/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62354",
+    "name": "SmartStore Förvaringsburk 1,6L",
+    "brand": "SmartStore",
+    "packageText": "1 st",
+    "price": 79.95,
+    "priceText": "79.95 SEK",
+    "unitPrice": 79.95,
+    "unitPriceText": "79.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fd4c92a4-930f-4ad6-ae78-8b8b646bf3fe.jpg?fit=bounds&format=auto&optimize=medium&width=195&s=0xfdc219a3accd10f1606fef4f76d653395c30099e",
+    "productUrl": "https://www.mathem.se/se/products/62354-smartstore-forvaringsburk-16l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62170",
+    "name": "Fixa Matlåda 1,6L",
+    "brand": "Fixa",
+    "packageText": "148 g",
+    "price": 36.95,
+    "priceText": "36.95 SEK",
+    "unitPrice": 184.75,
+    "unitPriceText": "184.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d5acfe98-754d-4d60-a8ed-223b78b13023.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x634f9d432a3f42e93819c2613ff6fa0967805cb0",
+    "productUrl": "https://www.mathem.se/se/products/62170-fixa-matlada-16l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66144",
+    "name": "Nordiska Yoghurtbägare",
+    "brand": "Nordiska",
+    "packageText": "1 st",
+    "price": 49.95,
+    "priceText": "49.95 SEK",
+    "unitPrice": 49.95,
+    "unitPriceText": "49.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ca970d25-bd0a-4282-aa53-651253696d5b.jpg?fit=bounds&format=auto&optimize=medium&width=184&s=0xf33f6b63b3dc1c6f7ce591ac0559618403cab797",
+    "productUrl": "https://www.mathem.se/se/products/66144-nordiska-yoghurtbagare/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "38826",
+    "name": "Malaco Colaflaskor",
+    "brand": "Malaco",
+    "packageText": "95 g",
+    "price": 11.95,
+    "priceText": "11.95 SEK",
+    "unitPrice": 125.79,
+    "unitPriceText": "125.79 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8547aede-6ab7-4cd6-87ec-db6ebc78bce1.jpg?fit=bounds&format=auto&optimize=medium&width=219&s=0xb2291bafecd5fe392fc8a5c671a4e99343fbc2a4",
+    "productUrl": "https://www.mathem.se/se/products/38826-malaco-colaflaskor/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66875",
+    "name": "Festis Kaktus & Lime",
+    "brand": "Festis",
+    "packageText": "50 cl",
+    "price": 15.1,
+    "priceText": "15.10 SEK",
+    "unitPrice": 30.2,
+    "unitPriceText": "30.20 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/16635ed0-1019-416c-86f0-cbd139915a24.jpg?fit=bounds&format=auto&optimize=medium&width=93&s=0xfbe5e94bfcf04e574de7484ccfd9111f826cc55d",
+    "productUrl": "https://www.mathem.se/se/products/66875-festis-festis-kaktus-lime/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "39986",
+    "name": "Smartstore Matförvaring 0,45L",
+    "brand": "Smartstore",
+    "packageText": "1 st",
+    "price": 19.95,
+    "priceText": "19.95 SEK",
+    "unitPrice": 19.95,
+    "unitPriceText": "19.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/19080a2c-d30f-4ec4-9a40-0598178feebc.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xb3f13c72614d9bd3cc362bda31e357b979377742",
+    "productUrl": "https://www.mathem.se/se/products/39986-smartstore-matforvaring-045l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63550",
+    "name": "Nordiska Yoghurtbägare",
+    "brand": "Nordiska",
+    "packageText": "1 st",
+    "price": 49.95,
+    "priceText": "49.95 SEK",
+    "unitPrice": 49.95,
+    "unitPriceText": "49.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2d766acc-0ea9-4e89-a5d9-36d99301455c.jpg?fit=bounds&format=auto&optimize=medium&width=187&s=0xcc1acb0a069354ac4f6fe3d673304f077a92c530",
+    "productUrl": "https://www.mathem.se/se/products/63550-nordiska-yoghurtbagare/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2303",
+    "name": "Fixa Korkskruv med Hävarm",
+    "brand": "Fixa",
+    "packageText": "1 st",
+    "price": 50.95,
+    "priceText": "50.95 SEK",
+    "unitPrice": 50.95,
+    "unitPriceText": "50.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/46ae8dae-ef32-4bdc-b23a-48e0c88934e9.jpg?fit=bounds&format=auto&optimize=medium&width=111&s=0x41f9e70f932704be96d7a9153b77c8bb81090ea7",
+    "productUrl": "https://www.mathem.se/se/products/2303-fixa-korkskruv-med-havarm/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62462",
+    "name": "Fixa Matlåda med Fack 950ml",
+    "brand": "Fixa",
+    "packageText": "1 st",
+    "price": 64.95,
+    "priceText": "64.95 SEK",
+    "unitPrice": 64.95,
+    "unitPriceText": "64.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c1705a67-e3fb-4de1-9fa1-21ce51f7d551.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x511dcf690878624080c6a8ddf2681aca60c3eaa0",
+    "productUrl": "https://www.mathem.se/se/products/62462-fixa-matlada-med-fack-950ml/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "38988",
+    "name": "SmartStore Matförvaring 1L",
+    "brand": "SmartStore",
+    "packageText": "1 st",
+    "price": 24.95,
+    "priceText": "24.95 SEK",
+    "unitPrice": 24.95,
+    "unitPriceText": "24.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9c53d1ff-0ee6-46c3-8b25-49482c8d1131.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xab4216712297837d5d6d02d8e77c12e237342ad5",
+    "productUrl": "https://www.mathem.se/se/products/38988-smartstore-matforvaring-1l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66874",
+    "name": "Festis Orange",
+    "brand": "Festis",
+    "packageText": "50 cl",
+    "price": 15.1,
+    "priceText": "15.10 SEK",
+    "unitPrice": 30.2,
+    "unitPriceText": "30.20 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/22cd9b39-83c1-41be-ad1a-f84f107cb820.jpg?fit=bounds&format=auto&optimize=medium&width=93&s=0x0ea0f777d039631d8a6f7050b1e2388da60f6ce8",
+    "productUrl": "https://www.mathem.se/se/products/66874-festis-festis-orange/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=flask",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65512",
+    "name": "Tomat 5-pack Klass1 Spanien",
+    "brand": "",
+    "packageText": "Spanien, 500 g",
+    "price": 43.74,
+    "priceText": "43.74 SEK",
+    "unitPrice": 87.48,
+    "unitPriceText": "87.48 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2d27b865-a797-42b6-80c2-0deaf86fe30b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc3d9abbf9b63c89ea57402e005b877c850ca8f0b",
+    "productUrl": "https://www.mathem.se/se/products/65512-tomat-5-pack-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6939",
+    "name": "Tomat plommon baby Klass1 Marocko",
+    "brand": "",
+    "packageText": "Marocko, 250 g",
+    "price": 31.95,
+    "priceText": "31.95 SEK",
+    "unitPrice": 127.8,
+    "unitPriceText": "127.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1a8b4f8c-c330-4f60-b03e-e7f8d953c894.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x9a0301aa7d4300503b96240c816fb6d45cb477be",
+    "productUrl": "https://www.mathem.se/se/products/6939-tomat-plommon-baby-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5501",
+    "name": "Tomat Cocktail Klass1 Nederländerna",
+    "brand": "",
+    "packageText": "Nederländerna, 250 g",
+    "price": 23.95,
+    "priceText": "23.95 SEK",
+    "unitPrice": 95.8,
+    "unitPriceText": "95.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/66772bb8-6303-4743-ab03-1341a46eaf3c.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x768d4e693a7335f0cf65606bda0b474c0bf63d8d",
+    "productUrl": "https://www.mathem.se/se/products/5501-tomat-cocktail-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8257",
+    "name": "Tomat Kvist Klass1 Nederländerna",
+    "brand": "",
+    "packageText": "Nederländerna, 500 g",
+    "price": 38.95,
+    "priceText": "38.95 SEK",
+    "unitPrice": 77.9,
+    "unitPriceText": "77.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5908fc09-1f0a-4504-82ec-423046dcc78e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x7f54655656a8f568829a95c40db645b315480d11",
+    "productUrl": "https://www.mathem.se/se/products/8257-tomat-kvist-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "884",
+    "name": "Tomat Kvist EKO Klass1 Spain",
+    "brand": "",
+    "packageText": "Spain, 500 g",
+    "price": 59.95,
+    "priceText": "59.95 SEK",
+    "unitPrice": 119.9,
+    "unitPriceText": "119.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8e6dec50-ed07-47f2-af31-f8bb8aebd22f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc300f4220dd12fa38b6dad3897c07894353e4ce4",
+    "productUrl": "https://www.mathem.se/se/products/884-tomat-kvist-eko-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "42226",
+    "name": "Tomat Plommon baby \"San Marzano\" Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 250 g",
+    "price": 34.95,
+    "priceText": "34.95 SEK",
+    "unitPrice": 139.8,
+    "unitPriceText": "139.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e96e2a97-8c97-4973-87d5-6d5e1fc4350d.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x86b367301092f539f28fdb41d474d380ef7df9ee",
+    "productUrl": "https://www.mathem.se/se/products/42226-tomat-plommon-baby-san-marzano-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8641",
+    "name": "Cocktailtomater på Kvist Klass1 Tunisien",
+    "brand": "",
+    "packageText": "Tunisien, 500 g",
+    "price": 44.95,
+    "priceText": "44.95 SEK",
+    "unitPrice": 89.9,
+    "unitPriceText": "89.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/baa29f9e-3264-4fb0-b2a1-a0883d22e1a7.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x2fc96a7a1094d2b92c403f0f1364ae761ab8e977",
+    "productUrl": "https://www.mathem.se/se/products/8641-cocktailtomater-pa-kvist-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8672",
+    "name": "Tomat cocktailkvist extra söt \"Delikata\" Klass1 Belgien",
+    "brand": "",
+    "packageText": "Belgien, 170 g",
+    "price": 42.95,
+    "priceText": "42.95 SEK",
+    "unitPrice": 252.65,
+    "unitPriceText": "252.65 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fd524d50-83b7-4e2f-8c2c-fc905f2a98bc.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xd783055b953bcadf9bdbd180c08b515d16fccb74",
+    "productUrl": "https://www.mathem.se/se/products/8672-tomat-cocktailkvist-extra-sot-delikata-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63267",
+    "name": "Garant Finkrossade Tomater 3-p",
+    "brand": "Garant",
+    "packageText": "1170 g",
+    "price": 30.76,
+    "priceText": "30.76 SEK",
+    "unitPrice": 26.29,
+    "unitPriceText": "26.29 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6e572388-3cf2-498a-953a-7d171c922f0e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x60bc0202772da2f07bce4f969b9e7819adc12877",
+    "productUrl": "https://www.mathem.se/se/products/63267-garant-finkrossade-tomater-3-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4575",
+    "name": "Garant Eko Krossade Tomater EKO",
+    "brand": "Garant Eko",
+    "packageText": "390 g",
+    "price": 16.04,
+    "priceText": "16.04 SEK",
+    "unitPrice": 41.13,
+    "unitPriceText": "41.13 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9ee2db6a-8ab0-45b2-bc10-2f86eeb53072.jpg?fit=bounds&format=auto&optimize=medium&width=233&s=0xe76e5b02cb465ddb5c1c71d7764352c5f88888db",
+    "productUrl": "https://www.mathem.se/se/products/4575-garant-eko-krossade-tomater-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8235",
+    "name": "Mutti Finkrossade Tomater 3x400g",
+    "brand": "Mutti",
+    "packageText": "1200 g",
+    "price": 41.5,
+    "priceText": "41.50 SEK",
+    "unitPrice": 34.58,
+    "unitPriceText": "34.58 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7c21ef74-5395-43de-824f-469b8a87e5f0.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x75d40a272a563fc70e65f15535cfceb71b93e93b",
+    "productUrl": "https://www.mathem.se/se/products/8235-mutti-finkrossade-tomater-3x400g/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7505",
+    "name": "Garant Krossade Tomater",
+    "brand": "Garant",
+    "packageText": "390 g",
+    "price": 13.72,
+    "priceText": "13.72 SEK",
+    "unitPrice": 35.18,
+    "unitPriceText": "35.18 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0108197b-3a00-4b38-be55-e84c44f09287.jpg?fit=bounds&format=auto&optimize=medium&width=208&s=0x387a1d70efe8fbec359fd0aaefa87911f434255c",
+    "productUrl": "https://www.mathem.se/se/products/7505-garant-krossade-tomater/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7447",
+    "name": "Paprika Röd Klass1 Nederländerna",
+    "brand": "",
+    "packageText": "Nederländerna, 180 g",
+    "price": 9.95,
+    "priceText": "9.95 SEK",
+    "unitPrice": 55.28,
+    "unitPriceText": "55.28 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c1f89649-d752-4e5b-8bec-87a83539ea64.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xcae66a75f8d97984321de06c0533356fd283eb3a",
+    "productUrl": "https://www.mathem.se/se/products/7447-paprika-rod-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3752",
+    "name": "Eldorado Passerade Tomater",
+    "brand": "Eldorado",
+    "packageText": "500 g",
+    "price": 10.88,
+    "priceText": "10.88 SEK",
+    "unitPrice": 21.76,
+    "unitPriceText": "21.76 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/da9890f5-df92-443a-b3d9-dfbb42495a56.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x3b478cfd6545414918f3369595f660196785c2ba",
+    "productUrl": "https://www.mathem.se/se/products/3752-eldorado-passerade-tomater/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "48324",
+    "name": "Garant Soltorkade Tomater Strimlade",
+    "brand": "Garant",
+    "packageText": "290 g",
+    "price": 33.6,
+    "priceText": "33.60 SEK",
+    "unitPrice": 216.77,
+    "unitPriceText": "216.77 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/55cdb3b4-da52-44b3-9b19-99b06f1e0cdc.jpg?fit=bounds&format=auto&optimize=medium&width=168&s=0xd3ff1a947110500301bc466285cb99b069c38b80",
+    "productUrl": "https://www.mathem.se/se/products/48324-garant-soltorkade-tomater-strimlade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "38095",
+    "name": "Tomat Gourmet Svensk Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 250 g",
+    "price": 37.95,
+    "priceText": "37.95 SEK",
+    "unitPrice": 151.8,
+    "unitPriceText": "151.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2b72bad9-79ef-4371-bd8a-60b7a151ab01.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x346a4211ec5b8ac39a91f78c6c0c55d2f4fba2fc",
+    "productUrl": "https://www.mathem.se/se/products/38095-tomat-gourmet-svensk-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4522",
+    "name": "Garant Eko Passerade Tomater EKO",
+    "brand": "Garant Eko",
+    "packageText": "390 g",
+    "price": 16.04,
+    "priceText": "16.04 SEK",
+    "unitPrice": 41.13,
+    "unitPriceText": "41.13 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cfc3bf8e-0b1f-46ce-8621-4022ff747cdc.jpg?fit=bounds&format=auto&optimize=medium&width=233&s=0x0ef77a33a5b762be8ab5af5b34b95c14546a6573",
+    "productUrl": "https://www.mathem.se/se/products/4522-garant-eko-passerade-tomater-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4719",
+    "name": "Arla Köket® Crème Fraiche Lätt 11% Tomat & Basilika",
+    "brand": "Arla Köket®",
+    "packageText": "2 dl",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 103.85,
+    "unitPriceText": "103.85 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/eb52bf8a-5591-4559-b29a-e5ce8428bf77.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x39144d135dd1d97c56fd600ba1f866f9a44539cb",
+    "productUrl": "https://www.mathem.se/se/products/4719-arla-koket-r-creme-fraiche-latt-11-tomat-basilika/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "227",
+    "name": "Eldorado Krossade Tomater",
+    "brand": "Eldorado",
+    "packageText": "500 g",
+    "price": 10.88,
+    "priceText": "10.88 SEK",
+    "unitPrice": 21.76,
+    "unitPriceText": "21.76 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6d85f93c-3029-4847-b85e-3162927aadd0.jpg?fit=bounds&format=auto&optimize=medium&width=166&s=0x372df22a9c095a13f97a189cc2accdebc4e88b23",
+    "productUrl": "https://www.mathem.se/se/products/227-eldorado-krossade-tomater/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7599",
+    "name": "Garant Passerade Tomater",
+    "brand": "Garant",
+    "packageText": "390 g",
+    "price": 13.72,
+    "priceText": "13.72 SEK",
+    "unitPrice": 35.18,
+    "unitPriceText": "35.18 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1dedb521-0ed3-47ed-86d9-914e295f19bb.jpg?fit=bounds&format=auto&optimize=medium&width=243&s=0x76f150026cbcf0936b644a345907b46cd68e474f",
+    "productUrl": "https://www.mathem.se/se/products/7599-garant-passerade-tomater/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4513",
+    "name": "Mutti Hela Skalade Tomater Pelati",
+    "brand": "Mutti",
+    "packageText": "400 g",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 47.2,
+    "unitPriceText": "47.20 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a2964449-f580-4b86-9c03-a9f5b4975cb7.jpg?fit=bounds&format=auto&optimize=medium&width=204&s=0xd124107662955b5af8646bfb080bd6d1312dd5f1",
+    "productUrl": "https://www.mathem.se/se/products/4513-mutti-hela-skalade-tomater-pelati/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7333",
+    "name": "Zeinas Hummus Soltorkad Tomat",
+    "brand": "Zeinas",
+    "packageText": "200 g",
+    "price": 26.95,
+    "priceText": "26.95 SEK",
+    "unitPrice": 134.75,
+    "unitPriceText": "134.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/01af39b7-20c3-44d0-b4cd-035a78cfeaaa.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xf946f0799dbd0bd7dcf41fd8d4d65be322598176",
+    "productUrl": "https://www.mathem.se/se/products/7333-zeinas-hummus-soltorkad-tomat/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4774",
+    "name": "Mutti Finkrossade Tomater",
+    "brand": "Mutti",
+    "packageText": "400 g",
+    "price": 20.35,
+    "priceText": "20.35 SEK",
+    "unitPrice": 50.88,
+    "unitPriceText": "50.88 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a1105f14-a26b-426a-98b7-d5d32c759f8d.jpg?fit=bounds&format=auto&optimize=medium&width=209&s=0x8a9ee05fa114eca2a4351b6934f99e681f388197",
+    "productUrl": "https://www.mathem.se/se/products/4774-mutti-finkrossade-tomater/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "38108",
+    "name": "Plommontomater Svenska Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 500 g",
+    "price": 42.95,
+    "priceText": "42.95 SEK",
+    "unitPrice": 85.9,
+    "unitPriceText": "85.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/77cb67e5-d190-49c6-90b4-3626361e4cf4.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xedf562a3c91f61cabe256815664e072d369dc862",
+    "productUrl": "https://www.mathem.se/se/products/38108-plommontomater-svenska-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7560",
+    "name": "Garant Krossade Tomater Vitlök",
+    "brand": "Garant",
+    "packageText": "390 g",
+    "price": 14.67,
+    "priceText": "14.67 SEK",
+    "unitPrice": 37.62,
+    "unitPriceText": "37.62 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0776fb19-dec7-4440-ac83-82f34b5f4de5.jpg?fit=bounds&format=auto&optimize=medium&width=208&s=0x9f7a3e34a6ead2427c95f7f68477306ce35ea0da",
+    "productUrl": "https://www.mathem.se/se/products/7560-garant-krossade-tomater-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5244",
+    "name": "Mutti Hela Skalade Tomater EKO",
+    "brand": "Mutti",
+    "packageText": "400 g",
+    "price": 24.13,
+    "priceText": "24.13 SEK",
+    "unitPrice": 60.33,
+    "unitPriceText": "60.33 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6c526db8-9d5d-422d-a733-5493bb8c0bb1.jpg?fit=bounds&format=auto&optimize=medium&width=208&s=0x84f1a98a105a4ee09b60a0fbcaf3cd742277aa35",
+    "productUrl": "https://www.mathem.se/se/products/5244-mutti-hela-skalade-tomater-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7577",
+    "name": "Garant Krossade Tomater Örter",
+    "brand": "Garant",
+    "packageText": "390 g",
+    "price": 14.67,
+    "priceText": "14.67 SEK",
+    "unitPrice": 37.62,
+    "unitPriceText": "37.62 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/38595b5c-0719-493e-bbd5-e5af9bdec0b9.jpg?fit=bounds&format=auto&optimize=medium&width=208&s=0x7640c706050ec13e37cd9aae6df270c336cbdac5",
+    "productUrl": "https://www.mathem.se/se/products/7577-garant-krossade-tomater-orter/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8727",
+    "name": "Paprikamix EKO Klass1 Nederländerna",
+    "brand": "",
+    "packageText": "Nederländerna, 300 g",
+    "price": 44.95,
+    "priceText": "44.95 SEK",
+    "unitPrice": 149.83,
+    "unitPriceText": "149.83 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7d4643bb-055c-41e9-a0f9-8d50e97cbd20.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x3ed2cd0fb0abde1379a9d6dccd5d6fce8e2bcd2b",
+    "productUrl": "https://www.mathem.se/se/products/8727-paprikamix-eko-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8682",
+    "name": "Itigo Finkrossade Tomater EKO/KRAV",
+    "brand": "Itigo",
+    "packageText": "690 g",
+    "price": 41.5,
+    "priceText": "41.50 SEK",
+    "unitPrice": 60.14,
+    "unitPriceText": "60.14 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/aab1cdb1-b6de-4ce5-8a28-9ca4f3ccd8ae.jpg?fit=bounds&format=auto&optimize=medium&width=101&s=0x437950c286ab2840290ac43ff951a54f8c8a75b2",
+    "productUrl": "https://www.mathem.se/se/products/8682-itigo-finkrossade-tomater-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67371",
+    "name": "Garant Eko Finkrossade Tomater EKO",
+    "brand": "Garant Eko",
+    "packageText": "390 g",
+    "price": 16.04,
+    "priceText": "16.04 SEK",
+    "unitPrice": 41.13,
+    "unitPriceText": "41.13 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fe751193-1c71-4937-a1f4-34830522b2d7.jpg?fit=bounds&format=auto&optimize=medium&width=243&s=0x6f0f9e3ffed53b0092b365dc407cd0b7b6e7aecd",
+    "productUrl": "https://www.mathem.se/se/products/67371-garant-eko-finkrossade-tomater-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4752",
+    "name": "Gurka EKO Klass1 Spanien",
+    "brand": "",
+    "packageText": "Spanien, 320 g",
+    "price": 22.95,
+    "priceText": "22.95 SEK",
+    "unitPrice": 71.72,
+    "unitPriceText": "71.72 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1b3bba74-d07c-4869-b5cd-bfa0d1c3fa2b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x5375871cc7b50dd818aea96313ed4d6463a2f588",
+    "productUrl": "https://www.mathem.se/se/products/4752-gurka-eko-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4656",
+    "name": "Heinz Vita Bönor i Tomatsås",
+    "brand": "Heinz",
+    "packageText": "415 g",
+    "price": 12.26,
+    "priceText": "12.26 SEK",
+    "unitPrice": 29.54,
+    "unitPriceText": "29.54 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0940bca1-1ba7-4c26-a4b7-b8f442529b8e.jpg?fit=bounds&format=auto&optimize=medium&width=198&s=0xd960b0ec0f41f2a264fb60efc0736500c71bfe67",
+    "productUrl": "https://www.mathem.se/se/products/4656-heinz-vita-bonor-i-tomatsas/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6958",
+    "name": "Kelda® Mild Tomatsoppa",
+    "brand": "Kelda®",
+    "packageText": "500 ml",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 60.48,
+    "unitPriceText": "60.48 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7ab1673e-31fd-4078-a6ff-136344552649.jpg?fit=bounds&format=auto&optimize=medium&width=154&s=0xcc688f384c9fc08cd6449de4727487a4cc632987",
+    "productUrl": "https://www.mathem.se/se/products/6958-kelda-r-mild-tomatsoppa/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "58159",
+    "name": "Mutti Krossade Tomater",
+    "brand": "Mutti",
+    "packageText": "500 g",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 47.22,
+    "unitPriceText": "47.22 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c7fd479b-ef25-46b4-a741-54d589323e3e.jpg?fit=bounds&format=auto&optimize=medium&width=167&s=0x2c7e191e105aef9594b14ce90261c762d6342d79",
+    "productUrl": "https://www.mathem.se/se/products/58159-mutti-krossade-tomater/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "50080",
+    "name": "Kung Markatta Tomatpuré EKO/KRAV",
+    "brand": "Kung Markatta",
+    "packageText": "200 g",
+    "price": 31.18,
+    "priceText": "31.18 SEK",
+    "unitPrice": 155.9,
+    "unitPriceText": "155.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f2a65f55-59ad-4aae-84ef-509c2c93197e.jpg?fit=bounds&format=auto&optimize=medium&width=90&s=0x75270529339ca6fff35797e1f6903a886d8584a1",
+    "productUrl": "https://www.mathem.se/se/products/50080-kung-markatta-tomatpure-eko-krav/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5398",
+    "name": "Fontana Juice Tomat",
+    "brand": "Fontana",
+    "packageText": "1 l",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 18.88,
+    "unitPriceText": "18.88 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/942cc180-3c5c-496d-b7a5-352c0c91b89e.jpg?fit=bounds&format=auto&optimize=medium&width=94&s=0x69b3a58b42de3fd6d4d15cdceb6be747052a6ff1",
+    "productUrl": "https://www.mathem.se/se/products/5398-fontana-juice-tomat/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67999",
+    "name": "Rydbergs Potatissallad Tomat & Basilikavinägrett",
+    "brand": "Rydbergs",
+    "packageText": "350 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 81,
+    "unitPriceText": "81.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7fd50afb-8c75-484e-a00c-07c596edebc1.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x61471c4432f88221dd889e42dbe05d09972f506e",
+    "productUrl": "https://www.mathem.se/se/products/67999-rydbergs-potatissallad-tomat-basilikavinagrett/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63905",
+    "name": "Monte Castello Pastasås Tomat & Basilika",
+    "brand": "Monte Castello",
+    "packageText": "480 g",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 43.27,
+    "unitPriceText": "43.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f78820d1-7e32-4d81-944f-fc8bbf5679b9.jpg?fit=bounds&format=auto&optimize=medium&width=179&s=0xefe0e70800b6a0c9e3a9f10634ecc845d1d4bac5",
+    "productUrl": "https://www.mathem.se/se/products/63905-monte-castello-pastasas-tomat-basilika/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10581",
+    "name": "Felix Soppa Tomat/Mozzarella",
+    "brand": "Felix",
+    "packageText": "470 g",
+    "price": 50.11,
+    "priceText": "50.11 SEK",
+    "unitPrice": 106.62,
+    "unitPriceText": "106.62 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a02f83f9-9010-4713-baa8-0a407546b288.jpg?fit=bounds&format=auto&optimize=medium&width=224&s=0x0a1a53e77fa64b5e0af095deca353ba135db23cc",
+    "productUrl": "https://www.mathem.se/se/products/10581-felix-soppa-tomat-mozzarella/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63906",
+    "name": "Monte Castello Pastasås Tomat & Vitlök",
+    "brand": "Monte Castello",
+    "packageText": "480 g",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 43.27,
+    "unitPriceText": "43.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3b0dc513-43fd-4fa2-9401-1b11d36ca65a.jpg?fit=bounds&format=auto&optimize=medium&width=179&s=0x7f2406d4a9f5ec7ae43693469722d601424a3fe0",
+    "productUrl": "https://www.mathem.se/se/products/63906-monte-castello-pastasas-tomat-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=tomat",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8343",
+    "name": "Felix Gammaldags Gurka",
+    "brand": "Felix",
+    "packageText": "730 g",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 85.93,
+    "unitPriceText": "85.93 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/375ccc35-c25c-45e3-a737-5c269600b0dd.jpg?fit=bounds&format=auto&optimize=medium&width=189&s=0x2daeecec7996525438ae2de1d2b7e9a360c2b3e3",
+    "productUrl": "https://www.mathem.se/se/products/8343-felix-gammaldags-gurka/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5712",
+    "name": "Felix Smörgåsgurka Skivad",
+    "brand": "Felix",
+    "packageText": "370 g",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 106.29,
+    "unitPriceText": "106.29 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/34fff5d8-ea12-4b17-9ed1-4416a85a8fe0.jpg?fit=bounds&format=auto&optimize=medium&width=191&s=0x50fe0bc4ff7616a76d9f65371b94e48d77413a7b",
+    "productUrl": "https://www.mathem.se/se/products/5712-felix-smorgasgurka-skivad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6677",
+    "name": "Önos Mor Annas Tunnskivad Gurka",
+    "brand": "Önos",
+    "packageText": "590 g",
+    "price": 30.76,
+    "priceText": "30.76 SEK",
+    "unitPrice": 89.16,
+    "unitPriceText": "89.16 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/66ff61ec-852e-43b3-99fe-9e638e731c30.jpg?fit=bounds&format=auto&optimize=medium&width=236&s=0x24f588f0ee9af94e6f2409e568ea0e839ef90e95",
+    "productUrl": "https://www.mathem.se/se/products/6677-onos-mor-annas-tunnskivad-gurka/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5404",
+    "name": "Garant Smörgåsgurka",
+    "brand": "Garant",
+    "packageText": "560 g",
+    "price": 24.56,
+    "priceText": "24.56 SEK",
+    "unitPrice": 70.17,
+    "unitPriceText": "70.17 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/16ae5a93-68b8-4490-99ce-17bc6f3b0322.jpg?fit=bounds&format=auto&optimize=medium&width=225&s=0xf2e4f573e24aaec1236e3cbe257d22319b9ff4e0",
+    "productUrl": "https://www.mathem.se/se/products/5404-garant-smorgasgurka/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6554",
+    "name": "Önos Mor Annas Smörgåsgurka",
+    "brand": "Önos",
+    "packageText": "590 g",
+    "price": 30.76,
+    "priceText": "30.76 SEK",
+    "unitPrice": 89.16,
+    "unitPriceText": "89.16 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/04b63db3-2b95-464e-8101-63a7bb88c1eb.jpg?fit=bounds&format=auto&optimize=medium&width=236&s=0x9530642068917926e4cd7b8e97e015a5a1e5ef87",
+    "productUrl": "https://www.mathem.se/se/products/6554-onos-mor-annas-smorgasgurka/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9544",
+    "name": "Felix Saltgurka Hel",
+    "brand": "Felix",
+    "packageText": "700 g",
+    "price": 36.44,
+    "priceText": "36.44 SEK",
+    "unitPrice": 107.18,
+    "unitPriceText": "107.18 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c2d5cf86-c1af-4f3d-9f10-85fb6747e5b2.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0xc6dc3f23082a28ba54f6a05f46624bf2efeb4380",
+    "productUrl": "https://www.mathem.se/se/products/9544-felix-saltgurka-hel/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7348",
+    "name": "Garant Hamburgergurka",
+    "brand": "Garant",
+    "packageText": "540 g",
+    "price": 28.87,
+    "priceText": "28.87 SEK",
+    "unitPrice": 96.23,
+    "unitPriceText": "96.23 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1ae41dfc-25b5-4c8b-bbe6-6c4d9b5f868d.jpg?fit=bounds&format=auto&optimize=medium&width=200&s=0x40c11971791249b91565fc8cbc014351c5ea803e",
+    "productUrl": "https://www.mathem.se/se/products/7348-garant-hamburgergurka/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "40031",
+    "name": "Eldorado Smörgåsgurka Skivad",
+    "brand": "Eldorado",
+    "packageText": "550 g",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 60.9,
+    "unitPriceText": "60.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c912f7a3-19d1-4f70-9adc-3c69f15149e1.jpg?fit=bounds&format=auto&optimize=medium&width=237&s=0xc9d2107c6db1fd8f4b123fc7259761d49d19ce78",
+    "productUrl": "https://www.mathem.se/se/products/40031-eldorado-smorgasgurka-skivad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "48310",
+    "name": "Kinda Gurka Färsksaltad Gurka Skivad Klass1 Sverige",
+    "brand": "Kinda Gurka",
+    "packageText": "Sverige, 400 g",
+    "price": 85.13,
+    "priceText": "85.13 SEK",
+    "unitPrice": 212.83,
+    "unitPriceText": "212.83 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7d6f83b7-6158-4065-927e-c8afdccdb244.jpg?fit=bounds&format=auto&optimize=medium&width=248&s=0x2dd251d088c2351aa169473448df84629d37295c",
+    "productUrl": "https://www.mathem.se/se/products/48310-kinda-gurka-farsksaltad-gurka-skivad-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6208",
+    "name": "Garant Finhackad Gurka",
+    "brand": "Garant",
+    "packageText": "560 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 50.63,
+    "unitPriceText": "50.63 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6dc580c6-49c2-41bb-95ca-d7e202a8a24d.jpg?fit=bounds&format=auto&optimize=medium&width=224&s=0xfa729e8475b853921f297c02c04b67bfd35649a5",
+    "productUrl": "https://www.mathem.se/se/products/6208-garant-finhackad-gurka/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9436",
+    "name": "Felix Bostongurka",
+    "brand": "Felix",
+    "packageText": "375 g",
+    "price": 34.02,
+    "priceText": "34.02 SEK",
+    "unitPrice": 90.72,
+    "unitPriceText": "90.72 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c4721cd7-4f3a-4929-ba18-71a51f6a7be5.jpg?fit=bounds&format=auto&optimize=medium&width=192&s=0xfd50f8d4e0dfb1955d3a9f5abe6b643cc93c9453",
+    "productUrl": "https://www.mathem.se/se/products/9436-felix-bostongurka/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7163",
+    "name": "Felix Cornichons",
+    "brand": "Felix",
+    "packageText": "350 g",
+    "price": 33.08,
+    "priceText": "33.08 SEK",
+    "unitPrice": 194.59,
+    "unitPriceText": "194.59 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ed26fca6-ca4b-4516-9596-94e5ea31477d.jpg?fit=bounds&format=auto&optimize=medium&width=187&s=0xbd8e6dabccb59f2c2a9a4c44289ac514c81822ca",
+    "productUrl": "https://www.mathem.se/se/products/7163-felix-cornichons/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9701",
+    "name": "Felix Saltgurka Skivad",
+    "brand": "Felix",
+    "packageText": "700 g",
+    "price": 36.44,
+    "priceText": "36.44 SEK",
+    "unitPrice": 82.82,
+    "unitPriceText": "82.82 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2f2d1a2a-4c27-4399-89dd-62d46dc7adab.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0x7d64070df9b4fe95f3534a89f5668645565a5b50",
+    "productUrl": "https://www.mathem.se/se/products/9701-felix-saltgurka-skivad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4480",
+    "name": "Ekobryggeriet Tonic Gurka EKO",
+    "brand": "Ekobryggeriet",
+    "packageText": "200 ml",
+    "price": 16.5,
+    "priceText": "16.50 SEK",
+    "unitPrice": 82.5,
+    "unitPriceText": "82.50 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4a65f2e7-230a-4444-88d2-8b78ba2254d9.jpg?fit=bounds&format=auto&optimize=medium&width=83&s=0x0e554fc88deb454e2d69a0e58d79eac69baeeaf1",
+    "productUrl": "https://www.mathem.se/se/products/4480-ekobryggeriet-tonic-gurka-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6478",
+    "name": "Garant Cornichons",
+    "brand": "Garant",
+    "packageText": "350 g",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 138.88,
+    "unitPriceText": "138.88 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1c9fb5ff-8658-45ca-9572-e42a83f17dd4.jpg?fit=bounds&format=auto&optimize=medium&width=192&s=0x9f0b62ccbcd3d3850f419c43afe67c0dcda87f50",
+    "productUrl": "https://www.mathem.se/se/products/6478-garant-cornichons/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8873",
+    "name": "Felix Bostongurka",
+    "brand": "Felix",
+    "packageText": "720 g",
+    "price": 45.38,
+    "priceText": "45.38 SEK",
+    "unitPrice": 63.03,
+    "unitPriceText": "63.03 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/eb874f69-65ac-4ddf-b70c-729ccf1fd22a.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0x6ff1b8f2cf026aa7aa04553d390d5432bc2812c9",
+    "productUrl": "https://www.mathem.se/se/products/8873-felix-bostongurka/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2254",
+    "name": "Pastejköket Leverpastej med Gurka Bredbar",
+    "brand": "Pastejköket",
+    "packageText": "200 g",
+    "price": 15.62,
+    "priceText": "15.62 SEK",
+    "unitPrice": 78.1,
+    "unitPriceText": "78.10 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a14ffb91-843f-4942-afcd-addaed6bb977.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xab2ed28a5101d982daec192c2d6c5ba9d70f63ab",
+    "productUrl": "https://www.mathem.se/se/products/2254-pastejkoket-leverpastej-med-gurka-bredbar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64345",
+    "name": "Garant Leverpastej Gurka Bredbar",
+    "brand": "Garant",
+    "packageText": "200 g",
+    "price": 11.31,
+    "priceText": "11.31 SEK",
+    "unitPrice": 56.55,
+    "unitPriceText": "56.55 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/35b9986d-0f8c-4a29-9026-b3008f7a1a70.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x76d8559064cad5e430b2c5e7043bce4b5921623f",
+    "productUrl": "https://www.mathem.se/se/products/64345-garant-leverpastej-gurka-bredbar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9523",
+    "name": "Innocent Juice Äpple, Kiwi & Gurka",
+    "brand": "Innocent",
+    "packageText": "900 ml",
+    "price": 35,
+    "priceText": "35.00 SEK",
+    "unitPrice": 38.89,
+    "unitPriceText": "38.89 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/daa242ad-a597-4667-a4a6-81f1f4c725c3.jpg?fit=bounds&format=auto&optimize=medium&width=101&s=0x931e43990a961b4b9df8fb45eabdde5b59716d0d",
+    "productUrl": "https://www.mathem.se/se/products/9523-innocent-juice-apple-kiwi-gurka/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67345",
+    "name": "Felix Bostongurka",
+    "brand": "Felix",
+    "packageText": "335 ml",
+    "price": 34.97,
+    "priceText": "34.97 SEK",
+    "unitPrice": 104.39,
+    "unitPriceText": "104.39 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/00aee3ba-485b-490e-a90b-569c51368683.jpg?fit=bounds&format=auto&optimize=medium&width=100&s=0x4aab1689d113292cf77b1611eadd2e216e6859d4",
+    "productUrl": "https://www.mathem.se/se/products/67345-felix-bostongurka/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62474",
+    "name": "Nelson Garden Odlingsfrön Gurka Växthus Baby",
+    "brand": "Nelson Garden",
+    "packageText": "1 st",
+    "price": 42.95,
+    "priceText": "42.95 SEK",
+    "unitPrice": 42.95,
+    "unitPriceText": "42.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b4363f48-91ca-41fc-a900-2ce3f0321730.jpg?fit=bounds&format=auto&optimize=medium&width=194&s=0x472cad076e14731a2a250f79f3fa23ef24abf682",
+    "productUrl": "https://www.mathem.se/se/products/62474-nelson-garden-nelson-garden-odlingsfron-gurka-vaxt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67586",
+    "name": "ACCoCEBeRRY Cornichons",
+    "brand": "ACCoCEBeRRY",
+    "packageText": "340 g",
+    "price": 58.63,
+    "priceText": "58.63 SEK",
+    "unitPrice": 325.72,
+    "unitPriceText": "325.72 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c705ab2b-05f5-4296-99c3-ab07ae3388f8.jpg?fit=bounds&format=auto&optimize=medium&width=145&s=0x3cf6f4b9587a921e2fde08543e088a0856481cc7",
+    "productUrl": "https://www.mathem.se/se/products/67586-accoceberry-cornichons/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "48317",
+    "name": "Eldorado Cornichons",
+    "brand": "Eldorado",
+    "packageText": "680 g",
+    "price": 26.03,
+    "priceText": "26.03 SEK",
+    "unitPrice": 68.5,
+    "unitPriceText": "68.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/de5b708c-840a-47b7-bf73-6821ffd48705.jpg?fit=bounds&format=auto&optimize=medium&width=168&s=0x99c84f0e97b21c2a6f361d08ac296b025c7a2547",
+    "productUrl": "https://www.mathem.se/se/products/48317-eldorado-cornichons/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "1363",
+    "name": "Rydbergs Gurksallad",
+    "brand": "Rydbergs",
+    "packageText": "200 g",
+    "price": 16.99,
+    "priceText": "16.99 SEK",
+    "unitPrice": 84.95,
+    "unitPriceText": "84.95 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ef3fb54a-dccb-45f4-a597-d70d18c9e6ef.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xf07ff504f04d9121a8fd5e561939d06377505b72",
+    "productUrl": "https://www.mathem.se/se/products/1363-rydbergs-gurksallad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9668",
+    "name": "Salakis Tzatziki",
+    "brand": "Salakis",
+    "packageText": "500 g",
+    "price": 35.5,
+    "priceText": "35.50 SEK",
+    "unitPrice": 71,
+    "unitPriceText": "71.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9059a22a-6ddc-4412-b06e-5292c2e4849d.jpg?fit=bounds&format=auto&optimize=medium&width=214&s=0x4975182ba0f54f914d3ad8a813228df5dc5975f7",
+    "productUrl": "https://www.mathem.se/se/products/9668-salakis-tzatziki/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "12435",
+    "name": "Saltgurka Kinda Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 500 g",
+    "price": 39.7,
+    "priceText": "39.70 SEK",
+    "unitPrice": 79.4,
+    "unitPriceText": "79.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/da340336-8374-464b-b7f4-dec7a946ab8c.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x02d50eac5fabaadfada05cce27999beedaec4b59",
+    "productUrl": "https://www.mathem.se/se/products/12435-saltgurka-kinda-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67587",
+    "name": "Iruela Banderillas Picantes",
+    "brand": "Iruela",
+    "packageText": "365 g",
+    "price": 47.27,
+    "priceText": "47.27 SEK",
+    "unitPrice": 295.44,
+    "unitPriceText": "295.44 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/acb3efa5-0ce5-4121-955f-cb2f52f31a8e.jpg?fit=bounds&format=auto&optimize=medium&width=238&s=0x2027d081d17b31fc24ab5c2f64ad40b15a73444e",
+    "productUrl": "https://www.mathem.se/se/products/67587-iruela-banderillas-picantes/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66007",
+    "name": "Dove Deo Roll-On Cucumber & Tea 72h",
+    "brand": "Dove",
+    "packageText": "50 ml",
+    "price": 37.5,
+    "priceText": "37.50 SEK",
+    "unitPrice": 750,
+    "unitPriceText": "750.00 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ac43355d-c463-40c1-8a9e-e756ef049b06.jpg?fit=bounds&format=auto&optimize=medium&width=116&s=0x66c9ecf91c05adec22124f4e5a51b6dbfa087b02",
+    "productUrl": "https://www.mathem.se/se/products/66007-dove-deo-roll-on-cucumber-tea-72h/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68021",
+    "name": "Sibylla Gurkmajo",
+    "brand": "Sibylla",
+    "packageText": "200 ml",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 141.75,
+    "unitPriceText": "141.75 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/213c8ba5-f540-4e2e-a8dd-4d53d868fffe.jpg?fit=bounds&format=auto&optimize=medium&width=171&s=0xdf65ddcd2b69b5ac73219ba398b18c22d96850cf",
+    "productUrl": "https://www.mathem.se/se/products/68021-sibylla-gurkmajo/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9473",
+    "name": "Mills Remouladsås",
+    "brand": "Mills",
+    "packageText": "270 g",
+    "price": 36.86,
+    "priceText": "36.86 SEK",
+    "unitPrice": 136.52,
+    "unitPriceText": "136.52 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a4ecf0b7-36a4-465e-addf-a7e3cfedd625.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xeaa6ed5ef49d4b29c536b7c0afd00ee2422e316a",
+    "productUrl": "https://www.mathem.se/se/products/9473-mills-remouladsas/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "39047",
+    "name": "Hellmann's Hamburgerdressing",
+    "brand": "Hellmann's",
+    "packageText": "250 ml",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 120.96,
+    "unitPriceText": "120.96 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e286920e-4015-4263-9b1c-2a5d237be931.jpg?fit=bounds&format=auto&optimize=medium&width=142&s=0x8c7ac012fc3c3ac62e47ff8ceb295be647c7e212",
+    "productUrl": "https://www.mathem.se/se/products/39047-hellmanns-hamburgerdressing/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6545",
+    "name": "Rydbergs Baguettsallad Tonfisk",
+    "brand": "Rydbergs",
+    "packageText": "175 g",
+    "price": 27.92,
+    "priceText": "27.92 SEK",
+    "unitPrice": 159.54,
+    "unitPriceText": "159.54 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1545bb57-f828-4274-b335-43dee5a708d0.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x777f6813f05333e2090da1e465506ab3c0143313",
+    "productUrl": "https://www.mathem.se/se/products/6545-rydbergs-baguettsallad-tonfisk/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8351",
+    "name": "Fontana Tzatziki Laktosfri",
+    "brand": "Fontana",
+    "packageText": "200 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 151.2,
+    "unitPriceText": "151.20 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/32ff4ede-bff1-4b6b-896c-8c34d1ce951b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc1a10db5cc9411ac25af4e88b133776b6724dee1",
+    "productUrl": "https://www.mathem.se/se/products/8351-fontana-tzatziki-laktosfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64513",
+    "name": "Felix Thousand Island Dressing",
+    "brand": "Felix",
+    "packageText": "335 ml",
+    "price": 31.18,
+    "priceText": "31.18 SEK",
+    "unitPrice": 93.07,
+    "unitPriceText": "93.07 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5fa4f541-8e2e-4914-96c7-fdcb22f3b0da.jpg?fit=bounds&format=auto&optimize=medium&width=89&s=0x6e9c16416b813aaacdecbafbdf9c24b443d28237",
+    "productUrl": "https://www.mathem.se/se/products/64513-felix-thousand-island-dressing/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6608",
+    "name": "K-Salat Remouladsås",
+    "brand": "K-Salat",
+    "packageText": "400 ml",
+    "price": 30.76,
+    "priceText": "30.76 SEK",
+    "unitPrice": 76.9,
+    "unitPriceText": "76.90 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b532c9a1-3676-48a6-9c65-d4842b9e8cf1.jpg?fit=bounds&format=auto&optimize=medium&width=148&s=0xd78bbbf48a5a5bbf2cb0227f456948baa30c8581",
+    "productUrl": "https://www.mathem.se/se/products/6608-k-salat-remouladsas/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6729",
+    "name": "Innocent Smoothie Antioxidant",
+    "brand": "Innocent",
+    "packageText": "300 ml",
+    "price": 25,
+    "priceText": "25.00 SEK",
+    "unitPrice": 83.33,
+    "unitPriceText": "83.33 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cb788e76-5b47-4f45-a754-a29c93d36bbf.jpg?fit=bounds&format=auto&optimize=medium&width=93&s=0xcad8c62632e5b634f8ad63b4dde6bdb585c04f5e",
+    "productUrl": "https://www.mathem.se/se/products/6729-innocent-smoothie-antioxidant/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10501",
+    "name": "Innocent Super Smoothie Antioxidant",
+    "brand": "Innocent",
+    "packageText": "750 ml",
+    "price": 35,
+    "priceText": "35.00 SEK",
+    "unitPrice": 46.67,
+    "unitPriceText": "46.67 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/435dfd22-9a7d-4f50-be80-81ed4bb2e76f.jpg?fit=bounds&format=auto&optimize=medium&width=91&s=0x16ff447f0e3fa544b4c80d4b052de33d66736cce",
+    "productUrl": "https://www.mathem.se/se/products/10501-innocent-super-smoothie-antioxidant/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=gurka",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6765",
+    "name": "Apelsin i Nät \"Navelinas\" Klass1 Spanien",
+    "brand": "",
+    "packageText": "Spanien, 1000 g",
+    "price": 28.87,
+    "priceText": "28.87 SEK",
+    "unitPrice": 28.87,
+    "unitPriceText": "28.87 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/08469ac6-a8db-4edd-8dc7-ea9be4241c30.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc24be51194cdfd675b47888483d4f3ff592789f4",
+    "productUrl": "https://www.mathem.se/se/products/6765-apelsin-i-nat-navelinas-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66819",
+    "name": "Apelsin 4-pack Klass1 Spanien",
+    "brand": "",
+    "packageText": "Spanien, 1000 g",
+    "price": 38.95,
+    "priceText": "38.95 SEK",
+    "unitPrice": 38.95,
+    "unitPriceText": "38.95 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/03eb629a-7c20-48b7-b689-310c5b1f93e3.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x9d3556a518a37cf9c1bda5f231b9480aaf09d43e",
+    "productUrl": "https://www.mathem.se/se/products/66819-apelsin-4-pack-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "28794",
+    "name": "Apelsin EKO \"Navelinas\" Klass1 Sydafrika",
+    "brand": "",
+    "packageText": "Sydafrika, 750 g",
+    "price": 39.95,
+    "priceText": "39.95 SEK",
+    "unitPrice": 53.27,
+    "unitPriceText": "53.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/af8c4cb8-32e1-4083-8842-620a48b59f32.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xd767283a9a58fdf821708f26a65ff3bd6cd7f589",
+    "productUrl": "https://www.mathem.se/se/products/28794-apelsin-eko-navelinas-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4991",
+    "name": "God Morgon® Juice Apelsin med fruktkött",
+    "brand": "God Morgon®",
+    "packageText": "1 l",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 28.35,
+    "unitPriceText": "28.35 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/84b09668-cf8f-486e-b4c5-6c18a5264293.jpg?fit=bounds&format=auto&optimize=medium&width=91&s=0x461b4dff307ef3f76f620550787615b78040f2a8",
+    "productUrl": "https://www.mathem.se/se/products/4991-god-morgon-r-juice-apelsin-med-fruktkott/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8701",
+    "name": "Bravo Juice Apelsin",
+    "brand": "Bravo",
+    "packageText": "2 l",
+    "price": 42.45,
+    "priceText": "42.45 SEK",
+    "unitPrice": 21.23,
+    "unitPriceText": "21.23 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7a21ea3c-c654-4e60-ac79-16b5c08e4797.jpg?fit=bounds&format=auto&optimize=medium&width=133&s=0xf5e003a7ed56b4491b81548012222e6fbc79bc18",
+    "productUrl": "https://www.mathem.se/se/products/8701-bravo-juice-apelsin/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6542",
+    "name": "Bravo Juice Apelsin",
+    "brand": "Bravo",
+    "packageText": "1 l",
+    "price": 29.81,
+    "priceText": "29.81 SEK",
+    "unitPrice": 29.81,
+    "unitPriceText": "29.81 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b1981b82-f49d-420c-b000-a8a71e63304b.jpg?fit=bounds&format=auto&optimize=medium&width=106&s=0xc4d10b34381abd6a094efd74f76af709efd4d72f",
+    "productUrl": "https://www.mathem.se/se/products/6542-bravo-juice-apelsin/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5488",
+    "name": "Garant Eko Juice Apelsin Koncentrat EKO",
+    "brand": "Garant Eko",
+    "packageText": "Max 2 per kund, 200 ml",
+    "price": 28.5,
+    "priceText": "28.50 SEK",
+    "unitPrice": 142.5,
+    "unitPriceText": "142.50 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fae1a20e-1374-46ea-8ce8-71d81876a280.jpg?fit=bounds&format=auto&optimize=medium&width=237&s=0x8fc0c65fd2a617d7044e21706ae657808b55e405",
+    "productUrl": "https://www.mathem.se/se/products/5488-garant-eko-juice-apelsin-koncentrat-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10777",
+    "name": "Brämhults Juice Apelsin Nypressad",
+    "brand": "Brämhults",
+    "packageText": "850 ml",
+    "price": 52.01,
+    "priceText": "52.01 SEK",
+    "unitPrice": 61.19,
+    "unitPriceText": "61.19 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5cfc4e82-966e-4c8a-b44e-895dd069d9cd.jpg?fit=bounds&format=auto&optimize=medium&width=114&s=0xd7fd3ea552e39dfe7b8735ce2c365b2c310ba0a4",
+    "productUrl": "https://www.mathem.se/se/products/10777-bramhults-juice-apelsin-nypressad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10005",
+    "name": "Garant Juice Apelsin utan fruktkött",
+    "brand": "Garant",
+    "packageText": "1,75 l",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 21.61,
+    "unitPriceText": "21.61 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d78e319d-f402-4cdb-93ce-c50666e83d3a.jpg?fit=bounds&format=auto&optimize=medium&width=137&s=0x84c7759b4d756c95e81d7f0eaf5da875497739aa",
+    "productUrl": "https://www.mathem.se/se/products/10005-garant-juice-apelsin-utan-fruktkott/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9674",
+    "name": "God Morgon® Juice Apelsin med fruktkött",
+    "brand": "God Morgon®",
+    "packageText": "1,75 l",
+    "price": 45.38,
+    "priceText": "45.38 SEK",
+    "unitPrice": 25.93,
+    "unitPriceText": "25.93 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9e2b5da0-5336-4a79-b770-ccf575a6d59d.jpg?fit=bounds&format=auto&optimize=medium&width=112&s=0x44435b257509d2d31e464f18211bf0fa19adabcc",
+    "productUrl": "https://www.mathem.se/se/products/9674-god-morgon-r-juice-apelsin-med-fruktkott/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9942",
+    "name": "Innocent Juice Apelsin utan fruktkött",
+    "brand": "Innocent",
+    "packageText": "900 ml",
+    "price": 35,
+    "priceText": "35.00 SEK",
+    "unitPrice": 38.89,
+    "unitPriceText": "38.89 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/94f327f9-b903-4378-8987-aab477c2d64d.jpg?fit=bounds&format=auto&optimize=medium&width=101&s=0x2dc9bc5235b32327b702af6972673b15da81c5d3",
+    "productUrl": "https://www.mathem.se/se/products/9942-innocent-juice-apelsin-utan-fruktkott/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66924",
+    "name": "Fun Light Saft Apelsin",
+    "brand": "Fun Light",
+    "packageText": "1000 ml",
+    "price": 26.95,
+    "priceText": "26.95 SEK",
+    "unitPrice": 2.7,
+    "unitPriceText": "2.70 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1019ca40-81cf-4649-846f-c809740ef1b3.jpg?fit=bounds&format=auto&optimize=medium&width=83&s=0x820a6b14e34e7cddbcb570e4c9b83f89ab232e86",
+    "productUrl": "https://www.mathem.se/se/products/66924-fun-light-saft-apelsin/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9149",
+    "name": "Innocent Juice Apelsin med fruktkött",
+    "brand": "Innocent",
+    "packageText": "1,5 l",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 37.83,
+    "unitPriceText": "37.83 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/84eaac25-6e4c-4a8c-8f05-72cff0386f36.jpg?fit=bounds&format=auto&optimize=medium&width=126&s=0xc2e30e4772e665e0d0d7a74531ac642ac0b3bd9f",
+    "productUrl": "https://www.mathem.se/se/products/9149-innocent-juice-apelsin-med-fruktkott/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11555",
+    "name": "Brämhults Juice Apelsin Nypressad",
+    "brand": "Brämhults",
+    "packageText": "1,3 l",
+    "price": 72.4,
+    "priceText": "72.40 SEK",
+    "unitPrice": 55.69,
+    "unitPriceText": "55.69 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/73fdb176-81b6-4f52-a902-0a2f00362ca9.jpg?fit=bounds&format=auto&optimize=medium&width=107&s=0x0f2cd5dc68e8bd47e74ea14b30b2b89c1900edb4",
+    "productUrl": "https://www.mathem.se/se/products/11555-bramhults-juice-apelsin-nypressad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9871",
+    "name": "Innocent Juice Apelsin med fruktkött",
+    "brand": "Innocent",
+    "packageText": "900 ml",
+    "price": 35,
+    "priceText": "35.00 SEK",
+    "unitPrice": 38.89,
+    "unitPriceText": "38.89 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2818a2a0-8dd6-4a8a-9e15-3e558a50c443.jpg?fit=bounds&format=auto&optimize=medium&width=101&s=0xd0ab812b71142e3b285cf7ff8c810d245dbaa580",
+    "productUrl": "https://www.mathem.se/se/products/9871-innocent-juice-apelsin-med-fruktkott/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7570",
+    "name": "Festis Apelsin EKO 3x200ml",
+    "brand": "Festis",
+    "packageText": "600 ml",
+    "price": 14.15,
+    "priceText": "14.15 SEK",
+    "unitPrice": 23.58,
+    "unitPriceText": "23.58 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/280780ef-2d2a-4f24-976a-c57c48828264.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa0a5ca30c683dceb6a304ecfaaafd926fb74537f",
+    "productUrl": "https://www.mathem.se/se/products/7570-festis-festis-apelsin-eko-3x200ml/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9879",
+    "name": "Önos Gunillas Apelsinmarmelad",
+    "brand": "Önos",
+    "packageText": "450 g",
+    "price": 37.38,
+    "priceText": "37.38 SEK",
+    "unitPrice": 83.07,
+    "unitPriceText": "83.07 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/15443cb6-f52d-4368-87d7-98229a1d84e8.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x0faeca884005bb1c175b3db43698870bb3f110e1",
+    "productUrl": "https://www.mathem.se/se/products/9879-onos-gunillas-apelsinmarmelad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8190",
+    "name": "Garant Apelsinjuice med Fruktkött",
+    "brand": "Garant",
+    "packageText": "1000 ml",
+    "price": 32.65,
+    "priceText": "32.65 SEK",
+    "unitPrice": 32.65,
+    "unitPriceText": "32.65 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d309c830-83f8-4581-ad66-a3e604c179fd.jpg?fit=bounds&format=auto&optimize=medium&width=96&s=0xc41b356be069cae84d0ac3eae0f941979bb75f7a",
+    "productUrl": "https://www.mathem.se/se/products/8190-garant-apelsinjuice-med-fruktkott/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "38855",
+    "name": "Eldorado Apelsinmarmelad",
+    "brand": "Eldorado",
+    "packageText": "400 g",
+    "price": 16.04,
+    "priceText": "16.04 SEK",
+    "unitPrice": 40.1,
+    "unitPriceText": "40.10 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/29373cf2-00a5-4b04-8a18-43583d53985d.jpg?fit=bounds&format=auto&optimize=medium&width=186&s=0x103daa58de55e8e271df239bdf6ef86454a586e8",
+    "productUrl": "https://www.mathem.se/se/products/38855-eldorado-apelsinmarmelad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9667",
+    "name": "Bravo Juice Röd Apelsin",
+    "brand": "Bravo",
+    "packageText": "2 l",
+    "price": 37.7,
+    "priceText": "37.70 SEK",
+    "unitPrice": 18.85,
+    "unitPriceText": "18.85 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a4d02256-daa5-481c-aefb-069a90a7b02f.jpg?fit=bounds&format=auto&optimize=medium&width=117&s=0xb3865de48206a7dcd71a069008c32970c9dc2053",
+    "productUrl": "https://www.mathem.se/se/products/9667-bravo-juice-rod-apelsin/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4533",
+    "name": "MER Apelsin",
+    "brand": "MER",
+    "packageText": "500 ml",
+    "price": 15.62,
+    "priceText": "15.62 SEK",
+    "unitPrice": 31.24,
+    "unitPriceText": "31.24 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/22a7a55d-7154-4fca-8a0a-814292972aa8.jpg?fit=bounds&format=auto&optimize=medium&width=94&s=0xbbed8a1f38574479eaa1940db1d9c227af1e5d11",
+    "productUrl": "https://www.mathem.se/se/products/4533-mer-mer-apelsin/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10331",
+    "name": "Råsaft Kallpressad Juice Apelsin med Fruktkött",
+    "brand": "Råsaft",
+    "packageText": "700 ml",
+    "price": 52.01,
+    "priceText": "52.01 SEK",
+    "unitPrice": 74.3,
+    "unitPriceText": "74.30 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/67743c4f-6af4-432e-80fc-9097ff6d4627.jpg?fit=bounds&format=auto&optimize=medium&width=108&s=0x8098cb6508f5aa54bb7a1885193de28e82d18fdf",
+    "productUrl": "https://www.mathem.se/se/products/10331-rasaft-kallpressad-juice-apelsin-med-fruktkott/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9422",
+    "name": "Bob Apelsinmarmelad Squeezy",
+    "brand": "Bob",
+    "packageText": "425 g",
+    "price": 33.6,
+    "priceText": "33.60 SEK",
+    "unitPrice": 79.06,
+    "unitPriceText": "79.06 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/65711c85-435b-42ab-8b74-fce64f2a4965.jpg?fit=bounds&format=auto&optimize=medium&width=158&s=0xc71994d307c47e86347f2ebabd8b6efeb165c184",
+    "productUrl": "https://www.mathem.se/se/products/9422-bob-apelsinmarmelad-squeezy/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10288",
+    "name": "Bob Apelsinsaft",
+    "brand": "Bob",
+    "packageText": "950 ml",
+    "price": 34.5,
+    "priceText": "34.50 SEK",
+    "unitPrice": 4.54,
+    "unitPriceText": "4.54 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cd18e100-8f50-4f83-bf64-75561c1fd9a0.jpg?fit=bounds&format=auto&optimize=medium&width=92&s=0xf4d75449ec3c4f54beb5f1c9c68b7f4e416bb73b",
+    "productUrl": "https://www.mathem.se/se/products/10288-bob-apelsinsaft/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9895",
+    "name": "Bravo Juice Apelsin, Äpple & Mandarin",
+    "brand": "Bravo",
+    "packageText": "2 l",
+    "price": 37.7,
+    "priceText": "37.70 SEK",
+    "unitPrice": 18.85,
+    "unitPriceText": "18.85 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e09d2472-5ad3-407a-9410-264d88061624.jpg?fit=bounds&format=auto&optimize=medium&width=133&s=0xa7e2460e478c4ec23c5f997cc0b70d45a7ddb871",
+    "productUrl": "https://www.mathem.se/se/products/9895-bravo-juice-apelsin-apple-mandarin/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65989",
+    "name": "Brämhults Juice Apelsin Utan Fruktkött",
+    "brand": "Brämhults",
+    "packageText": "850 ml",
+    "price": 52.01,
+    "priceText": "52.01 SEK",
+    "unitPrice": 61.19,
+    "unitPriceText": "61.19 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5ad6cbd7-0eec-42cb-bf4d-193748f09835.jpg?fit=bounds&format=auto&optimize=medium&width=113&s=0x78393a06235b17eccb56cbea47154ddc2c640ba7",
+    "productUrl": "https://www.mathem.se/se/products/65989-bramhults-juice-apelsin-utan-fruktkott/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67029",
+    "name": "Garant Juice Apelsin med fruktkött",
+    "brand": "Garant",
+    "packageText": "1000 ml",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 25.51,
+    "unitPriceText": "25.51 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ad7a629a-3c5c-4511-abc0-b41f0300ebad.jpg?fit=bounds&format=auto&optimize=medium&width=112&s=0x5d521ec51580a06ab2fe364bd3d02f208a253404",
+    "productUrl": "https://www.mathem.se/se/products/67029-garant-juice-apelsin-med-fruktkott/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8516",
+    "name": "Den Gamle Fabrik Apelsinmarmelad",
+    "brand": "Den Gamle Fabrik",
+    "packageText": "380 g",
+    "price": 40.22,
+    "priceText": "40.22 SEK",
+    "unitPrice": 105.84,
+    "unitPriceText": "105.84 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0dcb4f13-2255-49bb-8d96-4147342a45e1.jpg?fit=bounds&format=auto&optimize=medium&width=243&s=0x0aa502005f3b7894983b3462948253aa3ac8bad4",
+    "productUrl": "https://www.mathem.se/se/products/8516-den-gamle-fabrik-apelsinmarmelad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9614",
+    "name": "ProViva Fruktdryck Apelsin Utan Tillsatt Socker & Sötningsmedel",
+    "brand": "ProViva",
+    "packageText": "1 l",
+    "price": 36.44,
+    "priceText": "36.44 SEK",
+    "unitPrice": 36.44,
+    "unitPriceText": "36.44 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/43e567ec-cdf7-4c14-a22e-cc440f719885.jpg?fit=bounds&format=auto&optimize=medium&width=92&s=0xae48c19f54990b451cf93c660ef3b2c25c9a69b5",
+    "productUrl": "https://www.mathem.se/se/products/9614-proviva-fruktdryck-apelsin-utan-tillsatt-socker-so/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4855",
+    "name": "Zingo Zero Apelsin",
+    "brand": "Zingo",
+    "packageText": "1,5 l",
+    "price": 14.1,
+    "priceText": "14.10 SEK",
+    "unitPrice": 9.4,
+    "unitPriceText": "9.40 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/492a7a99-0e19-4c59-ad7b-52fa301f864d.jpg?fit=bounds&format=auto&optimize=medium&width=88&s=0xd78420dd16ff320df43c7f5835a72c9e33432bdd",
+    "productUrl": "https://www.mathem.se/se/products/4855-zingo-zingo-zero-apelsin/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62395",
+    "name": "God Morgon® Apelsin Nektar med fruktkött",
+    "brand": "God Morgon®",
+    "packageText": "1000 ml",
+    "price": 23.56,
+    "priceText": "23.56 SEK",
+    "unitPrice": 23.56,
+    "unitPriceText": "23.56 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8e147577-8089-4060-ae23-911e9c424309.jpg?fit=bounds&format=auto&optimize=medium&width=91&s=0xe401937830a225ba5f6e9a9e8fefe2748231ec96",
+    "productUrl": "https://www.mathem.se/se/products/62395-god-morgon-r-apelsin-nektar-med-fruktkott/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7092",
+    "name": "Garant Marmelad Apelsin & Ingefära",
+    "brand": "Garant",
+    "packageText": "400 g",
+    "price": 25,
+    "priceText": "25.00 SEK",
+    "unitPrice": 62.5,
+    "unitPriceText": "62.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e897bad4-0a75-4807-bc3b-f305ffbfc638.jpg?fit=bounds&format=auto&optimize=medium&width=215&s=0x448c492e9f20ac237fef15966f0eda84ff2a7c57",
+    "productUrl": "https://www.mathem.se/se/products/7092-garant-marmelad-apelsin-ingefara/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5657",
+    "name": "Bob Apelsinmarmelad Refill",
+    "brand": "Bob",
+    "packageText": "500 g",
+    "price": 23.19,
+    "priceText": "23.19 SEK",
+    "unitPrice": 46.38,
+    "unitPriceText": "46.38 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4f644b78-85aa-4cb6-8b3b-716c42c970d2.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x3747ca1b5a1581bb7a1670c0f305b88204eedf18",
+    "productUrl": "https://www.mathem.se/se/products/5657-bob-apelsinmarmelad-refill/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66113",
+    "name": "Marabou Mjölkchoklad Apelsinkrokant",
+    "brand": "Marabou",
+    "packageText": "160 g",
+    "price": 26.4,
+    "priceText": "26.40 SEK",
+    "unitPrice": 165,
+    "unitPriceText": "165.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3554fcac-f5d9-4632-b644-a413005f8e4e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc2777e2cb763556a3241ff81454eee9b02fe37fb",
+    "productUrl": "https://www.mathem.se/se/products/66113-marabou-mjolkchoklad-apelsinkrokant/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67377",
+    "name": "God Morgon® Apelsinjuice EKO",
+    "brand": "God Morgon®",
+    "packageText": "850 ml",
+    "price": 36.95,
+    "priceText": "36.95 SEK",
+    "unitPrice": 43.47,
+    "unitPriceText": "43.47 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/615bf528-30a6-474a-89d9-8c303e1c14ae.jpg?fit=bounds&format=auto&optimize=medium&width=95&s=0x5b58321ac757b9981ea5957e0528ae4f9e9ebb1c",
+    "productUrl": "https://www.mathem.se/se/products/67377-god-morgon-r-apelsinjuice-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10436",
+    "name": "SIA Glass Gräddglass Apelsinchoklad",
+    "brand": "SIA Glass",
+    "packageText": "1,5 l",
+    "price": 38.7,
+    "priceText": "38.70 SEK",
+    "unitPrice": 25.8,
+    "unitPriceText": "25.80 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2d8bc3a4-eb28-41d8-99b0-c4bc27900c21.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x3a8846dd75ee9533b12270aeb7fdfa8a396d9624",
+    "productUrl": "https://www.mathem.se/se/products/10436-sia-glass-graddglass-apelsinchoklad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "46145",
+    "name": "Björnekulla Apelsinmarmelad EKO",
+    "brand": "Björnekulla",
+    "packageText": "425 g",
+    "price": 33.5,
+    "priceText": "33.50 SEK",
+    "unitPrice": 78.82,
+    "unitPriceText": "78.82 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4fc0f84d-f8af-4736-9172-fc9e7008cf0d.jpg?fit=bounds&format=auto&optimize=medium&width=170&s=0x0f6b12e0d9670780e51feff34cbd9f0d07be77f3",
+    "productUrl": "https://www.mathem.se/se/products/46145-bjornekulla-apelsinmarmelad-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7140",
+    "name": "Garant Apelsinmarmelad",
+    "brand": "Garant",
+    "packageText": "400 g",
+    "price": 30.95,
+    "priceText": "30.95 SEK",
+    "unitPrice": 77.38,
+    "unitPriceText": "77.38 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a57c07b7-9d80-4537-8695-dc05a5b1b34a.jpg?fit=bounds&format=auto&optimize=medium&width=212&s=0xf2f6c3a3362e979e6aca14643d920c2055ba4428",
+    "productUrl": "https://www.mathem.se/se/products/7140-garant-apelsinmarmelad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64566",
+    "name": "Innocent Apelsinjuice utan fruktkött",
+    "brand": "Innocent",
+    "packageText": "1500 ml",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 37.83,
+    "unitPriceText": "37.83 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/92cdd841-73b0-4689-a4c0-6ab8f604aaf6.jpg?fit=bounds&format=auto&optimize=medium&width=126&s=0xd7777b47879a79f801158de02ac483c5a28c9df9",
+    "productUrl": "https://www.mathem.se/se/products/64566-innocent-apelsinjuice-utan-fruktkott/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7473",
+    "name": "Kiwi EKO Klass1 Italien",
+    "brand": "",
+    "packageText": "Italien, 90 g",
+    "price": 8.95,
+    "priceText": "8.95 SEK",
+    "unitPrice": 99.44,
+    "unitPriceText": "99.44 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/dd8cee54-c676-490a-b1e7-0f8545838626.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x204914d7ffa908dcbeb78128a9ff5f0b9bac7a04",
+    "productUrl": "https://www.mathem.se/se/products/7473-kiwi-eko-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "21050",
+    "name": "Fontana Juice Apelsin",
+    "brand": "Fontana",
+    "packageText": "1000 ml",
+    "price": 26,
+    "priceText": "26.00 SEK",
+    "unitPrice": 26,
+    "unitPriceText": "26.00 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f215411c-0bc8-49d3-a919-6a394e7b3661.jpg?fit=bounds&format=auto&optimize=medium&width=97&s=0x947e3dcaa3a117427377488317025da0a3973072",
+    "productUrl": "https://www.mathem.se/se/products/21050-fontana-juice-apelsin/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62365",
+    "name": "Zingo Zero Apelsin",
+    "brand": "Zingo",
+    "packageText": "33 cl",
+    "price": 10.88,
+    "priceText": "10.88 SEK",
+    "unitPrice": 32.97,
+    "unitPriceText": "32.97 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a98ab5de-471b-4230-9212-5c6ec0a521fc.jpg?fit=bounds&format=auto&optimize=medium&width=112&s=0xa6200703d2f4c90f0c97c6a924ac1d23e47836a9",
+    "productUrl": "https://www.mathem.se/se/products/62365-zingo-zero-apelsin/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apelsin",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66771",
+    "name": "Äpple Pink Lady 4-pack Klass1 Italien",
+    "brand": "",
+    "packageText": "Italien, 600 g",
+    "price": 39.47,
+    "priceText": "39.47 SEK",
+    "unitPrice": 65.78,
+    "unitPriceText": "65.78 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b4b419af-748c-4470-8551-be08106974bb.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xfac688a44cbf60315e4a83cef96308e0e3d72fc0",
+    "productUrl": "https://www.mathem.se/se/products/66771-apple-pink-lady-4-pack-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66476",
+    "name": "Äpple Royal Gala 6-pack Klass1 Österrike",
+    "brand": "",
+    "packageText": "Österrike, 1000 g",
+    "price": 42.95,
+    "priceText": "42.95 SEK",
+    "unitPrice": 42.95,
+    "unitPriceText": "42.95 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3c2ae9a6-e89e-44b9-8c5e-8c8ffa9fbd9f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x9d3dc9a4c6eaf65118f5b1d817cb9e57a4beaa2a",
+    "productUrl": "https://www.mathem.se/se/products/66476-apple-royal-gala-6-pack-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66707",
+    "name": "Äpple Royal Gala EKO 4-pack Klass1 Italien",
+    "brand": "",
+    "packageText": "Italien, 600 g",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 63.02,
+    "unitPriceText": "63.02 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/365113fd-fcb5-48f9-8374-e015bbd9fccd.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xba23b5b213fb91b4d3f87ee01930d700c36b7f62",
+    "productUrl": "https://www.mathem.se/se/products/66707-apple-royal-gala-eko-4-pack-klass1/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66302",
+    "name": "Billys Sweet Apple Pie Fryst",
+    "brand": "Billys",
+    "packageText": "170 g",
+    "price": 17.93,
+    "priceText": "17.93 SEK",
+    "unitPrice": 105.47,
+    "unitPriceText": "105.47 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1bb1ea69-d60c-4a0d-be6a-613e71b744ae.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x921fc306239951150f152651625249d957c62193",
+    "productUrl": "https://www.mathem.se/se/products/66302-billys-sweet-apple-pie-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "416",
+    "name": "Äpple Svenska i påse Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 1 kg",
+    "price": 33.08,
+    "priceText": "33.08 SEK",
+    "unitPrice": 33.08,
+    "unitPriceText": "33.08 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a5bf3c49-5dde-4396-ad3f-94a8ec10744b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x0f41bd87b2e0c7a3607cde35051453bca359d5d4",
+    "productUrl": "https://www.mathem.se/se/products/416-apple-svenska-i-pase-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4953",
+    "name": "God Morgon® Juice Äpple",
+    "brand": "God Morgon®",
+    "packageText": "1 l",
+    "price": 23.1,
+    "priceText": "23.10 SEK",
+    "unitPrice": 23.1,
+    "unitPriceText": "23.10 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b5a6d9dd-19e6-40b5-8aee-12d3a2e068b4.jpg?fit=bounds&format=auto&optimize=medium&width=91&s=0x89364d87ee9e256f1eae5a013e52dc279cc9f206",
+    "productUrl": "https://www.mathem.se/se/products/4953-god-morgon-r-juice-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66706",
+    "name": "Äpple Granny Smith 4-pack Klass1 Italien",
+    "brand": "",
+    "packageText": "Italien, 600 g",
+    "price": 26.45,
+    "priceText": "26.45 SEK",
+    "unitPrice": 44.08,
+    "unitPriceText": "44.08 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1678e9bf-baa0-417d-846d-48d349fac062.jpg?fit=bounds&format=auto&optimize=medium&width=297&s=0xe74be425f398e4b9802f0c3ad928f546105370f2",
+    "productUrl": "https://www.mathem.se/se/products/66706-apple-granny-smith-4-pack-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9697",
+    "name": "Bravo Juice Äpple",
+    "brand": "Bravo",
+    "packageText": "2 l",
+    "price": 37.7,
+    "priceText": "37.70 SEK",
+    "unitPrice": 18.85,
+    "unitPriceText": "18.85 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cd25858b-efc0-4b6d-99b4-73d432dc139a.jpg?fit=bounds&format=auto&optimize=medium&width=133&s=0xfbe27dc4dd625b07a0f6696b98cd89f8c6a6ca3b",
+    "productUrl": "https://www.mathem.se/se/products/9697-bravo-juice-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6787",
+    "name": "Garant Juice Äpple",
+    "brand": "Garant",
+    "packageText": "1,75 l",
+    "price": 28.87,
+    "priceText": "28.87 SEK",
+    "unitPrice": 16.5,
+    "unitPriceText": "16.50 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/41f85a5f-6dd3-4bfe-8bc2-a635bce738bd.jpg?fit=bounds&format=auto&optimize=medium&width=137&s=0xc910a30359c1e9e5e87284776378326ae716c06b",
+    "productUrl": "https://www.mathem.se/se/products/6787-garant-juice-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9406",
+    "name": "Garant Äpplejuice med Fruktkött",
+    "brand": "Garant",
+    "packageText": "1000 ml",
+    "price": 30.76,
+    "priceText": "30.76 SEK",
+    "unitPrice": 30.76,
+    "unitPriceText": "30.76 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/83764d74-8d09-4333-a708-7b854f0d4780.jpg?fit=bounds&format=auto&optimize=medium&width=96&s=0xf1cce79219c0feb53e67e008b915fa7d225d1914",
+    "productUrl": "https://www.mathem.se/se/products/9406-garant-applejuice-med-fruktkott/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "12359",
+    "name": "Head & Shoulders Balsam Apple",
+    "brand": "Head & Shoulders",
+    "packageText": "220 ml",
+    "price": 38.5,
+    "priceText": "38.50 SEK",
+    "unitPrice": 175,
+    "unitPriceText": "175.00 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/61c37a20-a489-422f-bdb8-1a23c47a1cfa.jpg?fit=bounds&format=auto&optimize=medium&width=120&s=0x5d838085687e6b90e995a5b28ee02335f5186e4d",
+    "productUrl": "https://www.mathem.se/se/products/12359-head-shoulders-balsam-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67334",
+    "name": "Fanta Apple & Cherry",
+    "brand": "Fanta",
+    "packageText": "500 ml",
+    "price": 16.99,
+    "priceText": "16.99 SEK",
+    "unitPrice": 33.98,
+    "unitPriceText": "33.98 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/600a4da4-4290-4687-a41e-b339675ab9a5.jpg?fit=bounds&format=auto&optimize=medium&width=86&s=0x24e8464876d04ec7b8cc2b998066ff32adf6df85",
+    "productUrl": "https://www.mathem.se/se/products/67334-fanta-fanta-apple-cherry/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "12239",
+    "name": "Head & Shoulders Schampo Apple",
+    "brand": "Head & Shoulders",
+    "packageText": "250 ml",
+    "price": 43.5,
+    "priceText": "43.50 SEK",
+    "unitPrice": 174,
+    "unitPriceText": "174.00 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/05cfabf3-8b97-464c-ad55-4567e3cf1257.jpg?fit=bounds&format=auto&optimize=medium&width=110&s=0x145000134ac642fc755ad0e8e54aea2ca5596b6f",
+    "productUrl": "https://www.mathem.se/se/products/12239-head-shoulders-schampo-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11837",
+    "name": "Farmers & Chefs Hot Apple Chutney Mayo",
+    "brand": "Farmers & Chefs",
+    "packageText": "200 ml",
+    "price": 31.18,
+    "priceText": "31.18 SEK",
+    "unitPrice": 155.9,
+    "unitPriceText": "155.90 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/75a18426-1130-4128-9b30-49e7cbddcae1.jpg?fit=bounds&format=auto&optimize=medium&width=97&s=0xaa1958743ecaba92fd6eb13416daf37a6cfabad1",
+    "productUrl": "https://www.mathem.se/se/products/11837-farmers-chefs-hot-apple-chutney-mayo/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65670",
+    "name": "Färsking Flingor Baked Apple Pie",
+    "brand": "Färsking",
+    "packageText": "300 g",
+    "price": 47.27,
+    "priceText": "47.27 SEK",
+    "unitPrice": 157.57,
+    "unitPriceText": "157.57 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a880694b-dbda-473b-95be-e2255a03b6d7.jpg?fit=bounds&format=auto&optimize=medium&width=221&s=0x7e5c1885a14e2ce474816decf504f9ccf11f3654",
+    "productUrl": "https://www.mathem.se/se/products/65670-farsking-flingor-baked-apple-pie/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10904",
+    "name": "Softlan Sköljmedel Apple & Pear Blossom",
+    "brand": "Softlan",
+    "packageText": "1700 ml",
+    "price": 59.95,
+    "priceText": "59.95 SEK",
+    "unitPrice": 0.53,
+    "unitPriceText": "0.53 SEK",
+    "unitPriceUnit": "tvätt",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e856236d-272e-4710-a74e-404c8031a88b.jpg?fit=bounds&format=auto&optimize=medium&width=123&s=0x45ddb2e32861a6885ef8cfd3ba57c481fb0d8ab7",
+    "productUrl": "https://www.mathem.se/se/products/10904-softlan-skoljmedel-apple-pear-blossom/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66937",
+    "name": "Fun Light Saft Cactus Apple",
+    "brand": "Fun Light",
+    "packageText": "1000 ml",
+    "price": 26.95,
+    "priceText": "26.95 SEK",
+    "unitPrice": 2.7,
+    "unitPriceText": "2.70 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/66d34e7e-6276-47cc-9d8c-6d6b8e436c98.jpg?fit=bounds&format=auto&optimize=medium&width=84&s=0x4478063f646a00daa1bdbe449c74f76e561c4115",
+    "productUrl": "https://www.mathem.se/se/products/66937-fun-light-saft-cactus-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67105",
+    "name": "Zeroh! Saft Sour Apple",
+    "brand": "Zeroh!",
+    "packageText": "800 ml",
+    "price": 31.71,
+    "priceText": "31.71 SEK",
+    "unitPrice": 3.96,
+    "unitPriceText": "3.96 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6e845d16-d60b-4d23-bf81-e00de3f92dd7.jpg?fit=bounds&format=auto&optimize=medium&width=93&s=0xa37ea3e230ae76e6e853a4db0339db70daaae57e",
+    "productUrl": "https://www.mathem.se/se/products/67105-zeroh-saft-sour-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7259",
+    "name": "Gunry Flytande Handtvål Bretagne Green Apple",
+    "brand": "Gunry",
+    "packageText": "500 ml",
+    "price": 32.95,
+    "priceText": "32.95 SEK",
+    "unitPrice": 65.9,
+    "unitPriceText": "65.90 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/846075d3-5fd5-4189-8aaa-b305c0d400d3.jpg?fit=bounds&format=auto&optimize=medium&width=107&s=0x968ee9aa7adcdc243a7b2bfa6f8b01c417dd24db",
+    "productUrl": "https://www.mathem.se/se/products/7259-gunry-flytande-handtval-bretagne-green-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67926",
+    "name": "Lipton Svart Pyramidte Rhubarb & Apple",
+    "brand": "Lipton",
+    "packageText": "20 st",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 1.42,
+    "unitPriceText": "1.42 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a95a3ecd-2e96-43c5-8ce7-7eb61417dddb.jpg?fit=bounds&format=auto&optimize=medium&width=288&s=0xb018960a893809e878496647ece41dad008e294c",
+    "productUrl": "https://www.mathem.se/se/products/67926-lipton-svart-pyramidte-rhubarb-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8451",
+    "name": "Softlan Sköljmedel Apple & Pear Blossom",
+    "brand": "Softlan",
+    "packageText": "1000 ml",
+    "price": 40.5,
+    "priceText": "40.50 SEK",
+    "unitPrice": 0.61,
+    "unitPriceText": "0.61 SEK",
+    "unitPriceUnit": "tvätt",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3246f3bd-70ae-447e-861e-3b0b4b646b2d.jpg?fit=bounds&format=auto&optimize=medium&width=108&s=0x8e2cd66ff6ff18ecffce0e90e2560c59d1a88dad",
+    "productUrl": "https://www.mathem.se/se/products/8451-softlan-skoljmedel-apple-pear-blossom/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5628",
+    "name": "Get Raw No-Bake Apple Crumble EKO",
+    "brand": "Get Raw",
+    "packageText": "35 g",
+    "price": 24.13,
+    "priceText": "24.13 SEK",
+    "unitPrice": 689.43,
+    "unitPriceText": "689.43 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/549aa097-2313-4019-a015-74f21a9355c5.jpg?fit=bounds&format=auto&optimize=medium&width=228&s=0x6ec3658d2173529d2f73315e962af261e809eb2b",
+    "productUrl": "https://www.mathem.se/se/products/5628-get-raw-no-bake-apple-crumble-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68305",
+    "name": "Homie Synbiotic Apple Elderflower Zero Sugar",
+    "brand": "HOMIE",
+    "packageText": "330 ml",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 57.21,
+    "unitPriceText": "57.21 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3e9e8ef0-8163-488d-9e9c-5de43135390b.jpg?fit=bounds&format=auto&optimize=medium&width=118&s=0x0f87333a3b57e913d95da78a707e6bb4d6727f0f",
+    "productUrl": "https://www.mathem.se/se/products/68305-homie-homie-synbiotic-apple-elderflower-zero-sugar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10920",
+    "name": "La Ribaude Cider Äpple EKO 2%",
+    "brand": "La Ribaude",
+    "packageText": "75 cl",
+    "price": 61.47,
+    "priceText": "61.47 SEK",
+    "unitPrice": 81.96,
+    "unitPriceText": "81.96 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b14371db-eafa-4b5b-953b-6eed4477368a.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x77a2c6194a2170dd480e104de4bf3e603d0ef48b",
+    "productUrl": "https://www.mathem.se/se/products/10920-la-ribaude-cider-apple-eko-2/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "1386",
+    "name": "Kiviks Herrgårdscider Äpple Alkoholfri 0,3%",
+    "brand": "Kiviks",
+    "packageText": "750 ml",
+    "price": 23.19,
+    "priceText": "23.19 SEK",
+    "unitPrice": 30.92,
+    "unitPriceText": "30.92 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/72821502-4b14-4ade-8691-22776315c2ac.jpg?fit=bounds&format=auto&optimize=medium&width=89&s=0x6f1420f704055eb3fc3c442d7ea0c40cbcefea51",
+    "productUrl": "https://www.mathem.se/se/products/1386-kiviks-herrgardscider-apple-alkoholfri-03/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7692",
+    "name": "Premier Mousserande Äpple Dryck med Ciderkaraktär",
+    "brand": "Premier",
+    "packageText": "1500 ml",
+    "price": 15.1,
+    "priceText": "15.10 SEK",
+    "unitPrice": 10.07,
+    "unitPriceText": "10.07 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8fb99748-cf65-4728-b43d-3ce0f7841ee5.jpg?fit=bounds&format=auto&optimize=medium&width=92&s=0xa3e58612540062306e71b5c3e4d30a52dd5b2b5f",
+    "productUrl": "https://www.mathem.se/se/products/7692-premier-mousserande-apple-dryck-med-ciderkaraktar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5434",
+    "name": "Bravo Juice Äpple",
+    "brand": "Bravo",
+    "packageText": "1 l",
+    "price": 27.92,
+    "priceText": "27.92 SEK",
+    "unitPrice": 27.92,
+    "unitPriceText": "27.92 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/dfb95270-726f-4ac0-8c5d-852bc1c2e73a.jpg?fit=bounds&format=auto&optimize=medium&width=106&s=0xae02c2faa950df25a58f49892c6f8ae68b77eebf",
+    "productUrl": "https://www.mathem.se/se/products/5434-bravo-juice-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9248",
+    "name": "Innocent Juice Äpple",
+    "brand": "Innocent",
+    "packageText": "1,5 l",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 37.83,
+    "unitPriceText": "37.83 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fa46e0fb-d702-4f34-841a-a1ca116c7f04.jpg?fit=bounds&format=auto&optimize=medium&width=126&s=0x188a9149b85e69136b279f653300db8bd5c82512",
+    "productUrl": "https://www.mathem.se/se/products/9248-innocent-juice-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4476",
+    "name": "MER Äpple",
+    "brand": "MER",
+    "packageText": "500 ml",
+    "price": 15.62,
+    "priceText": "15.62 SEK",
+    "unitPrice": 31.24,
+    "unitPriceText": "31.24 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c305620c-df4e-4302-b5b6-c71c16a2c6b0.jpg?fit=bounds&format=auto&optimize=medium&width=94&s=0x83bc0b4f0e74cd04556f28d5992fac5bff1a0f84",
+    "productUrl": "https://www.mathem.se/se/products/4476-mer-mer-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9952",
+    "name": "Innocent Juice Äpple",
+    "brand": "Innocent",
+    "packageText": "900 ml",
+    "price": 35,
+    "priceText": "35.00 SEK",
+    "unitPrice": 38.89,
+    "unitPriceText": "38.89 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b712561b-3969-45ab-9012-e437edac8b1f.jpg?fit=bounds&format=auto&optimize=medium&width=101&s=0xae192faf0c2d8ebbb2bbf631a49cd7a09b09c931",
+    "productUrl": "https://www.mathem.se/se/products/9952-innocent-juice-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2990",
+    "name": "Kiviks Musteri Fruktdryck Äpple Koncentrat",
+    "brand": "Kiviks Musteri",
+    "packageText": "200 ml",
+    "price": 9.42,
+    "priceText": "9.42 SEK",
+    "unitPrice": 9.42,
+    "unitPriceText": "9.42 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4b98fbf4-bb55-46f1-8a2c-e50ae8ccd308.jpg?fit=bounds&format=auto&optimize=medium&width=238&s=0x86d527023e333beac6a5a4c4368ee2aef9ad2368",
+    "productUrl": "https://www.mathem.se/se/products/2990-kiviks-musteri-fruktdryck-apple-koncentrat/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7430",
+    "name": "Bravo Juice Äpple",
+    "brand": "Bravo",
+    "packageText": "250 ml",
+    "price": 9.42,
+    "priceText": "9.42 SEK",
+    "unitPrice": 37.68,
+    "unitPriceText": "37.68 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/41cb4fc4-0730-4c0e-8a5c-d2773cc65b48.jpg?fit=bounds&format=auto&optimize=medium&width=125&s=0x26a631bd9567a62a5a22ad2fc132337c8192974e",
+    "productUrl": "https://www.mathem.se/se/products/7430-bravo-juice-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67036",
+    "name": "Garant Juice Äpple",
+    "brand": "Garant",
+    "packageText": "1000 ml",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 20.77,
+    "unitPriceText": "20.77 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/77aea725-7775-41df-9048-bceb612fae6f.jpg?fit=bounds&format=auto&optimize=medium&width=112&s=0xc0675f58f8d85c1d0c33bd9081fb35259e54a839",
+    "productUrl": "https://www.mathem.se/se/products/67036-garant-juice-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4726",
+    "name": "Eldorado Städservett Universal Äpple",
+    "brand": "Eldorado",
+    "packageText": "70 st",
+    "price": 19.95,
+    "priceText": "19.95 SEK",
+    "unitPrice": 0.29,
+    "unitPriceText": "0.29 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c3621617-9130-4214-9799-93d634d68ea9.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x24e8093dadde588d3a9907cebb09441b28ae149b",
+    "productUrl": "https://www.mathem.se/se/products/4726-eldorado-stadservett-universal-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5005",
+    "name": "Kiviks Musteri Fruktdryck Nektarin Äpple",
+    "brand": "Kiviks Musteri",
+    "packageText": "1,5 l",
+    "price": 19.4,
+    "priceText": "19.40 SEK",
+    "unitPrice": 12.93,
+    "unitPriceText": "12.93 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b7168c43-abbc-4116-bf5c-4ed7f39e5f44.jpg?fit=bounds&format=auto&optimize=medium&width=119&s=0x0e50b52fdab1eafc04aeeb21fa10b4c14e9853ba",
+    "productUrl": "https://www.mathem.se/se/products/5005-kiviks-musteri-fruktdryck-nektarin-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4743",
+    "name": "Äpple Klass1 Polen",
+    "brand": "",
+    "packageText": "Polen, 1000 g",
+    "price": 14.1,
+    "priceText": "14.10 SEK",
+    "unitPrice": 14.1,
+    "unitPriceText": "14.10 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fc01b482-e0f4-4066-9e14-83bc36d0fc5b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x89bb6f0cdf51d0d089ea15ade71d77f750cfe3ee",
+    "productUrl": "https://www.mathem.se/se/products/4743-apple-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4929",
+    "name": "Kiviks Musteri Juice Äpple",
+    "brand": "Kiviks Musteri",
+    "packageText": "1 l",
+    "price": 23.19,
+    "priceText": "23.19 SEK",
+    "unitPrice": 23.19,
+    "unitPriceText": "23.19 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f3ea825c-7e76-496d-af3a-a0e88b13400d.jpg?fit=bounds&format=auto&optimize=medium&width=113&s=0x6c1c2ba7b7610ca9c011952d6add615b1314fe13",
+    "productUrl": "https://www.mathem.se/se/products/4929-kiviks-musteri-juice-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3587",
+    "name": "Eldorado Juice Äpple Koncentrat",
+    "brand": "Eldorado",
+    "packageText": "Max 2 per kund, 200 ml",
+    "price": 15.62,
+    "priceText": "15.62 SEK",
+    "unitPrice": 15.62,
+    "unitPriceText": "15.62 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/151dbaac-7a8a-43ab-9fb9-0fc7c04b623b.jpg?fit=bounds&format=auto&optimize=medium&width=235&s=0x0ca40cf6c38659d6664cde01e64f86d8f6962e40",
+    "productUrl": "https://www.mathem.se/se/products/3587-eldorado-juice-apple-koncentrat/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8222",
+    "name": "Kiviks Tranbärsdryck med Äpple",
+    "brand": "Kiviks",
+    "packageText": "1 l",
+    "price": 33.08,
+    "priceText": "33.08 SEK",
+    "unitPrice": 33.08,
+    "unitPriceText": "33.08 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c73eb591-779d-4371-ae4a-8666ae97f5f6.jpg?fit=bounds&format=auto&optimize=medium&width=94&s=0xe3257f3e904902c6cc6a31a872b48fed4e94f4c3",
+    "productUrl": "https://www.mathem.se/se/products/8222-kiviks-tranbarsdryck-med-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9776",
+    "name": "God Morgon® Juice Äpple",
+    "brand": "God Morgon®",
+    "packageText": "1,75 l",
+    "price": 39.7,
+    "priceText": "39.70 SEK",
+    "unitPrice": 22.69,
+    "unitPriceText": "22.69 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/07761836-ebfe-4437-8322-975faf1295b4.jpg?fit=bounds&format=auto&optimize=medium&width=112&s=0x045af7326feb7d9daa4cd82d5d993e40e6d4ace7",
+    "productUrl": "https://www.mathem.se/se/products/9776-god-morgon-r-juice-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64537",
+    "name": "Garant Juice Äpple & Fläder",
+    "brand": "Garant",
+    "packageText": "1000 ml",
+    "price": 30.68,
+    "priceText": "30.68 SEK",
+    "unitPrice": 30.68,
+    "unitPriceText": "30.68 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e8b55ef2-5dd3-4cb1-b067-a77287f88ece.jpg?fit=bounds&format=auto&optimize=medium&width=96&s=0x931fafda43638ebc3e94504673b2e545f720e099",
+    "productUrl": "https://www.mathem.se/se/products/64537-garant-juice-apple-flader/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67529",
+    "name": "Ramlösa Grönt Äpple",
+    "brand": "Ramlösa",
+    "packageText": "33 cl",
+    "price": 7.1,
+    "priceText": "7.10 SEK",
+    "unitPrice": 21.52,
+    "unitPriceText": "21.52 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ce8bebfa-fc58-4d69-afd8-b9d8d0c0808a.jpg?fit=bounds&format=auto&optimize=medium&width=114&s=0xe33c3dc2d31846c36d84eb5e1e216c835eaaf8c1",
+    "productUrl": "https://www.mathem.se/se/products/67529-ramlosa-ramlosa-gront-apple/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=apple",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5243",
+    "name": "Garant Mörk Choklad 70% Havssalt Fairtrade",
+    "brand": "Garant",
+    "packageText": "100 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 283.5,
+    "unitPriceText": "283.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/85ad83a3-2f60-47ba-affc-a0b8d2a2853f.jpg?fit=bounds&format=auto&optimize=medium&width=149&s=0x03e0ea9a461709e593ce775972137e2d1cb2e84a",
+    "productUrl": "https://www.mathem.se/se/products/5243-garant-mork-choklad-70-havssalt-fairtrade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66111",
+    "name": "Marabou Mjölkchoklad",
+    "brand": "Marabou",
+    "packageText": "160 g",
+    "price": 26.4,
+    "priceText": "26.40 SEK",
+    "unitPrice": 165,
+    "unitPriceText": "165.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/dfff8029-2d04-4559-919a-272b2c324033.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x044ec23dd0f78ff06b2c2d74f9b995ec440b4b8d",
+    "productUrl": "https://www.mathem.se/se/products/66111-marabou-mjolkchoklad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5232",
+    "name": "Garant Mörk Choklad 70% Fairtrade",
+    "brand": "Garant",
+    "packageText": "100 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 283.5,
+    "unitPriceText": "283.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b587c70d-0151-4a83-b85c-19b75f268c2e.jpg?fit=bounds&format=auto&optimize=medium&width=149&s=0x49aef922cd0858cf52035c6515cb7eb963d0cba9",
+    "productUrl": "https://www.mathem.se/se/products/5232-garant-mork-choklad-70-fairtrade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2363",
+    "name": "Cloetta Kexchoklad",
+    "brand": "Cloetta",
+    "packageText": "60 g",
+    "price": 9.94,
+    "priceText": "9.94 SEK",
+    "unitPrice": 165.67,
+    "unitPriceText": "165.67 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2ef0e088-1668-4408-91a8-3c1d179be360.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x923190f2cec741317126df1c69bcbba8ed2d30fd",
+    "productUrl": "https://www.mathem.se/se/products/2363-cloetta-kexchoklad/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6096",
+    "name": "Fazer Chokladkaka Mjölkchoklad",
+    "brand": "Fazer",
+    "packageText": "145 g",
+    "price": 29.29,
+    "priceText": "29.29 SEK",
+    "unitPrice": 202,
+    "unitPriceText": "202.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e2b2aa6c-02d8-4c9c-9430-13e79bd2b522.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x98436d98592c7c3f6ba9ff9d7d2017c79eb0fcf7",
+    "productUrl": "https://www.mathem.se/se/products/6096-fazer-chokladkaka-mjolkchoklad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5240",
+    "name": "Garant Mörk Choklad 85% Fairtrade",
+    "brand": "Garant",
+    "packageText": "100 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 283.5,
+    "unitPriceText": "283.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/435a7d72-46ff-40dd-8e8c-e79d772b1c64.jpg?fit=bounds&format=auto&optimize=medium&width=149&s=0xdb05808405dc14783ab7956d0ef7a4e1fa8f7449",
+    "productUrl": "https://www.mathem.se/se/products/5240-garant-mork-choklad-85-fairtrade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6110",
+    "name": "Cloetta Kexchoklad Mini",
+    "brand": "Cloetta",
+    "packageText": "156 g",
+    "price": 29.81,
+    "priceText": "29.81 SEK",
+    "unitPrice": 191.09,
+    "unitPriceText": "191.09 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/439d6243-489f-497c-892b-f05aec4aa1af.jpg?fit=bounds&format=auto&optimize=medium&width=229&s=0x9ee5cab18f3fc06709a3d11ef1651b4d381a4979",
+    "productUrl": "https://www.mathem.se/se/products/6110-cloetta-kexchoklad-mini/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8122",
+    "name": "Lindt Excellence Mörk Chokladkaka Havssalt",
+    "brand": "Lindt",
+    "packageText": "100 g",
+    "price": 45.9,
+    "priceText": "45.90 SEK",
+    "unitPrice": 459,
+    "unitPriceText": "459.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ffd122ea-f026-4685-8606-79cbbe8585ba.jpg?fit=bounds&format=auto&optimize=medium&width=147&s=0x8028eadcd8e0243ec19ed587b09d478cbdc648ab",
+    "productUrl": "https://www.mathem.se/se/products/8122-lindt-excellence-mork-chokladkaka-havssalt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67422",
+    "name": "Marabou Mjölkchoklad Biscoff",
+    "brand": "Marabou",
+    "packageText": "160 g",
+    "price": 26.4,
+    "priceText": "26.40 SEK",
+    "unitPrice": 165,
+    "unitPriceText": "165.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0f1e4d50-e923-4713-9374-1c626835e047.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xb6b1f90249d1a8506d3ec36e9108a4b7cd9e4a2c",
+    "productUrl": "https://www.mathem.se/se/products/67422-marabou-mjolkchoklad-biscoff/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5368",
+    "name": "Garant Mörk Choklad 70% Mint & Kakaonibs Fairtrade",
+    "brand": "Garant",
+    "packageText": "100 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 283.5,
+    "unitPriceText": "283.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0fdee19b-d7a6-4a53-983b-527485929cda.jpg?fit=bounds&format=auto&optimize=medium&width=149&s=0xd3192af64cb14ab0d9153849cd38133c453a02be",
+    "productUrl": "https://www.mathem.se/se/products/5368-garant-mork-choklad-70-mint-kakaonibs-fairtrade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5307",
+    "name": "Garant Mörk Choklad 70% Hallon Fairtrade",
+    "brand": "Garant",
+    "packageText": "100 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 283.5,
+    "unitPriceText": "283.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7c74d47a-2c59-46a8-b25c-e1eefa23edb4.jpg?fit=bounds&format=auto&optimize=medium&width=149&s=0xa3d3b05e377cc1fe96bd650db3e579f46689d59f",
+    "productUrl": "https://www.mathem.se/se/products/5307-garant-mork-choklad-70-hallon-fairtrade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63860",
+    "name": "Fazer Bakchoklad Vit",
+    "brand": "Fazer",
+    "packageText": "100 g",
+    "price": 27.4,
+    "priceText": "27.40 SEK",
+    "unitPrice": 274,
+    "unitPriceText": "274.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3396edb7-001a-4449-9631-b20e36e55937.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa3059aa6c37672959c6a205e8ee7fda45e161fc4",
+    "productUrl": "https://www.mathem.se/se/products/63860-fazer-bakchoklad-vit/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6147",
+    "name": "TOFFIFEE Choklad Toffifee",
+    "brand": "TOFFIFEE",
+    "packageText": "125 g",
+    "price": 26.45,
+    "priceText": "26.45 SEK",
+    "unitPrice": 211.6,
+    "unitPriceText": "211.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e2561ac7-1aaa-44ec-aab4-88aa74951ad7.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x7dce955c0774ab59db7382d59c584faea74bdbf4",
+    "productUrl": "https://www.mathem.se/se/products/6147-toffifee-choklad-toffifee/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6061",
+    "name": "Cloetta Plopp Mini",
+    "brand": "Cloetta",
+    "packageText": "158 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 179.43,
+    "unitPriceText": "179.43 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8dbb045a-2ccd-49fa-937c-a451d3337193.jpg?fit=bounds&format=auto&optimize=medium&width=261&s=0xd72a68f55bed86342bf2a16b9d55301fffff2f6a",
+    "productUrl": "https://www.mathem.se/se/products/6061-cloetta-plopp-mini/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "35322",
+    "name": "Marabou Premium Mörk 70%",
+    "brand": "Marabou",
+    "packageText": "100 g",
+    "price": 36.44,
+    "priceText": "36.44 SEK",
+    "unitPrice": 364.4,
+    "unitPriceText": "364.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6a4f4baa-4868-494e-9d2b-8e79c7e17551.jpg?fit=bounds&format=auto&optimize=medium&width=148&s=0x46ea02860593553027e4e7184d38dc9feb4d271a",
+    "productUrl": "https://www.mathem.se/se/products/35322-marabou-premium-mork-70/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66110",
+    "name": "Marabou Mjölkchoklad Schweizernöt",
+    "brand": "Marabou",
+    "packageText": "160 g",
+    "price": 26.4,
+    "priceText": "26.40 SEK",
+    "unitPrice": 165,
+    "unitPriceText": "165.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e4199c20-e172-4817-b514-3c5b5a81e6c0.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xe68a2faea7311a263a35be5c615b0b3db7e36074",
+    "productUrl": "https://www.mathem.se/se/products/66110-marabou-mjolkchoklad-schweizernot/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66117",
+    "name": "Marabou Mjölkchoklad",
+    "brand": "Marabou",
+    "packageText": "90 g",
+    "price": 15,
+    "priceText": "15.00 SEK",
+    "unitPrice": 166.67,
+    "unitPriceText": "166.67 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/463e301c-7060-4b54-8ac3-a45b4f307631.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdb55b470998cba86030e9da9cbfe78091bb36a5f",
+    "productUrl": "https://www.mathem.se/se/products/66117-marabou-mjolkchoklad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6013",
+    "name": "Fazer Chokladkaka Geisha",
+    "brand": "Fazer",
+    "packageText": "121 g",
+    "price": 29.29,
+    "priceText": "29.29 SEK",
+    "unitPrice": 242.07,
+    "unitPriceText": "242.07 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/323c5624-d651-4216-8df6-531d02426193.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xddad17c409c83d783be28d6b787c206b2b7d9e77",
+    "productUrl": "https://www.mathem.se/se/products/6013-fazer-chokladkaka-geisha/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8065",
+    "name": "Lindt Excellence Mörk Chokladkaka Mint",
+    "brand": "Lindt",
+    "packageText": "100 g",
+    "price": 45.9,
+    "priceText": "45.90 SEK",
+    "unitPrice": 459,
+    "unitPriceText": "459.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/74e716f4-0b88-4168-8c54-098182cba2dd.jpg?fit=bounds&format=auto&optimize=medium&width=147&s=0x6dc642552b92cb8eaacd8805f9a6c9663ba34614",
+    "productUrl": "https://www.mathem.se/se/products/8065-lindt-excellence-mork-chokladkaka-mint/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8050",
+    "name": "Lindt Excellence Mörk Chokladkaka Apelsin",
+    "brand": "Lindt",
+    "packageText": "100 g",
+    "price": 45.9,
+    "priceText": "45.90 SEK",
+    "unitPrice": 459,
+    "unitPriceText": "459.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3b3e541e-6043-44cb-8c24-e73499d9e2c0.jpg?fit=bounds&format=auto&optimize=medium&width=147&s=0xf996e94f753c2f18e962c9ad7bcd2219076791e8",
+    "productUrl": "https://www.mathem.se/se/products/8050-lindt-excellence-mork-chokladkaka-apelsin/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10249",
+    "name": "Marabou Noblesse Original",
+    "brand": "Marabou",
+    "packageText": "150 g",
+    "price": 49.69,
+    "priceText": "49.69 SEK",
+    "unitPrice": 331.27,
+    "unitPriceText": "331.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bcc3dc72-001d-490d-9127-31240d9f5de7.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xad2dc9225c970e421ea9bc21969fd2bf8eac8613",
+    "productUrl": "https://www.mathem.se/se/products/10249-marabou-noblesse-original/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5590",
+    "name": "Cloetta Mörk Choklad 72% Sockerfri",
+    "brand": "Cloetta",
+    "packageText": "100 g",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 255.1,
+    "unitPriceText": "255.10 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cc48cab8-2323-4977-a6fd-9ca10bd353f7.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x3eb751b2a8739b767a6e8a83935289c222d53e33",
+    "productUrl": "https://www.mathem.se/se/products/5590-cloetta-mork-choklad-72-sockerfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8173",
+    "name": "Lindt Excellence Mörk Chokladkaka 85%",
+    "brand": "Lindt",
+    "packageText": "100 g",
+    "price": 45.9,
+    "priceText": "45.90 SEK",
+    "unitPrice": 459,
+    "unitPriceText": "459.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ad99b239-1e53-41c0-8492-ac02a9c6633d.jpg?fit=bounds&format=auto&optimize=medium&width=139&s=0xd4480959fbf0c9637ec82edd80eabb3806836fc8",
+    "productUrl": "https://www.mathem.se/se/products/8173-lindt-excellence-mork-chokladkaka-85/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63862",
+    "name": "Fazer Bakchoklad Mörk 45%",
+    "brand": "Fazer",
+    "packageText": "200 g",
+    "price": 42.12,
+    "priceText": "42.12 SEK",
+    "unitPrice": 210.6,
+    "unitPriceText": "210.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d6f8f8f8-2066-4df0-8770-cea9debaa547.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa5fa8efb195aaa011c6c71843bdb612206b61020",
+    "productUrl": "https://www.mathem.se/se/products/63862-fazer-bakchoklad-mork-45/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66112",
+    "name": "Marabou Mjölkchoklad Helnöt",
+    "brand": "Marabou",
+    "packageText": "160 g",
+    "price": 26.4,
+    "priceText": "26.40 SEK",
+    "unitPrice": 165,
+    "unitPriceText": "165.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/747bfcfa-ff1d-4781-b733-cd954e3719db.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x660c7a429ebf42ea0386fd06bd75070c6aaf79f7",
+    "productUrl": "https://www.mathem.se/se/products/66112-marabou-mjolkchoklad-helnot/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7482",
+    "name": "Ehrmann Grand Dessert Chokladpudding",
+    "brand": "Ehrmann",
+    "packageText": "190 g",
+    "price": 12.78,
+    "priceText": "12.78 SEK",
+    "unitPrice": 67.26,
+    "unitPriceText": "67.26 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/59732b4e-bc16-4c87-9b81-446cc3c8ee6d.jpg?fit=bounds&format=auto&optimize=medium&width=282&s=0x1c6ccab6aa7f93ab175c70771ac4fa0ea94b5660",
+    "productUrl": "https://www.mathem.se/se/products/7482-ehrmann-grand-dessert-chokladpudding/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6297",
+    "name": "Odense Mörka Chokladknappar 54%",
+    "brand": "Odense",
+    "packageText": "150 g",
+    "price": 33.08,
+    "priceText": "33.08 SEK",
+    "unitPrice": 220.53,
+    "unitPriceText": "220.53 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7cf8d633-e29c-49f5-adf5-dee22abf0dbb.jpg?fit=bounds&format=auto&optimize=medium&width=197&s=0xb6688a93b5477d0e72260e796a3974f75bf49cd7",
+    "productUrl": "https://www.mathem.se/se/products/6297-odense-morka-chokladknappar-54/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66056",
+    "name": "Garant Eko Mörk Choklad med Pistaschnötter & Havssalt 52% EKO/Fairtrade",
+    "brand": "Garant Eko",
+    "packageText": "85 g",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 444.82,
+    "unitPriceText": "444.82 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2e1f91bd-f043-492a-9380-26efbeed585b.jpg?fit=bounds&format=auto&optimize=medium&width=145&s=0xd9ae442b394c443fb5246211b67553a1b009ecd6",
+    "productUrl": "https://www.mathem.se/se/products/66056-garant-eko-mork-choklad-med-pistaschnotter-havssal/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4814",
+    "name": "Eldorado Block Vit",
+    "brand": "Eldorado",
+    "packageText": "150 g",
+    "price": 22.67,
+    "priceText": "22.67 SEK",
+    "unitPrice": 151.13,
+    "unitPriceText": "151.13 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9223d6d1-8a3d-47e2-a8b4-b8653c5a0006.jpg?fit=bounds&format=auto&optimize=medium&width=118&s=0x01a810a110be55839b74ecd7100bb403478952c0",
+    "productUrl": "https://www.mathem.se/se/products/4814-eldorado-block-vit/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8062",
+    "name": "Lindt Excellence Mörk Chokladkaka Karamell & Havssalt",
+    "brand": "Lindt",
+    "packageText": "100 g",
+    "price": 45.9,
+    "priceText": "45.90 SEK",
+    "unitPrice": 459,
+    "unitPriceText": "459.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/909c4431-608c-4555-8d81-7b2e7544fc89.jpg?fit=bounds&format=auto&optimize=medium&width=147&s=0x17bd3c69214a3b5e8e00a30bf159388680ecee52",
+    "productUrl": "https://www.mathem.se/se/products/8062-lindt-excellence-mork-chokladkaka-karamell-havssal/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8162",
+    "name": "Lindt Excellence Mörk Chokladkaka 70%",
+    "brand": "Lindt",
+    "packageText": "100 g",
+    "price": 45.9,
+    "priceText": "45.90 SEK",
+    "unitPrice": 459,
+    "unitPriceText": "459.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c75a989d-f0a6-482d-8062-0104d201391a.jpg?fit=bounds&format=auto&optimize=medium&width=139&s=0xd0b5a638d1038b330b3c674d75b1fc19b4799883",
+    "productUrl": "https://www.mathem.se/se/products/8162-lindt-excellence-mork-chokladkaka-70/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67427",
+    "name": "Marabou Mjölkchoklad Daim",
+    "brand": "Marabou",
+    "packageText": "160 g",
+    "price": 26.4,
+    "priceText": "26.40 SEK",
+    "unitPrice": 165,
+    "unitPriceText": "165.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/de59de2c-d446-47f7-a861-03dcc273e201.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x56c9fd2af03a654cfdd57c814455022fd3ffbb8b",
+    "productUrl": "https://www.mathem.se/se/products/67427-marabou-mjolkchoklad-daim/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7435",
+    "name": "Marabou Dubbelnougat",
+    "brand": "Marabou",
+    "packageText": "43 g",
+    "price": 13.72,
+    "priceText": "13.72 SEK",
+    "unitPrice": 319.07,
+    "unitPriceText": "319.07 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/44926b4f-2bbc-4875-b533-db64d47845cd.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x2e1ac0ac0a448074c6a69052f5b0e97c3b43db3c",
+    "productUrl": "https://www.mathem.se/se/products/7435-marabou-dubbelnougat/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5579",
+    "name": "SIA Glass Gräddglass Choklad",
+    "brand": "SIA Glass",
+    "packageText": "500 ml",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 41.54,
+    "unitPriceText": "41.54 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/41ef3dfa-4db2-4785-a7d8-658ac6c7ee09.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x6f229e88fb4e742c2abcd993c35b9e1e21066101",
+    "productUrl": "https://www.mathem.se/se/products/5579-sia-glass-graddglass-choklad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67425",
+    "name": "Marabou Mjölkchoklad Frukt & Mandel",
+    "brand": "Marabou",
+    "packageText": "160 g",
+    "price": 26.4,
+    "priceText": "26.40 SEK",
+    "unitPrice": 165,
+    "unitPriceText": "165.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4ce17c10-e91a-43d9-ac7c-070317080855.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x5f08219856f2aeb3b819fe8c31096522ae3b3aea",
+    "productUrl": "https://www.mathem.se/se/products/67425-marabou-mjolkchoklad-frukt-mandel/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "35883",
+    "name": "Marabou Premium Dark 86%",
+    "brand": "Marabou",
+    "packageText": "100 g",
+    "price": 36.44,
+    "priceText": "36.44 SEK",
+    "unitPrice": 364.4,
+    "unitPriceText": "364.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b675fdbc-f6ef-4dfa-9019-35b11035358d.jpg?fit=bounds&format=auto&optimize=medium&width=148&s=0xc18459e129dd8ae54a74a274126861ba38aae7f0",
+    "productUrl": "https://www.mathem.se/se/products/35883-marabou-premium-dark-86/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3037",
+    "name": "Oatly Havredryck Choklad 1,5%",
+    "brand": "Oatly",
+    "packageText": "1 l",
+    "price": 16.5,
+    "priceText": "16.50 SEK",
+    "unitPrice": 16.5,
+    "unitPriceText": "16.50 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9f081a31-af09-49d0-96e6-f2e558cc4d75.jpg?fit=bounds&format=auto&optimize=medium&width=221&s=0x5c069519bef2a872278d1be5b8b7401d9f2b0864",
+    "productUrl": "https://www.mathem.se/se/products/3037-oatly-havredryck-choklad-15/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "844",
+    "name": "Cloetta Mjölkchoklad Utan Tillsatt Socker",
+    "brand": "Cloetta",
+    "packageText": "100 g",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 255.1,
+    "unitPriceText": "255.10 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5bb17ae5-702a-423d-897c-f506caf66a26.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x506f9e92fd6c873a8e04f93703de9580af2e0e24",
+    "productUrl": "https://www.mathem.se/se/products/844-cloetta-mjolkchoklad-utan-tillsatt-socker/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6269",
+    "name": "Odense Ljusa Chokladknappar",
+    "brand": "Odense",
+    "packageText": "150 g",
+    "price": 33.08,
+    "priceText": "33.08 SEK",
+    "unitPrice": 220.53,
+    "unitPriceText": "220.53 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/61c25345-402d-4e90-9e00-35ba41cb770a.jpg?fit=bounds&format=auto&optimize=medium&width=203&s=0xca3c9dbe517c9574e455a79bbb8a6a40f010c921",
+    "productUrl": "https://www.mathem.se/se/products/6269-odense-ljusa-chokladknappar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8977",
+    "name": "Renée Voltaire Choklad med 80% Kakao EKO",
+    "brand": "Renée Voltaire",
+    "packageText": "80 g",
+    "price": 59.15,
+    "priceText": "59.15 SEK",
+    "unitPrice": 739.38,
+    "unitPriceText": "739.38 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/77138f00-3628-4f2d-a8bb-9c7eb1048d07.jpg?fit=bounds&format=auto&optimize=medium&width=147&s=0xdd2b6ed8cbd48fbc3337c874b1a24eb29fb99c8f",
+    "productUrl": "https://www.mathem.se/se/products/8977-renee-voltaire-choklad-med-80-kakao-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11540",
+    "name": "Malmö Chokladfabrik Vegansk Choklad Peru 85% EKO",
+    "brand": "Malmö Chokladfabrik",
+    "packageText": "80 g",
+    "price": 69.56,
+    "priceText": "69.56 SEK",
+    "unitPrice": 869.5,
+    "unitPriceText": "869.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4bd24f20-2303-411a-b83c-d3a57635e132.jpg?fit=bounds&format=auto&optimize=medium&width=140&s=0x94b83abe5b9f7abea2ee0c914cae3c892f319773",
+    "productUrl": "https://www.mathem.se/se/products/11540-malmo-chokladfabrik-vegansk-choklad-peru-85-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=choklad",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7116",
+    "name": "Estrella Chips Sourcream & Onion",
+    "brand": "Estrella",
+    "packageText": "275 g",
+    "price": 27.3,
+    "priceText": "27.30 SEK",
+    "unitPrice": 99.27,
+    "unitPriceText": "99.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/18891d88-e04b-4bab-b11d-2b33e4010394.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0xe6d941deb699ad3f8939d815f4285c91d78e35e3",
+    "productUrl": "https://www.mathem.se/se/products/7116-estrella-chips-sourcream-onion/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7157",
+    "name": "Estrella Chips Saltade",
+    "brand": "Estrella",
+    "packageText": "275 g",
+    "price": 27.3,
+    "priceText": "27.30 SEK",
+    "unitPrice": 99.27,
+    "unitPriceText": "99.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7f64eceb-cac9-4200-bb10-fcbe263a9900.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0x48f936561731d5e4590745f85c368297cd47100b",
+    "productUrl": "https://www.mathem.se/se/products/7157-estrella-chips-saltade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7089",
+    "name": "Estrella Chips Grill",
+    "brand": "Estrella",
+    "packageText": "275 g",
+    "price": 27.3,
+    "priceText": "27.30 SEK",
+    "unitPrice": 99.27,
+    "unitPriceText": "99.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1a902d0a-6cb9-4a3b-91ac-3cd0c0c927e7.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0xa65dba4a5842c9ae43902853680c5ed8a00247a1",
+    "productUrl": "https://www.mathem.se/se/products/7089-estrella-chips-grill/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63228",
+    "name": "Svenska LantChips Chips Lättsaltade",
+    "brand": "Svenska LantChips",
+    "packageText": "200 g",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 127.55,
+    "unitPriceText": "127.55 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/16bdb2f4-905d-4d6c-8ed4-5d3454cfee04.jpg?fit=bounds&format=auto&optimize=medium&width=177&s=0x76b65c24767c35c3bd95645d818fcfefbff9e030",
+    "productUrl": "https://www.mathem.se/se/products/63228-svenska-lantchips-chips-lattsaltade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7020",
+    "name": "Estrella Chips Ranch & Sourcream",
+    "brand": "Estrella",
+    "packageText": "275 g",
+    "price": 27.3,
+    "priceText": "27.30 SEK",
+    "unitPrice": 99.27,
+    "unitPriceText": "99.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/72b395e1-af99-4197-a9e7-66df4581f62c.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0x3167d8a53aa798e0c43713bd5084e7f28a9e2a46",
+    "productUrl": "https://www.mathem.se/se/products/7020-estrella-chips-ranch-sourcream/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7975",
+    "name": "Gårdschips Chips Parmesan",
+    "brand": "Gårdschips",
+    "packageText": "150 g",
+    "price": 26.5,
+    "priceText": "26.50 SEK",
+    "unitPrice": 176.67,
+    "unitPriceText": "176.67 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/70252a54-1d0c-4fd4-88bd-75f38c65be0f.jpg?fit=bounds&format=auto&optimize=medium&width=214&s=0xac199f14d0ae14c51423ebb6da301b0428ff532f",
+    "productUrl": "https://www.mathem.se/se/products/7975-gardschips-chips-parmesan/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63277",
+    "name": "Svenska LantChips Chips Gräddfil",
+    "brand": "Svenska LantChips",
+    "packageText": "200 g",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 127.55,
+    "unitPriceText": "127.55 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8a3a4378-4bcc-4c4e-b8dd-7450b3da0335.jpg?fit=bounds&format=auto&optimize=medium&width=178&s=0x3efe69d2206f5e43367e0c6f676973e9eb24d94b",
+    "productUrl": "https://www.mathem.se/se/products/63277-svenska-lantchips-chips-graddfil/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7095",
+    "name": "Estrella Chips Dill",
+    "brand": "Estrella",
+    "packageText": "275 g",
+    "price": 27.3,
+    "priceText": "27.30 SEK",
+    "unitPrice": 99.27,
+    "unitPriceText": "99.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b74b46db-43ec-4459-be82-ac34a3c2eb32.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0xbd42dc1ced5cdb80f322daf09df12e81268957c1",
+    "productUrl": "https://www.mathem.se/se/products/7095-estrella-chips-dill/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7229",
+    "name": "Estrella Västkustchips Havssalt",
+    "brand": "Estrella",
+    "packageText": "180 g",
+    "price": 25,
+    "priceText": "25.00 SEK",
+    "unitPrice": 138.89,
+    "unitPriceText": "138.89 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/61c421b1-d433-49f2-b586-64f142cc0f68.jpg?fit=bounds&format=auto&optimize=medium&width=210&s=0x67ab68ceb3189a44f674f70fbd662e4c78e7c235",
+    "productUrl": "https://www.mathem.se/se/products/7229-estrella-vastkustchips-havssalt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7397",
+    "name": "Estrella Chips Sourcream & Onion",
+    "brand": "Estrella",
+    "packageText": "40 g",
+    "price": 11.83,
+    "priceText": "11.83 SEK",
+    "unitPrice": 295.75,
+    "unitPriceText": "295.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c4e3431f-c88a-4283-ac1d-d23c4da20d3d.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0x02be95ee557eac879fb9cc1a59a2011be446baf6",
+    "productUrl": "https://www.mathem.se/se/products/7397-estrella-chips-sourcream-onion/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6885",
+    "name": "OLW Chips Saltade",
+    "brand": "OLW",
+    "packageText": "275 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 109.96,
+    "unitPriceText": "109.96 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5c54196e-1ac3-4fc2-9493-b660d15ca3ca.jpg?fit=bounds&format=auto&optimize=medium&width=195&s=0xc97472e4d0cff84f7f7191d92db0a2fd94c557bb",
+    "productUrl": "https://www.mathem.se/se/products/6885-olw-chips-saltade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7361",
+    "name": "Estrella Chips Grill",
+    "brand": "Estrella",
+    "packageText": "40 g",
+    "price": 11.83,
+    "priceText": "11.83 SEK",
+    "unitPrice": 295.75,
+    "unitPriceText": "295.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6235b707-04b6-4da6-8815-b1446829ba09.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0x25f1b0acf4947739bc38e86c0ff2b9c3a33ce176",
+    "productUrl": "https://www.mathem.se/se/products/7361-estrella-chips-grill/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6719",
+    "name": "OLW Chips Sourcream & Onion",
+    "brand": "OLW",
+    "packageText": "275 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 109.96,
+    "unitPriceText": "109.96 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f676283b-5c3a-4031-80b8-e60bd67aeef2.jpg?fit=bounds&format=auto&optimize=medium&width=195&s=0xc1265c0adc45cdeb4d77f1ac59f637ac69267529",
+    "productUrl": "https://www.mathem.se/se/products/6719-olw-chips-sourcream-onion/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6970",
+    "name": "Estrella Chips Salt & Vinäger",
+    "brand": "Estrella",
+    "packageText": "275 g",
+    "price": 27.3,
+    "priceText": "27.30 SEK",
+    "unitPrice": 99.27,
+    "unitPriceText": "99.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5677b77f-9b38-4029-926a-e946d908f089.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0xc147add4d13482cb003c81e3c193d02eb9a13fd2",
+    "productUrl": "https://www.mathem.se/se/products/6970-estrella-chips-salt-vinager/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6592",
+    "name": "OLW Chips Ranch",
+    "brand": "OLW",
+    "packageText": "275 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 109.96,
+    "unitPriceText": "109.96 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4f408849-09cc-4be4-a15b-c2e69a801d50.jpg?fit=bounds&format=auto&optimize=medium&width=195&s=0xd7ebd9045066e63c6a300406e4aef104de92e61e",
+    "productUrl": "https://www.mathem.se/se/products/6592-olw-chips-ranch/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "12177",
+    "name": "Svenska LantChips Chips Dill & Gräslök Räfflade",
+    "brand": "Svenska LantChips",
+    "packageText": "200 g",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 127.55,
+    "unitPriceText": "127.55 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/50dd1ca1-15c8-4f9f-aec5-3cdf8f1dfecf.jpg?fit=bounds&format=auto&optimize=medium&width=178&s=0xac20daf5be048dabcd5c5b3dc66c36e1afbbcab3",
+    "productUrl": "https://www.mathem.se/se/products/12177-svenska-lantchips-chips-dill-graslok-rafflade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7215",
+    "name": "Estrella Västkustchips Gräddfil & Lök",
+    "brand": "Estrella",
+    "packageText": "180 g",
+    "price": 25,
+    "priceText": "25.00 SEK",
+    "unitPrice": 138.89,
+    "unitPriceText": "138.89 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ba9dfa25-e283-48a8-b453-235d25a85bb8.jpg?fit=bounds&format=auto&optimize=medium&width=205&s=0x5c2eff68456d037c9d307a3aad628709843cb38d",
+    "productUrl": "https://www.mathem.se/se/products/7215-estrella-vastkustchips-graddfil-lok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7011",
+    "name": "Estrella Chips Paprika & Havssalt",
+    "brand": "Estrella",
+    "packageText": "275 g",
+    "price": 27.3,
+    "priceText": "27.30 SEK",
+    "unitPrice": 99.27,
+    "unitPriceText": "99.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/10647f64-7d43-41c8-a576-eb0bb07033be.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0xee026a1e0ec4e3702c430a3f4a5d73fff6de1ac5",
+    "productUrl": "https://www.mathem.se/se/products/7011-estrella-chips-paprika-havssalt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6451",
+    "name": "Bjärechips Chips Tryffel & Parmesan",
+    "brand": "Bjärechips",
+    "packageText": "200 g",
+    "price": 27.4,
+    "priceText": "27.40 SEK",
+    "unitPrice": 137,
+    "unitPriceText": "137.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b6300a65-57fd-41a0-a62d-435e33b7876a.jpg?fit=bounds&format=auto&optimize=medium&width=215&s=0xb7f212ed7c46242cc7c09451e9564098cffdea69",
+    "productUrl": "https://www.mathem.se/se/products/6451-bjarechips-chips-tryffel-parmesan/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6630",
+    "name": "OLW Chips Dill & Gräslök",
+    "brand": "OLW",
+    "packageText": "275 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 109.96,
+    "unitPriceText": "109.96 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6a993d98-9079-491d-80d3-f7bcd526fdb5.jpg?fit=bounds&format=auto&optimize=medium&width=195&s=0xe19a870b487bf47da8fe965289e10bae9a9cdd7a",
+    "productUrl": "https://www.mathem.se/se/products/6630-olw-chips-dill-graslok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6999",
+    "name": "Estrella Vickningschips",
+    "brand": "Estrella",
+    "packageText": "275 g",
+    "price": 27.3,
+    "priceText": "27.30 SEK",
+    "unitPrice": 99.27,
+    "unitPriceText": "99.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/390f739b-69ad-4faf-8e1e-a14960f9694e.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0xc7635e0a2348d1c120b60c9be829f4fde0c0928e",
+    "productUrl": "https://www.mathem.se/se/products/6999-estrella-vickningschips/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6494",
+    "name": "Bjärechips Chips Gräddfil & Lök",
+    "brand": "Bjärechips",
+    "packageText": "200 g",
+    "price": 27.4,
+    "priceText": "27.40 SEK",
+    "unitPrice": 137,
+    "unitPriceText": "137.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/12943c5d-c763-40cd-bd10-2a7e55c3ca03.jpg?fit=bounds&format=auto&optimize=medium&width=230&s=0x24b983d674eafa52be39bee789e020125ce3cd23",
+    "productUrl": "https://www.mathem.se/se/products/6494-bjarechips-chips-graddfil-lok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6696",
+    "name": "OLW Chips Cream Cheese",
+    "brand": "OLW",
+    "packageText": "275 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 109.96,
+    "unitPriceText": "109.96 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3d6e3cb4-f4cb-4878-9dfe-bb10c55db8ce.jpg?fit=bounds&format=auto&optimize=medium&width=195&s=0x8d513a8490643cb72565e162735c9a4202e221e2",
+    "productUrl": "https://www.mathem.se/se/products/6696-olw-chips-cream-cheese/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "45",
+    "name": "Estrella Västkustchips Vitlök, Gräslök & Chili",
+    "brand": "Estrella",
+    "packageText": "180 g",
+    "price": 25,
+    "priceText": "25.00 SEK",
+    "unitPrice": 138.89,
+    "unitPriceText": "138.89 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/94ee3045-f99f-4f5f-8e03-5643e7b26818.jpg?fit=bounds&format=auto&optimize=medium&width=205&s=0xd1b6486adf5217cb97182a6964dbde6c60650f5d",
+    "productUrl": "https://www.mathem.se/se/products/45-estrella-vastkustchips-vitlok-graslok-chili/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6244",
+    "name": "Estrella Ugnsbakade Chips Sourcream & Onion",
+    "brand": "Estrella",
+    "packageText": "125 g",
+    "price": 27.92,
+    "priceText": "27.92 SEK",
+    "unitPrice": 223.36,
+    "unitPriceText": "223.36 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/08369acc-34c8-403c-9fc9-3ffd204cc817.jpg?fit=bounds&format=auto&optimize=medium&width=241&s=0x5dfbd356bc665255faccfdaf424b91d1c8cea659",
+    "productUrl": "https://www.mathem.se/se/products/6244-estrella-ugnsbakade-chips-sourcream-onion/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6444",
+    "name": "Bjärechips Chips Varsamt Saltade",
+    "brand": "Bjärechips",
+    "packageText": "200 g",
+    "price": 27.4,
+    "priceText": "27.40 SEK",
+    "unitPrice": 137,
+    "unitPriceText": "137.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/447c9098-2a75-4edc-a07e-48d85dc41264.jpg?fit=bounds&format=auto&optimize=medium&width=215&s=0x5fca2388c08e1eabc5e11163255924903365673a",
+    "productUrl": "https://www.mathem.se/se/products/6444-bjarechips-chips-varsamt-saltade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7779",
+    "name": "Gårdschips Chips Havssalt Räfflade",
+    "brand": "Gårdschips",
+    "packageText": "150 g",
+    "price": 26.5,
+    "priceText": "26.50 SEK",
+    "unitPrice": 176.67,
+    "unitPriceText": "176.67 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/276517de-9201-480b-86fe-3cd6462c65d8.jpg?fit=bounds&format=auto&optimize=medium&width=214&s=0x68e508fec5f68e3ad0a858c35d12da0e426b411c",
+    "productUrl": "https://www.mathem.se/se/products/7779-gardschips-chips-havssalt-rafflade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "1083",
+    "name": "Gårdschips Chips Tryffel",
+    "brand": "Gårdschips",
+    "packageText": "150 g",
+    "price": 26.5,
+    "priceText": "26.50 SEK",
+    "unitPrice": 176.67,
+    "unitPriceText": "176.67 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/dc14a6af-4730-4787-bd96-c00cc60d5beb.jpg?fit=bounds&format=auto&optimize=medium&width=214&s=0x5cacff1273da7612c315167893dc8bc9017586f5",
+    "productUrl": "https://www.mathem.se/se/products/1083-gardschips-chips-tryffel/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67085",
+    "name": "OLW Chips Rödlök & Gräddfil",
+    "brand": "OLW",
+    "packageText": "275 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 109.96,
+    "unitPriceText": "109.96 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4da01534-9a95-4ef6-b9f9-f6489e8e8dc3.jpg?fit=bounds&format=auto&optimize=medium&width=195&s=0x2eeab157747e3d229ae904ee7aaeba43c31163e0",
+    "productUrl": "https://www.mathem.se/se/products/67085-olw-chips-rodlok-graddfil/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65160",
+    "name": "Estrella Chips Cream Cheese & Onion",
+    "brand": "Estrella",
+    "packageText": "275 g",
+    "price": 27.3,
+    "priceText": "27.30 SEK",
+    "unitPrice": 99.27,
+    "unitPriceText": "99.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/af420268-ec63-48ce-a0ab-9b5d53e93727.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0x4438ba673409c6b464d6a1789c2b12aed203371f",
+    "productUrl": "https://www.mathem.se/se/products/65160-estrella-chips-cream-cheese-onion/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "12087",
+    "name": "Santa Maria Tortilla Chips Cheese",
+    "brand": "Santa Maria",
+    "packageText": "185 g",
+    "price": 12.2,
+    "priceText": "12.20 SEK",
+    "unitPrice": 65.95,
+    "unitPriceText": "65.95 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/12628003-38d3-410b-93e4-7075ff082f68.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0x0153409afb9785b1ae4b0ab17b325e7aa3d87bf2",
+    "productUrl": "https://www.mathem.se/se/products/12087-santa-maria-tortilla-chips-cheese/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67139",
+    "name": "Svenska LantChips Chips Vinäger Salt",
+    "brand": "Svenska LantChips",
+    "packageText": "200 g",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 127.55,
+    "unitPriceText": "127.55 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b0d34602-5db5-4536-af1c-79cc5657c8ff.jpg?fit=bounds&format=auto&optimize=medium&width=195&s=0x7b01bfc6957c110f540701e42cc4e1e5bb9ff4d0",
+    "productUrl": "https://www.mathem.se/se/products/67139-svenska-lantchips-chips-vinager-salt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "12125",
+    "name": "Santa Maria Nacho Chips",
+    "brand": "Santa Maria",
+    "packageText": "185 g",
+    "price": 12.2,
+    "priceText": "12.20 SEK",
+    "unitPrice": 65.95,
+    "unitPriceText": "65.95 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cf3c29c7-05b8-4526-86a4-88deba147df0.jpg?fit=bounds&format=auto&optimize=medium&width=184&s=0x4561585bebdf98efe95e770ae0c9c4bd4cce0b20",
+    "productUrl": "https://www.mathem.se/se/products/12125-santa-maria-nacho-chips/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63281",
+    "name": "Pringles Chips Sour Cream & Onion",
+    "brand": "Pringles",
+    "packageText": "165 g",
+    "price": 34.54,
+    "priceText": "34.54 SEK",
+    "unitPrice": 209.33,
+    "unitPriceText": "209.33 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d5c310ee-691e-4a7e-8d41-f35ef0f58330.jpg?fit=bounds&format=auto&optimize=medium&width=103&s=0x70e897555bc1cc7d0a4a0856ee035b8604ea6945",
+    "productUrl": "https://www.mathem.se/se/products/63281-pringles-chips-sour-cream-onion/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7004",
+    "name": "Estrella Pepparchips",
+    "brand": "Estrella",
+    "packageText": "275 g",
+    "price": 27.3,
+    "priceText": "27.30 SEK",
+    "unitPrice": 99.27,
+    "unitPriceText": "99.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f56cdfbb-3c55-4ae5-ac6d-43d807417698.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0x35370f22903c5def8df46c42f1f8949a303d1961",
+    "productUrl": "https://www.mathem.se/se/products/7004-estrella-pepparchips/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7270",
+    "name": "Estrella Västkustchips Ranch & Gräddfil",
+    "brand": "Estrella",
+    "packageText": "180 g",
+    "price": 25,
+    "priceText": "25.00 SEK",
+    "unitPrice": 138.89,
+    "unitPriceText": "138.89 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/18c67fbb-26d2-48dd-9f41-7b935a18d4df.jpg?fit=bounds&format=auto&optimize=medium&width=210&s=0x6fe20bcafde2c19ec6479d3e5e5a92a7f9748fc3",
+    "productUrl": "https://www.mathem.se/se/products/7270-estrella-vastkustchips-ranch-graddfil/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "48038",
+    "name": "Santa Maria Nachos Chips",
+    "brand": "Santa Maria",
+    "packageText": "475 g",
+    "price": 32.13,
+    "priceText": "32.13 SEK",
+    "unitPrice": 67.64,
+    "unitPriceText": "67.64 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f93a9442-7525-4c6c-aeee-dd8ba36dca35.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0xce6e8d04df4fb8a646572ceec731fd34ea426309",
+    "productUrl": "https://www.mathem.se/se/products/48038-santa-maria-nachos-chips/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6356",
+    "name": "Bjärechips Chips Cheddar",
+    "brand": "Bjärechips",
+    "packageText": "200 g",
+    "price": 27.4,
+    "priceText": "27.40 SEK",
+    "unitPrice": 137,
+    "unitPriceText": "137.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0b706bcd-90bb-4819-940d-c1d300fc6fdb.jpg?fit=bounds&format=auto&optimize=medium&width=239&s=0x194c3b7f0265dc98c546574ff37b48540388fd6e",
+    "productUrl": "https://www.mathem.se/se/products/6356-bjarechips-chips-cheddar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6922",
+    "name": "OLW Chips Grill",
+    "brand": "OLW",
+    "packageText": "275 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 109.96,
+    "unitPriceText": "109.96 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9b6f1729-512e-43e8-b5ee-0d5f9da903f7.jpg?fit=bounds&format=auto&optimize=medium&width=195&s=0x2bda959116e35f109d443ed25394dc41dda685d4",
+    "productUrl": "https://www.mathem.se/se/products/6922-olw-chips-grill/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=chips",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10070",
+    "name": "Bravo Juice Tropisk",
+    "brand": "Bravo",
+    "packageText": "2 l",
+    "price": 37.7,
+    "priceText": "37.70 SEK",
+    "unitPrice": 18.85,
+    "unitPriceText": "18.85 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d728eb61-769c-4578-a531-5a9918c2b372.jpg?fit=bounds&format=auto&optimize=medium&width=133&s=0x47b67cc61097db5e322be5696d5ca3e4c4e238bd",
+    "productUrl": "https://www.mathem.se/se/products/10070-bravo-juice-tropisk/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67379",
+    "name": "God Morgon® Juice Äpple, Mandarin & Morot EKO",
+    "brand": "God Morgon®",
+    "packageText": "850 ml",
+    "price": 32.13,
+    "priceText": "32.13 SEK",
+    "unitPrice": 37.8,
+    "unitPriceText": "37.80 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2e1a94c6-a340-4fd6-a1ec-3b2d665b50d0.jpg?fit=bounds&format=auto&optimize=medium&width=95&s=0xd4c6396006e1ea6de542a9bac221e31994c96bc8",
+    "productUrl": "https://www.mathem.se/se/products/67379-god-morgon-r-juice-apple-mandarin-morot-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65687",
+    "name": "Garant Juice Äpple, Ananas, Kiwi & Lime",
+    "brand": "Garant",
+    "packageText": "1000 ml",
+    "price": 31.18,
+    "priceText": "31.18 SEK",
+    "unitPrice": 31.18,
+    "unitPriceText": "31.18 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6218ea35-f71f-4191-a654-536cdc1cae33.jpg?fit=bounds&format=auto&optimize=medium&width=96&s=0x986deb2899edf8d45fd737283595b62bd412e537",
+    "productUrl": "https://www.mathem.se/se/products/65687-garant-juice-apple-ananas-kiwi-lime/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5561",
+    "name": "Bravo Juice Tropisk",
+    "brand": "Bravo",
+    "packageText": "1 l",
+    "price": 27.92,
+    "priceText": "27.92 SEK",
+    "unitPrice": 27.92,
+    "unitPriceText": "27.92 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4b8969cc-3ffb-41f8-9a68-87f25c27c57c.jpg?fit=bounds&format=auto&optimize=medium&width=106&s=0xc3940ff53e2e08e78147848bcd5c686dbcb39f94",
+    "productUrl": "https://www.mathem.se/se/products/5561-bravo-juice-tropisk/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7272",
+    "name": "Garant Juice Tropisk utan fruktkött",
+    "brand": "Garant",
+    "packageText": "1,75 l",
+    "price": 33.08,
+    "priceText": "33.08 SEK",
+    "unitPrice": 18.9,
+    "unitPriceText": "18.90 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5803f226-f825-4823-9eb3-39a0151c44f9.jpg?fit=bounds&format=auto&optimize=medium&width=134&s=0xbfdec819d3f9d5e6c53af8b6791c9cb898f55e26",
+    "productUrl": "https://www.mathem.se/se/products/7272-garant-juice-tropisk-utan-fruktkott/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7189",
+    "name": "God Morgon® Juice Blodgrape",
+    "brand": "God Morgon®",
+    "packageText": "1 l",
+    "price": 34.97,
+    "priceText": "34.97 SEK",
+    "unitPrice": 34.97,
+    "unitPriceText": "34.97 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d76443cb-47fe-4e2d-9f4b-a419ed9d9d0e.jpg?fit=bounds&format=auto&optimize=medium&width=91&s=0xc652e584b214a9235c3662b034209f5baa61a59a",
+    "productUrl": "https://www.mathem.se/se/products/7189-god-morgon-r-juice-blodgrape/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64764",
+    "name": "Brämhults Juice Äpple, Päron, Ingefära, Kiwi & Ananas",
+    "brand": "Brämhults",
+    "packageText": "850 ml",
+    "price": 52.01,
+    "priceText": "52.01 SEK",
+    "unitPrice": 61.19,
+    "unitPriceText": "61.19 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/604a483e-9670-4122-ac37-26364f7c82c4.jpg?fit=bounds&format=auto&optimize=medium&width=114&s=0xcea9a1bb6a488148aca26852ccfdd2ca3c6d4b5b",
+    "productUrl": "https://www.mathem.se/se/products/64764-bramhults-juice-apple-paron-ingefara-kiwi-ananas/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67380",
+    "name": "God Morgon® Fruktdryck Äpple, Rabarber & Jordgubb EKO",
+    "brand": "God Morgon®",
+    "packageText": "850 ml",
+    "price": 34.97,
+    "priceText": "34.97 SEK",
+    "unitPrice": 41.14,
+    "unitPriceText": "41.14 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7f009314-61df-49b5-87b6-a125d1aece64.jpg?fit=bounds&format=auto&optimize=medium&width=95&s=0xfe82a1ad7340427565681d58bbd9560d22a3cfca",
+    "productUrl": "https://www.mathem.se/se/products/67380-god-morgon-r-fruktdryck-apple-rabarber-jordgubb-ek/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8950",
+    "name": "Råsaft Kallpressad Juice Äpple, Ananas, Spenat & Citron",
+    "brand": "Råsaft",
+    "packageText": "700 ml",
+    "price": 50.11,
+    "priceText": "50.11 SEK",
+    "unitPrice": 71.59,
+    "unitPriceText": "71.59 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6070c330-8046-4891-a3c4-e8bd0f845732.jpg?fit=bounds&format=auto&optimize=medium&width=108&s=0x680834bc4e8f3d4bb75046dd497a7a7c3294fe96",
+    "productUrl": "https://www.mathem.se/se/products/8950-rasaft-kallpressad-juice-apple-ananas-spenat-citro/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4850",
+    "name": "Garant Eko Juice Äpple Koncentrat EKO",
+    "brand": "Garant Eko",
+    "packageText": "Max 2 per kund, 200 ml",
+    "price": 19.83,
+    "priceText": "19.83 SEK",
+    "unitPrice": 99.15,
+    "unitPriceText": "99.15 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ff1ec69c-d60c-45fc-9c8e-391cbfaddcc2.jpg?fit=bounds&format=auto&optimize=medium&width=235&s=0x6827b3578c1c3172dcdf54fe71e603ff5d70ce46",
+    "productUrl": "https://www.mathem.se/se/products/4850-garant-eko-juice-apple-koncentrat-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5442",
+    "name": "Fontana Juice Ananas",
+    "brand": "Fontana",
+    "packageText": "1 l",
+    "price": 22.67,
+    "priceText": "22.67 SEK",
+    "unitPrice": 22.67,
+    "unitPriceText": "22.67 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1d937264-0cb2-4e96-9f93-57dedec66228.jpg?fit=bounds&format=auto&optimize=medium&width=96&s=0xe67c72764b704d20136b2e8f3d1b64a4bb757722",
+    "productUrl": "https://www.mathem.se/se/products/5442-fontana-juice-ananas/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10010",
+    "name": "Innocent Juice Tropisk",
+    "brand": "Innocent",
+    "packageText": "900 ml",
+    "price": 32,
+    "priceText": "32.00 SEK",
+    "unitPrice": 35.56,
+    "unitPriceText": "35.56 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9afb0bf0-e2ae-48a3-bdcb-d5719fb66b08.jpg?fit=bounds&format=auto&optimize=medium&width=101&s=0xf7b9d0c98e16c17c9fa4cb9eef2548366e2b1212",
+    "productUrl": "https://www.mathem.se/se/products/10010-innocent-juice-tropisk/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67378",
+    "name": "God Morgon® Fruktdryck Äpple & Fläderblom EKO",
+    "brand": "God Morgon®",
+    "packageText": "850 ml",
+    "price": 32.13,
+    "priceText": "32.13 SEK",
+    "unitPrice": 37.8,
+    "unitPriceText": "37.80 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3600ab7c-ff66-40db-bfab-9906e487f049.jpg?fit=bounds&format=auto&optimize=medium&width=95&s=0xe432d47004b9b436da0215eac81b5731b1bda7f4",
+    "productUrl": "https://www.mathem.se/se/products/67378-god-morgon-r-fruktdryck-apple-fladerblom-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63609",
+    "name": "Innocent Juice Ananas & Jordgubbe",
+    "brand": "Innocent",
+    "packageText": "900 ml",
+    "price": 35,
+    "priceText": "35.00 SEK",
+    "unitPrice": 38.89,
+    "unitPriceText": "38.89 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/187c2fc4-8cb0-43e6-af0c-5e43737728f9.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0x37a80dbd471e79fa81786109fe599dc410e02357",
+    "productUrl": "https://www.mathem.se/se/products/63609-innocent-juice-ananas-jordgubbe/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8149",
+    "name": "Garant Juice Äpple, Vindruva, Körsbär, Jordgubbe & Svartvinbär",
+    "brand": "Garant",
+    "packageText": "1000 ml",
+    "price": 31.18,
+    "priceText": "31.18 SEK",
+    "unitPrice": 31.18,
+    "unitPriceText": "31.18 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4f4e83fb-c791-40cb-9780-659bafcea842.jpg?fit=bounds&format=auto&optimize=medium&width=96&s=0x52790d5a6784d3e684b625c2163dc0dc430346f9",
+    "productUrl": "https://www.mathem.se/se/products/8149-garant-juice-apple-vindruva-korsbar-jordgubbe-svar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2972",
+    "name": "Kiviks Fruktdryck Tropisk Multivitamin Koncentrat",
+    "brand": "Kiviks",
+    "packageText": "200 ml",
+    "price": 9.42,
+    "priceText": "9.42 SEK",
+    "unitPrice": 9.42,
+    "unitPriceText": "9.42 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d8fa583f-61b8-487c-aa22-ac095afef7dd.jpg?fit=bounds&format=auto&optimize=medium&width=238&s=0xd520652bf3c6fcfd79df32be89f29baae5decf8c",
+    "productUrl": "https://www.mathem.se/se/products/2972-kiviks-fruktdryck-tropisk-multivitamin-koncentrat/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11825",
+    "name": "Bravo Juice Philippines",
+    "brand": "Bravo",
+    "packageText": "1,75 l",
+    "price": 42.54,
+    "priceText": "42.54 SEK",
+    "unitPrice": 24.31,
+    "unitPriceText": "24.31 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/952eddb7-fe72-42db-9b69-b4e368fbe5c9.jpg?fit=bounds&format=auto&optimize=medium&width=139&s=0xfb33920b3a9160df35c129e06c9d9ded11bcacb3",
+    "productUrl": "https://www.mathem.se/se/products/11825-bravo-juice-philippines/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=juice",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3914",
+    "name": "Coca-Cola Zero Sugar 20x33cl",
+    "brand": "Coca-Cola",
+    "packageText": "660 cl",
+    "price": 125.88,
+    "priceText": "125.88 SEK",
+    "unitPrice": 19.07,
+    "unitPriceText": "19.07 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b85220c5-1992-484f-a535-4140e8bd35a2.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x541dd82261ac61406eca59202e15caa1becd94cc",
+    "productUrl": "https://www.mathem.se/se/products/3914-coca-cola-coca-cola-zero-sugar-20x33cl/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4955",
+    "name": "Coca-Cola Zero Sugar",
+    "brand": "Coca-Cola",
+    "packageText": "1,5 l",
+    "price": 21.72,
+    "priceText": "21.72 SEK",
+    "unitPrice": 14.48,
+    "unitPriceText": "14.48 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7281b7dc-64f0-43e5-9cb6-bcf2ef73d1c7.jpg?fit=bounds&format=auto&optimize=medium&width=89&s=0xb17026490296fe7c4df13567f15bc74797fc9750",
+    "productUrl": "https://www.mathem.se/se/products/4955-coca-cola-coca-cola-zero-sugar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3779",
+    "name": "Coca-Cola Zero Sugar 10x33cl",
+    "brand": "Coca-Cola",
+    "packageText": "330 cl",
+    "price": 67.1,
+    "priceText": "67.10 SEK",
+    "unitPrice": 20.33,
+    "unitPriceText": "20.33 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d9148bdc-25aa-458d-9fc9-9fe6e8fd3b0e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x12f48562f94631dcff248ac464dbd760dfa97b6b",
+    "productUrl": "https://www.mathem.se/se/products/3779-coca-cola-coca-cola-zero-sugar-10x33cl/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4029",
+    "name": "Coca-Cola 20x33cl",
+    "brand": "Coca-Cola",
+    "packageText": "660 cl",
+    "price": 125.88,
+    "priceText": "125.88 SEK",
+    "unitPrice": 19.07,
+    "unitPriceText": "19.07 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1a57a305-5b82-4121-8dcd-1559369b18a2.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdc0076863c66b93b27b2c8429a0cdb0590372450",
+    "productUrl": "https://www.mathem.se/se/products/4029-coca-cola-coca-cola-20x33cl/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11422",
+    "name": "Coca-Cola Zero Sugar 4x1,5L",
+    "brand": "Coca-Cola",
+    "packageText": "6000 ml",
+    "price": 75.24,
+    "priceText": "75.24 SEK",
+    "unitPrice": 12.54,
+    "unitPriceText": "12.54 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b8f59571-ba6e-4f27-bc2a-5d5142a06bdd.jpg?fit=bounds&format=auto&optimize=medium&width=263&s=0xb301662229558f1a08ea74317d6c4516a66f1c29",
+    "productUrl": "https://www.mathem.se/se/products/11422-coca-cola-coca-cola-zero-sugar-4x15l/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4947",
+    "name": "Coca-Cola Coca-Cola",
+    "brand": "Coca-Cola",
+    "packageText": "1,5 l",
+    "price": 21.72,
+    "priceText": "21.72 SEK",
+    "unitPrice": 14.48,
+    "unitPriceText": "14.48 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/28348c22-e669-43bd-8fe9-e22d4512a303.jpg?fit=bounds&format=auto&optimize=medium&width=89&s=0xa497b5c2334584e5d19fbfc260486b48c0f707db",
+    "productUrl": "https://www.mathem.se/se/products/4947-coca-cola-coca-cola/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6099",
+    "name": "Coca-Cola Coca-Cola",
+    "brand": "Coca-Cola",
+    "packageText": "2 l",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 12.76,
+    "unitPriceText": "12.76 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6d46dd08-fa82-4996-a8dc-808f762e058d.jpg?fit=bounds&format=auto&optimize=medium&width=83&s=0x8362117db1d2b603664ce8a09e5d610341b7e68a",
+    "productUrl": "https://www.mathem.se/se/products/6099-coca-cola-coca-cola/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6083",
+    "name": "Coca-Cola Zero Sugar",
+    "brand": "Coca-Cola",
+    "packageText": "2 l",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 12.76,
+    "unitPriceText": "12.76 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c4e66850-e7a5-40df-bd2e-b5d68ae324de.jpg?fit=bounds&format=auto&optimize=medium&width=83&s=0x50d73ae7fe1e2401165346e7de2a4c77a3e43353",
+    "productUrl": "https://www.mathem.se/se/products/6083-coca-cola-coca-cola-zero-sugar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4982",
+    "name": "Coca-Cola Zero Koffeinfri",
+    "brand": "Coca-Cola",
+    "packageText": "1,5 l",
+    "price": 21.72,
+    "priceText": "21.72 SEK",
+    "unitPrice": 14.48,
+    "unitPriceText": "14.48 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b8c2947a-ca7a-4d44-909e-8942b1bab2fa.jpg?fit=bounds&format=auto&optimize=medium&width=89&s=0x40f49f7d7d193a9106627777b3768dd38c85956c",
+    "productUrl": "https://www.mathem.se/se/products/4982-coca-cola-coca-cola-zero-koffeinfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10784",
+    "name": "Coca-Cola 6x33cl",
+    "brand": "Coca-Cola",
+    "packageText": "198 cl",
+    "price": 51.06,
+    "priceText": "51.06 SEK",
+    "unitPrice": 25.79,
+    "unitPriceText": "25.79 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f0db0489-31af-4057-bc07-869133cf66e9.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x4eb4463af00d1592cfd18d1033af65029160f8bf",
+    "productUrl": "https://www.mathem.se/se/products/10784-coca-cola-coca-cola-6x33cl/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7445",
+    "name": "Coca-Cola Zero Sugar Koffeinfri",
+    "brand": "Coca-Cola",
+    "packageText": "33 cl",
+    "price": 11.83,
+    "priceText": "11.83 SEK",
+    "unitPrice": 35.85,
+    "unitPriceText": "35.85 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/98350d4f-ca2b-4d9c-b0a7-5172ff03a41f.jpg?fit=bounds&format=auto&optimize=medium&width=110&s=0x100b3d6767a7fb43480904d3c68d620c04c0220a",
+    "productUrl": "https://www.mathem.se/se/products/7445-coca-cola-coca-cola-zero-sugar-koffeinfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67310",
+    "name": "Coca-Cola Zero Mini 6x20cl",
+    "brand": "Coca-Cola",
+    "packageText": "1200 ml",
+    "price": 42.54,
+    "priceText": "42.54 SEK",
+    "unitPrice": 35.45,
+    "unitPriceText": "35.45 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/159917e8-ca31-49a0-8ee1-d73cbb836c63.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xe608ef78321060320d0e9b453693fc9e007ce0d5",
+    "productUrl": "https://www.mathem.se/se/products/67310-coca-cola-coca-cola-zero-mini-6x20cl/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7400",
+    "name": "Coca-Cola Coca-Cola",
+    "brand": "Coca-Cola",
+    "packageText": "33 cl",
+    "price": 11.83,
+    "priceText": "11.83 SEK",
+    "unitPrice": 35.85,
+    "unitPriceText": "35.85 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/48abb194-d142-4c02-bd0f-58b2e24255f6.jpg?fit=bounds&format=auto&optimize=medium&width=110&s=0x4809a015b6b49c2518c117b0f8738093e3dee13d",
+    "productUrl": "https://www.mathem.se/se/products/7400-coca-cola-coca-cola/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4496",
+    "name": "Coca-Cola Coca-Cola",
+    "brand": "Coca-Cola",
+    "packageText": "50 cl",
+    "price": 16.99,
+    "priceText": "16.99 SEK",
+    "unitPrice": 33.98,
+    "unitPriceText": "33.98 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/88c6876f-1e3d-484e-8ced-84f71f3e9f23.jpg?fit=bounds&format=auto&optimize=medium&width=84&s=0x0b5664762353e032736bead034bb71ca4ec58143",
+    "productUrl": "https://www.mathem.se/se/products/4496-coca-cola-coca-cola/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7380",
+    "name": "Coca-Cola Zero Sugar",
+    "brand": "Coca-Cola",
+    "packageText": "33 cl",
+    "price": 11.83,
+    "priceText": "11.83 SEK",
+    "unitPrice": 35.85,
+    "unitPriceText": "35.85 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c0efcc7d-f88c-4553-a77d-410bc6fa6e5d.jpg?fit=bounds&format=auto&optimize=medium&width=110&s=0x26129ede85285033c181d46aa50f518cc16544ac",
+    "productUrl": "https://www.mathem.se/se/products/7380-coca-cola-coca-cola-zero-sugar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10792",
+    "name": "Coca-Cola Zero Sugar 6x33cl",
+    "brand": "Coca-Cola",
+    "packageText": "198 cl",
+    "price": 51.06,
+    "priceText": "51.06 SEK",
+    "unitPrice": 25.79,
+    "unitPriceText": "25.79 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e32e1806-8f08-475b-8e00-dafc512af8a5.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xcca40cc0dc3ccd84ed0f8ae6748be1adf45ccf6f",
+    "productUrl": "https://www.mathem.se/se/products/10792-coca-cola-coca-cola-zero-sugar-6x33cl/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3949",
+    "name": "Coca-Cola 10x33cl",
+    "brand": "Coca-Cola",
+    "packageText": "330 cl",
+    "price": 67.1,
+    "priceText": "67.10 SEK",
+    "unitPrice": 20.33,
+    "unitPriceText": "20.33 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5f6337c6-f755-4200-a4f5-bdd910bd98e3.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x2c566b76c9db6a7d64ab94143e6ab27c9cab068e",
+    "productUrl": "https://www.mathem.se/se/products/3949-coca-cola-coca-cola-10x33cl/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4472",
+    "name": "Coca-Cola Zero Sugar",
+    "brand": "Coca-Cola",
+    "packageText": "50 cl",
+    "price": 16.99,
+    "priceText": "16.99 SEK",
+    "unitPrice": 33.98,
+    "unitPriceText": "33.98 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9185ca8a-d5d8-495c-addb-127929da5bf5.jpg?fit=bounds&format=auto&optimize=medium&width=84&s=0x96852467bb4f2791fd5d1dfb2c7be9fa85f512c2",
+    "productUrl": "https://www.mathem.se/se/products/4472-coca-cola-coca-cola-zero-sugar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67309",
+    "name": "Coca-Cola Mini 6x20cl",
+    "brand": "Coca-Cola",
+    "packageText": "1200 ml",
+    "price": 42.54,
+    "priceText": "42.54 SEK",
+    "unitPrice": 35.45,
+    "unitPriceText": "35.45 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bf0ade00-ac4f-43a7-bb1c-57b4ed461156.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xaea288675d071132a01d6a0fe3a90da58bb2b3a0",
+    "productUrl": "https://www.mathem.se/se/products/67309-coca-cola-coca-cola-mini-6x20cl/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63726",
+    "name": "Coca-Cola Zero Sugar Cherry",
+    "brand": "Coca-Cola",
+    "packageText": "330 ml",
+    "price": 11.83,
+    "priceText": "11.83 SEK",
+    "unitPrice": 35.85,
+    "unitPriceText": "35.85 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/efebcafc-6455-41fa-a1a2-dbb422004e86.jpg?fit=bounds&format=auto&optimize=medium&width=110&s=0xbd63a185607230eb11d1c8b951cca6231d001bfc",
+    "productUrl": "https://www.mathem.se/se/products/63726-coca-cola-coca-cola-zero-sugar-cherry/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7398",
+    "name": "Coca-Cola Vanilla",
+    "brand": "Coca-Cola",
+    "packageText": "33 cl",
+    "price": 11.83,
+    "priceText": "11.83 SEK",
+    "unitPrice": 35.85,
+    "unitPriceText": "35.85 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/00ca22ad-50db-4c06-bc3f-2e9850463f95.jpg?fit=bounds&format=auto&optimize=medium&width=110&s=0xbc0371f14dda9fd5a1949924d3a68e14db172db8",
+    "productUrl": "https://www.mathem.se/se/products/7398-coca-cola-coca-cola-vanilla/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5011",
+    "name": "Coca-Cola Zero Sugar Vanilla",
+    "brand": "Coca-Cola",
+    "packageText": "1,5 l",
+    "price": 21.72,
+    "priceText": "21.72 SEK",
+    "unitPrice": 14.48,
+    "unitPriceText": "14.48 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0241717a-6768-40cb-bfbb-abfd3204f66e.jpg?fit=bounds&format=auto&optimize=medium&width=89&s=0xe82962434eab2152730374e4a58124159853313d",
+    "productUrl": "https://www.mathem.se/se/products/5011-coca-cola-coca-cola-zero-sugar-vanilla/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7415",
+    "name": "Coca-Cola Cherry",
+    "brand": "Coca-Cola",
+    "packageText": "33 cl",
+    "price": 11.83,
+    "priceText": "11.83 SEK",
+    "unitPrice": 35.85,
+    "unitPriceText": "35.85 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/295e0787-a3c6-4661-925a-eb0428b3031e.jpg?fit=bounds&format=auto&optimize=medium&width=110&s=0x53bb40a9c9ddf29714eafd3782cd0e6c24e1c377",
+    "productUrl": "https://www.mathem.se/se/products/7415-coca-cola-coca-cola-cherry/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64262",
+    "name": "Coca-Cola Zero Glas",
+    "brand": "Coca-Cola",
+    "packageText": "330 ml",
+    "price": 15.62,
+    "priceText": "15.62 SEK",
+    "unitPrice": 47.33,
+    "unitPriceText": "47.33 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/74e614d4-ac41-4159-83df-94c6a0868bca.jpg?fit=bounds&format=auto&optimize=medium&width=89&s=0xf1423bdb792cb2b4d40f639162c1e51c90e8060b",
+    "productUrl": "https://www.mathem.se/se/products/64262-coca-cola-coca-cola-zero-glas/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4798",
+    "name": "Cuba Cola Zero",
+    "brand": "Cuba Cola",
+    "packageText": "1,5 l",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 13.85,
+    "unitPriceText": "13.85 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9c069ac5-4516-41ef-95e6-1fb2d07bd063.jpg?fit=bounds&format=auto&optimize=medium&width=86&s=0x2dedb6dd034058c53d258683c3ddc3d90c7b23c0",
+    "productUrl": "https://www.mathem.se/se/products/4798-cuba-cola-cuba-cola-zero/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64263",
+    "name": "Coca-Cola Glas",
+    "brand": "Coca-Cola",
+    "packageText": "330 ml",
+    "price": 15.62,
+    "priceText": "15.62 SEK",
+    "unitPrice": 47.33,
+    "unitPriceText": "47.33 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c1307d3e-8717-4417-ae93-4d07a3985e97.jpg?fit=bounds&format=auto&optimize=medium&width=89&s=0xbcee90c68a1fae9f93a661b5a638edc522d90be5",
+    "productUrl": "https://www.mathem.se/se/products/64263-coca-cola-coca-cola-glas/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4661",
+    "name": "Coca-Cola Coca-Cola",
+    "brand": "Coca-Cola",
+    "packageText": "1000 ml",
+    "price": 18.95,
+    "priceText": "18.95 SEK",
+    "unitPrice": 18.95,
+    "unitPriceText": "18.95 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e113c154-fa9f-4e39-a4db-d453813a9e77.jpg?fit=bounds&format=auto&optimize=medium&width=92&s=0x8b91f001f78edb14853960bde662a2c9a2870bf7",
+    "productUrl": "https://www.mathem.se/se/products/4661-coca-cola-coca-cola/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67311",
+    "name": "Coca-Cola Lemon Zero",
+    "brand": "Coca-Cola",
+    "packageText": "1,5 l",
+    "price": 21.72,
+    "priceText": "21.72 SEK",
+    "unitPrice": 14.48,
+    "unitPriceText": "14.48 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2babcdcf-301b-4921-a45f-d8d6204cf8b7.jpg?fit=bounds&format=auto&optimize=medium&width=89&s=0xe3d6fb5b8b80215930fae9a46a4937d0ed466629",
+    "productUrl": "https://www.mathem.se/se/products/67311-coca-cola-coca-cola-lemon-zero/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3201",
+    "name": "Cuba Cola Zero 20x33cl",
+    "brand": "Cuba Cola",
+    "packageText": "6600 ml",
+    "price": 131.55,
+    "priceText": "131.55 SEK",
+    "unitPrice": 19.93,
+    "unitPriceText": "19.93 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b9dbf523-e80e-4f6f-8747-9f031a9ac4fd.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x5638f2b301f3692340fb33d55d1c547ac65c514f",
+    "productUrl": "https://www.mathem.se/se/products/3201-cuba-cola-cuba-cola-zero-20x33cl/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64273",
+    "name": "Coca-Cola Zero Cherry",
+    "brand": "Coca-Cola",
+    "packageText": "500 ml",
+    "price": 16.99,
+    "priceText": "16.99 SEK",
+    "unitPrice": 33.98,
+    "unitPriceText": "33.98 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d2a80bb9-37a2-4760-ae03-b698d89bc6f1.jpg?fit=bounds&format=auto&optimize=medium&width=84&s=0xcff22ab4ce6a9d36ccd691c76e207a069e0fe982",
+    "productUrl": "https://www.mathem.se/se/products/64273-coca-cola-coca-cola-zero-cherry/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2115",
+    "name": "Cuba Cola 20x33cl",
+    "brand": "Cuba Cola",
+    "packageText": "6600 ml",
+    "price": 131.55,
+    "priceText": "131.55 SEK",
+    "unitPrice": 19.93,
+    "unitPriceText": "19.93 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/11349e9b-e527-4f8a-a924-5e5a6813df13.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xee6e8551699647c79493012da0deb8edd093654e",
+    "productUrl": "https://www.mathem.se/se/products/2115-cuba-cola-cuba-cola-20x33cl/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66279",
+    "name": "Hammars Bryggeri Svensk Cola",
+    "brand": "Hammars Bryggeri",
+    "packageText": "1 l",
+    "price": 16.04,
+    "priceText": "16.04 SEK",
+    "unitPrice": 16.04,
+    "unitPriceText": "16.04 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7c51a0be-9996-439a-a768-ec4e2268bc91.jpg?fit=bounds&format=auto&optimize=medium&width=90&s=0x94e1e61173c6cb1fadc65c9090fda67996acf7f1",
+    "productUrl": "https://www.mathem.se/se/products/66279-hammars-bryggeri-svensk-cola/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4574",
+    "name": "Premier Cola Zero Sugar",
+    "brand": "Premier",
+    "packageText": "1,5 l",
+    "price": 17.51,
+    "priceText": "17.51 SEK",
+    "unitPrice": 11.67,
+    "unitPriceText": "11.67 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/16a75e48-c98e-41be-a0e3-b1717732c89d.jpg?fit=bounds&format=auto&optimize=medium&width=92&s=0x6e6c55daed5e9ea19272ac282f9c2391f12c043a",
+    "productUrl": "https://www.mathem.se/se/products/4574-premier-cola-zero-sugar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66280",
+    "name": "Hammars Bryggeri Svensk Cola Sockerfri",
+    "brand": "Hammars Bryggeri",
+    "packageText": "1 l",
+    "price": 16.04,
+    "priceText": "16.04 SEK",
+    "unitPrice": 16.04,
+    "unitPriceText": "16.04 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/adb79b37-b3b8-44dd-922b-655e2190db05.jpg?fit=bounds&format=auto&optimize=medium&width=90&s=0x74420c4d3517c50470f203f84f071a83a6c22fff",
+    "productUrl": "https://www.mathem.se/se/products/66280-hammars-bryggeri-svensk-cola-sockerfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68337",
+    "name": "Nocco Energidryck Focus Cola Sockerfri",
+    "brand": "Nocco",
+    "packageText": "330 ml",
+    "price": 19.2,
+    "priceText": "19.20 SEK",
+    "unitPrice": 58.18,
+    "unitPriceText": "58.18 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/96040a84-7ba4-4110-956d-86d5932c0822.jpg?fit=bounds&format=auto&optimize=medium&width=113&s=0x5e9a5062080c5f168c5156e2439a7076e3017f55",
+    "productUrl": "https://www.mathem.se/se/products/68337-nocco-energidryck-focus-cola-sockerfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2468",
+    "name": "Haribo Nappar Cola",
+    "brand": "Haribo",
+    "packageText": "80 g",
+    "price": 11.83,
+    "priceText": "11.83 SEK",
+    "unitPrice": 147.88,
+    "unitPriceText": "147.88 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/268c66b0-d7e2-4207-8577-62b0010465e7.jpg?fit=bounds&format=auto&optimize=medium&width=225&s=0x50eec0067b130f37914e5319f596b3d7d8de4f22",
+    "productUrl": "https://www.mathem.se/se/products/2468-haribo-nappar-cola/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67887",
+    "name": "Triumf Glass Isglass Kalas Cola & Hallon",
+    "brand": "Triumf Glass",
+    "packageText": "21 st",
+    "price": 35,
+    "priceText": "35.00 SEK",
+    "unitPrice": 1.67,
+    "unitPriceText": "1.67 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7d2fc7e0-c2aa-4b0f-a000-e1186e9cb957.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xb35ee42e4c0386509790eac5c5822ba441cab0ae",
+    "productUrl": "https://www.mathem.se/se/products/67887-triumf-glass-isglass-kalas-cola-hallon/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7395",
+    "name": "Fanta Zero Sugar Lemon",
+    "brand": "Fanta zero",
+    "packageText": "33 cl",
+    "price": 11.83,
+    "priceText": "11.83 SEK",
+    "unitPrice": 35.85,
+    "unitPriceText": "35.85 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a703d8f1-58ee-41b5-bdd6-8d6018ac7997.jpg?fit=bounds&format=auto&optimize=medium&width=111&s=0x325351af6464e8ab8a414c6638f07790dae10418",
+    "productUrl": "https://www.mathem.se/se/products/7395-fanta-zero-fanta-zero-sugar-lemon/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7392",
+    "name": "Fanta Zero Sugar Exotic",
+    "brand": "Fanta zero",
+    "packageText": "33 cl",
+    "price": 11.83,
+    "priceText": "11.83 SEK",
+    "unitPrice": 35.85,
+    "unitPriceText": "35.85 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/656cfac4-7ec8-4fdb-acf6-a81dc9cad12c.jpg?fit=bounds&format=auto&optimize=medium&width=111&s=0xc24094053065c6f5e99604828e17a711b2699a9b",
+    "productUrl": "https://www.mathem.se/se/products/7392-fanta-zero-fanta-zero-sugar-exotic/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2710",
+    "name": "Cuba Cola Zero 18x33cl",
+    "brand": "Cuba Cola",
+    "packageText": "594 cl",
+    "price": 112.63,
+    "priceText": "112.63 SEK",
+    "unitPrice": 18.96,
+    "unitPriceText": "18.96 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/63f05475-0ac4-492c-afe9-7197c13a1870.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x1c30383eb56185bfce2547865dc5a1a8898b7bb8",
+    "productUrl": "https://www.mathem.se/se/products/2710-cuba-cola-cuba-cola-zero-18x33cl/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67016",
+    "name": "Enervit Gel Cola",
+    "brand": "Enervit",
+    "packageText": "25 ml",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 1134,
+    "unitPriceText": "1134.00 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e2eef362-3ffc-4442-9815-1146f63fb6ec.jpg?fit=bounds&format=auto&optimize=medium&width=175&s=0x26bf2cc9f756e9011eacdd5bfe10572377b79e6d",
+    "productUrl": "https://www.mathem.se/se/products/67016-enervit-gel-cola/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5860",
+    "name": "Jarritos Mexican Cola",
+    "brand": "Jarritos",
+    "packageText": "370 ml",
+    "price": 26.45,
+    "priceText": "26.45 SEK",
+    "unitPrice": 26.45,
+    "unitPriceText": "26.45 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c86d68c1-5543-4927-b4a1-e8c9849de26d.jpg?fit=bounds&format=auto&optimize=medium&width=80&s=0xfe8a476b96a380199a830f25c045b08a80b0a6ac",
+    "productUrl": "https://www.mathem.se/se/products/5860-jarritos-mexican-cola/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=cola",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62665",
+    "name": "Garant Te Mango & Jordgubb",
+    "brand": "Garant",
+    "packageText": "Max 2 per kund, 20 st",
+    "price": 14.95,
+    "priceText": "14.95 SEK",
+    "unitPrice": 415.28,
+    "unitPriceText": "415.28 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2a75d4ee-cf69-4253-8544-882cc4a82d43.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x901e87dea54cfdc90d1931747e8e34c1b3ca588d",
+    "productUrl": "https://www.mathem.se/se/products/62665-garant-te-mango-jordgubb/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4583",
+    "name": "Garant Te Gamla Söder",
+    "brand": "Garant",
+    "packageText": "Max 2 per kund, 20 st",
+    "price": 14.95,
+    "priceText": "14.95 SEK",
+    "unitPrice": 0.75,
+    "unitPriceText": "0.75 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cb91a274-dd5e-4753-ae09-e888d938fcad.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x6be9e4d600e6a6ce46fdf25bb786b53658f2ce1c",
+    "productUrl": "https://www.mathem.se/se/products/4583-garant-te-gamla-soder/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4551",
+    "name": "Garant Te Rabarber & Vanilj",
+    "brand": "Garant",
+    "packageText": "Max 2 per kund, 20 st",
+    "price": 14.95,
+    "priceText": "14.95 SEK",
+    "unitPrice": 0.75,
+    "unitPriceText": "0.75 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f8d303a8-80ca-4644-8789-bc97d04550de.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc185906897307989a78ec4a66783562fe4b0510a",
+    "productUrl": "https://www.mathem.se/se/products/4551-garant-te-rabarber-vanilj/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4569",
+    "name": "Garant Svart Te Earl Grey",
+    "brand": "Garant",
+    "packageText": "Max 2 per kund, 20 st",
+    "price": 14.95,
+    "priceText": "14.95 SEK",
+    "unitPrice": 0.75,
+    "unitPriceText": "0.75 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e9cc17b1-b6e5-43cd-a707-d47ccfa2c1b8.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x8b8abc5a9e00e3f98dde96a651b19a562fe83e08",
+    "productUrl": "https://www.mathem.se/se/products/4569-garant-svart-te-earl-grey/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4587",
+    "name": "Garant Te Svarta Vinbär",
+    "brand": "Garant",
+    "packageText": "Max 2 per kund, 20 st",
+    "price": 14.95,
+    "priceText": "14.95 SEK",
+    "unitPrice": 0.75,
+    "unitPriceText": "0.75 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/614c09b0-6e0a-4e4a-93be-d7c0b4156cbd.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x5a81647daca5aee97ccc647a1a61646e7833a7da",
+    "productUrl": "https://www.mathem.se/se/products/4587-garant-te-svarta-vinbar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4567",
+    "name": "Garant Te Grönt Citrus",
+    "brand": "Garant",
+    "packageText": "Max 2 per kund, 20 st",
+    "price": 14.95,
+    "priceText": "14.95 SEK",
+    "unitPrice": 0.75,
+    "unitPriceText": "0.75 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5080cd86-7976-4ce5-b24e-21ab31b1086f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc05f2abdc5570b66a7c7676a7dc8eb8e04f9694f",
+    "productUrl": "https://www.mathem.se/se/products/4567-garant-te-gront-citrus/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "38910",
+    "name": "Lipton Svart Te Rich Earl Grey",
+    "brand": "Lipton",
+    "packageText": "100 st",
+    "price": 42.12,
+    "priceText": "42.12 SEK",
+    "unitPrice": 0.42,
+    "unitPriceText": "0.42 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ea6fc520-b4c6-4dc2-9283-ad9840efcf16.jpg?fit=bounds&format=auto&optimize=medium&width=267&s=0x2f0c5c6bd8c76514f03108d19a3bc521506b395d",
+    "productUrl": "https://www.mathem.se/se/products/38910-lipton-svart-te-rich-earl-grey/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4591",
+    "name": "Garant Grönt Te Vanilj",
+    "brand": "Garant",
+    "packageText": "Max 2 per kund, 20 st",
+    "price": 14.95,
+    "priceText": "14.95 SEK",
+    "unitPrice": 0.75,
+    "unitPriceText": "0.75 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/687daf80-4129-48ad-abba-e6e5f9859f3b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x6aef9c887b9ca5f2e03983e7149a7d8b35b74aa6",
+    "productUrl": "https://www.mathem.se/se/products/4591-garant-gront-te-vanilj/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62692",
+    "name": "Garant Svart Te Äpple & Kanel",
+    "brand": "Garant",
+    "packageText": "Max 2 per kund, 20 st",
+    "price": 14.95,
+    "priceText": "14.95 SEK",
+    "unitPrice": 0.75,
+    "unitPriceText": "0.75 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/523f333c-fdb7-41a6-85a7-6985999b27f3.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xe74de5b03ad31a5ed0c9225e98466dfe8c5a76bb",
+    "productUrl": "https://www.mathem.se/se/products/62692-garant-svart-te-apple-kanel/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65722",
+    "name": "Lipton Te Collection",
+    "brand": "Lipton",
+    "packageText": "40 st",
+    "price": 41.6,
+    "priceText": "41.60 SEK",
+    "unitPrice": 1.04,
+    "unitPriceText": "1.04 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/681b179b-5cd5-4320-879b-61d1b9541c85.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x21c4f493c1885dd399c14803dd09d5239b48a7c0",
+    "productUrl": "https://www.mathem.se/se/products/65722-lipton-te-collection/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63322",
+    "name": "Lipton Svart Te Forest Fruit",
+    "brand": "Lipton",
+    "packageText": "20 st",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 1.42,
+    "unitPriceText": "1.42 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/516e7494-095a-4714-8a5e-7b31695248e2.jpg?fit=bounds&format=auto&optimize=medium&width=288&s=0x9ca4c7b7b3f853cb6c9cf5e388868450590763d1",
+    "productUrl": "https://www.mathem.se/se/products/63322-lipton-svart-te-forest-fruit/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7916",
+    "name": "Kung Markatta Te Grönt Original EKO/KRAV/Fairtrade",
+    "brand": "Kung Markatta",
+    "packageText": "20 st",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 1.51,
+    "unitPriceText": "1.51 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/34bd0024-2b06-4d8c-be4b-7f46121d6447.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xcdd2d7563c212d682ff069222b7d7ebbfc8f2835",
+    "productUrl": "https://www.mathem.se/se/products/7916-kung-markatta-te-gront-original-eko-krav-fairtrade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "1045",
+    "name": "Garant Svart Te Masala Chai",
+    "brand": "Garant",
+    "packageText": "Max 2 per kund, 20 st",
+    "price": 14.95,
+    "priceText": "14.95 SEK",
+    "unitPrice": 0.75,
+    "unitPriceText": "0.75 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fae2b48b-1209-466e-8669-1c99ff68b839.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x40a708057b5992238da4bfe3a46df4854818e772",
+    "productUrl": "https://www.mathem.se/se/products/1045-garant-svart-te-masala-chai/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4586",
+    "name": "Garant Örtte Pepparmynta",
+    "brand": "Garant",
+    "packageText": "Max 2 per kund, 20 st",
+    "price": 14.95,
+    "priceText": "14.95 SEK",
+    "unitPrice": 0.75,
+    "unitPriceText": "0.75 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8dbd2267-ab6c-40b9-8bda-f6be35367cea.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x2e4e6d69460f87b8b6c9cf22e67c10696584f43c",
+    "productUrl": "https://www.mathem.se/se/products/4586-garant-ortte-pepparmynta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62754",
+    "name": "Garant Grönt Te Ingefära & Citron",
+    "brand": "Garant",
+    "packageText": "Max 2 per kund, 20 st",
+    "price": 14.95,
+    "priceText": "14.95 SEK",
+    "unitPrice": 0.75,
+    "unitPriceText": "0.75 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5201e4d9-a799-44b7-982d-d64d43bc4481.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x305821a6274808eb253b69c6f865bbd970ba18ae",
+    "productUrl": "https://www.mathem.se/se/products/62754-garant-gront-te-ingefara-citron/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63226",
+    "name": "Lipton Svart Te Peach Mango",
+    "brand": "Lipton",
+    "packageText": "20 st",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 1.42,
+    "unitPriceText": "1.42 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/da3400da-22a3-4256-93a8-14b24976a35b.jpg?fit=bounds&format=auto&optimize=medium&width=288&s=0x3646cf953d264c2b42c951d140b46fac0743a933",
+    "productUrl": "https://www.mathem.se/se/products/63226-lipton-svart-te-peach-mango/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64282",
+    "name": "Twinings Te Earl Grey",
+    "brand": "Twinings",
+    "packageText": "25 st",
+    "price": 39.28,
+    "priceText": "39.28 SEK",
+    "unitPrice": 1.57,
+    "unitPriceText": "1.57 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1760c035-089a-44ac-81df-7bc1b4ecafe7.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x86b5f77fb915c753956c2b9b9e59ac4b81157031",
+    "productUrl": "https://www.mathem.se/se/products/64282-twinings-te-earl-grey/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9006",
+    "name": "Lipton Svart Te Yellow Label",
+    "brand": "Lipton",
+    "packageText": "100 st",
+    "price": 42.12,
+    "priceText": "42.12 SEK",
+    "unitPrice": 0.42,
+    "unitPriceText": "0.42 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c0939777-6f79-4f2d-9285-a7e1500551ad.jpg?fit=bounds&format=auto&optimize=medium&width=267&s=0x59d56693800c0b357de6636646d1720faf8dddbc",
+    "productUrl": "https://www.mathem.se/se/products/9006-lipton-svart-te-yellow-label/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6210",
+    "name": "Friggs Te Grönt Ingefära/Citron",
+    "brand": "Friggs",
+    "packageText": "20 st",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 1.28,
+    "unitPriceText": "1.28 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1c6f9d0b-a3ea-4426-9b1d-0812f1c10e75.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x61f565ab396e01e8d01c15fbc4b15f62cb5d2a94",
+    "productUrl": "https://www.mathem.se/se/products/6210-friggs-te-gront-ingefara-citron/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64281",
+    "name": "Twinings Te Grönt Citron",
+    "brand": "Twinings",
+    "packageText": "25 st",
+    "price": 39.28,
+    "priceText": "39.28 SEK",
+    "unitPrice": 1.57,
+    "unitPriceText": "1.57 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9e71e079-c58a-4575-8b23-18c3b242f371.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x5c3ccfc5733e6f9352c78376b056359ec33d935c",
+    "productUrl": "https://www.mathem.se/se/products/64281-twinings-te-gront-citron/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64472",
+    "name": "Arvid Nordquist Te Skogsglänta",
+    "brand": "Arvid Nordquist",
+    "packageText": "17 st",
+    "price": 33.08,
+    "priceText": "33.08 SEK",
+    "unitPrice": 1.95,
+    "unitPriceText": "1.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/58376b32-8dd9-4c5f-905d-de078dcf1086.jpg?fit=bounds&format=auto&optimize=medium&width=213&s=0x38a09d0df2519334e2749ffb2d4f3c69ad264029",
+    "productUrl": "https://www.mathem.se/se/products/64472-arvid-nordquist-te-skogsglanta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64651",
+    "name": "Twinings Te Earl Grey",
+    "brand": "Twinings",
+    "packageText": "50 st",
+    "price": 68.1,
+    "priceText": "68.10 SEK",
+    "unitPrice": 1.36,
+    "unitPriceText": "1.36 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4ee9db50-53d4-42fa-a044-e9cd5d11f7a0.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x4f8a7340df03ccb838d7e3913afcc00e8c4b87dd",
+    "productUrl": "https://www.mathem.se/se/products/64651-twinings-te-earl-grey/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "22560",
+    "name": "Twinings Te English Breakfast EKO/KRAV",
+    "brand": "Twinings",
+    "packageText": "25 st",
+    "price": 43.06,
+    "priceText": "43.06 SEK",
+    "unitPrice": 1.72,
+    "unitPriceText": "1.72 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6004ba5c-5c9a-426a-9a9b-43abcc504703.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x195995f4cd3160d76ccebae874dd2630b811503c",
+    "productUrl": "https://www.mathem.se/se/products/22560-twinings-te-english-breakfast-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7789",
+    "name": "Kung Markatta Te Earl Grey EKO/KRAV Fairtrade",
+    "brand": "Kung Markatta",
+    "packageText": "20 st",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 1.51,
+    "unitPriceText": "1.51 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d77a71d3-588e-48f7-89b2-060c47ec6f96.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc59b951f62dac4aec24073620724387e7c621b88",
+    "productUrl": "https://www.mathem.se/se/products/7789-kung-markatta-te-earl-grey-eko-krav-fairtrade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8582",
+    "name": "Twinings Te Grönt",
+    "brand": "Twinings",
+    "packageText": "50 g",
+    "price": 39.28,
+    "priceText": "39.28 SEK",
+    "unitPrice": 1.57,
+    "unitPriceText": "1.57 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/31428194-d166-4b15-95b7-318ffc0bbebc.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x8813b576a3fa5c5ab23cba06da7ddf7f0320323c",
+    "productUrl": "https://www.mathem.se/se/products/8582-twinings-te-gront/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6289",
+    "name": "Friggs Te Rabarber & Mynta",
+    "brand": "Friggs",
+    "packageText": "20 st",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 1.28,
+    "unitPriceText": "1.28 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/656761d2-c4c8-4e20-ace0-e4682d317eb9.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa0e495f415b72f9ab937ddabe12cd495da51c970",
+    "productUrl": "https://www.mathem.se/se/products/6289-friggs-te-rabarber-mynta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7971",
+    "name": "Kung Markatta Te Rooibos KRAV/Fairtrade",
+    "brand": "Kung Markatta",
+    "packageText": "20 st",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 1.51,
+    "unitPriceText": "1.51 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4720f811-54c2-45b0-938b-90819bedda33.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x4cdf10d9d7f2703f8629575e01881a2d75236986",
+    "productUrl": "https://www.mathem.se/se/products/7971-kung-markatta-te-rooibos-krav-fairtrade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10663",
+    "name": "Pukka Te Supreme Matcha Green EKO",
+    "brand": "Pukka",
+    "packageText": "20 st",
+    "price": 37.38,
+    "priceText": "37.38 SEK",
+    "unitPrice": 1.87,
+    "unitPriceText": "1.87 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e84bd5da-5976-4233-be29-bd1fb45f2801.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0x68c99aa7b79eddcdc2b9e40186d1f8d2561740f5",
+    "productUrl": "https://www.mathem.se/se/products/10663-pukka-te-supreme-matcha-green-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63303",
+    "name": "Lipton Svart Te Vanilla Caramel",
+    "brand": "Lipton",
+    "packageText": "20 st",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 1.42,
+    "unitPriceText": "1.42 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/70b2c8dd-f869-4028-a326-2b99f89dd213.jpg?fit=bounds&format=auto&optimize=medium&width=288&s=0x09a6740f8bc1f1bd33a3c0f8814eef691c98232d",
+    "productUrl": "https://www.mathem.se/se/products/63303-lipton-svart-te-vanilla-caramel/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65718",
+    "name": "Kung Markatta Svart Te Forest Fruit EKO/KRAV",
+    "brand": "Kung Markatta",
+    "packageText": "20 st",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 1.51,
+    "unitPriceText": "1.51 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5248878d-3cdd-4c8a-bfef-f414d46c1462.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x6ae5fe87c641aad1470ceb6d664c72910601449e",
+    "productUrl": "https://www.mathem.se/se/products/65718-kung-markatta-svart-te-forest-fruit-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10488",
+    "name": "Pukka Te Vanilla Chai EKO Fair for Life",
+    "brand": "Pukka",
+    "packageText": "20 st",
+    "price": 37.38,
+    "priceText": "37.38 SEK",
+    "unitPrice": 1.87,
+    "unitPriceText": "1.87 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a338c3ea-ae63-4481-9ed9-b65aca75ae59.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0xa62e8003fdfdc3fab7bb8bc0add02a58d38090ee",
+    "productUrl": "https://www.mathem.se/se/products/10488-pukka-te-vanilla-chai-eko-fair-for-life/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8649",
+    "name": "Twinings Te Grönt Earl Grey",
+    "brand": "Twinings",
+    "packageText": "25 st",
+    "price": 39.28,
+    "priceText": "39.28 SEK",
+    "unitPrice": 1.57,
+    "unitPriceText": "1.57 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4c464008-0fd3-42a6-a813-eea52bdd6f6f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x55337f11777aaba99991be8afc2ddd4cf62ad268",
+    "productUrl": "https://www.mathem.se/se/products/8649-twinings-te-gront-earl-grey/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62645",
+    "name": "Garant Grönt Te Citrus & Äpple Fairtrade",
+    "brand": "Garant",
+    "packageText": "20 st",
+    "price": 21.29,
+    "priceText": "21.29 SEK",
+    "unitPrice": 1.06,
+    "unitPriceText": "1.06 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bc3437bb-996d-46e4-b00c-b8b2c40e8088.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xb32abb33d951fdd65abc73b443c1eb9ee50944af",
+    "productUrl": "https://www.mathem.se/se/products/62645-garant-gront-te-citrus-apple-fairtrade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64474",
+    "name": "Arvid Nordquist Te Äppellund",
+    "brand": "Arvid Nordquist",
+    "packageText": "17 st",
+    "price": 33.08,
+    "priceText": "33.08 SEK",
+    "unitPrice": 1.95,
+    "unitPriceText": "1.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a624e6e7-b2a3-4c90-860d-fb92c4fe79c6.jpg?fit=bounds&format=auto&optimize=medium&width=213&s=0xf9cc21236663f75b28c3c511d31e789aa64a888f",
+    "productUrl": "https://www.mathem.se/se/products/64474-arvid-nordquist-te-appellund/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10572",
+    "name": "Pukka Te Original Chai EKO",
+    "brand": "Pukka",
+    "packageText": "20 st",
+    "price": 37.38,
+    "priceText": "37.38 SEK",
+    "unitPrice": 1.87,
+    "unitPriceText": "1.87 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/436d8360-a833-410a-94f5-f9f92d6d6b89.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0x764bb098abe15331f53c5f1b4f7b489687d09df8",
+    "productUrl": "https://www.mathem.se/se/products/10572-pukka-te-original-chai-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64621",
+    "name": "Pukka Té Lemon, Ginger, Manuka & Honey EKO",
+    "brand": "Pukka",
+    "packageText": "20 st",
+    "price": 37.38,
+    "priceText": "37.38 SEK",
+    "unitPrice": 1.87,
+    "unitPriceText": "1.87 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f81a7bca-ca7c-4cfd-8839-de59c7944402.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0x26dd70d1873defe01e98217c9fe6cb1dc299c203",
+    "productUrl": "https://www.mathem.se/se/products/64621-pukka-te-lemon-ginger-manuka-honey-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8591",
+    "name": "Twinings Te Grönt Ingefära",
+    "brand": "Twinings",
+    "packageText": "25 st",
+    "price": 39.28,
+    "priceText": "39.28 SEK",
+    "unitPrice": 1.57,
+    "unitPriceText": "1.57 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/aa66c1bc-03ee-4925-95c2-9398e1d3fa42.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdd57c63472bccd6df24228a62ecd9c25dd4d5d27",
+    "productUrl": "https://www.mathem.se/se/products/8591-twinings-te-gront-ingefara/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4552",
+    "name": "Garant Örtte Kamomill",
+    "brand": "Garant",
+    "packageText": "Max 2 per kund, 20 st",
+    "price": 14.95,
+    "priceText": "14.95 SEK",
+    "unitPrice": 427.14,
+    "unitPriceText": "427.14 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e03b36c7-bdfe-4fca-ae75-8af61ad7f3ed.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x2052f2d5388055fc318621b1860b56bd4af363b1",
+    "productUrl": "https://www.mathem.se/se/products/4552-garant-ortte-kamomill/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "38772",
+    "name": "Lipton Grönt Te Sencha Pyramidte",
+    "brand": "Lipton",
+    "packageText": "20 st",
+    "price": 22.24,
+    "priceText": "22.24 SEK",
+    "unitPrice": 1.11,
+    "unitPriceText": "1.11 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/03fe017f-7866-41f3-951e-f36405659c9a.jpg?fit=bounds&format=auto&optimize=medium&width=288&s=0xde8beebdc9d91430ef7878a77b3a2efb16c0dbc5",
+    "productUrl": "https://www.mathem.se/se/products/38772-lipton-gront-te-sencha-pyramidte/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6182",
+    "name": "Friggs Te Rött Blåbär",
+    "brand": "Friggs",
+    "packageText": "20 st",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 1.28,
+    "unitPriceText": "1.28 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bc09fd1d-825f-4ac9-b2cb-483264ce2067.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x43fa725e1d83e1ab63dc2f9789140306cceb4caf",
+    "productUrl": "https://www.mathem.se/se/products/6182-friggs-te-rott-blabar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "38882",
+    "name": "Fredsted Te Chai Latte Grönt",
+    "brand": "Fredsted",
+    "packageText": "8 st",
+    "price": 34.02,
+    "priceText": "34.02 SEK",
+    "unitPrice": 4.25,
+    "unitPriceText": "4.25 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5a2b01f3-b5b2-430b-a026-d94049bc125f.jpg?fit=bounds&format=auto&optimize=medium&width=141&s=0x75b894f6fd1461688a4e3d4c5143080007621e30",
+    "productUrl": "https://www.mathem.se/se/products/38882-fredsted-te-chai-latte-gront/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62097",
+    "name": "English Tea Shop Grönt Te Granatäpple Fairtrade",
+    "brand": "English Tea Shop",
+    "packageText": "20 st",
+    "price": 43.49,
+    "priceText": "43.49 SEK",
+    "unitPrice": 2.17,
+    "unitPriceText": "2.17 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/54ca90cf-0da1-4e4b-a948-a4639c09cfca.jpg?fit=bounds&format=auto&optimize=medium&width=218&s=0xad749b107e7de40125fe3b9ea897a59b05f01446",
+    "productUrl": "https://www.mathem.se/se/products/62097-english-tea-shop-gront-te-granatapple-fairtrade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=te",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4892",
+    "name": "Garant Vetemjöl",
+    "brand": "Garant",
+    "packageText": "2 kg",
+    "price": 16.94,
+    "priceText": "16.94 SEK",
+    "unitPrice": 8.47,
+    "unitPriceText": "8.47 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/48c0fa56-8f6e-4aea-ab7d-3cf316c00a90.jpg?fit=bounds&format=auto&optimize=medium&width=182&s=0x8d14552ca39f6df4be63f1b0a22fd0efb856daa1",
+    "productUrl": "https://www.mathem.se/se/products/4892-garant-vetemjol/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64023",
+    "name": "Caputo Mjöl Pizzeria",
+    "brand": "Caputo",
+    "packageText": "1 kg",
+    "price": 30.76,
+    "priceText": "30.76 SEK",
+    "unitPrice": 30.76,
+    "unitPriceText": "30.76 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/372a4f9f-70cd-43d2-b187-e585fdda0286.jpg?fit=bounds&format=auto&optimize=medium&width=230&s=0x13bc09e398d05d0c5166f611eec3b21176ef5118",
+    "productUrl": "https://www.mathem.se/se/products/64023-caputo-mjol-pizzeria/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63886",
+    "name": "Garant Mjöl Rågsikt",
+    "brand": "Garant",
+    "packageText": "2 kg",
+    "price": 18.46,
+    "priceText": "18.46 SEK",
+    "unitPrice": 9.23,
+    "unitPriceText": "9.23 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/772d3136-a23d-4c2a-bb37-eb05ac14d3b8.jpg?fit=bounds&format=auto&optimize=medium&width=193&s=0x3f94894375e7d420abe0d16a2e775384fc03688a",
+    "productUrl": "https://www.mathem.se/se/products/63886-garant-mjol-ragsikt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62437",
+    "name": "da Carla Mjöl Durra EKO",
+    "brand": "da Carla",
+    "packageText": "400 g",
+    "price": 39.7,
+    "priceText": "39.70 SEK",
+    "unitPrice": 99.25,
+    "unitPriceText": "99.25 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ffdf243f-4be6-4e09-be61-50d8fc3baa2c.jpg?fit=bounds&format=auto&optimize=medium&width=146&s=0x1bf92634b6799ab5108daf1e8349c88110b66eca",
+    "productUrl": "https://www.mathem.se/se/products/62437-da-carla-mjol-durra-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63915",
+    "name": "Saltå Kvarn Mjöl Kulturvete Sikt",
+    "brand": "Saltå Kvarn",
+    "packageText": "1,25 kg",
+    "price": 40.65,
+    "priceText": "40.65 SEK",
+    "unitPrice": 32.52,
+    "unitPriceText": "32.52 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8f4d685e-2e73-42e9-9e13-468ea0e2766e.jpg?fit=bounds&format=auto&optimize=medium&width=206&s=0x6adc327045faa225e71bff257e6c078b9e959139",
+    "productUrl": "https://www.mathem.se/se/products/63915-salta-kvarn-mjol-kulturvete-sikt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9801",
+    "name": "Finax Mjöl Manitoba Cream Ramlösa Kvarn",
+    "brand": "Finax",
+    "packageText": "2 kg",
+    "price": 33.08,
+    "priceText": "33.08 SEK",
+    "unitPrice": 16.54,
+    "unitPriceText": "16.54 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7b65eb6f-4c16-4dfb-b041-9f3066e2a927.jpg?fit=bounds&format=auto&optimize=medium&width=180&s=0x934817e6933b37d48658ad5c2033097d7934b153",
+    "productUrl": "https://www.mathem.se/se/products/9801-finax-mjol-manitoba-cream-ramlosa-kvarn/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6186",
+    "name": "KUNGSÖRNEN Grahamsmjöl Grovmalet",
+    "brand": "KUNGSÖRNEN",
+    "packageText": "1,5 kg",
+    "price": 25.08,
+    "priceText": "25.08 SEK",
+    "unitPrice": 16.72,
+    "unitPriceText": "16.72 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/15c0e734-6b9f-4d60-9fbf-1bdeecf41450.jpg?fit=bounds&format=auto&optimize=medium&width=226&s=0xbb027c6ba9dd186b81999b96dc2cb30d71d08f0b",
+    "productUrl": "https://www.mathem.se/se/products/6186-kungsornen-grahamsmjol-grovmalet/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6366",
+    "name": "KUNGSÖRNEN Vetemjöl EKO/KRAV",
+    "brand": "KUNGSÖRNEN",
+    "packageText": "1500 g",
+    "price": 25.08,
+    "priceText": "25.08 SEK",
+    "unitPrice": 16.72,
+    "unitPriceText": "16.72 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2331ef4c-2dff-48ab-b57e-8219d3c138e7.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0x4998b20c4468cecdd7fd2cd31a91006bca32801d",
+    "productUrl": "https://www.mathem.se/se/products/6366-kungsornen-vetemjol-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8019",
+    "name": "Saltå Kvarn Rågmjöl EKO/KRAV",
+    "brand": "Saltå Kvarn",
+    "packageText": "1250 g",
+    "price": 33.08,
+    "priceText": "33.08 SEK",
+    "unitPrice": 26.46,
+    "unitPriceText": "26.46 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9c450bf9-662f-4f18-a74a-22b2a0bd5530.jpg?fit=bounds&format=auto&optimize=medium&width=206&s=0x11e9ff5a574ef5c73440e7c46e730ba6198251b9",
+    "productUrl": "https://www.mathem.se/se/products/8019-salta-kvarn-ragmjol-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4633",
+    "name": "Kungsörnen Vetemjöl av Kärnvete",
+    "brand": "Kungsörnen",
+    "packageText": "1 kg",
+    "price": 17.51,
+    "priceText": "17.51 SEK",
+    "unitPrice": 17.51,
+    "unitPriceText": "17.51 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/78cf2783-d4ed-41c2-a130-c3b59ba14736.jpg?fit=bounds&format=auto&optimize=medium&width=204&s=0x2b7ca7d599dd3227f1a98b445099792a981c455c",
+    "productUrl": "https://www.mathem.se/se/products/4633-kungsornen-vetemjol-av-karnvete/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9686",
+    "name": "Ramlösa Kvarn Rustique Vetemjöl Ramlösa Kvarn",
+    "brand": "Ramlösa Kvarn",
+    "packageText": "2 kg",
+    "price": 33.08,
+    "priceText": "33.08 SEK",
+    "unitPrice": 16.54,
+    "unitPriceText": "16.54 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e4db03e2-01ca-4f94-811d-8c11295b1092.jpg?fit=bounds&format=auto&optimize=medium&width=180&s=0xa266a13fcdedfce15acaa901def3c6169fdfcf98",
+    "productUrl": "https://www.mathem.se/se/products/9686-ramlosa-kvarn-rustique-vetemjol-ramlosa-kvarn/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4853",
+    "name": "KUNGSÖRNEN Idealmjöl Snabblösligt",
+    "brand": "KUNGSÖRNEN",
+    "packageText": "500 g",
+    "price": 24.13,
+    "priceText": "24.13 SEK",
+    "unitPrice": 48.26,
+    "unitPriceText": "48.26 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/38dfb588-c8df-494d-baeb-5f9d10669f9a.jpg?fit=bounds&format=auto&optimize=medium&width=145&s=0xf4442fbc1dd3996101f0bb9b50d5bd8157de90ec",
+    "productUrl": "https://www.mathem.se/se/products/4853-kungsornen-idealmjol-snabblosligt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2187",
+    "name": "Kungsörnen Kruskakli",
+    "brand": "Kungsörnen",
+    "packageText": "300 g",
+    "price": 9.42,
+    "priceText": "9.42 SEK",
+    "unitPrice": 31.4,
+    "unitPriceText": "31.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/edc17e76-a43e-4aa9-b72a-8c0133441887.jpg?fit=bounds&format=auto&optimize=medium&width=204&s=0xb8bf80784c3d1166034ab86cf2ec80b8483a6a2c",
+    "productUrl": "https://www.mathem.se/se/products/2187-kungsornen-kruskakli/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9519",
+    "name": "Kungsörnen Kärnvetemjöl med Fullkorn",
+    "brand": "Kungsörnen",
+    "packageText": "2 kg",
+    "price": 33.08,
+    "priceText": "33.08 SEK",
+    "unitPrice": 16.54,
+    "unitPriceText": "16.54 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/16acf18d-ea46-466c-851f-4d520922df54.jpg?fit=bounds&format=auto&optimize=medium&width=200&s=0xb79b2ff8fa916bae43b7ea310dc8519aa1e27724",
+    "productUrl": "https://www.mathem.se/se/products/9519-kungsornen-karnvetemjol-med-fullkorn/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6493",
+    "name": "Kungsörnen Pizzamjöl",
+    "brand": "Kungsörnen",
+    "packageText": "1,5 kg",
+    "price": 24.13,
+    "priceText": "24.13 SEK",
+    "unitPrice": 16.09,
+    "unitPriceText": "16.09 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cabf3805-f412-4963-8528-5f7e3702f6bd.jpg?fit=bounds&format=auto&optimize=medium&width=201&s=0x397577aa2781fdd81f4630a0752ffb5fb30acc90",
+    "productUrl": "https://www.mathem.se/se/products/6493-kungsornen-pizzamjol/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9323",
+    "name": "Kungsörnen Vetemjöl Special",
+    "brand": "Kungsörnen",
+    "packageText": "2 kg",
+    "price": 30.76,
+    "priceText": "30.76 SEK",
+    "unitPrice": 15.38,
+    "unitPriceText": "15.38 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4c909227-5623-4f2c-85ff-a444c35bf025.jpg?fit=bounds&format=auto&optimize=medium&width=179&s=0x8244f3748abc2d79fc02ad90d5e74a2a99f04ca5",
+    "productUrl": "https://www.mathem.se/se/products/9323-kungsornen-vetemjol-special/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6763",
+    "name": "KUNGSÖRNEN Rågmjöl Grovtmalt",
+    "brand": "KUNGSÖRNEN",
+    "packageText": "1,5 kg",
+    "price": 26.45,
+    "priceText": "26.45 SEK",
+    "unitPrice": 17.63,
+    "unitPriceText": "17.63 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/dc63ba2a-12b1-4961-9416-89d164f2ec22.jpg?fit=bounds&format=auto&optimize=medium&width=226&s=0x142bfa0c00cb0c7ae5c780ee7340a47e3aaef6e5",
+    "productUrl": "https://www.mathem.se/se/products/6763-kungsornen-ragmjol-grovtmalt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5821",
+    "name": "Kungsörnen Rågmjöl Grovmalt EKO/KRAV",
+    "brand": "Kungsörnen",
+    "packageText": "1 kg",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 23.61,
+    "unitPriceText": "23.61 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c64a69d6-e593-4455-9464-8a1439b0b413.jpg?fit=bounds&format=auto&optimize=medium&width=204&s=0xa6c11ecb1f847489e21a6d5d5c64a817c6fdcaee",
+    "productUrl": "https://www.mathem.se/se/products/5821-kungsornen-ragmjol-grovmalt-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64017",
+    "name": "Lailas Mjölmix Glutenfri och Mjölkfri",
+    "brand": "Lailas",
+    "packageText": "1 kg",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 37.81,
+    "unitPriceText": "37.81 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/917213eb-3e23-4a6b-9fef-68c7b57d7ecb.jpg?fit=bounds&format=auto&optimize=medium&width=295&s=0x99d44e5c3b5b5178cb8552382e518f2f781c24d0",
+    "productUrl": "https://www.mathem.se/se/products/64017-lailas-mjolmix-glutenfri-och-mjolkfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5980",
+    "name": "Garant Specialvetemjöl",
+    "brand": "Garant",
+    "packageText": "2 kg",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 11.81,
+    "unitPriceText": "11.81 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c09d3bc2-f38e-49a0-8895-16da6219dd7f.jpg?fit=bounds&format=auto&optimize=medium&width=182&s=0x370c48291ffc479f8b60b0ff2844a8ed650f9e43",
+    "productUrl": "https://www.mathem.se/se/products/5980-garant-specialvetemjol/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9512",
+    "name": "KUNGSÖRNEN Dinkelmjöl Siktat",
+    "brand": "KUNGSÖRNEN",
+    "packageText": "1 kg",
+    "price": 34.97,
+    "priceText": "34.97 SEK",
+    "unitPrice": 34.97,
+    "unitPriceText": "34.97 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/562bbfcf-59a1-4ccb-8d17-7931216ac6c1.jpg?fit=bounds&format=auto&optimize=medium&width=204&s=0x600c578dae955b155c29f75adb2de0466f3b88cf",
+    "productUrl": "https://www.mathem.se/se/products/9512-kungsornen-dinkelmjol-siktat/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3912",
+    "name": "Kungsörnen Havrekli",
+    "brand": "Kungsörnen",
+    "packageText": "300 g",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 62.93,
+    "unitPriceText": "62.93 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2e40b5d7-6b0b-4451-8fde-525914927371.jpg?fit=bounds&format=auto&optimize=medium&width=180&s=0xd3cc6b02e21fe3573bcf71984a65f73978f4016c",
+    "productUrl": "https://www.mathem.se/se/products/3912-kungsornen-havrekli/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "179",
+    "name": "Saltå Kvarn Dinkelmjöl Siktat EKO/KRAV",
+    "brand": "Saltå Kvarn",
+    "packageText": "1250 g",
+    "price": 42.54,
+    "priceText": "42.54 SEK",
+    "unitPrice": 34.03,
+    "unitPriceText": "34.03 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/18ec701d-22f7-4006-96d4-5a84c0d0e1a7.jpg?fit=bounds&format=auto&optimize=medium&width=206&s=0xc825ef5bb4aace3bfa2c6e69fa83fba23553dc46",
+    "productUrl": "https://www.mathem.se/se/products/179-salta-kvarn-dinkelmjol-siktat-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5452",
+    "name": "Kungsörnen Grahamsmjöl EKO/KRAV",
+    "brand": "Kungsörnen",
+    "packageText": "1 kg",
+    "price": 19.83,
+    "priceText": "19.83 SEK",
+    "unitPrice": 19.83,
+    "unitPriceText": "19.83 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/341453a1-4503-4909-a933-1e87988e9328.jpg?fit=bounds&format=auto&optimize=medium&width=213&s=0xa34c1d50fdd3e292dddc9ae4b8e2fbec7bd3b172",
+    "productUrl": "https://www.mathem.se/se/products/5452-kungsornen-grahamsmjol-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9633",
+    "name": "KUNGSÖRNEN Dinkelmjöl Fullkorn",
+    "brand": "KUNGSÖRNEN",
+    "packageText": "1000 g",
+    "price": 34.97,
+    "priceText": "34.97 SEK",
+    "unitPrice": 34.97,
+    "unitPriceText": "34.97 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c84177c1-1f0e-4787-83e6-4a26fd3c9d17.jpg?fit=bounds&format=auto&optimize=medium&width=204&s=0x36b758cb4d115c0f76239abd78c1912a73301578",
+    "productUrl": "https://www.mathem.se/se/products/9633-kungsornen-dinkelmjol-fullkorn/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "1401",
+    "name": "Kungsörnen Vetemjöl av Fint Kärnvete",
+    "brand": "Kungsörnen",
+    "packageText": "2 kg",
+    "price": 19.83,
+    "priceText": "19.83 SEK",
+    "unitPrice": 9.92,
+    "unitPriceText": "9.92 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9796b6a5-e86b-421b-ba47-9381597110cc.jpg?fit=bounds&format=auto&optimize=medium&width=200&s=0x18e20c4f344249ebf4f91b2c4ea5b3bd7a351342",
+    "productUrl": "https://www.mathem.se/se/products/1401-kungsornen-vetemjol-av-fint-karnvete/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9462",
+    "name": "KUNGSÖRNEN Vetemjöl Special EKO/KRAV",
+    "brand": "KUNGSÖRNEN",
+    "packageText": "2 kg",
+    "price": 34.02,
+    "priceText": "34.02 SEK",
+    "unitPrice": 17.01,
+    "unitPriceText": "17.01 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fa3960c9-8862-49d5-9401-0ed9a8708b83.jpg?fit=bounds&format=auto&optimize=medium&width=200&s=0x9ef191729520d5eabcf479e9d1e3d93d6449782a",
+    "productUrl": "https://www.mathem.se/se/products/9462-kungsornen-vetemjol-special-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67995",
+    "name": "Falköpings Mejeri Mjölkpulver",
+    "brand": "Falköpings Mejeri",
+    "packageText": "480 g",
+    "price": 80.4,
+    "priceText": "80.40 SEK",
+    "unitPrice": 167.5,
+    "unitPriceText": "167.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/39e115e8-832b-4f9d-a006-a1477cea6dea.jpg?fit=bounds&format=auto&optimize=medium&width=238&s=0xfbbcfe870abd50eaee2eb4a0d2939a5eb7a9e823",
+    "productUrl": "https://www.mathem.se/se/products/67995-falkopings-mejeri-mjolkpulver/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "219",
+    "name": "Saltå Kvarn Vetemjöl EKO/KRAV",
+    "brand": "Saltå Kvarn",
+    "packageText": "2 kg",
+    "price": 41.6,
+    "priceText": "41.60 SEK",
+    "unitPrice": 20.8,
+    "unitPriceText": "20.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ef5ee911-200e-4e1e-9626-435189c82cb3.jpg?fit=bounds&format=auto&optimize=medium&width=166&s=0xba45126f16b7f2b9f9150f90d13291987a3cbb79",
+    "productUrl": "https://www.mathem.se/se/products/219-salta-kvarn-vetemjol-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7828",
+    "name": "Kungsörnen Lantbrödsmjöl Fyra Sädesslag",
+    "brand": "Kungsörnen",
+    "packageText": "1,5 kg",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 18.9,
+    "unitPriceText": "18.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/46ec5aec-fd9e-4d59-9fa0-63cb25a8192f.jpg?fit=bounds&format=auto&optimize=medium&width=225&s=0x6e43a724aa3dfad7e20a36e2282b01679e410c9e",
+    "productUrl": "https://www.mathem.se/se/products/7828-kungsornen-lantbrodsmjol-fyra-sadesslag/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66556",
+    "name": "Schär Grov Mjölmix Glutenfri & Laktosfri",
+    "brand": "Schär",
+    "packageText": "500 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 60.48,
+    "unitPriceText": "60.48 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/aada24fc-fddf-4429-8cc2-ad1970ab5e10.jpg?fit=bounds&format=auto&optimize=medium&width=222&s=0xefca82e8c5dae6ad7cd400c4a448c1423d114d96",
+    "productUrl": "https://www.mathem.se/se/products/66556-schar-grov-mjolmix-glutenfri-laktosfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2885",
+    "name": "Kungsörnen Rågkross",
+    "brand": "Kungsörnen",
+    "packageText": "500 g",
+    "price": 14.15,
+    "priceText": "14.15 SEK",
+    "unitPrice": 28.3,
+    "unitPriceText": "28.30 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/351d9d76-fff2-43b6-9a6e-d2dc1a8a9900.jpg?fit=bounds&format=auto&optimize=medium&width=178&s=0x83cd0de0757fb148c739d5c471d9769841cca15e",
+    "productUrl": "https://www.mathem.se/se/products/2885-kungsornen-ragkross/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9730",
+    "name": "Pågen Jättefranska",
+    "brand": "Pågen",
+    "packageText": "1100 g",
+    "price": 34.95,
+    "priceText": "34.95 SEK",
+    "unitPrice": 31.77,
+    "unitPriceText": "31.77 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7a28bfa6-84e3-42ef-894b-6647a9166d24.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xf039bb8321f210e6a3215bb6c0ffab518403997a",
+    "productUrl": "https://www.mathem.se/se/products/9730-pagen-jattefranska/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6667",
+    "name": "Kungsörnen Rågmjöl Finmalt",
+    "brand": "Kungsörnen",
+    "packageText": "1,5 kg",
+    "price": 26.45,
+    "priceText": "26.45 SEK",
+    "unitPrice": 17.63,
+    "unitPriceText": "17.63 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/124c0308-25df-4263-ad1f-c5b7ab95cde8.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0x59cddb477adb319d7ef187560065b6138d4841e3",
+    "productUrl": "https://www.mathem.se/se/products/6667-kungsornen-ragmjol-finmalt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66533",
+    "name": "Moilas Ciabatta Glutenfri 2-p",
+    "brand": "Moilas",
+    "packageText": "200 g",
+    "price": 33.95,
+    "priceText": "33.95 SEK",
+    "unitPrice": 169.75,
+    "unitPriceText": "169.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c7bde652-4adb-46ad-96b6-8cd3f29e567f.jpg?fit=bounds&format=auto&optimize=medium&width=298&s=0xf0b0ca3748a7e537149228a45b417921643445f0",
+    "productUrl": "https://www.mathem.se/se/products/66533-moilas-ciabatta-glutenfri-2-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "12312",
+    "name": "da Carla Kokosmjöl EKO",
+    "brand": "da Carla",
+    "packageText": "400 g",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 94.53,
+    "unitPriceText": "94.53 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4e5072be-664e-4875-bcfa-35b50f20671a.jpg?fit=bounds&format=auto&optimize=medium&width=144&s=0xb96b453ba7a617e879ac874aa92427c8d6392fd0",
+    "productUrl": "https://www.mathem.se/se/products/12312-da-carla-kokosmjol-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66534",
+    "name": "Moilas Fröfralla Glutenfri 2-p",
+    "brand": "Moilas",
+    "packageText": "200 g",
+    "price": 33.95,
+    "priceText": "33.95 SEK",
+    "unitPrice": 169.75,
+    "unitPriceText": "169.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5505ed37-eaf6-4f97-a4ab-b6abed5a0bed.jpg?fit=bounds&format=auto&optimize=medium&width=298&s=0x1a11b6a76bd021776a0d88fe54e1273207287eab",
+    "productUrl": "https://www.mathem.se/se/products/66534-moilas-frofralla-glutenfri-2-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68540",
+    "name": "Arla® Shake Up Mjölkdryck Choklad",
+    "brand": "Arla®",
+    "packageText": "240 ml",
+    "price": 15.5,
+    "priceText": "15.50 SEK",
+    "unitPrice": 64.58,
+    "unitPriceText": "64.58 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ad732ef5-1536-4d7b-8a5a-aeaf6826f64e.jpg?fit=bounds&format=auto&optimize=medium&width=111&s=0xa8d172387fbae873ddad0319d743726903a2d438",
+    "productUrl": "https://www.mathem.se/se/products/68540-arla-r-shake-up-mjolkdryck-choklad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3638",
+    "name": "Klöver® Mjölkdryck Längre Hållbarhet 1,3%",
+    "brand": "Klöver®",
+    "packageText": "1,5 l",
+    "price": 16.94,
+    "priceText": "16.94 SEK",
+    "unitPrice": 11.29,
+    "unitPriceText": "11.29 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/290f8db1-3812-4309-b722-d4bae749045a.jpg?fit=bounds&format=auto&optimize=medium&width=128&s=0x048cf13c60520e66c7e7a4c122d4d7a3c5e0312f",
+    "productUrl": "https://www.mathem.se/se/products/3638-klover-r-mjolkdryck-langre-hallbarhet-13/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=mjol",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9827",
+    "name": "Garant Strösocker",
+    "brand": "Garant",
+    "packageText": "2 kg",
+    "price": 22.61,
+    "priceText": "22.61 SEK",
+    "unitPrice": 11.31,
+    "unitPriceText": "11.31 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1c91efa7-cac8-4dc7-8a56-d677be6edb1a.jpg?fit=bounds&format=auto&optimize=medium&width=199&s=0x4351e12284473157f1979c4fb431b37c5de7c397",
+    "productUrl": "https://www.mathem.se/se/products/9827-garant-strosocker/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10077",
+    "name": "Dan Sukker Strösocker",
+    "brand": "Dan Sukker",
+    "packageText": "2 kg",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 12.76,
+    "unitPriceText": "12.76 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5730387f-741e-4017-a3b8-1490756e0eac.jpg?fit=bounds&format=auto&optimize=medium&width=191&s=0xb6529464f2766a0196f9acbfcb2b8b1f01b5c336",
+    "productUrl": "https://www.mathem.se/se/products/10077-dan-sukker-strosocker/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6082",
+    "name": "Dan Sukker Strösocker",
+    "brand": "Dan Sukker",
+    "packageText": "1 kg",
+    "price": 21.72,
+    "priceText": "21.72 SEK",
+    "unitPrice": 21.72,
+    "unitPriceText": "21.72 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2ecf18fc-46d7-474a-94e1-183c52afbb9e.jpg?fit=bounds&format=auto&optimize=medium&width=191&s=0x6d892008ec61fa2b73b05c9af3fef27dc850b0da",
+    "productUrl": "https://www.mathem.se/se/products/6082-dan-sukker-strosocker/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9483",
+    "name": "Dan Sukker Strösocker EKO/KRAV",
+    "brand": "Dan Sukker",
+    "packageText": "1 kg",
+    "price": 35.92,
+    "priceText": "35.92 SEK",
+    "unitPrice": 35.92,
+    "unitPriceText": "35.92 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/54a77d72-b52c-44b4-80d6-9bdfd2520b76.jpg?fit=bounds&format=auto&optimize=medium&width=181&s=0xe3d097ba58c83fd07d96d474e575f543ceb290ff",
+    "productUrl": "https://www.mathem.se/se/products/9483-dan-sukker-strosocker-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9386",
+    "name": "Garant Snabbitsocker",
+    "brand": "Garant",
+    "packageText": "1 kg",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 28.35,
+    "unitPriceText": "28.35 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fbc3015f-d7fd-440e-80aa-765ad523630a.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xeefaf33811749ef4c7721e984532b114512e9565",
+    "productUrl": "https://www.mathem.se/se/products/9386-garant-snabbitsocker/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5798",
+    "name": "Garant Strösocker",
+    "brand": "Garant",
+    "packageText": "750 g",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 27.69,
+    "unitPriceText": "27.69 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/74a1cf96-f4c4-44b7-8eab-9bbb5eca8de7.jpg?fit=bounds&format=auto&optimize=medium&width=236&s=0xccec998fcc0e270a923c201664a08b7d94ba5973",
+    "productUrl": "https://www.mathem.se/se/products/5798-garant-strosocker/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4996",
+    "name": "Dan Sukker Snabbitsocker",
+    "brand": "Dan Sukker",
+    "packageText": "500 g",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 37.76,
+    "unitPriceText": "37.76 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/15053c7a-f47e-49e1-a7db-81dbaa96b145.jpg?fit=bounds&format=auto&optimize=medium&width=296&s=0x27015958d892758b9a101b0567685857d306e457",
+    "productUrl": "https://www.mathem.se/se/products/4996-dan-sukker-snabbitsocker/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7644",
+    "name": "Garant Vanillinsocker",
+    "brand": "Garant",
+    "packageText": "140 g",
+    "price": 11.83,
+    "priceText": "11.83 SEK",
+    "unitPrice": 84.5,
+    "unitPriceText": "84.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ee7430f0-6750-43bd-926b-d0b333871555.jpg?fit=bounds&format=auto&optimize=medium&width=167&s=0x0245b6df9b6f1b73fcb3586cca07918982295533",
+    "productUrl": "https://www.mathem.se/se/products/7644-garant-vanillinsocker/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2970",
+    "name": "Dan Sukker Strösocker Sticks Box 225-p",
+    "brand": "Dan Sukker",
+    "packageText": "900 g",
+    "price": 79.97,
+    "priceText": "79.97 SEK",
+    "unitPrice": 88.86,
+    "unitPriceText": "88.86 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5d698e68-1365-49c5-b77d-d4e8eb27011b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x6acef4af296f4ea82d98ff61a9ca09e4c7cede15",
+    "productUrl": "https://www.mathem.se/se/products/2970-dan-sukker-strosocker-sticks-box-225-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5960",
+    "name": "Dan Sukker Brun Farin Strö",
+    "brand": "Dan Sukker",
+    "packageText": "500 g",
+    "price": 24.13,
+    "priceText": "24.13 SEK",
+    "unitPrice": 48.26,
+    "unitPriceText": "48.26 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/30a70fd1-105d-4101-b558-7cc55dd5bb9b.jpg?fit=bounds&format=auto&optimize=medium&width=185&s=0x9392a377178eb8f3702382c91774997ba9faaecd",
+    "productUrl": "https://www.mathem.se/se/products/5960-dan-sukker-brun-farin-stro/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7283",
+    "name": "Dan Sukker Socker Muscovado Ljust Fairtrade",
+    "brand": "Dan Sukker",
+    "packageText": "400 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 70.88,
+    "unitPriceText": "70.88 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a3b17040-f0df-4024-8c37-f5aff016d987.jpg?fit=bounds&format=auto&optimize=medium&width=200&s=0x1cc1841173325f60792603c2d3d4b8ccfffdd4e1",
+    "productUrl": "https://www.mathem.se/se/products/7283-dan-sukker-socker-muscovado-ljust-fairtrade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5745",
+    "name": "Garant Rörsocker Fairtrade",
+    "brand": "Garant",
+    "packageText": "500 g",
+    "price": 23.19,
+    "priceText": "23.19 SEK",
+    "unitPrice": 46.38,
+    "unitPriceText": "46.38 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7698f336-c850-4a7d-8d73-7acd9d2360fa.jpg?fit=bounds&format=auto&optimize=medium&width=181&s=0x0ff2a17d892d24bd212090f8325a8729af786ee6",
+    "productUrl": "https://www.mathem.se/se/products/5745-garant-rorsocker-fairtrade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5160",
+    "name": "Dan Sukker Florsocker",
+    "brand": "Dan Sukker",
+    "packageText": "500 g",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 37.76,
+    "unitPriceText": "37.76 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bd63277d-6854-4057-9fc7-2cef747b524e.jpg?fit=bounds&format=auto&optimize=medium&width=154&s=0x935f54d18668f7a5924a7421b898becf614fffe7",
+    "productUrl": "https://www.mathem.se/se/products/5160-dan-sukker-florsocker/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7316",
+    "name": "Dan Sukker Rörsocker Bit Fairtrade",
+    "brand": "Dan Sukker",
+    "packageText": "500 g",
+    "price": 28.87,
+    "priceText": "28.87 SEK",
+    "unitPrice": 57.74,
+    "unitPriceText": "57.74 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e0a93205-459d-44a6-8782-5264ed5f95be.jpg?fit=bounds&format=auto&optimize=medium&width=229&s=0xf9ae728cbf6b0d69a588ac9d54a0cd024d7b9558",
+    "productUrl": "https://www.mathem.se/se/products/7316-dan-sukker-rorsocker-bit-fairtrade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4205",
+    "name": "Garant Florsocker Fairtrade",
+    "brand": "Garant",
+    "packageText": "500 g",
+    "price": 16.56,
+    "priceText": "16.56 SEK",
+    "unitPrice": 33.12,
+    "unitPriceText": "33.12 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9452ca88-5510-4e3a-a642-f273751f160e.jpg?fit=bounds&format=auto&optimize=medium&width=187&s=0xbda54095d51c6ccc673d97f11ee40373b823e6f3",
+    "productUrl": "https://www.mathem.se/se/products/4205-garant-florsocker-fairtrade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8308",
+    "name": "Sockerärtor Klass1 Peru",
+    "brand": "",
+    "packageText": "Peru, 150 g",
+    "price": 29.95,
+    "priceText": "29.95 SEK",
+    "unitPrice": 199.67,
+    "unitPriceText": "199.67 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9bb6de0e-b00f-4910-88cb-a15e4ab9d319.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x7cfe7d4072bb8acdf7933d466359776be7c1e165",
+    "productUrl": "https://www.mathem.se/se/products/8308-sockerartor-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5157",
+    "name": "Dan Sukker Pärlsocker",
+    "brand": "Dan Sukker",
+    "packageText": "500 g",
+    "price": 19.83,
+    "priceText": "19.83 SEK",
+    "unitPrice": 39.66,
+    "unitPriceText": "39.66 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6147fd60-99e8-4878-85cd-b5c8ea05b32f.jpg?fit=bounds&format=auto&optimize=medium&width=194&s=0x843b7ebccd90ef99e2a59847878410a3d7101a56",
+    "productUrl": "https://www.mathem.se/se/products/5157-dan-sukker-parlsocker/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6446",
+    "name": "Gille Havrekakor Sockerfria",
+    "brand": "Gille",
+    "packageText": "160 g",
+    "price": 27.4,
+    "priceText": "27.40 SEK",
+    "unitPrice": 171.25,
+    "unitPriceText": "171.25 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/62d46610-1430-47f1-b6db-8a712d28b776.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xeda76f43a80094954b2d13fa1fc696d41d1cf046",
+    "productUrl": "https://www.mathem.se/se/products/6446-gille-havrekakor-sockerfria/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5262",
+    "name": "Dr. Oetker Vaniljsocker",
+    "brand": "Dr. Oetker",
+    "packageText": "160 g",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 129.81,
+    "unitPriceText": "129.81 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7cb024c4-b602-4634-9536-9ad12e65c857.jpg?fit=bounds&format=auto&optimize=medium&width=227&s=0xc97f5a44a841cb2cdc2a645dfc5a388e4fb14ed0",
+    "productUrl": "https://www.mathem.se/se/products/5262-dr-oetker-vaniljsocker/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8023",
+    "name": "Dan Sukker Syltsocker",
+    "brand": "Dan Sukker",
+    "packageText": "1 kg",
+    "price": 33.6,
+    "priceText": "33.60 SEK",
+    "unitPrice": 33.6,
+    "unitPriceText": "33.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f8443a29-9433-4a61-874f-5263393f14aa.jpg?fit=bounds&format=auto&optimize=medium&width=191&s=0x61c78f961a402839d3c14066810ae22d219b9a0a",
+    "productUrl": "https://www.mathem.se/se/products/8023-dan-sukker-syltsocker/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "46088",
+    "name": "Urtekram Kokossocker EKO",
+    "brand": "Urtekram",
+    "packageText": "280 g",
+    "price": 43.49,
+    "priceText": "43.49 SEK",
+    "unitPrice": 155.32,
+    "unitPriceText": "155.32 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/aea715c2-559b-45e9-8878-0fd9d1c38b7a.jpg?fit=bounds&format=auto&optimize=medium&width=175&s=0x8bedc537314089416c3f740ee29ef10528a2cd2d",
+    "productUrl": "https://www.mathem.se/se/products/46088-urtekram-kokossocker-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5759",
+    "name": "Yoggi® Yoghurt Mini 0,1% Jordgubb",
+    "brand": "Yoggi®",
+    "packageText": "1000 g",
+    "price": 26.97,
+    "priceText": "26.97 SEK",
+    "unitPrice": 26.97,
+    "unitPriceText": "26.97 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9636b1bf-55c7-4bcb-8945-9e6984fca785.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0x51e7d22ba0a70dd30d03a50ae449666d34e24605",
+    "productUrl": "https://www.mathem.se/se/products/5759-yoggi-r-yoghurt-mini-01-jordgubb/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5435",
+    "name": "Kiviks Musteri Lemonad Citron EKO",
+    "brand": "Kiviks Musteri",
+    "packageText": "275 ml",
+    "price": 22.67,
+    "priceText": "22.67 SEK",
+    "unitPrice": 82.44,
+    "unitPriceText": "82.44 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8a7f70ce-b364-4f31-a705-b115bccb421d.jpg?fit=bounds&format=auto&optimize=medium&width=98&s=0x44c0cf23a0619b9aea629a9012375d881a0984a6",
+    "productUrl": "https://www.mathem.se/se/products/5435-kiviks-musteri-lemonad-citron-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2936",
+    "name": "Superfruit Kokossocker EKO",
+    "brand": "Superfruit",
+    "packageText": "500 g",
+    "price": 169.41,
+    "priceText": "169.41 SEK",
+    "unitPrice": 338.82,
+    "unitPriceText": "338.82 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4f713b7e-0c1a-4889-8958-a0133b3bdc75.jpg?fit=bounds&format=auto&optimize=medium&width=193&s=0x66f595a7027199113418546a5e75fb2c19ecde03",
+    "productUrl": "https://www.mathem.se/se/products/2936-superfruit-kokossocker-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7346",
+    "name": "Dan Sukker Mörkt Muscovadorörsocker Fairtrade",
+    "brand": "Dan Sukker",
+    "packageText": "400 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 70.88,
+    "unitPriceText": "70.88 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a0e49d5f-0420-4a87-90e2-cdc88867f87f.jpg?fit=bounds&format=auto&optimize=medium&width=200&s=0x8dd07f029d0b6b7f3efda8fe3cc97c92566d5683",
+    "productUrl": "https://www.mathem.se/se/products/7346-dan-sukker-morkt-muscovadororsocker-fairtrade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6116",
+    "name": "Dan Sukker Gelésocker Multi",
+    "brand": "Dan Sukker",
+    "packageText": "370 g",
+    "price": 24.13,
+    "priceText": "24.13 SEK",
+    "unitPrice": 65.22,
+    "unitPriceText": "65.22 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/86f5d731-1fa8-49fb-8f37-54501b6cc7c8.jpg?fit=bounds&format=auto&optimize=medium&width=224&s=0x9ce6439ba8a7e16a0172362831f6cc0487e6f7fa",
+    "productUrl": "https://www.mathem.se/se/products/6116-dan-sukker-gelesocker-multi/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5443",
+    "name": "Garant Mörk Sirap",
+    "brand": "Garant",
+    "packageText": "750 g",
+    "price": 17.51,
+    "priceText": "17.51 SEK",
+    "unitPrice": 23.35,
+    "unitPriceText": "23.35 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/56f88517-5560-42f1-8255-9f4bb90399e6.jpg?fit=bounds&format=auto&optimize=medium&width=140&s=0xbba8f60b3c4a4a9ab1fe4d97dde6c353d6cc46c9",
+    "productUrl": "https://www.mathem.se/se/products/5443-garant-mork-sirap/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68166",
+    "name": "Bann Thai Palmsocker",
+    "brand": "Bann Thai",
+    "packageText": "300 g",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 78.7,
+    "unitPriceText": "78.70 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/23b50442-e250-48c5-a68b-bb708718507a.jpg?fit=bounds&format=auto&optimize=medium&width=184&s=0xd38405dff8462373ba52883c5353ac7b1e4416a0",
+    "productUrl": "https://www.mathem.se/se/products/68166-bann-thai-palmsocker/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8036",
+    "name": "Odense Mandelmassa 50/50",
+    "brand": "Odense",
+    "packageText": "200 g",
+    "price": 35.92,
+    "priceText": "35.92 SEK",
+    "unitPrice": 179.6,
+    "unitPriceText": "179.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a6c56954-aa05-4291-b254-fd8898ed345c.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xfc4bc50af9851186f55cd85effbcb71d1d7c1b44",
+    "productUrl": "https://www.mathem.se/se/products/8036-odense-mandelmassa-50-50/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65173",
+    "name": "Garant Blåbärssylt",
+    "brand": "Garant",
+    "packageText": "400 g",
+    "price": 42.54,
+    "priceText": "42.54 SEK",
+    "unitPrice": 106.35,
+    "unitPriceText": "106.35 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d0c6700b-2730-4202-84a0-ed637e163a65.jpg?fit=bounds&format=auto&optimize=medium&width=186&s=0xd0ca907ff448443c392d2b8a974379370524c90e",
+    "productUrl": "https://www.mathem.se/se/products/65173-garant-blabarssylt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5963",
+    "name": "Dan Sukker Ljus Sirap",
+    "brand": "Dan Sukker",
+    "packageText": "750 g",
+    "price": 19.4,
+    "priceText": "19.40 SEK",
+    "unitPrice": 25.87,
+    "unitPriceText": "25.87 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/aff34501-12d8-4d73-9a72-fdf812ac1493.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0x8a7c278bc0df84291abf80bbdd259463bae13d9a",
+    "productUrl": "https://www.mathem.se/se/products/5963-dan-sukker-ljus-sirap/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "38780",
+    "name": "Garant Jordgubbssylt",
+    "brand": "Garant",
+    "packageText": "400 g",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 63.78,
+    "unitPriceText": "63.78 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/486f6616-d584-4e4c-bf67-d7c9097377da.jpg?fit=bounds&format=auto&optimize=medium&width=186&s=0x378494120b8f5dd9062b329f2e98c7f55a1f6cce",
+    "productUrl": "https://www.mathem.se/se/products/38780-garant-jordgubbssylt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3086",
+    "name": "Aroma Skumbananer",
+    "brand": "Aroma",
+    "packageText": "110 g",
+    "price": 13.56,
+    "priceText": "13.56 SEK",
+    "unitPrice": 123.27,
+    "unitPriceText": "123.27 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5e282665-bc98-49fd-b878-de8c59d95f03.jpg?fit=bounds&format=auto&optimize=medium&width=235&s=0xf9a3cae152e67e0ef7a7a322c24016201c253bf4",
+    "productUrl": "https://www.mathem.se/se/products/3086-aroma-skumbananer/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66945",
+    "name": "Kellogg's Flingor Bluey",
+    "brand": "Kellogg's",
+    "packageText": "350 g",
+    "price": 40,
+    "priceText": "40.00 SEK",
+    "unitPrice": 114.29,
+    "unitPriceText": "114.29 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/afc19951-f5fb-46f1-ac8a-9b26eab55b7c.jpg?fit=bounds&format=auto&optimize=medium&width=196&s=0x942c29c2b8fd8ae227a51e7dd5f709b647aea1b1",
+    "productUrl": "https://www.mathem.se/se/products/66945-kelloggs-flingor-bluey/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63297",
+    "name": "Mixed Twix",
+    "brand": "Mixed",
+    "packageText": "50 g",
+    "price": 12.78,
+    "priceText": "12.78 SEK",
+    "unitPrice": 255.6,
+    "unitPriceText": "255.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6d0a2d33-6a71-4dcb-a240-879fedc33b53.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc63f120bede24b6920f0b5d1d1f549a933bc02c0",
+    "productUrl": "https://www.mathem.se/se/products/63297-mixed-twix/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4568",
+    "name": "Ekströms Nyponsoppa",
+    "brand": "Ekströms",
+    "packageText": "1 l",
+    "price": 17.93,
+    "priceText": "17.93 SEK",
+    "unitPrice": 17.93,
+    "unitPriceText": "17.93 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cbe765a7-171f-4af4-b3d0-95b159bfc52e.jpg?fit=bounds&format=auto&optimize=medium&width=106&s=0xcc0d0be12ef5e16a4aac4164eecdbc6083e40c7f",
+    "productUrl": "https://www.mathem.se/se/products/4568-ekstroms-nyponsoppa/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62987",
+    "name": "Garant Senap Sötstark",
+    "brand": "Garant",
+    "packageText": "500 g",
+    "price": 16.56,
+    "priceText": "16.56 SEK",
+    "unitPrice": 33.12,
+    "unitPriceText": "33.12 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ae5d0d16-9ae5-4cbc-a1d0-f534f53c60c1.jpg?fit=bounds&format=auto&optimize=medium&width=107&s=0xb2be8e730b9bb40eb61c2610f8d76b7bd7e05422",
+    "productUrl": "https://www.mathem.se/se/products/62987-garant-senap-sotstark/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7176",
+    "name": "Ekströms Aprikoskräm",
+    "brand": "Ekströms",
+    "packageText": "1 l",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 28.35,
+    "unitPriceText": "28.35 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8539c2cc-9538-4310-87b8-a622d269ca39.jpg?fit=bounds&format=auto&optimize=medium&width=131&s=0x22b1365a3b748168b910ffc90b544584130294d2",
+    "productUrl": "https://www.mathem.se/se/products/7176-ekstroms-aprikoskram/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10274",
+    "name": "Den Gamle Fabrik Jordgubbsmarmelad",
+    "brand": "Den Gamle Fabrik",
+    "packageText": "380 g",
+    "price": 42.12,
+    "priceText": "42.12 SEK",
+    "unitPrice": 110.84,
+    "unitPriceText": "110.84 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b2fe535d-2846-464e-80b3-b1ab4a7c1169.jpg?fit=bounds&format=auto&optimize=medium&width=244&s=0x05b031130f02d016ede08c4d5d7d668cbe4a1542",
+    "productUrl": "https://www.mathem.se/se/products/10274-den-gamle-fabrik-jordgubbsmarmelad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8501",
+    "name": "Jokk Dryck Tranbär",
+    "brand": "Jokk",
+    "packageText": "1 l",
+    "price": 34.02,
+    "priceText": "34.02 SEK",
+    "unitPrice": 34.02,
+    "unitPriceText": "34.02 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8f687de5-8c7b-4591-945b-58b88b189cbc.jpg?fit=bounds&format=auto&optimize=medium&width=131&s=0x947c51621a66dd942f432849ee62072b8f91b4c9",
+    "productUrl": "https://www.mathem.se/se/products/8501-jokk-dryck-tranbar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=socker",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10008",
+    "name": "Eldorado Rapsolja",
+    "brand": "Eldorado",
+    "packageText": "1000 ml",
+    "price": 26.45,
+    "priceText": "26.45 SEK",
+    "unitPrice": 26.45,
+    "unitPriceText": "26.45 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5360a8bd-17aa-4af1-9eeb-81ae5e2ce088.jpg?fit=bounds&format=auto&optimize=medium&width=88&s=0xc2a7770e5b4f25822f2ffd2dc1a9f7f4036c8ab2",
+    "productUrl": "https://www.mathem.se/se/products/10008-eldorado-rapsolja/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8295",
+    "name": "Zeta Rapsolja",
+    "brand": "Zeta",
+    "packageText": "900 ml",
+    "price": 34.54,
+    "priceText": "34.54 SEK",
+    "unitPrice": 38.38,
+    "unitPriceText": "38.38 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b86c7c79-a569-4a25-a7e7-414b0fe57076.jpg?fit=bounds&format=auto&optimize=medium&width=88&s=0x8a684bf0b979e858af3ac163406046a02ce3e318",
+    "productUrl": "https://www.mathem.se/se/products/8295-zeta-rapsolja/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "38978",
+    "name": "Garant Olivolja Classico Extra Virgin",
+    "brand": "Garant",
+    "packageText": "500 ml",
+    "price": 66.15,
+    "priceText": "66.15 SEK",
+    "unitPrice": 132.3,
+    "unitPriceText": "132.30 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a8171018-a66d-4b12-8278-4712512cff28.jpg?fit=bounds&format=auto&optimize=medium&width=74&s=0x60e04483cb67b65bbc87409b9f0b22a18d0674e3",
+    "productUrl": "https://www.mathem.se/se/products/38978-garant-olivolja-classico-extra-virgin/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11335",
+    "name": "Eldorado Rapsolja",
+    "brand": "Eldorado",
+    "packageText": "2000 ml",
+    "price": 51.06,
+    "priceText": "51.06 SEK",
+    "unitPrice": 25.53,
+    "unitPriceText": "25.53 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/747ab225-8e1a-4df1-8afb-f0407f3470ba.jpg?fit=bounds&format=auto&optimize=medium&width=102&s=0xd22132f8e492f12fc1d79a03df172e1d2dd36644",
+    "productUrl": "https://www.mathem.se/se/products/11335-eldorado-rapsolja/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4433",
+    "name": "Monini Olivolja Delicato Extra Virgin",
+    "brand": "Monini",
+    "packageText": "750 ml",
+    "price": 87.54,
+    "priceText": "87.54 SEK",
+    "unitPrice": 116.72,
+    "unitPriceText": "116.72 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/70a0d6d5-5218-4ce6-b34d-bc441b6c92df.jpg?fit=bounds&format=auto&optimize=medium&width=97&s=0xa7197f17ffde81bf7b306db6ba7254a295e20e70",
+    "productUrl": "https://www.mathem.se/se/products/4433-monini-olivolja-delicato-extra-virgin/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "83",
+    "name": "Laoganma Krispig Chili i Olja",
+    "brand": "Laoganma",
+    "packageText": "210 g",
+    "price": 52.01,
+    "priceText": "52.01 SEK",
+    "unitPrice": 247.67,
+    "unitPriceText": "247.67 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/87cfc9a4-ef33-4067-8c84-6d91b2f01ebb.jpg?fit=bounds&format=auto&optimize=medium&width=171&s=0x165605b357ee5502529183846a60a20d3353364c",
+    "productUrl": "https://www.mathem.se/se/products/83-laoganma-krispig-chili-i-olja/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8250",
+    "name": "Abba Tonfisk i Olja Bit MSC",
+    "brand": "Abba",
+    "packageText": "200 g",
+    "price": 29.81,
+    "priceText": "29.81 SEK",
+    "unitPrice": 198.73,
+    "unitPriceText": "198.73 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6c61dc0e-2b9c-4194-9365-ae25b5eb0e7c.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xef5c69247a19501b25b688e7aee66ef13feda556",
+    "productUrl": "https://www.mathem.se/se/products/8250-abba-tonfisk-i-olja-bit-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6163",
+    "name": "Garant Tonfisk I Solrosolja MSC",
+    "brand": "Garant",
+    "packageText": "170 g",
+    "price": 18.83,
+    "priceText": "18.83 SEK",
+    "unitPrice": 156.92,
+    "unitPriceText": "156.92 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d5c005b3-100c-4e9c-8734-013425bc98c5.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x62e40b4a9fe5f9a0e9d48ab995ba3f3cdbce020b",
+    "productUrl": "https://www.mathem.se/se/products/6163-garant-tonfisk-i-solrosolja-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68323",
+    "name": "Zeta Rapsolja Spray",
+    "brand": "Zeta",
+    "packageText": "200 ml",
+    "price": 49.95,
+    "priceText": "49.95 SEK",
+    "unitPrice": 249.75,
+    "unitPriceText": "249.75 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4691355d-c466-4876-8a4e-d10b9890295b.jpg?fit=bounds&format=auto&optimize=medium&width=66&s=0xe79dd18bb5b970e7a7b487f690032f472e0d72a5",
+    "productUrl": "https://www.mathem.se/se/products/68323-zeta-rapsolja-spray/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3746",
+    "name": "Zeta Olivolja Classico Extra Virgin",
+    "brand": "Zeta",
+    "packageText": "750 ml",
+    "price": 89.81,
+    "priceText": "89.81 SEK",
+    "unitPrice": 119.75,
+    "unitPriceText": "119.75 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c9edd586-0605-4ab9-ab33-c36d972c7c30.jpg?fit=bounds&format=auto&optimize=medium&width=72&s=0x2edbc7546516ec2b157a19abb2d71afd4db74462",
+    "productUrl": "https://www.mathem.se/se/products/3746-zeta-olivolja-classico-extra-virgin/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68321",
+    "name": "Zeta Olivolja Spray",
+    "brand": "Zeta",
+    "packageText": "200 ml",
+    "price": 64.95,
+    "priceText": "64.95 SEK",
+    "unitPrice": 324.75,
+    "unitPriceText": "324.75 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/90d57fad-4a5c-466d-9021-ac7450f16972.jpg?fit=bounds&format=auto&optimize=medium&width=66&s=0xe214ed3055c3e0c801073a578f37455321e48b09",
+    "productUrl": "https://www.mathem.se/se/products/68321-zeta-olivolja-spray/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7878",
+    "name": "Zeta Rapsolja",
+    "brand": "Zeta",
+    "packageText": "0,5 l",
+    "price": 24.13,
+    "priceText": "24.13 SEK",
+    "unitPrice": 48.26,
+    "unitPriceText": "48.26 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c2b4dca5-0f03-4616-a18e-1b0c3a9a7400.jpg?fit=bounds&format=auto&optimize=medium&width=85&s=0xef6db842c92c94852e454bf0f7670a019827e006",
+    "productUrl": "https://www.mathem.se/se/products/7878-zeta-rapsolja/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66766",
+    "name": "Garant Sesamolja",
+    "brand": "Garant",
+    "packageText": "150 ml",
+    "price": 25,
+    "priceText": "25.00 SEK",
+    "unitPrice": 166.67,
+    "unitPriceText": "166.67 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8e03f8bf-1e14-440a-b3bd-7af2bfde6707.jpg?fit=bounds&format=auto&optimize=medium&width=79&s=0x66fee80cd3a5fc6db6f854e706c19caf35022786",
+    "productUrl": "https://www.mathem.se/se/products/66766-garant-sesamolja/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5332",
+    "name": "Eldorado Tonfisk i Olja MSC",
+    "brand": "Eldorado",
+    "packageText": "170 g",
+    "price": 18.46,
+    "priceText": "18.46 SEK",
+    "unitPrice": 108.59,
+    "unitPriceText": "108.59 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a8c8316c-2a1c-4bf5-8bca-0dfe9b5367ca.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xe5bfdfffc528479dc9fdb1c6c5c1d6edcb3cc949",
+    "productUrl": "https://www.mathem.se/se/products/5332-eldorado-tonfisk-i-olja-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10614",
+    "name": "Garant Eko Rapsolja Kallpressad EKO/KRAV",
+    "brand": "Garant Eko",
+    "packageText": "500 ml",
+    "price": 48.95,
+    "priceText": "48.95 SEK",
+    "unitPrice": 97.9,
+    "unitPriceText": "97.90 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bb3d76ee-1a38-4ef8-8177-b2b781a2e2d1.jpg?fit=bounds&format=auto&optimize=medium&width=79&s=0xa54ac7cc0097b2e54cbd41574acf1f177be189f9",
+    "productUrl": "https://www.mathem.se/se/products/10614-garant-eko-rapsolja-kallpressad-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64824",
+    "name": "Eldorado Tonfisk Finfördelad i Olja MSC",
+    "brand": "Eldorado",
+    "packageText": "170 g",
+    "price": 13.72,
+    "priceText": "13.72 SEK",
+    "unitPrice": 114.33,
+    "unitPriceText": "114.33 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b13c99ba-10f0-4f4f-97b6-49c2a628d897.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xd83b25722a7a010927f5594802e1a7a81309f788",
+    "productUrl": "https://www.mathem.se/se/products/64824-eldorado-tonfisk-finfordelad-i-olja-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10039",
+    "name": "Zeta Solrosolja",
+    "brand": "Zeta",
+    "packageText": "0,5 l",
+    "price": 34.02,
+    "priceText": "34.02 SEK",
+    "unitPrice": 68.04,
+    "unitPriceText": "68.04 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ee047cf6-3c6b-40a8-a3ed-ad85074ff07e.jpg?fit=bounds&format=auto&optimize=medium&width=84&s=0x19dec325d5c9d7b6ab741f8779f4ba41b905f088",
+    "productUrl": "https://www.mathem.se/se/products/10039-zeta-solrosolja/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64647",
+    "name": "Twin Dragon Sesamolja",
+    "brand": "Twin Dragon",
+    "packageText": "150 ml",
+    "price": 34.97,
+    "priceText": "34.97 SEK",
+    "unitPrice": 233.13,
+    "unitPriceText": "233.13 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5c4288af-4faf-40cf-a415-5f81486d92cc.jpg?fit=bounds&format=auto&optimize=medium&width=84&s=0x7545b19ebc7734c6d8f3bcb5a7ec7a01ad3a5a2d",
+    "productUrl": "https://www.mathem.se/se/products/64647-twin-dragon-sesamolja/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64546",
+    "name": "Garant Rapsolja Raffinerad EKO/KRAV",
+    "brand": "Garant",
+    "packageText": "2000 ml",
+    "price": 118,
+    "priceText": "118.00 SEK",
+    "unitPrice": 59,
+    "unitPriceText": "59.00 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/414985b5-714c-4279-adf3-03d09ca86222.jpg?fit=bounds&format=auto&optimize=medium&width=108&s=0x64a6c234eaa055bbb90d8ad6de55bc3c5a8e2630",
+    "productUrl": "https://www.mathem.se/se/products/64546-garant-rapsolja-raffinerad-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11633",
+    "name": "Garant Eko Olivolja Spansk Extra Virgin EKO",
+    "brand": "Garant Eko",
+    "packageText": "500 ml",
+    "price": 61.04,
+    "priceText": "61.04 SEK",
+    "unitPrice": 122.08,
+    "unitPriceText": "122.08 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f1c87fc9-2d2a-4482-9653-4725e27ce47a.jpg?fit=bounds&format=auto&optimize=medium&width=75&s=0xfdb8625f20780eb8b4c16f765c5d4cdcc98a9b28",
+    "productUrl": "https://www.mathem.se/se/products/11633-garant-eko-olivolja-spansk-extra-virgin-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67367",
+    "name": "Garant Olivolja Extra Virgin",
+    "brand": "Garant",
+    "packageText": "250 ml",
+    "price": 40.65,
+    "priceText": "40.65 SEK",
+    "unitPrice": 162.6,
+    "unitPriceText": "162.60 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6fded3a7-e1a8-4e01-a464-af1a293a7758.jpg?fit=bounds&format=auto&optimize=medium&width=78&s=0xc7de2373fcf097f83782aca04a3275836c2d37c2",
+    "productUrl": "https://www.mathem.se/se/products/67367-garant-olivolja-extra-virgin/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "30430",
+    "name": "Garant Olivolja Classico Extra Virgin",
+    "brand": "Garant",
+    "packageText": "750 ml",
+    "price": 85.65,
+    "priceText": "85.65 SEK",
+    "unitPrice": 114.2,
+    "unitPriceText": "114.20 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5cee6b90-9d9a-49fd-be78-6529b76223cd.jpg?fit=bounds&format=auto&optimize=medium&width=84&s=0xed82a6d8c030f0c757827fd9fe195fcd305339da",
+    "productUrl": "https://www.mathem.se/se/products/30430-garant-olivolja-classico-extra-virgin/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64043",
+    "name": "Garant Eko Rapsolja Varmpressad EKO",
+    "brand": "Garant Eko",
+    "packageText": "1 l",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 56.74,
+    "unitPriceText": "56.74 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/00d66ab7-43a9-42c1-abdf-b2047ccb2d82.jpg?fit=bounds&format=auto&optimize=medium&width=93&s=0x46dea586d5a61d881a2b8e013b0a52bddea8d198",
+    "productUrl": "https://www.mathem.se/se/products/64043-garant-eko-rapsolja-varmpressad-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64540",
+    "name": "Garant Rapsolja Vitamin D",
+    "brand": "Garant",
+    "packageText": "1000 ml",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 37.81,
+    "unitPriceText": "37.81 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1385496b-5866-4db9-8327-192fbe3387fe.jpg?fit=bounds&format=auto&optimize=medium&width=93&s=0x646fe04522e58df3e0c7ed4baecc8ce02b2613bf",
+    "productUrl": "https://www.mathem.se/se/products/64540-garant-rapsolja-vitamin-d/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8675",
+    "name": "Garant Tonfisk i Solrosolja MSC 3x80g",
+    "brand": "Garant",
+    "packageText": "240 g",
+    "price": 40.65,
+    "priceText": "40.65 SEK",
+    "unitPrice": 241.96,
+    "unitPriceText": "241.96 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/730ddbfb-9e42-4a26-a2be-c02dbf97230b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x0943b4d5e9b475a0661937f2e79c9307f23ee250",
+    "productUrl": "https://www.mathem.se/se/products/8675-garant-tonfisk-i-solrosolja-msc-3x80g/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65593",
+    "name": "Fontana Matlagningsolja Stekar´n Mild",
+    "brand": "Fontana",
+    "packageText": "500 ml",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 113.48,
+    "unitPriceText": "113.48 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c6511d27-4691-4fd7-89e0-d4176a1e1997.jpg?fit=bounds&format=auto&optimize=medium&width=104&s=0x9fbc23be4b4329d3663601d06a507b08dc3641ce",
+    "productUrl": "https://www.mathem.se/se/products/65593-fontana-matlagningsolja-stekarn-mild/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "47942",
+    "name": "Fontana Olivolja Mild ONE",
+    "brand": "Fontana",
+    "packageText": "1 l",
+    "price": 108.84,
+    "priceText": "108.84 SEK",
+    "unitPrice": 108.84,
+    "unitPriceText": "108.84 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7e94a526-2369-467f-b7f2-905d73eb71ff.jpg?fit=bounds&format=auto&optimize=medium&width=165&s=0x262d3345223379c0e3374f7add9c36cafeaed05d",
+    "productUrl": "https://www.mathem.se/se/products/47942-fontana-olivolja-mild-one/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68261",
+    "name": "Monini Extra Jungfruolivolja Classico",
+    "brand": "Monini",
+    "packageText": "750 cl",
+    "price": 96.95,
+    "priceText": "96.95 SEK",
+    "unitPrice": 129.27,
+    "unitPriceText": "129.27 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/97c1ce3a-3f92-4cd1-8be4-675eb67beca5.jpg?fit=bounds&format=auto&optimize=medium&width=99&s=0xfcba6da614f61612e50b32d97ea174308f8eceae",
+    "productUrl": "https://www.mathem.se/se/products/68261-monini-extra-jungfruolivolja-classico/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8654",
+    "name": "Zeta Rapsolja Kallpressad Nötig",
+    "brand": "Zeta",
+    "packageText": "0,5 l",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 75.62,
+    "unitPriceText": "75.62 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d882af6b-d6c6-463d-8fa1-8ba802a91a09.jpg?fit=bounds&format=auto&optimize=medium&width=64&s=0x0eca41006a5c5ae4408816d87e0d665107ea17c1",
+    "productUrl": "https://www.mathem.se/se/products/8654-zeta-rapsolja-kallpressad-notig/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10406",
+    "name": "Natusan® by Johnson's® Baby Oil Aloe Vera",
+    "brand": "Natusan® by Johnson's®",
+    "packageText": "300 ml",
+    "price": 41.95,
+    "priceText": "41.95 SEK",
+    "unitPrice": 139.83,
+    "unitPriceText": "139.83 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/345f92c4-91ec-4d3b-8980-265d9fcf07be.jpg?fit=bounds&format=auto&optimize=medium&width=132&s=0xac441ce4acadd68134deed81dfde19d2aa44659a",
+    "productUrl": "https://www.mathem.se/se/products/10406-natusan-r-by-johnsons-r-baby-oil-aloe-vera/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9932",
+    "name": "NIVEA Shower Natural Oil",
+    "brand": "NIVEA",
+    "packageText": "200 ml",
+    "price": 36.95,
+    "priceText": "36.95 SEK",
+    "unitPrice": 184.75,
+    "unitPriceText": "184.75 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e14f4a96-0339-46d5-a966-dd11c52b26d9.jpg?fit=bounds&format=auto&optimize=medium&width=149&s=0xa2255d2c0b6f4a184b85fc315a58c3c358db7c18",
+    "productUrl": "https://www.mathem.se/se/products/9932-nivea-shower-natural-oil/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "47939",
+    "name": "Kloka Rapsstekolja Smörsmak",
+    "brand": "Kloka",
+    "packageText": "500 ml",
+    "price": 35,
+    "priceText": "35.00 SEK",
+    "unitPrice": 70,
+    "unitPriceText": "70.00 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6d8325f8-7675-4d3e-a3fd-117d968f0ede.jpg?fit=bounds&format=auto&optimize=medium&width=66&s=0x64bf14d6230f9a0a541261cf99341d514ae11a81",
+    "productUrl": "https://www.mathem.se/se/products/47939-kloka-rapsstekolja-smorsmak/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9245",
+    "name": "Zeta Linfröolja",
+    "brand": "Zeta",
+    "packageText": "0,5 l",
+    "price": 49.17,
+    "priceText": "49.17 SEK",
+    "unitPrice": 98.34,
+    "unitPriceText": "98.34 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/74a151ed-c6bc-486b-b7c2-651ebb07e353.jpg?fit=bounds&format=auto&optimize=medium&width=84&s=0x64a41e0522e461ee6363a9354b79cefabb7ef575",
+    "productUrl": "https://www.mathem.se/se/products/9245-zeta-linfroolja/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "12417",
+    "name": "Kung Markatta Kokosolja Neutral EKO",
+    "brand": "Kung Markatta",
+    "packageText": "220 ml",
+    "price": 58.21,
+    "priceText": "58.21 SEK",
+    "unitPrice": 264.59,
+    "unitPriceText": "264.59 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/61b1746a-759b-48cf-98fa-e40503b4a88b.jpg?fit=bounds&format=auto&optimize=medium&width=221&s=0xd87b51658df47d25ef907d5426d52c58c2fd5704",
+    "productUrl": "https://www.mathem.se/se/products/12417-kung-markatta-kokosolja-neutral-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "24554",
+    "name": "Fontana Olivolja Extra Virgin EKO/KRAV",
+    "brand": "Fontana",
+    "packageText": "500 ml",
+    "price": 95,
+    "priceText": "95.00 SEK",
+    "unitPrice": 190,
+    "unitPriceText": "190.00 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/44284a69-dd32-4cfc-b0c9-e34699c6363e.jpg?fit=bounds&format=auto&optimize=medium&width=64&s=0xd265705039967e1d2925b568cf8d3f6d0277c1ad",
+    "productUrl": "https://www.mathem.se/se/products/24554-fontana-olivolja-extra-virgin-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "39998",
+    "name": "Eldorado Olivolja",
+    "brand": "Eldorado",
+    "packageText": "1 l",
+    "price": 77.13,
+    "priceText": "77.13 SEK",
+    "unitPrice": 77.13,
+    "unitPriceText": "77.13 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8ac0a06c-15ef-44f1-9138-43bf86077031.jpg?fit=bounds&format=auto&optimize=medium&width=74&s=0xf88fbd7bfdabbb2d6df6f5a30df76d322b2cc9cc",
+    "productUrl": "https://www.mathem.se/se/products/39998-eldorado-olivolja/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10163",
+    "name": "Arla Köket® Smör & Rapsolja Flytande 80%",
+    "brand": "Arla Köket®",
+    "packageText": "750 ml",
+    "price": 30,
+    "priceText": "30.00 SEK",
+    "unitPrice": 40,
+    "unitPriceText": "40.00 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/eb22f50b-0911-411a-9ac0-990479352c9d.jpg?fit=bounds&format=auto&optimize=medium&width=127&s=0x45646f1f7af2b72a86ed441913abe1796cbe9167",
+    "productUrl": "https://www.mathem.se/se/products/10163-arla-koket-r-smor-rapsolja-flytande-80/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63981",
+    "name": "Minstingen Babyolja Oparfymerad",
+    "brand": "Minstingen",
+    "packageText": "200 ml",
+    "price": 29.95,
+    "priceText": "29.95 SEK",
+    "unitPrice": 149.75,
+    "unitPriceText": "149.75 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/da3095d6-c978-43d3-a09d-cf31ead0354a.jpg?fit=bounds&format=auto&optimize=medium&width=124&s=0x73846889c9b9683eec9dc828b04aac7ce6811bf8",
+    "productUrl": "https://www.mathem.se/se/products/63981-minstingen-babyolja-oparfymerad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64398",
+    "name": "Superfruit Kokosolja Kallpressad Virgin EKO",
+    "brand": "Superfruit",
+    "packageText": "500 ml",
+    "price": 110.73,
+    "priceText": "110.73 SEK",
+    "unitPrice": 240.72,
+    "unitPriceText": "240.72 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d7b872ef-44c0-4be3-96d6-3039103a0807.jpg?fit=bounds&format=auto&optimize=medium&width=200&s=0x3ac86e93a82183fdbd9b058fcb838de84426bd7d",
+    "productUrl": "https://www.mathem.se/se/products/64398-superfruit-kokosolja-kallpressad-virgin-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "941",
+    "name": "Eldorado Sardiner i Olja MSC",
+    "brand": "Eldorado",
+    "packageText": "120 g",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 173.08,
+    "unitPriceText": "173.08 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/354bf393-c7d3-4a23-b7b4-43b16f119a7b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x4fc7edba3a7cb32f1a842b9dff9d1f329a974140",
+    "productUrl": "https://www.mathem.se/se/products/941-eldorado-sardiner-i-olja-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67781",
+    "name": "Garant Tonfisk i Olja MSC",
+    "brand": "Garant",
+    "packageText": "160 g",
+    "price": 17.93,
+    "priceText": "17.93 SEK",
+    "unitPrice": 149.42,
+    "unitPriceText": "149.42 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/53c735df-d1d5-408a-a6f6-e34c4ec7ecbd.jpg?fit=bounds&format=auto&optimize=medium&width=233&s=0x6ca929faaab3ab89af9e547e79e83c6359faf3d5",
+    "productUrl": "https://www.mathem.se/se/products/67781-garant-tonfisk-i-olja-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=olja",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8955",
+    "name": "SIA Glass Glassbåt",
+    "brand": "SIA Glass",
+    "packageText": "6 st",
+    "price": 42.45,
+    "priceText": "42.45 SEK",
+    "unitPrice": 7.08,
+    "unitPriceText": "7.08 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/49e4ed9d-be01-4709-8261-c8b1abfd2bc9.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xed8924757b39106ee3eb9d6a5ef4e0ca985b1e6b",
+    "productUrl": "https://www.mathem.se/se/products/8955-sia-glass-glassbat/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9153",
+    "name": "GB Glace Glass Sandwich Original",
+    "brand": "GB Glace",
+    "packageText": "6 st",
+    "price": 47.2,
+    "priceText": "47.20 SEK",
+    "unitPrice": 7.87,
+    "unitPriceText": "7.87 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/14d05f19-94b3-4483-a95e-21eb50a15970.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x01ccde4d351e0533a65154896e1b3ae248622601",
+    "productUrl": "https://www.mathem.se/se/products/9153-gb-glace-glass-sandwich-original/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2881",
+    "name": "GB Glace Glass Klassikerlåda",
+    "brand": "GB Glace",
+    "packageText": "Max 2 per kund, 54 ml",
+    "price": 79,
+    "priceText": "79.00 SEK",
+    "unitPrice": 55.91,
+    "unitPriceText": "55.91 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8d32e98a-669a-4497-ac93-09e17c35c1f6.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xfe92cc12dea4d433a68393b20ddd94b07eb0d605",
+    "productUrl": "https://www.mathem.se/se/products/2881-gb-glace-glass-klassikerlada/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10466",
+    "name": "SIA Glass Gräddglass Vanilj",
+    "brand": "SIA Glass",
+    "packageText": "1,5 l",
+    "price": 38.7,
+    "priceText": "38.70 SEK",
+    "unitPrice": 25.8,
+    "unitPriceText": "25.80 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/31dba6fc-732a-42c1-b56d-31f2fb3b98d0.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x35153c52ccb561ec27b674f803efcafe12f794d0",
+    "productUrl": "https://www.mathem.se/se/products/10466-sia-glass-graddglass-vanilj/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9013",
+    "name": "SIA Glass Glasstrut Juni Laktosfri/Glutenfri",
+    "brand": "SIA Glass",
+    "packageText": "6 st",
+    "price": 46.33,
+    "priceText": "46.33 SEK",
+    "unitPrice": 7.72,
+    "unitPriceText": "7.72 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/30d21ec6-d165-4781-8df9-2fbedde01152.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x1817800319ab4377a737ca2e3ce572f431097486",
+    "productUrl": "https://www.mathem.se/se/products/9013-sia-glass-glasstrut-juni-laktosfri-glutenfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67732",
+    "name": "Daim Daimstrut Mini",
+    "brand": "Daim",
+    "packageText": "6 st",
+    "price": 52.95,
+    "priceText": "52.95 SEK",
+    "unitPrice": 8.83,
+    "unitPriceText": "8.83 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8563a432-6cfd-4721-aded-dbdf66a97ed2.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdc18245da53c8bf4a142cab5fb5aa72208968bc6",
+    "productUrl": "https://www.mathem.se/se/products/67732-daim-daimstrut-mini/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67824",
+    "name": "SIA Glass Glass Äppelpaj",
+    "brand": "SIA Glass",
+    "packageText": "500 ml",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 41.54,
+    "unitPriceText": "41.54 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/093badbc-8e67-43e0-b6a0-aa3ac1e1329a.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xb3695592a92eb895c6f4d5e102d2fdfd14368401",
+    "productUrl": "https://www.mathem.se/se/products/67824-sia-glass-glass-appelpaj/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64945",
+    "name": "SIA Glass Glass Sandwich Laktosfri",
+    "brand": "SIA Glass",
+    "packageText": "6 st",
+    "price": 46.33,
+    "priceText": "46.33 SEK",
+    "unitPrice": 7.72,
+    "unitPriceText": "7.72 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/919aa4d8-8295-4df2-ae51-e4de1c4bb8de.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xb6b19570b308bc2d0ffeb1dfe654d41b17860ee1",
+    "productUrl": "https://www.mathem.se/se/products/64945-sia-glass-glass-sandwich-laktosfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5708",
+    "name": "SIA Glass Gräddglass Vanilj",
+    "brand": "SIA Glass",
+    "packageText": "500 ml",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 41.54,
+    "unitPriceText": "41.54 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c096c45f-bc88-440a-aa8a-7d6008b8d984.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x76ad9ffb2ac3f0735c23da4d871a9518480e5705",
+    "productUrl": "https://www.mathem.se/se/products/5708-sia-glass-graddglass-vanilj/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63903",
+    "name": "Magnum Glass After Dinner Classic",
+    "brand": "Magnum",
+    "packageText": "8 st",
+    "price": 53.9,
+    "priceText": "53.90 SEK",
+    "unitPrice": 6.74,
+    "unitPriceText": "6.74 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ba92b949-ad68-4d10-8967-d94dc3a2290a.jpg?fit=bounds&format=auto&optimize=medium&width=230&s=0x01ab5e300b8a077c434eb96ea0bb34e9e9dd9fd4",
+    "productUrl": "https://www.mathem.se/se/products/63903-magnum-glass-after-dinner-classic/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62327",
+    "name": "SIA Glass Gräddglass Kladdkaka",
+    "brand": "SIA Glass",
+    "packageText": "1,5 l",
+    "price": 38.7,
+    "priceText": "38.70 SEK",
+    "unitPrice": 25.8,
+    "unitPriceText": "25.80 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4d105c25-6aa8-4455-a96b-27cc049fb7b8.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x37f16032a6c2fbcfd99070bd230b9cf88e024eac",
+    "productUrl": "https://www.mathem.se/se/products/62327-sia-glass-graddglass-kladdkaka/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10469",
+    "name": "Triumf Glass Glasspinnar Sitting Bull",
+    "brand": "Triumf Glass",
+    "packageText": "8 st",
+    "price": 35,
+    "priceText": "35.00 SEK",
+    "unitPrice": 4.38,
+    "unitPriceText": "4.38 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d749ed2a-7584-43f8-b0ae-162fb10886f0.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa3843f9ca7e7b71a6148d3607838bd54d20ad91a",
+    "productUrl": "https://www.mathem.se/se/products/10469-triumf-glass-glasspinnar-sitting-bull/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5642",
+    "name": "SIA Glass Gräddglass Jordgubb",
+    "brand": "SIA Glass",
+    "packageText": "500 ml",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 41.54,
+    "unitPriceText": "41.54 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c126d1a6-aee5-4745-a93b-7d64e1fd66a7.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x28d6f7b258db8fa2c28e630957ceb04ae4943496",
+    "productUrl": "https://www.mathem.se/se/products/5642-sia-glass-graddglass-jordgubb/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9059",
+    "name": "SIA Glass Glasstrut Saltkaramell",
+    "brand": "SIA Glass",
+    "packageText": "5 st",
+    "price": 46.33,
+    "priceText": "46.33 SEK",
+    "unitPrice": 9.27,
+    "unitPriceText": "9.27 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a1900af6-3af3-4882-a727-2c85f1bb9f7e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xda8e9c1d5ce0d3f5d15f74f0c9d2815036d58e90",
+    "productUrl": "https://www.mathem.se/se/products/9059-sia-glass-glasstrut-saltkaramell/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62379",
+    "name": "SIA Glass Glassbåt Hallon & Vit Choklad",
+    "brand": "SIA Glass",
+    "packageText": "6 st",
+    "price": 42.45,
+    "priceText": "42.45 SEK",
+    "unitPrice": 7.08,
+    "unitPriceText": "7.08 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c66e5218-78fc-42ee-a627-f77f1a2717aa.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xd1f5320234c52444d58eb797ca8ace6742c240b1",
+    "productUrl": "https://www.mathem.se/se/products/62379-sia-glass-glassbat-hallon-vit-choklad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10508",
+    "name": "Triumf Glass Glasspinnar Ananas Split",
+    "brand": "Triumf Glass",
+    "packageText": "8 st",
+    "price": 35,
+    "priceText": "35.00 SEK",
+    "unitPrice": 4.38,
+    "unitPriceText": "4.38 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/221fed10-7867-42eb-b3e9-bbd23fbeb93e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x0a2ee63005586392e00481910252b3b4ec26c678",
+    "productUrl": "https://www.mathem.se/se/products/10508-triumf-glass-glasspinnar-ananas-split/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62451",
+    "name": "SIA Glass Glasspinne Saltlakrits",
+    "brand": "SIA Glass",
+    "packageText": "6 st",
+    "price": 46.33,
+    "priceText": "46.33 SEK",
+    "unitPrice": 7.72,
+    "unitPriceText": "7.72 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/334172c0-76f8-43e4-a1b1-507fd5a1c340.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x608fff74c3fec781dbc537f06b5d8f64ee6678cb",
+    "productUrl": "https://www.mathem.se/se/products/62451-sia-glass-glasspinne-saltlakrits/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62240",
+    "name": "Magnum Glasspinnar Mini Classic/Almond/White Chocolate 3x2-p",
+    "brand": "Magnum",
+    "packageText": "55 ml",
+    "price": 52.53,
+    "priceText": "52.53 SEK",
+    "unitPrice": 8.76,
+    "unitPriceText": "8.76 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6226d75f-3da9-41b9-9be9-cb3fe6711336.jpg?fit=bounds&format=auto&optimize=medium&width=296&s=0xad42d86128f574095c9b4e850d1f92fdb7f66212",
+    "productUrl": "https://www.mathem.se/se/products/62240-magnum-glasspinnar-mini-classic-almond-white-choco/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64946",
+    "name": "SIA Glass Glass Gräddkola",
+    "brand": "SIA Glass",
+    "packageText": "1500 ml",
+    "price": 38.7,
+    "priceText": "38.70 SEK",
+    "unitPrice": 25.8,
+    "unitPriceText": "25.80 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0754cf11-aff1-42c4-a478-2c4b960cf0c3.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x74776d63a25c9dd981beb2a43676673d5a570c40",
+    "productUrl": "https://www.mathem.se/se/products/64946-sia-glass-glass-graddkola/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10769",
+    "name": "Triumf Glass Gräddglass Vanilj",
+    "brand": "Triumf Glass",
+    "packageText": "1,75 l",
+    "price": 48.22,
+    "priceText": "48.22 SEK",
+    "unitPrice": 27.55,
+    "unitPriceText": "27.55 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/aaf8b02d-165e-4098-aa18-0feee6ee1306.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xd78eb21f1490fd81185a974f98568d4169321719",
+    "productUrl": "https://www.mathem.se/se/products/10769-triumf-glass-graddglass-vanilj/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62461",
+    "name": "Magnum Glasspinnar Mini Almond",
+    "brand": "Magnum",
+    "packageText": "6 st",
+    "price": 52.53,
+    "priceText": "52.53 SEK",
+    "unitPrice": 8.76,
+    "unitPriceText": "8.76 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a9c82756-2dbd-4d98-8f5b-3bab921ee99a.jpg?fit=bounds&format=auto&optimize=medium&width=296&s=0x9b25b428443335009fbad6aad45affe2556d49cf",
+    "productUrl": "https://www.mathem.se/se/products/62461-magnum-glasspinnar-mini-almond/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8769",
+    "name": "SIA Glass Gräddglass Chokladkross Laktosfri",
+    "brand": "SIA Glass",
+    "packageText": "0,75 l",
+    "price": 42.12,
+    "priceText": "42.12 SEK",
+    "unitPrice": 56.16,
+    "unitPriceText": "56.16 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/532238ea-b6b1-47ad-8de7-d8318fdbc4f7.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x82f0ac46648a79a708445a876adc79e83ac52f40",
+    "productUrl": "https://www.mathem.se/se/products/8769-sia-glass-graddglass-chokladkross-laktosfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5711",
+    "name": "SIA Glass Gräddglass Kola Havssalt",
+    "brand": "SIA Glass",
+    "packageText": "500 ml",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 41.54,
+    "unitPriceText": "41.54 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5d933c16-8199-4fe7-b384-7174d64fdda3.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xe06dc88cbbbb61e47dfcc4dddda49e2fe56770b7",
+    "productUrl": "https://www.mathem.se/se/products/5711-sia-glass-graddglass-kola-havssalt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67945",
+    "name": "Oreo Glass Sandwich Oreo Mini",
+    "brand": "Oreo",
+    "packageText": "6 st",
+    "price": 52.95,
+    "priceText": "52.95 SEK",
+    "unitPrice": 8.83,
+    "unitPriceText": "8.83 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d134898b-510d-43ef-bd31-d8f46360836b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x19ceda03c589c8578f6644a5bc03c2637e524efc",
+    "productUrl": "https://www.mathem.se/se/products/67945-oreo-glass-sandwich-oreo-mini/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8814",
+    "name": "SIA Glass Gräddglass Vanilj Laktosfri",
+    "brand": "SIA Glass",
+    "packageText": "0,75 l",
+    "price": 42.12,
+    "priceText": "42.12 SEK",
+    "unitPrice": 56.16,
+    "unitPriceText": "56.16 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c0668105-16ac-4767-b0b9-bee5cea59030.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x5e85cd1282215a1d9e6d6002d48c3df0e00c7427",
+    "productUrl": "https://www.mathem.se/se/products/8814-sia-glass-graddglass-vanilj-laktosfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67725",
+    "name": "Marabou Glasspinnar Vanilj & Chokladsmak",
+    "brand": "Marabou",
+    "packageText": "6 st",
+    "price": 52.95,
+    "priceText": "52.95 SEK",
+    "unitPrice": 8.83,
+    "unitPriceText": "8.83 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/27b3b647-36b1-4cb5-bf4a-d96291c66e86.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x986945e4c30bbcac2cb0018c51d6bd7430c5b408",
+    "productUrl": "https://www.mathem.se/se/products/67725-marabou-glasspinnar-vanilj-chokladsmak/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7896",
+    "name": "GB Glace Glass Big Pack Tresmak",
+    "brand": "GB Glace",
+    "packageText": "2000 ml",
+    "price": 31.71,
+    "priceText": "31.71 SEK",
+    "unitPrice": 15.86,
+    "unitPriceText": "15.86 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0fa57715-b043-4f9e-a216-141bd839ca49.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x8a47f50ef5c082f8089349eb88964c3b5dd78e01",
+    "productUrl": "https://www.mathem.se/se/products/7896-gb-glace-glass-big-pack-tresmak/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6384",
+    "name": "SIA Glass Mangosorbet",
+    "brand": "SIA Glass",
+    "packageText": "500 ml",
+    "price": 26.03,
+    "priceText": "26.03 SEK",
+    "unitPrice": 52.06,
+    "unitPriceText": "52.06 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/faf14dd8-474e-436b-bd11-d05be04ea83e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xd910988376c7443577d9bedb7381918fec79b19b",
+    "productUrl": "https://www.mathem.se/se/products/6384-sia-glass-mangosorbet/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7966",
+    "name": "GB Glace Glass Big Pack Vanilj",
+    "brand": "GB Glace",
+    "packageText": "2000 ml",
+    "price": 31.71,
+    "priceText": "31.71 SEK",
+    "unitPrice": 15.86,
+    "unitPriceText": "15.86 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/045c9b20-20e0-43cb-a483-07fa8a0232d6.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x8dbfda92e81522aa24d591848f3bcec166bf0fc8",
+    "productUrl": "https://www.mathem.se/se/products/7966-gb-glace-glass-big-pack-vanilj/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5705",
+    "name": "SIA Glass Gräddglass Pecannötkola",
+    "brand": "SIA Glass",
+    "packageText": "500 ml",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 41.54,
+    "unitPriceText": "41.54 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f76a8c33-ef51-4d68-9448-ebdf8531a89a.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xbd8144c9afd8380131b97b4d9f5581b8cd1e4786",
+    "productUrl": "https://www.mathem.se/se/products/5705-sia-glass-graddglass-pecannotkola/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10910",
+    "name": "Triumf Glass Gräddglass Vanilj Laktosfri",
+    "brand": "Triumf Glass",
+    "packageText": "1,75 l",
+    "price": 55.37,
+    "priceText": "55.37 SEK",
+    "unitPrice": 31.64,
+    "unitPriceText": "31.64 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2f497d39-1c4b-445b-9ca5-d1882808d91f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdaee5010f934307681c20aa2c56f33fb9a907b22",
+    "productUrl": "https://www.mathem.se/se/products/10910-triumf-glass-graddglass-vanilj-laktosfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64943",
+    "name": "SIA Glass Finaste Pistage Gräddglass",
+    "brand": "SIA Glass",
+    "packageText": "500 ml",
+    "price": 49.17,
+    "priceText": "49.17 SEK",
+    "unitPrice": 98.34,
+    "unitPriceText": "98.34 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ba4a84e3-c472-4fba-8517-64cc36f847c2.jpg?fit=bounds&format=auto&optimize=medium&width=246&s=0x0ef54500519db7c1f40a010c1c653bb433c1d9ea",
+    "productUrl": "https://www.mathem.se/se/products/64943-sia-glass-finaste-pistage-graddglass/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68386",
+    "name": "Dazzley Vaniljstrut",
+    "brand": "Dazzley",
+    "packageText": "6 st",
+    "price": 28.87,
+    "priceText": "28.87 SEK",
+    "unitPrice": 4.81,
+    "unitPriceText": "4.81 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/be6d6215-a14c-4b5e-984d-7b0bd8e144f7.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdebd4498ae952ff8acbbb4198d2962266da03b2b",
+    "productUrl": "https://www.mathem.se/se/products/68386-dazzley-vaniljstrut/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8855",
+    "name": "Dazzley Glasspinnar Klassisk Mandel",
+    "brand": "Dazzley",
+    "packageText": "6 st",
+    "price": 46.33,
+    "priceText": "46.33 SEK",
+    "unitPrice": 7.72,
+    "unitPriceText": "7.72 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cb51a1f1-c0bf-4811-ab00-5506abc8b7ec.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x8ff05417cb9590ed33cdce2e0c9f574a0ebba724",
+    "productUrl": "https://www.mathem.se/se/products/8855-dazzley-glasspinnar-klassisk-mandel/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5158",
+    "name": "GB Gräddglass Gräddglass Gammeldags Vanilj",
+    "brand": "GB Gräddglass",
+    "packageText": "500 ml",
+    "price": 21.29,
+    "priceText": "21.29 SEK",
+    "unitPrice": 42.58,
+    "unitPriceText": "42.58 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a7d58426-cf30-4b96-86c5-9562a7f794ec.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xe23b94c31f2848062bcd5ac7c5b4e39ea58354af",
+    "productUrl": "https://www.mathem.se/se/products/5158-gb-graddglass-graddglass-gammeldags-vanilj/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10691",
+    "name": "Alvestaglass Glass Gammeldags Vanilj Laktosfri",
+    "brand": "Alvestaglass",
+    "packageText": "1 l",
+    "price": 48.74,
+    "priceText": "48.74 SEK",
+    "unitPrice": 48.74,
+    "unitPriceText": "48.74 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c40b6004-dbc5-4946-a1c6-06bfc2a5a62c.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x0085e69f56fbae28e248b60af5622fd6b15ae713",
+    "productUrl": "https://www.mathem.se/se/products/10691-alvestaglass-glass-gammeldags-vanilj-laktosfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2836",
+    "name": "Heartbrand Gräddglass Vanilj med Krossad Choklad",
+    "brand": "Heartbrand",
+    "packageText": "500 ml",
+    "price": 17.93,
+    "priceText": "17.93 SEK",
+    "unitPrice": 35.86,
+    "unitPriceText": "35.86 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/be008dfe-55a1-496b-9eb8-db3d91264133.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x984ffd70723257ad321f6167a7285079412305b4",
+    "productUrl": "https://www.mathem.se/se/products/2836-heartbrand-graddglass-vanilj-med-krossad-choklad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64858",
+    "name": "Järna Glass Glass Pistage",
+    "brand": "Järna Glass",
+    "packageText": "500 ml",
+    "price": 66.2,
+    "priceText": "66.20 SEK",
+    "unitPrice": 132.4,
+    "unitPriceText": "132.40 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3eed9794-ea26-43cd-8fe5-204886935c2c.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xf000cce706a20bec8186f2000e99b5a1c42478a4",
+    "productUrl": "https://www.mathem.se/se/products/64858-jarna-glass-glass-pistage/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "29566",
+    "name": "Järna Glass Glass Blåbärsdröm EKO",
+    "brand": "Järna Glass",
+    "packageText": "500 ml",
+    "price": 58.63,
+    "priceText": "58.63 SEK",
+    "unitPrice": 117.26,
+    "unitPriceText": "117.26 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2e058f66-f9d8-47e7-b440-c9a678b89c66.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x97ff9a2c03796f1792fab13bcb33cb837284d561",
+    "productUrl": "https://www.mathem.se/se/products/29566-jarna-glass-glass-blabarsdrom-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=glass",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9893",
+    "name": "Blåbär Klass1 Marocko",
+    "brand": "",
+    "packageText": "Marocko, 125 g",
+    "price": 34.95,
+    "priceText": "34.95 SEK",
+    "unitPrice": 279.6,
+    "unitPriceText": "279.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6ec3f607-854c-4f6c-a1e9-337ca79e2cc1.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x49de8f94e41ecdcb8ad1730aa3f6c99aeb52189c",
+    "productUrl": "https://www.mathem.se/se/products/9893-blabar-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8915",
+    "name": "Eldorado Blåbär Frysta",
+    "brand": "Eldorado",
+    "packageText": "450 g",
+    "price": 35.92,
+    "priceText": "35.92 SEK",
+    "unitPrice": 79.82,
+    "unitPriceText": "79.82 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1cbe79ea-a851-4f9c-a848-eb04c490d147.jpg?fit=bounds&format=auto&optimize=medium&width=247&s=0x28e569ff6764263c573b29fe407568f02b16c46d",
+    "productUrl": "https://www.mathem.se/se/products/8915-eldorado-blabar-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9173",
+    "name": "Magnihill Blåbär Frysta",
+    "brand": "Magnihill",
+    "packageText": "500 g",
+    "price": 62.42,
+    "priceText": "62.42 SEK",
+    "unitPrice": 124.84,
+    "unitPriceText": "124.84 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/eacdf506-2870-4702-952c-95231586725d.jpg?fit=bounds&format=auto&optimize=medium&width=294&s=0x7ee86cfd5f5235048cc41d3e29b08e5614f3b763",
+    "productUrl": "https://www.mathem.se/se/products/9173-magnihill-blabar-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5457",
+    "name": "Garant Blåbär Frysta",
+    "brand": "Garant",
+    "packageText": "225 g",
+    "price": 34.97,
+    "priceText": "34.97 SEK",
+    "unitPrice": 155.42,
+    "unitPriceText": "155.42 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c3f1134e-f743-46d2-a429-8f989b9e3f4c.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x3f892216c79f2032bb4f0539f5b69eb646121cc3",
+    "productUrl": "https://www.mathem.se/se/products/5457-garant-blabar-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5578",
+    "name": "Garant Stora Blåbär Odlade Frysta",
+    "brand": "Garant",
+    "packageText": "225 g",
+    "price": 25.5,
+    "priceText": "25.50 SEK",
+    "unitPrice": 113.33,
+    "unitPriceText": "113.33 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c7ab182b-f742-4f94-8008-8acb1618d137.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xbfe2db67810ab380ae022004e1a6cf8443401270",
+    "productUrl": "https://www.mathem.se/se/products/5578-garant-stora-blabar-odlade-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6588",
+    "name": "Garant Eko Blåbär EKO/KRAV Fryst",
+    "brand": "Garant Eko",
+    "packageText": "225 g",
+    "price": 38.33,
+    "priceText": "38.33 SEK",
+    "unitPrice": 170.36,
+    "unitPriceText": "170.36 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8d27bb53-d2d5-4975-8539-213cb5e2278e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xfe2850c79dbcfa842f759a90cba866d13dfd9137",
+    "productUrl": "https://www.mathem.se/se/products/6588-garant-eko-blabar-eko-krav-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "15864",
+    "name": "Blåbär Klass1 Peru",
+    "brand": "",
+    "packageText": "Peru, 300 g",
+    "price": 70.95,
+    "priceText": "70.95 SEK",
+    "unitPrice": 236.5,
+    "unitPriceText": "236.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5e314ca3-28ab-47ff-82a3-15335b8678ee.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x04a147c460eb89b99da1821298892acb5e49782d",
+    "productUrl": "https://www.mathem.se/se/products/15864-blabar-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2387",
+    "name": "Superfruit Blåbär Torkade",
+    "brand": "Superfruit",
+    "packageText": "200 g",
+    "price": 164.68,
+    "priceText": "164.68 SEK",
+    "unitPrice": 823.4,
+    "unitPriceText": "823.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6e87c9f4-51bc-43ae-a1df-2cffe950ab4f.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0xd342b84f5949964e92034a7207f267cd2badedd4",
+    "productUrl": "https://www.mathem.se/se/products/2387-superfruit-blabar-torkade/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8057",
+    "name": "Garant Eko Hallon & Blåbär EKO/KRAV Fryst",
+    "brand": "Garant Eko",
+    "packageText": "225 g",
+    "price": 40.65,
+    "priceText": "40.65 SEK",
+    "unitPrice": 180.67,
+    "unitPriceText": "180.67 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f91ab817-657a-46f0-88f9-53bb67526dac.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x9e1c27127b11174598384a124986f8e6051295c8",
+    "productUrl": "https://www.mathem.se/se/products/8057-garant-eko-hallon-blabar-eko-krav-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67575",
+    "name": "Frukost Frystorkade Blåbär",
+    "brand": "Frukost",
+    "packageText": "50 g",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 1134.8,
+    "unitPriceText": "1134.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ad8182ea-4753-4397-88d4-20bbd216536f.jpg?fit=bounds&format=auto&optimize=medium&width=210&s=0xe6e425da5fc93478014d54fd0b8c7071e4618e20",
+    "productUrl": "https://www.mathem.se/se/products/67575-frukost-frystorkade-blabar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5640",
+    "name": "Göteborgs Kex Singoalla Blåbär",
+    "brand": "Göteborgs Kex",
+    "packageText": "190 g",
+    "price": 19.95,
+    "priceText": "19.95 SEK",
+    "unitPrice": 105,
+    "unitPriceText": "105.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ed071e67-a681-4ab2-9162-35b226bd24d0.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa4658529b73532bd9b0655d566b48468a4f42ab1",
+    "productUrl": "https://www.mathem.se/se/products/5640-goteborgs-kex-singoalla-blabar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62301",
+    "name": "SIA Glass Gräddglass Blåbär",
+    "brand": "SIA Glass",
+    "packageText": "500 ml",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 41.54,
+    "unitPriceText": "41.54 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e2bc1db4-1104-4ed6-8081-e17ebea4b1e3.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x46a6607b807d666f48c790068cee077c24fa5410",
+    "productUrl": "https://www.mathem.se/se/products/62301-sia-glass-graddglass-blabar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67950",
+    "name": "Perfect Ted Matchapulver Blåbär",
+    "brand": "Perfect Ted",
+    "packageText": "75 g",
+    "price": 150.48,
+    "priceText": "150.48 SEK",
+    "unitPrice": 2006.4,
+    "unitPriceText": "2006.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/667debb6-e5e2-4a01-b005-1a7ee9a5495d.jpg?fit=bounds&format=auto&optimize=medium&width=263&s=0xb0ea40f3058b54762d415b5d7217fd505e8174f3",
+    "productUrl": "https://www.mathem.se/se/products/67950-perfect-ted-matchapulver-blabar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65086",
+    "name": "Magnihill Blåbär Svenska Frysta",
+    "brand": "Magnihill",
+    "packageText": "270 g",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 8.75,
+    "unitPriceText": "8.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e9ef7042-061b-4669-9500-08a2ae5be86e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x7138dc2ad445bdda216b326e482e50109911ea44",
+    "productUrl": "https://www.mathem.se/se/products/65086-magnihill-blabar-svenska-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9603",
+    "name": "ProViva Fruktdryck Blåbär",
+    "brand": "ProViva",
+    "packageText": "1 l",
+    "price": 29.29,
+    "priceText": "29.29 SEK",
+    "unitPrice": 29.29,
+    "unitPriceText": "29.29 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8ea3697b-75ab-4baf-bca1-547b015349d2.jpg?fit=bounds&format=auto&optimize=medium&width=92&s=0xc44662c932e1b889073c75238125ebfc6cb1f6a2",
+    "productUrl": "https://www.mathem.se/se/products/9603-proviva-fruktdryck-blabar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "12279",
+    "name": "Magnihill Blåbär Svenska Frysta",
+    "brand": "Magnihill",
+    "packageText": "2,5 kg",
+    "price": 273.52,
+    "priceText": "273.52 SEK",
+    "unitPrice": 109.41,
+    "unitPriceText": "109.41 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ba272bdb-5f19-4d32-bd3d-e78275502f8e.jpg?fit=bounds&format=auto&optimize=medium&width=185&s=0xb8f091804104db1673e670bca1fb3ae761cac45d",
+    "productUrl": "https://www.mathem.se/se/products/12279-magnihill-blabar-svenska-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6529",
+    "name": "Ferme des Peupliers Yoghurt Blåbär",
+    "brand": "Ferme des Peupliers",
+    "packageText": "140 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 202.5,
+    "unitPriceText": "202.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4160fec2-cabf-47d5-97ca-1dd8d961ea1f.jpg?fit=bounds&format=auto&optimize=medium&width=238&s=0xbb421aef490226eb07a9505b618cb157a0ca2d67",
+    "productUrl": "https://www.mathem.se/se/products/6529-ferme-des-peupliers-yoghurt-blabar/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8033",
+    "name": "Bliw Handtvål Refill Blåbär",
+    "brand": "Bliw",
+    "packageText": "600 ml",
+    "price": 34.95,
+    "priceText": "34.95 SEK",
+    "unitPrice": 58.25,
+    "unitPriceText": "58.25 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/809777b7-d1c5-4433-871e-00b45964599b.jpg?fit=bounds&format=auto&optimize=medium&width=191&s=0x14d3b869d44eecaad283bed9791ed1e158707b12",
+    "productUrl": "https://www.mathem.se/se/products/8033-bliw-handtval-refill-blabar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5747",
+    "name": "Bliw Handtvål Pump Blåbär",
+    "brand": "Bliw",
+    "packageText": "300 ml",
+    "price": 24.5,
+    "priceText": "24.50 SEK",
+    "unitPrice": 81.67,
+    "unitPriceText": "81.67 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ccf2ebe2-8625-42b5-8ebf-656830b96c8b.jpg?fit=bounds&format=auto&optimize=medium&width=155&s=0x991c09c2b01a8222fdf69f790ca842fdf7744af8",
+    "productUrl": "https://www.mathem.se/se/products/5747-bliw-handtval-pump-blabar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68400",
+    "name": "Pågen Gifflar Blåbär & Vanilj",
+    "brand": "Pågen",
+    "packageText": "260 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 109.04,
+    "unitPriceText": "109.04 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/51d18c37-0dbd-47f2-82b2-c424608623a1.jpg?fit=bounds&format=auto&optimize=medium&width=212&s=0xd4502ff71b3c31d1a0709c020748cf225208c505",
+    "productUrl": "https://www.mathem.se/se/products/68400-pagen-gifflar-blabar-vanilj/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7774",
+    "name": "Alpro Plantgurt Blåbär 1,9%",
+    "brand": "Alpro",
+    "packageText": "750 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 40.32,
+    "unitPriceText": "40.32 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c3fb8798-4048-42dc-b012-b158b89b7db4.jpg?fit=bounds&format=auto&optimize=medium&width=129&s=0xa7fa05661bd89a32c86e6324b1110d51ea647a94",
+    "productUrl": "https://www.mathem.se/se/products/7774-alpro-plantgurt-blabar-19/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9374",
+    "name": "Garant Hallon & Blåbär Frysta",
+    "brand": "Garant",
+    "packageText": "225 g",
+    "price": 35.92,
+    "priceText": "35.92 SEK",
+    "unitPrice": 159.64,
+    "unitPriceText": "159.64 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cef3753a-7d6c-45c9-8ada-ef3bc1aebd08.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x754d99a9ab7c30a99b3e29c71f7ce02994532279",
+    "productUrl": "https://www.mathem.se/se/products/9374-garant-hallon-blabar-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "13435",
+    "name": "Magnihill Blåbär Frysta EKO/KRAV",
+    "brand": "Magnihill",
+    "packageText": "250 g",
+    "price": 42.12,
+    "priceText": "42.12 SEK",
+    "unitPrice": 168.48,
+    "unitPriceText": "168.48 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0fa2d365-14e4-4075-8033-e02167cfb071.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x52050ec0add64c0cab8f4da0b5a39801c2ba47a2",
+    "productUrl": "https://www.mathem.se/se/products/13435-magnihill-blabar-frysta-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5910",
+    "name": "Froosh Smoothie Blåbär & Hallon",
+    "brand": "Froosh",
+    "packageText": "250 ml",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 102.04,
+    "unitPriceText": "102.04 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/210a6590-11b3-4a47-a9b1-947967df10fb.jpg?fit=bounds&format=auto&optimize=medium&width=122&s=0x407b791de52a47ccce08e1f3d0aaa81327a2be10",
+    "productUrl": "https://www.mathem.se/se/products/5910-froosh-smoothie-blabar-hallon/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7491",
+    "name": "Bärry Blåbär 2,7%",
+    "brand": "Bärry",
+    "packageText": "250 g",
+    "price": 12.78,
+    "priceText": "12.78 SEK",
+    "unitPrice": 51.12,
+    "unitPriceText": "51.12 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/44ed5d83-5124-4cb1-9eb2-f9e6b8d21e5f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x43f21f32c42b50e773da88e5cf598048d6f71c51",
+    "productUrl": "https://www.mathem.se/se/products/7491-barry-barry-blabar-27/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68676",
+    "name": "Finnerödja Dryck Blåbär EKO/KRAV",
+    "brand": "Finnerödja",
+    "packageText": "1 l",
+    "price": 32.5,
+    "priceText": "32.50 SEK",
+    "unitPrice": 32.5,
+    "unitPriceText": "32.50 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c3579d16-aec0-4eee-9cc8-da557fabd491.jpg?fit=bounds&format=auto&optimize=medium&width=132&s=0x9d0bdf577fd515b28364d8a7422fc208f89d4d91",
+    "productUrl": "https://www.mathem.se/se/products/68676-finnerodja-dryck-blabar-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8466",
+    "name": "Torfolk Gård Sylt Blåbär EKO/KRAV",
+    "brand": "Torfolk Gård",
+    "packageText": "320 g",
+    "price": 53.95,
+    "priceText": "53.95 SEK",
+    "unitPrice": 168.59,
+    "unitPriceText": "168.59 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c76be76b-1e90-431e-ad2b-600678804f74.jpg?fit=bounds&format=auto&optimize=medium&width=228&s=0x8b4fbe8d5f1742d24222d12b6e9f0c32ba1d5940",
+    "productUrl": "https://www.mathem.se/se/products/8466-torfolk-gard-sylt-blabar-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68568",
+    "name": "Knatteplock Havrepannkakor Blåbär Fryst",
+    "brand": "Knatteplock",
+    "packageText": "280 g",
+    "price": 60.1,
+    "priceText": "60.10 SEK",
+    "unitPrice": 214.64,
+    "unitPriceText": "214.64 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/abbd6129-055f-4cb2-99b9-4f5a9527f427.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x9ef709c9156c492e459ac29dc6fcd7ca08f288d4",
+    "productUrl": "https://www.mathem.se/se/products/68568-knatteplock-havrepannkakor-blabar-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2915",
+    "name": "Fjällfil Blåbär 3,7%",
+    "brand": "Fjällfil",
+    "packageText": "1000 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 28.35,
+    "unitPriceText": "28.35 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4decf6fe-dc75-47a2-a545-1f7167252863.jpg?fit=bounds&format=auto&optimize=medium&width=115&s=0x190a83e67e6f635c2e9af0d8604cb16e1345f3ad",
+    "productUrl": "https://www.mathem.se/se/products/2915-fjallfil-fjallfil-blabar-37/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62817",
+    "name": "Garant Örtte Blåbär & Havtorn",
+    "brand": "Garant",
+    "packageText": "20 st",
+    "price": 21.29,
+    "priceText": "21.29 SEK",
+    "unitPrice": 1.06,
+    "unitPriceText": "1.06 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ec907a92-2940-4642-b033-a5856d9c150f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc650cb38eac1fd47cf5bdfbe6637c355550df325",
+    "productUrl": "https://www.mathem.se/se/products/62817-garant-ortte-blabar-havtorn/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8863",
+    "name": "Färsking Granola Blåbär & Jordgubb",
+    "brand": "Färsking",
+    "packageText": "375 g",
+    "price": 44.43,
+    "priceText": "44.43 SEK",
+    "unitPrice": 118.48,
+    "unitPriceText": "118.48 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0d3959d7-56a9-40ba-8fc2-26ec236b4093.jpg?fit=bounds&format=auto&optimize=medium&width=224&s=0xf95e96bef0b03fe63c8c715d72a92b7d6d2a334e",
+    "productUrl": "https://www.mathem.se/se/products/8863-farsking-granola-blabar-jordgubb/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "13450",
+    "name": "Arla® Mjölkdryck Protein Blåbär 0,5%",
+    "brand": "Arla®",
+    "packageText": "5 dl",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 37.76,
+    "unitPriceText": "37.76 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/be2959a1-5c2f-4b13-96b4-12b6d8355d6e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xf3519fd7599101d966cb8380c5526fdb48e16f7b",
+    "productUrl": "https://www.mathem.se/se/products/13450-arla-r-mjolkdryck-protein-blabar-05/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2566",
+    "name": "Magnihill Blåbär Frysta EKO/KRAV",
+    "brand": "Magnihill",
+    "packageText": "2500 g",
+    "price": 325.57,
+    "priceText": "325.57 SEK",
+    "unitPrice": 130.23,
+    "unitPriceText": "130.23 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/30074262-639a-440f-90a5-07f41e757df9.jpg?fit=bounds&format=auto&optimize=medium&width=181&s=0x1a422351f01d108b85a8c035bbd39936755a88fc",
+    "productUrl": "https://www.mathem.se/se/products/2566-magnihill-blabar-frysta-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10097",
+    "name": "Bob Blåbär och Hallonsylt Squeezy",
+    "brand": "Bob",
+    "packageText": "395 g",
+    "price": 46.95,
+    "priceText": "46.95 SEK",
+    "unitPrice": 118.86,
+    "unitPriceText": "118.86 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9571ec72-8da7-415a-b656-7eb8f9417575.jpg?fit=bounds&format=auto&optimize=medium&width=149&s=0x8efb62da72fe3be1b38a91cee86afe9ddad322ac",
+    "productUrl": "https://www.mathem.se/se/products/10097-bob-blabar-och-hallonsylt-squeezy/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3991",
+    "name": "Paulúns Granola Blåbär & Citron",
+    "brand": "Paulúns",
+    "packageText": "450 g",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 126.09,
+    "unitPriceText": "126.09 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bb3f9f87-6f85-4255-aa0c-818464e597eb.jpg?fit=bounds&format=auto&optimize=medium&width=184&s=0x24eb385bbeea614dc4995610b32da0bac12c9cf2",
+    "productUrl": "https://www.mathem.se/se/products/3991-pauluns-granola-blabar-citron/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "37198",
+    "name": "Skånemejerier Vaniljyoghurt Blåbär 2,5%",
+    "brand": "Skånemejerier",
+    "packageText": "1000 g",
+    "price": 26.95,
+    "priceText": "26.95 SEK",
+    "unitPrice": 26.95,
+    "unitPriceText": "26.95 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/68d42d61-dd97-429a-a915-cbbdda3298c7.jpg?fit=bounds&format=auto&optimize=medium&width=105&s=0x4a088ede5bf142d8537cab3b7c7fdd8123a882f0",
+    "productUrl": "https://www.mathem.se/se/products/37198-skanemejerier-vaniljyoghurt-blabar-25/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4584",
+    "name": "Red Bull Energidryck Blue Edition Blåbär",
+    "brand": "Red Bull",
+    "packageText": "25 cl",
+    "price": 16.99,
+    "priceText": "16.99 SEK",
+    "unitPrice": 67.96,
+    "unitPriceText": "67.96 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2e9c65e4-4aa0-4a3c-9e84-3a9f266302ad.jpg?fit=bounds&format=auto&optimize=medium&width=115&s=0xbad4fda9e694ee97a87964e6f7929c00c837068b",
+    "productUrl": "https://www.mathem.se/se/products/4584-red-bull-energidryck-blue-edition-blabar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67010",
+    "name": "Bamse Fruktstång Blåbär 5-p",
+    "brand": "Bamse",
+    "packageText": "75 g",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 314.8,
+    "unitPriceText": "314.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1cff67b9-c86b-4096-b5de-bcfd6b02a705.jpg?fit=bounds&format=auto&optimize=medium&width=229&s=0xb82c9b1dd5148e63812d4ebfa38d62e6e7f3d0f3",
+    "productUrl": "https://www.mathem.se/se/products/67010-bamse-fruktstang-blabar-5-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=blabar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68588",
+    "name": "Jordgubbar Klass1 Nederländerna",
+    "brand": "",
+    "packageText": "Nederländerna, 250 g",
+    "price": 44.95,
+    "priceText": "44.95 SEK",
+    "unitPrice": 179.8,
+    "unitPriceText": "179.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/106d0fe2-6fb5-4d08-851d-5c821d240cc3.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x55b97cb2026fad67c308da129a1ebf1aac30cb34",
+    "productUrl": "https://www.mathem.se/se/products/68588-jordgubbar-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9902",
+    "name": "Eldorado Jordgubbar Frysta",
+    "brand": "Eldorado",
+    "packageText": "1000 g",
+    "price": 36.44,
+    "priceText": "36.44 SEK",
+    "unitPrice": 36.44,
+    "unitPriceText": "36.44 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5a5f85ea-77ac-43b9-a36e-ca3ddb28c893.jpg?fit=bounds&format=auto&optimize=medium&width=278&s=0x0d38a2edc3505e2e4fcb3b0e00266205d394a706",
+    "productUrl": "https://www.mathem.se/se/products/9902-eldorado-jordgubbar-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "14329",
+    "name": "Jordgubbar Svenska klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 400 g",
+    "price": 79.95,
+    "priceText": "79.95 SEK",
+    "unitPrice": 199.88,
+    "unitPriceText": "199.88 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/36668691-8b55-4b22-b723-8733db0e4d98.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x2b671dcd2827e60eb8f7c6e4f1e0927b46d740f0",
+    "productUrl": "https://www.mathem.se/se/products/14329-jordgubbar-svenska-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8859",
+    "name": "Magnihill Jordgubbar Frysta",
+    "brand": "Magnihill",
+    "packageText": "750 g",
+    "price": 56.95,
+    "priceText": "56.95 SEK",
+    "unitPrice": 75.93,
+    "unitPriceText": "75.93 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/db145fef-09d8-4b2e-b418-f1d8bb0e2886.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xaf424080b2543a99cd987c22e12acfc9e5df7e53",
+    "productUrl": "https://www.mathem.se/se/products/8859-magnihill-jordgubbar-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66406",
+    "name": "Garant Jordgubbar Tärnade Fryst",
+    "brand": "Garant",
+    "packageText": "225 g",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 104.93,
+    "unitPriceText": "104.93 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ecf299e0-0ee5-47b0-adb3-027f4d8d0685.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x17a53a6a84c0a62f923cc7fe641eef818cc42430",
+    "productUrl": "https://www.mathem.se/se/products/66406-garant-jordgubbar-tarnade-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3023",
+    "name": "Magnihill Jordgubbar Frysta EKO/KRAV",
+    "brand": "Magnihill",
+    "packageText": "850 g",
+    "price": 98.5,
+    "priceText": "98.50 SEK",
+    "unitPrice": 115.88,
+    "unitPriceText": "115.88 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cb6dd6f2-096d-49fd-8fb9-129382e6b65e.jpg?fit=bounds&format=auto&optimize=medium&width=294&s=0xef743c93fe386b146b6021ee31beb52df12302f4",
+    "productUrl": "https://www.mathem.se/se/products/3023-magnihill-jordgubbar-frysta-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2869",
+    "name": "Magnihill Jordgubbar Fryst EKO/KRAV",
+    "brand": "Magnihill",
+    "packageText": "2500 g",
+    "price": 269,
+    "priceText": "269.00 SEK",
+    "unitPrice": 107.6,
+    "unitPriceText": "107.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6a694bee-680c-4487-a1cb-ceb41be3ff80.jpg?fit=bounds&format=auto&optimize=medium&width=234&s=0x16f9f1ba21e19e7679ba2daa63942a122c17a0b7",
+    "productUrl": "https://www.mathem.se/se/products/2869-magnihill-jordgubbar-fryst-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4800",
+    "name": "Garant Jordgubbar Frysta",
+    "brand": "Garant",
+    "packageText": "225 g",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 83.91,
+    "unitPriceText": "83.91 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/67a0b222-3a92-4344-b608-49e5bf3dba1a.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xe8b9e7efbc1a885ba1a35cc954cfde38d0005ceb",
+    "productUrl": "https://www.mathem.se/se/products/4800-garant-jordgubbar-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "14457",
+    "name": "Magnihill Jordgubbar Fryst",
+    "brand": "Magnihill",
+    "packageText": "2,5 kg",
+    "price": 177,
+    "priceText": "177.00 SEK",
+    "unitPrice": 70.8,
+    "unitPriceText": "70.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/84d4f848-4749-4db3-a8f7-d3eb1ec4ffc2.jpg?fit=bounds&format=auto&optimize=medium&width=234&s=0xa2527017289303067e32603baf6ee3f6f417e8c9",
+    "productUrl": "https://www.mathem.se/se/products/14457-magnihill-jordgubbar-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "12388",
+    "name": "Exotic Snacks Frystorkade Jordgubbar i Vit Choklad med Yoghurtsmak",
+    "brand": "Exotic Snacks",
+    "packageText": "125 g",
+    "price": 38.33,
+    "priceText": "38.33 SEK",
+    "unitPrice": 306.64,
+    "unitPriceText": "306.64 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/324fa495-aaf8-4fa7-966e-439393cea985.jpg?fit=bounds&format=auto&optimize=medium&width=178&s=0x282453cbb5c8f281cf1e29dad620cf0b10fd1ff9",
+    "productUrl": "https://www.mathem.se/se/products/12388-exotic-snacks-frystorkade-jordgubbar-i-vit-choklad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8124",
+    "name": "Eldorado Mango Fryst",
+    "brand": "Eldorado",
+    "packageText": "500 g",
+    "price": 26.45,
+    "priceText": "26.45 SEK",
+    "unitPrice": 52.9,
+    "unitPriceText": "52.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/da2115f2-61c5-44d4-aa0d-aafb211c5d58.jpg?fit=bounds&format=auto&optimize=medium&width=228&s=0xe5348505707fa0def909b4f5d7c3ece71d810226",
+    "productUrl": "https://www.mathem.se/se/products/8124-eldorado-mango-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2843",
+    "name": "Magnihill Mango Fryst EKO/KRAV",
+    "brand": "Magnihill",
+    "packageText": "750 g",
+    "price": 75.5,
+    "priceText": "75.50 SEK",
+    "unitPrice": 100.67,
+    "unitPriceText": "100.67 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/237724fa-5f84-442c-bcb1-97bfabd5f507.jpg?fit=bounds&format=auto&optimize=medium&width=285&s=0x85a2c077570354f7d0cb951ee2661a796eea5637",
+    "productUrl": "https://www.mathem.se/se/products/2843-magnihill-mango-fryst-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "380",
+    "name": "Garant Mango Fryst",
+    "brand": "Garant",
+    "packageText": "225 g",
+    "price": 18.83,
+    "priceText": "18.83 SEK",
+    "unitPrice": 83.69,
+    "unitPriceText": "83.69 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/41890930-8e4c-48df-9f68-3df368081c5f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x50059115f1f829dfb74f8505cd0c7d55a97b0d5f",
+    "productUrl": "https://www.mathem.se/se/products/380-garant-mango-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67576",
+    "name": "Frukost Frystorkade Jordgubbschips",
+    "brand": "Frukost",
+    "packageText": "45 g",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 1260.89,
+    "unitPriceText": "1260.89 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7d24728a-18a7-42f8-8af0-591bc662d771.jpg?fit=bounds&format=auto&optimize=medium&width=205&s=0x02d37dbd00ea5619e9568f43977258f8fdf3f358",
+    "productUrl": "https://www.mathem.se/se/products/67576-frukost-frystorkade-jordgubbschips/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4002",
+    "name": "Khoisan Gourmet Jordgubbar Frystorkade Skivor",
+    "brand": "Khoisan Gourmet",
+    "packageText": "25 g",
+    "price": 50.11,
+    "priceText": "50.11 SEK",
+    "unitPrice": 2004.4,
+    "unitPriceText": "2004.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fa241efc-90ce-4916-82d6-1b2fded017eb.jpg?fit=bounds&format=auto&optimize=medium&width=168&s=0x67c79b1cdd62c06f7fe59bb45fe14371c21a3ce0",
+    "productUrl": "https://www.mathem.se/se/products/4002-khoisan-gourmet-jordgubbar-frystorkade-skivor/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5215",
+    "name": "Garant Hallon Frysta",
+    "brand": "Garant",
+    "packageText": "225 g",
+    "price": 28.29,
+    "priceText": "28.29 SEK",
+    "unitPrice": 125.73,
+    "unitPriceText": "125.73 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3bba0a89-4768-4753-a9fb-0e40769121ec.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x83656231e86ce79eecf18f23dd8573b4e0c89261",
+    "productUrl": "https://www.mathem.se/se/products/5215-garant-hallon-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67570",
+    "name": "Supernova Freeze Frystorkade Jordgubbschips",
+    "brand": "Supernova Freeze",
+    "packageText": "30 g",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 1260.33,
+    "unitPriceText": "1260.33 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/19a4134c-bd9c-4dde-8331-0a567b9f0b05.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0x1a0a05467e774272ec10d11b9ec4539181d8ea15",
+    "productUrl": "https://www.mathem.se/se/products/67570-supernova-freeze-frystorkade-jordgubbschips/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7250",
+    "name": "Garant Passionsfrukt Fryst",
+    "brand": "Garant",
+    "packageText": "250 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 120.96,
+    "unitPriceText": "120.96 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9d766946-43db-405a-9c42-b7035e7d4596.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x93c4219be351c6b275d157d7f5a0c8d0d67a600c",
+    "productUrl": "https://www.mathem.se/se/products/7250-garant-passionsfrukt-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10233",
+    "name": "Garant Eko Hallon EKO/KRAV Frysta",
+    "brand": "Garant Eko",
+    "packageText": "225 g",
+    "price": 40.65,
+    "priceText": "40.65 SEK",
+    "unitPrice": 180.67,
+    "unitPriceText": "180.67 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/82d39437-e214-4b4b-8959-1830aa781ddf.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc2efd8ec9a4ddef3327d486db0f63b3957d03315",
+    "productUrl": "https://www.mathem.se/se/products/10233-garant-eko-hallon-eko-krav-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "46250",
+    "name": "Eldorado Jordgubbssylt",
+    "brand": "Eldorado",
+    "packageText": "1500 g",
+    "price": 35.92,
+    "priceText": "35.92 SEK",
+    "unitPrice": 23.95,
+    "unitPriceText": "23.95 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e7d5b931-b16e-4507-b50b-6c248af2d846.jpg?fit=bounds&format=auto&optimize=medium&width=291&s=0x8df9a786bdcd4c9268f4764c0ab10d5fa0fdda86",
+    "productUrl": "https://www.mathem.se/se/products/46250-eldorado-jordgubbssylt/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5726",
+    "name": "Garant Eko Mango EKO Fryst",
+    "brand": "Garant Eko",
+    "packageText": "225 g",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 104.93,
+    "unitPriceText": "104.93 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e53e7569-a088-467f-8e30-718413d85a11.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x5817778d7bb862c8419ab038ca6431842597e3a1",
+    "productUrl": "https://www.mathem.se/se/products/5726-garant-eko-mango-eko-fryst/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9585",
+    "name": "Garant Avokado Bitar Fryst",
+    "brand": "Garant",
+    "packageText": "250 g",
+    "price": 26.03,
+    "priceText": "26.03 SEK",
+    "unitPrice": 104.12,
+    "unitPriceText": "104.12 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e4d8ff78-694b-4ec0-9fe2-52706878f500.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa0ed51caeaa8c4d9c4b3856e2b880d302ef19984",
+    "productUrl": "https://www.mathem.se/se/products/9585-garant-avokado-bitar-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10828",
+    "name": "Magnihill Hallon Frysta",
+    "brand": "Magnihill",
+    "packageText": "750 g",
+    "price": 83.5,
+    "priceText": "83.50 SEK",
+    "unitPrice": 111.33,
+    "unitPriceText": "111.33 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0b2a7382-8e62-4677-b8a3-b2d821ae3903.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x055f8e415e6db1d4ad8b07cdd655a55d852ceee0",
+    "productUrl": "https://www.mathem.se/se/products/10828-magnihill-hallon-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5107",
+    "name": "Garant Björnbär Frysta",
+    "brand": "Garant",
+    "packageText": "225 g",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 92.31,
+    "unitPriceText": "92.31 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d68a0d66-e919-4f63-adae-a4a7ea7a05c4.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa764ad76ca10adc91dfcd39223082dbc230528a5",
+    "productUrl": "https://www.mathem.se/se/products/5107-garant-bjornbar-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8762",
+    "name": "Eldorado Hallon Frysta",
+    "brand": "Eldorado",
+    "packageText": "500 g",
+    "price": 50.63,
+    "priceText": "50.63 SEK",
+    "unitPrice": 101.26,
+    "unitPriceText": "101.26 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/54daa02d-83ad-496a-be28-59de44addfab.jpg?fit=bounds&format=auto&optimize=medium&width=241&s=0x72c8493e2bd44262bf05db843ac27ce4b3b96f1e",
+    "productUrl": "https://www.mathem.se/se/products/8762-eldorado-hallon-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5588",
+    "name": "Garant Körsbär Frysta",
+    "brand": "Garant",
+    "packageText": "225 g",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 113.38,
+    "unitPriceText": "113.38 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4acf6652-5dbf-4a93-80ee-3b6109544385.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xcaf8868589bcbae37dc00c9a9cd7029ee04b8ee5",
+    "productUrl": "https://www.mathem.se/se/products/5588-garant-korsbar-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "17361",
+    "name": "Ekströms Jordgubbskräm",
+    "brand": "Ekströms",
+    "packageText": "1 l",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 30.24,
+    "unitPriceText": "30.24 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d9769e3d-276a-48ce-913e-fbb8c10ddabe.jpg?fit=bounds&format=auto&optimize=medium&width=131&s=0xfc87353152c0840045c409873a633f6d0642f3fd",
+    "productUrl": "https://www.mathem.se/se/products/17361-ekstroms-jordgubbskram/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2912",
+    "name": "Magnihill Hallon Frysta EKO/KRAV",
+    "brand": "Magnihill",
+    "packageText": "2500 g",
+    "price": 359,
+    "priceText": "359.00 SEK",
+    "unitPrice": 143.6,
+    "unitPriceText": "143.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4907bd54-2b96-484d-8918-d094dee1a9ee.jpg?fit=bounds&format=auto&optimize=medium&width=240&s=0xd35b2a08096fb39e95785ff36a6bbdc9cad10211",
+    "productUrl": "https://www.mathem.se/se/products/2912-magnihill-hallon-frysta-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66409",
+    "name": "Eldorado Ananas Fryst",
+    "brand": "Eldorado",
+    "packageText": "500 g",
+    "price": 32.65,
+    "priceText": "32.65 SEK",
+    "unitPrice": 65.3,
+    "unitPriceText": "65.30 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7232d2b4-9bad-412c-a840-dcc2e74d8da4.jpg?fit=bounds&format=auto&optimize=medium&width=230&s=0xbaab43210b7429a3a1505fc4c0d8a8a8153fdec8",
+    "productUrl": "https://www.mathem.se/se/products/66409-eldorado-ananas-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66511",
+    "name": "Ella's Kitchen Majspuffar Jordgubbar & Bananer 6M",
+    "brand": "Ella's Kitchen",
+    "packageText": "20 g",
+    "price": 14.15,
+    "priceText": "14.15 SEK",
+    "unitPrice": 707.5,
+    "unitPriceText": "707.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/61a31adf-7663-4497-a215-c8ba24435043.jpg?fit=bounds&format=auto&optimize=medium&width=235&s=0x064bede1bb1be5c4fe7d1030a37e26c4693478ad",
+    "productUrl": "https://www.mathem.se/se/products/66511-ellas-kitchen-majspuffar-jordgubbar-bananer-6m/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4796",
+    "name": "Alex&Phil Gröt Jordgubbar, Äpple & Vanilj 6M KRAV",
+    "brand": "Alex&Phil",
+    "packageText": "100 g",
+    "price": 17.93,
+    "priceText": "17.93 SEK",
+    "unitPrice": 179.3,
+    "unitPriceText": "179.30 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/948d4911-4f1f-46dd-8f99-748acb2a6f7b.jpg?fit=bounds&format=auto&optimize=medium&width=160&s=0x4610556962757419b025d93a9e9793f5599e394b",
+    "productUrl": "https://www.mathem.se/se/products/4796-alexphil-grot-jordgubbar-apple-vanilj-6m-krav/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9859",
+    "name": "Humm Kombucha Jordgubbe EKO",
+    "brand": "Humm",
+    "packageText": "414 ml",
+    "price": 34.54,
+    "priceText": "34.54 SEK",
+    "unitPrice": 83.43,
+    "unitPriceText": "83.43 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/55692eed-8770-4a65-9ede-487e039b7eee.jpg?fit=bounds&format=auto&optimize=medium&width=110&s=0xe573f5997800f4e3054692a6dc2bc8c933f9af67",
+    "productUrl": "https://www.mathem.se/se/products/9859-humm-kombucha-jordgubbe-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63269",
+    "name": "Mokate Matcha Latte Jordgubbe",
+    "brand": "Mokate",
+    "packageText": "6 st",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 360,
+    "unitPriceText": "360.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f793fded-9635-4c94-a88a-baff1db161f3.jpg?fit=bounds&format=auto&optimize=medium&width=181&s=0xd37c6424f3724127042264bb7e8d828f19b8d7ff",
+    "productUrl": "https://www.mathem.se/se/products/63269-mokate-matcha-latte-jordgubbe/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67446",
+    "name": "Oatly Havredryck Matcha Jordgubbe 2,8%",
+    "brand": "Oatly",
+    "packageText": "1000 ml",
+    "price": 31.18,
+    "priceText": "31.18 SEK",
+    "unitPrice": 31.18,
+    "unitPriceText": "31.18 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bb859137-069a-468c-b18b-8a8f97cdf24d.jpg?fit=bounds&format=auto&optimize=medium&width=164&s=0x533f127efe3b793cef934c866414992fb472d6bd",
+    "productUrl": "https://www.mathem.se/se/products/67446-oatly-havredryck-matcha-jordgubbe-28/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67447",
+    "name": "Oatly Havredryck Matcha Jordgubbe 2,8%",
+    "brand": "Oatly",
+    "packageText": "250 ml",
+    "price": 16.04,
+    "priceText": "16.04 SEK",
+    "unitPrice": 64.16,
+    "unitPriceText": "64.16 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ed33bb23-2e08-45de-a994-bf34fa658c78.jpg?fit=bounds&format=auto&optimize=medium&width=180&s=0x835c271f45dad3c325d965dd1646642e7bf32cd3",
+    "productUrl": "https://www.mathem.se/se/products/67447-oatly-havredryck-matcha-jordgubbe-28/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=jordgubbar",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9800",
+    "name": "Scan Falukorv",
+    "brand": "Scan",
+    "packageText": "800 g",
+    "price": 37.6,
+    "priceText": "37.60 SEK",
+    "unitPrice": 47,
+    "unitPriceText": "47.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8079348b-adc2-4715-95b9-eec4a8585aaf.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xb2e52694c89c7d7b4d464316f5d5e404e7feee66",
+    "productUrl": "https://www.mathem.se/se/products/9800-scan-falukorv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5564",
+    "name": "Sorunda korvfabrik Grillkorv 8-p",
+    "brand": "Sorunda korvfabrik",
+    "packageText": "400 g",
+    "price": 22,
+    "priceText": "22.00 SEK",
+    "unitPrice": 55,
+    "unitPriceText": "55.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5d837646-d520-49dd-9a0f-f21337e5d635.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x83371782fde4c636014e3b2f3adb7a7b9c51d219",
+    "productUrl": "https://www.mathem.se/se/products/5564-sorunda-korvfabrik-grillkorv-8-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3332",
+    "name": "Sorunda korvfabrik Chorizo 5-p",
+    "brand": "Sorunda korvfabrik",
+    "packageText": "600 g",
+    "price": 49,
+    "priceText": "49.00 SEK",
+    "unitPrice": 81.67,
+    "unitPriceText": "81.67 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ea35903e-0be1-47e2-8a8c-3d36d5bcab26.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x86f38da8be019a294a7ac88da2931bd67e1fc8ff",
+    "productUrl": "https://www.mathem.se/se/products/3332-sorunda-korvfabrik-chorizo-5-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67986",
+    "name": "Hot Dogs Grillkorv 10-p",
+    "brand": "Hot Dogs",
+    "packageText": "400 g",
+    "price": 21.5,
+    "priceText": "21.50 SEK",
+    "unitPrice": 53.75,
+    "unitPriceText": "53.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ce94f0bb-81dc-4fb2-83de-626ab7379a63.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xd87d56e6a4347431b8bb1d456b0f7a4e365c2cb7",
+    "productUrl": "https://www.mathem.se/se/products/67986-hot-dogs-hot-dogs-grillkorv-10-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9222",
+    "name": "Sorunda korvfabrik Varmkorv 16-p",
+    "brand": "Sorunda korvfabrik",
+    "packageText": "800 g",
+    "price": 55.37,
+    "priceText": "55.37 SEK",
+    "unitPrice": 69.21,
+    "unitPriceText": "69.21 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1bcf8d77-8945-41b6-8ad8-5981baf46439.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdc4f8c80d7ff761b6fea3dae86672ba68c6aa8a9",
+    "productUrl": "https://www.mathem.se/se/products/9222-sorunda-korvfabrik-varmkorv-16-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6318",
+    "name": "Scan Falukorv",
+    "brand": "Scan",
+    "packageText": "300 g",
+    "price": 20,
+    "priceText": "20.00 SEK",
+    "unitPrice": 66.67,
+    "unitPriceText": "66.67 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/eee6df7b-47c6-43cb-9969-bcdd4484c0e1.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xebba93a3919f391874c99a483b1564e2ca57836a",
+    "productUrl": "https://www.mathem.se/se/products/6318-scan-falukorv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11745",
+    "name": "Gudruns Stockholmare",
+    "brand": "Gudruns",
+    "packageText": "240 g",
+    "price": 40.5,
+    "priceText": "40.50 SEK",
+    "unitPrice": 168.75,
+    "unitPriceText": "168.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/437b2394-24e7-4042-91d9-c5e84e38cfb0.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x586aac066fe117005b3e5d074316aba348be3d60",
+    "productUrl": "https://www.mathem.se/se/products/11745-gudruns-stockholmare/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5723",
+    "name": "Korvbrödsbagarn Korvbröd 16-p",
+    "brand": "Korvbrödsbagarn",
+    "packageText": "432 g",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 48.08,
+    "unitPriceText": "48.08 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2ac72b22-23fc-4707-a6a7-9c08df2c05ea.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x0ea7f5591dc3a3b92420303116b48eebb3344ac2",
+    "productUrl": "https://www.mathem.se/se/products/5723-korvbrodsbagarn-korvbrod-16-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7002",
+    "name": "Garant Grillkorv",
+    "brand": "Garant",
+    "packageText": "400 g",
+    "price": 31.18,
+    "priceText": "31.18 SEK",
+    "unitPrice": 77.95,
+    "unitPriceText": "77.95 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/875c2bdc-c0f6-4934-b350-b7887d675d52.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xb1bfadcda9592694075f45b7858a7401865ddd33",
+    "productUrl": "https://www.mathem.se/se/products/7002-garant-grillkorv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9292",
+    "name": "Solna Korv Grillkorv",
+    "brand": "Solna Korv",
+    "packageText": "700 g",
+    "price": 56,
+    "priceText": "56.00 SEK",
+    "unitPrice": 80,
+    "unitPriceText": "80.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/59315cb7-9ce5-43a9-b345-821ad335090b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x6dad1f9aa6389a7cf1c6000ea3806abbc4c7db1f",
+    "productUrl": "https://www.mathem.se/se/products/9292-solna-korv-grillkorv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8774",
+    "name": "Sorunda korvfabrik Falukorv",
+    "brand": "Sorunda korvfabrik",
+    "packageText": "800 g",
+    "price": 46.33,
+    "priceText": "46.33 SEK",
+    "unitPrice": 57.91,
+    "unitPriceText": "57.91 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d9fc9262-3cdf-4ee2-9e0a-8cfb0022c64d.jpg?fit=bounds&format=auto&optimize=medium&width=246&s=0x1ee99201f5c39c3e815a98ed023961e996d3f286",
+    "productUrl": "https://www.mathem.se/se/products/8774-sorunda-korvfabrik-falukorv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9226",
+    "name": "Scan Grillkorv med Tunt Skinn 8-p",
+    "brand": "Scan",
+    "packageText": "640 g",
+    "price": 45.3,
+    "priceText": "45.30 SEK",
+    "unitPrice": 70.78,
+    "unitPriceText": "70.78 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/aacfcc04-6cd4-4ce9-9b30-1e2951b8f3ab.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xb0ffbf7f4fe87b492a7cf641cbfa33e6c2ef7d62",
+    "productUrl": "https://www.mathem.se/se/products/9226-scan-grillkorv-med-tunt-skinn-8-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9635",
+    "name": "Sorunda Korvfabrik Kabanoss 4-p",
+    "brand": "Sorunda Korvfabrik",
+    "packageText": "220 g",
+    "price": 32,
+    "priceText": "32.00 SEK",
+    "unitPrice": 145.45,
+    "unitPriceText": "145.45 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4d561f80-e15c-418b-b976-57811631f8bd.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xf075de604cd01ef3dea0ac5aace4949dd32a51f8",
+    "productUrl": "https://www.mathem.se/se/products/9635-sorunda-korvfabrik-kabanoss-4-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8851",
+    "name": "Scan Falukorv Deli",
+    "brand": "Scan",
+    "packageText": "550 g",
+    "price": 43.06,
+    "priceText": "43.06 SEK",
+    "unitPrice": 78.29,
+    "unitPriceText": "78.29 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5b93c82a-bf1d-4fec-80e2-e65db8cb1b8d.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xde20b4cdcd0c13d11d98d0904e469294df79971d",
+    "productUrl": "https://www.mathem.se/se/products/8851-scan-falukorv-deli/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7033",
+    "name": "Garant Chorizo",
+    "brand": "Garant",
+    "packageText": "300 g",
+    "price": 30.76,
+    "priceText": "30.76 SEK",
+    "unitPrice": 102.53,
+    "unitPriceText": "102.53 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3cccc939-2308-403e-b100-fde9c8e246e7.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xffbb279ece99b9366e1601a6226eaa6a4ea9a2a4",
+    "productUrl": "https://www.mathem.se/se/products/7033-garant-chorizo/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10669",
+    "name": "Scan Grillkorv Bacon & Ost 6-p",
+    "brand": "Scan",
+    "packageText": "480 g",
+    "price": 48.22,
+    "priceText": "48.22 SEK",
+    "unitPrice": 100.46,
+    "unitPriceText": "100.46 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/34daa396-62ff-4aaf-af45-3eed0e85d288.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x65a7dfade519296925a39998d74757b2f0018163",
+    "productUrl": "https://www.mathem.se/se/products/10669-scan-grillkorv-bacon-ost-6-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5192",
+    "name": "Korvbrödsbagarn Korvbröd 10-p",
+    "brand": "Korvbrödsbagarn",
+    "packageText": "270 g",
+    "price": 17.7,
+    "priceText": "17.70 SEK",
+    "unitPrice": 65.56,
+    "unitPriceText": "65.56 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2f235c1c-bb45-4906-9e5b-b60eeaaed708.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x0bf6041b7f1392d89bf6eb88e07997e35c3196de",
+    "productUrl": "https://www.mathem.se/se/products/5192-korvbrodsbagarn-korvbrod-10-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8615",
+    "name": "Sorunda korvfabrik Wienerkorv 7-p",
+    "brand": "Sorunda korvfabrik",
+    "packageText": "400 g",
+    "price": 43.49,
+    "priceText": "43.49 SEK",
+    "unitPrice": 108.73,
+    "unitPriceText": "108.73 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/542c40bb-39b5-4af3-8ebf-7fbc45435e07.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x0afae615ae836c6ceadbe43aa33ce16a34591a13",
+    "productUrl": "https://www.mathem.se/se/products/8615-sorunda-korvfabrik-wienerkorv-7-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9764",
+    "name": "Scan Chorizo",
+    "brand": "Scan",
+    "packageText": "300 g",
+    "price": 36.44,
+    "priceText": "36.44 SEK",
+    "unitPrice": 121.47,
+    "unitPriceText": "121.47 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7375de14-d0b3-41b3-9780-d91bf30d854a.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x5a058ef85eb4e77350a5bdd6423f996c7dd40693",
+    "productUrl": "https://www.mathem.se/se/products/9764-scan-chorizo/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2514",
+    "name": "Scan Grillkorv med Tunt Skinn 12-p",
+    "brand": "Scan",
+    "packageText": "960 g",
+    "price": 66.1,
+    "priceText": "66.10 SEK",
+    "unitPrice": 68.85,
+    "unitPriceText": "68.85 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6cefe749-5e1d-4e05-8164-804fd6944e6d.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x695764a0bd5a742618659e89b206edff4d412cbd",
+    "productUrl": "https://www.mathem.se/se/products/2514-scan-grillkorv-med-tunt-skinn-12-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9741",
+    "name": "Ingelsta Kalkon Grillkorv Kalkon",
+    "brand": "Ingelsta Kalkon",
+    "packageText": "400 g",
+    "price": 34.97,
+    "priceText": "34.97 SEK",
+    "unitPrice": 87.43,
+    "unitPriceText": "87.43 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fe062e9a-c340-4429-9bea-811177b7b52b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x96c6de19da0298aaf21777224394c2b1366be5e0",
+    "productUrl": "https://www.mathem.se/se/products/9741-ingelsta-kalkon-grillkorv-kalkon/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4445",
+    "name": "Lök Gul styck Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 200 g",
+    "price": 3.95,
+    "priceText": "3.95 SEK",
+    "unitPrice": 19.75,
+    "unitPriceText": "19.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fe488cc6-e702-45a6-a5e5-75450f7fd956.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x41df90fe8987b2f85b0af4aaa1e332dd95b9b3fe",
+    "productUrl": "https://www.mathem.se/se/products/4445-lok-gul-styck-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8913",
+    "name": "Scan Wienerkorv",
+    "brand": "Scan",
+    "packageText": "300 g",
+    "price": 44.96,
+    "priceText": "44.96 SEK",
+    "unitPrice": 149.87,
+    "unitPriceText": "149.87 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b6d34ead-e32e-48ed-8866-0d4408b8d9fa.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xea9834fbf2b0882d1bf487194b45a9a5b78c2703",
+    "productUrl": "https://www.mathem.se/se/products/8913-scan-wienerkorv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10489",
+    "name": "Peas of Heaven Vegansk Grillkorv",
+    "brand": "Peas of Heaven",
+    "packageText": "250 g",
+    "price": 34.95,
+    "priceText": "34.95 SEK",
+    "unitPrice": 139.8,
+    "unitPriceText": "139.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5fec9663-8b7a-4c08-98bb-54d172a5873b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x60a5e1c419d39693a3f397a727bb492a7e956f91",
+    "productUrl": "https://www.mathem.se/se/products/10489-peas-of-heaven-vegansk-grillkorv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8911",
+    "name": "Scan Varmkorv",
+    "brand": "Scan",
+    "packageText": "360 g",
+    "price": 44.96,
+    "priceText": "44.96 SEK",
+    "unitPrice": 124.89,
+    "unitPriceText": "124.89 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/257110ad-34aa-443e-82de-ed5703a7cfb5.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x1a1122fa2c56f853ce341e7828bd5737578d2cc8",
+    "productUrl": "https://www.mathem.se/se/products/8911-scan-varmkorv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9659",
+    "name": "Scan Smal Chorizo",
+    "brand": "Scan",
+    "packageText": "240 g",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 157.54,
+    "unitPriceText": "157.54 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/78204b5b-057d-4cba-9375-5ca51f74d17e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xe34b7778dd8f56cfc37ed07bc08b0977ef0435c2",
+    "productUrl": "https://www.mathem.se/se/products/9659-scan-smal-chorizo/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63586",
+    "name": "Lithells Barnens Grillkorv",
+    "brand": "Lithells",
+    "packageText": "400 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 75.6,
+    "unitPriceText": "75.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/95bae0c9-06ba-4c4a-b63e-ba989c0a1717.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x98f58bfa271a6a16073e103dbf54b09962841e70",
+    "productUrl": "https://www.mathem.se/se/products/63586-lithells-barnens-grillkorv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2630",
+    "name": "Ingelsta Kalkon Kung Ingels Kalkonkorv",
+    "brand": "Ingelsta Kalkon",
+    "packageText": "500 g",
+    "price": 58.63,
+    "priceText": "58.63 SEK",
+    "unitPrice": 117.26,
+    "unitPriceText": "117.26 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/be93a33d-0eac-41d1-9449-521b1fb71ef3.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa3a1905650859b3bdadfd21a624c820fc1694645",
+    "productUrl": "https://www.mathem.se/se/products/2630-ingelsta-kalkon-kung-ingels-kalkonkorv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10563",
+    "name": "Peas of Heaven Vegansk Chorizo",
+    "brand": "Peas of Heaven",
+    "packageText": "250 g",
+    "price": 34.95,
+    "priceText": "34.95 SEK",
+    "unitPrice": 139.8,
+    "unitPriceText": "139.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/84f3168c-393a-466f-8d4d-646e4f5e75f7.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdbbdfddb43a6a9b2aa207cb00f05760c6d446983",
+    "productUrl": "https://www.mathem.se/se/products/10563-peas-of-heaven-vegansk-chorizo/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "39802",
+    "name": "Scan Prickig korv",
+    "brand": "Scan",
+    "packageText": "100 g",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 188.8,
+    "unitPriceText": "188.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c73ffc32-edb5-43a1-b192-6230bf12c006.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x4c4af7025a01c76f4fe9484ef1c12ca9aa9fe3ce",
+    "productUrl": "https://www.mathem.se/se/products/39802-scan-prickig-korv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8453",
+    "name": "Sorunda korvfabrik Grillkorv Nöt",
+    "brand": "Sorunda korvfabrik",
+    "packageText": "480 g",
+    "price": 35,
+    "priceText": "35.00 SEK",
+    "unitPrice": 72.92,
+    "unitPriceText": "72.92 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0e29eb5e-511a-4117-8891-a1a55e5a2b4e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x891a56b184dea6e0eeaba199f692dfa34e5bcbc7",
+    "productUrl": "https://www.mathem.se/se/products/8453-sorunda-korvfabrik-grillkorv-not/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68185",
+    "name": "Kronfågel Kycklinggrillkorv Skinnfri",
+    "brand": "Kronfågel",
+    "packageText": "400 g",
+    "price": 27.4,
+    "priceText": "27.40 SEK",
+    "unitPrice": 68.5,
+    "unitPriceText": "68.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/aafa40f7-67e5-4da4-b665-54128b17b566.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x69c8b8bd219f8d44c26720e44b8f6285264fb418",
+    "productUrl": "https://www.mathem.se/se/products/68185-kronfagel-kycklinggrillkorv-skinnfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2394",
+    "name": "Garant Eko Falukorv EKO",
+    "brand": "Garant Eko",
+    "packageText": "600 g",
+    "price": 61.04,
+    "priceText": "61.04 SEK",
+    "unitPrice": 101.73,
+    "unitPriceText": "101.73 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c065132b-cac2-468b-98e2-ed1fd7bf8663.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x9d419b1524533cca268ac45b60c4bcdfe288c64b",
+    "productUrl": "https://www.mathem.se/se/products/2394-garant-eko-falukorv-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "27721",
+    "name": "Garant Falukorv Svensk",
+    "brand": "Garant",
+    "packageText": "800 g",
+    "price": 37.38,
+    "priceText": "37.38 SEK",
+    "unitPrice": 46.73,
+    "unitPriceText": "46.73 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c178d449-d78e-4a8d-b381-7cbc7114aaf8.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x1ad9bed37beb7c48714b4b554424a5caf449770e",
+    "productUrl": "https://www.mathem.se/se/products/27721-garant-falukorv-svensk/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "26835",
+    "name": "Lithells Wienerkorv",
+    "brand": "Lithells",
+    "packageText": "750 g",
+    "price": 68.1,
+    "priceText": "68.10 SEK",
+    "unitPrice": 90.8,
+    "unitPriceText": "90.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/70945fb2-dea8-4f47-98ef-d08b6ccdea1d.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x59a1126c6139f11193af53eef4d8d69a08ac9b6a",
+    "productUrl": "https://www.mathem.se/se/products/26835-lithells-wienerkorv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "26886",
+    "name": "Lithells Hots 10-p",
+    "brand": "Lithells",
+    "packageText": "400 g",
+    "price": 19.83,
+    "priceText": "19.83 SEK",
+    "unitPrice": 49.58,
+    "unitPriceText": "49.58 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f4ac9cd9-c6ae-4f45-aecb-f1288024b81b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x2394841daea6773ab82dd749324851cadd8e6a83",
+    "productUrl": "https://www.mathem.se/se/products/26886-lithells-hots-10-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8695",
+    "name": "Scan Vego Middagskorv",
+    "brand": "Scan",
+    "packageText": "300 g",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 126.03,
+    "unitPriceText": "126.03 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/201bfae1-ce91-49eb-baab-de7bfa2eda1f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdfc19c44df122b883333b28f492238f7d4772022",
+    "productUrl": "https://www.mathem.se/se/products/8695-scan-vego-middagskorv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "12199",
+    "name": "Scan Prickig Korv",
+    "brand": "Scan",
+    "packageText": "200 g",
+    "price": 31.18,
+    "priceText": "31.18 SEK",
+    "unitPrice": 155.9,
+    "unitPriceText": "155.90 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/562d7930-ee2f-4559-8358-806fd9c714c6.jpg?fit=bounds&format=auto&optimize=medium&width=182&s=0xa73bd352c788e5ef13bc8b88534f3005be8e222f",
+    "productUrl": "https://www.mathem.se/se/products/12199-scan-prickig-korv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6700",
+    "name": "Dafgårds Korv Stroganoff Fryst",
+    "brand": "Dafgårds",
+    "packageText": "400 g",
+    "price": 27.2,
+    "priceText": "27.20 SEK",
+    "unitPrice": 68,
+    "unitPriceText": "68.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3e836fec-2a77-4bac-bb23-cf803b447b18.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x6a06e741a10ff7c4942f7c2b66d2a32a08fb052a",
+    "productUrl": "https://www.mathem.se/se/products/6700-dafgards-korv-stroganoff-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9181",
+    "name": "Solna Korv Falukorv",
+    "brand": "Solna Korv",
+    "packageText": "750 g",
+    "price": 61.99,
+    "priceText": "61.99 SEK",
+    "unitPrice": 61.99,
+    "unitPriceText": "61.99 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/417b2d47-03a6-42d2-b0ff-8f633cefe467.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x93a8cc2e4e93f3f1513f0576a425e2fc7426d754",
+    "productUrl": "https://www.mathem.se/se/products/9181-solna-korv-falukorv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11450",
+    "name": "Solna Korv Kalaswienerkorv",
+    "brand": "Solna Korv",
+    "packageText": "600 g",
+    "price": 69,
+    "priceText": "69.00 SEK",
+    "unitPrice": 115,
+    "unitPriceText": "115.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2eb0b2a2-83c0-4e31-a57f-227e32fd4ce2.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xd3088967df3fabef1ad6b03c7dddfc8720ee3dec",
+    "productUrl": "https://www.mathem.se/se/products/11450-solna-korv-kalaswienerkorv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=korv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3255",
+    "name": "Stensåkra Falukorv",
+    "brand": "Stensåkra",
+    "packageText": "800 g",
+    "price": 72.4,
+    "priceText": "72.40 SEK",
+    "unitPrice": 90.5,
+    "unitPriceText": "90.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c0ebe7be-c54b-4ffb-aca4-49e32e7f4c73.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x27f1a7a4bccd2dc3f9a4e16df853bc7993fc4a43",
+    "productUrl": "https://www.mathem.se/se/products/3255-stensakra-falukorv/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=falukorv",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62350",
+    "name": "Findus Fish&Crisp Gourmetfileer Fryst MSC",
+    "brand": "Findus",
+    "packageText": "480 g",
+    "price": 53.8,
+    "priceText": "53.80 SEK",
+    "unitPrice": 112.08,
+    "unitPriceText": "112.08 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/db6d21e0-e85d-48d0-bcbb-0357ee5d9cc5.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x41273916bbbcf3c3578a718939d62bc5405ef10d",
+    "productUrl": "https://www.mathem.se/se/products/62350-findus-fishcrisp-gourmetfileer-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "39062",
+    "name": "Omega Torskfilé Fryst MSC",
+    "brand": "Omega",
+    "packageText": "400 g",
+    "price": 75.67,
+    "priceText": "75.67 SEK",
+    "unitPrice": 189.18,
+    "unitPriceText": "189.18 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/90902917-7992-49c4-9c16-1bf91f3988de.jpg?fit=bounds&format=auto&optimize=medium&width=273&s=0x4eb42a1dbdb199a5992154348a41be025d75a6b1",
+    "productUrl": "https://www.mathem.se/se/products/39062-omega-torskfile-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67951",
+    "name": "Eldorado Alaska Pollock Fryst MSC",
+    "brand": "Eldorado",
+    "packageText": "400 g",
+    "price": 34.02,
+    "priceText": "34.02 SEK",
+    "unitPrice": 85.05,
+    "unitPriceText": "85.05 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6b0632e3-c108-4fcd-ab0c-c0215aaab66f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc145ebbccec8958626d529d52078d25569e99269",
+    "productUrl": "https://www.mathem.se/se/products/67951-eldorado-alaska-pollock-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "39954",
+    "name": "Omega Stillahavsflundra Fryst MSC",
+    "brand": "Omega",
+    "packageText": "500 g",
+    "price": 80.4,
+    "priceText": "80.40 SEK",
+    "unitPrice": 160.8,
+    "unitPriceText": "160.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8e668821-e52f-4edb-a5d6-52372341e004.jpg?fit=bounds&format=auto&optimize=medium&width=259&s=0xa1af923ca72b5f5f05221cfc54c908d05606a8e4",
+    "productUrl": "https://www.mathem.se/se/products/39954-omega-stillahavsflundra-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66405",
+    "name": "Garant Sprödbakad Firre Fryst MSC",
+    "brand": "Garant",
+    "packageText": "360 g",
+    "price": 38.5,
+    "priceText": "38.50 SEK",
+    "unitPrice": 106.94,
+    "unitPriceText": "106.94 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/694c57b3-ebeb-42af-a95b-d02c78e1e5c8.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x7bf35ace935caccc2df94317ad38597ab58cd7e2",
+    "productUrl": "https://www.mathem.se/se/products/66405-garant-sprodbakad-firre-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67849",
+    "name": "Garant Sejfilé Fryst MSC",
+    "brand": "Garant",
+    "packageText": "400 g",
+    "price": 65.26,
+    "priceText": "65.26 SEK",
+    "unitPrice": 163.15,
+    "unitPriceText": "163.15 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e64e59f8-ee0d-40fa-8522-724c3c571092.jpg?fit=bounds&format=auto&optimize=medium&width=273&s=0xce18a26f25e40851767e5c52b872f52ff32b0055",
+    "productUrl": "https://www.mathem.se/se/products/67849-garant-sejfile-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2117",
+    "name": "Garant Tonfisk i Vatten MSC",
+    "brand": "Garant",
+    "packageText": "170 g",
+    "price": 18.83,
+    "priceText": "18.83 SEK",
+    "unitPrice": 156.92,
+    "unitPriceText": "156.92 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a6c45644-5e67-44b0-ab90-89081888b7c9.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x66f454137e3f45ae6cac94b3f76d3c7a10c3d2f6",
+    "productUrl": "https://www.mathem.se/se/products/2117-garant-tonfisk-i-vatten-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11374",
+    "name": "Findus Torskfiléer MSC Fryst 3x125g",
+    "brand": "Findus",
+    "packageText": "375 g",
+    "price": 103.1,
+    "priceText": "103.10 SEK",
+    "unitPrice": 274.93,
+    "unitPriceText": "274.93 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c11533fe-ede6-4f46-bee2-114aaada05af.jpg?fit=bounds&format=auto&optimize=medium&width=225&s=0xbc73f638adcfd481cb8da5cc4cbbb021f7130414",
+    "productUrl": "https://www.mathem.se/se/products/11374-findus-torskfileer-msc-fryst-3x125g/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11094",
+    "name": "Findus Frasiga Fiskfiléer Glutenfria Frysta MSC 4-p",
+    "brand": "Findus",
+    "packageText": "340 g",
+    "price": 57.68,
+    "priceText": "57.68 SEK",
+    "unitPrice": 169.65,
+    "unitPriceText": "169.65 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a1715712-aa1e-429b-b6c9-dff32f2497a2.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x9d7c7e99212dd9e174a18e6d1bdb2e8d400a2c28",
+    "productUrl": "https://www.mathem.se/se/products/11094-findus-frasiga-fiskfileer-glutenfria-frysta-msc-4/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66400",
+    "name": "Findus Spröda Crispies Fryst MSC",
+    "brand": "Findus",
+    "packageText": "555 g",
+    "price": 64.95,
+    "priceText": "64.95 SEK",
+    "unitPrice": 117.03,
+    "unitPriceText": "117.03 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7b55d4df-5e35-4082-b09f-c2891de4827b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x6c5f9093ecc53125de120f2ce341e56036ee11df",
+    "productUrl": "https://www.mathem.se/se/products/66400-findus-sproda-crispies-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3181",
+    "name": "Findus Torskryggfilé Fryst MSC 3x140g",
+    "brand": "Findus",
+    "packageText": "420 g",
+    "price": 132.4,
+    "priceText": "132.40 SEK",
+    "unitPrice": 315.24,
+    "unitPriceText": "315.24 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/580a4e21-837d-4c17-89d1-42ff9b2859c8.jpg?fit=bounds&format=auto&optimize=medium&width=206&s=0x609b31981f7b8a0d4405b6c79f4b4b3f180dfa1d",
+    "productUrl": "https://www.mathem.se/se/products/3181-findus-torskryggfile-fryst-msc-3x140g/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7924",
+    "name": "Garant Fiskgratäng Räk- & Dillsås MSC Fryst",
+    "brand": "Garant",
+    "packageText": "350 g",
+    "price": 34.54,
+    "priceText": "34.54 SEK",
+    "unitPrice": 98.69,
+    "unitPriceText": "98.69 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d0743515-c55b-416c-9d38-ecfbb592ad90.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x0089641ed4b5dd09748c8a98572a986c7863528e",
+    "productUrl": "https://www.mathem.se/se/products/7924-garant-fiskgratang-rak-dillsas-msc-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10352",
+    "name": "Findus Frasiga Fiskpinnar Frysta MSC 15-p",
+    "brand": "Findus",
+    "packageText": "450 g",
+    "price": 42.12,
+    "priceText": "42.12 SEK",
+    "unitPrice": 93.6,
+    "unitPriceText": "93.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/405a2336-c93b-4703-a0ae-400093755b20.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xcf9b55e0fb28a6bb30fd08ac38fc1c8761305b45",
+    "productUrl": "https://www.mathem.se/se/products/10352-findus-frasiga-fiskpinnar-frysta-msc-15-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66398",
+    "name": "Findus Fiskpinnar Fryst MSC",
+    "brand": "Findus",
+    "packageText": "896 g",
+    "price": 57.9,
+    "priceText": "57.90 SEK",
+    "unitPrice": 64.62,
+    "unitPriceText": "64.62 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0a8a2d21-3920-4edd-b8e5-630dc37e88e8.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdeddee465da969ef577bba0b5f01ac0de9855cd8",
+    "productUrl": "https://www.mathem.se/se/products/66398-findus-fiskpinnar-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3054",
+    "name": "Findus Fish & Crisp Fish Nuggets Frysta MSC",
+    "brand": "Findus",
+    "packageText": "490 g",
+    "price": 55.7,
+    "priceText": "55.70 SEK",
+    "unitPrice": 113.67,
+    "unitPriceText": "113.67 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8ce1b3aa-ad1b-49f9-9795-e3b944446620.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x8d447f2f5a62186806659831d3ced096a7f56396",
+    "productUrl": "https://www.mathem.se/se/products/3054-findus-fish-crisp-fish-nuggets-frysta-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9463",
+    "name": "Falkenberg Inlagd Stekt Strömming MSC",
+    "brand": "Falkenberg",
+    "packageText": "500 g",
+    "price": 37.38,
+    "priceText": "37.38 SEK",
+    "unitPrice": 149.52,
+    "unitPriceText": "149.52 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/dbdd0f38-b6bd-445c-a1d2-ce16d5ed749a.jpg?fit=bounds&format=auto&optimize=medium&width=275&s=0x01b787559181b52397902e4ccd4c62ff16091980",
+    "productUrl": "https://www.mathem.se/se/products/9463-falkenberg-inlagd-stekt-stromming-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9870",
+    "name": "Garant Fiskpinnar Frysta MSC",
+    "brand": "Garant",
+    "packageText": "450 g",
+    "price": 29,
+    "priceText": "29.00 SEK",
+    "unitPrice": 64.44,
+    "unitPriceText": "64.44 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/79da3b3b-5bc1-4011-91e4-f3b5c385b888.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x5f7a65e0be1ea9e830dafa0598a0e5b355b96fd9",
+    "productUrl": "https://www.mathem.se/se/products/9870-garant-fiskpinnar-frysta-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10209",
+    "name": "Garant Tonfisk i Vatten MSC 3x80g",
+    "brand": "Garant",
+    "packageText": "240 g",
+    "price": 40.65,
+    "priceText": "40.65 SEK",
+    "unitPrice": 241.96,
+    "unitPriceText": "241.96 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a1133804-e1c6-4a8c-bd52-a5fd887088f9.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa2373e8b2b29b2a1dc728df112e8793163190181",
+    "productUrl": "https://www.mathem.se/se/products/10209-garant-tonfisk-i-vatten-msc-3x80g/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7800",
+    "name": "Garant Fiskgratäng Dillsås MSC Fryst",
+    "brand": "Garant",
+    "packageText": "350 g",
+    "price": 34.54,
+    "priceText": "34.54 SEK",
+    "unitPrice": 98.69,
+    "unitPriceText": "98.69 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0c5c1c8d-354b-4066-b8e9-e4aaa5f6f275.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc7889d628df2a68e466330b8b0ba45bfceab7fb9",
+    "productUrl": "https://www.mathem.se/se/products/7800-garant-fiskgratang-dillsas-msc-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64839",
+    "name": "Findus Fish & Fun Fryst MSC",
+    "brand": "Findus",
+    "packageText": "352 g",
+    "price": 46.33,
+    "priceText": "46.33 SEK",
+    "unitPrice": 131.62,
+    "unitPriceText": "131.62 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8e533717-d673-4252-898c-f3ede22c652f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xf7b0be61651f617716c346cfaea6e54ab5825a0a",
+    "productUrl": "https://www.mathem.se/se/products/64839-findus-fish-fun-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67210",
+    "name": "Vici Surimisticks MSC Fryst",
+    "brand": "Vici",
+    "packageText": "100 g",
+    "price": 10.88,
+    "priceText": "10.88 SEK",
+    "unitPrice": 108.8,
+    "unitPriceText": "108.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/31c7574b-38aa-4146-961c-146693272da9.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xde1c614f5c22f43892ee6dbd3b9e685be911e9bd",
+    "productUrl": "https://www.mathem.se/se/products/67210-vici-surimisticks-msc-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68414",
+    "name": "Polar Seafood Stillahavstorsk Fryst MSC",
+    "brand": "Polar Seafood",
+    "packageText": "300 g",
+    "price": 75.67,
+    "priceText": "75.67 SEK",
+    "unitPrice": 252.23,
+    "unitPriceText": "252.23 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8117083d-c954-4c84-957f-4f206f6ff8a2.jpg?fit=bounds&format=auto&optimize=medium&width=153&s=0x3c1214b013ec0eabe7269ee73c87ec9463891cd8",
+    "productUrl": "https://www.mathem.se/se/products/68414-polar-seafood-stillahavstorsk-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6220",
+    "name": "Abba Fiskbullar Hummer",
+    "brand": "Abba",
+    "packageText": "375 g",
+    "price": 26.03,
+    "priceText": "26.03 SEK",
+    "unitPrice": 69.41,
+    "unitPriceText": "69.41 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/be745aa1-37fc-4351-8c78-484e6eedc387.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x3a34eba9702aafd4cd649bd12de58dc0b03c70cb",
+    "productUrl": "https://www.mathem.se/se/products/6220-abba-fiskbullar-hummer/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6335",
+    "name": "Abba Fiskbullar Dillsås",
+    "brand": "Abba",
+    "packageText": "375 g",
+    "price": 26.03,
+    "priceText": "26.03 SEK",
+    "unitPrice": 69.41,
+    "unitPriceText": "69.41 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2994d1f0-3d7d-4fec-abf4-b6c076f34816.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xf61c7d4977795be4609fb50c89f4c85be11224bf",
+    "productUrl": "https://www.mathem.se/se/products/6335-abba-fiskbullar-dillsas/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "38792",
+    "name": "Garant Frasig Firre Fryst MSC",
+    "brand": "Garant",
+    "packageText": "480 g",
+    "price": 60.52,
+    "priceText": "60.52 SEK",
+    "unitPrice": 126.08,
+    "unitPriceText": "126.08 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/012890f9-0db6-4dc3-897a-651a886e2760.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xaa533994288d390e22f855af32fc2af0ad4f7009",
+    "productUrl": "https://www.mathem.se/se/products/38792-garant-frasig-firre-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68413",
+    "name": "Polar Seafood Alaska Pollock Fryst MSC",
+    "brand": "Polar Seafood",
+    "packageText": "400 g",
+    "price": 54.85,
+    "priceText": "54.85 SEK",
+    "unitPrice": 137.13,
+    "unitPriceText": "137.13 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0d559a71-f6c2-4ff3-b5c9-21bf41b28af2.jpg?fit=bounds&format=auto&optimize=medium&width=124&s=0xb30caf33ee4ed54be569958e93a0f4cfb8fdacb8",
+    "productUrl": "https://www.mathem.se/se/products/68413-polar-seafood-alaska-pollock-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67728",
+    "name": "Findus Fish and Crisp Fish Burger MSC Fryst",
+    "brand": "Findus",
+    "packageText": "230 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 123.26,
+    "unitPriceText": "123.26 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0f4c755e-764e-41da-b811-076412c56c27.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x03ef35750628370105048075cc616c28e191ace2",
+    "productUrl": "https://www.mathem.se/se/products/67728-findus-fish-and-crisp-fish-burger-msc-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66401",
+    "name": "Findus Stillahavsspätta Fryst MSC",
+    "brand": "Findus",
+    "packageText": "450 g",
+    "price": 84.95,
+    "priceText": "84.95 SEK",
+    "unitPrice": 188.78,
+    "unitPriceText": "188.78 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d544dd4b-883d-41b9-824d-17f226ceb96c.jpg?fit=bounds&format=auto&optimize=medium&width=269&s=0x065472a4a7cdef41e5d4090297a92cc014cd7086",
+    "productUrl": "https://www.mathem.se/se/products/66401-findus-stillahavsspatta-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67913",
+    "name": "Eldorado Fiskpinnar MSC Frysta",
+    "brand": "Eldorado",
+    "packageText": "450 g",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 46.16,
+    "unitPriceText": "46.16 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4062a0c7-4e2e-46c7-bd84-849b9f050215.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xbfdc80d70c32390d0f61177f6ddfa670dcb10a6b",
+    "productUrl": "https://www.mathem.se/se/products/67913-eldorado-fiskpinnar-msc-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9115",
+    "name": "Findus Fiskgratäng Dill Original Fryst MSC",
+    "brand": "Findus",
+    "packageText": "600 g",
+    "price": 50.63,
+    "priceText": "50.63 SEK",
+    "unitPrice": 84.38,
+    "unitPriceText": "84.38 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a95a6857-bddf-4f60-ab00-bd705797fa0d.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xf0ade850eeb0d94c32a6ec3e82b7afac4a59cd7d",
+    "productUrl": "https://www.mathem.se/se/products/9115-findus-fiskgratang-dill-original-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10905",
+    "name": "Findus Fiskgratäng Räk- & Dillsås MSC Fryst",
+    "brand": "Findus",
+    "packageText": "600 g",
+    "price": 54.85,
+    "priceText": "54.85 SEK",
+    "unitPrice": 91.42,
+    "unitPriceText": "91.42 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/73f35d4e-c1f0-46ce-82e2-b5f1b7349cba.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xb6db8424c10834ed092c8756e89b6de383e65b7b",
+    "productUrl": "https://www.mathem.se/se/products/10905-findus-fiskgratang-rak-dillsas-msc-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66408",
+    "name": "Garant Crispy Fish Bites Texmex Fryst MSC",
+    "brand": "Garant",
+    "packageText": "400 g",
+    "price": 45,
+    "priceText": "45.00 SEK",
+    "unitPrice": 112.5,
+    "unitPriceText": "112.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f34d5c68-df5e-4cfa-ba67-2955cb114d13.jpg?fit=bounds&format=auto&optimize=medium&width=289&s=0x5818beec6f913df41b516666145d8117e62e0881",
+    "productUrl": "https://www.mathem.se/se/products/66408-garant-crispy-fish-bites-texmex-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4211",
+    "name": "Maten É Klar Tareqs Fiskgratäng",
+    "brand": "Maten É Klar",
+    "packageText": "410 g",
+    "price": 76.61,
+    "priceText": "76.61 SEK",
+    "unitPrice": 186.85,
+    "unitPriceText": "186.85 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8cc7b148-938f-4d1d-b7f0-01a9444826b0.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xda32fd6a28f8a750f62fe21dc014037635cd0881",
+    "productUrl": "https://www.mathem.se/se/products/4211-maten-e-klar-tareqs-fiskgratang/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4373",
+    "name": "Korshags Varmrökt Regnbågslax ASC",
+    "brand": "Korshags",
+    "packageText": "ca 800 g",
+    "price": 159.95,
+    "priceText": "159.95 SEK",
+    "unitPrice": 199.94,
+    "unitPriceText": "199.94 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c76b014e-dbbc-4216-959c-adfede6b7ccc.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x8783ca028b35af7b93720a1ff8cf523d198bbf5b",
+    "productUrl": "https://www.mathem.se/se/products/4373-korshags-varmrokt-regnbagslax-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=fisk",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "61555",
+    "name": "Lillängshamnen Handskalade Räkor i Lake MSC 240/580g",
+    "brand": "Lillängshamnen",
+    "packageText": "580 g",
+    "price": 87.5,
+    "priceText": "87.50 SEK",
+    "unitPrice": 364.58,
+    "unitPriceText": "364.58 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e49d3bcb-eadf-4a78-94cf-388d32ccf89f.jpg?fit=bounds&format=auto&optimize=medium&width=236&s=0x118316572aa0cfd7ff8065b3f066781395ab2886",
+    "productUrl": "https://www.mathem.se/se/products/61555-lillangshamnen-handskalade-rakor-i-lake-msc-240-58/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10854",
+    "name": "Falkenberg Seafood Stora Räkor i Lake MSC 170/360g",
+    "brand": "Falkenberg Seafood",
+    "packageText": "360 g",
+    "price": 52.95,
+    "priceText": "52.95 SEK",
+    "unitPrice": 311.47,
+    "unitPriceText": "311.47 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bcfecc58-e239-4091-b5e0-f22465edc7a7.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xd890598aaaab8427bfbaab7763a5c18894d1ebee",
+    "productUrl": "https://www.mathem.se/se/products/10854-falkenberg-seafood-stora-rakor-i-lake-msc-170-360g/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2440",
+    "name": "Garant Stora Ishavsräkor Skalade KRAV/MSC Frysta",
+    "brand": "Garant",
+    "packageText": "300 g",
+    "price": 56.74,
+    "priceText": "56.74 SEK",
+    "unitPrice": 189.13,
+    "unitPriceText": "189.13 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/34b2d31f-a69d-4296-8269-f9a6b2308832.jpg?fit=bounds&format=auto&optimize=medium&width=201&s=0x8829ce3052e663811ac7ae593e742e26abe1c8eb",
+    "productUrl": "https://www.mathem.se/se/products/2440-garant-stora-ishavsrakor-skalade-krav-msc-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63036",
+    "name": "Lillängshamnens Handskalade Räkor MSC 140/370g",
+    "brand": "Lillängshamnens",
+    "packageText": "140 g",
+    "price": 67.5,
+    "priceText": "67.50 SEK",
+    "unitPrice": 482.14,
+    "unitPriceText": "482.14 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/45be71d9-c9df-496f-9298-d58c36f5a7fa.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x75735e33f3ec1835cf4cde51146966f0c5a5c14b",
+    "productUrl": "https://www.mathem.se/se/products/63036-lillangshamnens-handskalade-rakor-msc-140-370g/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2620",
+    "name": "Smålandskräftan Gambas Al Pil Pil ASC",
+    "brand": "Smålandskräftan",
+    "packageText": "300 g",
+    "price": 118.3,
+    "priceText": "118.30 SEK",
+    "unitPrice": 394.33,
+    "unitPriceText": "394.33 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c2867688-92a9-4e54-8419-d90e7b812f25.jpg?fit=bounds&format=auto&optimize=medium&width=277&s=0xacb3c55ec041da3976782d1608f01be6312e1228",
+    "productUrl": "https://www.mathem.se/se/products/2620-smalandskraftan-gambas-al-pil-pil-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67231",
+    "name": "Falkenberg Seafood Stora Räkor Handskalade i Lake MSC 200/400g",
+    "brand": "Falkenberg Seafood",
+    "packageText": "400 g",
+    "price": 89.81,
+    "priceText": "89.81 SEK",
+    "unitPrice": 449.05,
+    "unitPriceText": "449.05 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2d84a635-9bb0-4f8d-9748-5e91b42dbf4a.jpg?fit=bounds&format=auto&optimize=medium&width=265&s=0x8d7cbdb64da0f2be9347297940bcc046fe2491eb",
+    "productUrl": "https://www.mathem.se/se/products/67231-falkenberg-seafood-stora-rakor-handskalade-i-lake/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67973",
+    "name": "Eldorado Räkor och Oregonräkor i Lake MSC",
+    "brand": "Eldorado",
+    "packageText": "360 g",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 222.41,
+    "unitPriceText": "222.41 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2409dfe1-181d-48e0-ad01-212d54f3512f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x9f65720a66646a59137cbb3e4ab703a96bdf1a0a",
+    "productUrl": "https://www.mathem.se/se/products/67973-eldorado-rakor-och-oregonrakor-i-lake-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "40052",
+    "name": "Polar Seafood Räkor med Skal 70/90 Fryst MSC",
+    "brand": "Polar Seafood",
+    "packageText": "1000 g",
+    "price": 124.93,
+    "priceText": "124.93 SEK",
+    "unitPrice": 124.93,
+    "unitPriceText": "124.93 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c8ecfd00-cb1c-4e9d-8c05-580115971daa.jpg?fit=bounds&format=auto&optimize=medium&width=203&s=0x8fd1c47b7da55d529a8f777adca121f636e60640",
+    "productUrl": "https://www.mathem.se/se/products/40052-polar-seafood-rakor-med-skal-70-90-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68411",
+    "name": "Polar Seafood Räkor med Skal 70/90 Fryst MSC",
+    "brand": "Polar Seafood",
+    "packageText": "500 g",
+    "price": 79.97,
+    "priceText": "79.97 SEK",
+    "unitPrice": 159.94,
+    "unitPriceText": "159.94 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/16a3dfcf-ec2a-42b4-8eb7-ae120d4266c6.jpg?fit=bounds&format=auto&optimize=medium&width=269&s=0x1a8babf7703a1b1fab8d12e17206e7cd921eba8c",
+    "productUrl": "https://www.mathem.se/se/products/68411-polar-seafood-rakor-med-skal-70-90-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68412",
+    "name": "Polar Seafood Räkor med Skal 70/90 Fryst MSC",
+    "brand": "Polar Seafood",
+    "packageText": "700 g",
+    "price": 104.11,
+    "priceText": "104.11 SEK",
+    "unitPrice": 148.73,
+    "unitPriceText": "148.73 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8c1e308e-156d-4727-8052-2a35d29bcd56.jpg?fit=bounds&format=auto&optimize=medium&width=226&s=0xb1d9add07b68e68ae1a2eed59ecbd6144283a3f3",
+    "productUrl": "https://www.mathem.se/se/products/68412-polar-seafood-rakor-med-skal-70-90-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67234",
+    "name": "Falkenberg Räkor Handskalade i Lake MSC 140/280g",
+    "brand": "Falkenberg",
+    "packageText": "140 g",
+    "price": 65.95,
+    "priceText": "65.95 SEK",
+    "unitPrice": 471.07,
+    "unitPriceText": "471.07 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7cda4ca6-5273-4207-a234-5af0bde81bec.jpg?fit=bounds&format=auto&optimize=medium&width=261&s=0x9b7dc48ad1971871f928af6db67ed248345daa45",
+    "productUrl": "https://www.mathem.se/se/products/67234-falkenberg-rakor-handskalade-i-lake-msc-140-280g/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67237",
+    "name": "Falkenberg Seafood Stora Räkor i Lake MSC 400/800g",
+    "brand": "Falkenberg Seafood",
+    "packageText": "800 g",
+    "price": 108.84,
+    "priceText": "108.84 SEK",
+    "unitPrice": 272.1,
+    "unitPriceText": "272.10 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/844b9505-02a9-42f7-8c1f-5237602cc44e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xbf562553f4746bf6d1faabbe69cc55e269853f6a",
+    "productUrl": "https://www.mathem.se/se/products/67237-falkenberg-seafood-stora-rakor-i-lake-msc-400-800g/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67232",
+    "name": "Falkenberg Räkor Handskalade i Lake MSC 500/870g",
+    "brand": "Falkenberg",
+    "packageText": "870 g",
+    "price": 172,
+    "priceText": "172.00 SEK",
+    "unitPrice": 344,
+    "unitPriceText": "344.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c9ab0e0f-1697-4b72-8a17-099d86889f27.jpg?fit=bounds&format=auto&optimize=medium&width=287&s=0x49c1780acf41111cc06e95e58dadd1cb08498d01",
+    "productUrl": "https://www.mathem.se/se/products/67232-falkenberg-rakor-handskalade-i-lake-msc-500-870g/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67235",
+    "name": "Falkenberg Seafood Räkor Handskalade i Lake MSC 280/540g",
+    "brand": "Falkenberg Seafood",
+    "packageText": "540 g",
+    "price": 106,
+    "priceText": "106.00 SEK",
+    "unitPrice": 378.57,
+    "unitPriceText": "378.57 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/08a8a401-96d7-460e-af2d-333da526a7c8.jpg?fit=bounds&format=auto&optimize=medium&width=229&s=0x1cc7f34bb195a34ac9748dae02f7fc2cd913c1bd",
+    "productUrl": "https://www.mathem.se/se/products/67235-falkenberg-seafood-rakor-handskalade-i-lake-msc-28/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64363",
+    "name": "Eldorado Snabbnudlar Räkor",
+    "brand": "Eldorado",
+    "packageText": "85 g",
+    "price": 4.68,
+    "priceText": "4.68 SEK",
+    "unitPrice": 55.06,
+    "unitPriceText": "55.06 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/05d6f901-4636-4487-a059-e13a2f3a8fff.jpg?fit=bounds&format=auto&optimize=medium&width=216&s=0x3cf7b0e67ca227cb8099c26632f46cd70e82c37e",
+    "productUrl": "https://www.mathem.se/se/products/64363-eldorado-snabbnudlar-rakor/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66049",
+    "name": "Garant Ishavsräkor med Skal Frysta 90/120 MSC",
+    "brand": "Garant",
+    "packageText": "750 g",
+    "price": 78.45,
+    "priceText": "78.45 SEK",
+    "unitPrice": 104.6,
+    "unitPriceText": "104.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3f008383-0a3d-44b1-9b3e-7d4987039734.jpg?fit=bounds&format=auto&optimize=medium&width=210&s=0x9af1c534dba2baf4cb4f2a873f3f7f8744880e61",
+    "productUrl": "https://www.mathem.se/se/products/66049-garant-ishavsrakor-med-skal-frysta-90-120-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66048",
+    "name": "Garant Ishavsräkor med Skal 70/90 Frysta MSC",
+    "brand": "Garant",
+    "packageText": "750 g",
+    "price": 108.8,
+    "priceText": "108.80 SEK",
+    "unitPrice": 145.07,
+    "unitPriceText": "145.07 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/dc9f9183-8981-458a-9193-8cfe824152b2.jpg?fit=bounds&format=auto&optimize=medium&width=210&s=0x369b3f874a82beed66b6af3b711fce36e8934c84",
+    "productUrl": "https://www.mathem.se/se/products/66048-garant-ishavsrakor-med-skal-70-90-frysta-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68718",
+    "name": "Bake My Day Smörgåstårta Räkor 15 Bitar",
+    "brand": "Bake My Day",
+    "packageText": "3300 g",
+    "price": 1149,
+    "priceText": "1149.00 SEK",
+    "unitPrice": 348.18,
+    "unitPriceText": "348.18 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5abf1c81-6ab6-4a2a-a834-89a72e202083.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x0e99c462c9834c5d422a48c47672eb1b04163b80",
+    "productUrl": "https://www.mathem.se/se/products/68718-bake-my-day-smorgastarta-rakor-15-bitar/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8661",
+    "name": "Garant Fiskgratäng Räkor & Dill Fryst MSC",
+    "brand": "Garant",
+    "packageText": "600 g",
+    "price": 45.38,
+    "priceText": "45.38 SEK",
+    "unitPrice": 75.63,
+    "unitPriceText": "75.63 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/66469af8-e19e-47d9-8b5a-7eda8d72f405.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x6fb3efca9d1b18e86ab6288b392575f1f727802e",
+    "productUrl": "https://www.mathem.se/se/products/8661-garant-fiskgratang-rakor-dill-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68408",
+    "name": "Polar Seafood Scampi Kokta Fryst ASC",
+    "brand": "Polar Seafood",
+    "packageText": "750 g",
+    "price": 178.88,
+    "priceText": "178.88 SEK",
+    "unitPrice": 238.51,
+    "unitPriceText": "238.51 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7c0b44ab-4332-429b-99db-5576a6cc39c5.jpg?fit=bounds&format=auto&optimize=medium&width=227&s=0x59e4a96ef7e26d6b9b80e2c1245393409e92d681",
+    "productUrl": "https://www.mathem.se/se/products/68408-polar-seafood-scampi-kokta-fryst-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67241",
+    "name": "Miramar Vannameiräka Skalade 26/30 ASC Fryst",
+    "brand": "Miramar",
+    "packageText": "400 g",
+    "price": 90.38,
+    "priceText": "90.38 SEK",
+    "unitPrice": 225.95,
+    "unitPriceText": "225.95 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0a9c2edd-7b7c-4f0a-931d-ecfd80226440.jpg?fit=bounds&format=auto&optimize=medium&width=238&s=0x423485080fd135942cd50d7106e61eb97d6f592e",
+    "productUrl": "https://www.mathem.se/se/products/67241-miramar-vannameiraka-skalade-26-30-asc-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67238",
+    "name": "Miramar Vannameiräka Kokt 51/60 ASC Fryst",
+    "brand": "Miramar",
+    "packageText": "400 g",
+    "price": 90.38,
+    "priceText": "90.38 SEK",
+    "unitPrice": 225.95,
+    "unitPriceText": "225.95 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ba383896-fc7a-41d8-b848-2f6d75c0be54.jpg?fit=bounds&format=auto&optimize=medium&width=242&s=0x7fe836a0db6867c28b11e058a45c097cf5efa277",
+    "productUrl": "https://www.mathem.se/se/products/67238-miramar-vannameiraka-kokt-51-60-asc-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8824",
+    "name": "Kavli Räkost 16%",
+    "brand": "Kavli",
+    "packageText": "275 g",
+    "price": 40.65,
+    "priceText": "40.65 SEK",
+    "unitPrice": 147.82,
+    "unitPriceText": "147.82 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/af0b87a0-f816-4b67-bf86-1dfb63550963.jpg?fit=bounds&format=auto&optimize=medium&width=114&s=0x6543745f611ffb1c6e0a57f83d93b54d49d5763c",
+    "productUrl": "https://www.mathem.se/se/products/8824-kavli-rakost-16/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68407",
+    "name": "Polar Seafood Scampi Rå Fryst ASC",
+    "brand": "Polar Seafood",
+    "packageText": "750 g",
+    "price": 178.88,
+    "priceText": "178.88 SEK",
+    "unitPrice": 238.51,
+    "unitPriceText": "238.51 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/edc1bfbb-983b-4a75-aa22-8e1b343f90a2.jpg?fit=bounds&format=auto&optimize=medium&width=227&s=0xaf95e50ae53556e1c3eee1b377e4bbffc6f7d312",
+    "productUrl": "https://www.mathem.se/se/products/68407-polar-seafood-scampi-ra-fryst-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68409",
+    "name": "Polar Seafood Scampi Rå Fryst ASC",
+    "brand": "Polar Seafood",
+    "packageText": "300 g",
+    "price": 75.67,
+    "priceText": "75.67 SEK",
+    "unitPrice": 252.23,
+    "unitPriceText": "252.23 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/27da8a7c-a4a7-4faf-aa04-7c41b952b6ff.jpg?fit=bounds&format=auto&optimize=medium&width=223&s=0x42efc700321cbc1d09605c59e27d451ab662cf75",
+    "productUrl": "https://www.mathem.se/se/products/68409-polar-seafood-scampi-ra-fryst-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68410",
+    "name": "Polar Seafood Scampi Kokta Fryst ASC",
+    "brand": "Polar Seafood",
+    "packageText": "300 g",
+    "price": 75.67,
+    "priceText": "75.67 SEK",
+    "unitPrice": 252.23,
+    "unitPriceText": "252.23 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0ff81e3c-f094-4f27-991e-4f4a717f05f5.jpg?fit=bounds&format=auto&optimize=medium&width=227&s=0x64c6d9a7cd00cd319786d28a5ee10fd25eb826db",
+    "productUrl": "https://www.mathem.se/se/products/68410-polar-seafood-scampi-kokta-fryst-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5584",
+    "name": "Abba Räkstuvning",
+    "brand": "Abba",
+    "packageText": "185 g",
+    "price": 24.56,
+    "priceText": "24.56 SEK",
+    "unitPrice": 132.76,
+    "unitPriceText": "132.76 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2f54b2fa-5bb6-454a-ab3d-41082d7fa974.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x4b39026b60d568f1e6c66c18ae13a7deef6fe9b4",
+    "productUrl": "https://www.mathem.se/se/products/5584-abba-rakstuvning/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9014",
+    "name": "Findus Räkcrepes Frysta 6-p",
+    "brand": "Findus",
+    "packageText": "250 g",
+    "price": 46.85,
+    "priceText": "46.85 SEK",
+    "unitPrice": 187.4,
+    "unitPriceText": "187.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6d23f922-7339-4097-8afd-98f65756b08f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xbb16e2b34c9450d711f279a3b419771826b08831",
+    "productUrl": "https://www.mathem.se/se/products/9014-findus-rakcrepes-frysta-6-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9029",
+    "name": "Kavli Räkost 16%",
+    "brand": "Kavli",
+    "packageText": "330 g",
+    "price": 45.9,
+    "priceText": "45.90 SEK",
+    "unitPrice": 139.09,
+    "unitPriceText": "139.09 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/5a1ef138-5e32-4d07-888a-5cd72fbbc69f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc14aaeafd78dd3964c90a761008989c2d6e0e001",
+    "productUrl": "https://www.mathem.se/se/products/9029-kavli-rakost-16/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9535",
+    "name": "Felix Skaldjurspaj Fryst",
+    "brand": "Felix",
+    "packageText": "220 g",
+    "price": 36.44,
+    "priceText": "36.44 SEK",
+    "unitPrice": 165.64,
+    "unitPriceText": "165.64 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/25fbf5e8-11d6-4682-a3a9-5ced3b6030f0.jpg?fit=bounds&format=auto&optimize=medium&width=280&s=0xc8e2bc2efd908c72809308f1fe3d9b97412c488e",
+    "productUrl": "https://www.mathem.se/se/products/9535-felix-skaldjurspaj-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8712",
+    "name": "Kavli Räkost 14% Laktosfri",
+    "brand": "Kavli",
+    "packageText": "250 g",
+    "price": 40.65,
+    "priceText": "40.65 SEK",
+    "unitPrice": 162.6,
+    "unitPriceText": "162.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e6a3f484-cca0-40cb-83cc-eee5c11f8028.jpg?fit=bounds&format=auto&optimize=medium&width=114&s=0xaeef2f726942f2aa3931225a0b5f04e74d0ac798",
+    "productUrl": "https://www.mathem.se/se/products/8712-kavli-rakost-14-laktosfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66178",
+    "name": "Rydbergs Räksallad",
+    "brand": "Rydbergs",
+    "packageText": "350 g",
+    "price": 45.38,
+    "priceText": "45.38 SEK",
+    "unitPrice": 129.66,
+    "unitPriceText": "129.66 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b82c467c-b792-44d6-a05b-824118115196.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xd9da0c2838bd5cd2c5529d2a4dd16f575c900df5",
+    "productUrl": "https://www.mathem.se/se/products/66178-rydbergs-raksallad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64929",
+    "name": "REDO Räksallad",
+    "brand": "REDO",
+    "packageText": "400 g",
+    "price": 30,
+    "priceText": "30.00 SEK",
+    "unitPrice": 75,
+    "unitPriceText": "75.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bfcef770-fd2a-4c1e-a097-ce4d1115fd12.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc08679ae3b85f5c2ae1073d4e5153c28adce45dc",
+    "productUrl": "https://www.mathem.se/se/products/64929-redo-raksallad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11288",
+    "name": "Smålandskräftan Scampi Indienne ASC",
+    "brand": "Smålandskräftan",
+    "packageText": "400 g",
+    "price": 75.42,
+    "priceText": "75.42 SEK",
+    "unitPrice": 188.55,
+    "unitPriceText": "188.55 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ac4e3479-4cc5-42ae-bb8b-a267d87b6953.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x515fd01a050c73df7dde5b9d5dd56991215f4f6a",
+    "productUrl": "https://www.mathem.se/se/products/11288-smalandskraftan-scampi-indienne-asc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6240",
+    "name": "Abba Fiskbullar Räksås MSC",
+    "brand": "Abba",
+    "packageText": "375 g",
+    "price": 26.03,
+    "priceText": "26.03 SEK",
+    "unitPrice": 69.41,
+    "unitPriceText": "69.41 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ed2078b3-31d0-4977-89da-180fbc62c4c9.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x9e8c67ef6d68aa253c22a56ed4df19400b4dd72c",
+    "productUrl": "https://www.mathem.se/se/products/6240-abba-fiskbullar-raksas-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3893",
+    "name": "Erssons Skagenröra",
+    "brand": "Erssons",
+    "packageText": "180 ml",
+    "price": 115.46,
+    "priceText": "115.46 SEK",
+    "unitPrice": 641.44,
+    "unitPriceText": "641.44 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/dbce2fda-6588-42a1-8d30-8cf21e5abb02.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x2562619eaed403dc6e062c1e26ff5387cd270f8b",
+    "productUrl": "https://www.mathem.se/se/products/3893-erssons-skagenrora/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68415",
+    "name": "Polar Seafood Torskfilé Fryst MSC",
+    "brand": "Polar Seafood",
+    "packageText": "300 g",
+    "price": 64.83,
+    "priceText": "64.83 SEK",
+    "unitPrice": 216.1,
+    "unitPriceText": "216.10 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3503d06d-f24b-4012-b15e-8723834ea175.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x117b6d94060eda3dee20bc29550371f2cf4c6a2b",
+    "productUrl": "https://www.mathem.se/se/products/68415-polar-seafood-torskfile-fryst-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66177",
+    "name": "Rydbergs Räksallad",
+    "brand": "Rydbergs",
+    "packageText": "175 g",
+    "price": 26.45,
+    "priceText": "26.45 SEK",
+    "unitPrice": 151.14,
+    "unitPriceText": "151.14 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c53f5242-5fc2-4d11-a908-2a42244a8ef1.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x13d9b1f4540a5ce5ef071e8a692667a2066e7e1d",
+    "productUrl": "https://www.mathem.se/se/products/66177-rydbergs-raksallad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67243",
+    "name": "Findus Sprödbakad Fiskfilé MSC",
+    "brand": "Findus",
+    "packageText": "360 g",
+    "price": 44.5,
+    "priceText": "44.50 SEK",
+    "unitPrice": 123.61,
+    "unitPriceText": "123.61 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6a7010a6-f4a3-41ea-9fc6-0b2da343c65b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xfece8fa72a3d398b8ea9c6d2ccd1c736d7e3f19b",
+    "productUrl": "https://www.mathem.se/se/products/67243-findus-sprodbakad-fiskfile-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=rakor",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5690",
+    "name": "Morötter 1kg Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 1 kg",
+    "price": 14.15,
+    "priceText": "14.15 SEK",
+    "unitPrice": 14.15,
+    "unitPriceText": "14.15 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c6125d0e-8239-4202-b07f-c753d62ab366.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xf976402bc78f28419926d951a8165127355abfd0",
+    "productUrl": "https://www.mathem.se/se/products/5690-morotter-1kg-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6645",
+    "name": "Morötter EKO Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 1 kg",
+    "price": 29.81,
+    "priceText": "29.81 SEK",
+    "unitPrice": 29.81,
+    "unitPriceText": "29.81 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0220e698-62b9-4ef7-856c-27ec490cef1b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x1e277a86495e5088d254526acf71a9362ef3d1fa",
+    "productUrl": "https://www.mathem.se/se/products/6645-morotter-eko-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7664",
+    "name": "Morötter Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 500 g",
+    "price": 10.5,
+    "priceText": "10.50 SEK",
+    "unitPrice": 21,
+    "unitPriceText": "21.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/be97b7bc-67a1-4379-88e3-a6c8776c4efc.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x4b4e8abdba8744e1c0adaa99e696f178eb1d02f6",
+    "productUrl": "https://www.mathem.se/se/products/7664-morotter-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9940",
+    "name": "Morötter 2kg  Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 2 kg",
+    "price": 27.95,
+    "priceText": "27.95 SEK",
+    "unitPrice": 13.98,
+    "unitPriceText": "13.98 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1d2abafb-90e1-40fa-aa32-66df165bde02.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xeb9bb8c63f2aebf6a70f381f2fda85852349bf3c",
+    "productUrl": "https://www.mathem.se/se/products/9940-morotter-2kg-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64456",
+    "name": "Dole Morot Baby Klass1 Nederländerna",
+    "brand": "Dole",
+    "packageText": "Nederländerna, 85 g",
+    "price": 10.36,
+    "priceText": "10.36 SEK",
+    "unitPrice": 121.88,
+    "unitPriceText": "121.88 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fbdbf7fa-afca-4888-8e77-1d1562134532.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xe856a83be38d028de642e6f492ef54444bf1425d",
+    "productUrl": "https://www.mathem.se/se/products/64456-dole-morot-baby-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4542",
+    "name": "Morötter EKO Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 500 g",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 37.76,
+    "unitPriceText": "37.76 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7ce97d39-d155-42dc-8e13-f2d25a7c30a6.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc3f611a6350d397a2f123c81ef61a0b92b6f9bb9",
+    "productUrl": "https://www.mathem.se/se/products/4542-morotter-eko-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3535",
+    "name": "Snacksmorötter Klass1 Danmark",
+    "brand": "",
+    "packageText": "Danmark, 200 g",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 94.4,
+    "unitPriceText": "94.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b9364211-d658-4628-a789-49e67d80bbd5.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x71a36625de70f44d92a0f3ae2f97b20a1b26063e",
+    "productUrl": "https://www.mathem.se/se/products/3535-snacksmorotter-klass1/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2286",
+    "name": "Dole Crispy Carrot Klass1 Europeiska unionen",
+    "brand": "Dole",
+    "packageText": "Europeiska unionen, 300 g",
+    "price": 16.99,
+    "priceText": "16.99 SEK",
+    "unitPrice": 56.63,
+    "unitPriceText": "56.63 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/934b9c33-8a80-4ef2-b884-193e5544d2aa.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdf0ae20d442b66cf1b45a3b2bcbb985718c52ce2",
+    "productUrl": "https://www.mathem.se/se/products/2286-dole-crispy-carrot-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4934",
+    "name": "Vitkål/Morotsmix Klass1 Europeiska unionen",
+    "brand": "",
+    "packageText": "Europeiska unionen, 300 g",
+    "price": 17.93,
+    "priceText": "17.93 SEK",
+    "unitPrice": 59.77,
+    "unitPriceText": "59.77 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/82bf9f5f-1adc-49ff-9493-5c444a708c7b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xf8e971ab99e6eb0be64a5fcf481bb87ad4540558",
+    "productUrl": "https://www.mathem.se/se/products/4934-vitkal-morotsmix-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8941",
+    "name": "Brämhults Juice Morot Nypressad",
+    "brand": "Brämhults",
+    "packageText": "850 ml",
+    "price": 47.27,
+    "priceText": "47.27 SEK",
+    "unitPrice": 55.61,
+    "unitPriceText": "55.61 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6ba16ec1-fb77-43fb-bb29-d6c627720218.jpg?fit=bounds&format=auto&optimize=medium&width=114&s=0x72350db56ba2690d370044f5676ff7ee885ff286",
+    "productUrl": "https://www.mathem.se/se/products/8941-bramhults-juice-morot-nypressad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63607",
+    "name": "Innocent Juice Apelsin & Morot",
+    "brand": "Innocent",
+    "packageText": "900 ml",
+    "price": 35,
+    "priceText": "35.00 SEK",
+    "unitPrice": 38.89,
+    "unitPriceText": "38.89 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3b19484d-80f5-4aee-8fd2-84b0f43a26bd.jpg?fit=bounds&format=auto&optimize=medium&width=101&s=0x78fed083222a603e09e2346b7bac79c6cf87237c",
+    "productUrl": "https://www.mathem.se/se/products/63607-innocent-juice-apelsin-morot/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9082",
+    "name": "Brämhults Juice Apelsin, Morot, Ingefära & Chili",
+    "brand": "Brämhults",
+    "packageText": "850 ml",
+    "price": 52.01,
+    "priceText": "52.01 SEK",
+    "unitPrice": 61.19,
+    "unitPriceText": "61.19 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6eb9bc7b-3fae-4adc-a822-a731af7a038a.jpg?fit=bounds&format=auto&optimize=medium&width=114&s=0xefb141d6f3271457f9767121b6b50d498ff84db5",
+    "productUrl": "https://www.mathem.se/se/products/9082-bramhults-juice-apelsin-morot-ingefara-chili/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9928",
+    "name": "Elovena Småbröd Havre & Morot Glutenfri Fryst 4-p",
+    "brand": "Elovena",
+    "packageText": "400 g",
+    "price": 40.22,
+    "priceText": "40.22 SEK",
+    "unitPrice": 100.55,
+    "unitPriceText": "100.55 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e4ca7d4d-cff2-43b5-a86c-6c2ec2ae917f.jpg?fit=bounds&format=auto&optimize=medium&width=188&s=0xc6a851a69a1d826fa81ca5fc7c06a9120b6b4c2c",
+    "productUrl": "https://www.mathem.se/se/products/9928-elovena-smabrod-havre-morot-glutenfri-fryst-4-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4200",
+    "name": "Semper Puré Morot +4M",
+    "brand": "Semper",
+    "packageText": "125 g",
+    "price": 8.4,
+    "priceText": "8.40 SEK",
+    "unitPrice": 67.2,
+    "unitPriceText": "67.20 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6e9d463d-e327-44db-b56d-ec1ecd8a05ff.jpg?fit=bounds&format=auto&optimize=medium&width=270&s=0x0947f6ce602f1be093c37a58f500f097d61a8bfa",
+    "productUrl": "https://www.mathem.se/se/products/4200-semper-pure-morot-4m/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7023",
+    "name": "Findus Babymorötter Frysta",
+    "brand": "Findus",
+    "packageText": "500 g",
+    "price": 29.81,
+    "priceText": "29.81 SEK",
+    "unitPrice": 59.62,
+    "unitPriceText": "59.62 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fa33fe76-8a49-4362-b2d9-48215bd1c559.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x35d0b407d249fd2e0099197155c0073f2bc0569a",
+    "productUrl": "https://www.mathem.se/se/products/7023-findus-babymorotter-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63670",
+    "name": "Felix Kyckling och Morotssoppa",
+    "brand": "Felix",
+    "packageText": "475 g",
+    "price": 50.11,
+    "priceText": "50.11 SEK",
+    "unitPrice": 105.49,
+    "unitPriceText": "105.49 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3029af6e-a148-48c8-bb28-882603d5f8a3.jpg?fit=bounds&format=auto&optimize=medium&width=224&s=0x68dbab99f996a2c13ad80f64891b9effe9232174",
+    "productUrl": "https://www.mathem.se/se/products/63670-felix-kyckling-och-morotssoppa/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10840",
+    "name": "Hägges Morotskaka Fryst",
+    "brand": "Hägges",
+    "packageText": "350 g",
+    "price": 48.74,
+    "priceText": "48.74 SEK",
+    "unitPrice": 139.26,
+    "unitPriceText": "139.26 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/709eb8d5-5836-4139-b27e-ee217a9f7395.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x477c859ada76d63079b14bb559821c81c7c5ea01",
+    "productUrl": "https://www.mathem.se/se/products/10840-hagges-morotskaka-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "62482",
+    "name": "Nelson Garden Odlingsfrön Morot Nantaise",
+    "brand": "Nelson Garden",
+    "packageText": "1 st",
+    "price": 29.95,
+    "priceText": "29.95 SEK",
+    "unitPrice": 29.95,
+    "unitPriceText": "29.95 SEK",
+    "unitPriceUnit": "st",
+    "imageUrl": "https://images.mathem.se/prod/local_products/56a2bf54-5ad7-4388-9991-72c592964b09.jpg?fit=bounds&format=auto&optimize=medium&width=194&s=0x77ba2b307699b16bf5253719c90589411ccb0fbb",
+    "productUrl": "https://www.mathem.se/se/products/62482-nelson-garden-odlingsfron-morot-nantaise/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4277",
+    "name": "Minstingen Majssnacks Morot +10M EKO",
+    "brand": "Minstingen",
+    "packageText": "20 g",
+    "price": 11.83,
+    "priceText": "11.83 SEK",
+    "unitPrice": 591.5,
+    "unitPriceText": "591.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/038d8aff-2d86-412c-b24c-4c3573d4f34a.jpg?fit=bounds&format=auto&optimize=medium&width=218&s=0xbd67030b42fd1c0f9f433a3278b79660faca1d0d",
+    "productUrl": "https://www.mathem.se/se/products/4277-minstingen-majssnacks-morot-10m-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5035",
+    "name": "Hipp Morot- & Fiskgryta 8M MSC",
+    "brand": "Hipp",
+    "packageText": "190 g",
+    "price": 19.83,
+    "priceText": "19.83 SEK",
+    "unitPrice": 104.37,
+    "unitPriceText": "104.37 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/98cd370e-a4d7-4023-adbe-14ff9d75c058.jpg?fit=bounds&format=auto&optimize=medium&width=205&s=0x2c08d1423206fa50ff1b21eb433e09b3c59e4dd4",
+    "productUrl": "https://www.mathem.se/se/products/5035-hipp-morot-fiskgryta-8m-msc/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7970",
+    "name": "Pfanner Juice Morot EKO",
+    "brand": "Pfanner",
+    "packageText": "500 ml",
+    "price": 32.13,
+    "priceText": "32.13 SEK",
+    "unitPrice": 64.26,
+    "unitPriceText": "64.26 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f184a426-6c5d-4b12-af0c-cbbbc790f7ea.jpg?fit=bounds&format=auto&optimize=medium&width=90&s=0x109f23fa5e30d6089885993e8966ea5dc6397294",
+    "productUrl": "https://www.mathem.se/se/products/7970-pfanner-juice-morot-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5010",
+    "name": "Ella's Kitchen Sticks Majs & Morot 7M EKO",
+    "brand": "Ella's Kitchen",
+    "packageText": "16 g",
+    "price": 14.15,
+    "priceText": "14.15 SEK",
+    "unitPrice": 884.38,
+    "unitPriceText": "884.38 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1e00bda4-6842-48bd-81d4-5cff3949f64a.jpg?fit=bounds&format=auto&optimize=medium&width=174&s=0xe68de4b3bf01b0afaa4350ed58e0a51ce1c4d4ad",
+    "productUrl": "https://www.mathem.se/se/products/5010-ellas-kitchen-sticks-majs-morot-7m-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67971",
+    "name": "Falkenberg Seafood Laxburgare med Fetaost och Morot ASC",
+    "brand": "Falkenberg Seafood",
+    "packageText": "220 g",
+    "price": 40.5,
+    "priceText": "40.50 SEK",
+    "unitPrice": 184.09,
+    "unitPriceText": "184.09 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8d15b82e-3de6-4d0e-9cc4-30e391895656.jpg?fit=bounds&format=auto&optimize=medium&width=290&s=0x2ea557fb778c9c77318eaef5a7f6cb6e73bbca06",
+    "productUrl": "https://www.mathem.se/se/products/67971-falkenberg-seafood-laxburgare-med-fetaost-och-moro/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68565",
+    "name": "Knatteplock Måltidsbiffar Fisk, Potatis & Morot Fryst",
+    "brand": "Knatteplock",
+    "packageText": "360 g",
+    "price": 75.67,
+    "priceText": "75.67 SEK",
+    "unitPrice": 210.19,
+    "unitPriceText": "210.19 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2a9b930a-4a35-4e9b-8ed5-83bdae39072d.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xed92e2a1dc08c6cd9e49444a5fa836980359b226",
+    "productUrl": "https://www.mathem.se/se/products/68565-knatteplock-maltidsbiffar-fisk-potatis-morot-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4468",
+    "name": "LoveMade Smoothie Morot, Majs och Mango +6M EKO",
+    "brand": "LoveMade",
+    "packageText": "100 g",
+    "price": 15.62,
+    "priceText": "15.62 SEK",
+    "unitPrice": 156.2,
+    "unitPriceText": "156.20 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6605d86a-5103-4585-837b-788d71d4d03b.jpg?fit=bounds&format=auto&optimize=medium&width=161&s=0xff8fe1b01e00028f0bd77db44da973dc631db345",
+    "productUrl": "https://www.mathem.se/se/products/4468-lovemade-smoothie-morot-majs-och-mango-6m-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66510",
+    "name": "Ella's Kitchen Puré Äpple, Morot & Palsternacka 4M EKO",
+    "brand": "Ella's Kitchen",
+    "packageText": "120 g",
+    "price": 17.51,
+    "priceText": "17.51 SEK",
+    "unitPrice": 145.92,
+    "unitPriceText": "145.92 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c8068bf7-8fe0-435e-affa-2ea72c8b242a.jpg?fit=bounds&format=auto&optimize=medium&width=150&s=0x15d5b446486676bc89bd1065e2828d71d932d5ec",
+    "productUrl": "https://www.mathem.se/se/products/66510-ellas-kitchen-pure-apple-morot-palsternacka-4m-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8882",
+    "name": "Råsaft Kallpressad Juice Morot, Äpple, Apelsin, Ingefära & Gurkmeja",
+    "brand": "Råsaft",
+    "packageText": "700 ml",
+    "price": 50.11,
+    "priceText": "50.11 SEK",
+    "unitPrice": 71.59,
+    "unitPriceText": "71.59 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6317c3e4-bff9-4d59-ad02-54fffd1be789.jpg?fit=bounds&format=auto&optimize=medium&width=108&s=0x7bfdd661b5cfa0266205f51c6813cc3f857257d0",
+    "productUrl": "https://www.mathem.se/se/products/8882-rasaft-kallpressad-juice-morot-apple-apelsin-ingef/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65085",
+    "name": "Magnihill Grönsaksmix Ärt & Morot Svenska Frysta",
+    "brand": "Magnihill",
+    "packageText": "2500 g",
+    "price": 89.86,
+    "priceText": "89.86 SEK",
+    "unitPrice": 35.94,
+    "unitPriceText": "35.94 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a3f3cd02-9196-4084-a526-09886eb1199a.jpg?fit=bounds&format=auto&optimize=medium&width=184&s=0x8c8d669d7b8f024e784ac226aff3d92a3915d7de",
+    "productUrl": "https://www.mathem.se/se/products/65085-magnihill-gronsaksmix-art-morot-svenska-frysta/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4832",
+    "name": "Findus Ärter & Morötter",
+    "brand": "Findus",
+    "packageText": "305 g",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 127.62,
+    "unitPriceText": "127.62 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/dd6d9761-22c5-419f-87c1-8b46ee798896.jpg?fit=bounds&format=auto&optimize=medium&width=198&s=0x2b8836ee3ad0594607c3f853c2579a705c3e6d32",
+    "productUrl": "https://www.mathem.se/se/products/4832-findus-arter-morotter/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "48314",
+    "name": "Eldorado Morötter Små Hela",
+    "brand": "Eldorado",
+    "packageText": "400 g",
+    "price": 16.56,
+    "priceText": "16.56 SEK",
+    "unitPrice": 41.4,
+    "unitPriceText": "41.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/96fc8225-bd92-4147-9213-dbbe3ab6e463.jpg?fit=bounds&format=auto&optimize=medium&width=231&s=0x7a6797215588ccab80691260a3b206cf12d8a733",
+    "productUrl": "https://www.mathem.se/se/products/48314-eldorado-morotter-sma-hela/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6185",
+    "name": "Garant Rotfruktsmix Fryst",
+    "brand": "Garant",
+    "packageText": "600 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 47.25,
+    "unitPriceText": "47.25 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/097f6563-6571-425a-b1ae-2fec6a43c851.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x2a0f20437c4f986da9bc37e8ed07ceca943365c3",
+    "productUrl": "https://www.mathem.se/se/products/6185-garant-rotfruktsmix-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66527",
+    "name": "LoveMade Organics Corn, Carrot & Mango Rings 8M EKO",
+    "brand": "LoveMade Organics",
+    "packageText": "20 g",
+    "price": 13.2,
+    "priceText": "13.20 SEK",
+    "unitPrice": 660,
+    "unitPriceText": "660.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d579c5df-adeb-4ec0-86d0-e42cb06ca3a6.jpg?fit=bounds&format=auto&optimize=medium&width=284&s=0x299ae45ac66da857d3aad713640122ca0e77ef5c",
+    "productUrl": "https://www.mathem.se/se/products/66527-lovemade-organics-corn-carrot-mango-rings-8m-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "48296",
+    "name": "Eldorado Ärter & Morötter Hela",
+    "brand": "Eldorado",
+    "packageText": "400 g",
+    "price": 16.56,
+    "priceText": "16.56 SEK",
+    "unitPrice": 41.4,
+    "unitPriceText": "41.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/b1f78bbf-c79d-46e7-84cc-79ab944794df.jpg?fit=bounds&format=auto&optimize=medium&width=231&s=0x8d2a9c4af2f1d75d7e867bb5f8f1ed1050b97e51",
+    "productUrl": "https://www.mathem.se/se/products/48296-eldorado-arter-morotter-hela/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3901",
+    "name": "Mutti Tomatpuré Verdurine",
+    "brand": "Mutti",
+    "packageText": "130 g",
+    "price": 22.24,
+    "priceText": "22.24 SEK",
+    "unitPrice": 171.08,
+    "unitPriceText": "171.08 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/708470bd-1531-427c-8004-d74aeb6b7957.jpg?fit=bounds&format=auto&optimize=medium&width=79&s=0xea6a36aab954f999aa50ee97c2dfbd6b4d944767",
+    "productUrl": "https://www.mathem.se/se/products/3901-mutti-tomatpure-verdurine/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10121",
+    "name": "Bong Touch of Taste Grönsaksfond",
+    "brand": "Bong Touch of Taste",
+    "packageText": "180 ml",
+    "price": 39.28,
+    "priceText": "39.28 SEK",
+    "unitPrice": 218.22,
+    "unitPriceText": "218.22 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e879d5b9-1e54-44bf-afde-7cb9f1108158.jpg?fit=bounds&format=auto&optimize=medium&width=114&s=0x2c87ce6f0d030b844be59fef12e849f7db2af2f2",
+    "productUrl": "https://www.mathem.se/se/products/10121-bong-touch-of-taste-gronsaksfond/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5505",
+    "name": "Bong Grönsaksbuljong",
+    "brand": "Bong",
+    "packageText": "12 st",
+    "price": 22.67,
+    "priceText": "22.67 SEK",
+    "unitPrice": 3.78,
+    "unitPriceText": "3.78 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/3edc5135-a0f4-4c15-82b4-622027b24e37.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xa5d3feca5438aa9e425d9c861c879bf6efd47e83",
+    "productUrl": "https://www.mathem.se/se/products/5505-bong-gronsaksbuljong/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4190",
+    "name": "Hipp Ris med Grönsaker & Kyckling 6M EKO",
+    "brand": "Hipp",
+    "packageText": "190 g",
+    "price": 17.51,
+    "priceText": "17.51 SEK",
+    "unitPrice": 92.16,
+    "unitPriceText": "92.16 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a427be56-b7ec-4e90-aef8-0619868f5a3a.jpg?fit=bounds&format=auto&optimize=medium&width=206&s=0x5946cab85d2c087741d8249f9deca31fd9ce7e47",
+    "productUrl": "https://www.mathem.se/se/products/4190-hipp-ris-med-gronsaker-kyckling-6m-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "12234",
+    "name": "Magnihill Ugnsgrönsaker Fryst EKO/KRAV",
+    "brand": "Magnihill",
+    "packageText": "2,5 kg",
+    "price": 112,
+    "priceText": "112.00 SEK",
+    "unitPrice": 44.8,
+    "unitPriceText": "44.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7cfb5c82-a084-4e57-a32a-3ab50bf1d56c.jpg?fit=bounds&format=auto&optimize=medium&width=190&s=0x4adf41c9517d93797d7a70c026d6d442ffae0f14",
+    "productUrl": "https://www.mathem.se/se/products/12234-magnihill-ugnsgronsaker-fryst-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3834",
+    "name": "Garant Eko Grönsaksbuljong EKO",
+    "brand": "Garant Eko",
+    "packageText": "6 st",
+    "price": 14.67,
+    "priceText": "14.67 SEK",
+    "unitPrice": 4.89,
+    "unitPriceText": "4.89 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9f078ecb-de44-4bab-b32d-4bd5c6f16a32.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x0f2742218c8891aa4906d1371e3fad73f4268ff3",
+    "productUrl": "https://www.mathem.se/se/products/3834-garant-eko-gronsaksbuljong-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=morot",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5531",
+    "name": "Lök Gul Påse Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 1000 g",
+    "price": 15.1,
+    "priceText": "15.10 SEK",
+    "unitPrice": 15.1,
+    "unitPriceText": "15.10 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0102192a-dbce-4b64-a0e6-7ed15f8a8ef4.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x8dcf81a38bdcc1287c1cee6f9d8a15b78071d8b0",
+    "productUrl": "https://www.mathem.se/se/products/5531-lok-gul-pase-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "14088",
+    "name": "Lök Gul Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 500 g",
+    "price": 10.36,
+    "priceText": "10.36 SEK",
+    "unitPrice": 20.72,
+    "unitPriceText": "20.72 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/441b18bd-7174-45d8-9ee0-7fc9030e155a.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x9df82c8020805be8c2bfd2025ec62a3ecb3cdfb7",
+    "productUrl": "https://www.mathem.se/se/products/14088-lok-gul-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6008",
+    "name": "Lök Röd Påse Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 1 kg",
+    "price": 20.12,
+    "priceText": "20.12 SEK",
+    "unitPrice": 20.12,
+    "unitPriceText": "20.12 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/18e74bb8-f7e5-4356-9812-0525cd2e7ac6.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xf346e9d93ee4f8031a601e6b7ea0d53ec32fc75d",
+    "productUrl": "https://www.mathem.se/se/products/6008-lok-rod-pase-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4831",
+    "name": "Eldorado Rostad Lök",
+    "brand": "Eldorado",
+    "packageText": "150 g",
+    "price": 17.51,
+    "priceText": "17.51 SEK",
+    "unitPrice": 116.73,
+    "unitPriceText": "116.73 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/72072dc2-88f5-4de5-9238-67120c68dd1d.jpg?fit=bounds&format=auto&optimize=medium&width=217&s=0xeadc9b2a4f9b2ec05a191a5b7b9ade9aff499438",
+    "productUrl": "https://www.mathem.se/se/products/4831-eldorado-rostad-lok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7714",
+    "name": "Eldorado Gul Lök Hackad Fryst",
+    "brand": "Eldorado",
+    "packageText": "300 g",
+    "price": 13.2,
+    "priceText": "13.20 SEK",
+    "unitPrice": 44,
+    "unitPriceText": "44.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2ca2f69d-a7c6-48d0-a265-8bf612499ac6.jpg?fit=bounds&format=auto&optimize=medium&width=245&s=0x00da401a37f8f3deb5744b44b293a431109e033d",
+    "productUrl": "https://www.mathem.se/se/products/7714-eldorado-gul-lok-hackad-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5742",
+    "name": "Salladslök Klass1 Tyskland",
+    "brand": "",
+    "packageText": "Tyskland, 125 g",
+    "price": 17.84,
+    "priceText": "17.84 SEK",
+    "unitPrice": 142.72,
+    "unitPriceText": "142.72 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0f7e7425-6ae3-46ae-830e-8e9fb3299153.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x3e8bed29056be15805d8f30718b0154995da1225",
+    "productUrl": "https://www.mathem.se/se/products/5742-salladslok-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7525",
+    "name": "Purjolök Klass1 Nederländerna",
+    "brand": "",
+    "packageText": "Nederländerna, 285 g",
+    "price": 11.95,
+    "priceText": "11.95 SEK",
+    "unitPrice": 41.93,
+    "unitPriceText": "41.93 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/83334512-0d4c-4d15-b40e-cd69cc2057af.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xf0b7aa36c4409e06626fd7041195cec6d48c7d71",
+    "productUrl": "https://www.mathem.se/se/products/7525-purjolok-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7365",
+    "name": "Vitlök Klass1 Spanien",
+    "brand": "",
+    "packageText": "Spanien, 55 g",
+    "price": 10.95,
+    "priceText": "10.95 SEK",
+    "unitPrice": 199.09,
+    "unitPriceText": "199.09 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/57e9b888-e501-4edc-be2c-71de550370a4.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x68c9df776aad06b88c5c97e52b9b215516257914",
+    "productUrl": "https://www.mathem.se/se/products/7365-vitlok-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "291",
+    "name": "Loka Naturell",
+    "brand": "Loka",
+    "packageText": "150 cl",
+    "price": 14.15,
+    "priceText": "14.15 SEK",
+    "unitPrice": 9.43,
+    "unitPriceText": "9.43 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/46367b53-f515-44c2-bb22-1c586882c425.jpg?fit=bounds&format=auto&optimize=medium&width=89&s=0x9432c7e4470482a38538b2a69b238d169797b452",
+    "productUrl": "https://www.mathem.se/se/products/291-loka-loka-naturell/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9071",
+    "name": "Loka Naturell 12x33cl",
+    "brand": "Loka",
+    "packageText": "396 cl",
+    "price": 44.43,
+    "priceText": "44.43 SEK",
+    "unitPrice": 11.22,
+    "unitPriceText": "11.22 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1faacc77-cb76-4f12-8e91-8815ff9fd914.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x072fffd92c7481281d91dfaf10f5f01a37368b05",
+    "productUrl": "https://www.mathem.se/se/products/9071-loka-loka-naturell-12x33cl/",
+    "available": false,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "909",
+    "name": "Lök Roscoff Klass1 Frankrike",
+    "brand": "",
+    "packageText": "Frankrike, 500 g",
+    "price": 35.4,
+    "priceText": "35.40 SEK",
+    "unitPrice": 70.8,
+    "unitPriceText": "70.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fcc78cdb-fe35-4a66-bda9-d082c513a489.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x2f8cb4302c98670208ac08e7d6a652d4736a89a7",
+    "productUrl": "https://www.mathem.se/se/products/909-lok-roscoff-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6035",
+    "name": "Lök Silver Klass1 Australia",
+    "brand": "",
+    "packageText": "Australia, 300 g",
+    "price": 24.95,
+    "priceText": "24.95 SEK",
+    "unitPrice": 83.17,
+    "unitPriceText": "83.17 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/eafd6bf4-d5e3-4421-8aac-97e565860c95.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x18aef3567a6147055597f6bd76ba0feeecff671e",
+    "productUrl": "https://www.mathem.se/se/products/6035-lok-silver-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5196",
+    "name": "Lök Stek Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 250 g",
+    "price": 18.95,
+    "priceText": "18.95 SEK",
+    "unitPrice": 75.8,
+    "unitPriceText": "75.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/44e64b1c-af52-4de2-87eb-048452ff3f71.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x57a856d045049ff8f933095d5c8633ad9556b02c",
+    "productUrl": "https://www.mathem.se/se/products/5196-lok-stek-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "17496",
+    "name": "Lök Röd Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 500 g",
+    "price": 16.04,
+    "priceText": "16.04 SEK",
+    "unitPrice": 32.08,
+    "unitPriceText": "32.08 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/44823b7c-1289-426b-8084-9a6753bceb16.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x213ee3924bf891e5a8f10e0ee377f68ef91098b4",
+    "productUrl": "https://www.mathem.se/se/products/17496-lok-rod-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4786",
+    "name": "Lök Schalotten Klass1 Frankrike",
+    "brand": "",
+    "packageText": "Frankrike, 250 g",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 75.52,
+    "unitPriceText": "75.52 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/389f65a2-3311-4502-aa81-ab878d7b54df.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc86e81da9d67404a4fa5423b330311c65c398add",
+    "productUrl": "https://www.mathem.se/se/products/4786-lok-schalotten-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7752",
+    "name": "Lök Röd EKO Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 500 g",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 47.22,
+    "unitPriceText": "47.22 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/945b3b2a-18b3-42bc-b7cd-7ff1d4ba35c8.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x410194061632955e0ef78f5c2526ae72d8ae34c7",
+    "productUrl": "https://www.mathem.se/se/products/7752-lok-rod-eko-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6726",
+    "name": "Lök Gul EKO Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 500 g",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 41.54,
+    "unitPriceText": "41.54 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7253046c-564f-4d04-82ba-0612d38c6aad.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc12deb36da43360c297551ef6a20c240335f0b2c",
+    "productUrl": "https://www.mathem.se/se/products/6726-lok-gul-eko-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "16246",
+    "name": "Lök Gul i Knippe Klass1 Italien",
+    "brand": "",
+    "packageText": "Italien, 250 g",
+    "price": 10,
+    "priceText": "10.00 SEK",
+    "unitPrice": 40,
+    "unitPriceText": "40.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9dd1909a-af25-4abf-92a3-f4550d9e2032.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xaf29ae1672e98a6c38f9c89eed4e5a32155e2468",
+    "productUrl": "https://www.mathem.se/se/products/16246-lok-gul-i-knippe-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7547",
+    "name": "Loka Päron",
+    "brand": "Loka",
+    "packageText": "1,5 l",
+    "price": 14.15,
+    "priceText": "14.15 SEK",
+    "unitPrice": 9.43,
+    "unitPriceText": "9.43 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/f8a93664-3cfe-4635-b6a6-be27ff0903b3.jpg?fit=bounds&format=auto&optimize=medium&width=89&s=0x3f435df0819791195952172a7f6ad24a0b9d6ad8",
+    "productUrl": "https://www.mathem.se/se/products/7547-loka-loka-paron/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64495",
+    "name": "Eldorado Rostad Lök",
+    "brand": "Eldorado",
+    "packageText": "500 g",
+    "price": 40.22,
+    "priceText": "40.22 SEK",
+    "unitPrice": 80.44,
+    "unitPriceText": "80.44 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d304cda9-d0f3-492e-9923-8654737121e0.jpg?fit=bounds&format=auto&optimize=medium&width=189&s=0xc32a1d179b208ce48949188e9709800982195317",
+    "productUrl": "https://www.mathem.se/se/products/64495-eldorado-rostad-lok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64550",
+    "name": "GOTTSKÄR FOOD Rostad Lök Glutenfri",
+    "brand": "GOTTSKÄR FOOD",
+    "packageText": "100 g",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 188.8,
+    "unitPriceText": "188.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e7848047-86c0-4e65-8bcc-407137aceedc.jpg?fit=bounds&format=auto&optimize=medium&width=283&s=0xb7a16b88cd96e8e9f5a8a1895da297eb4fc6fb3f",
+    "productUrl": "https://www.mathem.se/se/products/64550-gottskar-food-rostad-lok-glutenfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "95",
+    "name": "Magnihill Lök i skivor Fryst EKO/KRAV",
+    "brand": "Magnihill",
+    "packageText": "2,5 kg",
+    "price": 119,
+    "priceText": "119.00 SEK",
+    "unitPrice": 47.6,
+    "unitPriceText": "47.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1ba9481e-2b3d-4eac-8730-524c98226ed4.jpg?fit=bounds&format=auto&optimize=medium&width=251&s=0x4423059904984e35fc41893fcb07d6866b4903df",
+    "productUrl": "https://www.mathem.se/se/products/95-magnihill-lok-i-skivor-fryst-eko-krav/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "12432",
+    "name": "Röd Steklök Klass1 Australia",
+    "brand": "",
+    "packageText": "Australia, 250 g",
+    "price": 18.95,
+    "priceText": "18.95 SEK",
+    "unitPrice": 75.8,
+    "unitPriceText": "75.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c72169aa-5aaf-4a18-a054-ecb4409ff2fa.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xc082c5ea9779b6cc07aa4454b0df6b3653754c02",
+    "productUrl": "https://www.mathem.se/se/products/12432-rod-steklok-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "12829",
+    "name": "Lök Gul storpack Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 3000 g",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 12.6,
+    "unitPriceText": "12.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ace1cf90-b409-494c-8cf7-c537a9889919.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x87056fb2140741c54967cf7741dfb5b29bfc586a",
+    "productUrl": "https://www.mathem.se/se/products/12829-lok-gul-storpack-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "14157",
+    "name": "Magnihill Lök Tärnad Fryst",
+    "brand": "Magnihill",
+    "packageText": "2,5 kg",
+    "price": 93.95,
+    "priceText": "93.95 SEK",
+    "unitPrice": 37.58,
+    "unitPriceText": "37.58 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ff5eec06-5c35-4aa1-9310-a57a39af99d2.jpg?fit=bounds&format=auto&optimize=medium&width=202&s=0x002a4cb44938aa6fac26c14530bacca8aa71c34d",
+    "productUrl": "https://www.mathem.se/se/products/14157-magnihill-lok-tarnad-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68002",
+    "name": "Lohmanders Burgardressing Grillad Lök",
+    "brand": "Lohmanders",
+    "packageText": "230 ml",
+    "price": 23.19,
+    "priceText": "23.19 SEK",
+    "unitPrice": 100.83,
+    "unitPriceText": "100.83 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/50ad3ed9-9eb3-467d-8d8d-c58b3046ba74.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x50ce58241e451538a26f67eb7f9187d90eeb1413",
+    "productUrl": "https://www.mathem.se/se/products/68002-lohmanders-burgardressing-grillad-lok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66815",
+    "name": "Lök mix Klass1 Sverige",
+    "brand": "",
+    "packageText": "Sverige, 1000 g",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 18.88,
+    "unitPriceText": "18.88 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/7444c490-5c13-492c-8bd9-2d44bfe25c33.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x93775796f5b5a480f5fbfec949484b5c888d7fd1",
+    "productUrl": "https://www.mathem.se/se/products/66815-lok-mix-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66237",
+    "name": "Zeinas Hummus Karamelliserad Lök",
+    "brand": "Zeinas",
+    "packageText": "200 g",
+    "price": 26.95,
+    "priceText": "26.95 SEK",
+    "unitPrice": 134.75,
+    "unitPriceText": "134.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4f3b3015-cdd8-40fc-9bca-b5b2bebb3e7b.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x3bcb9a313dafe9b610b0f05ca0b1ee7f10069c29",
+    "productUrl": "https://www.mathem.se/se/products/66237-zeinas-hummus-karamelliserad-lok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65743",
+    "name": "OLW Chips Cheddar & Lök",
+    "brand": "OLW",
+    "packageText": "275 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 109.96,
+    "unitPriceText": "109.96 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/741b04a2-eee6-411a-9b69-5a018a8fbc3c.jpg?fit=bounds&format=auto&optimize=medium&width=195&s=0xeb512e6945970745439a51cfb0dc1149b73131b8",
+    "productUrl": "https://www.mathem.se/se/products/65743-olw-chips-cheddar-lok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5999",
+    "name": "Garant Linskakor Gräddfil & Lök",
+    "brand": "Garant",
+    "packageText": "125 g",
+    "price": 25.08,
+    "priceText": "25.08 SEK",
+    "unitPrice": 200.64,
+    "unitPriceText": "200.64 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/e43a6ea6-5637-47c3-9344-644eb0115e32.jpg?fit=bounds&format=auto&optimize=medium&width=170&s=0x8d7257780a799ecdef9d72d8134ca6d9ca945f78",
+    "productUrl": "https://www.mathem.se/se/products/5999-garant-linskakor-graddfil-lok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3635",
+    "name": "Eldorado Riskakor  Gräddfil & Lök",
+    "brand": "Eldorado",
+    "packageText": "125 g",
+    "price": 16.04,
+    "priceText": "16.04 SEK",
+    "unitPrice": 128.32,
+    "unitPriceText": "128.32 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/0f6700b5-d07f-4e0c-883b-d8f67ef64dc9.jpg?fit=bounds&format=auto&optimize=medium&width=166&s=0x027b6ec0dfae27f2b12bbcfb58992cd4635848d6",
+    "productUrl": "https://www.mathem.se/se/products/3635-eldorado-riskakor-graddfil-lok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "28132",
+    "name": "BjäreChips Dippmix Paprika & Lök",
+    "brand": "BjäreChips",
+    "packageText": "24 g",
+    "price": 9.42,
+    "priceText": "9.42 SEK",
+    "unitPrice": 392.5,
+    "unitPriceText": "392.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a74fdbff-dcd4-4b9e-a7cf-07b77557a469.jpg?fit=bounds&format=auto&optimize=medium&width=186&s=0xa0833152384a3762d310dde48960f0a1073099ab",
+    "productUrl": "https://www.mathem.se/se/products/28132-bjarechips-dippmix-paprika-lok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63339",
+    "name": "Garant Chips Grytfriterade Gräddfil & Lök",
+    "brand": "Garant",
+    "packageText": "175 g",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 145.77,
+    "unitPriceText": "145.77 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/03da9697-36a3-49b7-84f3-0ecde8d26182.jpg?fit=bounds&format=auto&optimize=medium&width=221&s=0xc48483cbe074fbdf924c65a8800b9d511f0edf36",
+    "productUrl": "https://www.mathem.se/se/products/63339-garant-chips-grytfriterade-graddfil-lok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63443",
+    "name": "Stensåkra Kryddkorv Karamelliserad & Rostad Lök",
+    "brand": "Stensåkra",
+    "packageText": "240 g",
+    "price": 40.95,
+    "priceText": "40.95 SEK",
+    "unitPrice": 170.63,
+    "unitPriceText": "170.63 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/bdbff34d-989b-4a15-9a3e-ad80ab53c422.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xfc0ac1fcd14f7cf78e33257147836e752be58550",
+    "productUrl": "https://www.mathem.se/se/products/63443-stensakra-kryddkorv-karamelliserad-rostad-lok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "27959",
+    "name": "BjäreDip Dippmix Tomat, Paprika & Lök",
+    "brand": "BjäreDip",
+    "packageText": "24 g",
+    "price": 9.42,
+    "priceText": "9.42 SEK",
+    "unitPrice": 392.5,
+    "unitPriceText": "392.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ff14bb58-9ea3-431d-8adc-e2969274cad4.jpg?fit=bounds&format=auto&optimize=medium&width=184&s=0x7f4605c7110942a4b6738de62f9b6f9e90c0dd1f",
+    "productUrl": "https://www.mathem.se/se/products/27959-bjaredip-dippmix-tomat-paprika-lok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "68383",
+    "name": "Farmers & Chefs Korvbröd med Rostad Lök 6-p",
+    "brand": "Farmers & Chefs",
+    "packageText": "240 g",
+    "price": 32.95,
+    "priceText": "32.95 SEK",
+    "unitPrice": 137.29,
+    "unitPriceText": "137.29 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/c862213d-9fb1-4aad-8805-1660a2f58b33.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xeee7f3d45fe56c33086efabe7345c26e7fee0f04",
+    "productUrl": "https://www.mathem.se/se/products/68383-farmers-chefs-korvbrod-med-rostad-lok-6-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=lok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4525",
+    "name": "Vitlök EKO Klass1 Spanien",
+    "brand": "",
+    "packageText": "Spanien, 100 g",
+    "price": 16.95,
+    "priceText": "16.95 SEK",
+    "unitPrice": 169.5,
+    "unitPriceText": "169.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d98ee80a-318d-4d73-ad4a-2ef467968a5a.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xeca8b06f8f466fc7d0510bcf8f1f87aac0759bb8",
+    "productUrl": "https://www.mathem.se/se/products/4525-vitlok-eko-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67763",
+    "name": "Garant Vitlök Hackad Fryst",
+    "brand": "Garant",
+    "packageText": "100 g",
+    "price": 12,
+    "priceText": "12.00 SEK",
+    "unitPrice": 120,
+    "unitPriceText": "120.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/37666ee0-21bc-45ae-9df5-aa7c3f6cc5bb.jpg?fit=bounds&format=auto&optimize=medium&width=277&s=0x84440f512d6c2e9f50d902797b5678dfdf133b8a",
+    "productUrl": "https://www.mathem.se/se/products/67763-garant-vitlok-hackad-fryst/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6883",
+    "name": "Vitlök Klass1 Spanien",
+    "brand": "",
+    "packageText": "Spanien, 250 g",
+    "price": 34.95,
+    "priceText": "34.95 SEK",
+    "unitPrice": 139.8,
+    "unitPriceText": "139.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/94665643-a8f5-4214-b528-1edf3d64a14d.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x69ed533129f003bfe0837029ae964be61a957c94",
+    "productUrl": "https://www.mathem.se/se/products/6883-vitlok-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10485",
+    "name": "Vitlök Super Solo Klass1 Kina",
+    "brand": "",
+    "packageText": "Kina, 250 g",
+    "price": 42.54,
+    "priceText": "42.54 SEK",
+    "unitPrice": 170.16,
+    "unitPriceText": "170.16 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6022e2cc-3379-4a2e-81b2-4362b73c80e3.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x987488c331689ddc9b91ab6e69f44841ee7176af",
+    "productUrl": "https://www.mathem.se/se/products/10485-vitlok-super-solo-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8740",
+    "name": "Risberg Vitlök Krossad",
+    "brand": "Risberg",
+    "packageText": "210 g",
+    "price": 42.54,
+    "priceText": "42.54 SEK",
+    "unitPrice": 202.57,
+    "unitPriceText": "202.57 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/2731fbec-f8b7-4b64-93d4-1e51c4588cdf.jpg?fit=bounds&format=auto&optimize=medium&width=166&s=0x55875a7b4d0470fdc18226b3a1a48b06075e6f80",
+    "productUrl": "https://www.mathem.se/se/products/8740-risberg-vitlok-krossad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8512",
+    "name": "Santa Maria Grillolja Vitlök",
+    "brand": "Santa Maria",
+    "packageText": "400 ml",
+    "price": 33.08,
+    "priceText": "33.08 SEK",
+    "unitPrice": 82.7,
+    "unitPriceText": "82.70 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/cd8a4841-8b1b-417b-9fc5-acf6506b1dbe.jpg?fit=bounds&format=auto&optimize=medium&width=89&s=0x37ad693febee2b66636b7ff2d6a14291d62724cf",
+    "productUrl": "https://www.mathem.se/se/products/8512-santa-maria-grillolja-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7162",
+    "name": "Santa Maria Grillolja Vitlök",
+    "brand": "Santa Maria",
+    "packageText": "270 ml",
+    "price": 20,
+    "priceText": "20.00 SEK",
+    "unitPrice": 74.07,
+    "unitPriceText": "74.07 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/425112e1-af6c-4e7c-b046-9aeb4731be41.jpg?fit=bounds&format=auto&optimize=medium&width=116&s=0x48fa0f22614b67f44bcad6e97a507c8fc0d57c6f",
+    "productUrl": "https://www.mathem.se/se/products/7162-santa-maria-grillolja-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10333",
+    "name": "Boursin Färskost Vitlök 40%",
+    "brand": "Boursin",
+    "packageText": "150 g",
+    "price": 41.6,
+    "priceText": "41.60 SEK",
+    "unitPrice": 277.33,
+    "unitPriceText": "277.33 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/466bf807-4876-4f3e-bc9d-967b4b4221a4.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xf95555dccb31c7d3d9f95b0a02bbab0a489c63cc",
+    "productUrl": "https://www.mathem.se/se/products/10333-boursin-farskost-vitlok-40/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9939",
+    "name": "Herbafrost Vitlök Hackad Fryst EKO",
+    "brand": "Herbafrost",
+    "packageText": "250 g",
+    "price": 38.95,
+    "priceText": "38.95 SEK",
+    "unitPrice": 155.8,
+    "unitPriceText": "155.80 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d1fc4be9-eec0-4eca-8ef3-299a721cf7e4.jpg?fit=bounds&format=auto&optimize=medium&width=229&s=0x8655e8a252fe37a3210d44761f57b38558c5c133",
+    "productUrl": "https://www.mathem.se/se/products/9939-herbafrost-vitlok-hackad-fryst-eko/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "10125",
+    "name": "Garant Marinerad Vitlök i Chiliolja",
+    "brand": "Garant",
+    "packageText": "180 g",
+    "price": 39.7,
+    "priceText": "39.70 SEK",
+    "unitPrice": 220.56,
+    "unitPriceText": "220.56 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/04253515-b811-4d4d-a686-81b863edf953.jpg?fit=bounds&format=auto&optimize=medium&width=175&s=0x75f8a20e593cf0b2d65e36b73364d3f5bf30faf3",
+    "productUrl": "https://www.mathem.se/se/products/10125-garant-marinerad-vitlok-i-chiliolja/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "11184",
+    "name": "Svart Vitlök Klass1 Storbritannien",
+    "brand": "",
+    "packageText": "Storbritannien, 50 g",
+    "price": 80.4,
+    "priceText": "80.40 SEK",
+    "unitPrice": 1608,
+    "unitPriceText": "1608.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a4c7496c-0b97-48b5-8169-de65f8ac24ef.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x6c6bd924011b76390af749b8f4caba17eb9b60a8",
+    "productUrl": "https://www.mathem.se/se/products/11184-svart-vitlok-klass1/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "3576",
+    "name": "Crème Bonjour Färskost Vitlök 25% Laktosfri",
+    "brand": "Crème Bonjour",
+    "packageText": "100 g",
+    "price": 16.56,
+    "priceText": "16.56 SEK",
+    "unitPrice": 165.6,
+    "unitPriceText": "165.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4123c0f7-537c-4e67-b61b-837cde672dcb.jpg?fit=bounds&format=auto&optimize=medium&width=291&s=0x5643142af70de4b083083c300f12e37608aff9d9",
+    "productUrl": "https://www.mathem.se/se/products/3576-creme-bonjour-farskost-vitlok-25-laktosfri/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "50760",
+    "name": "Santa Maria Grillkrydda Vitlök & Örter",
+    "brand": "Santa Maria",
+    "packageText": "87 g",
+    "price": 30.5,
+    "priceText": "30.50 SEK",
+    "unitPrice": 350.57,
+    "unitPriceText": "350.57 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/ebf81ddc-0ed0-45f2-96b1-40cf5c27f37f.jpg?fit=bounds&format=auto&optimize=medium&width=119&s=0x046139ef017ac838a409d0dd872d824c6b95f7f7",
+    "productUrl": "https://www.mathem.se/se/products/50760-santa-maria-grillkrydda-vitlok-orter/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4970",
+    "name": "Arla® Färskost Vitlök & Örter 24%",
+    "brand": "Arla®",
+    "packageText": "150 g",
+    "price": 20.77,
+    "priceText": "20.77 SEK",
+    "unitPrice": 138.47,
+    "unitPriceText": "138.47 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/d4b15cd6-d72f-4d4a-805b-a21d17121864.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xdb65725fd24b43123f5ab97255d7192577016ee6",
+    "productUrl": "https://www.mathem.se/se/products/4970-arla-r-farskost-vitlok-orter-24/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63813",
+    "name": "Dolmio Pastasås Vitlök",
+    "brand": "Dolmio",
+    "packageText": "450 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 63,
+    "unitPriceText": "63.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/725ebaae-745c-40e0-add5-92fd713e8a51.jpg?fit=bounds&format=auto&optimize=medium&width=138&s=0x944eb7fcb0f55a096d624dc9d45ccc0212e13927",
+    "productUrl": "https://www.mathem.se/se/products/63813-dolmio-pastasas-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9996",
+    "name": "Stensåkra Ölkorv Vitlök",
+    "brand": "Stensåkra",
+    "packageText": "105 g",
+    "price": 37.81,
+    "priceText": "37.81 SEK",
+    "unitPrice": 360.1,
+    "unitPriceText": "360.10 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/df671bc6-3bd4-4fcd-b39f-3485d3bd7e7c.jpg?fit=bounds&format=auto&optimize=medium&width=107&s=0xcecefadeaaeab6d7a604029f168442897ee2d85d",
+    "productUrl": "https://www.mathem.se/se/products/9996-stensakra-olkorv-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64523",
+    "name": "Felix Sås Vitlök",
+    "brand": "Felix",
+    "packageText": "335 ml",
+    "price": 32.65,
+    "priceText": "32.65 SEK",
+    "unitPrice": 97.46,
+    "unitPriceText": "97.46 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8e6cf949-251c-4488-94ac-877878edf927.jpg?fit=bounds&format=auto&optimize=medium&width=89&s=0x3b62fccb17f3b9b46f7eb3f362da652fff8779dc",
+    "productUrl": "https://www.mathem.se/se/products/64523-felix-sas-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "5498",
+    "name": "Biggans Aromsmör Vitlök",
+    "brand": "Biggans",
+    "packageText": "100 g",
+    "price": 24.56,
+    "priceText": "24.56 SEK",
+    "unitPrice": 245.6,
+    "unitPriceText": "245.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9c97e352-b5b3-4ed0-bfb6-23c75e6af425.jpg?fit=bounds&format=auto&optimize=medium&width=58&s=0x83b8fc52b028da917be8b4cd871f9c0dd1e2a097",
+    "productUrl": "https://www.mathem.se/se/products/5498-biggans-aromsmor-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "66251",
+    "name": "Örneborgs Delikatesser Riven Vitlök",
+    "brand": "Örneborgs Delikatesser",
+    "packageText": "90 g",
+    "price": 25.51,
+    "priceText": "25.51 SEK",
+    "unitPrice": 283.44,
+    "unitPriceText": "283.44 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/84cc27ad-69ec-4a14-9294-04241dece9dd.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0xe81dee8edbfeee1e596af87fb38badc2a6337b54",
+    "productUrl": "https://www.mathem.se/se/products/66251-orneborgs-delikatesser-riven-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2861",
+    "name": "Fontana Snacksoliver Vitlök",
+    "brand": "Fontana",
+    "packageText": "70 g",
+    "price": 16.99,
+    "priceText": "16.99 SEK",
+    "unitPrice": 242.71,
+    "unitPriceText": "242.71 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/8ce79964-081a-4ab6-bf0b-f7b6a878a9e1.jpg?fit=bounds&format=auto&optimize=medium&width=208&s=0x74283915f1db5ebe81dced0883dcac60b374e86a",
+    "productUrl": "https://www.mathem.se/se/products/2861-fontana-snacksoliver-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "2487",
+    "name": "OLW Dippmix Vitlök",
+    "brand": "OLW",
+    "packageText": "21 g",
+    "price": 12.26,
+    "priceText": "12.26 SEK",
+    "unitPrice": 583.81,
+    "unitPriceText": "583.81 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fa504eae-6fea-4b5d-b99c-f8ec43761887.jpg?fit=bounds&format=auto&optimize=medium&width=170&s=0xa718dfb24ed3acbf81b3cf5ec6ec54d51933dc72",
+    "productUrl": "https://www.mathem.se/se/products/2487-olw-dippmix-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65795",
+    "name": "Spicefield Woksås Vitlök",
+    "brand": "Spicefield",
+    "packageText": "300 ml",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 94.5,
+    "unitPriceText": "94.50 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/00f8a7f0-2e84-447d-9b06-b50ba5b5b747.jpg?fit=bounds&format=auto&optimize=medium&width=80&s=0x6f3987fb3756a01f6a711488e2b2abccabeec09b",
+    "productUrl": "https://www.mathem.se/se/products/65795-spicefield-woksas-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64517",
+    "name": "Felix Dressing Vitlök",
+    "brand": "Felix",
+    "packageText": "335 ml",
+    "price": 31.18,
+    "priceText": "31.18 SEK",
+    "unitPrice": 93.07,
+    "unitPriceText": "93.07 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/95776dac-80f3-4f3a-a9bc-ba8737334189.jpg?fit=bounds&format=auto&optimize=medium&width=89&s=0xbdd0587ec820828ed862b5507db75025f51dfe40",
+    "productUrl": "https://www.mathem.se/se/products/64517-felix-dressing-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "7413",
+    "name": "Santa Maria Marinad Vitlök",
+    "brand": "Santa Maria",
+    "packageText": "75 g",
+    "price": 9.42,
+    "priceText": "9.42 SEK",
+    "unitPrice": 125.6,
+    "unitPriceText": "125.60 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/057ebbca-fbbe-47e9-bbae-860ea8468dc1.jpg?fit=bounds&format=auto&optimize=medium&width=169&s=0x83cf3b5c94735fbe3bca7ad3c9e6eeaf93a3cbf3",
+    "productUrl": "https://www.mathem.se/se/products/7413-santa-maria-marinad-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "24284",
+    "name": "Eldorado Färskost Vitlök 25%",
+    "brand": "Eldorado",
+    "packageText": "200 g",
+    "price": 18.88,
+    "priceText": "18.88 SEK",
+    "unitPrice": 94.4,
+    "unitPriceText": "94.40 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/fa113adb-94f9-459d-a223-a143c5f2de3f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x57baf12ea758fe1a88af0c4c6418aade9ac9011a",
+    "productUrl": "https://www.mathem.se/se/products/24284-eldorado-farskost-vitlok-25/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65118",
+    "name": "Barilla Pastasås Vitlök",
+    "brand": "Barilla",
+    "packageText": "400 g",
+    "price": 20.7,
+    "priceText": "20.70 SEK",
+    "unitPrice": 51.75,
+    "unitPriceText": "51.75 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/df997434-e8c9-4ad9-808f-76e0af1060da.jpg?fit=bounds&format=auto&optimize=medium&width=161&s=0x16fbf845de7d4ee031deafb102a8a6cc6873a257",
+    "productUrl": "https://www.mathem.se/se/products/65118-barilla-pastasas-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63521",
+    "name": "Prime Patrol Oliver med Vitlök",
+    "brand": "Prime Patrol",
+    "packageText": "130 g",
+    "price": 23.61,
+    "priceText": "23.61 SEK",
+    "unitPrice": 181.62,
+    "unitPriceText": "181.62 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/de3aa1e4-6a3c-403b-9021-03c5870f395d.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x3e0c5040f438186902f7c966356345d0c9072d6b",
+    "productUrl": "https://www.mathem.se/se/products/63521-prime-patrol-oliver-med-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "4461",
+    "name": "Zeta Snacksoliver Vitlök",
+    "brand": "Zeta",
+    "packageText": "70 g",
+    "price": 21.5,
+    "priceText": "21.50 SEK",
+    "unitPrice": 307.14,
+    "unitPriceText": "307.14 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/023ab1fd-3067-4eeb-8994-0c047498d3a1.jpg?fit=bounds&format=auto&optimize=medium&width=189&s=0x31cde84b6f016e591a5cf82904d1f7f63013cb83",
+    "productUrl": "https://www.mathem.se/se/products/4461-zeta-snacksoliver-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63615",
+    "name": "GØL Salami Snack Vitlök",
+    "brand": "GØL",
+    "packageText": "80 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 354.38,
+    "unitPriceText": "354.38 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/1167259f-a7d9-450b-b447-889c33062e3c.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x636342cca64c2ebfa489ba9e5e94e5ff2ba1c315",
+    "productUrl": "https://www.mathem.se/se/products/63615-gol-salami-snack-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "9511",
+    "name": "GØL Vitlök Salami Skivad",
+    "brand": "GØL",
+    "packageText": "150 g",
+    "price": 32.13,
+    "priceText": "32.13 SEK",
+    "unitPrice": 214.2,
+    "unitPriceText": "214.20 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/a86eee0d-5eb7-4f54-bcd9-dcd6336e6f3e.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x06c8b68ff49c357eeb72f5f42f50f6f473fe9016",
+    "productUrl": "https://www.mathem.se/se/products/9511-gol-vitlok-salami-skivad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "28336",
+    "name": "Bjäre Chips Dippmix Aioli Vitlök",
+    "brand": "Bjäre Chips",
+    "packageText": "24 g",
+    "price": 9.42,
+    "priceText": "9.42 SEK",
+    "unitPrice": 392.5,
+    "unitPriceText": "392.50 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6df72604-3ea1-4064-9895-d8d95a87c8ae.jpg?fit=bounds&format=auto&optimize=medium&width=184&s=0xe4c388b4d191d9a7ab5f4d7781ee0687505420d2",
+    "productUrl": "https://www.mathem.se/se/products/28336-bjare-chips-dippmix-aioli-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "8273",
+    "name": "Santa Maria Vitlök Finhackad",
+    "brand": "Santa Maria",
+    "packageText": "44 g",
+    "price": 30,
+    "priceText": "30.00 SEK",
+    "unitPrice": 681.82,
+    "unitPriceText": "681.82 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/9112f262-1646-4b0f-9e23-934aa344d927.jpg?fit=bounds&format=auto&optimize=medium&width=122&s=0xf469b0560800a3ff08af9b3e2b9507fe9920e4b2",
+    "productUrl": "https://www.mathem.se/se/products/8273-santa-maria-vitlok-finhackad/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "64876",
+    "name": "Lohmanders Sås Vitlök & Örter",
+    "brand": "Lohmanders",
+    "packageText": "230 ml",
+    "price": 23.19,
+    "priceText": "23.19 SEK",
+    "unitPrice": 100.83,
+    "unitPriceText": "100.83 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/08db3e9c-fd66-44fc-91ec-bf7508ccda7f.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x3bb6eb8a48bf718376f62096336b04d1d4ea4f67",
+    "productUrl": "https://www.mathem.se/se/products/64876-lohmanders-sas-vitlok-orter/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "6935",
+    "name": "Zeta Crostini Vitlök & Persilja",
+    "brand": "Zeta",
+    "packageText": "120 g",
+    "price": 28.35,
+    "priceText": "28.35 SEK",
+    "unitPrice": 236.25,
+    "unitPriceText": "236.25 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/4daf46be-7216-4309-8231-b04e872c30d4.jpg?fit=bounds&format=auto&optimize=medium&width=204&s=0x1b3c3806496cd50248c0172405bdb042719add48",
+    "productUrl": "https://www.mathem.se/se/products/6935-zeta-crostini-vitlok-persilja/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65742",
+    "name": "OLW Chips Vitlök & Gräddfil",
+    "brand": "OLW",
+    "packageText": "275 g",
+    "price": 30.24,
+    "priceText": "30.24 SEK",
+    "unitPrice": 109.96,
+    "unitPriceText": "109.96 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/46d15444-265e-4c5d-bb39-4f0425a50945.jpg?fit=bounds&format=auto&optimize=medium&width=195&s=0x71676b558ac248d75306c48c4579362b602b5131",
+    "productUrl": "https://www.mathem.se/se/products/65742-olw-chips-vitlok-graddfil/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "63515",
+    "name": "Prime Patrol Ölkorv Vitlök 3-p",
+    "brand": "Prime Patrol",
+    "packageText": "120 g",
+    "price": 29.29,
+    "priceText": "29.29 SEK",
+    "unitPrice": 244.08,
+    "unitPriceText": "244.08 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/60e8c043-86aa-4443-a91a-5d4f3449c869.jpg?fit=bounds&format=auto&optimize=medium&width=74&s=0x6ea79517f1b7acb404b7e51026e8f4af3aa2cb6e",
+    "productUrl": "https://www.mathem.se/se/products/63515-prime-patrol-olkorv-vitlok-3-p/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "65079",
+    "name": "Farmers & Chefs Örter & Vitlök Sås",
+    "brand": "Farmers & Chefs",
+    "packageText": "200 g",
+    "price": 27.4,
+    "priceText": "27.40 SEK",
+    "unitPrice": 137,
+    "unitPriceText": "137.00 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/65266026-fcea-4c8d-91a9-3731a7194a7c.jpg?fit=bounds&format=auto&optimize=medium&width=300&s=0x3166d72d186a9c61c1ada3c4b40014176cfaff53",
+    "productUrl": "https://www.mathem.se/se/products/65079-farmers-chefs-orter-vitlok-sas/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "53203",
+    "name": "PANTAINORASINGH Teriyakisås med Vitlök Pantai",
+    "brand": "PANTAINORASINGH",
+    "packageText": "300 ml",
+    "price": 46.33,
+    "priceText": "46.33 SEK",
+    "unitPrice": 154.43,
+    "unitPriceText": "154.43 SEK",
+    "unitPriceUnit": "l",
+    "imageUrl": "https://images.mathem.se/prod/local_products/6adc8807-c58d-4f71-99da-729535874cd8.jpg?fit=bounds&format=auto&optimize=medium&width=83&s=0xff47e9d24adc78afabe956e20a6f273feaff8215",
+    "productUrl": "https://www.mathem.se/se/products/53203-pantainorasingh-teriyakisas-med-vitlok-pantai/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
+  },
+  {
+    "code": "67829",
+    "name": "Yipin Tofu Chili & Vitlök",
+    "brand": "Yipin",
+    "packageText": "230 g",
+    "price": 33.08,
+    "priceText": "33.08 SEK",
+    "unitPrice": 143.83,
+    "unitPriceText": "143.83 SEK",
+    "unitPriceUnit": "kg",
+    "imageUrl": "https://images.mathem.se/prod/local_products/05e792ee-8af6-4b21-94e1-84c2c83bd6cf.jpg?fit=bounds&format=auto&optimize=medium&width=258&s=0x190714f7bdb0e82984b560315b57d5c67b4f8497",
+    "productUrl": "https://www.mathem.se/se/products/67829-yipin-tofu-chili-vitlok/",
+    "available": true,
+    "sourceUrl": "https://www.mathem.se/se/search/products/?q=vitlok",
+    "retrievedAt": "2026-05-22T14:07:06.694Z"
   }
 ];
