@@ -15,6 +15,9 @@ import {
   buildHemkopWeeklyDiscountsUrl,
   buildEmaginPdfUrl,
   buildIcaStorePromotionsUrl,
+  buildLidlOfferPageUrl,
+  buildLidlStoreDetailPayloadUrl,
+  buildLidlStoresUrl,
   buildMatpriskollenStoreOffersUrl,
   buildMatpriskollenStoresUrl,
   buildMathemSearchUrl,
@@ -50,6 +53,9 @@ import {
   fetchIcaDefaultStoreProducts,
   fetchIcaProducts,
   fetchIcaReklambladOffers,
+  fetchLidlOffers,
+  fetchLidlOffersForAllStores,
+  fetchLidlStores,
   fetchMathemProducts,
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
@@ -65,6 +71,7 @@ import {
   GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
+  GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
   ingestRetailerProduct,
@@ -1639,6 +1646,158 @@ describe('fetchCityGrossProducts', () => {
       buildCityGrossProductsUrl({ siteId: '22', query: 'kaffe', take: 1, skip: 0 })
     ]);
     assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['21', 10], ['22', 11]]);
+  });
+});
+
+describe('fetchLidlStores', () => {
+  it('discovers Lidl public store detail pages and normalizes branch metadata', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url) === buildLidlStoresUrl()) {
+        return new Response(`
+          <a href="/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/">Alingsås</a>
+          <a href="/s/sv-SE/butiker/angered/traktorgatan-3/">Angered</a>
+        `, { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+      if (String(url) === buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/')) {
+        return new Response('<meta name="description" content="Din Lidl-butik vid Vänersborgsvägen 21, 441 37 Alingsås Se öppettider"><a href="https://bing.com/maps/default.aspx?rtp=~pos.57.93452_12.54588_Alings%C3%A5s">Map</a>', { status: 200 });
+      }
+      return new Response('<meta name="description" content="Din Lidl-butik vid Traktorgatan 3, 424 65 Angered Se öppettider"><a href="https://bing.com/maps/default.aspx?rtp=~pos.57.79633_12.05174_Angered">Map</a>', { status: 200 });
+    };
+
+    const stores = await fetchLidlStores({
+      fetchImpl,
+      maxRows: 2,
+      retrievedAt: '2026-05-22T14:10:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildLidlStoresUrl(),
+      buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/'),
+      buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/angered/traktorgatan-3/')
+    ]);
+    assert.deepEqual(stores[0], {
+      storeId: 'alingsas/vaenersborgsvaegen-21',
+      name: 'Lidl Alingsås Vänersborgsvägen 21',
+      address: 'Vänersborgsvägen 21',
+      city: 'Alingsås',
+      postalCode: '441 37',
+      countryCode: 'SE',
+      latitude: 57.93452,
+      longitude: 12.54588,
+      url: 'https://www.lidl.se/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/',
+      sourceUrl: buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/'),
+      retrievedAt: '2026-05-22T14:10:00.000Z'
+    });
+  });
+});
+
+describe('fetchLidlOffers', () => {
+  it('extracts public Lidl product prices from embedded grid data', async () => {
+    const gridData = {
+      imageList_V1: [{ image: 'https://www.lidl.se/assets/watermelon.png' }],
+      regions: [1, 2, 3],
+      title: 'Grekisk vattenmelon',
+      regionsPrices: {
+        1: {
+          currentPrice: {
+            price: 14.9,
+            basePrice: { text: '/kg' },
+            startDate: '2026-05-05T11:22:50.499Z',
+            endDate: '2026-05-24T21:59:59Z',
+            currencyCode: 'SEK',
+            discount: { discountText: 'Superpris' }
+          }
+        }
+      },
+      price: { price: 14.9, basePrice: { text: '/kg' }, currencyCode: 'SEK' },
+      productId: 11029834,
+      canonicalUrl: '/p/grekisk-vattenmelon/p11029834',
+      keyfacts: { title: 'Grekisk vattenmelon' }
+    };
+    const html = `<div data-grid-data="${JSON.stringify(gridData).replaceAll('"', '&quot;')}"></div>`;
+    const fetchImpl: typeof fetch = async () => new Response(html, { status: 200, headers: { 'content-type': 'text/html' } });
+
+    const rows = await fetchLidlOffers({
+      fetchImpl,
+      offerPaths: ['/c/veckans-frukt-groent/a10094676'],
+      retrievedAt: '2026-05-22T14:11:00.000Z'
+    });
+
+    assert.deepEqual(rows, [{
+      code: '11029834',
+      name: 'Grekisk vattenmelon',
+      brand: '',
+      packageText: '/kg',
+      category: 'lidl-public-offers',
+      price: 14.9,
+      regularPrice: null,
+      priceText: '14.90 SEK',
+      unitPriceText: '/kg',
+      promotionText: 'Superpris',
+      memberOnly: false,
+      regions: ['1', '2', '3'],
+      validFrom: '2026-05-05T11:22:50.499Z',
+      validTo: '2026-05-24T21:59:59Z',
+      productUrl: 'https://www.lidl.se/p/grekisk-vattenmelon/p11029834',
+      imageUrl: 'https://www.lidl.se/assets/watermelon.png',
+      sourceUrl: buildLidlOfferPageUrl('/c/veckans-frukt-groent/a10094676'),
+      retrievedAt: '2026-05-22T14:11:00.000Z'
+    }]);
+  });
+
+  it('fans public Lidl offers across discovered stores for daily materialization', async () => {
+    const requestedUrls: string[] = [];
+    const gridData = {
+      title: 'Röd paprika',
+      regions: [1],
+      productId: 11029717,
+      canonicalUrl: '/p/rod-paprika/p11029717',
+      currentLidlPlusPrice: { price: { price: 29.9 } },
+      regionsPrices: {
+        1: {
+          currentLidlPlusPrice: {
+            price: {
+              price: 29.9,
+              oldPrice: 44.9,
+              basePrice: { text: '/kg' },
+              currencyCode: 'SEK',
+              discount: { discountText: '-33%' }
+            },
+            lidlPlusText: 'Med Lidl Plus'
+          }
+        }
+      }
+    };
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url) === buildLidlStoresUrl()) {
+        return new Response('<a href="/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/">Alingsås</a>', { status: 200 });
+      }
+      if (String(url).includes('/butiker/')) {
+        return new Response('<meta name="description" content="Din Lidl-butik vid Vänersborgsvägen 21, 441 37 Alingsås Se öppettider"><a href="https://bing.com/maps/default.aspx?rtp=~pos.57.93452_12.54588_Alings%C3%A5s">Map</a>', { status: 200 });
+      }
+      return new Response(`<div data-grid-data="${JSON.stringify(gridData).replaceAll('"', '&quot;')}"></div>`, { status: 200 });
+    };
+
+    const rows = await fetchLidlOffersForAllStores({
+      fetchImpl,
+      maxStores: 1,
+      offerPaths: ['/c/lidl-plus-erbjudanden/a10094682'],
+      retrievedAt: '2026-05-22T14:12:00.000Z'
+    });
+
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0].storeId, 'alingsas/vaenersborgsvaegen-21');
+    assert.equal(rows[0].price, 29.9);
+    assert.equal(rows[0].regularPrice, 44.9);
+    assert.equal(rows[0].memberOnly, true);
+    assert.deepEqual(requestedUrls, [
+      buildLidlStoresUrl(),
+      buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/'),
+      buildLidlOfferPageUrl('/c/lidl-plus-erbjudanden/a10094682')
+    ]);
   });
 });
 
@@ -3476,6 +3635,63 @@ describe('daily ingestion runner', () => {
     assert.equal(observationInsert?.params[2], 'store-db-2');
     assert.equal(observationInsert?.params[7], 31.5);
     assert.equal(observationInsert?.params[8], 39.9);
+  });
+
+  it('materializes native Lidl all-store public offer prices into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const gridData = {
+      title: 'Grekisk vattenmelon',
+      regions: [1],
+      productId: 11029834,
+      canonicalUrl: '/p/grekisk-vattenmelon/p11029834',
+      regionsPrices: {
+        1: {
+          currentPrice: {
+            price: 14.9,
+            basePrice: { text: '/kg' },
+            currencyCode: 'SEK',
+            discount: { discountText: 'Superpris' }
+          }
+        }
+      }
+    };
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T14:13:00.000Z',
+      connectors: [{
+        connectorId: 'lidl-public-offers-all-stores',
+        chainId: 'lidl',
+        sourceType: 'retailer_online_page',
+        endpointUrl: `${GROCERYVIEW_DAILY_LIDL_PUBLIC_OFFERS_URL}?paths=/c/veckans-frukt-groent/a10094676&maxStores=1`,
+        parserVersion: 'lidl-public-offers-native-v1',
+        robotsTxtStatus: 'allow',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: 'alingsas/vaenersborgsvaegen-21', name: 'Lidl Alingsås Vänersborgsvägen 21', address: 'Vänersborgsvägen 21', city: 'Alingsås' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url) === buildLidlStoresUrl()) {
+          return new Response('<a href="/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/">Alingsås</a>', { status: 200 });
+        }
+        if (String(url).includes('/butiker/')) {
+          return new Response('<meta name="description" content="Din Lidl-butik vid Vänersborgsvägen 21, 441 37 Alingsås Se öppettider"><a href="https://bing.com/maps/default.aspx?rtp=~pos.57.93452_12.54588_Alings%C3%A5s">Map</a>', { status: 200 });
+        }
+        return new Response(`<div data-grid-data="${JSON.stringify(gridData).replaceAll('"', '&quot;')}"></div>`, { status: 200 });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildLidlStoresUrl(),
+      buildLidlStoreDetailPayloadUrl('/s/sv-SE/butiker/alingsas/vaenersborgsvaegen-21/'),
+      buildLidlOfferPageUrl('/c/veckans-frukt-groent/a10094676')
+    ]);
+    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+    assert.equal(observationInsert?.params[2], 'store-db-2');
+    assert.equal(observationInsert?.params[7], 14.9);
   });
 
   it('fails closed before persistence when store-scoped prices omit configured branch metadata', async () => {
