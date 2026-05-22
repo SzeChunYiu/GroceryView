@@ -778,6 +778,29 @@ export const accountSavedShoppingContract = {
   ]
 };
 
+
+export const shareableHouseholdListContract = {
+  title: 'Shareable household lists',
+  status: 'planned_account_runtime_contract',
+  corePlanner: 'planShareableHouseholdList',
+  roles: [
+    { role: 'viewer', canEdit: false, label: 'Can view checked items, quantities, store groups, and missing-price blockers.' },
+    { role: 'editor', canEdit: true, label: 'Can edit quantities only after the signed-in user is already a household member.' }
+  ],
+  requiredInputs: [
+    'signed-in requester userId from the authenticated session',
+    'household membership from account storage before any share token is minted',
+    'recipient user id or invite email plus viewer/editor role',
+    'server-minted expiring share token before a public link can open the list'
+  ],
+  guardrails: [
+    'No anonymous household edits are accepted.',
+    'External email invites are view-only until the recipient signs in and joins the household.',
+    'Share links must expire and should never expose private receipts, budgets, or retailer credentials.',
+    'Missing prices and unavailable products remain visible blockers instead of being hidden from recipients.'
+  ]
+};
+
 export const basketImportExportContract = {
   endpoint: '/api/basket/import-export',
   title: 'Bookmarklet import/export',

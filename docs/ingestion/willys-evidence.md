@@ -350,3 +350,119 @@ Sample rows:
 3. 2500303258 | 2110 | Mozzarella | 2 för 20,00 | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
 4. 2500298388 | 2110 | Hushållspapper 12-pack, toalettpapper 18-pack | 59,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
 5. 2500301201 | 2110 | Läsk 6-pack | Välj & blanda! 3 för 89,00 +pant | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
+
+## Willys weekly discounts 181-store expansion 2026-05-22
+
+- Source: willys.se public Axfood campaign JSON
+- Store catalog source: https://www.willys.se/axfood/rest/store?online=true
+- Source URL pattern: https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
+- Retrieved: 2026-05-22T16:39:50.737Z
+- Store IDs: 2110, 2187, 2102, 2149, 2355, 2268, 2121, 2212, 2193, 2207, 2219, 2260, 2259, 2232, 2206, 2353, 2103, 2329, 2348, 2328, 2249, 2225, 2152, 2224, 2118, 2282, 2240, 2325, 2267, 2322, 2230, 2248, 2292, 2241, 2132, 2223, 2288, 2111, 2247, 2226, 2321, 2137, 2236, 2335, 2271, 2196, 2324, 2173, 2338, 2250, 2296, 2349, 2234, 2135, 2285, 2238, 2145, 2153, 2117, 2290, 2358, 2210, 2334, 2266, 2108, 2337, 2275, 2104, 2201, 2198, 2269, 2105, 2160, 2298, 2256, 2347, 2127, 2179, 2176, 2354, 2360, 2125, 2244, 2114, 2144, 2253, 2150, 2279, 2189, 2202, 2141, 2215, 2170, 2192, 2159, 2336, 2246, 2281, 2278, 2188, 2227, 2323, 2257, 2211, 2291, 2327, 2208, 2199, 2299, 2277, 2270, 2294, 2228, 2220, 2200, 2351, 2205, 2252, 2350, 2295, 2129, 2345, 2163, 2134, 2660, 2242, 2214, 2167, 2344, 2340, 2239, 2138, 2284, 2229, 2330, 2361, 2274, 2143, 2151, 2213, 2106, 2262, 2184, 2203, 2333, 2276, 2194, 2218, 2272, 2341, 2235, 2161, 2182, 2342, 2346, 2162, 2320, 2263, 2204, 2297, 2171, 2339, 2261, 2343, 2265, 2131, 2231, 2286, 2280, 2662, 2174, 2254, 2326, 2233, 2222, 2289, 2123, 2139, 2197, 2120, 2357
+- Added store IDs in this iteration: 2189, 2202, 2141, 2215, 2170, 2192, 2159, 2336, 2246, 2281, 2278, 2188, 2227, 2323, 2257, 2211, 2291, 2327, 2208, 2199, 2299, 2277, 2270, 2294, 2228, 2220, 2200, 2351, 2205, 2252, 2350, 2295, 2129, 2345, 2163, 2134, 2660, 2242, 2214, 2167, 2344, 2340, 2239, 2138, 2284, 2229, 2330, 2361, 2274, 2143, 2151, 2213, 2106, 2262, 2184, 2203, 2333, 2276, 2194, 2218, 2272, 2341, 2235, 2161, 2182, 2342, 2346, 2162, 2320, 2263, 2204, 2297, 2171, 2339, 2261, 2343, 2265, 2131, 2231, 2286, 2280, 2662, 2174, 2254, 2326, 2233, 2222, 2289, 2123, 2139, 2197, 2120, 2357
+- Retained existing public store IDs not currently returned as online: 2355
+- Real weekly discount rows fetched and wired: 36570
+- Source URLs fetched: 543
+- Web wire: apps/web/src/lib/ingested/willys.ts
+- Connector: packages/ingestion/src/connectors/willys.ts
+
+Added-store row counts:
+- 2189: 202 rows
+- 2202: 202 rows
+- 2141: 202 rows
+- 2215: 202 rows
+- 2170: 202 rows
+- 2192: 202 rows
+- 2159: 202 rows
+- 2336: 202 rows
+- 2246: 202 rows
+- 2281: 202 rows
+- 2278: 202 rows
+- 2188: 202 rows
+- 2227: 202 rows
+- 2323: 202 rows
+- 2257: 202 rows
+- 2211: 202 rows
+- 2291: 202 rows
+- 2327: 202 rows
+- 2208: 202 rows
+- 2199: 202 rows
+- 2299: 202 rows
+- 2277: 202 rows
+- 2270: 202 rows
+- 2294: 202 rows
+- 2228: 202 rows
+- 2220: 202 rows
+- 2200: 202 rows
+- 2351: 202 rows
+- 2205: 202 rows
+- 2252: 202 rows
+- 2350: 202 rows
+- 2295: 202 rows
+- 2129: 202 rows
+- 2345: 202 rows
+- 2163: 202 rows
+- 2134: 202 rows
+- 2660: 202 rows
+- 2242: 202 rows
+- 2214: 202 rows
+- 2167: 202 rows
+- 2344: 202 rows
+- 2340: 202 rows
+- 2239: 202 rows
+- 2138: 202 rows
+- 2284: 202 rows
+- 2229: 202 rows
+- 2330: 202 rows
+- 2361: 206 rows
+- 2274: 202 rows
+- 2143: 202 rows
+- 2151: 202 rows
+- 2213: 202 rows
+- 2106: 202 rows
+- 2262: 202 rows
+- 2184: 202 rows
+- 2203: 202 rows
+- 2333: 202 rows
+- 2276: 202 rows
+- 2194: 202 rows
+- 2218: 202 rows
+- 2272: 202 rows
+- 2341: 202 rows
+- 2235: 202 rows
+- 2161: 202 rows
+- 2182: 202 rows
+- 2342: 202 rows
+- 2346: 202 rows
+- 2162: 202 rows
+- 2320: 202 rows
+- 2263: 202 rows
+- 2204: 202 rows
+- 2297: 202 rows
+- 2171: 202 rows
+- 2339: 202 rows
+- 2261: 202 rows
+- 2343: 202 rows
+- 2265: 202 rows
+- 2131: 202 rows
+- 2231: 202 rows
+- 2286: 202 rows
+- 2280: 202 rows
+- 2662: 202 rows
+- 2174: 202 rows
+- 2254: 202 rows
+- 2326: 202 rows
+- 2233: 202 rows
+- 2222: 202 rows
+- 2289: 202 rows
+- 2123: 202 rows
+- 2139: 202 rows
+- 2197: 202 rows
+- 2120: 202 rows
+- 2357: 202 rows
+
+Sample rows:
+1. 2500306014 | 2110 | Grön sparris 250g | 29,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
+2. 2500306996 | 2110 | Lyxrosor 12-pack | 99,00/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
+3. 2500303258 | 2110 | Mozzarella | 2 för 20,00 | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
+4. 2500298388 | 2110 | Hushållspapper 12-pack, toalettpapper 18-pack | 59,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
+5. 2500301201 | 2110 | Läsk 6-pack | Välj & blanda! 3 för 89,00 +pant | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
