@@ -331,13 +331,13 @@ class RecordingQueryExecutor implements QueryExecutor {
       product_id: 'coffee',
       category_id: 'pantry',
       observed_chain_ids: ['coop', 'willys'],
-      observed_store_ids: ['coop-odenplan', 'willys-odenplan']
+      observed_store_ids: ['216502', '2102']
     },
     {
       product_id: 'milk',
       category_id: 'dairy',
       observed_chain_ids: ['willys'],
-      observed_store_ids: ['willys-odenplan']
+      observed_store_ids: ['2102']
     }
   ];
 
@@ -1190,18 +1190,19 @@ describe('createPostgresCatalogReader', () => {
         id: 'coffee',
         categoryId: 'pantry',
         observedChainIds: ['coop', 'willys'],
-        observedStoreIds: ['coop-odenplan', 'willys-odenplan']
+        observedStoreIds: ['2102', '216502']
       },
       {
         id: 'milk',
         categoryId: 'dairy',
         observedChainIds: ['willys'],
-        observedStoreIds: ['willys-odenplan']
+        observedStoreIds: ['2102']
       }
     ]);
     assert.match(executor.calls[0]!.sql, /left join latest_prices on latest_prices\.product_id = products\.id/);
+    assert.match(executor.calls[0]!.sql, /left join stores on stores\.id = latest_prices\.store_id/);
     assert.match(executor.calls[0]!.sql, /array_agg\(distinct latest_prices\.chain_id\)/);
-    assert.match(executor.calls[0]!.sql, /array_agg\(distinct latest_prices\.store_id\)/);
+    assert.match(executor.calls[0]!.sql, /stores\.external_ref/);
     assert.deepEqual(executor.calls[0]!.params, [25]);
   });
 });
