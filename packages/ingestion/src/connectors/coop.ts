@@ -282,7 +282,8 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [
   '105710',
   '105830',
   '105630',
-  '105810'
+  '105810',
+  '163120'
 ] as const;
 export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Färsk laxfilé Harbour',
@@ -313,6 +314,7 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Bravo Juice Tropisk'
 ];
 const COOP_LUND_STADION_FLYER_STORE_IDS = ['105860', '105760', '105740', '105710', '105830', '105630', '105810'] as const;
+const COOP_KARLSKOGA_MATCHED_FLYER_STORE_IDS = ['163120'] as const;
 export const DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS: readonly CoopFlyerOfferHint[] = [
   {
     query: 'Färsk laxfilé Harbour',
@@ -371,8 +373,52 @@ export const DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS: readonly CoopFlyerOfferHint[
     offerUnitPrice: 317.33,
     offerUnitPriceText: '317.33 kr/kg',
     offerMechanicText: 'Torskryggfilé 3-pack-119:- /förp'
-  }
+  },
+  ...coopFlyerOfferHints(COOP_KARLSKOGA_MATCHED_FLYER_STORE_IDS, [
+    ['Färsk laxfilé Harbour', '2383471000006', 149, 149, '149.00 kr/kilo', '149 kr/kg', true],
+    ['Mini vattenmelon', '2317342100007', 20, 20, '20.00 kr/kilo', 'Medlemspris-Vattenmelon Mini-20:- /kg', true],
+    ['Svenskt smör Arla 500 g', '7310865005168', 45, 90, '90.00 kr/kilo', 'Medlemspris-Smör 45 kr/st-1 för 45:-', true],
+    ['Hushållsost Arla', '2340375400004', 74.9, 74.9, '74.90 kr/kilo', 'Medlemspris-Hushållsost-74:90 /kg', true],
+    ['Toalettpapper 24-pack Coop', '7340191179691', 99, 42.45, '42.45 kr/kilo', 'Toalettpapper Nice & Soft 24-pack-99:- /st', false],
+    ['Bacon Scan 3-pack', '7300206718000', 37.9, 90.24, '90.24 kr/kilo', 'Bacon 3-pack-37:90 /st', false],
+    ['Grekisk yoghurt Arla Köket 1000 g', '7310865095466', 29.9, 29.9, '29.90 kr/kilo', 'Grekisk yoghurt 10%-29:90 /st', false],
+    ['Olivolja Monini 750', '80508816', 89, 118.67, '118.67 kr/liter', 'Olivolja Classico-89:- /st', false],
+    ['Kalkonbröstfilé Ingelsta', '7331044072573', 76.9, 192.25, '192.25 kr/kilo', 'Kalkonbröstfilé-76:90 /st', false],
+    ['Danish Crown fläskfilé', '2385912200006', 99, 99, '99.00 kr/kilo', '99 kg/kg', false],
+    ['Coop stekfläsk', '2317264300004', 89, 89, '89.00 kr/kilo', 'Stekfläsk Skivor-89:- /kg', false],
+    ['Kycklingbröstfilé Guldfågeln mango chili', '2307125100003', 149, 149, '149.00 kr/kilo', 'Kycklingbröstfilé Tvådelad Marinerad Mango Chili Glaze-149:- /kg', false],
+    ['Lövbiff fransyska Coop', '2317075000001', 179, 179, '179.00 kr/kilo', 'Lövbiff av fransyska-179:- /kg', false],
+    ['Torskryggfilé Royal Greenland 3-pack', '5740301203124', 119, 317.33, '317.33 kr/kilo', 'Torskryggfilé 3-pack-119:- /st', false],
+    ['Fläskkarré Dalsjöfors eld rök', '2330120500004', 79.9, 79.9, '79.90 kr/kilo', 'Karré Eld & rök-79:90 /kg', false],
+    ['Pepsi Max 20-pack', '7310074009230', 84, 12.73, '12.73 kr/liter', 'Pepsi Max 20-pack-84:- /st', false],
+    ['Grillkorv Scan tunt skinn', '7300207071005', 39, 60.94, '60.94 kr/kilo', 'Medlemspris-Grillkorv med tunt skinn-39:- /st', true],
+    ['Lök Gul Eko Änglamark', '7300156596727', 13, 26, '26.00 kr/kilo', 'Lök Gul Eko-13:- /st', false],
+    ['Rabarber', '2097474500004', 38, 38, '38.00 kr/kilo', 'Rabarber-38:- /kg', false],
+    ['Fazer Lantbröd Havssalt', '7314873525014', 25, 41.67, '41.67 kr/kilo', 'Lantbröd Havssalt-25:- /st', false],
+    ['Pågen Lingongrova Special', '7311070330243', 20, 40, '40.00 kr/kilo', 'Lingongrova Special-20:- /st', false],
+    ['Engelmanns Salami Milano', '7350051211164', 39.9, 498.75, '498.75 kr/kilo', 'Salami Milano-39:90 /st', false],
+    ['Marabou Chokladpraliner Hjärta', '7622210929525', 45, 272.73, '272.73 kr/kilo', 'Chokladpraliner Hjärta-45:- /st', false],
+    ['Vanish White Gold', '5701092111067', 54.9, 116.81, '116.81 kr/kilo', 'Fläckborttagning White Gold-54:90 /st', false],
+    ['NIVEA Q10 Energy', '4006000089874', 89, 1780, '1780.00 kr/liter', 'Dagkräm Q10 Energy spf 15-89:- /st', false],
+    ['Bravo Juice Tropisk', '7310867561020', 34, 17, '17.00 kr/liter', 'Medlemspris-Juice Tropisk-34:- /st', true]
+  ])
 ];
+
+function coopFlyerOfferHints(
+  storeIds: readonly string[],
+  rows: readonly (readonly [string, string, number, number, string, string, boolean])[]
+): CoopFlyerOfferHint[] {
+  return rows.map(([query, code, offerPrice, offerUnitPrice, offerUnitPriceText, offerMechanicText, medMeraRequired]) => ({
+    query,
+    code,
+    storeIds,
+    offerPrice,
+    offerUnitPrice,
+    offerUnitPriceText,
+    offerMechanicText,
+    medMeraRequired
+  }));
+}
 
 export type CoopPublicServiceAccess = {
   personalizationApiUrl: string;
