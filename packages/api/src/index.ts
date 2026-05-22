@@ -748,6 +748,14 @@ export type ProductPriceHistoryAppliedFilters = {
   limit?: number;
 };
 
+export const productPriceHistoryEndpoint = {
+  method: 'GET',
+  controllerPath: 'products/:productId',
+  actionPath: 'price-history',
+  path: '/products/:productId/price-history',
+  queryParams: ['priceType', 'chain', 'store', 'sourceRun', 'minConfidence', 'from', 'to', 'limit']
+} as const;
+
 export type ProductPriceHistoryPoint = ProductPriceHistoryObservationInput;
 
 export type ProductPriceHistoryEvidenceTable = 'products' | 'observations' | 'chains' | 'stores';
