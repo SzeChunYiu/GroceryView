@@ -2601,6 +2601,7 @@ function dailyPayloadHash(payload: unknown): string {
 
 type BatchRawRecordIdRow = { ordinal: number; id: string };
 type BatchObservationIdRow = { id: string };
+type BatchProductIdRow = { slug: string; id: string };
 
 async function upsertDailyChain(executor: QueryExecutor, chainId: string): Promise<string> {
   const slug = normalizeDailySlug(chainId);
@@ -2708,6 +2709,112 @@ async function upsertDailyProduct(executor: QueryExecutor, product: IngestedProd
   return id;
 }
 
+
+async function upsertDailyProductBatch(executor: QueryExecutor, products: IngestedProduct[]): Promise<Map<string, string>> {
+  if (products.length === 0) return new Map();
+  const uniqueProducts = [...new Map(products.map((product) => [normalizeDailySlug(product.id), product])).values()];
+  const rows = await executor.query<BatchProductIdRow>(
+    `with input as (
+       select *
+       from jsonb_to_recordset($1::jsonb) as x(
+         slug text,
+         canonical_name text,
+         brand text,
+         category_id text,
+         package_size numeric,
+         package_unit text,
+         comparable_unit text
+       )
+     ),
+     upserted as (
+       insert into products(
+         slug,
+         canonical_name,
+         brand,
+         category_path,
+         package_size,
+         package_unit,
+         comparable_unit
+       )
+       select
+         slug,
+         canonical_name,
+         brand,
+         case when category_id is null then '{}'::text[] else array[category_id] end,
+         package_size,
+         package_unit,
+         comparable_unit
+       from input
+       on conflict (slug) do update set
+         canonical_name = excluded.canonical_name,
+         brand = excluded.brand,
+         category_path = excluded.category_path,
+         package_size = excluded.package_size,
+         package_unit = excluded.package_unit,
+         comparable_unit = excluded.comparable_unit,
+         updated_at = now()
+       returning slug, id
+     )
+     select slug, id from upserted`,
+    [JSON.stringify(uniqueProducts.map((product) => ({
+      slug: normalizeDailySlug(product.id),
+      canonical_name: product.canonicalName,
+      brand: product.brand ?? null,
+      category_id: product.categoryId ?? null,
+      package_size: product.packageSize ?? null,
+      package_unit: product.packageUnit ?? null,
+      comparable_unit: product.comparableUnit
+    })))]
+  );
+  return new Map(rows.map((row) => [row.slug, row.id]));
+}
+
+async function upsertDailyAliasBatch(executor: QueryExecutor, aliases: Array<{
+  productId: string;
+  alias: string;
+  normalizedAlias: string;
+  sourceRef: string;
+  matchConfidence: number;
+}>): Promise<void> {
+  if (aliases.length === 0) return;
+  const uniqueAliases = [...new Map(aliases.map((alias) => [`${alias.normalizedAlias}:${alias.sourceRef}`, alias])).values()];
+  await executor.query(
+    `with input as (
+       select *
+       from jsonb_to_recordset($1::jsonb) as x(
+         product_id uuid,
+         alias text,
+         normalized_alias text,
+         source_ref text,
+         match_confidence numeric
+       )
+     )
+     insert into aliases(
+       product_id,
+       alias,
+       normalized_alias,
+       source_type,
+       source_ref,
+       match_confidence,
+       reviewed_at
+     )
+     select product_id, alias, normalized_alias, 'retailer', source_ref, match_confidence, null
+     from input
+     on conflict (normalized_alias, source_type, source_ref) do update set
+       product_id = excluded.product_id,
+       alias = excluded.alias,
+       match_confidence = excluded.match_confidence,
+       reviewed_at = excluded.reviewed_at`,
+    [JSON.stringify(uniqueAliases.map((alias) => ({
+      product_id: alias.productId,
+      alias: alias.alias,
+      normalized_alias: alias.normalizedAlias,
+      source_ref: alias.sourceRef,
+      match_confidence: alias.matchConfidence
+    })))]
+  );
+}
+
 async function persistDailyConnectorOutput(input: {
   executor: QueryExecutor;
   config: DailyIngestionConnectorConfig;
@@ -2715,7 +2822,6 @@ async function persistDailyConnectorOutput(input: {
 }): Promise<Pick<DailyIngestionRunResult, 'sourceRunIds' | 'rawRecordIds' | 'observationIds' | 'acceptedCount' | 'rejectedCount'>> {
   const { executor, config, result } = input;
   const sourceWriter = createPostgresSourceRecordWriter(executor);
-  const aliasRepository = createPostgresProductAliasRepository(executor);
   const storesBySlug = new Map((config.stores ?? []).map((store) => [normalizeDailySlug(store.storeId), store]));
   const sourceRun = await sourceWriter.createSourceRun({
     sourceType: dbSourceTypeForConnector(config.sourceType),
@@ -2739,8 +2845,6 @@ async function persistDailyConnectorOutput(input: {
   const observationIds: string[] = [];
   const chainIdsBySlug = new Map<string, string>();
   const storeIdsBySlug = new Map<string, string>();
-  const productIdsBySlug = new Map<string, string>();
-  const aliasKeys = new Set<string>();
 
   async function getDailyChainId(chainId: string): Promise<string> {
     const slug = normalizeDailySlug(chainId);
@@ -2760,14 +2864,6 @@ async function persistDailyConnectorOutput(input: {
     return id;
   }
 
-  async function getDailyProductId(product: IngestedProduct): Promise<string> {
-    const slug = normalizeDailySlug(product.id);
-    const cached = productIdsBySlug.get(slug);
-    if (cached) return cached;
-    const id = await upsertDailyProduct(executor, product);
-    productIdsBySlug.set(slug, id);
-    return id;
-  }
 
   async function upsertRawRecordBatch(records: Array<{
     ordinal: number;
@@ -3003,6 +3099,21 @@ async function persistDailyConnectorOutput(input: {
     return rows.map((row) => row.id);
   }
 
+  const productIdsBySlug = await upsertDailyProductBatch(executor, result.ingestion.accepted.map((accepted) => accepted.product));
+  const aliasesToUpsert: Parameters<typeof upsertDailyAliasBatch>[1] = [];
+  for (const accepted of result.ingestion.accepted) {
+    const productId = productIdsBySlug.get(normalizeDailySlug(accepted.product.id));
+    if (!productId) throw new Error(`Daily ingestion product batch did not return an id: ${accepted.product.id}`);
+    aliasesToUpsert.push({
+      productId,
+      alias: accepted.alias.rawName,
+      normalizedAlias: accepted.alias.rawName.trim().toLowerCase().replace(/\s+/g, ' '),
+      sourceRef: result.plan.runKey,
+      matchConfidence: accepted.alias.matchConfidence
+    });
+  }
+  await upsertDailyAliasBatch(executor, aliasesToUpsert);
+
   const rawRecordsToUpsert: Parameters<typeof upsertRawRecordBatch>[0] = [];
   const observationsToInsert: Parameters<typeof insertObservationBatch>[0] = [];
 
@@ -3010,20 +3121,8 @@ async function persistDailyConnectorOutput(input: {
     const chainId = await getDailyChainId(accepted.priceObservation.chainId);
     const storeConfig = accepted.priceObservation.storeId ? storesBySlug.get(normalizeDailySlug(accepted.priceObservation.storeId)) : undefined;
     const storeId = storeConfig ? await getDailyStoreId(chainId, storeConfig) : undefined;
-    const productId = await getDailyProductId(accepted.product);
-    const normalizedAlias = accepted.alias.rawName.trim().toLowerCase().replace(/\s+/g, ' ');
-    const aliasKey = `${productId}:${normalizedAlias}:${result.plan.runKey}`;
-    if (!aliasKeys.has(aliasKey)) {
-      aliasKeys.add(aliasKey);
-      await aliasRepository.upsertProductAlias({
-        productId,
-        alias: accepted.alias.rawName,
-        normalizedAlias,
-        sourceType: 'retailer',
-        sourceRef: result.plan.runKey,
-        matchConfidence: accepted.alias.matchConfidence
-      });
-    }
+    const productId = productIdsBySlug.get(normalizeDailySlug(accepted.product.id));
+    if (!productId) throw new Error(`Daily ingestion product batch did not return an id: ${accepted.product.id}`);
 
     const payload = {
       product: accepted.product,
