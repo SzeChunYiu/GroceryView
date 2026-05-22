@@ -1,7 +1,8 @@
 import { COMMODITIES, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { calculateDealScore, compareCommodityUnitPrices, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type CommodityPriceObservation, type ProductMatchInput } from '@groceryview/core';
+import { calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type CommodityPriceObservation, type ProductMatchInput } from '@groceryview/core';
 import { axfoodProducts } from './axfood-products';
 import { icaReklambladOffers, icaReklambladSource } from './ingested/ica-reklamblad';
+import { mathemProducts, mathemSource } from './ingested/mathem';
 import { openFoodFactsCatalog } from './openfoodfacts-catalog';
 import { matpriskollenOffers } from './ingested/matpriskollen';
 import { categoryLabels, pricedProducts } from './openprices-products';
@@ -112,6 +113,175 @@ export const matchedChainProducts = axfoodProducts.filter((product) => product.i
 export const topChainSpreads = [...matchedChainProducts].sort((a, b) => b.spreadPct - a.spreadPct).slice(0, 18);
 export const freshestOpenPrices = [...pricedProducts].sort((a, b) => b.lastObservedAt.localeCompare(a.lastObservedAt)).slice(0, 18);
 export const productUniverse = [...topChainSpreads, ...freshestOpenPrices].slice(0, 36);
+
+type DeliveryVsInStoreBasketPair = {
+  matchedToken: string;
+  matchEvidence: string;
+  onlineProduct: (typeof mathemProducts)[number];
+  inStoreProduct: (typeof matchedChainProducts)[number];
+};
+
+const deliveryVsInStoreStaples = [
+  { matchedToken: 'havregryn', label: 'Havregryn' },
+  { matchedToken: 'pasta', label: 'Pasta / makaroner', aliases: ['makaroner'] },
+  { matchedToken: 'honung', label: 'Honung' },
+  { matchedToken: 'vetemjol', label: 'Vetemjöl', aliases: ['vetemjöl'] },
+  { matchedToken: 'ris', label: 'Ris' },
+  { matchedToken: 'salt', label: 'Salt' }
+];
+
+function normalizeBasketMatchText(value: string) {
+  return value
+    .normalize('NFKD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase();
+}
+
+function matchesBasketToken(value: string, token: string, aliases: string[] = []) {
+  const normalized = normalizeBasketMatchText(value);
+  return [token, ...aliases].some((candidate) => normalized.includes(normalizeBasketMatchText(candidate)));
+}
+
+function roundSek(value: number) {
+  return Math.round(value * 100) / 100;
+}
+
+function cheapestMathemProductFor(token: string, aliases: string[] = []) {
+  return mathemProducts
+    .filter((product) => product.available && Number.isFinite(product.price) && product.price > 0)
+    .filter((product) => matchesBasketToken(`${product.name} ${product.brand} ${product.packageText}`, token, aliases))
+    .sort((a, b) => a.price - b.price || a.name.localeCompare(b.name))[0];
+}
+
+function cheapestMatchedChainProductFor(token: string, aliases: string[] = []) {
+  return matchedChainProducts
+    .filter((product) => Number.isFinite(product.lowestPrice) && product.lowestPrice > 0)
+    .filter((product) => matchesBasketToken(`${product.name} ${product.brand} ${product.subline}`, token, aliases))
+    .sort((a, b) => a.lowestPrice - b.lowestPrice || a.name.localeCompare(b.name))[0];
+}
+
+const deliveryVsInStoreBasketPairs = deliveryVsInStoreStaples
+  .map((staple): DeliveryVsInStoreBasketPair | null => {
+    const onlineProduct = cheapestMathemProductFor(staple.matchedToken, staple.aliases);
+    const inStoreProduct = cheapestMatchedChainProductFor(staple.matchedToken, staple.aliases);
+    if (!onlineProduct || !inStoreProduct) return null;
+    return {
+      matchedToken: staple.label,
+      matchEvidence: `public product-name token match: ${staple.label}`,
+      onlineProduct,
+      inStoreProduct
+    };
+  })
+  .filter((row): row is DeliveryVsInStoreBasketPair => row !== null)
+  .slice(0, 6);
+
+const deliveryVsInStoreOnlineBasketTotal = deliveryVsInStoreBasketPairs.length > 0
+  ? roundSek(deliveryVsInStoreBasketPairs.reduce((sum, row) => sum + row.onlineProduct.price, 0))
+  : null;
+const deliveryVsInStoreInStoreBasketTotal = deliveryVsInStoreBasketPairs.length > 0
+  ? roundSek(deliveryVsInStoreBasketPairs.reduce((sum, row) => sum + row.inStoreProduct.lowestPrice, 0))
+  : null;
+const deliveryVsInStoreMatchedChainIds = [...new Set(deliveryVsInStoreBasketPairs.map((row) => row.inStoreProduct.lowestChain))];
+
+const deliveryVsInStoreDeliveryPlan = planBasketTripCost({
+  currency: 'SEK',
+  travelMode: 'delivery',
+  options: [
+    {
+      strategyId: 'mathem-public-online-delivery-fee-49',
+      label: 'Mathem public online basket + 49 kr deliveryFee scenario',
+      basketTotal: deliveryVsInStoreOnlineBasketTotal,
+      storeIds: ['mathem-online-public-search'],
+      deliveryFee: 49
+    },
+    {
+      strategyId: 'mathem-public-online-delivery-fee-79',
+      label: 'Mathem public online basket + 79 kr deliveryFee scenario',
+      basketTotal: deliveryVsInStoreOnlineBasketTotal,
+      storeIds: ['mathem-online-public-search'],
+      deliveryFee: 79
+    }
+  ]
+});
+
+const deliveryVsInStoreInStorePlan = planBasketTripCost({
+  currency: 'SEK',
+  travelMode: 'car',
+  valueOfTimePerHour: 120,
+  carCostPerKm: 3.5,
+  options: [
+    {
+      strategyId: 'matched-chain-in-store-nearby-car-trip',
+      label: 'Matched-chain in-store basket + nearby car/time scenario',
+      basketTotal: deliveryVsInStoreInStoreBasketTotal,
+      storeIds: deliveryVsInStoreMatchedChainIds.length > 0 ? deliveryVsInStoreMatchedChainIds : ['matched-chain-public-prices'],
+      distanceKm: 3.2,
+      durationMinutes: 28
+    },
+    {
+      strategyId: 'matched-chain-in-store-longer-car-trip',
+      label: 'Matched-chain in-store basket + longer car/time scenario',
+      basketTotal: deliveryVsInStoreInStoreBasketTotal,
+      storeIds: deliveryVsInStoreMatchedChainIds.length > 0 ? deliveryVsInStoreMatchedChainIds : ['matched-chain-public-prices'],
+      distanceKm: 6.5,
+      durationMinutes: 44
+    }
+  ]
+});
+
+export const deliveryVsInStoreComparison = {
+  title: 'Online delivery vs in-store total',
+  status: 'static_public_scenario_from_verified_price_rows',
+  sourceLabel: mathemSource.source,
+  retrievedAt: mathemSource.retrievedAt,
+  onlineRowCount: mathemProducts.length,
+  basketLabel: 'Matched staple-token basket; product-name evidence only, not exact-retailer equivalence.',
+  matchedBasketRows: deliveryVsInStoreBasketPairs.map((row) => ({
+    matchedToken: row.matchedToken,
+    matchEvidence: row.matchEvidence,
+    onlineName: row.onlineProduct.name,
+    onlineBrand: row.onlineProduct.brand,
+    onlinePackageText: row.onlineProduct.packageText,
+    onlinePrice: row.onlineProduct.price,
+    onlinePriceText: row.onlineProduct.priceText,
+    onlineUnitPriceText: row.onlineProduct.unitPriceText,
+    onlineSourceUrl: row.onlineProduct.sourceUrl,
+    inStoreName: row.inStoreProduct.name,
+    inStoreBrand: row.inStoreProduct.brand,
+    inStorePackageText: row.inStoreProduct.subline,
+    inStoreLowestChain: row.inStoreProduct.lowestChain,
+    inStoreLowestPrice: row.inStoreProduct.lowestPrice,
+    inStoreLowestPriceText: formatSek(row.inStoreProduct.lowestPrice),
+    inStoreChains: row.inStoreProduct.inChains,
+    productPriceDelta: roundSek(row.onlineProduct.price - row.inStoreProduct.lowestPrice)
+  })),
+  onlineBasketTotal: deliveryVsInStoreOnlineBasketTotal,
+  inStoreBasketTotal: deliveryVsInStoreInStoreBasketTotal,
+  deliveryFeeScenarios: deliveryVsInStoreDeliveryPlan.options.map((option) => ({
+    strategyId: option.strategyId,
+    label: option.label,
+    deliveryFee: option.deliveryFee ?? 0,
+    pricedBasketTotal: option.pricedBasketTotal,
+    travelCost: option.travelCost,
+    effectiveTotal: option.effectiveTotal,
+    warnings: option.warnings
+  })),
+  deliveryPlan: deliveryVsInStoreDeliveryPlan,
+  inStorePlan: deliveryVsInStoreInStorePlan,
+  bestDeliveryOption: deliveryVsInStoreDeliveryPlan.bestOption,
+  bestInStoreOption: deliveryVsInStoreInStorePlan.bestOption,
+  effectiveTotalDelta: deliveryVsInStoreDeliveryPlan.bestOption?.effectiveTotal !== null && deliveryVsInStoreDeliveryPlan.bestOption?.effectiveTotal !== undefined && deliveryVsInStoreInStorePlan.bestOption?.effectiveTotal !== null && deliveryVsInStoreInStorePlan.bestOption?.effectiveTotal !== undefined
+    ? roundSek(deliveryVsInStoreDeliveryPlan.bestOption.effectiveTotal - deliveryVsInStoreInStorePlan.bestOption.effectiveTotal)
+    : null,
+  guardrails: [
+    'deliveryFee values are explicit scenario inputs and are rendered separately from verified product prices.',
+    'Mathem prices come from public search page __NEXT_DATA__ rows, not from checkout, stock, payment, or delivery booking evidence.',
+    'This comparison is not a retailer reservation and cannot book delivery, pickup, payment, or inventory.',
+    'Matched staple-token rows show product-name evidence only; exact substitutions still require shopper review.',
+    'Private home location, saved basket contents, and retailer sessions stay absent from this static snapshot.'
+  ],
+  engineGuardrails: [...deliveryVsInStoreDeliveryPlan.guardrails, ...deliveryVsInStoreInStorePlan.guardrails]
+};
 
 function brandTierForAxfoodProduct(product: (typeof axfoodProducts)[number]): BrandTier {
   const brand = product.brand.toLowerCase();
