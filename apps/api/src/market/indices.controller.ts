@@ -1,10 +1,13 @@
 import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { groceryApi } from '../demo-data.js';
+import { IndicesService } from './indices.service.js';
 
 @ApiTags('market')
 @Controller('indices')
 export class IndicesController {
+  constructor(private readonly indicesService: IndicesService) {}
+
   @Get()
   @ApiOkResponse({ description: 'List grocery indices' })
   list() {
@@ -13,20 +16,20 @@ export class IndicesController {
 
   @Get('chains')
   @ApiOkResponse({ description: 'Current chain price indices from observed product prices' })
-  chains() {
-    return { ...groceryApi.getChainPriceIndices(), demo: true };
+  async chains() {
+    return this.indicesService.getChainPriceIndices();
   }
 
   @Get('categories')
   @ApiOkResponse({ description: 'Category price indices from product price history and current prices' })
-  categories() {
-    return { ...groceryApi.getCategoryPriceIndices(), demo: true };
+  async categories() {
+    return this.indicesService.getCategoryPriceIndices();
   }
 
   @Get('brands')
   @ApiOkResponse({ description: 'Brand-tier price indices from product price history and current prices' })
-  brands() {
-    return { ...groceryApi.getBrandPriceIndices(), demo: true };
+  async brands() {
+    return this.indicesService.getBrandPriceIndices();
   }
 
   @Get(':id')

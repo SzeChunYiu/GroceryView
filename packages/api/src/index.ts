@@ -39,6 +39,7 @@ import {
   type RetailerHandoffSupport,
   type BrandTierIndexSummary,
   type BrandTierPriceObservation,
+  type BrandTier,
   type BudgetSummary,
   type ChainPriceIndexSummary,
   type ChainPriceObservation,
@@ -251,6 +252,25 @@ export type CategoryPriceIndexSummary = {
 export type BrandPriceIndexSummary = BrandTierIndexSummary & {
   currency: 'SEK';
   generatedFrom: number;
+  guardrails: string[];
+};
+
+export type RealPriceIndexRow = {
+  productId: string;
+  productSlug: string;
+  productName: string;
+  categoryPath: string[];
+  chainSlug?: string;
+  brand?: string;
+  privateLabelOwner?: string;
+  baseUnitPrice?: number;
+  currentUnitPrice?: number;
+  baseObservedAt?: string;
+  currentObservedAt?: string;
+};
+
+export type RealChainPriceIndexSummary = ChainPriceIndexSummary & {
+  currency: 'SEK';
   guardrails: string[];
 };
 
@@ -2170,6 +2190,142 @@ export function buildProductCheapestNowReport(rows: ProductCheapestNowPriceRow[]
       'Cheapest-now rows are calculated only from persisted latest_prices observations for the requested product.',
       'Each chain contributes at most one current lowest package price, preserving the store that supplied it.',
       'No missing chain or product prices are filled with synthetic estimates.'
+    ]
+  };
+}
+
+function topCategory(categoryPath: string[]): string {
+  return categoryPath.find((part) => part.trim().length > 0) ?? 'uncategorized';
+}
+
+function productBrandTier(row: Pick<RealPriceIndexRow, 'brand' | 'privateLabelOwner'>): BrandTier {
+  if (row.privateLabelOwner?.trim()) return 'standard_private_label';
+  return 'national';
+}
+
+function realIndexComponentRows(rows: RealPriceIndexRow[]): Array<RealPriceIndexRow & { baseUnitPrice: number; currentUnitPrice: number }> {
+  return rows.filter((row): row is RealPriceIndexRow & { baseUnitPrice: number; currentUnitPrice: number } => {
+    const currentUnitPrice = row.currentUnitPrice;
+    const baseUnitPrice = row.baseUnitPrice;
+    return currentUnitPrice !== undefined &&
+      Number.isFinite(currentUnitPrice) &&
+      currentUnitPrice > 0 &&
+      baseUnitPrice !== undefined &&
+      Number.isFinite(baseUnitPrice) &&
+      baseUnitPrice > 0;
+  });
+}
+
+function earliestIso(values: Array<string | undefined>): string {
+  return values.filter((value): value is string => Boolean(value)).sort()[0] ?? 'unknown';
+}
+
+function latestIso(values: Array<string | undefined>): string {
+  return values.filter((value): value is string => Boolean(value)).sort().at(-1) ?? 'unknown';
+}
+
+export function buildRealChainPriceIndices(rows: RealPriceIndexRow[]): RealChainPriceIndexSummary {
+  const observations: ChainPriceObservation[] = rows.flatMap((row) => {
+    const currentUnitPrice = row.currentUnitPrice;
+    if (!row.chainSlug || currentUnitPrice === undefined || !Number.isFinite(currentUnitPrice) || currentUnitPrice <= 0) return [];
+    return [{
+      chainId: row.chainSlug,
+      category: topCategory(row.categoryPath),
+      unitPrice: currentUnitPrice
+    }];
+  });
+
+  return {
+    ...calculateChainPriceIndex(observations),
+    currency: 'SEK',
+    guardrails: [
+      'Chain indices are calculated from persisted latest_prices rows only.',
+      'Unit prices are compared inside observed product categories before chain-level aggregation.',
+      'No missing chain/category cells are filled with synthetic product prices.'
+    ]
+  };
+}
+
+export function buildRealCategoryPriceIndices(rows: RealPriceIndexRow[]): CategoryPriceIndexSummary {
+  const byCategory = new Map<string, Array<RealPriceIndexRow & { baseUnitPrice: number; currentUnitPrice: number }>>();
+  for (const row of realIndexComponentRows(rows)) {
+    const category = topCategory(row.categoryPath);
+    const current = byCategory.get(category) ?? [];
+    current.push(row);
+    byCategory.set(category, current);
+  }
+
+  const indices = [...byCategory.entries()].flatMap(([category, categoryRows]) => {
+    const index = calculateFixedBasketIndex({
+      id: `${category}-category-price-index`,
+      label: `${category[0]?.toUpperCase() ?? ''}${category.slice(1)} Price Index`,
+      baseDate: earliestIso(categoryRows.map((row) => row.baseObservedAt)),
+      currentDate: latestIso(categoryRows.map((row) => row.currentObservedAt)),
+      components: categoryRows.map((row) => ({
+        productId: row.productSlug || row.productId,
+        baseUnitPrice: row.baseUnitPrice,
+        currentUnitPrice: row.currentUnitPrice,
+        weight: 1
+      }))
+    });
+
+    return [{
+      id: index.id,
+      category,
+      label: index.label,
+      value: index.value,
+      movementPercent: index.movementPercent,
+      productCount: index.components.length,
+      baseDate: index.baseDate,
+      currentDate: index.currentDate
+    }];
+  }).sort((left, right) => left.value - right.value || left.category.localeCompare(right.category));
+
+  return {
+    currency: 'SEK',
+    indices,
+    generatedFrom: indices.reduce((sum, row) => sum + row.productCount, 0),
+    guardrails: [
+      'Category indices use earliest persisted observations as the base and current latest_prices as the current value.',
+      'Products without both a base observation and a current latest price are excluded instead of estimated.',
+      'Each observed product contributes equal weight within its category until basket weights are explicitly stored.'
+    ]
+  };
+}
+
+export function buildRealBrandPriceIndices(rows: RealPriceIndexRow[]): BrandPriceIndexSummary {
+  const componentRows = realIndexComponentRows(rows);
+  if (componentRows.length === 0) {
+    return {
+      indices: [],
+      privateLabelSavingsPercent: 0,
+      highestSavingsCategories: [],
+      premiumGapPercent: 0,
+      currency: 'SEK',
+      generatedFrom: 0,
+      guardrails: [
+        'Brand indices require products with both persisted historical observations and current latest_prices.',
+        'No brand-tier prices are backfilled when persisted rows are missing.'
+      ]
+    };
+  }
+
+  const observations: BrandTierPriceObservation[] = componentRows.map((row) => ({
+    brandTier: productBrandTier(row),
+    category: topCategory(row.categoryPath),
+    baseUnitPrice: row.baseUnitPrice,
+    currentUnitPrice: row.currentUnitPrice
+  }));
+  const summary = calculateBrandTierIndices(observations);
+
+  return {
+    ...summary,
+    currency: 'SEK',
+    generatedFrom: observations.length,
+    guardrails: [
+      'Brand indices are derived from product brand/private-label metadata plus persisted price observations.',
+      'Private-label rows are identified only by stored private_label_owner values.',
+      'No missing brand tiers are backfilled with estimated prices.'
     ]
   };
 }

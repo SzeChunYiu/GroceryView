@@ -44,6 +44,9 @@ describe('real catalog API fail-closed behavior', () => {
 
   it('fails closed instead of querying or serving demo data without PostgreSQL', async () => {
     await request(app.getHttpServer()).get('/products/search/faceted?q=mjolk').expect(503);
+    await request(app.getHttpServer()).get('/indices/chains').expect(503);
+    await request(app.getHttpServer()).get('/indices/categories').expect(503);
+    await request(app.getHttpServer()).get('/indices/brands').expect(503);
     await request(app.getHttpServer())
       .post('/baskets/compare')
       .send({ items: [{ productId: 'standardmjolk-1l', quantity: 1 }] })

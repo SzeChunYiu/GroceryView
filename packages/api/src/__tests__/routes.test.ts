@@ -7,6 +7,9 @@ import {
   buildProductLatestPrices,
   buildProductCheapestNowReport,
   buildProductPriceHistoryReport,
+  buildRealBrandPriceIndices,
+  buildRealCategoryPriceIndices,
+  buildRealChainPriceIndices,
   buildRealBasketComparison,
   createGroceryViewApi,
   productPriceHistoryPriceTypes,
@@ -360,6 +363,82 @@ describe('createGroceryViewApi', () => {
     assert.equal(report?.chainCount, 2);
     assert.equal(report?.observedPriceCount, 3);
     assert.equal(report?.lastObservedAt, '2026-05-21T10:00:00.000Z');
+  });
+
+  it('builds real market index reports from persisted current and historical price rows', () => {
+    const rows = [
+      {
+        productId: 'product-coffee',
+        productSlug: 'bryggkaffe-450g',
+        productName: 'Bryggkaffe mellanrost 450 g',
+        categoryPath: ['coffee'],
+        chainSlug: 'willys',
+        brand: 'Zoegas',
+        currentUnitPrice: 110.89,
+        baseUnitPrice: 133.11,
+        baseObservedAt: '2026-05-01T09:00:00.000Z',
+        currentObservedAt: '2026-05-21T09:00:00.000Z'
+      },
+      {
+        productId: 'product-coffee',
+        productSlug: 'bryggkaffe-450g',
+        productName: 'Bryggkaffe mellanrost 450 g',
+        categoryPath: ['coffee'],
+        chainSlug: 'coop',
+        brand: 'Zoegas',
+        currentUnitPrice: 133.11,
+        currentObservedAt: '2026-05-21T08:00:00.000Z'
+      },
+      {
+        productId: 'product-milk',
+        productSlug: 'standardmjolk-1l',
+        productName: 'Standardmjolk 3% 1 l',
+        categoryPath: ['dairy'],
+        chainSlug: 'lidl',
+        brand: 'Arla',
+        currentUnitPrice: 13.9,
+        baseUnitPrice: 16.9,
+        baseObservedAt: '2026-05-01T09:00:00.000Z',
+        currentObservedAt: '2026-05-21T09:00:00.000Z'
+      },
+      {
+        productId: 'product-private-label-milk',
+        productSlug: 'garant-mjolk-1l',
+        productName: 'Garant Milk 1 l',
+        categoryPath: ['dairy'],
+        chainSlug: 'willys',
+        brand: 'Garant',
+        privateLabelOwner: 'Axfood',
+        currentUnitPrice: 12.9,
+        baseUnitPrice: 19.9,
+        baseObservedAt: '2026-05-02T09:00:00.000Z',
+        currentObservedAt: '2026-05-21T10:00:00.000Z'
+      }
+    ];
+
+    const chains = buildRealChainPriceIndices(rows);
+    assert.equal(chains.generatedFrom, 4);
+    assert.deepEqual(chains.categories, ['coffee', 'dairy']);
+    assert.equal(chains.currency, 'SEK');
+    assert.match(chains.guardrails[0], /persisted latest_prices/i);
+
+    const categories = buildRealCategoryPriceIndices(rows);
+    assert.deepEqual(categories.indices.map((row) => [row.category, row.value, row.productCount]), [
+      ['dairy', 72.83, 2],
+      ['coffee', 83.31, 1]
+    ]);
+    assert.equal(categories.generatedFrom, 3);
+    assert.match(categories.guardrails[0], /earliest persisted observations/i);
+
+    const brands = buildRealBrandPriceIndices(rows);
+    assert.deepEqual(brands.indices.map((row) => [row.brandTier, row.value, row.categoryCount]), [
+      ['standard_private_label', 64.82, 1],
+      ['national', 83.19, 2]
+    ]);
+    assert.equal(brands.privateLabelSavingsPercent, 7.19);
+    assert.deepEqual(brands.highestSavingsCategories, ['dairy']);
+    assert.equal(brands.generatedFrom, 3);
+    assert.match(brands.guardrails[1], /private_label_owner/i);
   });
 
   it('validates canonical price observation provenance DTOs', () => {
