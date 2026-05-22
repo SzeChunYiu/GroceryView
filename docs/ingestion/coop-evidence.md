@@ -16,15 +16,23 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
 ## Weekly flyer discount evidence
 
 - Source: Coop public store API current flyer metadata plus public personalization product search promotions
-- Store API URL: https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true
-- Flyer PDF URL: https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna
-- Product search URL: https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1
+- Store API URLs:
+  - https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true
+  - https://proxy.api.coop.se/external/store/stores/252700?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true
+- Flyer PDF URLs:
+  - https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna
+  - https://dr.coop.se/Butik/Stora-Coop-Bromma
+- Product search URLs:
+  - https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1
+  - https://external.api.coop.se/personalization/search/products?store=252700&device=desktop&direct=true&api-version=v1
 - Request body: weekly flyer item queries listed in `DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES`, resultsOptions take 8, empty sort/facets, relatedResultsOptions take 0
 - Required public headers: `storeApiSubscriptionKey` for store metadata and `personalizationApiSubscriptionKey` for product search, both exposed in `window.coopSettings.serviceAccess` on https://www.coop.se/handla/
-- Retrieved: 2026-05-22T08:39:41.000Z
-- Store: 251300, Stora Coop Boländerna, Uppsala
+- Retrieved: 2026-05-22T09:05:19.000Z
+- Stores:
+  - 251300, Stora Coop Boländerna, Uppsala, 26 real discount rows
+  - 252700, Stora Coop Bromma, Bromma, 24 real discount rows
 - Flyer validity: 2026-05-18T00:00:00 through 2026-05-24T23:59:59
-- Real current flyer discount rows fetched: 26
+- Real current flyer discount rows fetched: 50
 
 Every weekly discount row includes Coop product id/EAN, product name, brand, package label, ordinary B2C SEK price, offer SEK price, comparative offer price when present, promotion id/copy, MedMera requirement, store/region, validity, flyer URL, store API source URL, product search URL, and retrieval timestamp.
 
@@ -35,6 +43,7 @@ Every weekly discount row includes Coop product id/EAN, product name, brand, pac
 3. 7310074014630 | Pepsi Max 20-pack | Pepsi | ordinary 122.09 SEK | offer 84.00 SEK | 12.73 kr/lit | 2026-05-18T00:00:00 to 2026-05-24T23:59:59
 4. 7622210929525 | Chokladpraliner Hjärta | Marabou | ordinary 67.15 SEK | offer 45.00 SEK | 272.73 kr/kg | 2026-05-18T00:00:00 to 2026-05-24T23:59:59
 5. 7310867561020 | Juice Tropisk | Bravo | ordinary 37.81 SEK | offer 34.00 SEK | 17.00 kr/lit | 2026-05-18T00:00:00 to 2026-05-24T23:59:59
+6. 2317342100007 | Vattenmelon Mini | Stora Coop Bromma | ordinary 26.45 SEK | offer 20.00 SEK | 20.00 kr/kg | 2026-05-18T00:00:00 to 2026-05-24T23:59:59
 
 ## Sample Retrieved Rows
 
