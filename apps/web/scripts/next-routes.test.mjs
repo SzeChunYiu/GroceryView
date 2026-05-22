@@ -284,6 +284,30 @@ describe('verified-data UI', () => {
   });
 
 
+  it('ships signed-in ad disclosure controls without anonymous sponsored-ranking state', async () => {
+    const account = await read('src/app/account/page.tsx');
+    const actions = await read('src/components/ad-disclosure-actions.tsx');
+    const server = await read('../../packages/server/src/index.ts');
+
+    assert.match(account, /AdDisclosureActions/);
+    assert.match(actions, /'use client'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:accessToken'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:userId'/);
+    assert.match(actions, /Authorization: `Bearer \$\{accessToken\}`/);
+    assert.match(actions, /\/api\/ads\/disclosure\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /method: 'GET'/);
+    assert.match(actions, /premiumAdsRemoved/);
+    assert.match(actions, /excludedSurfaces/);
+    assert.match(actions, /organicRankingSeparated/);
+    assert.match(actions, /Sponsored placements cannot change Deal Score/);
+    assert.match(actions, /Sign in first/);
+    assert.match(actions, /No anonymous ad disclosure/);
+    assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);
+    assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
+    assert.match(server, /\/api\/ads\/disclosure/);
+  });
+
+
 
   it('ships signed-in coupon and loyalty offer controls without anonymous savings claims', async () => {
     const couponStacks = await read('src/app/coupon-stacks/page.tsx');
