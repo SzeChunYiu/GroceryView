@@ -258,15 +258,15 @@ Sample rows:
 4. 2500298388 | 2110 | Hushållspapper 12-pack, toalettpapper 18-pack | 59,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
 5. 2500301201 | 2110 | Läsk 6-pack | Välj & blanda! 3 för 89,00 +pant | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
 
-## Willys weekly discounts 72-store expansion 2026-05-22
+## Willys weekly discounts 88-store expansion 2026-05-22
 
 - Source: www.willys.se public Axfood campaign JSON
 - Store catalog source: https://www.willys.se/axfood/rest/store?online=true
 - Source URL pattern: https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
-- Retrieved: 2026-05-22T14:46:16.311Z
-- Store IDs: 2110, 2187, 2102, 2149, 2355, 2268, 2121, 2212, 2193, 2207, 2219, 2260, 2259, 2232, 2206, 2353, 2103, 2329, 2348, 2328, 2249, 2225, 2152, 2224, 2118, 2282, 2240, 2325, 2267, 2322, 2230, 2248, 2292, 2241, 2132, 2223, 2288, 2111, 2247, 2226, 2321, 2137, 2236, 2335, 2271, 2196, 2324, 2173, 2338, 2250, 2296, 2349, 2234, 2135, 2285, 2238, 2145, 2153, 2117, 2290, 2358, 2210, 2334, 2266, 2108, 2337, 2275, 2104, 2201, 2198, 2269, 2105
-- Real weekly discount rows fetched and wired: 14548
-- Source URLs fetched: 216
+- Retrieved: 2026-05-22T16:05:16.501Z
+- Store IDs: 2110, 2187, 2102, 2149, 2355, 2268, 2121, 2212, 2193, 2207, 2219, 2260, 2259, 2232, 2206, 2353, 2103, 2329, 2348, 2328, 2249, 2225, 2152, 2224, 2118, 2282, 2240, 2325, 2267, 2322, 2230, 2248, 2292, 2241, 2132, 2223, 2288, 2111, 2247, 2226, 2321, 2137, 2236, 2335, 2271, 2196, 2324, 2173, 2338, 2250, 2296, 2349, 2234, 2135, 2285, 2238, 2145, 2153, 2117, 2290, 2358, 2210, 2334, 2266, 2108, 2337, 2275, 2104, 2201, 2198, 2269, 2105, 2160, 2298, 2256, 2347, 2127, 2179, 2176, 2354, 2360, 2125, 2244, 2114, 2144, 2253, 2150, 2279
+- Real weekly discount rows fetched and wired: 17780
+- Source URLs fetched: 264
 - Web wire: apps/web/src/lib/ingested/willys.ts
 - Connector: packages/ingestion/src/connectors/willys.ts
 
@@ -278,17 +278,25 @@ Per-store row counts:
 - 2108: 202 rows
 - 2110: 202 rows
 - 2111: 202 rows
+- 2114: 202 rows
 - 2117: 202 rows
 - 2118: 202 rows
 - 2121: 202 rows
+- 2125: 202 rows
+- 2127: 202 rows
 - 2132: 202 rows
 - 2135: 202 rows
 - 2137: 202 rows
+- 2144: 202 rows
 - 2145: 202 rows
 - 2149: 202 rows
+- 2150: 202 rows
 - 2152: 202 rows
 - 2153: 202 rows
+- 2160: 202 rows
 - 2173: 202 rows
+- 2176: 202 rows
+- 2179: 202 rows
 - 2187: 202 rows
 - 2193: 202 rows
 - 2196: 202 rows
@@ -310,10 +318,13 @@ Per-store row counts:
 - 2238: 202 rows
 - 2240: 202 rows
 - 2241: 202 rows
+- 2244: 202 rows
 - 2247: 202 rows
 - 2248: 202 rows
 - 2249: 202 rows
 - 2250: 202 rows
+- 2253: 202 rows
+- 2256: 202 rows
 - 2259: 202 rows
 - 2260: 202 rows
 - 2266: 202 rows
@@ -322,12 +333,14 @@ Per-store row counts:
 - 2269: 202 rows
 - 2271: 202 rows
 - 2275: 202 rows
+- 2279: 202 rows
 - 2282: 202 rows
 - 2285: 202 rows
 - 2288: 202 rows
 - 2290: 202 rows
 - 2292: 202 rows
 - 2296: 202 rows
+- 2298: 202 rows
 - 2321: 202 rows
 - 2322: 202 rows
 - 2324: 202 rows
@@ -341,8 +354,10 @@ Per-store row counts:
 - 2348: 202 rows
 - 2349: 202 rows
 - 2353: 202 rows
+- 2354: 202 rows
 - 2355: 206 rows
 - 2358: 202 rows
+- 2360: 202 rows
 
 Sample rows:
 1. 2500306014 | 2110 | Grön sparris 250g | 29,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100

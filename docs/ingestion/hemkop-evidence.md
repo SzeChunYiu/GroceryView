@@ -263,7 +263,7 @@ Sample rows:
 - Source: www.hemkop.se public Axfood campaign JSON
 - Store catalog source: https://www.hemkop.se/axfood/rest/store?online=true
 - Source URL pattern: https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
-- Retrieved: 2026-05-22T14:46:16.311Z
+- Retrieved: 2026-05-22T16:05:16.501Z
 - Store IDs: 4003, 4127, 4190, 4798, 4660, 4775, 4196, 4111, 4162, 4273, 4349, 4359, 4734, 4773, 4239, 4667, 4221, 4203, 4521, 4930, 4524, 4146, 4222, 4219, 4792, 4245, 4189, 4511, 4263, 4293, 4214, 4526, 4131, 4266, 4207, 4535, 4681, 4142, 4545, 4277, 4225, 4738, 4550, 4224, 4123, 4212, 4114, 4247, 4199, 4682, 4730, 4560, 4201, 4202, 4156, 4183, 4307, 4737, 4195, 4706, 4168, 4573, 4175, 4103, 4256, 4735, 4587, 4508, 4265, 4353, 4204
 - Real weekly discount rows fetched and wired: 17650
 - Source URLs fetched: 213
