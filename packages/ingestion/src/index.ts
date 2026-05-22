@@ -2736,12 +2736,42 @@ async function persistDailyConnectorOutput(input: {
 
   const rawRecordIds: string[] = [];
   const observationIds: string[] = [];
+  const chainIdsBySlug = new Map<string, string>();
+  const storeIdsBySlug = new Map<string, string>();
+  const productIdsBySlug = new Map<string, string>();
+
+  async function getDailyChainId(chainId: string): Promise<string> {
+    const slug = normalizeDailySlug(chainId);
+    const cached = chainIdsBySlug.get(slug);
+    if (cached) return cached;
+    const id = await upsertDailyChain(executor, chainId);
+    chainIdsBySlug.set(slug, id);
+    return id;
+  }
+
+  async function getDailyStoreId(chainId: string, store: DailyIngestionStoreConfig): Promise<string> {
+    const slug = normalizeDailySlug(store.storeId);
+    const cached = storeIdsBySlug.get(slug);
+    if (cached) return cached;
+    const id = await upsertDailyStore(executor, chainId, store);
+    storeIdsBySlug.set(slug, id);
+    return id;
+  }
+
+  async function getDailyProductId(product: IngestedProduct): Promise<string> {
+    const slug = normalizeDailySlug(product.id);
+    const cached = productIdsBySlug.get(slug);
+    if (cached) return cached;
+    const id = await upsertDailyProduct(executor, product);
+    productIdsBySlug.set(slug, id);
+    return id;
+  }
 
   for (const accepted of result.ingestion.accepted) {
-    const chainId = await upsertDailyChain(executor, accepted.priceObservation.chainId);
+    const chainId = await getDailyChainId(accepted.priceObservation.chainId);
     const storeConfig = accepted.priceObservation.storeId ? storesBySlug.get(normalizeDailySlug(accepted.priceObservation.storeId)) : undefined;
-    const storeId = storeConfig ? await upsertDailyStore(executor, chainId, storeConfig) : undefined;
-    const productId = await upsertDailyProduct(executor, accepted.product);
+    const storeId = storeConfig ? await getDailyStoreId(chainId, storeConfig) : undefined;
+    const productId = await getDailyProductId(accepted.product);
     await aliasRepository.upsertProductAlias({
       productId,
       alias: accepted.alias.rawName,
