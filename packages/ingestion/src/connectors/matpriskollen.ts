@@ -70,11 +70,11 @@ type MatpriskollenApiOffer = {
 };
 
 export const MATPRISKOLLEN_BASE_URL = 'https://matpriskollen.se';
-export const DEFAULT_MATPRISKOLLEN_LAT = 56.93287;
-export const DEFAULT_MATPRISKOLLEN_LON = 12.54594;
-export const DEFAULT_MATPRISKOLLEN_STORE_LIMIT = 40;
+export const DEFAULT_MATPRISKOLLEN_LAT = 55.605;
+export const DEFAULT_MATPRISKOLLEN_LON = 13.0038;
+export const DEFAULT_MATPRISKOLLEN_STORE_LIMIT = 60;
 export const DEFAULT_MATPRISKOLLEN_OFFER_LIMIT_PER_STORE = 200;
-export const DEFAULT_MATPRISKOLLEN_MAX_ROWS = 600;
+export const DEFAULT_MATPRISKOLLEN_MAX_ROWS = 650;
 export const DEFAULT_MATPRISKOLLEN_GROCERY_STORE_PATTERN = /(willys|lidl|coop|ica|hemk[oö]p|city gross)/i;
 
 export type FetchMatpriskollenOffersOptions = {
