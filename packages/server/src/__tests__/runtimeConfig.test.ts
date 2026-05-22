@@ -56,6 +56,8 @@ class RecordingPgPool {
           'retailer_source_policies',
           'observations',
           'latest_prices',
+          'price_daily',
+          'price_weekly',
           'app_users',
           'favorite_stores',
           'user_preferences',
@@ -93,7 +95,10 @@ class RecordingPgPool {
           '007_receipt_uploads',
           '008_household_plans',
           '009_retailer_source_policies',
-          '010_basket_import_reviews'
+          '010_basket_import_reviews',
+          '010_commodity_taxonomy',
+          '011_multi_vertical_domains',
+          '012_price_rollups'
         ].map((version) => ({ version }))
       };
     }
@@ -828,6 +833,8 @@ describe('runtime config', () => {
       assert.equal(body.evidence.includes('table:app_users'), true);
       assert.equal(body.evidence.includes('table:alert_rules'), true);
       assert.equal(body.evidence.includes('table:pantry_items'), true);
+      assert.equal(body.evidence.includes('table:price_daily'), true);
+      assert.equal(body.evidence.includes('table:price_weekly'), true);
       assert.equal(body.evidence.includes('table:receipt_uploads'), true);
       assert.equal(body.evidence.includes('table:receipt_items'), true);
       assert.equal(body.evidence.includes('table:household_plans'), true);
@@ -837,6 +844,7 @@ describe('runtime config', () => {
       assert.equal(body.evidence.includes('migration:005_pantry_inventory'), true);
       assert.equal(body.evidence.includes('migration:007_receipt_uploads'), true);
       assert.equal(body.evidence.includes('migration:008_household_plans'), true);
+      assert.equal(body.evidence.includes('migration:012_price_rollups'), true);
       assert.equal(JSON.stringify(body).includes('runtime-password'), false);
     } finally {
       await service.close();

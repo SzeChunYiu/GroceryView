@@ -3161,6 +3161,8 @@ export const POSTGRES_INTEGRATION_REQUIRED_TABLES = [
   'retailer_source_policies',
   'observations',
   'latest_prices',
+  'price_daily',
+  'price_weekly',
   'app_users',
   'favorite_stores',
   'user_preferences',
@@ -3195,7 +3197,10 @@ export const POSTGRES_INTEGRATION_REQUIRED_MIGRATIONS = [
   '007_receipt_uploads',
   '008_household_plans',
   '009_retailer_source_policies',
-  '010_basket_import_reviews'
+  '010_basket_import_reviews',
+  '010_commodity_taxonomy',
+  '011_multi_vertical_domains',
+  '012_price_rollups'
 ] as const;
 
 function assertProbe(condition: boolean, message: string): void {

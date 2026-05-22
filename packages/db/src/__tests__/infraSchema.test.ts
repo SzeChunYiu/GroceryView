@@ -116,6 +116,24 @@ describe('infra/db PostgreSQL schema contract', () => {
     assert.match(latestPrices, /unique nulls not distinct \(product_id, chain_id, store_id, price_type\)/);
   });
 
+  it('materializes daily and weekly price rollups for chart and 52-week-low reads', () => {
+    for (const table of ['price_daily', 'price_weekly']) {
+      assert.match(allMigrations, new RegExp(`create table if not exists ${table}\\b`), `${table} table missing`);
+      assert.match(schemaDoc, new RegExp(`### \`${table}\``), `${table} missing from SCHEMA.md`);
+      assert.match(migrationVerifier, new RegExp(`\\b${table}\\b`), `${table} missing from migration verifier`);
+    }
+
+    assert.match(allMigrations, /date_trunc\('week', observed_at\)::date/);
+    assert.match(allMigrations, /min_price numeric\(12, 2\) not null/);
+    assert.match(allMigrations, /max_price numeric\(12, 2\) not null/);
+    assert.match(allMigrations, /avg_price numeric\(12, 4\) not null/);
+    assert.match(allMigrations, /last_price numeric\(12, 2\) not null/);
+    assert.match(allMigrations, /observation_count integer not null check \(observation_count > 0\)/);
+    assert.match(allMigrations, /price_daily_product_chain_day_idx/);
+    assert.match(allMigrations, /price_weekly_product_chain_week_idx/);
+    assert.match(schemaDoc, /charts and 52-week-low reads must hit `price_daily` or `price_weekly`/);
+  });
+
   it('preserves provenance on source-derived tables', () => {
     for (const table of provenanceTables) {
       assert.match(tableDefinition(table), /\bprovenance\b/, `${table}.provenance missing`);
