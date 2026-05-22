@@ -41,6 +41,7 @@ const historyWindowDefinitions = [
   { label: '90-day', rangeDays: 90, title: 'Observed 90-day low/high' },
   { label: '365-day', rangeDays: 365, title: 'Observed 365-day low/high' }
 ] as const;
+const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] as const;
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
@@ -646,6 +647,81 @@ function priceChangeEventLogFor(product: NonNullable<ReturnType<typeof findProdu
   };
 }
 
+function seasonalMonthlyAveragesFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  const emptyMonthlySeasonalityRows: {
+    monthLabel: (typeof monthLabels)[number];
+    monthIndex: number;
+    monthAverageLabel: string;
+    monthObservationCount: number;
+    yearCount: number;
+    lowPriceLabel: string;
+    highPriceLabel: string;
+    detail: string;
+  }[] = [];
+  const withheld = (observationCount: number, observedMonthCount = 0) => ({
+    available: false,
+    title: 'Not enough dated observations',
+    monthlySeasonalityRows: emptyMonthlySeasonalityRows,
+    observedMonthCount,
+    observationCount,
+    detail: 'Not enough dated observations exist across multiple calendar months, so GroceryView withholds the seasonal-by-month view instead of inventing a historical monthly average.'
+  });
+
+  if ('lowestPrice' in product) return withheld(0);
+  if (product.observations.length < 2) return withheld(product.observations.length);
+
+  const monthBuckets = new Map<number, { prices: number[]; years: Set<number> }>();
+  product.observations.forEach((observation) => {
+    const observedTime = Date.parse(`${observation.date}T00:00:00.000Z`);
+    if (!Number.isFinite(observedTime) || !Number.isFinite(observation.price)) return;
+    const observedDate = new Date(observedTime);
+    const monthIndex = observedDate.getUTCMonth();
+    const year = observedDate.getUTCFullYear();
+    const bucket = monthBuckets.get(monthIndex) ?? { prices: [], years: new Set<number>() };
+    bucket.prices.push(observation.price);
+    bucket.years.add(year);
+    monthBuckets.set(monthIndex, bucket);
+  });
+
+  const monthlySeasonalityRows = [...monthBuckets.entries()]
+    .sort(([leftMonth], [rightMonth]) => leftMonth - rightMonth)
+    .map(([monthIndex, bucket]) => {
+      const total = bucket.prices.reduce((sum, price) => sum + price, 0);
+      const average = total / bucket.prices.length;
+      const lowPrice = Math.min(...bucket.prices);
+      const highPrice = Math.max(...bucket.prices);
+      const monthLabel = monthLabels[monthIndex]!;
+      const yearLabel = bucket.years.size === 1 ? 'year' : 'years';
+      return {
+        monthLabel,
+        monthIndex,
+        monthAverageLabel: formatSek(average),
+        monthObservationCount: bucket.prices.length,
+        yearCount: bucket.years.size,
+        lowPriceLabel: formatSek(lowPrice),
+        highPriceLabel: formatSek(highPrice),
+        detail: `${monthLabel} historical monthly average is ${formatSek(average)} from ${bucket.prices.length} dated observations across ${bucket.years.size} observed ${yearLabel}; avg price per month uses only observed OpenPrices rows.`
+      };
+    });
+
+  const observationCount = monthlySeasonalityRows.reduce((total, row) => total + row.monthObservationCount, 0);
+  if (monthlySeasonalityRows.length < 2) {
+    return {
+      ...withheld(observationCount, monthlySeasonalityRows.length),
+      detail: 'Not enough dated observations are spread across at least two calendar months, so GroceryView withholds the seasonal-by-month view.'
+    };
+  }
+
+  return {
+    available: true,
+    title: 'seasonal-by-month view',
+    monthlySeasonalityRows,
+    observedMonthCount: monthlySeasonalityRows.length,
+    observationCount,
+    detail: `This seasonal-by-month view uses historical monthly average prices to show avg price per month across ${monthlySeasonalityRows.length} observed month buckets. No forecast or seasonal prediction is shown.`
+  };
+}
+
 function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduct>>): PriceChartTerminalModel {
   const emptyWindows: PriceChartTerminalWindow[] = timeframeWindows.map((window) => ({
     label: window.label,
@@ -736,6 +812,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const priceVsUsualSignal = priceVsUsualSignalFor(product);
   const typicalRangeBand = priceTypicalRangeBandFor(product);
   const priceChangeLog = priceChangeEventLogFor(product);
+  const monthlySeasonality = seasonalMonthlyAveragesFor(product);
   const priceChartTerminal = priceChartTerminalFor(product);
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
   const productJsonLd = productJsonLdFor(product);
@@ -920,6 +997,38 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-amber-950">{priceChangeLog.detail}</p>
         )}
         <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{priceChangeLog.detail}</p>
+      </Card>
+      <Card className="mt-6 overflow-hidden border-amber-200 bg-amber-50/80">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-amber-800">seasonal-by-month view</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Historical monthly average price</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Groups dated OpenPrices observations by calendar month and shows the avg price per month. No forecast or seasonal prediction is shown.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-amber-900">
+            {monthlySeasonality.observationCount} dated points · {monthlySeasonality.observedMonthCount} months
+          </p>
+        </div>
+        {monthlySeasonality.available ? (
+          <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {monthlySeasonality.monthlySeasonalityRows.map((month) => (
+              <div className="rounded-2xl bg-white/90 p-4 shadow-sm" key={`${month.monthIndex}-${month.monthLabel}`}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">{month.monthLabel}</p>
+                <p className="mt-2 text-2xl font-black text-slate-950">{month.monthAverageLabel}</p>
+                <p className="mt-2 text-sm font-semibold text-slate-600">
+                  monthObservationCount {month.monthObservationCount} · {month.yearCount} observed {month.yearCount === 1 ? 'year' : 'years'}
+                </p>
+                <p className="mt-2 text-sm font-bold text-slate-700">Observed range {month.lowPriceLabel}–{month.highPriceLabel}</p>
+                <p className="mt-2 text-xs font-semibold leading-5 text-slate-500">{month.detail}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-amber-950">{monthlySeasonality.detail}</p>
+        )}
+        <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{monthlySeasonality.detail}</p>
       </Card>
       <Card className="mt-6 border-indigo-200 bg-indigo-50/70">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
