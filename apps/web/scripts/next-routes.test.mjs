@@ -321,6 +321,18 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces immigrant familiar-brand search from verified product rows', async () => {
+    const source = await read('src/app/products/page.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+    assert.match(verified, /export const immigrantFamiliarBrandSearch/);
+    assert.match(source, /immigrantFamiliarBrandSearch/);
+    assert.match(source, /Familiar-brand search/);
+    assert.match(source, /reportedBrand/);
+    assert.match(source, /verifiedProductSlug/);
+    assert.match(source, /searchTokens/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces immigrant multilingual UI access in the public shell', async () => {
     const source = await read('src/components/market-shell.tsx');
     assert.match(source, /immigrantMultilingualUi/);
