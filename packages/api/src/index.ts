@@ -2237,6 +2237,24 @@ function realIndexComponentRows(rows: RealPriceIndexRow[]): Array<RealPriceIndex
   });
 }
 
+function realChainIndexRows(rows: RealPriceIndexRow[]): Array<RealPriceIndexRow & { chainSlug: string; currentUnitPrice: number }> {
+  const byProductChain = new Map<string, RealPriceIndexRow & { chainSlug: string; currentUnitPrice: number }>();
+  for (const row of rows) {
+    const currentUnitPrice = row.currentUnitPrice;
+    if (!row.chainSlug || currentUnitPrice === undefined || !Number.isFinite(currentUnitPrice) || currentUnitPrice <= 0) continue;
+    const key = `${row.productId}:${row.chainSlug}`;
+    const current = byProductChain.get(key);
+    if (
+      !current ||
+      currentUnitPrice < current.currentUnitPrice ||
+      (currentUnitPrice === current.currentUnitPrice && (row.currentObservedAt ?? '') > (current.currentObservedAt ?? ''))
+    ) {
+      byProductChain.set(key, { ...row, chainSlug: row.chainSlug, currentUnitPrice });
+    }
+  }
+  return [...byProductChain.values()];
+}
+
 function earliestIso(values: Array<string | undefined>): string {
   return values.filter((value): value is string => Boolean(value)).sort()[0] ?? 'unknown';
 }
@@ -2246,21 +2264,17 @@ function latestIso(values: Array<string | undefined>): string {
 }
 
 export function buildRealChainPriceIndices(rows: RealPriceIndexRow[]): RealChainPriceIndexSummary {
-  const observations: ChainPriceObservation[] = rows.flatMap((row) => {
-    const currentUnitPrice = row.currentUnitPrice;
-    if (!row.chainSlug || currentUnitPrice === undefined || !Number.isFinite(currentUnitPrice) || currentUnitPrice <= 0) return [];
-    return [{
-      chainId: row.chainSlug,
-      category: topCategory(row.categoryPath),
-      unitPrice: currentUnitPrice
-    }];
-  });
+  const observations: ChainPriceObservation[] = realChainIndexRows(rows).map((row) => ({
+    chainId: row.chainSlug,
+    category: topCategory(row.categoryPath),
+    unitPrice: row.currentUnitPrice
+  }));
 
   return {
     ...calculateChainPriceIndex(observations),
     currency: 'SEK',
     guardrails: [
-      'Chain indices are calculated from persisted latest_prices rows only.',
+      'Chain indices are calculated from persisted latest_prices rows only, using one cheapest current product price per chain.',
       'Unit prices are compared inside observed product categories before chain-level aggregation.',
       'No missing chain/category cells are filled with synthetic product prices.'
     ]

@@ -151,7 +151,7 @@ class RecordingPriceHistoryExecutor {
         }
       ] as T[];
     }
-    if (sql.includes('latest_prices.unit_price as current_unit_price') && !sql.includes('base_prices')) {
+    if (sql.includes('current_unit_price') && sql.includes('current_chain_prices') && !sql.includes('base_prices')) {
       return [
         {
           product_id: 'product-coffee',
@@ -161,6 +161,15 @@ class RecordingPriceHistoryExecutor {
           chain_slug: 'willys',
           current_unit_price: '110.89',
           current_observed_at: '2026-05-21T09:00:00.000Z'
+        },
+        {
+          product_id: 'product-coffee',
+          product_slug: 'bryggkaffe-450g',
+          product_name: 'Bryggkaffe mellanrost 450 g',
+          category_path: ['coffee'],
+          chain_slug: 'willys',
+          current_unit_price: '121.50',
+          current_observed_at: '2026-05-21T07:00:00.000Z'
         },
         {
           product_id: 'product-coffee',
@@ -585,6 +594,7 @@ describe('GroceryView API app', () => {
     assert.equal(chainIndices.body.demo, undefined);
     assert.match(chainIndices.body.guardrails[0], /persisted latest_prices/i);
     assert.equal(priceHistoryExecutor.calls.some((call) => /from latest_prices/i.test(call.sql) && /join products/i.test(call.sql)), true);
+    assert.equal(priceHistoryExecutor.calls.some((call) => /distinct on \(latest_prices\.product_id, latest_prices\.chain_id\)/i.test(call.sql)), true);
 
     const categoryIndices = await request(app.getHttpServer()).get('/indices/categories').expect(200);
     assert.deepEqual(categoryIndices.body.indices.map((row: { category: string }) => row.category), ['dairy', 'coffee']);
