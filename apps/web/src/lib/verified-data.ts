@@ -511,6 +511,22 @@ export const basketTripCostContract = {
   ]
 };
 
+export const elderlyNearestDeliveryPlanner = {
+  persona: 'Elderly / seniors',
+  title: 'Nearest-store + delivery options',
+  status: 'static_public_planner',
+  mobilitySupport: [
+    { label: 'Nearest verified store', evidence: 'uses OSM store records and public district labels before any private home location is requested' },
+    { label: 'Delivery fallback', evidence: 'routes shoppers to fulfillment slot evidence when walking or transit effort is too high' },
+    { label: 'Pickup fallback', evidence: 'keeps pickup separate from delivery and requires retailer checkout confirmation' }
+  ],
+  guardrails: [
+    'no private home location is bundled with the static snapshot',
+    'store distance is not personalized until a signed-in shopper consents',
+    'delivery and pickup options are evidence only, not retailer reservations'
+  ]
+};
+
 export const fulfillmentSlotsContract = {
   endpoint: '/api/basket/fulfillment-slots/{retailerId}/{storeId}',
   title: 'Delivery and pickup slot evidence',
