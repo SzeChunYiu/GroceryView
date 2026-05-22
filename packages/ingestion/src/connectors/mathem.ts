@@ -52,9 +52,34 @@ export const DEFAULT_MATHEM_SEARCH_QUERIES = [
   'banan',
   'kyckling',
   'ketchup',
-  'havregryn'
+  'havregryn',
+  'lax',
+  'notfars',
+  'flask',
+  'tomat',
+  'gurka',
+  'apelsin',
+  'apple',
+  'choklad',
+  'chips',
+  'juice',
+  'cola',
+  'te',
+  'mjol',
+  'socker',
+  'olja',
+  'glass',
+  'blabar',
+  'jordgubbar',
+  'korv',
+  'falukorv',
+  'fisk',
+  'rakor',
+  'morot',
+  'lok',
+  'vitlok'
 ] as const;
-export const DEFAULT_MATHEM_MAX_ROWS = 600;
+export const DEFAULT_MATHEM_MAX_ROWS = 1600;
 
 export type FetchMathemProductsOptions = {
   fetchImpl?: typeof fetch;
