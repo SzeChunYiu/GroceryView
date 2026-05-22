@@ -23,7 +23,7 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
 - Product search URLs: per-branch `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1`, listed in `apps/web/src/lib/ingested/coop.ts`
 - Request body: weekly flyer item queries listed in `DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES`, resultsOptions take 8, empty sort/facets, relatedResultsOptions take 0
 - Required public headers: `storeApiSubscriptionKey` for store metadata and `personalizationApiSubscriptionKey` for product search, both exposed in `window.coopSettings.serviceAccess` on https://www.coop.se/handla/
-- Retrieved: 2026-05-22T23:08:48.345Z for 12 added rows at Coop Åmål Mellanbrogatan; previous retained rows retrieved 2026-05-22T15:07:27.837Z, 2026-05-22T16:05:03.230Z, 2026-05-22T16:55:10.087Z, 2026-05-22T16:34:51.000Z, 2026-05-22T18:13:24.527Z, 2026-05-22T18:46:18.919Z, 2026-05-22T19:36:22.255Z, 2026-05-22T20:44:26.622Z, 2026-05-22T21:07:45.585Z
+- Retrieved: 2026-05-22T23:37:11.938Z for 25 added rows at Coop Fårbo, Coop Harads, Coop Sorsele, Coop Dorotea, and Coop Åsele; previous retained rows retrieved 2026-05-22T15:07:27.837Z, 2026-05-22T16:05:03.230Z, 2026-05-22T16:55:10.087Z, 2026-05-22T16:34:51.000Z, 2026-05-22T18:13:24.527Z, 2026-05-22T18:46:18.919Z, 2026-05-22T19:36:22.255Z, 2026-05-22T20:44:26.622Z, 2026-05-22T21:07:45.585Z, 2026-05-22T23:08:48.345Z
 - Added this iteration: 015320 Coop Västerhaninge Centrum; 245200 Coop Haparanda; 163900 Coop Sunne; 163500 Coop Hagfors; 136251 Coop Hunnebostrand; 135220 Coop Kungshamn; 205150 Coop Sandviken; 066452 Coop Torup; 075220 Coop Sävsjö; 086811 Coop Högsby; 165500 Coop Sysslebäck; 196311 Coop Sollerön; 235160 Coop Byske; 235180 Coop Norsjö; 235200 Coop Malå
 - Added this iteration (worker B follow-up): 235300 Coop Tärnaby; 235380 Coop Burträsk; 235420 Coop Nordmaling; 235430 Coop Storuman; 235480 Coop Robertsfors; 235920 Coop Hammarstrand; 235960 Coop Åre; 235980 Coop Järpen; 236030 Coop Bjurholm; 235600 Coop Kramfors; 235900 Coop Strömsund; 235410 Coop Vännäs; 235510 Coop Ånge; 135030 Coop Lysekil
 - Added this iteration (worker B second follow-up): 074400 Coop Tranås; 245040 Coop Älvsbyn; 086804 Coop Kolberga; 083700 Coop Flanaden
@@ -32,6 +32,7 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
 - Added this iteration (worker B fifth follow-up): 055500 Coop Stenbärsvägen Nyköping; 075600 Coop Kristinedal; 135040 Coop Älvängen; 235610 Coop Sollefteå; 165250 Coop Charlottenberg; 196170 Coop Sälen; 195520 Coop Rättvik; 195070 Coop Orsa; 195040 Coop Säter; 185261 Coop Skinnskatteberg; 184400 Coop Fagersta; 035440 Coop Tierp; 035400 Stora Coop Östhammar; 156000 Coop Änghagen Lidköping; 155550 Coop Vipans Gränd Skövde; 155000 Coop Sydport Mariestad; 154900 Coop Tidaholm; 154000 Coop Falköping; 126406 Coop Gamlestaden; 126350 Coop Eriksberg; 123000 Coop Stenungsund; 030760 Coop Tyresö Centrum; 185010 Coop Pilgatan Västerås; 106433 Coop Simrishamn; 035000 Coop Daglivs; 133700 Coop Kronhjorten. Coop product search returned promotion objects with ordinary and offer prices for these store-scoped branches; current flyer URLs and validity came from the public store API.
 - Added this iteration (worker B sixth follow-up): 056313 Coop Östermalmshallen; 196231 Coop Bjursås; 245080 Coop Arjeplog; 245050 Coop Pajala; 116385 Coop Getinge; 116418 Coop Knäred. Fresh connector fetch also matched falukorv offers for all six stores. Flyer PDF text from `https://dr.coop.se/Butik/<store-slug>` verified offer prices for falukorv, avokado, spare ribs, Finish maskindisktabletter, ost familjefavoriter, and Coop fiskpinnar; ordinary prices came from the matching store-scoped product search URLs listed in `apps/web/src/lib/ingested/coop.ts`.
 - Added this iteration (worker B seventh follow-up): 135120 Coop Åmål Mellanbrogatan, 12 real discount rows. Flyer PDF text from `https://dr.coop.se/Butik/Coop-%C3%85m%C3%A5l-Mellanbrogatan` matched the Avenyn flyer group and verified the offer prices; ordinary prices came from `https://external.api.coop.se/personalization/search/products?store=135120&device=desktop&direct=true&api-version=v1`, with validity and flyer URL from `https://proxy.api.coop.se/external/store/stores/135120?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true`.
+- Added this iteration (worker B eighth follow-up): 086802 Coop Fårbo; 245060 Coop Harads; 235190 Coop Sorsele; 235220 Coop Dorotea; 235400 Coop Åsele, 25 real discount rows. Store API validity and flyer URLs came from the matching `https://proxy.api.coop.se/external/store/stores/<storeId>?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true` responses. Ordinary prices came from the matching store-scoped `https://external.api.coop.se/personalization/search/products?store=<storeId>&device=desktop&direct=true&api-version=v1` responses. Flyer PDF text from each added branch URL verified the emitted small-store offer prices for falukorv, avokado, Finish maskindisktabletter, ost familjefavoriter, spare ribs where emitted, and Coop fiskpinnar.
 - Stores:
   - 251300, Stora Coop Boländerna, Uppsala, 26 real discount rows
   - 252700, Stora Coop Bromma, Bromma, 24 real discount rows
@@ -177,8 +178,13 @@ Every emitted row includes Coop product id/EAN, product name, brand, package lab
   - 116385, Coop Getinge, Getinge, 3 real discount rows
   - 116418, Coop Knäred, Knäred, 5 real discount rows
   - 135120, Coop Åmål Mellanbrogatan, Åmål, 12 real discount rows
+  - 086802, Coop Fårbo, Fårbo, 5 real discount rows
+  - 245060, Coop Harads, Harads, 6 real discount rows
+  - 235190, Coop Sorsele, Sorsele, 4 real discount rows
+  - 235220, Coop Dorotea, Dorotea, 5 real discount rows
+  - 235400, Coop Åsele, Åsele, 5 real discount rows
 - Flyer validity: 2026-05-18T00:00:00 through 2026-05-24T23:59:59
-- Real current flyer discount rows fetched: 2774
+- Real current flyer discount rows fetched: 2799
 
 Every weekly discount row includes Coop product id/EAN, product name, brand, package label, ordinary B2C SEK price, offer SEK price, comparative offer price when present, promotion id/copy, MedMera requirement, store/region, validity, flyer URL, store API source URL, product search URL, and retrieval timestamp.
 
