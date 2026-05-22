@@ -641,6 +641,24 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces signed-in saved-basket auto-reorder readiness without automatic checkout', async () => {
+    const source = await read('src/app/weekly-basket/page.tsx');
+    const demo = await read('src/lib/demo-data.ts');
+
+    assert.match(demo, /savedBasketAutoReorderPlan/);
+    assert.match(demo, /compareBasketStrategies/);
+    assert.match(demo, /autoReorderEligibleLines/);
+    assert.match(demo, /manualReviewRequired/);
+    assert.match(demo, /No retailer checkout or payment is submitted automatically/);
+    assert.match(source, /savedBasketAutoReorderPlan/);
+    assert.match(source, /Saved basket auto-reorder readiness/);
+    assert.match(source, /autoReorderEligibleLines/);
+    assert.match(source, /manualReviewRequired/);
+    assert.match(source, /No retailer checkout or payment is submitted automatically/);
+    assert.match(source, /signed-in saved basket/i);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces loyalty-adjusted basket comparison using eligible member prices only', async () => {
     const source = await read('src/app/weekly-basket/page.tsx');
     const demo = await read('src/lib/demo-data.ts');

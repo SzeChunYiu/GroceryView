@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, oneTapBasketOptimizer, weeklyBasketOptimizer } from '@/lib/demo-data';
+import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, oneTapBasketOptimizer, savedBasketAutoReorderPlan, weeklyBasketOptimizer } from '@/lib/demo-data';
 import { recurringBasketDigestContract, weeklyBasketChangeDigest } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -80,6 +80,58 @@ export default function WeeklyBasketPage() {
               ))}
             </ul>
             <p className="mt-3 text-sm font-black text-sky-950">Signed-in saved baskets are required before GroceryView can prepare the one-tap mutation.</p>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50/70">
+        <div className="grid gap-5 lg:grid-cols-[1fr_0.9fr] lg:items-start">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">{savedBasketAutoReorderPlan.persona}</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Saved basket auto-reorder readiness</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Busy professionals can prepare the next {savedBasketAutoReorderPlan.readyAction.nextRunLabel} from a signed-in saved basket, but GroceryView only drafts the reviewed plan from compareBasketStrategies. No retailer checkout or payment is submitted automatically.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">autoReorderEligibleLines</span>
+                <span className="mt-1 block text-2xl font-black text-cyan-900">{savedBasketAutoReorderPlan.autoReorderEligibleLines.length}</span>
+              </p>
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">manualReviewRequired</span>
+                <span className="mt-1 block text-2xl font-black text-cyan-900">{savedBasketAutoReorderPlan.manualReviewRequired.length}</span>
+              </p>
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Draft total</span>
+                <span className="mt-1 block text-2xl font-black text-slate-950">{formatSek(savedBasketAutoReorderPlan.readyAction.estimatedTotal)}</span>
+              </p>
+            </div>
+            <div className="mt-4 grid gap-2 text-sm font-semibold text-slate-700 sm:grid-cols-2">
+              {savedBasketAutoReorderPlan.autoReorderEligibleLines.map((line) => (
+                <Link className="rounded-2xl bg-white p-3 hover:bg-cyan-100" href={`/products/${line.productId}`} key={`${line.productId}-${line.storeName}`}>
+                  <span className="block font-black text-slate-950">{line.productId}</span>
+                  <span className="mt-1 block">{line.quantity}× at {line.storeName} · {formatSek(line.lineTotal)} · {line.priceType}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-[1.5rem] border border-cyan-100 bg-white p-4 shadow-sm">
+            <h3 className="text-lg font-black text-slate-950">{savedBasketAutoReorderPlan.readyAction.label}</h3>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              Account-bound reorder readiness is fail-closed: signed-in saved basket state is required before a shopper can approve any draft.
+            </p>
+            <ul className="mt-3 space-y-2 text-sm font-semibold text-slate-700">
+              {savedBasketAutoReorderPlan.guardrails.map((guardrail) => (
+                <li className="rounded-2xl bg-cyan-50 p-3" key={guardrail}>{guardrail}</li>
+              ))}
+            </ul>
+            <div className="mt-4 space-y-2">
+              {savedBasketAutoReorderPlan.manualReviewRequired.map((blocker) => (
+                <Link className="block rounded-2xl bg-slate-50 p-3 text-sm font-black text-slate-950 hover:bg-cyan-50" href={`/products/${blocker.productId}`} key={blocker.productId}>
+                  {blocker.productId}: {blocker.reason} {blocker.missingStoreCount} missing stores.
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
       </Card>
