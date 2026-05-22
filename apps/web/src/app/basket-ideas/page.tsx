@@ -1,29 +1,75 @@
-import { Card, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import Link from 'next/link';
+import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { studentBasicsBoard } from '@/lib/demo-data';
 import { retailerHandoffContract } from '@/lib/verified-data';
 
-const titles: Record<string, string> = {
-  'weekly-basket': 'Weekly basket planner',
-  watchlist: 'Watchlist alerts',
-  scanner: 'Receipt scanner',
-  household: 'Household profile',
-  account: 'Account and alerts',
-  'basket-ideas': 'Basket ideas',
-  'coupon-stacks': 'Coupon stacks',
-  deals: 'Deal radar',
-  'meal-planner': 'Meal planner',
-  'nutrition-value': 'Nutrition value',
-  'pantry-planner': 'Pantry planner',
-  'price-reports': 'Price reports',
-  'savings-dashboard': 'Savings dashboard',
-  'shopping-trips': 'Shopping trips',
-  privacy: 'Privacy controls'
-};
+function formatSek(value: number) {
+  return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);
+}
 
-export default function FeaturePage() {
-  const route = 'basket-ideas';
+export default function BasketIdeasPage() {
+  const { comparison, coverage } = studentBasicsBoard;
   return (
     <PageShell>
-      <NoVerifiedData route={route} title={`${titles[route]} has no private production records in this static snapshot`} />
+      <Eyebrow>Student staples</Eyebrow>
+      <h1 className="mt-2 text-4xl font-black tracking-tight">Student staples cheapest-basics board</h1>
+      <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">
+        This persona board calls compareBasketStrategies and summarizeStoreBasketCoverage for a tight student basics basket, showing the cheapest staple rows across chains without inventing missing prices.
+      </p>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr_1fr]">
+        <Card>
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Split-shop basics</p>
+          <p className="mt-2 text-5xl font-black text-emerald-800">{formatSek(comparison.cheapestByProduct.total)}</p>
+          <p className="mt-3 font-semibold text-slate-700">for {comparison.cheapestByProduct.assignments.length} student staple rows.</p>
+        </Card>
+        <Card>
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Savings vs one store</p>
+          <p className="mt-2 text-5xl font-black text-slate-950">{formatSek(comparison.savingsVsBestSingleStore)}</p>
+          <p className="mt-3 font-semibold text-slate-700">Best full-coverage option: {comparison.bestSingleStore?.storeName ?? 'no full-coverage store'}.</p>
+        </Card>
+        <Card>
+          <p className="text-sm font-black uppercase tracking-[0.2em] text-slate-500">Coverage</p>
+          <p className="mt-2 text-5xl font-black capitalize text-slate-950">{studentBasicsBoard.confidence.level}</p>
+          <p className="mt-3 font-semibold text-slate-700">{studentBasicsBoard.confidence.caveat}</p>
+        </Card>
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+        <Card>
+          <h2 className="text-2xl font-black">Cheapest basics basket</h2>
+          <div className="mt-4 space-y-3">
+            {studentBasicsBoard.items.map((item) => (
+              <Link className="block rounded-2xl border border-slate-200 p-4 hover:border-emerald-700" href={`/products/${item.productId}`} key={item.productId}>
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xl font-black text-slate-950">{item.name}</p>
+                    <p className="mt-1 text-sm text-slate-600">{item.quantity} × {formatSek(item.unitPrice)} at {item.storeName}</p>
+                  </div>
+                  <p className="text-2xl font-black text-emerald-800">{formatSek(item.lineTotal)}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </Card>
+        <Card>
+          <h2 className="text-2xl font-black">Store coverage</h2>
+          <div className="mt-4 space-y-3">
+            {coverage.stores.map((store) => (
+              <div className="rounded-2xl bg-slate-50 p-4" key={store.storeId}>
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-black text-slate-950">{store.storeName}</p>
+                    <p className="mt-1 text-sm font-semibold text-slate-700">{store.availableProductIds.length} of {store.availableProductIds.length + store.missingProductIds.length} basics covered</p>
+                  </div>
+                  <p className="text-xl font-black text-slate-950">{formatSek(store.knownTotal)}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
       <Card className="mt-6 border-amber-200 bg-amber-50">
         <p className="text-sm font-black uppercase tracking-[0.2em] text-amber-800">Retailer action layer</p>
         <h2 className="mt-2 text-2xl font-black tracking-tight">Retailer handoff support matrix: {retailerHandoffContract.title}</h2>
@@ -52,13 +98,8 @@ export default function FeaturePage() {
             </ul>
           </div>
         </div>
-        <div className="mt-4 rounded-2xl border border-amber-200 bg-white/70 p-4">
-          <p className="font-black text-slate-950">Static snapshot remains closed</p>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
-            {retailerHandoffContract.blockedInStaticSnapshot.map((blocker) => <li key={blocker}>{blocker}</li>)}
-          </ul>
-        </div>
       </Card>
+
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
         <TopSpreads limit={5} />
         <SourceCoverage />
