@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, weeklyBasketOptimizer } from '@/lib/demo-data';
+import { budgetStretchKronaOptimizer, familyBulkUnitPriceComparison, loyaltyAdjustedBasketComparison, oneTapBasketOptimizer, weeklyBasketOptimizer } from '@/lib/demo-data';
 import { recurringBasketDigestContract, weeklyBasketChangeDigest } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -39,6 +39,50 @@ export default function WeeklyBasketPage() {
           <p className="mt-3 font-semibold text-slate-700">{weeklyBasketOptimizer.confidence.caveat}</p>
         </Card>
       </div>
+
+      <Card className="mt-6 border-sky-200 bg-sky-50/70">
+        <div className="grid gap-5 lg:grid-cols-[1fr_0.85fr] lg:items-start">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">{oneTapBasketOptimizer.persona}</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">One-tap basket optimizer</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              Busy shoppers can see the readyAction from compareBasketStrategies before any signed-in account mutation. The tap applies the reviewed cheapest plan to a saved basket; it is not a retailer checkout or automatic purchase.
+            </p>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">readyAction</span>
+                <span className="mt-1 block text-lg font-black text-sky-900">{oneTapBasketOptimizer.readyAction.label}</span>
+              </p>
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Optimized total</span>
+                <span className="mt-1 block text-2xl font-black text-sky-900">{formatSek(oneTapBasketOptimizer.readyAction.total)}</span>
+              </p>
+              <p className="rounded-2xl bg-white p-4 shadow-sm">
+                <span className="block text-xs font-black uppercase tracking-[0.18em] text-slate-500">Coverage rows</span>
+                <span className="mt-1 block text-2xl font-black text-slate-950">{oneTapBasketOptimizer.coverage.stores.length} stores</span>
+              </p>
+            </div>
+            <div className="mt-4 grid gap-2 text-sm font-semibold text-slate-700 sm:grid-cols-2">
+              {oneTapBasketOptimizer.quickestPath.map((line) => (
+                <Link className="rounded-2xl bg-white p-3 hover:bg-sky-100" href={`/products/${line.productId}`} key={`${line.productId}-${line.storeName}`}>
+                  <span className="block font-black text-slate-950">{line.productId}</span>
+                  <span className="mt-1 block">{line.storeName} · {formatSek(line.lineTotal)} · {line.priceType}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-[1.5rem] border border-sky-100 bg-white p-4 shadow-sm">
+            <h3 className="text-lg font-black text-slate-950">checkoutGuardrails</h3>
+            <p className="mt-1 text-sm leading-6 text-slate-600">The public snapshot stays account-safe even when the plan is ready.</p>
+            <ul className="mt-3 space-y-2 text-sm font-semibold text-slate-700">
+              {oneTapBasketOptimizer.checkoutGuardrails.map((guardrail) => (
+                <li className="rounded-2xl bg-sky-50 p-3" key={guardrail}>{guardrail}</li>
+              ))}
+            </ul>
+            <p className="mt-3 text-sm font-black text-sky-950">Signed-in saved baskets are required before GroceryView can prepare the one-tap mutation.</p>
+          </div>
+        </div>
+      </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50/70">
         <div className="grid gap-5 lg:grid-cols-[1fr_0.85fr] lg:items-start">
