@@ -2031,6 +2031,63 @@ export const watchlistAlertBoard = {
   }
 };
 
+export const babyDiaperWatchlistInputs: { favoriteStoreIds: string[]; watchlist: WatchlistItem[]; products: (WatchlistProductSnapshot & { source: string; diaperUnitPrice: number })[] } = {
+  favoriteStoreIds: ['willys-odenplan', 'hemkop-hornstull', 'coop-medborgarplatsen'],
+  watchlist: [
+    { productId: 'libero-touch-size-4-88p', targetPrice: 179, alertDealScoreAt: 75, favoriteStoresOnly: true, allowedPriceTypes: ['member', 'promotion'] },
+    { productId: 'pampers-baby-dry-size-5-96p', targetPrice: 189, alertDealScoreAt: 76, favoriteStoresOnly: true, allowedPriceTypes: ['member', 'promotion'] }
+  ],
+  products: [
+    {
+      productId: 'libero-touch-size-4-88p',
+      productName: 'Libero Touch Size 4 88-pack',
+      bestPrice: 169,
+      bestStoreId: 'willys-odenplan',
+      bestPriceType: 'member' as const,
+      prices: [
+        { storeId: 'willys-odenplan', storeName: 'Willys Odenplan', price: 169, priceType: 'member' as const },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 189, priceType: 'shelf' as const }
+      ],
+      dealScore: 81,
+      isNew52WeekLow: false,
+      diaperUnitPrice: 1.92,
+      source: 'visible baby aisle member-promo row with pack count'
+    },
+    {
+      productId: 'pampers-baby-dry-size-5-96p',
+      productName: 'Pampers Baby-Dry Size 5 96-pack',
+      bestPrice: 185,
+      bestStoreId: 'coop-medborgarplatsen',
+      bestPriceType: 'promotion' as const,
+      prices: [
+        { storeId: 'coop-medborgarplatsen', storeName: 'Coop Medborgarplatsen', price: 185, priceType: 'promotion' as const },
+        { storeId: 'hemkop-hornstull', storeName: 'Hemköp Hornstull', price: 209, priceType: 'shelf' as const }
+      ],
+      dealScore: 78,
+      isNew52WeekLow: true,
+      diaperUnitPrice: 1.93,
+      source: 'visible weekly-deal baby aisle row with pack count'
+    }
+  ]
+};
+
+const babyDiaperAlerts = buildWatchlistAlerts(babyDiaperWatchlistInputs);
+
+export const babyDiaperPriceTracker = {
+  persona: 'Families with kids',
+  title: 'Baby & diaper price tracking',
+  alerts: babyDiaperAlerts,
+  rows: babyDiaperWatchlistInputs.products.map((product) => ({
+    ...product,
+    diaperUnitPrice: product.diaperUnitPrice,
+    alertCount: babyDiaperAlerts.filter((alert) => alert.productId === product.productId).length
+  })),
+  coverage: {
+    confidence: 'medium',
+    caveat: 'Diaper tracking uses visible pack counts and watchlist alert rules; missing private loyalty wallet offers are not estimated.'
+  }
+};
+
 export const dealBasedMealInputs = [
   { productId: 'kronfagel-kycklingfile-1kg', name: 'Kronfågel Kycklingfilé 1kg', category: 'protein' as const, price: 109, dealScore: 78, source: 'visible Hemköp Skanstull weekly-deal row' },
   { productId: 'barilla-spaghetti-1kg', name: 'Barilla Spaghetti 1kg', category: 'pantry' as const, price: 27.9, dealScore: 71, source: 'visible City Gross online row' },

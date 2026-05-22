@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
-import { watchlistAlertBoard, watchlistAlertInputs } from '@/lib/demo-data';
+import { babyDiaperPriceTracker, watchlistAlertBoard, watchlistAlertInputs } from '@/lib/demo-data';
 
 function priceSource(productId: string) {
   return watchlistAlertInputs.products.find((product) => product.productId === productId)?.source ?? 'visible price row';
@@ -71,6 +71,33 @@ export default function WatchlistPage() {
             </div>
           ))}
         </div>
+      </Card>
+
+      <Card className="mt-6 border-blue-200 bg-blue-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-blue-800">{babyDiaperPriceTracker.persona}</p>
+        <h2 className="mt-2 text-2xl font-black">Baby & diaper price tracking</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          This family tracker calls buildWatchlistAlerts for diaper packs and exposes diaperUnitPrice so parents can compare price per diaper without estimating missing loyalty-wallet offers.
+        </p>
+        <div className="mt-4 grid gap-3 lg:grid-cols-2">
+          {babyDiaperPriceTracker.rows.map((row) => (
+            <Link className="rounded-2xl border border-blue-200 bg-white p-4 hover:border-blue-700" href={`/products/${row.productId}`} key={row.productId}>
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className="text-lg font-black text-slate-950">{row.productName}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">{row.source}</p>
+                </div>
+                <p className="text-2xl font-black text-blue-800">{row.alertCount} alerts</p>
+              </div>
+              <div className="mt-3 grid gap-2 text-sm text-slate-700 sm:grid-cols-3">
+                <p className="rounded-2xl bg-blue-100 p-3 font-semibold">Best {row.bestPrice} SEK</p>
+                <p className="rounded-2xl bg-blue-100 p-3 font-semibold">diaperUnitPrice {row.diaperUnitPrice.toFixed(2)} SEK</p>
+                <p className="rounded-2xl bg-emerald-50 p-3 font-black text-emerald-900">Deal Score {row.dealScore}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+        <p className="mt-4 text-sm font-semibold text-slate-700">{babyDiaperPriceTracker.coverage.caveat}</p>
       </Card>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_1fr]">
