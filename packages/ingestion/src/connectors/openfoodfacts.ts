@@ -67,6 +67,22 @@ type OpenFoodFactsApiResponse = {
   product?: OpenFoodFactsApiProduct;
 };
 
+type OpenFoodFactsSearchResponse = {
+  count?: unknown;
+  page?: unknown;
+  page_count?: unknown;
+  page_size?: unknown;
+  products?: OpenFoodFactsApiProduct[];
+};
+
+export type OpenFoodFactsCatalogPageEvent = {
+  page: number;
+  products: number;
+  rows: number;
+  skipped: boolean;
+  totalPages: number;
+};
+
 export const OPENFOODFACTS_FIELDS = [
   'code',
   'product_name',
@@ -159,6 +175,20 @@ export type FetchOpenFoodFactsExportProductsOptions = {
   retrievedAt?: string;
 };
 
+export type FetchOpenFoodFactsSwedenCatalogOptions = {
+  concurrency?: number;
+  fetchImpl?: typeof fetch;
+  maxPages?: number;
+  maxRows?: number;
+  onPage?: (event: OpenFoodFactsCatalogPageEvent) => void;
+  pageDelayMs?: number;
+  pageSize?: number;
+  requestRetryAttempts?: number;
+  requestRetryBaseDelayMs?: number;
+  retrievedAt?: string;
+  skipFailedPages?: boolean;
+};
+
 export type FetchOpenFoodFactsRetailerEnrichmentsOptions = {
   candidates: readonly OpenFoodFactsRetailerProductCandidate[];
   fetchImpl?: typeof fetch;
@@ -176,6 +206,112 @@ export type FetchOpenFoodFactsExportRetailerEnrichmentsOptions = {
 export function buildOpenFoodFactsProductUrl(code: string): string {
   const fields = OPENFOODFACTS_FIELDS.join(',');
   return `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}?fields=${encodeURIComponent(fields)}`;
+}
+
+export function buildOpenFoodFactsSwedenSearchUrl(page = 1, pageSize = 100): string {
+  const url = new URL('https://world.openfoodfacts.org/api/v2/search');
+  url.searchParams.set('countries_tags', 'sweden');
+  url.searchParams.set('fields', OPENFOODFACTS_FIELDS.join(','));
+  url.searchParams.set('page_size', String(pageSize));
+  url.searchParams.set('page', String(page));
+  return url.toString();
+}
+
+
+export async function fetchOpenFoodFactsSwedenCatalog(options: FetchOpenFoodFactsSwedenCatalogOptions = {}): Promise<OpenFoodFactsProduct[]> {
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+  const concurrency = Math.max(1, Math.floor(options.concurrency ?? 1));
+  const pageDelayMs = options.pageDelayMs ?? 0;
+  const pageSize = options.pageSize ?? 100;
+  const requestRetryAttempts = options.requestRetryAttempts ?? 6;
+  const requestRetryBaseDelayMs = options.requestRetryBaseDelayMs ?? 1500;
+  const skipFailedPages = options.skipFailedPages ?? false;
+  const onPage = options.onPage;
+  const maxPages = options.maxPages ?? Number.POSITIVE_INFINITY;
+  const maxRows = options.maxRows ?? Number.POSITIVE_INFINITY;
+  const rows: OpenFoodFactsProduct[] = [];
+  const seenCodes = new Set<string>();
+  let totalPages = Number.POSITIVE_INFINITY;
+
+  const fetchPage = async (page: number): Promise<{ page: number; payload: OpenFoodFactsSearchResponse; sourceUrl: string } | null> => {
+    const sourceUrl = buildOpenFoodFactsSwedenSearchUrl(page, pageSize);
+    try {
+      const payload = await fetchOpenFoodFactsSearchPage(fetchImpl, sourceUrl, page, {
+        retryAttempts: requestRetryAttempts,
+        retryBaseDelayMs: requestRetryBaseDelayMs
+      });
+      return { page, payload, sourceUrl };
+    } catch (error) {
+      if (!skipFailedPages) {
+        throw error;
+      }
+      onPage?.({ page, products: 0, rows: rows.length, skipped: true, totalPages });
+      return null;
+    }
+  };
+
+  const appendPageRows = (page: number, payload: OpenFoodFactsSearchResponse, sourceUrl: string): number => {
+    const products = Array.isArray(payload.products) ? payload.products : [];
+    const reportedCount = numberOrNull(payload.count);
+    const reportedPageSize = numberOrNull(payload.page_size) ?? pageSize;
+    if (reportedCount !== null && reportedPageSize > 0) {
+      totalPages = Math.max(1, Math.ceil(reportedCount / reportedPageSize));
+    } else if (products.length < pageSize) {
+      totalPages = page;
+    }
+    if (products.length === 0) {
+      return 0;
+    }
+
+    for (const product of products) {
+      const row = normalizeOpenFoodFactsProduct(product, sourceUrl, retrievedAt);
+      if (!row || seenCodes.has(row.code)) {
+        continue;
+      }
+      rows.push(row);
+      seenCodes.add(row.code);
+      if (rows.length >= maxRows) {
+        break;
+      }
+    }
+    onPage?.({ page, products: products.length, rows: rows.length, skipped: false, totalPages });
+    return products.length;
+  };
+
+  const firstPage = await fetchPage(1);
+  if (!firstPage) {
+    return rows;
+  }
+  if (appendPageRows(firstPage.page, firstPage.payload, firstPage.sourceUrl) === 0) {
+    return rows;
+  }
+
+  let nextPage = 2;
+  while (nextPage <= totalPages && nextPage <= maxPages && rows.length < maxRows) {
+    const batchPages: number[] = [];
+    while (batchPages.length < concurrency && nextPage <= totalPages && nextPage <= maxPages && rows.length < maxRows) {
+      batchPages.push(nextPage);
+      nextPage += 1;
+    }
+
+    const batchResults = await Promise.all(batchPages.map((page) => fetchPage(page)));
+    for (const result of batchResults) {
+      if (!result) {
+        continue;
+      }
+      appendPageRows(result.page, result.payload, result.sourceUrl);
+      if (rows.length >= maxRows) {
+        break;
+      }
+    }
+
+    if (pageDelayMs > 0 && nextPage <= totalPages && nextPage <= maxPages && rows.length < maxRows) {
+      await sleep(pageDelayMs);
+    }
+  }
+
+  return rows;
 }
 
 export async function fetchOpenFoodFactsProducts(options: FetchOpenFoodFactsProductsOptions = {}): Promise<OpenFoodFactsProduct[]> {
@@ -462,6 +598,39 @@ export function extractOpenFoodFactsBarcodeFromAxfoodImageUrl(imageUrl: string):
     return '';
   }
   return match[1].replace(/^0(?=\d{13}$)/, '');
+}
+
+
+async function fetchOpenFoodFactsSearchPage(
+  fetchImpl: typeof fetch,
+  sourceUrl: string,
+  page: number,
+  options: { retryAttempts: number; retryBaseDelayMs: number }
+): Promise<OpenFoodFactsSearchResponse> {
+  const retryStatuses = new Set([429, 500, 502, 503, 504]);
+  let lastStatus = 0;
+  const attempts = Math.max(1, Math.floor(options.retryAttempts));
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    const response = await fetchImpl(sourceUrl, {
+      headers: {
+        accept: 'application/json',
+        'user-agent': 'GroceryView/0.1 (https://github.com/SzeChunYiu/GroceryView)'
+      }
+    });
+    lastStatus = response.status;
+    if (response.ok) {
+      return await response.json() as OpenFoodFactsSearchResponse;
+    }
+    if (!retryStatuses.has(response.status) || attempt === attempts - 1) {
+      break;
+    }
+    await sleep(Math.max(0, options.retryBaseDelayMs) * (attempt + 1));
+  }
+  throw new Error(`OpenFoodFacts Sweden catalog request failed for page ${page}: ${lastStatus}`);
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function groupOpenFoodFactsCandidatesByBarcode(

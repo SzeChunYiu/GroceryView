@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { formatSek, formatPct, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, productUniverse, topChainSpreads, freshestOpenPrices } from '@/lib/verified-data';
+import { formatSek, formatPct, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, productUniverse, topChainSpreads, freshestOpenPrices } from '@/lib/verified-data';
 
 export default function ProductsPage() {
   return (
@@ -8,6 +8,33 @@ export default function ProductsPage() {
       <Eyebrow>Products</Eyebrow>
       <h1 className="mt-2 text-4xl font-black tracking-tight">Verified product catalogue</h1>
       <p className="mt-3 max-w-3xl text-lg leading-8 text-slate-700">Products are shown only when present in the Axfood chain snapshot or OpenPrices SEK observations. No synthetic prices or filler products are rendered.</p>
+      <Card className="mt-8 border-emerald-200 bg-emerald-50/70">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-emerald-800">OpenFoodFacts metadata catalog</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Swedish product metadata-only catalog</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              OpenFoodFacts rows widen the browseable product dimension with names, brands, package sizes, category tags, labels, and images.
+              No synthetic prices are shown here; GroceryView still requires Axfood, OpenPrices, or retailer observations before a price appears.
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white px-4 py-3 text-sm font-black text-emerald-950 shadow-sm">
+            {openFoodFactsCatalogSummary.products.toLocaleString('sv-SE')} metadata-only products · {openFoodFactsCatalogSummary.brands.toLocaleString('sv-SE')} brands
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {openFoodFactsCatalogPreview.map((product) => (
+            <a className="rounded-2xl border border-emerald-100 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-emerald-700" href={product.productUrl} key={product.code}>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-800">{product.brands || 'Brand not reported'}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{product.name}</h3>
+              <p className="mt-1 text-xs font-semibold text-slate-500">{product.quantity || 'Quantity not reported'} · {product.nutriscoreGrade}</p>
+              <p className="mt-3 text-xs leading-5 text-slate-600">{product.categories.slice(0, 3).join(' · ') || 'Category tags not reported'}</p>
+              <p className="mt-3 rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-900">metadata-only · No synthetic prices</p>
+            </a>
+          ))}
+        </div>
+      </Card>
+
       <Card className="mt-8 border-sky-200 bg-sky-50/70">
         <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
           <div>

@@ -23,6 +23,7 @@ import {
   buildMathemSearchUrl,
   buildMatsparSearchUrl,
   buildOpenFoodFactsProductUrl,
+  buildOpenFoodFactsSwedenSearchUrl,
   buildOpenPricesConnectorUrl,
   cacheKeyForScbPxWebQueryFixture,
   cellCountForScbPxWebQueryFixture,
@@ -35,6 +36,7 @@ import {
   fetchOpenFoodFactsExportProducts,
   fetchOpenFoodFactsExportRetailerEnrichments,
   fetchOpenFoodFactsProducts,
+  fetchOpenFoodFactsSwedenCatalog,
   fetchOpenFoodFactsRetailerEnrichments,
   fetchOverpassGroceryStores,
   fetchRetailerConnectorSnapshot,
@@ -185,6 +187,217 @@ describe('fetchOpenFoodFactsProducts', () => {
       sourceUrl: buildOpenFoodFactsProductUrl('7340083494406'),
       retrievedAt: '2026-05-20T23:29:26.000Z'
     }]);
+  });
+});
+
+describe('fetchOpenFoodFactsSwedenCatalog', () => {
+  it('can outwait a longer transient 503 burst from the public search API', async () => {
+    let attempts = 0;
+    const fetchImpl: typeof fetch = async () => {
+      attempts += 1;
+      if (attempts < 8) {
+        return new Response('temporary upstream outage', { status: 503 });
+      }
+
+      return new Response(JSON.stringify({
+        count: 1,
+        page: 1,
+        page_count: 1,
+        page_size: 1,
+        products: [{
+          code: '7311870010970',
+          product_name_sv: 'Bregott - Normalsaltat',
+          brands: 'Bregott',
+          quantity: '500 g'
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const options = {
+      fetchImpl,
+      pageSize: 1,
+      requestRetryAttempts: 8,
+      requestRetryBaseDelayMs: 0,
+      retrievedAt: '2026-05-22T12:10:00.000Z'
+    };
+
+    const rows = await fetchOpenFoodFactsSwedenCatalog(options);
+
+    assert.equal(attempts, 8);
+    assert.deepEqual(rows.map((row) => row.code), ['7311870010970']);
+  });
+
+  it('paginates the public Sweden product metadata API without price claims', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      const page = new URL(String(url)).searchParams.get('page');
+      return new Response(JSON.stringify({
+        count: 5,
+        page: Number(page),
+        page_count: 3,
+        page_size: 2,
+        products: page === '1'
+          ? [{
+              code: '7311870010970',
+              product_name_sv: 'Bregott - Normalsaltat',
+              brands: 'Bregott',
+              quantity: '500 g',
+              categories_tags: ['en:dairies', 'en:butters'],
+              labels_tags: ['en:svensk-gradde'],
+              nutriscore_grade: 'e',
+              image_front_url: 'https://images.openfoodfacts.org/images/products/731/187/001/0970/front_sv.27.400.jpg',
+              url: 'https://world.openfoodfacts.org/product/7311870010970/normalsaltat-bregott'
+            }, {
+              code: '7318690080008',
+              product_name: 'ICA Basic Pommes strips',
+              brands: 'ICA Basic',
+              quantity: '1 kg',
+              categories_tags: ['en:frozen-foods'],
+              labels_tags: [],
+              nutriscore_grade: 'unknown'
+            }]
+          : page === '2'
+            ? [{
+              code: '7318690514398',
+              product_name_sv: 'Glutenfritt Ljust Bröd',
+              brands: 'ICA',
+              quantity: '360 g',
+              categories_tags: ['en:breads'],
+              labels_tags: ['en:gluten-free'],
+              nutriscore_grade: 'c'
+            }, {
+              code: '7310865074034',
+              product_name_sv: 'Arla Mild Yoghurt Naturell',
+              brands: 'Arla',
+              quantity: '1 kg',
+              categories_tags: ['en:dairies'],
+              labels_tags: ['en:swedish-milk'],
+              nutriscore_grade: 'b'
+            }]
+            : [{
+              code: '7300205848329',
+              product_name_sv: 'Kungsörnen Vetemjöl',
+              brands: 'Kungsörnen',
+              quantity: '2 kg',
+              categories_tags: ['en:flours'],
+              labels_tags: ['en:made-in-sweden'],
+              nutriscore_grade: 'a'
+            }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchOpenFoodFactsSwedenCatalog({
+      fetchImpl,
+      pageSize: 2,
+      retrievedAt: '2026-05-22T12:10:00.000Z'
+    });
+
+    assert.equal(requestedUrls[0], buildOpenFoodFactsSwedenSearchUrl(1, 2));
+    assert.equal(requestedUrls[1], buildOpenFoodFactsSwedenSearchUrl(2, 2));
+    assert.equal(requestedUrls[2], buildOpenFoodFactsSwedenSearchUrl(3, 2));
+    assert.deepEqual(rows.map((row) => row.code), ['7311870010970', '7318690080008', '7318690514398', '7310865074034', '7300205848329']);
+    assert.equal(rows[0].name, 'Bregott - Normalsaltat');
+    assert.deepEqual(rows[0].labels, ['en:svensk-gradde']);
+    assert.equal(rows[0].sourceUrl, buildOpenFoodFactsSwedenSearchUrl(1, 2));
+    assert.equal(rows[0].nutritionPer100g.energyKcal, null);
+  });
+
+  it('uses total count and page size rather than current-page count to stop pagination', async () => {
+    const requestedPages: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      const page = new URL(String(url)).searchParams.get('page') ?? '1';
+      requestedPages.push(page);
+      const productCount = page === '1' || page === '2' ? 100 : page === '3' ? 50 : 0;
+      const products = Array.from({ length: productCount }, (_, index) => ({
+        code: `${page}${String(index).padStart(2, '0')}`,
+        product_name_sv: `Svensk metadata ${page}-${index}`,
+        brands: 'OpenFoodFacts',
+        quantity: '1 st'
+      }));
+
+      return new Response(JSON.stringify({
+        count: 250,
+        page: Number(page),
+        page_count: products.length,
+        page_size: 100,
+        products
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchOpenFoodFactsSwedenCatalog({
+      fetchImpl,
+      pageSize: 100,
+      retrievedAt: '2026-05-22T12:10:00.000Z'
+    });
+
+    assert.deepEqual(requestedPages, ['1', '2', '3']);
+    assert.equal(rows.length, 250);
+  });
+
+  it('can fetch remaining Sweden catalog pages concurrently after the first count page', async () => {
+    let inFlight = 0;
+    let maxInFlight = 0;
+    const fetchImpl: typeof fetch = async (url) => {
+      const page = Number(new URL(String(url)).searchParams.get('page'));
+      inFlight += 1;
+      maxInFlight = Math.max(maxInFlight, inFlight);
+      if (page > 1) {
+        await new Promise((resolve) => setTimeout(resolve, 5));
+      }
+      inFlight -= 1;
+      return new Response(JSON.stringify({
+        count: 3,
+        page,
+        page_count: 1,
+        page_size: 1,
+        products: [{
+          code: `731000000000${page}`,
+          product_name_sv: `Produkt ${page}`,
+          brands: 'Concurrency Brand',
+          quantity: '1 st'
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchOpenFoodFactsSwedenCatalog({
+      concurrency: 2,
+      fetchImpl,
+      pageSize: 1,
+      retrievedAt: '2026-05-22T12:10:00.000Z'
+    });
+
+    assert.equal(maxInFlight, 2);
+    assert.deepEqual(rows.map((row) => row.code), ['7310000000001', '7310000000002', '7310000000003']);
+  });
+
+  it('reports successful page progress for long catalog refreshes', async () => {
+    const progress: Array<{ page: number; rows: number; totalPages: number }> = [];
+    const fetchImpl: typeof fetch = async () => new Response(JSON.stringify({
+      count: 1,
+      page: 1,
+      page_count: 1,
+      page_size: 100,
+      products: [{
+        code: '7311870010970',
+        product_name_sv: 'Bregott - Normalsaltat',
+        brands: 'Bregott',
+        quantity: '500 g'
+      }]
+    }), { status: 200, headers: { 'content-type': 'application/json' } });
+
+    await fetchOpenFoodFactsSwedenCatalog({
+      fetchImpl,
+      onPage: (event) => progress.push({
+        page: event.page,
+        rows: event.rows,
+        totalPages: event.totalPages
+      }),
+      pageSize: 100,
+      retrievedAt: '2026-05-22T12:10:00.000Z'
+    });
+
+    assert.deepEqual(progress, [{ page: 1, rows: 1, totalPages: 1 }]);
   });
 });
 

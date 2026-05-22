@@ -658,6 +658,26 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(householdPage, /@\/components\/sample-data/);
   });
 
+  it('surfaces a widened OpenFoodFacts metadata catalog without synthetic prices', async () => {
+    const script = await read('scripts/refresh-openfoodfacts-catalog.mjs');
+    const catalog = await read('src/lib/openfoodfacts-catalog.ts');
+    const verified = await read('src/lib/verified-data.ts');
+    const products = await read('src/app/products/page.tsx');
+    const catalogRows = (catalog.match(/"code":/g) ?? []).length;
+
+    assert.match(script, /fetchOpenFoodFactsSwedenCatalog/);
+    assert.match(script, /GROCERYVIEW_OPENFOODFACTS_MIN_ROWS/);
+    assert.match(script, /loadExistingOpenPricesMetadata/);
+    assert.match(script, /apps\/web\/src\/lib\/openfoodfacts-catalog\.ts/);
+    assert.match(script, /OpenFoodFacts Sweden metadata catalog/);
+    assert.ok(catalogRows >= 900, `expected generated OpenFoodFacts catalog to contain at least 900 metadata rows, saw ${catalogRows}`);
+    assert.match(verified, /openFoodFactsCatalog/);
+    assert.match(verified, /openFoodFactsCatalogSummary/);
+    assert.match(products, /OpenFoodFacts metadata catalog/);
+    assert.match(products, /metadata-only/);
+    assert.match(products, /No synthetic prices/);
+  });
+
   it('surfaces verified source coverage on the data sources route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/data-sources/page.tsx');
