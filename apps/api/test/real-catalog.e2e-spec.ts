@@ -174,7 +174,19 @@ class FakePostgresQueryExecutorService {
           product_name: row.canonical_name
         })) as T[];
     }
-    if (sql.includes('from observations')) return priceHistoryRows as T[];
+    if (sql.includes('from observations')) {
+      const [productId, priceType, chain, store, sourceRun, observedFrom, observedTo, minConfidence, limit] = params;
+      return priceHistoryRows
+        .filter((row) => productId === 'product-milk')
+        .filter((row) => priceType === null || row.price_type === priceType)
+        .filter((row) => chain === null || row.chain_slug === chain || row.chain_id === chain)
+        .filter((row) => store === null || row.store_slug === store || row.store_id === store)
+        .filter((row) => sourceRun === null || row.source_run_id === sourceRun)
+        .filter((row) => observedFrom === null || Date.parse(row.observed_at) >= Date.parse(String(observedFrom)))
+        .filter((row) => observedTo === null || Date.parse(row.observed_at) <= Date.parse(String(observedTo)))
+        .filter((row) => minConfidence === null || Number(row.confidence) >= Number(minConfidence))
+        .slice(0, Number(limit)) as T[];
+    }
     if (sql.includes('where slug = $1 or id::text = $1')) return productRows as T[];
     return priceRows as T[];
   }
@@ -285,20 +297,20 @@ describe('real catalog API endpoints', () => {
       observedTo: '2026-05-31T23:59:59.000Z',
       limit: 25
     });
-    assert.equal(response.body.pointCount, 2);
+    assert.equal(response.body.pointCount, 1);
     assert.deepEqual(response.body.evidence, {
-      observationCount: 2,
+      observationCount: 1,
       sourceTables: ['products', 'observations', 'chains', 'stores']
     });
-    assert.deepEqual(response.body.points.map((point: { observationId: string }) => point.observationId), ['obs-milk-shelf', 'obs-milk-promo']);
-    assert.equal(response.body.points[1].priceType, 'promotion');
-    assert.equal(response.body.points[1].chainSlug, 'willys');
-    assert.equal(response.body.points[1].chainName, 'Willys');
-    assert.equal(response.body.points[1].storeSlug, 'willys-hemma-stockholm-torsplan');
-    assert.equal(response.body.points[1].storeName, 'Willys Hemma Stockholm Torsplan');
-    assert.equal(response.body.points[1].price, 13.9);
-    assert.equal(response.body.points[1].regularPrice, 14.9);
-    assert.equal(response.body.points[1].provenance.rawSnapshotRef, 's3://raw/willys/milk-promo.json');
+    assert.deepEqual(response.body.points.map((point: { observationId: string }) => point.observationId), ['obs-milk-promo']);
+    assert.equal(response.body.points[0].priceType, 'promotion');
+    assert.equal(response.body.points[0].chainSlug, 'willys');
+    assert.equal(response.body.points[0].chainName, 'Willys');
+    assert.equal(response.body.points[0].storeSlug, 'willys-hemma-stockholm-torsplan');
+    assert.equal(response.body.points[0].storeName, 'Willys Hemma Stockholm Torsplan');
+    assert.equal(response.body.points[0].price, 13.9);
+    assert.equal(response.body.points[0].regularPrice, 14.9);
+    assert.equal(response.body.points[0].provenance.rawSnapshotRef, 's3://raw/willys/milk-promo.json');
     assert.equal(response.body.summary.latestPrice, 13.9);
     assert.equal('demo' in response.body, false);
 
@@ -322,6 +334,22 @@ describe('real catalog API endpoints', () => {
     assert.match(observationsQuery?.sql ?? '', /source_run_id::text = \$5/i);
     assert.match(observationsQuery?.sql ?? '', /observed_at >=/i);
     assert.match(observationsQuery?.sql ?? '', /observations\.confidence >= \$8::numeric/i);
+  });
+
+  it('returns an explicit empty price history when persisted filters match no observation rows', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/products/standardmjolk-1l/price-history?priceType=promotion&sourceRun=run-without-milk-prices&limit=25')
+      .expect(200);
+
+    assert.equal(response.body.productId, 'product-milk');
+    assert.equal(response.body.pointCount, 0);
+    assert.deepEqual(response.body.points, []);
+    assert.equal(response.body.summary, null);
+    assert.deepEqual(response.body.evidence, {
+      observationCount: 0,
+      sourceTables: ['products', 'observations', 'chains', 'stores']
+    });
+    assert.match(response.body.guardrails.join(' '), /No observations are returned/i);
   });
 
   it('serves latest product prices from persisted latest price rows', async () => {
