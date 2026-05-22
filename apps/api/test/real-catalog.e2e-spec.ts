@@ -250,6 +250,7 @@ describe('real catalog API endpoints', () => {
     assert.equal(saved.body.userId, 'user-1');
     assert.equal(saved.body.itemCount, 1);
     assert.match(database.calls.find((call) => call.sql.includes('from weekly_baskets'))?.sql ?? '', /join basket_items/i);
+    assert.match(database.calls.find((call) => call.sql.includes('from weekly_baskets'))?.sql ?? '', /order by week_start desc, id desc\s+limit 1/i);
   });
 
   it('serves product price history from persisted observation rows', async () => {
