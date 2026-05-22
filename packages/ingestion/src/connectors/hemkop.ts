@@ -106,6 +106,7 @@ type AxfoodCampaignResponse = {
 export const HEMKOP_SEARCH_BASE_URL = 'https://www.hemkop.se/search';
 export const HEMKOP_WEEKLY_DISCOUNTS_BASE_URL = 'https://www.hemkop.se/search/campaigns/offline';
 export const DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_ID = '4003';
+export const DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS = ['4003', '4127', '4190'] as const;
 
 export const DEFAULT_HEMKOP_SEARCH_QUERIES = [
   'makaroner',
@@ -204,8 +205,10 @@ export async function fetchHemkopWeeklyDiscounts(
   const fetchImpl = options.fetchImpl ?? fetch;
   const storeIds = options.storeIds && options.storeIds.length > 0
     ? options.storeIds
-    : [options.storeId ?? DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_ID];
-  const maxRows = options.maxRows ?? 300;
+    : options.storeId
+      ? [options.storeId]
+      : DEFAULT_HEMKOP_WEEKLY_DISCOUNTS_STORE_IDS;
+  const maxRows = options.maxRows ?? storeIds.length * 300;
   const pageSize = options.pageSize ?? Math.min(maxRows, 100);
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: HemkopWeeklyDiscount[] = [];

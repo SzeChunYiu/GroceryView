@@ -3,9 +3,9 @@
 // Retrieved: 2026-05-22T09:20:01.415Z
 // Row count: 150 real product rows fetched from handla.willys.se / willys.se search.
 // Weekly discount source URL pattern: https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
-// Weekly discount source URLs: https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100; https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100; https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100; https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100; https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100; https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100
-// Weekly discount retrieved: 2026-05-22T09:40:42.000Z
-// Weekly discount row count: 404 real Axfood campaign rows fetched from willys.se for store IDs 2110 and 2187.
+// Weekly discount source URLs: https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100; https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100; https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100; https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100; https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100; https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100; https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100; https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100; https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100
+// Weekly discount retrieved: 2026-05-22T10:16:45.360Z
+// Weekly discount row count: 606 real Axfood campaign rows fetched from willys.se for store IDs 2110, 2187, and 2102.
 
 export type WillysIngestedProduct = {
   code: string;
@@ -2843,9 +2843,9 @@ export const willysProducts: WillysIngestedProduct[] = [
 
 export const willysWeeklyDiscountSource = {
   source: "willys.se public Axfood campaign JSON",
-  retrievedAt: "2026-05-22T09:40:42.000Z",
-  rowCount: 404,
-  storeIds: ["2110","2187"],
+  retrievedAt: "2026-05-22T10:16:45.360Z",
+  rowCount: 606,
+  storeIds: ["2110","2187","2102"],
   sourceUrlPattern: "https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100",
   sourceUrls: [
     "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
@@ -2853,7 +2853,10 @@ export const willysWeeklyDiscountSource = {
     "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
     "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
     "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100"
+    "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
+    "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100"
   ]
 } as const;
 
@@ -2883,7 +2886,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306996",
@@ -2911,7 +2914,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500303258",
@@ -2936,7 +2939,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08000430133035_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298388",
@@ -2964,7 +2967,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301201",
@@ -2989,7 +2992,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05449000259127_C1L1_s06",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297764",
@@ -3016,7 +3019,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500308130",
@@ -3043,7 +3046,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298073",
@@ -3068,7 +3071,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298184",
@@ -3095,7 +3098,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297334",
@@ -3124,7 +3127,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298121",
@@ -3153,7 +3156,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295760",
@@ -3178,7 +3181,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310027605_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295548",
@@ -3203,7 +3206,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240060072_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298373",
@@ -3231,7 +3234,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295482",
@@ -3256,7 +3259,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311311014017_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500303335",
@@ -3283,7 +3286,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298041",
@@ -3313,7 +3316,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295432",
@@ -3338,7 +3341,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08715700422046_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295666",
@@ -3363,7 +3366,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043007271_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298253",
@@ -3391,7 +3394,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295522",
@@ -3416,7 +3419,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043014842_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298337",
@@ -3441,7 +3444,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310628005572_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295679",
@@ -3466,7 +3469,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07316110001886_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500296825",
@@ -3494,7 +3497,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298420",
@@ -3519,7 +3522,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622210697134_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298366",
@@ -3544,7 +3547,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03523230062633_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298359",
@@ -3569,7 +3572,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015498_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500279416",
@@ -3596,7 +3599,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301294",
@@ -3625,7 +3628,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301271",
@@ -3653,7 +3656,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301272",
@@ -3681,7 +3684,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298095",
@@ -3709,7 +3712,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301909",
@@ -3734,7 +3737,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340052513046_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298123",
@@ -3762,7 +3765,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298363",
@@ -3787,7 +3790,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083435645_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500300844",
@@ -3814,7 +3817,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298140",
@@ -3842,7 +3845,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298294",
@@ -3869,7 +3872,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298141",
@@ -3899,7 +3902,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298295",
@@ -3924,7 +3927,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083456701_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298145",
@@ -3949,7 +3952,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05059319023229_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295678",
@@ -3974,7 +3977,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001761_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298129",
@@ -3999,7 +4002,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447549_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298034",
@@ -4027,7 +4030,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298371",
@@ -4052,7 +4055,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451996_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298383",
@@ -4077,7 +4080,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07331217012993_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298161",
@@ -4102,7 +4105,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451439_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500293352",
@@ -4130,7 +4133,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298187",
@@ -4158,7 +4161,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500293354",
@@ -4183,7 +4186,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006274_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297576",
@@ -4208,7 +4211,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451880_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298449",
@@ -4233,7 +4236,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020829_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295519",
@@ -4258,7 +4261,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083472275_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298066",
@@ -4286,7 +4289,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295802",
@@ -4311,7 +4314,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020683_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298272",
@@ -4338,7 +4341,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298033",
@@ -4368,7 +4371,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298125",
@@ -4393,7 +4396,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/donutss-x4-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3wxMDU2NnxpbWFnZS9qcGVnfGMzbHpMVzFoYzNSbGNpOXBiV0ZuWlhNdmFHUTVMMmczT0M4eE1qZzVNemMwTVRVNE1ETXhPQzlrYjI1MWRITnpJSGcwSUZOR1RVTmZZWGhtYjI5a1h6TXdNQXw5NzllOTAyZTRiMTBlNDE5NzFlMzhlMzNlZjAzYjIwMTJmYWUyODY5MTY5YmQwY2M5YjI3YzgyZTVmMTgzMDY5",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298029",
@@ -4418,7 +4421,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08076809513739_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298035",
@@ -4446,7 +4449,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "swedish_bird"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298692",
@@ -4474,7 +4477,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298186",
@@ -4499,7 +4502,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490446_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295520",
@@ -4526,7 +4529,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298303",
@@ -4551,7 +4554,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350045596499_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298229",
@@ -4580,7 +4583,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295388",
@@ -4605,7 +4608,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471193_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297257",
@@ -4630,7 +4633,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08718951560109_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295799",
@@ -4655,7 +4658,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083486920_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297066",
@@ -4680,7 +4683,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04015400565574_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298153",
@@ -4707,7 +4710,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295542",
@@ -4732,7 +4735,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05701090068493_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297073",
@@ -4760,7 +4763,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "flame"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500302552",
@@ -4785,7 +4788,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04820218098677_C1N0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500269629",
@@ -4810,7 +4813,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489358_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298137",
@@ -4835,7 +4838,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/axfood-300-Pampers-Blo-jor-x2-SFMC.jpg?context=bWFzdGVyfGltYWdlc3w3NzgwfGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YUdOaUwyZzROeTh5TmpVeE56UTFPVEEzTlRFd01pOWhlR1p2YjJSZk16QXdYMUJoYlhCbGNuTWdRbXh2eklocWIzSWdlRElnVTBaTlF5NXFjR2N8OWU1NmEzYTc5MDgzOGJhYTdiYWYxNTcwNzI1NWI5ZDMzMjhiNzZjNzg2YTIwZGZjNWYyYTE1NTQ5MjIzMzQwMg",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297260",
@@ -4860,7 +4863,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000059092629_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298039",
@@ -4887,7 +4890,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297070",
@@ -4912,7 +4915,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089812_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298148",
@@ -4940,7 +4943,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297064",
@@ -4965,7 +4968,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531127547_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298149",
@@ -4993,7 +4996,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297161",
@@ -5018,7 +5021,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531130141_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298038",
@@ -5047,7 +5050,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298203",
@@ -5074,7 +5077,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298356",
@@ -5103,7 +5106,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306008",
@@ -5130,7 +5133,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306011",
@@ -5157,7 +5160,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306000",
@@ -5185,7 +5188,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295381",
@@ -5214,7 +5217,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500305999",
@@ -5241,7 +5244,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295518",
@@ -5268,7 +5271,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500305998",
@@ -5295,7 +5298,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306009",
@@ -5322,7 +5325,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306013",
@@ -5349,7 +5352,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306971",
@@ -5374,7 +5377,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042009658_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306012",
@@ -5401,7 +5404,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298100",
@@ -5426,7 +5429,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07317530110394_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297072",
@@ -5451,7 +5454,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04005900100115_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297190",
@@ -5476,7 +5479,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600522287339_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297123",
@@ -5501,7 +5504,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05703147053209_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297124",
@@ -5526,7 +5529,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600523183524_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301864",
@@ -5551,7 +5554,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531093965_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301133",
@@ -5576,7 +5579,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089874_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500299056",
@@ -5601,7 +5604,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/mariestads-flak-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3w2NjM3fGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YURVekwyZ3dNUzh4TWpjeE5ESTROelU1TlRVMU1DOXRZWEpwWlhOMFlXUnpJR1pzWVdzZ1UwWk5RMTloZUdadmIyUmZNekF3fDQxMTlkNmI1OGMzYmJkNDFmZWQ5NDZlZGE2M2U4OTg5NWU4YzViN2RhMjMzN2RiY2UwZjk0YmU5MWE5YzFjZWM",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295405",
@@ -5629,7 +5632,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295684",
@@ -5654,7 +5657,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07042110081848_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295551",
@@ -5679,7 +5682,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04014400901191_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295703",
@@ -5704,7 +5707,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350106844_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295397",
@@ -5733,7 +5736,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500299037",
@@ -5758,7 +5761,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310403059240_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295463",
@@ -5786,7 +5789,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295696",
@@ -5811,7 +5814,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041006597_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295892",
@@ -5836,7 +5839,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310029500_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301062",
@@ -5861,7 +5864,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310070124906_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295830",
@@ -5886,7 +5889,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03838975566606_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295700",
@@ -5914,7 +5917,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295571",
@@ -5939,7 +5942,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622300336738_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295709",
@@ -5964,7 +5967,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532150764_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297781",
@@ -5992,7 +5995,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295372",
@@ -6017,7 +6020,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04008429037894_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295812",
@@ -6042,7 +6045,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001785_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295692",
@@ -6070,7 +6073,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295841",
@@ -6095,7 +6098,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350028546992_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295614",
@@ -6120,7 +6123,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043019557_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500300934",
@@ -6145,7 +6148,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07312720021238_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295591",
@@ -6173,7 +6176,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298030",
@@ -6201,7 +6204,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "milk_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295378",
@@ -6229,7 +6232,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298348",
@@ -6254,7 +6257,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043012855_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295377",
@@ -6282,7 +6285,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298438",
@@ -6307,7 +6310,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07330416751092_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298841",
@@ -6335,7 +6338,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298380",
@@ -6363,7 +6366,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295677",
@@ -6390,7 +6393,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298062",
@@ -6415,7 +6418,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468391_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295365",
@@ -6440,7 +6443,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612700092_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500300393",
@@ -6465,7 +6468,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471650_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295524",
@@ -6493,7 +6496,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298144",
@@ -6518,7 +6521,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160004638_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295674",
@@ -6545,7 +6548,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298152",
@@ -6570,7 +6573,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068295867_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295657",
@@ -6598,7 +6601,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "corrosion"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298446",
@@ -6626,7 +6629,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295392",
@@ -6651,7 +6654,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112690569_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298023",
@@ -6676,7 +6679,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491863_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500296249",
@@ -6705,7 +6708,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298395",
@@ -6730,7 +6733,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043000517_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301061",
@@ -6755,7 +6758,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473173_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298128",
@@ -6780,7 +6783,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08001665722131_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295409",
@@ -6805,7 +6808,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473180_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298132",
@@ -6830,7 +6833,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350051214561_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295544",
@@ -6855,7 +6858,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327416239_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500304896",
@@ -6880,7 +6883,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07038010070839_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295589",
@@ -6905,7 +6908,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083475337_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500305045",
@@ -6933,7 +6936,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500292984",
@@ -6958,7 +6961,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312005458_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298017",
@@ -6986,7 +6989,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295737",
@@ -7013,7 +7016,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298278",
@@ -7038,7 +7041,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04100290056308_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295371",
@@ -7063,7 +7066,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350113940285_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301055",
@@ -7091,7 +7094,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295547",
@@ -7116,7 +7119,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031130973_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295708",
@@ -7143,7 +7146,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295385",
@@ -7168,7 +7171,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796091_C1N1_s05",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295804",
@@ -7193,7 +7196,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350116923957_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295835",
@@ -7218,7 +7221,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004270_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295531",
@@ -7248,7 +7251,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295805",
@@ -7273,7 +7276,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000396055979_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295528",
@@ -7298,7 +7301,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311441165610_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295370",
@@ -7323,7 +7326,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006946_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295369",
@@ -7348,7 +7351,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006977_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295374",
@@ -7378,7 +7381,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295670",
@@ -7408,7 +7411,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295807",
@@ -7433,7 +7436,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088005_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295975",
@@ -7458,7 +7461,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720608006656_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295768",
@@ -7486,7 +7489,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295525",
@@ -7511,7 +7514,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05010394006804_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297649",
@@ -7536,7 +7539,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04002359021022_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500294890",
@@ -7564,7 +7567,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295695",
@@ -7589,7 +7592,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154813648_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295815",
@@ -7614,7 +7617,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08723400940982_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500291111",
@@ -7642,7 +7645,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295836",
@@ -7667,7 +7670,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015856_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295834",
@@ -7692,7 +7695,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154815260_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295640",
@@ -7717,7 +7720,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310155803771_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295688",
@@ -7745,7 +7748,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295533",
@@ -7770,7 +7773,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181638701_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295527",
@@ -7798,7 +7801,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295384",
@@ -7823,7 +7826,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796084_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295187",
@@ -7848,7 +7851,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613287554376_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301321",
@@ -7873,7 +7876,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07392031803853_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295642",
@@ -7898,7 +7901,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06006507008840_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295407",
@@ -7923,7 +7926,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000073550013_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295569",
@@ -7948,7 +7951,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018851324_C1N1_s06",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301380",
@@ -7973,7 +7976,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491108_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295568",
@@ -7998,7 +8001,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018458110_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297318",
@@ -8023,7 +8026,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216596701_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295566",
@@ -8048,7 +8051,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216568944_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295567",
@@ -8073,7 +8076,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216489720_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298005",
@@ -8101,7 +8104,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298700",
@@ -8126,7 +8129,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216456876_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500310063",
@@ -8153,7 +8156,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306014",
@@ -8180,7 +8183,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306996",
@@ -8208,7 +8211,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500303258",
@@ -8233,7 +8236,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08000430133035_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298388",
@@ -8261,7 +8264,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301201",
@@ -8286,7 +8289,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05449000259127_C1L1_s06",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297764",
@@ -8313,7 +8316,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500308130",
@@ -8340,7 +8343,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298073",
@@ -8365,7 +8368,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298184",
@@ -8392,7 +8395,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297334",
@@ -8421,7 +8424,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298121",
@@ -8450,7 +8453,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295760",
@@ -8475,7 +8478,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310027605_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295548",
@@ -8500,7 +8503,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240060072_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298373",
@@ -8528,7 +8531,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295482",
@@ -8553,7 +8556,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311311014017_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500303335",
@@ -8580,7 +8583,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298041",
@@ -8610,7 +8613,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295432",
@@ -8635,7 +8638,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08715700422046_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295666",
@@ -8660,7 +8663,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043007271_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298253",
@@ -8688,7 +8691,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295522",
@@ -8713,7 +8716,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043014842_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298337",
@@ -8738,7 +8741,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310628005572_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295679",
@@ -8763,7 +8766,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07316110001886_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500296825",
@@ -8791,7 +8794,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298420",
@@ -8816,7 +8819,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622210697134_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298366",
@@ -8841,7 +8844,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03523230062633_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298359",
@@ -8866,7 +8869,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015498_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500279416",
@@ -8893,7 +8896,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301294",
@@ -8922,7 +8925,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301271",
@@ -8950,7 +8953,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301272",
@@ -8978,7 +8981,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298095",
@@ -9006,7 +9009,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301909",
@@ -9031,7 +9034,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340052513046_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298123",
@@ -9059,7 +9062,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298363",
@@ -9084,7 +9087,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083435645_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500300844",
@@ -9111,7 +9114,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298140",
@@ -9139,7 +9142,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298294",
@@ -9166,7 +9169,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298141",
@@ -9196,7 +9199,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298295",
@@ -9221,7 +9224,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083456701_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298145",
@@ -9246,7 +9249,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05059319023229_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295678",
@@ -9271,7 +9274,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001761_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298129",
@@ -9296,7 +9299,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447549_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298034",
@@ -9324,7 +9327,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298371",
@@ -9349,7 +9352,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451996_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298383",
@@ -9374,7 +9377,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07331217012993_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298161",
@@ -9399,7 +9402,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451439_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500293352",
@@ -9427,7 +9430,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298187",
@@ -9455,7 +9458,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500293354",
@@ -9480,7 +9483,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006274_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297576",
@@ -9505,7 +9508,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451880_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298449",
@@ -9530,7 +9533,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020829_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295519",
@@ -9555,7 +9558,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083472275_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298066",
@@ -9583,7 +9586,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295802",
@@ -9608,7 +9611,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020683_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298272",
@@ -9635,7 +9638,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298033",
@@ -9665,7 +9668,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298125",
@@ -9690,7 +9693,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/donutss-x4-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3wxMDU2NnxpbWFnZS9qcGVnfGMzbHpMVzFoYzNSbGNpOXBiV0ZuWlhNdmFHUTVMMmczT0M4eE1qZzVNemMwTVRVNE1ETXhPQzlrYjI1MWRITnpJSGcwSUZOR1RVTmZZWGhtYjI5a1h6TXdNQXw5NzllOTAyZTRiMTBlNDE5NzFlMzhlMzNlZjAzYjIwMTJmYWUyODY5MTY5YmQwY2M5YjI3YzgyZTVmMTgzMDY5",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298029",
@@ -9715,7 +9718,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08076809513739_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298035",
@@ -9743,7 +9746,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "swedish_bird"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298692",
@@ -9771,7 +9774,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298186",
@@ -9796,7 +9799,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490446_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295520",
@@ -9823,7 +9826,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298303",
@@ -9848,7 +9851,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350045596499_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298229",
@@ -9877,7 +9880,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295388",
@@ -9902,7 +9905,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471193_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297257",
@@ -9927,7 +9930,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08718951560109_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295799",
@@ -9952,7 +9955,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083486920_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297066",
@@ -9977,7 +9980,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04015400565574_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298153",
@@ -10004,7 +10007,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "laktosfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295542",
@@ -10029,7 +10032,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05701090068493_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297073",
@@ -10057,7 +10060,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "flame"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500302552",
@@ -10082,7 +10085,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04820218098677_C1N0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500269629",
@@ -10107,7 +10110,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489358_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298137",
@@ -10132,7 +10135,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/axfood-300-Pampers-Blo-jor-x2-SFMC.jpg?context=bWFzdGVyfGltYWdlc3w3NzgwfGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YUdOaUwyZzROeTh5TmpVeE56UTFPVEEzTlRFd01pOWhlR1p2YjJSZk16QXdYMUJoYlhCbGNuTWdRbXh2eklocWIzSWdlRElnVTBaTlF5NXFjR2N8OWU1NmEzYTc5MDgzOGJhYTdiYWYxNTcwNzI1NWI5ZDMzMjhiNzZjNzg2YTIwZGZjNWYyYTE1NTQ5MjIzMzQwMg",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297260",
@@ -10157,7 +10160,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000059092629_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298039",
@@ -10184,7 +10187,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297070",
@@ -10209,7 +10212,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089812_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298148",
@@ -10237,7 +10240,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297064",
@@ -10262,7 +10265,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531127547_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298149",
@@ -10290,7 +10293,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297161",
@@ -10315,7 +10318,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531130141_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298038",
@@ -10344,7 +10347,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298203",
@@ -10371,7 +10374,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298356",
@@ -10400,7 +10403,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306008",
@@ -10427,7 +10430,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306011",
@@ -10454,7 +10457,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306000",
@@ -10482,7 +10485,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295381",
@@ -10511,7 +10514,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500305999",
@@ -10538,7 +10541,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295518",
@@ -10565,7 +10568,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500305998",
@@ -10592,7 +10595,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306009",
@@ -10619,7 +10622,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306013",
@@ -10646,7 +10649,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306971",
@@ -10671,7 +10674,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042009658_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500306012",
@@ -10698,7 +10701,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298100",
@@ -10723,7 +10726,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07317530110394_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297072",
@@ -10748,7 +10751,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04005900100115_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297190",
@@ -10773,7 +10776,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600522287339_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297123",
@@ -10798,7 +10801,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05703147053209_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297124",
@@ -10823,7 +10826,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600523183524_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301864",
@@ -10848,7 +10851,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531093965_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301133",
@@ -10873,7 +10876,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089874_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500299056",
@@ -10898,7 +10901,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "/medias/mariestads-flak-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3w2NjM3fGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YURVekwyZ3dNUzh4TWpjeE5ESTROelU1TlRVMU1DOXRZWEpwWlhOMFlXUnpJR1pzWVdzZ1UwWk5RMTloZUdadmIyUmZNekF3fDQxMTlkNmI1OGMzYmJkNDFmZWQ5NDZlZGE2M2U4OTg5NWU4YzViN2RhMjMzN2RiY2UwZjk0YmU5MWE5YzFjZWM",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295405",
@@ -10926,7 +10929,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295684",
@@ -10951,7 +10954,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07042110081848_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295551",
@@ -10976,7 +10979,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04014400901191_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295703",
@@ -11001,7 +11004,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350106844_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295397",
@@ -11030,7 +11033,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500299037",
@@ -11055,7 +11058,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310403059240_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295463",
@@ -11083,7 +11086,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295696",
@@ -11108,7 +11111,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041006597_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295892",
@@ -11133,7 +11136,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310029500_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301062",
@@ -11158,7 +11161,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310070124906_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295830",
@@ -11183,7 +11186,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03838975566606_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295700",
@@ -11211,7 +11214,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295571",
@@ -11236,7 +11239,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622300336738_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295709",
@@ -11261,7 +11264,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532150764_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297781",
@@ -11289,7 +11292,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295372",
@@ -11314,7 +11317,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04008429037894_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295812",
@@ -11339,7 +11342,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001785_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295692",
@@ -11367,7 +11370,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295841",
@@ -11392,7 +11395,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350028546992_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295614",
@@ -11417,7 +11420,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043019557_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500300934",
@@ -11442,7 +11445,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07312720021238_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295591",
@@ -11470,7 +11473,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298030",
@@ -11498,7 +11501,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "milk_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295378",
@@ -11526,7 +11529,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298348",
@@ -11551,7 +11554,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043012855_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295377",
@@ -11579,7 +11582,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298438",
@@ -11604,7 +11607,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07330416751092_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298841",
@@ -11632,7 +11635,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298380",
@@ -11660,7 +11663,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295677",
@@ -11687,7 +11690,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298062",
@@ -11712,7 +11715,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468391_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295365",
@@ -11737,7 +11740,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612700092_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500300393",
@@ -11762,7 +11765,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471650_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295524",
@@ -11790,7 +11793,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298144",
@@ -11815,7 +11818,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160004638_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295674",
@@ -11842,7 +11845,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298152",
@@ -11867,7 +11870,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068295867_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295657",
@@ -11895,7 +11898,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "corrosion"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298446",
@@ -11923,7 +11926,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "glutenfree"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295392",
@@ -11948,7 +11951,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112690569_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298023",
@@ -11973,7 +11976,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491863_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500296249",
@@ -12002,7 +12005,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298395",
@@ -12027,7 +12030,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043000517_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301061",
@@ -12052,7 +12055,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473173_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298128",
@@ -12077,7 +12080,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08001665722131_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295409",
@@ -12102,7 +12105,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473180_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298132",
@@ -12127,7 +12130,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350051214561_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295544",
@@ -12152,7 +12155,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327416239_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500304896",
@@ -12177,7 +12180,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07038010070839_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295589",
@@ -12202,7 +12205,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083475337_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500305045",
@@ -12230,7 +12233,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500292984",
@@ -12255,7 +12258,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312005458_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298017",
@@ -12283,7 +12286,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295737",
@@ -12310,7 +12313,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298278",
@@ -12335,7 +12338,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04100290056308_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295371",
@@ -12360,7 +12363,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350113940285_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301055",
@@ -12388,7 +12391,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295547",
@@ -12413,7 +12416,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031130973_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295708",
@@ -12440,7 +12443,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295385",
@@ -12465,7 +12468,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796091_C1N1_s05",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295804",
@@ -12490,7 +12493,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350116923957_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295835",
@@ -12515,7 +12518,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004270_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295531",
@@ -12545,7 +12548,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295805",
@@ -12570,7 +12573,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000396055979_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295528",
@@ -12595,7 +12598,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311441165610_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295370",
@@ -12620,7 +12623,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006946_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295369",
@@ -12645,7 +12648,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006977_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295374",
@@ -12675,7 +12678,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295670",
@@ -12705,7 +12708,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295807",
@@ -12730,7 +12733,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088005_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295975",
@@ -12755,7 +12758,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720608006656_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295768",
@@ -12783,7 +12786,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295525",
@@ -12808,7 +12811,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05010394006804_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297649",
@@ -12833,7 +12836,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04002359021022_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500294890",
@@ -12861,7 +12864,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "frozen"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295695",
@@ -12886,7 +12889,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154813648_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295815",
@@ -12911,7 +12914,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08723400940982_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500291111",
@@ -12939,7 +12942,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295836",
@@ -12964,7 +12967,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015856_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295834",
@@ -12989,7 +12992,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154815260_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295640",
@@ -13014,7 +13017,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310155803771_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295688",
@@ -13042,7 +13045,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295533",
@@ -13067,7 +13070,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181638701_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295527",
@@ -13095,7 +13098,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295384",
@@ -13120,7 +13123,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796084_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295187",
@@ -13145,7 +13148,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613287554376_S01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301321",
@@ -13170,7 +13173,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07392031803853_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295642",
@@ -13195,7 +13198,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06006507008840_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295407",
@@ -13220,7 +13223,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000073550013_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295569",
@@ -13245,7 +13248,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018851324_C1N1_s06",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500301380",
@@ -13270,7 +13273,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491108_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295568",
@@ -13295,7 +13298,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018458110_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500297318",
@@ -13320,7 +13323,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216596701_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295566",
@@ -13345,7 +13348,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216568944_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500295567",
@@ -13370,7 +13373,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216489720_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298005",
@@ -13398,7 +13401,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500298700",
@@ -13423,7 +13426,7 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216456876_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   },
   {
     "code": "2500310063",
@@ -13450,6 +13453,5303 @@ export const willysWeeklyDiscounts: WillysIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2187&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T09:40:42.000Z"
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500306014",
+    "productCode": "100771309_ST",
+    "name": "Grön sparris 250g",
+    "brand": "",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29.9,
+    "priceText": "29,90/st",
+    "comparePriceText": "119:60 kr/kg",
+    "regularPriceText": "34.9",
+    "savePriceText": "Spara 5,00 kr",
+    "packageText": "Styck",
+    "conditionText": "",
+    "redeemLimitText": "Max 5 köp",
+    "startDate": "20/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042002680_C1N0_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500306996",
+    "productCode": "101844500_ST",
+    "name": "Lyxrosor 12-pack",
+    "brand": "Blommor",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 99,
+    "priceText": "99,00/st",
+    "comparePriceText": "",
+    "regularPriceText": "129.0",
+    "savePriceText": "",
+    "packageText": "Styck",
+    "conditionText": "",
+    "redeemLimitText": "Max 5 köp",
+    "startDate": "20/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042017233_C1N1_s01",
+    "labels": [
+      "fairtrade",
+      "fairtrade_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500303258",
+    "productCode": "100271983_ST",
+    "name": "Mozzarella",
+    "brand": "GALBANI",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20,00",
+    "comparePriceText": "80:00 kr/kg",
+    "regularPriceText": "17.9",
+    "savePriceText": "Tillfälligt parti",
+    "packageText": "125g",
+    "conditionText": "2 för",
+    "redeemLimitText": "Max 2 köp",
+    "startDate": "20/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08000430133035_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298388",
+    "productCode": "101842099_ST",
+    "name": "Hushållspapper 12-pack, toalettpapper 18-pack",
+    "brand": "FIXA",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 59.9,
+    "priceText": "59,90/st",
+    "comparePriceText": "30:69-32:88 kr/kg",
+    "regularPriceText": "109.0",
+    "savePriceText": "Spara 30,00-49,10 kr",
+    "packageText": "12-18p",
+    "conditionText": "",
+    "redeemLimitText": "Max 5 köp",
+    "startDate": "20/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043027798_C1N1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500301201",
+    "productCode": "101291227_ST",
+    "name": "Läsk 6-pack",
+    "brand": "COCA-COLA • FANTA • SPRITE",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 89,
+    "priceText": "Välj & blanda! 3 för 89,00 +pant",
+    "comparePriceText": "14:98 kr/l +pant",
+    "regularPriceText": "40.6",
+    "savePriceText": "",
+    "packageText": "6p/33cl",
+    "conditionText": "3 för",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "20/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05449000259127_C1L1_s06",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297764",
+    "productCode": "101551759_ST",
+    "name": "Crunchy fries",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35,00",
+    "comparePriceText": "23:33 kr/kg",
+    "regularPriceText": "23.56",
+    "savePriceText": "Spara 12,12 kr",
+    "packageText": "750g",
+    "conditionText": "2 för",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "20/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043009091_C1N1_s01",
+    "labels": [
+      "frozen"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500308130",
+    "productCode": "101860922_ST",
+    "name": "Kycklingbröstfilé",
+    "brand": "TOP CHOICE",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39.9,
+    "priceText": "39,90/st",
+    "comparePriceText": "49:88 kr/kg",
+    "regularPriceText": "56.68",
+    "savePriceText": "Tillfälligt parti",
+    "packageText": "800g",
+    "conditionText": "",
+    "redeemLimitText": "Max 5 köp",
+    "startDate": "20/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04770513127216_C1N1_s01",
+    "labels": [
+      "frozen"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298073",
+    "productCode": "101017249_ST",
+    "name": "Smör",
+    "brand": "SVENSKT SMÖR",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39.9,
+    "priceText": "39,90/st",
+    "comparePriceText": "79:80 kr/kg",
+    "regularPriceText": "60.9",
+    "savePriceText": "Spara 21,00 kr",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298184",
+    "productCode": "101290116_ST",
+    "name": "Klassikerlåda 18-pack",
+    "brand": "GB GLACE",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 79.9,
+    "priceText": "79,90/st",
+    "comparePriceText": "4:44 kr/st",
+    "regularPriceText": "125.0",
+    "savePriceText": "Spara 45,10 kr",
+    "packageText": "18p",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327343573_C1L1_s01",
+    "labels": [
+      "frozen"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297334",
+    "productCode": "101810246_ST",
+    "name": "Kaptenens favoriter",
+    "brand": "KAPTEN ROYAL",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49.9,
+    "priceText": "49,90/st",
+    "comparePriceText": "83:17 kr/kg",
+    "regularPriceText": "75.61",
+    "savePriceText": "Tillfälligt parti",
+    "packageText": "600g",
+    "conditionText": "",
+    "redeemLimitText": "Max 10 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350013139666_C1L1_s01",
+    "labels": [
+      "msc_fish",
+      "frozen",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298121",
+    "productCode": "101330534_ST",
+    "name": "Kallrökt lax, gravad lax",
+    "brand": "FALKENBERG",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39.9,
+    "priceText": "39,90/st",
+    "comparePriceText": "266:00 kr/kg",
+    "regularPriceText": "47.22",
+    "savePriceText": "Spara 7,32 kr",
+    "packageText": "150g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083486272_C1N1_s02",
+    "labels": [
+      "asc_fish",
+      "keyhole",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295760",
+    "productCode": "100426139_ST",
+    "name": "Grillolja",
+    "brand": "SANTA MARIA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 27.9,
+    "priceText": "27,90/st",
+    "comparePriceText": "69:75 kr/l",
+    "regularPriceText": "31.13",
+    "savePriceText": "Spara 3,23 kr",
+    "packageText": "400ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310027605_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295548",
+    "productCode": "101222172_ST",
+    "name": "Ketchup",
+    "brand": "FELIX",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 27.9,
+    "priceText": "27,90/st",
+    "comparePriceText": "27:90-28:47 kr/kg",
+    "regularPriceText": "31.13",
+    "savePriceText": "Spara 3,23-3,80 kr",
+    "packageText": "980g • 1kg",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240060072_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298373",
+    "productCode": "101276779_ST",
+    "name": "Grillkorv",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.9,
+    "priceText": "24,90/st",
+    "comparePriceText": "62:25 kr/kg",
+    "regularPriceText": "28.29",
+    "savePriceText": "Spara 3,39 kr",
+    "packageText": "400g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083465017_C1N1_s03",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295482",
+    "productCode": "101282283_ST",
+    "name": "Grillkrydda",
+    "brand": "SANTA MARIA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22.9,
+    "priceText": "22,90/st",
+    "comparePriceText": "190:83-388:14 kr/kg",
+    "regularPriceText": "26.4",
+    "savePriceText": "Spara 2,55-4,45 kr",
+    "packageText": "59-120g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311311014017_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500303335",
+    "productCode": "101578070_ST",
+    "name": "Pizzabotten 2-pack",
+    "brand": "AMA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39.9,
+    "priceText": "39,90/st",
+    "comparePriceText": "57:00 kr/kg",
+    "regularPriceText": "39.9",
+    "savePriceText": "Tillfälligt parti",
+    "packageText": "700g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350112910029_C1N0_s01",
+    "labels": [
+      "frozen"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298041",
+    "productCode": "101336701_ST",
+    "name": "Räkor med skal",
+    "brand": "ROYAL GREENLAND",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49.9,
+    "priceText": "49,90/st",
+    "comparePriceText": "99:80 kr/kg",
+    "regularPriceText": "68.04",
+    "savePriceText": "Spara 18,14 kr",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05740301187004_C1N1_s01",
+    "labels": [
+      "msc_fish",
+      "keyhole",
+      "frozen",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295432",
+    "productCode": "101406960_ST",
+    "name": "Majonnäs",
+    "brand": "HEINZ",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.9,
+    "priceText": "24,90/st",
+    "comparePriceText": "54:13 kr/kg • 62:25 kr/l",
+    "regularPriceText": "31.13",
+    "savePriceText": "Spara 3,39-6,23 kr",
+    "packageText": "460g • 400ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08715700422046_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295666",
+    "productCode": "101544279_ST",
+    "name": "Flingsalt",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 16.9,
+    "priceText": "16,90/st",
+    "comparePriceText": "99:41 kr/kg",
+    "regularPriceText": "18.83",
+    "savePriceText": "",
+    "packageText": "170g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043007271_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298253",
+    "productCode": "101677312_ST",
+    "name": "Räksallad, skagenröra",
+    "brand": "REDO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32.9,
+    "priceText": "32,90/st",
+    "comparePriceText": "82:25 kr/kg",
+    "regularPriceText": "37.76",
+    "savePriceText": "Spara 4,86 kr",
+    "packageText": "400g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015535_C1C1_s01",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295522",
+    "productCode": "101662413_ST",
+    "name": "Rostad lök",
+    "brand": "ELDORADO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 13.9,
+    "priceText": "13,90/st",
+    "comparePriceText": "92:67 kr/kg",
+    "regularPriceText": "15.99",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043014842_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298337",
+    "productCode": "101837666_ST",
+    "name": "Grillkorv",
+    "brand": "SIBYLLA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 27.9,
+    "priceText": "27,90/st",
+    "comparePriceText": "79:71-87:19 kr/kg",
+    "regularPriceText": "33.02",
+    "savePriceText": "Spara 5,12 kr",
+    "packageText": "320-350g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310628005572_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295679",
+    "productCode": "101802393_ST",
+    "name": "Bostongurka",
+    "brand": "FELIX",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29.9,
+    "priceText": "29,90/st",
+    "comparePriceText": "89:25 kr/l",
+    "regularPriceText": "33.02",
+    "savePriceText": "Spara 3,12 kr",
+    "packageText": "335ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07316110001886_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500296825",
+    "productCode": "101848503_ST",
+    "name": "Laxfilé i bitar",
+    "brand": "POSEIDON",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 59.9,
+    "priceText": "59,90/st",
+    "comparePriceText": "149:75 kr/kg",
+    "regularPriceText": "59.9",
+    "savePriceText": "Tillfälligt parti",
+    "packageText": "400g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07033352757448_C1R1_s01",
+    "labels": [
+      "keyhole",
+      "frozen"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298420",
+    "productCode": "101262509_ST",
+    "name": "Hamburgerost",
+    "brand": "SOTTILETTE",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 19.9,
+    "priceText": "19,90/st",
+    "comparePriceText": "99:50 kr/kg",
+    "regularPriceText": "24.9",
+    "savePriceText": "Spara 5,00 kr",
+    "packageText": "200g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622210697134_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298366",
+    "productCode": "101511398_ST",
+    "name": "Getost",
+    "brand": "SOIGNON",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23.9,
+    "priceText": "23,90/st",
+    "comparePriceText": "159:33-191:20 kr/kg",
+    "regularPriceText": "28.9",
+    "savePriceText": "Spara 2,50-5,00 kr",
+    "packageText": "125-150g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03523230062633_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298359",
+    "productCode": "101677308_ST",
+    "name": "Potatissallad",
+    "brand": "REDO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 21.8,
+    "priceText": "21,80/st",
+    "comparePriceText": "27:25 kr/kg",
+    "regularPriceText": "28.29",
+    "savePriceText": "",
+    "packageText": "800g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015498_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500279416",
+    "productCode": "101607949_ST",
+    "name": "Pizzapockets 2-pack",
+    "brand": "FINDUS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 45,
+    "priceText": "Välj & blanda! 2 för 45,00",
+    "comparePriceText": "90:00 kr/kg",
+    "regularPriceText": "25.45",
+    "savePriceText": "Spara 5,90 kr",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "06/04-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310500188454_C1N1_s01",
+    "labels": [
+      "frozen"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500301294",
+    "productCode": "101599328_ST",
+    "name": "Kycklingfilé",
+    "brand": "KRONFÅGEL",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 73.9,
+    "priceText": "73,90/st",
+    "comparePriceText": "123:17-134:36 kr/kg",
+    "regularPriceText": "82.24",
+    "savePriceText": "Spara 8,34 kr",
+    "packageText": "550-600g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300328530009_C1N1_s01",
+    "labels": [
+      "swedish_flag",
+      "swedish_bird",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500301271",
+    "productCode": "101548724_ST",
+    "name": "Nötspett",
+    "brand": "SCAN",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 69.9,
+    "priceText": "69,90/st",
+    "comparePriceText": "174:75 kr/kg",
+    "regularPriceText": "87.9",
+    "savePriceText": "Spara 18,00 kr",
+    "packageText": "400g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300200630001_C1N1_s02",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500301272",
+    "productCode": "101548725_ST",
+    "name": "Grillspett",
+    "brand": "SCAN",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 42.9,
+    "priceText": "42,90/st",
+    "comparePriceText": "107:25 kr/kg",
+    "regularPriceText": "46.9",
+    "savePriceText": "Spara 4,00 kr",
+    "packageText": "400g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300200730008_C1N1_s02",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298095",
+    "productCode": "101748537_ST",
+    "name": "Ribs",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 59.9,
+    "priceText": "59,90/st",
+    "comparePriceText": "121:01-134:61 kr/kg",
+    "regularPriceText": "66.15",
+    "savePriceText": "Spara 6,25 kr",
+    "packageText": "445-495g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043014798_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500301909",
+    "productCode": "101853871_ST",
+    "name": "Salsicciafärs",
+    "brand": "GUDRUNS",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34.9,
+    "priceText": "34,90/st",
+    "comparePriceText": "87:25 kr/kg",
+    "regularPriceText": "37.76",
+    "savePriceText": "",
+    "packageText": "400g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340052513046_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298123",
+    "productCode": "101736405_ST",
+    "name": "Limpan, frölimpa",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 19.9,
+    "priceText": "19,90/st",
+    "comparePriceText": "22:11-34:91 kr/kg",
+    "regularPriceText": "28.29",
+    "savePriceText": "Spara 8,39 kr",
+    "packageText": "570-900g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020201_C1L1_s02",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298363",
+    "productCode": "101224548_ST",
+    "name": "Skivad ost",
+    "brand": "ELDORADO",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34.9,
+    "priceText": "34,90/st",
+    "comparePriceText": "87:25 kr/kg",
+    "regularPriceText": "43.9",
+    "savePriceText": "Spara 9,00 kr",
+    "packageText": "400g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083435645_C1C1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500300844",
+    "productCode": "101231662_ST",
+    "name": "Ikaffe",
+    "brand": "OATLY",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "Välj & blanda! 2 för 32,00",
+    "comparePriceText": "16:00 kr/l",
+    "regularPriceText": "17.5",
+    "savePriceText": "Spara 3,00-11,34 kr",
+    "packageText": "1l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07394376616037_C1R1_s04",
+    "labels": [
+      "laktosfree"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298140",
+    "productCode": "101183319_ST",
+    "name": "Skivat smörgåspålägg",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "Välj & blanda! 2 för 30,00",
+    "comparePriceText": "125:00-187:50 kr/kg",
+    "regularPriceText": "19.77",
+    "savePriceText": "Spara 9,54 kr",
+    "packageText": "80-120g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041071748_C1N1_s03",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298294",
+    "productCode": "101232098_ST",
+    "name": "Naturell kvarg",
+    "brand": "ELDORADO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25,00",
+    "comparePriceText": "25:00 kr/kg",
+    "regularPriceText": "14.1",
+    "savePriceText": "Spara 3,20 kr",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083435539_C1L1_s03",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298141",
+    "productCode": "101262976_ST",
+    "name": "Ekologiskt skivat smörgåspålägg",
+    "brand": "GARANT EKO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.9,
+    "priceText": "24,90/st",
+    "comparePriceText": "249:00 kr/kg",
+    "regularPriceText": "29.81",
+    "savePriceText": "Spara 4,91 kr",
+    "packageText": "100g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083457999_C1N1_s02",
+    "labels": [
+      "ecological",
+      "swedish_flag",
+      "meat_from_sweden",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298295",
+    "productCode": "101263332_ST",
+    "name": "Äpplejuice",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22.9,
+    "priceText": "22,90/st",
+    "comparePriceText": "13:09 kr/l",
+    "regularPriceText": "26.4",
+    "savePriceText": "Spara 3,50 kr",
+    "packageText": "1,75l",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083456701_C1L1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298145",
+    "productCode": "101502692_ST",
+    "name": "Flingor",
+    "brand": "KELLOGG'S",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 48.9,
+    "priceText": "48,90/st",
+    "comparePriceText": "65:20-108:67 kr/kg",
+    "regularPriceText": "53.85",
+    "savePriceText": "Spara 4,95-12,52 kr",
+    "packageText": "450-750g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05059319023229_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295678",
+    "productCode": "101200489_ST",
+    "name": "Granola",
+    "brand": "PAULÚNS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33.9,
+    "priceText": "33,90/st",
+    "comparePriceText": "75:33 kr/kg",
+    "regularPriceText": "37.76",
+    "savePriceText": "",
+    "packageText": "450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001761_C1L1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298129",
+    "productCode": "101244012_ST",
+    "name": "Naturell färskost",
+    "brand": "ELDORADO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 19.9,
+    "priceText": "19,90/st",
+    "comparePriceText": "66:33 kr/kg",
+    "regularPriceText": "23.56",
+    "savePriceText": "Spara 3,66 kr",
+    "packageText": "300g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447549_C1L1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298034",
+    "productCode": "101351867_ST",
+    "name": "Bredbar leverpastej",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 9.9,
+    "priceText": "9,90/st",
+    "comparePriceText": "49:50 kr/kg",
+    "regularPriceText": "11.26",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492129_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298371",
+    "productCode": "101807036_ST",
+    "name": "Kebab",
+    "brand": "SCHYSST KÄK",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39.9,
+    "priceText": "39,90/st",
+    "comparePriceText": "145:09 kr/kg",
+    "regularPriceText": "48.73",
+    "savePriceText": "Spara 8,83-10,16 kr",
+    "packageText": "275g",
+    "conditionText": "",
+    "redeemLimitText": "Max 5 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451996_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298383",
+    "productCode": "101283553_ST",
+    "name": "Hummus",
+    "brand": "SEVAN",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22.9,
+    "priceText": "22,90/st",
+    "comparePriceText": "83:27 kr/kg",
+    "regularPriceText": "27.35",
+    "savePriceText": "Spara 4,45 kr",
+    "packageText": "275g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07331217012993_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298161",
+    "productCode": "101347751_ST",
+    "name": "Kebabsås",
+    "brand": "SCHYSST KÄK",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 19.9,
+    "priceText": "19,90/st",
+    "comparePriceText": "79:60 kr/l",
+    "regularPriceText": "25.45",
+    "savePriceText": "Spara 5,00-5,55 kr",
+    "packageText": "250ml",
+    "conditionText": "",
+    "redeemLimitText": "Max 5 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451439_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500293352",
+    "productCode": "101245990_ST",
+    "name": "Grillkol, grillbriketter",
+    "brand": "FIXA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 89,
+    "priceText": "Välj & blanda! 2 för 89,00",
+    "comparePriceText": "17:80 kr/kg",
+    "regularPriceText": "54.9",
+    "savePriceText": "Spara 20,80 kr",
+    "packageText": "2,5kg",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "20/04-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083448874_C1N1_s01",
+    "labels": [
+      "environmental_choice",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298187",
+    "productCode": "101178948_ST",
+    "name": "Naturell turkisk yoghurt",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 17.9,
+    "priceText": "17,90/st",
+    "comparePriceText": "35:80 kr/l",
+    "regularPriceText": "20.72",
+    "savePriceText": "",
+    "packageText": "5dl",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041065044_C1C1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500293354",
+    "productCode": "101540726_ST",
+    "name": "Grillpinnar",
+    "brand": "FIXA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34.9,
+    "priceText": "34,90/st",
+    "comparePriceText": "0:47 kr/st",
+    "regularPriceText": "39.9",
+    "savePriceText": "Spara 5,00 kr",
+    "packageText": "75p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "20/04-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006274_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297576",
+    "productCode": "101547447_ST",
+    "name": "Kebabrullebröd 6-pack",
+    "brand": "SCHYSST KÄK",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22.9,
+    "priceText": "22,90/st",
+    "comparePriceText": "44:90 kr/kg",
+    "regularPriceText": "25.45",
+    "savePriceText": "",
+    "packageText": "510g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451880_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298449",
+    "productCode": "101751666_ST",
+    "name": "Salladsost",
+    "brand": "ELDORADO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "Välj & blanda! 2 för 30,00",
+    "comparePriceText": "75:00 kr/kg",
+    "regularPriceText": "17.88",
+    "savePriceText": "Spara 5,76-7,66 kr",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020829_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295519",
+    "productCode": "101287452_ST",
+    "name": "La mafalda pasta",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22.9,
+    "priceText": "22,90/st",
+    "comparePriceText": "45:80 kr/kg",
+    "regularPriceText": "28.29",
+    "savePriceText": "Spara 5,39 kr",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083472275_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298066",
+    "productCode": "101344106_ST",
+    "name": "Vegokebab",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32.9,
+    "priceText": "32,90/st",
+    "comparePriceText": "119:64 kr/kg",
+    "regularPriceText": "37.76",
+    "savePriceText": "Spara 4,86 kr",
+    "packageText": "275g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490705_C1N1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295802",
+    "productCode": "101755477_ST",
+    "name": "Pane napoletano",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14.9,
+    "priceText": "14,90/st",
+    "comparePriceText": "59:60 kr/kg",
+    "regularPriceText": "18.83",
+    "savePriceText": "Spara 3,93 kr",
+    "packageText": "250g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043020683_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298272",
+    "productCode": "101825190_ST",
+    "name": "Kycklingnuggets",
+    "brand": "ELDORADO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34.9,
+    "priceText": "34,90/st",
+    "comparePriceText": "34:90 kr/kg",
+    "regularPriceText": "40.6",
+    "savePriceText": "Spara 5,70 kr",
+    "packageText": "1kg",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043021666_C1N1_s01",
+    "labels": [
+      "frozen"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298033",
+    "productCode": "101190071_ST",
+    "name": "Falukorv",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29.9,
+    "priceText": "29,90/st",
+    "comparePriceText": "37:38 kr/kg",
+    "regularPriceText": "33.97",
+    "savePriceText": "Spara 4,07 kr",
+    "packageText": "800g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041056318_C1N1_s01",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden",
+      "glutenfree",
+      "laktosfree"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298125",
+    "productCode": "101847254_ST",
+    "name": "Donut",
+    "brand": "LA LORRAINE",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "Välj & blanda! 4 för 18,00",
+    "comparePriceText": "77:59-90:00 kr/kg",
+    "regularPriceText": "11.26",
+    "savePriceText": "Spara 10,00 kr",
+    "packageText": "50-58g",
+    "conditionText": "4 för",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "/medias/donutss-x4-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3wxMDU2NnxpbWFnZS9qcGVnfGMzbHpMVzFoYzNSbGNpOXBiV0ZuWlhNdmFHUTVMMmczT0M4eE1qZzVNemMwTVRVNE1ETXhPQzlrYjI1MWRITnpJSGcwSUZOR1RVTmZZWGhtYjI5a1h6TXdNQXw5NzllOTAyZTRiMTBlNDE5NzFlMzhlMzNlZjAzYjIwMTJmYWUyODY5MTY5YmQwY2M5YjI3YzgyZTVmMTgzMDY5",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298029",
+    "productCode": "100524194_ST",
+    "name": "Pastasås",
+    "brand": "BARILLA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 16.9,
+    "priceText": "16,90/st",
+    "comparePriceText": "42:25 kr/kg",
+    "regularPriceText": "20.72",
+    "savePriceText": "Spara 3,82 kr",
+    "packageText": "400g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08076809513739_C1C1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298035",
+    "productCode": "101260149_ST",
+    "name": "Kycklingköttbullar",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.9,
+    "priceText": "24,90/st",
+    "comparePriceText": "71:14 kr/kg",
+    "regularPriceText": "28.29",
+    "savePriceText": "Spara 3,39 kr",
+    "packageText": "350g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083453892_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "swedish_bird"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298692",
+    "productCode": "101664927_ST",
+    "name": "Chokladkakor",
+    "brand": "ANTHON BERG",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 50,
+    "priceText": "Välj & blanda! 2 för 50,00",
+    "comparePriceText": "312:50 kr/kg",
+    "regularPriceText": "28.29",
+    "savePriceText": "Spara 6,58 kr",
+    "packageText": "80g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05774540137506_C1N1_s01",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298186",
+    "productCode": "101343635_ST",
+    "name": "Matgrädde",
+    "brand": "DAIRY FOOD",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18.9,
+    "priceText": "18,90/st",
+    "comparePriceText": "37:80 kr/l",
+    "regularPriceText": "21.9",
+    "savePriceText": "Spara 3,00 kr",
+    "packageText": "5dl",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490446_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295520",
+    "productCode": "101285406_ST",
+    "name": "Krossade, passerade tomater",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 16,
+    "priceText": "Välj & blanda! 2 för 16,00",
+    "comparePriceText": "20:51 kr/kg",
+    "regularPriceText": "9.36",
+    "savePriceText": "",
+    "packageText": "390g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083469602_C1L1_s03",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298303",
+    "productCode": "101719027_ST",
+    "name": "Chips",
+    "brand": "GÅRDSCHIPS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "Välj & blanda! 3 för 30,00",
+    "comparePriceText": "111:11 kr/kg",
+    "regularPriceText": "12.9",
+    "savePriceText": "Tillfälligt parti",
+    "packageText": "90g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350045596499_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298229",
+    "productCode": "101725759_ST",
+    "name": "Sprödbakad firre",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29.9,
+    "priceText": "29,90/st",
+    "comparePriceText": "83:06 kr/kg",
+    "regularPriceText": "37.76",
+    "savePriceText": "Spara 7,86 kr",
+    "packageText": "360g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043019533_C1L1_s01",
+    "labels": [
+      "msc_fish",
+      "frozen",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295388",
+    "productCode": "101286111_ST",
+    "name": "Mikropopcorn 3-pack",
+    "brand": "GARANT • GARANT EKO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "Välj & blanda! 2 för 32,00",
+    "comparePriceText": "59:26-66:67 kr/kg",
+    "regularPriceText": "18.83",
+    "savePriceText": "Spara 5,66 kr",
+    "packageText": "240-270g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471193_C1L1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297257",
+    "productCode": "101436174_ST",
+    "name": "Tandborste, tandkräm, barntandborste",
+    "brand": "COLGATE",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "Välj & blanda! 2 för 28,00",
+    "comparePriceText": "186:67-280:00kr/l • 14:00kr/st",
+    "regularPriceText": "15.9",
+    "savePriceText": "Spara 3,80-11,80 kr",
+    "packageText": "1p • 50-75ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "11/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08718951560109_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295799",
+    "productCode": "101332229_ST",
+    "name": "Pasta korta former",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22,
+    "priceText": "Välj & blanda! 2 för 22,00",
+    "comparePriceText": "22:00 kr/kg",
+    "regularPriceText": "12.2",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083486920_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297066",
+    "productCode": "101228718_ST",
+    "name": "Bindor, trosskydd",
+    "brand": "ALWAYS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 115,
+    "priceText": "Välj & blanda! 3 för 115,00",
+    "comparePriceText": "0:64-3:19 kr/st",
+    "regularPriceText": "48.9",
+    "savePriceText": "Spara 19,70-31,70 kr",
+    "packageText": "12-60p",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "11/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04015400565574_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298153",
+    "productCode": "101252611_ST",
+    "name": "Laktosfri milkshake",
+    "brand": "PROPUD",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "Välj & blanda! 2 för 32,00",
+    "comparePriceText": "48:48 kr/l",
+    "regularPriceText": "17.88",
+    "savePriceText": "Spara 3,76 kr",
+    "packageText": "330ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068291210_C1N1_s06",
+    "labels": [
+      "laktosfree"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295542",
+    "productCode": "101280167_ST",
+    "name": "Godispåsar",
+    "brand": "HARIBO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "Välj & blanda! 2 för 25,00",
+    "comparePriceText": "73:53-104:17 kr/kg",
+    "regularPriceText": "14.1",
+    "savePriceText": "Spara 3,20 kr",
+    "packageText": "120-170g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "14/06-2026",
+    "validUntil": "2026-06-14T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05701090068493_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297073",
+    "productCode": "101335525_ST",
+    "name": "Deo roll on, deospray",
+    "brand": "AXE",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29.9,
+    "priceText": "29,90/st",
+    "comparePriceText": "199:33-598:00 kr/l",
+    "regularPriceText": "37.9",
+    "savePriceText": "Spara 3,00-8,00 kr",
+    "packageText": "50-150ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "11/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181029370_C1N1_s02",
+    "labels": [
+      "danger",
+      "flame"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500302552",
+    "productCode": "101582747_ST",
+    "name": "Mariakex",
+    "brand": "KLIM",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 10,
+    "priceText": "2 för 10,00",
+    "comparePriceText": "31:25 kr/kg",
+    "regularPriceText": "5.58",
+    "savePriceText": "Tillfälligt parti",
+    "packageText": "160g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04820218098677_C1N0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500269629",
+    "productCode": "101339963_ST",
+    "name": "Flytande handtvål",
+    "brand": "MEVOLUTION",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "Välj & blanda! 3 för 28,00",
+    "comparePriceText": "31:10 kr/l",
+    "regularPriceText": "13.9",
+    "savePriceText": "Spara 13,70 kr",
+    "packageText": "300ml",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "11/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489358_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298137",
+    "productCode": "101708117_ST",
+    "name": "Blöjor",
+    "brand": "PAMPERS",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 169,
+    "priceText": "Välj & blanda! 2 för 169,00",
+    "comparePriceText": "2:01-3:25 kr/st",
+    "regularPriceText": "113.0",
+    "savePriceText": "Spara 57,00-69,00 kr",
+    "packageText": "26-42p",
+    "conditionText": "2 för",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "/medias/axfood-300-Pampers-Blo-jor-x2-SFMC.jpg?context=bWFzdGVyfGltYWdlc3w3NzgwfGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YUdOaUwyZzROeTh5TmpVeE56UTFPVEEzTlRFd01pOWhlR1p2YjJSZk16QXdYMUJoYlhCbGNuTWdRbXh2eklocWIzSWdlRElnVTBaTlF5NXFjR2N8OWU1NmEzYTc5MDgzOGJhYTdiYWYxNTcwNzI1NWI5ZDMzMjhiNzZjNzg2YTIwZGZjNWYyYTE1NTQ5MjIzMzQwMg",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297260",
+    "productCode": "101547628_ST",
+    "name": "Deo roll on",
+    "brand": "DOVE • DOVE MEN+CARE",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29.9,
+    "priceText": "29,90/st",
+    "comparePriceText": "598:00 kr/l",
+    "regularPriceText": "36.9",
+    "savePriceText": "Spara 7,00-10,00 kr",
+    "packageText": "50ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "11/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000059092629_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298039",
+    "productCode": "101194178_ST",
+    "name": "Majskorvar",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14.9,
+    "priceText": "14,90/st",
+    "comparePriceText": "165:56 kr/kg",
+    "regularPriceText": "18.83",
+    "savePriceText": "Spara 3,93 kr",
+    "packageText": "90g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083401794_C1C1_s02",
+    "labels": [
+      "glutenfree"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297070",
+    "productCode": "101597633_ST",
+    "name": "Ansiktskräm Q10",
+    "brand": "NIVEA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 69.9,
+    "priceText": "69,90/st",
+    "comparePriceText": "1398:00 kr/l",
+    "regularPriceText": "109.0",
+    "savePriceText": "",
+    "packageText": "50ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "11/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089812_C1R0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298148",
+    "productCode": "101260398_ST",
+    "name": "Fruktklämmisar",
+    "brand": "MINSTINGEN",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 75,
+    "priceText": "Välj & blanda! 10 för 75,00",
+    "comparePriceText": "83:33 kr/kg",
+    "regularPriceText": "9.36",
+    "savePriceText": "Spara 18,60 kr",
+    "packageText": "90g",
+    "conditionText": "10 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083453977_C1N1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297064",
+    "productCode": "101767522_ST",
+    "name": "Duschkräm, duschgel",
+    "brand": "BARNÄNGEN",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14.9,
+    "priceText": "14,90/st",
+    "comparePriceText": "59:60 kr/l",
+    "regularPriceText": "19.9",
+    "savePriceText": "Spara 5,00 kr",
+    "packageText": "250ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "11/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531127547_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298149",
+    "productCode": "101261712_ST",
+    "name": "Grötklämmisar",
+    "brand": "MINSTINGEN",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 60,
+    "priceText": "Välj & blanda! 6 för 60,00",
+    "comparePriceText": "83:33 kr/kg",
+    "regularPriceText": "11.26",
+    "savePriceText": "7,56",
+    "packageText": "120g",
+    "conditionText": "6 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083453953_C1N1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297161",
+    "productCode": "101823053_ST",
+    "name": "Schampo, balsam",
+    "brand": "BARNÄNGEN",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14.9,
+    "priceText": "14,90/st",
+    "comparePriceText": "59:60 kr/l",
+    "regularPriceText": "21.9",
+    "savePriceText": "Spara 7,00 kr",
+    "packageText": "250ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "11/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531130141_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298038",
+    "productCode": "101406830_ST",
+    "name": "Babytvätt",
+    "brand": "MINSTINGEN",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 40,
+    "priceText": "Välj & blanda! 2 för 40,00",
+    "comparePriceText": "80:00 kr/l",
+    "regularPriceText": "24.9",
+    "savePriceText": "Spara 9,80 kr",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083497520_C1N1_s02",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298203",
+    "productCode": "101688884_ST",
+    "name": "Barntvål",
+    "brand": "KIDS STUFF",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49.9,
+    "priceText": "49,90/st",
+    "comparePriceText": "249:50 kr/l",
+    "regularPriceText": "64.9",
+    "savePriceText": "Spara 15,00 kr",
+    "packageText": "200ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05060950963775_C1N1_s01",
+    "labels": [
+      "no_pictogram"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298356",
+    "productCode": "101843496_ST",
+    "name": "Våtservetter 120-pack",
+    "brand": "MINSTINGEN",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 19.9,
+    "priceText": "19,90/st",
+    "comparePriceText": "0:17 kr/st",
+    "regularPriceText": "23.9",
+    "savePriceText": "Spara 4,00 kr",
+    "packageText": "120p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043028061_C1N1_s01",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500306008",
+    "productCode": "101178320_ST",
+    "name": "Nektariner 500g",
+    "brand": "SPANIEN • ITALIEN • EGYPTEN",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.9,
+    "priceText": "24,90/st",
+    "comparePriceText": "59:80 kr/kg",
+    "regularPriceText": "27.9",
+    "savePriceText": "",
+    "packageText": "Styck",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042005896_C1R1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500306011",
+    "productCode": "100268130_ST",
+    "name": "Grön zucchini",
+    "brand": "SPANIEN",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 9.9,
+    "priceText": "9,90/st",
+    "comparePriceText": "27:73 kr/kg",
+    "regularPriceText": "13.9",
+    "savePriceText": "",
+    "packageText": "Styck",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042002338_C1N0_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500306000",
+    "productCode": "100297064_ST",
+    "name": "Kruksallad",
+    "brand": "SVERIGE",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 9.9,
+    "priceText": "9,90/st",
+    "comparePriceText": "49:50 kr/kg",
+    "regularPriceText": "16.9",
+    "savePriceText": "",
+    "packageText": "Styck",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042002635_C1N1_s01",
+    "labels": [
+      "swedish_flag",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295381",
+    "productCode": "100841920_ST",
+    "name": "Ekologiska bönor, linser",
+    "brand": "ZETA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "Välj & blanda! 2 för 23,00",
+    "comparePriceText": "50:00 kr/kg",
+    "regularPriceText": "13.15",
+    "savePriceText": "Spara 3,30 kr",
+    "packageText": "380/230g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350002402955_C1R1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500305999",
+    "productCode": "100816306_ST",
+    "name": "Röd spetspaprika 200g",
+    "brand": "NEDERLÄNDERNA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14.9,
+    "priceText": "14,90/st",
+    "comparePriceText": "74:50 kr/kg",
+    "regularPriceText": "19.9",
+    "savePriceText": "",
+    "packageText": "Styck",
+    "conditionText": "",
+    "redeemLimitText": "Max 5 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042001683_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295518",
+    "productCode": "101288103_ST",
+    "name": "Majskakor",
+    "brand": "FRIGGS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "Välj & blanda! 2 för 32,00",
+    "comparePriceText": "128:00 kr/kg",
+    "regularPriceText": "17.88",
+    "savePriceText": "Spara 3,76-11,34 kr",
+    "packageText": "125g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350028546411_C1N1_s03",
+    "labels": [
+      "glutenfree"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500305998",
+    "productCode": "101086165_ST",
+    "name": "Champinjoner 250g",
+    "brand": "POLEN • LITAUEN",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14.9,
+    "priceText": "14,90/st",
+    "comparePriceText": "59:60 kr/kg",
+    "regularPriceText": "16.9",
+    "savePriceText": "",
+    "packageText": "Styck",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042002079_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500306009",
+    "productCode": "101174339_ST",
+    "name": "Förkokt majs 2-pack",
+    "brand": "GARANT • INDIEN • SPANIEN",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 19.9,
+    "priceText": "19,90/st",
+    "comparePriceText": "44:22 kr/kg",
+    "regularPriceText": "22.9",
+    "savePriceText": "",
+    "packageText": "Styck",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042001461_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500306013",
+    "productCode": "101200430_ST",
+    "name": "Lime",
+    "brand": "BRASILIEN • MEXIKO • COLOMBIA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 10,
+    "priceText": "5 för 10,00",
+    "comparePriceText": "26:67 kr/kg",
+    "regularPriceText": "5.5",
+    "savePriceText": "",
+    "packageText": "Styck",
+    "conditionText": "5 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042000532_C1C0_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500306971",
+    "productCode": "101296740_ST",
+    "name": "Pioner 3-pack",
+    "brand": "Blommor",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49.9,
+    "priceText": "49,90/st",
+    "comparePriceText": "",
+    "regularPriceText": "79.9",
+    "savePriceText": "",
+    "packageText": "Styck",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042009658_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500306012",
+    "productCode": "101361485_ST",
+    "name": "Salladslök i knippe",
+    "brand": "TYSKLAND",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 9.9,
+    "priceText": "9,90/st",
+    "comparePriceText": "99:00 kr/kg",
+    "regularPriceText": "14.9",
+    "savePriceText": "",
+    "packageText": "Styck",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042011873_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298100",
+    "productCode": "101591352_ST",
+    "name": "Donut 4-pack",
+    "brand": "LA LORRAINE",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "18,00/st",
+    "comparePriceText": "80:36-90:00 kr/kg",
+    "regularPriceText": "",
+    "savePriceText": "Spara 10,39 kr",
+    "packageText": "4x50-58g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07317530110394_S01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297072",
+    "productCode": "101252957_ST",
+    "name": "Ansiktsrengöring",
+    "brand": "NIVEA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "Välj & blanda! 2 för 65,00",
+    "comparePriceText": "",
+    "regularPriceText": "41.9",
+    "savePriceText": "Spara 6,80-34,80 kr",
+    "packageText": "25p • 125-200ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "11/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04005900100115_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297190",
+    "productCode": "101199413_ST",
+    "name": "Ansiktskräm",
+    "brand": "L'ORÉAL • REVITALIFT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 79.9,
+    "priceText": "79,90/st",
+    "comparePriceText": "1598:00 kr/l",
+    "regularPriceText": "105.0",
+    "savePriceText": "spara 25,10-45,10",
+    "packageText": "50ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "11/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600522287339_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297123",
+    "productCode": "101201149_ST",
+    "name": "Hudvård",
+    "brand": "L'ORÉAL",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 54.9,
+    "priceText": "54,90/st",
+    "comparePriceText": "1098:00 kr/l",
+    "regularPriceText": "64.9",
+    "savePriceText": "",
+    "packageText": "50ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "11/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05703147053209_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297124",
+    "productCode": "101267069_ST",
+    "name": "Dag-, Nattkräm",
+    "brand": "L'ORÉAL",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 59.9,
+    "priceText": "59,90/st",
+    "comparePriceText": "1198:00 kr/l",
+    "regularPriceText": "78.9",
+    "savePriceText": "spara 19,00-22,00",
+    "packageText": "50ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "11/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03600523183524_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500301864",
+    "productCode": "101346240_ST",
+    "name": "Blonderingsspray",
+    "brand": "BLONDE",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 54.9,
+    "priceText": "54,90/st",
+    "comparePriceText": "439:20 kr/l",
+    "regularPriceText": "64.9",
+    "savePriceText": "Spara 10,00 kr",
+    "packageText": "125ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "11/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531093965_S01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500301133",
+    "productCode": "101597669_ST",
+    "name": "Ansiktskräm",
+    "brand": "NIVEA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 79.9,
+    "priceText": "79,90/st",
+    "comparePriceText": "1598:00-5326:67 kr/l",
+    "regularPriceText": "119.0",
+    "savePriceText": "",
+    "packageText": "15-50ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "11/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04006000089874_C1R0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500299056",
+    "productCode": "101348411_ST",
+    "name": "Alkoholfri öl",
+    "brand": "MARIESTADS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 179,
+    "priceText": "179,00/st",
+    "comparePriceText": "22:60 kr/l",
+    "regularPriceText": "235.65",
+    "savePriceText": "Spara 56,65 kr",
+    "packageText": "24/33pcl",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "/medias/mariestads-flak-SFMC-axfood-300?context=bWFzdGVyfGltYWdlc3w2NjM3fGltYWdlL2pwZWd8YzNsekxXMWhjM1JsY2k5cGJXRm5aWE12YURVekwyZ3dNUzh4TWpjeE5ESTROelU1TlRVMU1DOXRZWEpwWlhOMFlXUnpJR1pzWVdzZ1UwWk5RMTloZUdadmIyUmZNekF3fDQxMTlkNmI1OGMzYmJkNDFmZWQ5NDZlZGE2M2U4OTg5NWU4YzViN2RhMjMzN2RiY2UwZjk0YmU5MWE5YzFjZWM",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295405",
+    "productCode": "100976829_ST",
+    "name": "Barnmat",
+    "brand": "HIPP",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 85,
+    "priceText": "Välj & blanda! 6 för 85,00",
+    "comparePriceText": "56:68-74:58 kr/kg",
+    "regularPriceText": "19.77",
+    "savePriceText": "Spara 2,96-33,62 kr",
+    "packageText": "190-250g",
+    "conditionText": "6 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04062300122284_C1N1_s03",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295684",
+    "productCode": "100359434_ST",
+    "name": "Kattmat",
+    "brand": "GOURMET",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 69,
+    "priceText": "Välj & blanda! 10 för 69,00",
+    "comparePriceText": "81:18 kr/kg",
+    "regularPriceText": "8.5",
+    "savePriceText": "Spara 16,00-20,00 kr",
+    "packageText": "85g",
+    "conditionText": "10 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07042110081848_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295551",
+    "productCode": "100070085_ST",
+    "name": "Chokladask",
+    "brand": "MERCI",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 54.9,
+    "priceText": "54,90/st",
+    "comparePriceText": "219:60 kr/kg",
+    "regularPriceText": "62.36",
+    "savePriceText": "Spara 7,46 kr",
+    "packageText": "250g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04014400901191_C1L1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295703",
+    "productCode": "100103433_ST",
+    "name": "Godispåse",
+    "brand": "MALACO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "Välj & blanda! 2 för 30,00",
+    "comparePriceText": "71:43-88:24 kr/kg",
+    "regularPriceText": "16.94",
+    "savePriceText": "Spara 3,88 kr",
+    "packageText": "170-210g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350106844_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295397",
+    "productCode": "100132296_ST",
+    "name": "Havregryn",
+    "brand": "AXA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25,00",
+    "comparePriceText": "16:67 kr/kg",
+    "regularPriceText": "14.1",
+    "savePriceText": "Spara 3,20 kr",
+    "packageText": "750g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130321122_C1N1_s03",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500299037",
+    "productCode": "101847620_ST",
+    "name": "Kolsyrat vatten",
+    "brand": "LOKA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34.9,
+    "priceText": "34,90/st  +pant",
+    "comparePriceText": "8:81 kr/l +pant",
+    "regularPriceText": "42.49",
+    "savePriceText": "",
+    "packageText": "12p/33cl",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310403059240_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295463",
+    "productCode": "100299525_ST",
+    "name": "Flingor",
+    "brand": "NESTLÉ",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29.9,
+    "priceText": "29,90/st",
+    "comparePriceText": "79:73-92:00 kr/kg",
+    "regularPriceText": "34.92",
+    "savePriceText": "Spara 5,02-10,70 kr",
+    "packageText": "325-375g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05011476103053_C1L1_s04",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295696",
+    "productCode": "100317015_ST",
+    "name": "Fryspåse",
+    "brand": "ELDORADO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 15,
+    "priceText": "Välj & blanda! 2 för 15,00",
+    "comparePriceText": "0:19-0:30 kr/st",
+    "regularPriceText": "9.9",
+    "savePriceText": "Spara 4,80 kr",
+    "packageText": "25-40p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041006597_C1L1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295892",
+    "productCode": "100426148_ST",
+    "name": "Marinad",
+    "brand": "SANTA MARIA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 19,
+    "priceText": "Välj & blanda! 3 för 19,00",
+    "comparePriceText": "84:40-287:73 kr/kg",
+    "regularPriceText": "7.09",
+    "savePriceText": "Spara 2,27-9,08 kr",
+    "packageText": "22-75g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310029500_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500301062",
+    "productCode": "100573256_ST",
+    "name": "Läsk",
+    "brand": "PEPSI • 7UP",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22,
+    "priceText": "Välj & blanda! 2 för 22,00 +pant",
+    "comparePriceText": "22:00 kr/l +pant",
+    "regularPriceText": "12.77",
+    "savePriceText": "Spara 3,54 kr",
+    "packageText": "50cl",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310070124906_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295830",
+    "productCode": "100812435_ST",
+    "name": "Pastej",
+    "brand": "ARGETA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 45,
+    "priceText": "Välj & blanda! 4 för 45,00",
+    "comparePriceText": "118:42 kr/kg",
+    "regularPriceText": "12.77",
+    "savePriceText": "Spara 6,08 kr",
+    "packageText": "95g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03838975566606_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295700",
+    "productCode": "101232495_ST",
+    "name": "Choklad",
+    "brand": "CLOETTA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 38,
+    "priceText": "Välj & blanda! 5 för 38,00",
+    "comparePriceText": "126:67-152:00 kr/kg",
+    "regularPriceText": "8.99",
+    "savePriceText": "Spara 6,95-8,80 kr",
+    "packageText": "50-60g",
+    "conditionText": "5 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350118342_C1N1_s02",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295571",
+    "productCode": "101114973_ST",
+    "name": "Kakor",
+    "brand": "OREO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14.9,
+    "priceText": "14,90/st",
+    "comparePriceText": "94:90-96:75 kr/kg",
+    "regularPriceText": "18.83",
+    "savePriceText": "Spara 3,93 kr",
+    "packageText": "154-157g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622300336738_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295709",
+    "productCode": "101116338_ST",
+    "name": "Jordnötter",
+    "brand": "ESTRELLA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37,00",
+    "comparePriceText": "67:27 kr/kg",
+    "regularPriceText": "20.72",
+    "savePriceText": "Spara 4,44 kr",
+    "packageText": "275g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532150764_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297781",
+    "productCode": "101144851_ST",
+    "name": "Kaffe hela bönor",
+    "brand": "ARVID NORDQUIST",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 76.9,
+    "priceText": "76,90/st",
+    "comparePriceText": "153:80-170:89 kr/kg",
+    "regularPriceText": "84.9",
+    "savePriceText": "Spara 7,00-8,00 kr",
+    "packageText": "450-500g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310760040929_C1N1_s01",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295372",
+    "productCode": "101199266_ST",
+    "name": "Kattgodis",
+    "brand": "DREAMIES",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "Välj & blanda! 2 för 30,00",
+    "comparePriceText": "250:00 kr/kg",
+    "regularPriceText": "18.5",
+    "savePriceText": "Spara 7,00 kr",
+    "packageText": "40-60g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04008429037894_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295812",
+    "productCode": "101200506_ST",
+    "name": "Granola, müsli",
+    "brand": "PAULÚNS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 43.9,
+    "priceText": "43,90/st",
+    "comparePriceText": "97:56-117:07 kr/kg",
+    "regularPriceText": "48.17",
+    "savePriceText": "Spara 4,27-8,05 kr",
+    "packageText": "375-450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240001785_C1L1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295692",
+    "productCode": "101207525_ST",
+    "name": "After eight",
+    "brand": "NESTLÉ",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 79,
+    "priceText": "2 för 79,00",
+    "comparePriceText": "197:50 kr/kg",
+    "regularPriceText": "47.22",
+    "savePriceText": "Spara 15,44 kr",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000189363069_C1L1_s03",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295841",
+    "productCode": "101304330_ST",
+    "name": "Proteinbar",
+    "brand": "DALBLADS • SWEBAR",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 50,
+    "priceText": "Välj & blanda! 3 för 50,00",
+    "comparePriceText": "303:09 kr/kg",
+    "regularPriceText": "18.83",
+    "savePriceText": "Spara 6,49 kr",
+    "packageText": "55g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350028546992_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295614",
+    "productCode": "101726390_ST",
+    "name": "Fond",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.9,
+    "priceText": "24,90/st",
+    "comparePriceText": "6:23 kr/l",
+    "regularPriceText": "28.29",
+    "savePriceText": "Spara 3,39 kr",
+    "packageText": "180ml/4l",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043019557_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500300934",
+    "productCode": "100870274_ST",
+    "name": "Alkoholfri cider",
+    "brand": "HERRLJUNGA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "Välj & blanda! 2 för 26,00 +pant",
+    "comparePriceText": "13:00 kr/l +pant",
+    "regularPriceText": "14.66",
+    "savePriceText": "Spara 3,32 kr",
+    "packageText": "1l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07312720021238_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295591",
+    "productCode": "101219497_ST",
+    "name": "Servett",
+    "brand": "FIXA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 50,
+    "priceText": "Välj & blanda! 2 för 50,00",
+    "comparePriceText": "0:50 kr/st",
+    "regularPriceText": "29.9",
+    "savePriceText": "spara 9,80",
+    "packageText": "50p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083434181_C1N1_s02",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298030",
+    "productCode": "101197646_ST",
+    "name": "Yoghurtbägare",
+    "brand": "BÄRRY",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "Välj & blanda! 3 för 26,00",
+    "comparePriceText": "34:68 kr/kg",
+    "regularPriceText": "9.93",
+    "savePriceText": "Spara 3,79 kr",
+    "packageText": "250g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311443210509_C1C1_s04",
+    "labels": [
+      "swedish_flag",
+      "milk_from_sweden"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295378",
+    "productCode": "101306433_ST",
+    "name": "Sköljmedel",
+    "brand": "FIXA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.9,
+    "priceText": "24,90/st",
+    "comparePriceText": "0:50 kr/tvätt",
+    "regularPriceText": "29.9",
+    "savePriceText": "Spara 5,00 kr",
+    "packageText": "750ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083479670_C1N1_s01",
+    "labels": [
+      "environmental_choice",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298348",
+    "productCode": "101618365_ST",
+    "name": "Tapas",
+    "brand": "Olika sorter",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14.9,
+    "priceText": "14,90/st",
+    "comparePriceText": "59:60-298:00 kr/kg",
+    "regularPriceText": "18.83",
+    "savePriceText": "Spara 3,93 kr",
+    "packageText": "50-250g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043012855_C1C1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295377",
+    "productCode": "101232355_ST",
+    "name": "Toalettpapper 16-pack",
+    "brand": "FIXA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 74.9,
+    "priceText": "74,90/st",
+    "comparePriceText": "35:03 kr/kg",
+    "regularPriceText": "89.9",
+    "savePriceText": "Spara 15,00 kr",
+    "packageText": "16p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083440694_C1L1_s03",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298438",
+    "productCode": "101243233_ST",
+    "name": "Hummersoppa",
+    "brand": "FISKEXPORTEN",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 54.9,
+    "priceText": "54,90/st",
+    "comparePriceText": "122:00 kr/kg",
+    "regularPriceText": "",
+    "savePriceText": "Spara 6,52 kr",
+    "packageText": "450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07330416751092_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298841",
+    "productCode": "101241262_ST",
+    "name": "Kaffe",
+    "brand": "ZOÉGAS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 70.9,
+    "priceText": "70,90/st",
+    "comparePriceText": "157:56 kr/kg",
+    "regularPriceText": "77.9",
+    "savePriceText": "Spara 7,00-9,00 kr",
+    "packageText": "450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310731101666_C1R1_s05",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298380",
+    "productCode": "101256988_ST",
+    "name": "Vegoskivor",
+    "brand": "PÄRSONS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 19.9,
+    "priceText": "19,90/st",
+    "comparePriceText": "199:00 kr/kg",
+    "regularPriceText": "22.61",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07330797077606_C1N1_s02",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295677",
+    "productCode": "101824279_ST",
+    "name": "Energidryck",
+    "brand": "NOCCO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 15.9,
+    "priceText": "15,90/st  +pant",
+    "comparePriceText": "44:79-48:18 kr/l +pant",
+    "regularPriceText": "17.88",
+    "savePriceText": "",
+    "packageText": "33-35,5cl",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340131606232_C1N1_s02",
+    "labels": [
+      "age_restricted_15"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298062",
+    "productCode": "101277028_ST",
+    "name": "Vegobacon",
+    "brand": "ELDORADO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 17.9,
+    "priceText": "17,90/st",
+    "comparePriceText": "149:17 kr/kg",
+    "regularPriceText": "21.67",
+    "savePriceText": "",
+    "packageText": "120g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468391_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295365",
+    "productCode": "101250650_ST",
+    "name": "Tortilla 8-pack",
+    "brand": "BANDEROS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20,00",
+    "comparePriceText": "31:25 kr/kg",
+    "regularPriceText": "11.26",
+    "savePriceText": "",
+    "packageText": "320g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612700092_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500300393",
+    "productCode": "101286197_ST",
+    "name": "Pizza",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37.9,
+    "priceText": "37,90/st",
+    "comparePriceText": "94:75-98:44 kr/kg",
+    "regularPriceText": "47.22",
+    "savePriceText": "Spara 9,32 kr",
+    "packageText": "385-400g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471650_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295524",
+    "productCode": "101254294_ST",
+    "name": "Papptallrik",
+    "brand": "FIXA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34.9,
+    "priceText": "34,90/st",
+    "comparePriceText": "1:40 kr/st",
+    "regularPriceText": "39.9",
+    "savePriceText": "Spara 5,00 kr",
+    "packageText": "25p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083452208_C1N1_s03",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298144",
+    "productCode": "101291236_ST",
+    "name": "Bearnaise, Mangoraja",
+    "brand": "RYDBERGS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32.9,
+    "priceText": "32,90/st",
+    "comparePriceText": "73:11 kr/l",
+    "regularPriceText": "37.76",
+    "savePriceText": "Spara 4,86 kr",
+    "packageText": "450ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160004638_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295674",
+    "productCode": "101255116_ST",
+    "name": "Risnudlar",
+    "brand": "SANTA MARIA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 16.9,
+    "priceText": "16,90/st",
+    "comparePriceText": "93:89 kr/kg",
+    "regularPriceText": "19.77",
+    "savePriceText": "",
+    "packageText": "180g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312000545_C1L1_s01",
+    "labels": [
+      "glutenfree"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298152",
+    "productCode": "101291856_ST",
+    "name": "Fruktdryck",
+    "brand": "LOWCALY",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "Välj & blanda! 2 för 28,00",
+    "comparePriceText": "14:00 kr/l",
+    "regularPriceText": "15.99",
+    "savePriceText": "Spara 3,98 kr",
+    "packageText": "1l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068295867_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295657",
+    "productCode": "101418630_ST",
+    "name": "Toalett rengöring",
+    "brand": "WC BREF",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.9,
+    "priceText": "24,90/st",
+    "comparePriceText": "249:00 kr/kg • 12:45 kr/st",
+    "regularPriceText": "39.9",
+    "savePriceText": "Spara 7,00-15,00 kr",
+    "packageText": "2p • 100g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05201395146938_C1N1_s01",
+    "labels": [
+      "danger",
+      "corrosion"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298446",
+    "productCode": "101344022_ST",
+    "name": "Majskakor",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "Välj & blanda! 2 för 28,00",
+    "comparePriceText": "112:00 kr/kg",
+    "regularPriceText": "15.99",
+    "savePriceText": "Spara 3,98 kr",
+    "packageText": "125g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490552_C1N1_s01",
+    "labels": [
+      "crossed_ax",
+      "glutenfree"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295392",
+    "productCode": "101855885_ST",
+    "name": "Läsk 4-pack",
+    "brand": "COCA-COLA • FANTA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 59.9,
+    "priceText": "59,90/st  +pant",
+    "comparePriceText": "9:98 kr/l +pant",
+    "regularPriceText": "66.15",
+    "savePriceText": "Spara 6,25 kr",
+    "packageText": "4p/1,5L",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112690569_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298023",
+    "productCode": "101350578_ST",
+    "name": "Brie",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49.9,
+    "priceText": "49,90/st",
+    "comparePriceText": "99:80 kr/kg",
+    "regularPriceText": "56.68",
+    "savePriceText": "Spara 6,78 kr",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491863_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500296249",
+    "productCode": "101289231_ST",
+    "name": "Varmrökt lax i bit",
+    "brand": "FALKENBERG",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37.9,
+    "priceText": "37,90/st",
+    "comparePriceText": "303:20 kr/kg",
+    "regularPriceText": "44.38",
+    "savePriceText": "Spara 6,48 kr",
+    "packageText": "125g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043025817_C1N1_s01",
+    "labels": [
+      "asc_fish",
+      "keyhole",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298395",
+    "productCode": "101435582_ST",
+    "name": "Ingefära shot",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29.9,
+    "priceText": "29,90/st",
+    "comparePriceText": "59:80 kr/l",
+    "regularPriceText": "33.97",
+    "savePriceText": "Spara 4,07 kr",
+    "packageText": "500ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043000517_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500301061",
+    "productCode": "101289267_ST",
+    "name": "Plastfolie",
+    "brand": "FIXA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22.9,
+    "priceText": "22,90/st",
+    "comparePriceText": "0:29 kr/m",
+    "regularPriceText": "26.9",
+    "savePriceText": "Spara 4,00 kr",
+    "packageText": "80m",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473173_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298128",
+    "productCode": "101418679_ST",
+    "name": "Gnocchi",
+    "brand": "RANA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 27.9,
+    "priceText": "27,90/st",
+    "comparePriceText": "55:80 kr/kg",
+    "regularPriceText": "31.13",
+    "savePriceText": "Spara 3,23 kr",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08001665722131_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295409",
+    "productCode": "101289268_ST",
+    "name": "Ugn & grill folie",
+    "brand": "FIXA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.9,
+    "priceText": "24,90/st",
+    "comparePriceText": "2:49 kr/m",
+    "regularPriceText": "29.9",
+    "savePriceText": "Spara 5,00 kr",
+    "packageText": "10m",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083473180_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298132",
+    "productCode": "101499761_ST",
+    "name": "Marmelad",
+    "brand": "ENGELMANNS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34.8,
+    "priceText": "34,80/st",
+    "comparePriceText": "290:00 kr/kg",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "120g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350051214561_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295544",
+    "productCode": "101337941_ST",
+    "name": "Snackpot",
+    "brand": "KNORR",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "Välj & blanda! 2 för 25,00",
+    "comparePriceText": "198:41-208:33 kr/kg",
+    "regularPriceText": "15.04",
+    "savePriceText": "Spara 5,08 kr",
+    "packageText": "60-63g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711327416239_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500304896",
+    "productCode": "101509066_ST",
+    "name": "Rislunsj",
+    "brand": "TINE",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 15,
+    "priceText": "Välj & blanda! 2 för 15,00",
+    "comparePriceText": "50:00 kr/st • 50:00 kr/kg",
+    "regularPriceText": "11.26",
+    "savePriceText": "Tillfälligt parti",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07038010070839_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295589",
+    "productCode": "101294197_ST",
+    "name": "Värmeljus",
+    "brand": "FIXA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 44.9,
+    "priceText": "44,90/st",
+    "comparePriceText": "0:90 kr/st",
+    "regularPriceText": "49.9",
+    "savePriceText": "Spara 5,00 kr",
+    "packageText": "50p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083475337_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500305045",
+    "productCode": "101599326_ST",
+    "name": "Grillkorv, wienerkorv",
+    "brand": "ERNST",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39.9,
+    "priceText": "39,90/st",
+    "comparePriceText": "110:83-114:00 kr/kg",
+    "regularPriceText": "66.15",
+    "savePriceText": "Tillfälligt parti",
+    "packageText": "350-360g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07393287785351_C1N1_s03",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500292984",
+    "productCode": "101295567_ST",
+    "name": "Kokosmjölk",
+    "brand": "SANTA MARIA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "Välj & blanda! 2 för 30,00",
+    "comparePriceText": "60:00 kr/l",
+    "regularPriceText": "16.94",
+    "savePriceText": "Spara 3,88 kr",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311312005458_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298017",
+    "productCode": "101670633_ST",
+    "name": "Finkornig rom, caviarmix",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20.9,
+    "priceText": "20,90/st",
+    "comparePriceText": "278:67-298:57 kr/kg",
+    "regularPriceText": "27.35",
+    "savePriceText": "Spara 2,66-6,45 kr",
+    "packageText": "70-75g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015306_C1C1_s01",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295737",
+    "productCode": "101295728_ST",
+    "name": "Doftblock",
+    "brand": "GLADE",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "Välj & blanda! 2 för 25,00",
+    "comparePriceText": "83:33 kr/kg",
+    "regularPriceText": "16.5",
+    "savePriceText": "Spara 8,00 kr",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000050204649_C1N1_s02",
+    "labels": [
+      "no_pictogram"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298278",
+    "productCode": "101776413_ST",
+    "name": "Iskaffe",
+    "brand": "STARBUCKS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 15.9,
+    "priceText": "15,90/st",
+    "comparePriceText": "72:27 kr/l",
+    "regularPriceText": "18.45",
+    "savePriceText": "",
+    "packageText": "220ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04100290056308_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295371",
+    "productCode": "101334453_ST",
+    "name": "Ris quick n' easy 2 port",
+    "brand": "ZEINAS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "Välj & blanda! 2 för 30,00",
+    "comparePriceText": "60:00 kr/kg",
+    "regularPriceText": "20.34",
+    "savePriceText": "Spara 10,68-11,44 kr",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350113940285_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500301055",
+    "productCode": "101819630_ST",
+    "name": "Råggyberry",
+    "brand": "GARANT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 13.9,
+    "priceText": "13,90/st",
+    "comparePriceText": "92:67 kr/st",
+    "regularPriceText": "19.9",
+    "savePriceText": "Spara 6,00 kr",
+    "packageText": "150g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "07/06-2026",
+    "validUntil": "2026-06-07T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043025251_C1C1_s04",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295547",
+    "productCode": "101348123_ST",
+    "name": "Focacca tomat",
+    "brand": "LA LORRAINE",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22,
+    "priceText": "2 för 22,00",
+    "comparePriceText": "79:71 kr/kg",
+    "regularPriceText": "14.1",
+    "savePriceText": "Spara 6,20 kr",
+    "packageText": "138g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031130973_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295708",
+    "productCode": "101840595_ST",
+    "name": "Glass flerpack",
+    "brand": "TRIUMF GLASS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "Välj & blanda! 2 för 65,00",
+    "comparePriceText": "1:55-4:06 kr/st",
+    "regularPriceText": "37.76",
+    "savePriceText": "Spara 10,52 kr",
+    "packageText": "8p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07312060200492_C1L1_s01",
+    "labels": [
+      "frozen"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295385",
+    "productCode": "101364285_ST",
+    "name": "Pesto genovese",
+    "brand": "ZETA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23.9,
+    "priceText": "23,90/st",
+    "comparePriceText": "125:79 kr/kg",
+    "regularPriceText": "26.97",
+    "savePriceText": "Spara 3,07 kr",
+    "packageText": "190g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796091_C1N1_s05",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295804",
+    "productCode": "101501024_ST",
+    "name": "Japansk soja",
+    "brand": "TWIN DRAGON",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49.9,
+    "priceText": "49,90/st",
+    "comparePriceText": "49:90 kr/l",
+    "regularPriceText": "56.68",
+    "savePriceText": "Spara 6,78 kr",
+    "packageText": "1l",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350116923957_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295835",
+    "productCode": "101501308_ST",
+    "name": "Sopsäck med handtag",
+    "brand": "FIXA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35,00",
+    "comparePriceText": "2:19 kr/st",
+    "regularPriceText": "19.9",
+    "savePriceText": "Spara 4,80 kr",
+    "packageText": "8p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004270_C1L1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295531",
+    "productCode": "101513687_ST",
+    "name": "Flytande tvättmedel",
+    "brand": "VIA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 99,
+    "priceText": "99,00/st",
+    "comparePriceText": "1:77 kr/tvätt",
+    "regularPriceText": "113.0",
+    "savePriceText": "Spara 14,00-16,00 kr",
+    "packageText": "2,25l",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181411892_C1N1_s02",
+    "labels": [
+      "eu_flower",
+      "warning",
+      "exclamation_mark",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295805",
+    "productCode": "101544440_ST",
+    "name": "Tartlets",
+    "brand": "MCVITIES",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "Välj & blanda! 2 för 20,00",
+    "comparePriceText": "100:00 kr/kg",
+    "regularPriceText": "12.2",
+    "savePriceText": "Spara 4,40 kr",
+    "packageText": "100g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000396055979_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295528",
+    "productCode": "101545338_ST",
+    "name": "Burgercheese",
+    "brand": "KAVLI",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 31.9,
+    "priceText": "31,90/st",
+    "comparePriceText": "138:70 kr/kg",
+    "regularPriceText": "35.9",
+    "savePriceText": "Spara 4,00 kr",
+    "packageText": "230g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311441165610_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295370",
+    "productCode": "101546124_ST",
+    "name": "Flergångsglas",
+    "brand": "FIXA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34.9,
+    "priceText": "34,90/st",
+    "comparePriceText": "2:91-5:82 kr/st",
+    "regularPriceText": "39.9",
+    "savePriceText": "Spara 5,00 kr",
+    "packageText": "6-12p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006946_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295369",
+    "productCode": "101546284_ST",
+    "name": "Flergångsglas",
+    "brand": "FIXA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.9,
+    "priceText": "24,90/st",
+    "comparePriceText": "4:15 kr/st",
+    "regularPriceText": "29.9",
+    "savePriceText": "Spara 5,00 kr",
+    "packageText": "6p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006977_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295374",
+    "productCode": "101547792_ST",
+    "name": "Maskindiskmedel",
+    "brand": "YES",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 79.9,
+    "priceText": "79,90/st",
+    "comparePriceText": "1:66-2:10 kr/st",
+    "regularPriceText": "89.9",
+    "savePriceText": "Spara 10,00 kr",
+    "packageText": "38-48p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216240239_C1N1_s03",
+    "labels": [
+      "swan",
+      "danger",
+      "corrosion",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295670",
+    "productCode": "101599020_ST",
+    "name": "Handdiskmedel",
+    "brand": "YES",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 59.9,
+    "priceText": "59,90/st",
+    "comparePriceText": "47:92 kr/l",
+    "regularPriceText": "59.9",
+    "savePriceText": "Tillfälligt parti",
+    "packageText": "1250ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216497008_C1N1_s01",
+    "labels": [
+      "swan",
+      "warning",
+      "exclamation_mark",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295807",
+    "productCode": "101551167_ST",
+    "name": "Dentalsticks",
+    "brand": "SMART PETS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30,00",
+    "comparePriceText": "83:33 kr/kg",
+    "regularPriceText": "17.9",
+    "savePriceText": "Spara 5,80 kr",
+    "packageText": "180g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088005_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295975",
+    "productCode": "101584097_ST",
+    "name": "Iste",
+    "brand": "LIPTON",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "Välj & blanda! 4 för 30,00",
+    "comparePriceText": "144:23-150:00 kr/kg",
+    "regularPriceText": "8.42",
+    "savePriceText": "Spara 3,68 kr",
+    "packageText": "50-52g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720608006656_C1R1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295768",
+    "productCode": "101600207_ST",
+    "name": "Smash",
+    "brand": "SMASH!",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20,00",
+    "comparePriceText": "250:00 kr/kg",
+    "regularPriceText": "11.26",
+    "savePriceText": "",
+    "packageText": "40g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07037710020069_C1N1_s01",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295525",
+    "productCode": "101607703_ST",
+    "name": "Dentalsnacks",
+    "brand": "PEDIGREE",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 99,
+    "priceText": "99,00/st",
+    "comparePriceText": "122:22-180:00 kr/kg",
+    "regularPriceText": "115.0",
+    "savePriceText": "Spara 16,00 kr",
+    "packageText": "550-810g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05010394006804_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297649",
+    "productCode": "101608101_ST",
+    "name": "Pastasås",
+    "brand": "DOLMIO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 19.9,
+    "priceText": "19,90/st",
+    "comparePriceText": "44:22-51:03 kr/kg",
+    "regularPriceText": "23.56",
+    "savePriceText": "Tillfälligt parti",
+    "packageText": "390-450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04002359021022_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500294890",
+    "productCode": "101613193_ST",
+    "name": "Salladskyckling, strimlad bröstfilé",
+    "brand": "ELDORADO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49.9,
+    "priceText": "49,90/st",
+    "comparePriceText": "124:75 kr/kg",
+    "regularPriceText": "56.68",
+    "savePriceText": "Spara 6,78 kr",
+    "packageText": "400g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043012527_C1N1_s01",
+    "labels": [
+      "keyhole",
+      "frozen"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295695",
+    "productCode": "101620051_ST",
+    "name": "Matmix 2 portioner",
+    "brand": "MACHEAVEN",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22.9,
+    "priceText": "22,90/st",
+    "comparePriceText": "124:46 kr/kg",
+    "regularPriceText": "26.4",
+    "savePriceText": "Spara 3,50 kr",
+    "packageText": "184g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154813648_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295815",
+    "productCode": "101674975_ST",
+    "name": "Tuggummi",
+    "brand": "STIMOROL",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22,
+    "priceText": "Välj & blanda! 2 för 22,00",
+    "comparePriceText": "366:67 kr/kg",
+    "regularPriceText": "13.15",
+    "savePriceText": "Spara 4,30 kr",
+    "packageText": "30g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08723400940982_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500291111",
+    "productCode": "101676416_ST",
+    "name": "Tepåsar 17-pack",
+    "brand": "ARVID NORDQUIST",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49,
+    "priceText": "Välj & blanda! 2 för 49,00",
+    "comparePriceText": "1:44 kr/st",
+    "regularPriceText": "30.19",
+    "savePriceText": "Spara 9,48-11,38 kr",
+    "packageText": "17p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310760534282_C1R1_s01",
+    "labels": [
+      "fairtrade",
+      "fairtrade_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295836",
+    "productCode": "101676682_ST",
+    "name": "Avfallspåse",
+    "brand": "FIXA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "Välj & blanda! 2 för 35,00",
+    "comparePriceText": "0:70 kr/st",
+    "regularPriceText": "19.9",
+    "savePriceText": "Spara 4,80 kr",
+    "packageText": "25p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015856_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295834",
+    "productCode": "101677048_ST",
+    "name": "Hot sauce",
+    "brand": "VALENTINA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32.9,
+    "priceText": "32,90/st",
+    "comparePriceText": "88:92 kr/l",
+    "regularPriceText": "37.76",
+    "savePriceText": "",
+    "packageText": "370ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340154815260_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295640",
+    "productCode": "101677387_ST",
+    "name": "BBQ sås",
+    "brand": "JOHNNY'S",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.9,
+    "priceText": "24,90/st",
+    "comparePriceText": "79:05-83:00 kr/kg",
+    "regularPriceText": "28.29",
+    "savePriceText": "Spara 2,45-3,39 kr",
+    "packageText": "300-315g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310155803771_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295688",
+    "productCode": "101692574_ST",
+    "name": "Batterier 10-pack",
+    "brand": "VARTA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 89,
+    "priceText": "Välj & blanda! 2 för 89,00",
+    "comparePriceText": "4:45 kr/st",
+    "regularPriceText": "69.9",
+    "savePriceText": "Spara 50,80 kr",
+    "packageText": "10p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04008496067220_C1N1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295533",
+    "productCode": "101698357_ST",
+    "name": "Sköljmedel",
+    "brand": "COMFORT",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 59,
+    "priceText": "Välj & blanda! 2 för 59,00",
+    "comparePriceText": "0:70 kr/tvätt",
+    "regularPriceText": "36.9",
+    "savePriceText": "Spara 14,80 kr",
+    "packageText": "762ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181638701_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295527",
+    "productCode": "101708068_ST",
+    "name": "Kattmat",
+    "brand": "SHEBA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 58,
+    "priceText": "Välj & blanda! 2 för 58,00",
+    "comparePriceText": "96:67 kr/kg",
+    "regularPriceText": "32.5",
+    "savePriceText": "Spara 7,00 kr",
+    "packageText": "300g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04770608266028_C1N1_s01",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295384",
+    "productCode": "101807605_ST",
+    "name": "Spaghetti, Capellini",
+    "brand": "ZETA",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "Välj & blanda! 2 för 20,00",
+    "comparePriceText": "25:00 kr/kg",
+    "regularPriceText": "14.1",
+    "savePriceText": "Spara 8,20 kr",
+    "packageText": "400g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350027796084_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295187",
+    "productCode": "101806247_ST",
+    "name": "Nudlar",
+    "brand": "MAGGI",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22,
+    "priceText": "Välj & blanda! 2 för 22,00",
+    "comparePriceText": "46:41 kr/kg",
+    "regularPriceText": "23.56",
+    "savePriceText": "Spara 25,12 kr",
+    "packageText": "4p/59g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613287554376_S01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500301321",
+    "productCode": "101838887_ST",
+    "name": "Grillolja",
+    "brand": "JOHNNY'S",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 40,
+    "priceText": "Välj & blanda! 2 för 40,00",
+    "comparePriceText": "75:47 kr/l",
+    "regularPriceText": "22.9",
+    "savePriceText": "Spara 5,80 kr",
+    "packageText": "265ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07392031803853_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295642",
+    "productCode": "101838920_ST",
+    "name": "Grill rub",
+    "brand": "CAPE HERB & SPICE",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32.9,
+    "priceText": "32,90/st",
+    "comparePriceText": "329:00 kr/kg",
+    "regularPriceText": "45.33",
+    "savePriceText": "Spara 12,43 kr",
+    "packageText": "100g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "31/05-2026",
+    "validUntil": "2026-05-31T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06006507008840_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295407",
+    "productCode": "100481284_ST",
+    "name": "Chokladbitar",
+    "brand": "MARABOU",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "Välj & blanda! 4 för 20,00",
+    "comparePriceText": "166:67-208:33 kr/kg",
+    "regularPriceText": "5.58",
+    "savePriceText": "",
+    "packageText": "24-30g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "14/06-2026",
+    "validUntil": "2026-06-14T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000073550013_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295569",
+    "productCode": "101231660_ST",
+    "name": "Rakblad",
+    "brand": "GILLETTE",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 259,
+    "priceText": "259,00/st",
+    "comparePriceText": "32:38 kr/st",
+    "regularPriceText": "289.0",
+    "savePriceText": "Spara 30,00 kr",
+    "packageText": "8p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "14/06-2026",
+    "validUntil": "2026-06-14T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018851324_C1N1_s06",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500301380",
+    "productCode": "101345892_ST",
+    "name": "Sprayflaska",
+    "brand": "ELDORADO",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 17.9,
+    "priceText": "17,90/st",
+    "comparePriceText": "17:90 kr/st",
+    "regularPriceText": "19.9",
+    "savePriceText": "",
+    "packageText": "1p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "14/06-2026",
+    "validUntil": "2026-06-14T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083491108_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295568",
+    "productCode": "101519821_ST",
+    "name": "Rakhyvel",
+    "brand": "GILLETTE",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 99,
+    "priceText": "99,00/st",
+    "comparePriceText": "99:00 kr/st",
+    "regularPriceText": "115.0",
+    "savePriceText": "Spara 16,00 kr",
+    "packageText": "1p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "14/06-2026",
+    "validUntil": "2026-06-14T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07702018458110_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500297318",
+    "productCode": "101708116_ST",
+    "name": "Blöjor",
+    "brand": "PAMPERS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 99,
+    "priceText": "99,00/st",
+    "comparePriceText": "2:36-3:81 kr/st",
+    "regularPriceText": "113.0",
+    "savePriceText": "Spara 14,00-20,00 kr",
+    "packageText": "26-42p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "06/04-2026",
+    "endDate": "28/06-2026",
+    "validUntil": "2026-06-28T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216596701_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295566",
+    "productCode": "101692898_ST",
+    "name": "Rakhyvel",
+    "brand": "VENUS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 129,
+    "priceText": "129,00/st",
+    "comparePriceText": "129:00 kr/st",
+    "regularPriceText": "149.0",
+    "savePriceText": "Spara 20,00 kr",
+    "packageText": "1p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "14/06-2026",
+    "validUntil": "2026-06-14T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216568944_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500295567",
+    "productCode": "101692899_ST",
+    "name": "Rakhyvel",
+    "brand": "VENUS",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 119,
+    "priceText": "119,00/st",
+    "comparePriceText": "119:00 kr/st",
+    "regularPriceText": "139.0",
+    "savePriceText": "Spara 20,00 kr",
+    "packageText": "1p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "14/06-2026",
+    "validUntil": "2026-06-14T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216489720_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298005",
+    "productCode": "101742839_ST",
+    "name": "Kitkat",
+    "brand": "NESTLÉ",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14.9,
+    "priceText": "14,90/st",
+    "comparePriceText": "150:51 kr/kg",
+    "regularPriceText": "18.83",
+    "savePriceText": "Spara 3,93 kr",
+    "packageText": "99g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "14/06-2026",
+    "validUntil": "2026-06-14T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03800020491423_C1N1_s01",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500298700",
+    "productCode": "101758682_ST",
+    "name": "Eltandborste 2-pack",
+    "brand": "ORAL-B",
+    "storeId": "2102",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 169,
+    "priceText": "169,00/st",
+    "comparePriceText": "84:50 kr/st",
+    "regularPriceText": "199.0",
+    "savePriceText": "Spara 30,00 kr",
+    "packageText": "2p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "14/06-2026",
+    "validUntil": "2026-06-14T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216456876_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
+  },
+  {
+    "code": "2500310063",
+    "productCode": "100764503_ST",
+    "name": "Blåbär 125g",
+    "brand": "POLEN • PORTUGAL • SPANIEN",
+    "storeId": "2102",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 19.9,
+    "priceText": "19,90/st",
+    "comparePriceText": "159:20 kr/kg",
+    "regularPriceText": "27.9",
+    "savePriceText": "Spara 8,00 kr",
+    "packageText": "125g",
+    "conditionText": "",
+    "redeemLimitText": "Max 5 köp",
+    "startDate": "20/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042000181_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.willys.se/search/campaigns/offline?q=2102&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:16:45.360Z"
   }
 ];
