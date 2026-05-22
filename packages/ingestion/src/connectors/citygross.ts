@@ -71,6 +71,7 @@ export const CITY_GROSS_BASE_URL = 'https://www.citygross.se';
 export const CITY_GROSS_API_BASE_URL = 'https://www.citygross.se/api/v1';
 export const CITY_GROSS_STORES_PATH = 'PageData/stores';
 export const CITY_GROSS_PRODUCTS_PATH = 'Loop54/products';
+export const DEFAULT_CITY_GROSS_ROWS_PER_STORE = 48;
 
 export const DEFAULT_CITY_GROSS_PRODUCT_QUERIES = [
   'kaffe',
@@ -209,7 +210,7 @@ export async function fetchCityGrossProductsForAllStores(
         fetchImpl: options.fetchImpl,
         siteId: store.storeId,
         query,
-        maxRows: options.maxRowsPerStore ?? options.pageSize ?? 24,
+        maxRows: options.maxRowsPerStore ?? DEFAULT_CITY_GROSS_ROWS_PER_STORE,
         pageSize: options.pageSize,
         retrievedAt: options.retrievedAt,
         apiBaseUrl: options.apiBaseUrl
