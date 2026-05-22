@@ -551,6 +551,19 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces a budget lowest price anywhere radar from matched chain prices', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/compare/page.tsx');
+
+    assert.match(verified, /export const budgetLowestPriceRadar/);
+    assert.match(route, /budgetLowestPriceRadar/);
+    assert.match(route, /Lowest price anywhere radar/);
+    assert.match(route, /cheapestChain/);
+    assert.match(route, /verifiedProductSlug/);
+    assert.match(route, /priceGap/);
+    assert.doesNotMatch(route, /NoVerifiedData/);
+  });
+
   it('surfaces verified OpenPrices observation depth on the homepage', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const shell = await read('src/components/market-shell.tsx');
