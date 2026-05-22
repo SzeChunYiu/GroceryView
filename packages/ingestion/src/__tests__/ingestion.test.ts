@@ -4420,6 +4420,10 @@ describe('daily ingestion runner', () => {
     assert.equal(observation.store_id, 'store-db-2');
     assert.equal(observation.price, 45);
     assert.equal(observation.member_required, true);
+    assert.equal(observation.promotion_starts_on, '2026-05-18');
+    assert.equal(observation.promotion_ends_on, '2026-05-24');
+    assert.equal(observation.valid_from, '2026-05-18T00:00:00');
+    assert.equal(observation.valid_until, '2026-05-24T23:59:59');
   });
 
   it('materializes native City Gross all-store public product prices into daily database observations', async () => {

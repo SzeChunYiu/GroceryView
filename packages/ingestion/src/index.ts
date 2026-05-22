@@ -1731,6 +1731,8 @@ function coopWeeklyDiscountToDailyItem(row: CoopWeeklyDiscount): RetailerConnect
     regularPrice: row.ordinaryPrice > row.offerPrice ? row.ordinaryPrice : undefined,
     promoText: row.offerMechanicText || row.offerPriceText || undefined,
     memberOnly: row.medMeraRequired,
+    validFrom: row.validFrom,
+    validUntil: row.validTo,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl
   };
@@ -2076,6 +2078,8 @@ export function parseRetailerProductJsonSnapshot(snapshot: RetailerConnectorSnap
       regularPrice: optionalNumber(record, 'regularPrice', path),
       promoText: optionalString(record, 'promoText', path),
       memberOnly: optionalBoolean(record, 'memberOnly', path),
+      validFrom: optionalString(record, 'validFrom', path),
+      validUntil: optionalString(record, 'validUntil', path),
       observedAt: optionalString(record, 'observedAt', path),
       sourceUrl: optionalString(record, 'sourceUrl', path)
     };
@@ -2256,6 +2260,8 @@ export type RetailerProductInput = {
   regularPrice?: number;
   promoText?: string;
   memberOnly?: boolean;
+  validFrom?: string;
+  validUntil?: string;
   sourceUrl?: string;
 };
 
@@ -2316,6 +2322,8 @@ export type IngestedPriceObservation = {
   memberPrice?: number;
   promoType?: string;
   priceType: PriceType;
+  validFrom?: string;
+  validUntil?: string;
   sourceType: SourceType;
   sourceUrl?: string;
   parserVersion: string;
@@ -2336,6 +2344,8 @@ export type IngestedPromotionObservation = {
   promoText: string;
   memberOnly: boolean;
   priceType: PriceType;
+  validFrom?: string;
+  validUntil?: string;
   sourceType: SourceType;
   provenance: PriceProvenance;
   confidenceScore: number;
@@ -2357,6 +2367,8 @@ function validateInput(input: RetailerProductInput): void {
   if (!input.parserVersion.trim()) throw new Error('parserVersion is required.');
   if (!input.rawSnapshotRef.trim()) throw new Error('rawSnapshotRef is required.');
   if (Number.isNaN(Date.parse(input.observedAt))) throw new Error('observedAt must be an ISO date.');
+  if (input.validFrom !== undefined && Number.isNaN(Date.parse(input.validFrom))) throw new Error('validFrom must be an ISO date.');
+  if (input.validUntil !== undefined && Number.isNaN(Date.parse(input.validUntil))) throw new Error('validUntil must be an ISO date.');
   if (input.originCountry !== undefined && !/^[a-z]{2}$/i.test(input.originCountry)) throw new Error('originCountry must be an ISO-3166 alpha-2 code.');
 }
 
@@ -2479,6 +2491,8 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
       promoPrice: hasPromotion ? input.price : undefined,
       promoType: hasPromotion ? 'discount' : undefined,
       priceType,
+      validFrom: input.validFrom,
+      validUntil: input.validUntil,
       sourceType: input.sourceType,
       sourceUrl: input.sourceUrl,
       parserVersion: input.parserVersion,
@@ -2499,6 +2513,8 @@ export function ingestRetailerProduct(input: RetailerProductInput): IngestionOut
           promoText: input.promoText ?? 'Promotion observed',
           memberOnly: input.memberOnly ?? false,
           priceType,
+          validFrom: input.validFrom,
+          validUntil: input.validUntil,
           sourceType: input.sourceType,
           provenance,
           confidenceScore: confidence
@@ -3625,8 +3641,12 @@ async function persistDailyConnectorOutput(input: {
       quantity: accepted.product.packageSize,
       quantityUnit: accepted.product.packageUnit,
       promotionText: accepted.promotionObservation?.promoText,
+      promotionStartsOn: accepted.promotionObservation?.validFrom?.slice(0, 10),
+      promotionEndsOn: accepted.promotionObservation?.validUntil?.slice(0, 10),
       memberRequired: accepted.promotionObservation?.memberOnly ?? false,
       observedAt: accepted.priceObservation.observedAt,
+      validFrom: accepted.priceObservation.validFrom,
+      validUntil: accepted.priceObservation.validUntil,
       confidence: accepted.priceObservation.confidenceScore,
       provenance: rawProvenance
     });
