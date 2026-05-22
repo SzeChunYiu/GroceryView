@@ -15,14 +15,14 @@ function normalizeChainId(value) {
 export function buildCatalogCoverageTargets(rows) {
   const targetProducts = uniqueSorted(rows.products.map((row) => row.id));
   const targetCategories = uniqueSorted(rows.products.map((row) => row.category_id ?? 'uncategorized'));
-  const targetStores = uniqueSorted(rows.stores.map((row) => row.slug ?? row.external_ref ?? row.id));
+  const targetStores = uniqueSorted(rows.stores.map((row) => row.external_ref));
   const observedChains = uniqueSorted(rows.chains.map((row) => normalizeChainId(row.id)));
   const missingRequiredChains = requiredDailyChainIds.filter((chainId) => !observedChains.includes(chainId));
   if (missingRequiredChains.length > 0) {
     throw new Error(`Catalog target DB is missing required chains: ${missingRequiredChains.join(', ')}`);
   }
   if (targetProducts.length === 0) throw new Error('Catalog target DB has no products. Run ingestion before exporting coverage targets.');
-  if (targetStores.length === 0) throw new Error('Catalog target DB has no stores. Run store ingestion/seed before exporting coverage targets.');
+  if (targetStores.length === 0) throw new Error('Catalog target DB has no connector-addressable stores with external_ref. Run daily store ingestion before exporting coverage targets.');
   return {
     targetProducts,
     targetCategories,
@@ -46,13 +46,27 @@ async function readCatalogRows(databaseUrl) {
 }
 
 async function main() {
-  if (process.argv.includes('--self-test') || process.argv.includes('--self-test-hyphenated-chain-slugs')) {
+  if (
+    process.argv.includes('--self-test') ||
+    process.argv.includes('--self-test-hyphenated-chain-slugs') ||
+    process.argv.includes('--self-test-store-external-refs')
+  ) {
     const chainIds = process.argv.includes('--self-test-hyphenated-chain-slugs')
       ? requiredDailyChainIds.map((id) => id.replace(/_/g, '-'))
       : requiredDailyChainIds;
+    const stores = process.argv.includes('--self-test-store-external-refs')
+      ? [
+          { id: 'seed-coop-odenplan', slug: 'coop-odenplan', external_ref: null },
+          { id: 'daily-coop-kirseberg', slug: '216502', external_ref: '216502' },
+          { id: 'daily-ica-kungsholmen', slug: '1004599', external_ref: '1004599' }
+        ]
+      : [
+          { id: 'daily-willys-odenplan', slug: 'willys-odenplan', external_ref: 'willys-odenplan' },
+          { id: 'daily-coop-odenplan', slug: 'coop-odenplan', external_ref: 'coop-odenplan' }
+        ];
     const targets = buildCatalogCoverageTargets({
       products: [{ id: 'coffee', category_id: 'coffee' }, { id: 'milk', category_id: 'dairy' }],
-      stores: [{ id: 'willys-odenplan' }, { id: 'coop-odenplan' }],
+      stores,
       chains: chainIds.map((id) => ({ id }))
     });
     process.stdout.write(`${JSON.stringify(targets)}\n`);

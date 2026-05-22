@@ -2956,9 +2956,14 @@ export function createPostgresCatalogReader(executor: QueryExecutor): PostgresCa
         `select products.id as product_id,
                 coalesce(products.category_path[1], 'uncategorized') as category_id,
                 coalesce(array_agg(distinct latest_prices.chain_id) filter (where latest_prices.chain_id is not null), '{}') as observed_chain_ids,
-                coalesce(array_agg(distinct latest_prices.store_id) filter (where latest_prices.store_id is not null), '{}') as observed_store_ids
+                coalesce(
+                  array_agg(distinct coalesce(stores.external_ref, stores.slug, latest_prices.store_id::text))
+                    filter (where latest_prices.store_id is not null),
+                  '{}'
+                ) as observed_store_ids
          from products
          left join latest_prices on latest_prices.product_id = products.id
+         left join stores on stores.id = latest_prices.store_id
          group by products.id, products.category_path
          order by products.id
          limit $1`,
