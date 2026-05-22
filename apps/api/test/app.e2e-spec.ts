@@ -129,7 +129,7 @@ class RecordingPriceHistoryExecutor {
         chain_slug: 'willys'
       }] as T[];
     }
-    if (sql.includes('from latest_prices') && sql.includes('latest_prices.price_type')) {
+    if (sql.includes('from latest_prices') && sql.includes('latest_prices.price_type') && !sql.includes('current_unit_price')) {
       return [
         {
           product_slug: 'coffee',
@@ -148,6 +148,89 @@ class RecordingPriceHistoryExecutor {
           price: '54.90',
           price_type: 'promotion',
           confidence: '0.8800'
+        }
+      ] as T[];
+    }
+    if (sql.includes('latest_prices.unit_price as current_unit_price') && !sql.includes('base_prices')) {
+      return [
+        {
+          product_id: 'product-coffee',
+          product_slug: 'bryggkaffe-450g',
+          product_name: 'Bryggkaffe mellanrost 450 g',
+          category_path: ['coffee'],
+          chain_slug: 'willys',
+          current_unit_price: '110.89',
+          current_observed_at: '2026-05-21T09:00:00.000Z'
+        },
+        {
+          product_id: 'product-coffee',
+          product_slug: 'bryggkaffe-450g',
+          product_name: 'Bryggkaffe mellanrost 450 g',
+          category_path: ['coffee'],
+          chain_slug: 'coop',
+          current_unit_price: '133.11',
+          current_observed_at: '2026-05-21T08:00:00.000Z'
+        },
+        {
+          product_id: 'product-milk',
+          product_slug: 'standardmjolk-1l',
+          product_name: 'Standardmjolk 3% 1 l',
+          category_path: ['dairy'],
+          chain_slug: 'lidl',
+          current_unit_price: '13.90',
+          current_observed_at: '2026-05-21T09:00:00.000Z'
+        },
+        {
+          product_id: 'product-private-label-milk',
+          product_slug: 'garant-mjolk-1l',
+          product_name: 'Garant Milk 1 l',
+          category_path: ['dairy'],
+          chain_slug: 'willys',
+          current_unit_price: '12.90',
+          current_observed_at: '2026-05-21T10:00:00.000Z'
+        }
+      ] as T[];
+    }
+    if (sql.includes('with current_prices as') && sql.includes('base_prices as')) {
+      return [
+        {
+          product_id: 'product-coffee',
+          product_slug: 'bryggkaffe-450g',
+          product_name: 'Bryggkaffe mellanrost 450 g',
+          brand: 'Zoegas',
+          private_label_owner: null,
+          category_path: ['coffee'],
+          chain_slug: 'willys',
+          current_unit_price: '110.89',
+          current_observed_at: '2026-05-21T09:00:00.000Z',
+          base_unit_price: '133.11',
+          base_observed_at: '2026-05-01T09:00:00.000Z'
+        },
+        {
+          product_id: 'product-milk',
+          product_slug: 'standardmjolk-1l',
+          product_name: 'Standardmjolk 3% 1 l',
+          brand: 'Arla',
+          private_label_owner: null,
+          category_path: ['dairy'],
+          chain_slug: 'lidl',
+          current_unit_price: '13.90',
+          current_observed_at: '2026-05-21T09:00:00.000Z',
+          base_unit_price: '16.90',
+          base_observed_at: '2026-05-01T09:00:00.000Z'
+        },
+        {
+          product_id: 'product-private-label-milk',
+          product_slug: 'garant-mjolk-1l',
+          product_name: 'Garant Milk 1 l',
+          brand: 'Garant',
+          private_label_owner: 'Axfood',
+          category_path: ['dairy'],
+          chain_slug: 'willys',
+          current_unit_price: '12.90',
+          current_observed_at: '2026-05-21T10:00:00.000Z',
+          base_unit_price: '19.90',
+          base_observed_at: '2026-05-02T09:00:00.000Z'
         }
       ] as T[];
     }
@@ -495,17 +578,23 @@ describe('GroceryView API app', () => {
     assert.equal(index.body.demo, true);
 
     const chainIndices = await request(app.getHttpServer()).get('/indices/chains').expect(200);
-    assert.equal(chainIndices.body.generatedFrom, 8);
+    assert.equal(chainIndices.body.generatedFrom, 4);
     assert.equal(chainIndices.body.chains[0].chainId, 'willys');
-    assert.equal(chainIndices.body.demo, true);
+    assert.equal(chainIndices.body.demo, undefined);
+    assert.match(chainIndices.body.guardrails[0], /persisted latest_prices/i);
+    assert.equal(priceHistoryExecutor.calls.some((call) => /from latest_prices/i.test(call.sql) && /join products/i.test(call.sql)), true);
 
     const categoryIndices = await request(app.getHttpServer()).get('/indices/categories').expect(200);
-    assert.deepEqual(categoryIndices.body.indices.map((row: { category: string }) => row.category), ['coffee', 'dairy']);
-    assert.equal(categoryIndices.body.demo, true);
+    assert.deepEqual(categoryIndices.body.indices.map((row: { category: string }) => row.category), ['dairy', 'coffee']);
+    assert.equal(categoryIndices.body.indices[0].value, 72.83);
+    assert.equal(categoryIndices.body.demo, undefined);
+    assert.match(categoryIndices.body.guardrails[0], /earliest persisted observations/i);
+    assert.equal(priceHistoryExecutor.calls.some((call) => /base_prices as/i.test(call.sql) && /from observations/i.test(call.sql)), true);
 
     const brandIndices = await request(app.getHttpServer()).get('/indices/brands').expect(200);
-    assert.deepEqual(brandIndices.body.indices.map((row: { brandTier: string }) => row.brandTier), ['national', 'standard_private_label']);
-    assert.equal(brandIndices.body.demo, true);
+    assert.deepEqual(brandIndices.body.indices.map((row: { brandTier: string }) => row.brandTier), ['standard_private_label', 'national']);
+    assert.equal(brandIndices.body.privateLabelSavingsPercent, 7.19);
+    assert.equal(brandIndices.body.demo, undefined);
 
     const products = await request(app.getHttpServer()).get('/products?q=coffee').expect(200);
     assert.equal(products.body[0].id, 'coffee');
