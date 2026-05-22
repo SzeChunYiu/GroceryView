@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, MetricGrid, PageShell, SourceCoverage, TopSpreads } from './data-ui';
+import { ProductPriceCards } from './product-price-cards';
 import { mapChainIndexScores } from '@/lib/map-chain-index';
 import {
   chainSavingsLedger,
@@ -10,10 +11,10 @@ import {
   formatPct,
   formatSek,
   freshestOpenPrices,
+  homepageAdaptiveProductCards,
   openPriceObservationDepth,
   priceDropMoversBoard,
   privateFeatureCopy,
-  productUniverse,
   snapshot,
   sourceClaimLedger,
   sourceCoverage,
@@ -24,7 +25,6 @@ import {
 } from '@/lib/verified-data';
 
 const featureReadinessQueue = Object.entries(privateFeatureCopy).slice(0, 6);
-const productUniverseRail = productUniverse.slice(0, 6);
 const homepageClaimLedger = sourceClaimLedger.slice(0, 3);
 const homepageSourceReadiness = sourceReadinessMatrix.slice(0, 3);
 const homepageChainSavings = chainSavingsLedger.slice(0, 2);
@@ -135,29 +135,13 @@ export function MarketShell() {
             Chain spread rows and OpenPrices observations are shown together, with every card linking to a verified product page.
           </p>
         </div>
-        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {productUniverseRail.map((product) => {
-            const brand = 'brands' in product ? product.brands : product.brand;
-            const priceSignal =
-              'priceMedian' in product
-                ? `Median ${formatSek(product.priceMedian)} · ${product.observationCount.toLocaleString('sv-SE')} observations`
-                : `${product.lowestChain} lowest · ${formatPct(product.spreadPct)} spread`;
-            const sourceSignal =
-              'lastObservedAt' in product ? `OpenPrices ${product.lastObservedAt}` : 'Willys/Hemkop chain match';
-
-            return (
-              <Link
-                className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
-                href={`/products/${product.slug}`}
-                key={product.slug}
-              >
-                <p className="font-black text-slate-950">{product.name}</p>
-                <p className="mt-1 text-sm text-slate-600">{brand || 'Brand not reported'}</p>
-                <p className="mt-3 font-black text-emerald-800">{priceSignal}</p>
-                <p className="mt-2 text-sm font-semibold text-slate-600">{sourceSignal}</p>
-              </Link>
-            );
-          })}
+        <div className="mt-5">
+          <ProductPriceCards
+            cards={homepageAdaptiveProductCards}
+            eyebrow="Product-card display"
+            title="Homepage cards show pack price and jämförpris"
+            intro="The homepage now uses the same adaptive total/per-unit card model as the product catalogue, with no hidden actual price."
+          />
         </div>
       </Card>
 

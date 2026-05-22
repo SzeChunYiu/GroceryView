@@ -464,8 +464,8 @@ describe('verified-data UI', () => {
     assert.match(shell, /zero placeholder rows/);
     assert.match(shell, /Data provenance|SourceCoverage/);
     assert.match(shell, /Verified product universe/);
-    assert.match(shell, /productUniverseRail\.map/);
-    assert.match(shell, /\/products\/\$\{product\.slug\}/);
+    assert.match(shell, /ProductPriceCards/);
+    assert.match(shell, /homepageAdaptiveProductCards/);
     assert.match(shell, /Freshness board/);
     assert.match(shell, /sourceCoverage\.map/);
     assert.match(shell, /Claim boundaries/);
@@ -735,6 +735,27 @@ describe('verified-data UI', () => {
     assert.match(products, /OpenFoodFacts metadata catalog/);
     assert.match(products, /metadata-only/);
     assert.match(products, /No synthetic prices/);
+  });
+
+  it('surfaces adaptive total and unit price product cards with a compare-mode toggle', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const products = await read('src/app/products/page.tsx');
+    const shell = await read('src/components/market-shell.tsx');
+    const cards = await read('src/components/product-price-cards.tsx');
+
+    assert.match(verified, /export const adaptiveProductCards/);
+    assert.match(verified, /normalizeComparableUnitPrice/);
+    assert.match(verified, /cheapestUnitBadge/);
+    assert.match(products, /ProductPriceCards/);
+    assert.match(products, /adaptiveProductCards/);
+    assert.match(shell, /ProductPriceCards/);
+    assert.match(shell, /homepageAdaptiveProductCards/);
+    assert.match(cards, /Compare by:/);
+    assert.match(cards, /localStorage/);
+    assert.match(cards, /unitSortPrice/);
+    assert.match(cards, /totalSortPrice/);
+    assert.match(cards, /cheapest-per-unit/);
+    assert.match(cards, /No synthetic unit prices/);
   });
 
   it('surfaces verified source coverage on the data sources route', async () => {
