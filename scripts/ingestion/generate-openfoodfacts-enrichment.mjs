@@ -11,6 +11,7 @@ const WEB_OUTPUT = new URL('apps/web/src/lib/ingested/openfoodfacts.ts', REPO_RO
 const EVIDENCE_OUTPUT = new URL('docs/ingestion/openfoodfacts-evidence.md', REPO_ROOT);
 
 const CANDIDATE_SOURCES = [
+  { chain: 'citygross', file: 'citygross.ts', exportName: 'cityGrossProducts', surface: 'products', barcodeFrom: 'gtin' },
   { chain: 'willys', file: 'willys.ts', exportName: 'willysProducts', surface: 'products', barcodeFrom: 'imageUrl' },
   { chain: 'willys', file: 'willys.ts', exportName: 'willysWeeklyDiscounts', surface: 'weeklyDiscounts', barcodeFrom: 'imageUrl' },
   { chain: 'hemkop', file: 'hemkop.ts', exportName: 'hemkopProducts', surface: 'products', barcodeFrom: 'imageUrl' },
@@ -176,6 +177,9 @@ function addCandidate(barcode, candidate) {
 }
 
 function barcodesForRow(row, barcodeFrom) {
+  if (barcodeFrom === 'gtin') {
+    return barcodeList(row.gtin);
+  }
   if (barcodeFrom === 'ean') {
     return barcodeList(row.ean);
   }
@@ -320,7 +324,7 @@ async function writeOpenFoodFactsWebFile(enrichmentRows, stats, summary) {
     `// Retrieved: ${retrievedAt}`,
     `// Row count: ${summary.rowCount} real barcode+nutrition enrichment rows matched to existing ingested retailer products.`,
     `// Retailer match count: ${summary.retailerMatchCount} current ingested retailer rows linked by real barcode.`,
-    `// Candidate barcode count checked from current Willys/Hemkop/Coop/ICA ingested rows: ${summary.candidateBarcodeCount}.`,
+    `// Candidate barcode count checked from current City Gross/Willys/Hemkop/Coop/ICA ingested rows: ${summary.candidateBarcodeCount}.`,
     `// Candidate source surfaces: ${stats.map((stat) => `${stat.chain}/${stat.surface} ${stat.uniqueBarcodeCount}`).join('; ')}.`,
     `// Export rows scanned: ${summary.scannedExportRowCount}; candidate barcodes present in export: ${summary.matchedExportBarcodeCount}; matched rows without usable nutrition/name: ${summary.matchedWithoutNutritionCount}.`,
     '// No-match or nutrition-empty products were skipped.',
@@ -341,7 +345,7 @@ async function writeOpenFoodFactsWebFile(enrichmentRows, stats, summary) {
 };
 
 export type OpenFoodFactsRetailerMatch = {
-  chain: 'willys' | 'hemkop' | 'coop' | 'ica';
+  chain: 'citygross' | 'willys' | 'hemkop' | 'coop' | 'ica';
   productCode: string;
   name: string;
   brand: string;
@@ -392,7 +396,7 @@ async function writeEvidenceFile(enrichmentRows, stats, summary, samples) {
 - Source: official OpenFoodFacts world data export
 - Source URL: ${OPENFOODFACTS_EXPORT_URL}
 - Retrieved: ${retrievedAt}
-- Candidate barcode count checked from current Willys/Hemkop/Coop/ICA ingested rows: ${summary.candidateBarcodeCount}
+- Candidate barcode count checked from current City Gross/Willys/Hemkop/Coop/ICA ingested rows: ${summary.candidateBarcodeCount}
 - Candidate source surfaces: ${stats.map((stat) => `${stat.chain}/${stat.surface} ${stat.uniqueBarcodeCount} unique barcodes from ${stat.usableCandidateRowCount}/${stat.rowCount} rows`).join('; ')}
 - Export rows scanned: ${summary.scannedExportRowCount}
 - Candidate barcodes present in export: ${summary.matchedExportBarcodeCount}
@@ -404,7 +408,7 @@ async function writeEvidenceFile(enrichmentRows, stats, summary, samples) {
 - Generator: scripts/ingestion/generate-openfoodfacts-enrichment.mjs
 - Web wire: apps/web/src/lib/ingested/openfoodfacts.ts
 
-The official OpenFoodFacts export URL under \`world.openfoodfacts.org/data\` streamed successfully, so this iteration uses that public export. Candidate barcodes came only from current ingested rows with a real barcode-bearing field or URL: Coop \`ean\` fields, ICA reklamblad \`eans\`, and barcode-like public image URL filenames from Willys, Hemkop, and ICA store promotions. Mathem, Matspar, and Matpriskollen wired rows were inspected but skipped because they do not expose barcode fields in the ingested artifacts. No-match and nutrition-empty products were skipped. Every emitted row includes its exact export source marker in \`sourceUrl\`, a product URL, and the retailer rows it matched by barcode.
+The official OpenFoodFacts export URL under \`world.openfoodfacts.org/data\` streamed successfully, so this iteration uses that public export. Candidate barcodes came only from current ingested rows with a real barcode-bearing field or URL: City Gross \`gtin\` fields, Coop \`ean\` fields, ICA reklamblad \`eans\`, and barcode-like public image URL filenames from Willys, Hemkop, and ICA store promotions. Lidl, Mathem, Matspar, and Matpriskollen wired rows were inspected but skipped because they do not expose barcode fields in the ingested artifacts. No-match and nutrition-empty products were skipped. Every emitted row includes its exact export source marker in \`sourceUrl\`, a product URL, and the retailer rows it matched by barcode.
 
 ## Verification
 
