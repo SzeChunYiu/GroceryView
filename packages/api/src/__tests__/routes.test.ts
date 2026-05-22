@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   assertPriceObservationDto,
   buildFacetedProductSearch,
+  buildFlyerOfferReport,
   buildProductPriceHistoryReport,
   buildRealBasketComparison,
   createGroceryViewApi,
@@ -403,6 +404,46 @@ describe('createGroceryViewApi', () => {
     assert.equal(storeReport.bestOffer?.productId, 'milk');
     assert.equal(storeReport.totalOneEachSavings, 3);
     assert.throws(() => api.getStoreFlyerOffers('missing-store'), /Unknown storeId/);
+  });
+
+  it('builds flyer offers from persisted promotion observations', () => {
+    const report = buildFlyerOfferReport({
+      asOf: '2026-05-20T12:00:00.000Z',
+      filters: { storeId: 'willys-odenplan' },
+      observations: [{
+        observationId: 'obs-promo-coffee',
+        sourceRunId: 'run-weekly-leaflet',
+        rawRecordId: 'raw-weekly-leaflet',
+        priceType: 'promotion',
+        price: 49.9,
+        regularPrice: 64.9,
+        currency: 'SEK',
+        promotionText: 'Weekly leaflet',
+        promotionStartsOn: '2026-05-19T00:00:00.000Z',
+        promotionEndsOn: '2026-05-25T21:59:59.000Z',
+        memberRequired: false,
+        observedAt: '2026-05-19T06:30:00.000Z',
+        confidence: 0.92,
+        provenance: { sourceUrl: 'https://example.test/flyer' },
+        productId: 'product-coffee',
+        productSlug: 'coffee',
+        productName: 'Zoégas Coffee 450g',
+        categoryPath: ['coffee'],
+        chainId: 'chain-willys',
+        chainSlug: 'willys',
+        chainName: 'Willys',
+        storeId: 'store-willys',
+        storeSlug: 'willys-odenplan',
+        storeName: 'Willys Odenplan',
+        storeCity: 'Stockholm'
+      }]
+    });
+
+    assert.equal(report.offerCount, 1);
+    assert.equal(report.offers[0]?.offerId, 'obs-promo-coffee');
+    assert.equal(report.offers[0]?.sourceRunId, 'run-weekly-leaflet');
+    assert.equal(report.offers[0]?.savings, 15);
+    assert.equal(report.offers[0]?.sourceUrl, 'https://example.test/flyer');
   });
 
   it('serves pantry replenishment plans with live deal and basket duplicate context', () => {

@@ -24,6 +24,68 @@ class RecordingPriceHistoryExecutor {
         canonical_name: 'Bryggkaffe mellanrost 450 g'
       }] as T[];
     }
+    if (sql.includes("observations.price_type in ('promotion', 'member')")) {
+      return [
+        {
+          observation_id: 'obs-flyer-coffee',
+          source_run_id: 'run-weekly-leaflet',
+          raw_record_id: 'raw-weekly-leaflet',
+          price_type: 'promotion',
+          price: '49.90',
+          regular_price: '64.90',
+          currency: 'SEK',
+          promotion_text: 'Weekly leaflet',
+          promotion_starts_on: '2026-05-19',
+          promotion_ends_on: '2026-05-25',
+          member_required: false,
+          observed_at: '2026-05-19T06:30:00.000Z',
+          valid_from: '2026-05-19T00:00:00.000Z',
+          valid_until: '2026-05-25T21:59:59.000Z',
+          confidence: '0.9200',
+          provenance: { sourceUrl: 'https://example.test/willys/flyer' },
+          product_id: 'product-coffee',
+          product_slug: 'coffee',
+          product_name: 'Zoégas Coffee 450g',
+          category_path: ['coffee'],
+          chain_id: 'chain-willys',
+          chain_slug: 'willys',
+          chain_name: 'Willys',
+          store_id: 'store-willys',
+          store_slug: 'willys-odenplan',
+          store_name: 'Willys Odenplan',
+          store_city: 'Stockholm'
+        },
+        {
+          observation_id: 'obs-flyer-private-label-milk',
+          source_run_id: 'run-weekly-leaflet',
+          raw_record_id: 'raw-weekly-leaflet-milk',
+          price_type: 'member',
+          price: '12.90',
+          regular_price: '19.90',
+          currency: 'SEK',
+          promotion_text: 'Member weekly leaflet',
+          promotion_starts_on: '2026-05-19',
+          promotion_ends_on: '2026-05-25',
+          member_required: true,
+          observed_at: '2026-05-19T06:30:00.000Z',
+          valid_from: '2026-05-19T00:00:00.000Z',
+          valid_until: '2026-05-25T21:59:59.000Z',
+          confidence: '0.8800',
+          provenance: { sourceUrl: 'https://example.test/willys/flyer' },
+          product_id: 'product-private-label-milk',
+          product_slug: 'private-label-milk',
+          product_name: 'Garant Milk 1L',
+          category_path: ['dairy'],
+          chain_id: 'chain-willys',
+          chain_slug: 'willys',
+          chain_name: 'Willys',
+          store_id: 'store-willys',
+          store_slug: 'willys-odenplan',
+          store_name: 'Willys Odenplan',
+          store_city: 'Stockholm'
+        }
+      ] as T[];
+    }
     if (sql.includes('from observations')) {
       return [
         {
@@ -283,11 +345,11 @@ describe('GroceryView API app', () => {
         offer.sourceType
       ]),
       [
-        ['flyer-willys-odenplan-coffee-2026w21', 'coffee', 15, 'weekly_flyer'],
-        ['flyer-willys-odenplan-private-label-milk-2026w21', 'private-label-milk', 7, 'weekly_flyer']
+        ['obs-flyer-private-label-milk', 'private-label-milk', 7, 'weekly_flyer'],
+        ['obs-flyer-coffee', 'coffee', 15, 'weekly_flyer']
       ]
     );
-    assert.equal(flyerOffers.body.demo, true);
+    assert.equal(flyerOffers.body.offers[0].sourceRunId, 'run-weekly-leaflet');
 
     const storeFlyerOffers = await request(app.getHttpServer())
       .get('/stores/lidl-sveavagen/flyer-offers?asOf=2026-05-20T12:00:00.000Z')
