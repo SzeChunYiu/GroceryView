@@ -242,6 +242,11 @@ describe('createGroceryViewApi', () => {
     ]);
     assert.deepEqual(report.missingProductIds, ['product-missing']);
     assert.match(report.strategies[0]?.warnings[0] ?? '', /missing persisted latest_prices/i);
+    assert.deepEqual(report.evidence, {
+      basketSource: 'request_body',
+      latestPriceCount: realRows.length,
+      sourceTables: ['products', 'latest_prices', 'stores']
+    });
   });
 
   it('builds latest product price rows from persisted latest price inputs', () => {

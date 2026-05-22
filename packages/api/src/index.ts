@@ -1215,7 +1215,10 @@ export type RealBasketCompareInput = {
   items: RealBasketCompareItem[];
   selectedStoreSlugs?: string[];
   latestPrices: RealCatalogSearchPriceRow[];
+  basketSource?: 'request_body' | 'weekly_baskets';
 };
+
+export type RealBasketCompareEvidenceTable = 'weekly_baskets' | 'basket_items' | 'products' | 'latest_prices' | 'stores';
 
 export type RealBasketCompareResult = {
   userId: string | null;
@@ -1246,8 +1249,9 @@ export type RealBasketCompareResult = {
   }>;
   missingProductIds: string[];
   evidence: {
+    basketSource: 'request_body' | 'weekly_baskets';
     latestPriceCount: number;
-    sourceTables: ['basket_items', 'weekly_baskets', 'products', 'latest_prices', 'stores'];
+    sourceTables: RealBasketCompareEvidenceTable[];
   };
 };
 
@@ -1400,6 +1404,7 @@ export function buildFacetedProductSearch(input: {
 
 export function buildRealBasketComparison(input: RealBasketCompareInput): RealBasketCompareResult {
   const selectedStoreSlugs = normalizedList(input.selectedStoreSlugs);
+  const basketSource = input.basketSource ?? 'request_body';
   const itemOrder = new Map(input.items.map((item, index) => [item.productId, index]));
   const rowsByProduct = new Map<string, RealCatalogSearchPriceRow[]>();
   const productNames = new Map<string, { slug: string; canonicalName: string }>();
@@ -1509,8 +1514,12 @@ export function buildRealBasketComparison(input: RealBasketCompareInput): RealBa
     ],
     missingProductIds,
     evidence: {
+      basketSource,
       latestPriceCount: input.latestPrices.filter((row) => row.observationId).length,
-      sourceTables: ['basket_items', 'weekly_baskets', 'products', 'latest_prices', 'stores']
+      sourceTables:
+        basketSource === 'weekly_baskets'
+          ? ['weekly_baskets', 'basket_items', 'products', 'latest_prices', 'stores']
+          : ['products', 'latest_prices', 'stores']
     }
   };
 }
