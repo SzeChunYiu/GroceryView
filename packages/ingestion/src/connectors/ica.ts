@@ -31,7 +31,7 @@ export const ICA_STORE_BASE_URL = 'https://handlaprivatkund.ica.se';
 export const DEFAULT_ICA_STORE_ACCOUNT_ID = '1004599';
 export const DEFAULT_ICA_STORE_NAME = 'ICA Kvantum Kungsholmen';
 export const DEFAULT_ICA_REGION_ID = '6ae1c52a-99a8-4b19-9464-dd01274df39d';
-export const DEFAULT_ICA_MAX_PRODUCTS = 200;
+export const DEFAULT_ICA_MAX_PRODUCTS = 300;
 
 export type IcaStoreConfig = {
   storeAccountId: string;
