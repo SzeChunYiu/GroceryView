@@ -476,7 +476,7 @@ export async function fetchWillysStores(options: FetchWillysStoresOptions = {}):
 }
 
 export async function fetchWillysProducts(options: FetchWillysProductsOptions = {}): Promise<WillysProduct[]> {
-  const fetchImpl = options.fetchImpl ?? fetch;
+  const fetchImpl = withWillysRequestTimeout(options.fetchImpl ?? fetch);
   const queries = options.queries ?? DEFAULT_WILLYS_SEARCH_QUERIES;
   const maxRows = options.maxRows ?? DEFAULT_WILLYS_PRODUCTS_MAX_ROWS;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
