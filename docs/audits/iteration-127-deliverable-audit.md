@@ -14,7 +14,7 @@ User asked to implement the research findings as real GroceryView product functi
 | Implement recurring baskets / weekly digest research finding | Core digest computes comparable totals, price-up/down/new-item/substitute/missing-price states, headline, recommended actions, and guardrails. | Complete |
 | Keep product honest/fail-closed | Digest compares only lines with current and previous verified prices; missing current prices remain blockers; substitutes never rewrite baskets automatically; static web page still withholds private rows without auth-backed data. | Complete |
 | Verify with tests | Targeted tests added for core, API, server HTTP, and web route contract. `rtk git diff --check`, `rtk npm test`, `rtk npm run build`, and `rtk npm run typecheck` passed on 2026-05-22. Next build emitted SWC native-load warnings but completed successfully using WASM bindings. | Complete |
-| PR and merge to main | PR URL and merged state must be recorded after merge. | Pending until PR is merged |
+| PR and merge to main | PR #725 merged to `main` at 2026-05-22T08:21:04Z with merge commit `03ab0e065a18d3909b0eb43ce0a87b5a5d8b06ec`: https://github.com/SzeChunYiu/GroceryView/pull/725 | Complete |
 
 ## Verification notes
 
