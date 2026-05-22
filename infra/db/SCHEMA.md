@@ -38,19 +38,23 @@ The same pattern can be reused for long-term raw payload retention in `raw_recor
 
 The schema stores store location in `stores.position` for map and trip-planning features. Distance or travel time must not be stored as an input to default Deal Score ranking. Deal Score should use price history, discount depth, confidence, and provenance; distance can be applied later as an explicit user-side filter or trip-planning sort.
 
+## Multi-Vertical Price Domain Model
+
+Migration 011 adds a `domain` column to `chains`, `stores`, `products`, `observations`, and `latest_prices`. Existing rows default to `grocery`; future verticals are constrained to `fuel` and `pharmacy` until a later migration expands the supported set. This keeps matching domain-scoped: grocery uses EAN + commodity matching, fuel uses fuel grades, and pharmacy uses OTC/health EANs. Public routes must not render non-grocery prices until `observations.domain` has connector or trusted crowd rows for that vertical.
+
 ## Tables
 
 ### `chains`
 
 Retail banners such as ICA, Willys, Coop, Lidl, Hemkop, and City Gross.
 
-Key columns: `slug`, `name`, `country_code`, `website_url`.
+Key columns: `slug`, `name`, `domain`, `country_code`, `website_url`.
 
 ### `stores`
 
 Physical or online stores belonging to a chain.
 
-Key columns: `chain_id`, `slug`, `external_ref`, address fields, `position`, `store_type`, `opening_hours`, `online_order_url`.
+Key columns: `chain_id`, `slug`, `domain`, `external_ref`, address fields, `position`, `store_type`, `opening_hours`, `online_order_url`.
 
 Indexes: `stores_position_gix` for location queries, plus `stores_name_trgm_idx` and `stores_slug_trgm_idx` for fuzzy store search.
 
@@ -58,7 +62,7 @@ Indexes: `stores_position_gix` for location queries, plus `stores_name_trgm_idx`
 
 Canonical product records used by search, charts, baskets, and matching.
 
-Key columns: `slug`, `canonical_name`, `brand`, `brand_owner`, `private_label_owner`, `barcode`, `category_path`, package fields, `comparable_unit`, `nutrition`, `image_url`. Commodity columns (migration 010): `product_kind` (`branded`|`commodity`), `commodity_id`, `variant`, `is_organic`, `origin_country`.
+Key columns: `slug`, `canonical_name`, `domain`, `brand`, `brand_owner`, `private_label_owner`, `barcode`, `category_path`, package fields, `comparable_unit`, `nutrition`, `image_url`. Commodity columns (migration 010): `product_kind` (`branded`|`commodity`), `commodity_id`, `variant`, `is_organic`, `origin_country`.
 
 Indexes: `products_name_trgm_idx` and `products_slug_trgm_idx` for fuzzy product search; `products_commodity_idx` and `products_kind_idx` for commodity matching.
 
@@ -106,7 +110,7 @@ Indexes: `retailer_source_policies_label_review_idx`, `retailer_source_policies_
 
 Immutable normalized price facts. This is the canonical table for historical charts and price provenance.
 
-Key columns: `product_id`, `chain_id`, `store_id`, `source_run_id`, `raw_record_id`, `retailer_product_ref`, `price_type`, `price`, `regular_price`, `unit_price`, `currency`, `quantity`, `quantity_unit`, promotion fields, `member_required`, `observed_at`, validity window fields, `confidence`, `provenance`.
+Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `source_run_id`, `raw_record_id`, `retailer_product_ref`, `price_type`, `price`, `regular_price`, `unit_price`, `currency`, `quantity`, `quantity_unit`, promotion fields, `member_required`, `observed_at`, validity window fields, `confidence`, `provenance`.
 
 Allowed `price_type` values: `shelf`, `online`, `member`, `promotion`, `receipt`, `community`, `estimated`.
 
@@ -116,7 +120,7 @@ Indexes: product/time, store/time, price type/time, and provenance GIN.
 
 Materialized latest price lookup for API and UI reads. Each row references the observation that won the rollup.
 
-Key columns: `product_id`, `chain_id`, `store_id`, `price_type`, `observation_id`, `price`, `regular_price`, `unit_price`, `currency`, `observed_at`, `confidence`, `provenance`, `updated_at`.
+Key columns: `product_id`, `chain_id`, `store_id`, `domain`, `price_type`, `observation_id`, `price`, `regular_price`, `unit_price`, `currency`, `observed_at`, `confidence`, `provenance`, `updated_at`.
 
 Primary key: `(product_id, chain_id, store_id, price_type)`.
 
