@@ -155,3 +155,71 @@ Sample rows:
 3. 2500298172 | 4003 | Svenskt smör | 39,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
 4. 2500298127 | 4003 | Smörgåspålägg | 2 för 28 kr | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
 5. 2500299506 | 4003 | Kaffe | 59,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
+## Hemköp weekly discounts 48-store expansion 2026-05-22
+
+- Source: hemkop.se public Axfood campaign JSON
+- Store catalog source: https://www.hemkop.se/axfood/rest/store?online=true
+- Source URL pattern: https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
+- Retrieved: 2026-05-22T13:34:18.349Z
+- Store IDs: 4003, 4127, 4190, 4798, 4660, 4775, 4196, 4111, 4162, 4273, 4349, 4359, 4734, 4773, 4239, 4667, 4221, 4203, 4521, 4930, 4524, 4146, 4222, 4219, 4792, 4245, 4189, 4511, 4263, 4293, 4214, 4526, 4131, 4266, 4207, 4535, 4681, 4142, 4545, 4277, 4225, 4738, 4550, 4224, 4123, 4212, 4114, 4247
+- Real weekly discount rows fetched and wired: 11927
+- Source URLs fetched: 144
+- Web wire: apps/web/src/lib/ingested/hemkop.ts
+- Connector: packages/ingestion/src/connectors/hemkop.ts
+
+Per-store row counts:
+- 4003: 249 rows
+- 4111: 247 rows
+- 4114: 247 rows
+- 4123: 248 rows
+- 4127: 246 rows
+- 4131: 248 rows
+- 4142: 249 rows
+- 4146: 249 rows
+- 4162: 250 rows
+- 4189: 248 rows
+- 4190: 249 rows
+- 4196: 250 rows
+- 4203: 246 rows
+- 4207: 247 rows
+- 4212: 249 rows
+- 4214: 249 rows
+- 4219: 248 rows
+- 4221: 250 rows
+- 4222: 246 rows
+- 4224: 247 rows
+- 4225: 246 rows
+- 4239: 249 rows
+- 4245: 248 rows
+- 4247: 249 rows
+- 4263: 249 rows
+- 4266: 249 rows
+- 4273: 249 rows
+- 4277: 250 rows
+- 4293: 248 rows
+- 4349: 250 rows
+- 4359: 249 rows
+- 4511: 250 rows
+- 4521: 249 rows
+- 4524: 248 rows
+- 4526: 249 rows
+- 4535: 247 rows
+- 4545: 248 rows
+- 4550: 250 rows
+- 4660: 250 rows
+- 4667: 249 rows
+- 4681: 249 rows
+- 4734: 248 rows
+- 4738: 249 rows
+- 4773: 249 rows
+- 4775: 250 rows
+- 4792: 248 rows
+- 4798: 248 rows
+- 4930: 248 rows
+
+Sample rows:
+1. 2500309493 | 4003 | Läsk | 6 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
+2. 2500303429 | 4003 | Lingongrova, Guldkorn | 19 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
+3. 2500298172 | 4003 | Svenskt smör | 39,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
+4. 2500298127 | 4003 | Smörgåspålägg | 2 för 28 kr | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
+5. 2500299506 | 4003 | Kaffe | 59,95 kr/st | 18/05-2026-24/05-2026 | https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100
