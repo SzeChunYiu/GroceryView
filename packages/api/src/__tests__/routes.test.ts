@@ -1,8 +1,186 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { assertPriceObservationDto, createGroceryViewApi, validatePriceObservationDto } from '../index.js';
+import {
+  assertPriceObservationDto,
+  buildFacetedProductSearch,
+  buildProductPriceHistoryReport,
+  buildRealBasketComparison,
+  createGroceryViewApi,
+  validatePriceObservationDto,
+  type RealCatalogSearchPriceRow
+} from '../index.js';
 
 describe('createGroceryViewApi', () => {
+  const realRows: RealCatalogSearchPriceRow[] = [
+    {
+      productId: 'product-milk',
+      slug: 'standardmjolk-1l',
+      canonicalName: 'Standardmjolk 3% 1 l',
+      brand: 'Arla',
+      categoryPath: ['Dairy', 'Milk'],
+      packageSize: 1,
+      packageUnit: 'l',
+      comparableUnit: 'l',
+      observationId: 'obs-milk-willys',
+      price: 14.9,
+      unitPrice: 14.9,
+      currency: 'SEK',
+      priceType: 'shelf',
+      confidence: 0.94,
+      observedAt: '2026-05-21T09:00:00.000Z',
+      chainId: 'chain-willys',
+      chainSlug: 'willys',
+      chainName: 'Willys',
+      storeId: 'store-willys',
+      storeSlug: 'willys-hemma-stockholm-torsplan',
+      storeName: 'Willys Hemma Stockholm Torsplan'
+    },
+    {
+      productId: 'product-milk',
+      slug: 'standardmjolk-1l',
+      canonicalName: 'Standardmjolk 3% 1 l',
+      brand: 'Arla',
+      categoryPath: ['Dairy', 'Milk'],
+      packageSize: 1,
+      packageUnit: 'l',
+      comparableUnit: 'l',
+      observationId: 'obs-milk-coop',
+      price: 15.5,
+      unitPrice: 15.5,
+      currency: 'SEK',
+      priceType: 'shelf',
+      confidence: 0.91,
+      observedAt: '2026-05-21T08:00:00.000Z',
+      chainId: 'chain-coop',
+      chainSlug: 'coop',
+      chainName: 'Coop',
+      storeId: 'store-coop',
+      storeSlug: 'coop-odenplan',
+      storeName: 'Coop Odenplan'
+    },
+    {
+      productId: 'product-butter',
+      slug: 'smor-500g',
+      canonicalName: 'Smor 500 g',
+      categoryPath: ['Dairy', 'Butter'],
+      packageSize: 500,
+      packageUnit: 'g',
+      comparableUnit: 'kg',
+      observationId: 'obs-butter-willys',
+      price: 54.9,
+      unitPrice: 109.8,
+      currency: 'SEK',
+      priceType: 'shelf',
+      confidence: 0.9,
+      observedAt: '2026-05-21T09:10:00.000Z',
+      chainId: 'chain-willys',
+      chainSlug: 'willys',
+      chainName: 'Willys',
+      storeId: 'store-willys',
+      storeSlug: 'willys-hemma-stockholm-torsplan',
+      storeName: 'Willys Hemma Stockholm Torsplan'
+    }
+  ];
+
+  it('builds product price-history reports from persisted observation inputs', () => {
+    const report = buildProductPriceHistoryReport([
+      {
+        observationId: 'obs-coffee-new',
+        productId: 'product-coffee',
+        productSlug: 'bryggkaffe-450g',
+        productName: 'Bryggkaffe mellanrost 450 g',
+        chainId: 'chain-willys',
+        storeId: 'store-willys',
+        priceType: 'promotion',
+        price: 49.9,
+        regularPrice: 59.9,
+        unitPrice: 110.89,
+        currency: 'SEK',
+        memberRequired: false,
+        observedAt: '2026-05-19T09:00:00.000Z',
+        confidence: 0.94,
+        provenance: { source: 'open_prices', rawSnapshotRef: 's3://raw/coffee-new.html' }
+      },
+      {
+        observationId: 'obs-coffee-old',
+        productId: 'product-coffee',
+        productSlug: 'bryggkaffe-450g',
+        productName: 'Bryggkaffe mellanrost 450 g',
+        chainId: 'chain-willys',
+        storeId: 'store-willys',
+        priceType: 'shelf',
+        price: 59.9,
+        unitPrice: 133.11,
+        currency: 'SEK',
+        memberRequired: false,
+        observedAt: '2026-05-01T09:00:00.000Z',
+        confidence: 0.91,
+        provenance: { source: 'open_prices', rawSnapshotRef: 's3://raw/coffee-old.html' }
+      }
+    ]);
+
+    assert.equal(report?.productSlug, 'bryggkaffe-450g');
+    assert.deepEqual(report?.points.map((point) => point.observationId), ['obs-coffee-old', 'obs-coffee-new']);
+    assert.deepEqual(report?.priceTypes, ['promotion', 'shelf']);
+    assert.equal(report?.summary?.latestPrice, 49.9);
+    assert.equal(report?.summary?.changeFromPrevious, -10);
+    assert.equal(report?.guardrails.some((guardrail) => /persisted observation rows/i.test(guardrail)), true);
+  });
+
+  it('builds faceted search responses from persisted catalog and latest price rows', () => {
+    const result = buildFacetedProductSearch({
+      rows: realRows,
+      filters: { query: 'mjolk', categories: ['Dairy'], chains: ['willys'], limit: 10 }
+    });
+
+    assert.equal(result.count, 2);
+    assert.equal(result.products[0]?.productId, 'product-milk');
+    assert.equal(result.products[0]?.cheapestPrice, 14.9);
+    assert.equal(result.products[0]?.currentPrices[0]?.observationId, 'obs-milk-willys');
+    assert.deepEqual(result.facets.categories.find((facet) => facet.value === 'Dairy'), { value: 'Dairy', count: 2 });
+    assert.deepEqual(result.facets.chains.find((facet) => facet.value === 'willys'), { value: 'willys', label: 'Willys', count: 2 });
+    assert.deepEqual(result.facets.priceRange, { min: 14.9, max: 54.9 });
+    assert.deepEqual(result.evidence.sourceTables, ['products', 'latest_prices', 'chains', 'stores']);
+  });
+
+  it('builds basket comparisons from latest price rows without estimated fallback prices', () => {
+    const report = buildRealBasketComparison({
+      userId: 'user-1',
+      selectedStoreSlugs: ['willys-hemma-stockholm-torsplan', 'coop-odenplan'],
+      items: [
+        { productId: 'product-milk', quantity: 2 },
+        { productId: 'product-butter', quantity: 1 },
+        { productId: 'product-missing', quantity: 1 }
+      ],
+      latestPrices: realRows
+    });
+
+    assert.equal(report.userId, 'user-1');
+    assert.equal(report.strategies[0]?.total, null);
+    assert.deepEqual(report.strategies[0]?.assignments.map((assignment) => ({
+      productId: assignment.productId,
+      storeSlug: assignment.storeSlug,
+      lineTotal: assignment.lineTotal,
+      priceLabel: assignment.priceLabel
+    })), [
+      {
+        productId: 'product-milk',
+        storeSlug: 'willys-hemma-stockholm-torsplan',
+        lineTotal: 29.8,
+        priceLabel: 'verified_latest_price'
+      },
+      {
+        productId: 'product-butter',
+        storeSlug: 'willys-hemma-stockholm-torsplan',
+        lineTotal: 54.9,
+        priceLabel: 'verified_latest_price'
+      },
+      { productId: 'product-missing', storeSlug: null, lineTotal: null, priceLabel: 'missing_price' }
+    ]);
+    assert.deepEqual(report.missingProductIds, ['product-missing']);
+    assert.match(report.strategies[0]?.warnings[0] ?? '', /missing persisted latest_prices/i);
+  });
+
   it('validates canonical price observation provenance DTOs', () => {
     const baseObservation = {
       observationId: 'obs-coffee-willys-2026-05-20',
@@ -195,6 +373,38 @@ describe('createGroceryViewApi', () => {
     assert.throws(() => api.getExpiryDealRadarReport('user-1', { maxDistanceKm: 0 }), /maxDistanceKm must be positive/);
   });
 
+  it('serves active per-branch flyer offers with source evidence and filters', () => {
+    const api = createGroceryViewApi();
+
+    const report = api.getFlyerOffers({
+      asOf: '2026-05-20T12:00:00.000Z',
+      chain: 'willys'
+    });
+
+    assert.equal(report.offerCount, 2);
+    assert.deepEqual(report.filters, { chain: 'willys' });
+    assert.deepEqual(report.stores, [{
+      storeId: 'willys-odenplan',
+      storeName: 'Willys Odenplan',
+      chain: 'willys',
+      offerCount: 2,
+      totalOneEachSavings: 22,
+      topOfferId: 'flyer-willys-odenplan-coffee-2026w21',
+      topDealScore: 82
+    }]);
+    assert.deepEqual(report.offers.map((offer) => [offer.offerId, offer.storeId, offer.productId, offer.savings, offer.discountPercent, offer.sourceRunId]), [
+      ['flyer-willys-odenplan-coffee-2026w21', 'willys-odenplan', 'coffee', 15, 23.1, 'source-run-willys-flyer-2026-05-19'],
+      ['flyer-willys-odenplan-private-label-milk-2026w21', 'willys-odenplan', 'private-label-milk', 7, 35.2, 'source-run-willys-flyer-2026-05-19']
+    ]);
+    assert.match(report.guardrails[0], /validity window/i);
+
+    const storeReport = api.getStoreFlyerOffers('lidl-sveavagen', { asOf: '2026-05-20T12:00:00.000Z' });
+    assert.equal(storeReport.offerCount, 1);
+    assert.equal(storeReport.bestOffer?.productId, 'milk');
+    assert.equal(storeReport.totalOneEachSavings, 3);
+    assert.throws(() => api.getStoreFlyerOffers('missing-store'), /Unknown storeId/);
+  });
+
   it('serves pantry replenishment plans with live deal and basket duplicate context', () => {
     const api = createGroceryViewApi();
     api.addFavoriteStore('user-1', 'willys-odenplan');
@@ -383,6 +593,12 @@ describe('createGroceryViewApi', () => {
         message: 'Arla Milk 1L is 13.90 SEK at Lidl Sveavagen, below your 14.00 SEK target.'
       }
     ]);
+
+    const priceAlerts = api.getWatchlistPriceAlerts('user-1');
+    assert.equal(priceAlerts.trackedItemCount, 1);
+    assert.equal(priceAlerts.alertCount, 1);
+    assert.equal(priceAlerts.alerts[0]?.type, 'target_price');
+    assert.match(priceAlerts.guardrails[0], /target price/i);
   });
 
   it('returns ranked store-specific deals without mixing other stores', () => {
@@ -598,10 +814,43 @@ describe('createGroceryViewApi', () => {
     assert.deepEqual(api.getFavoriteStores('user-1').map((store) => store.id), ['willys-odenplan']);
     assert.deepEqual(api.getWatchlist('user-1').items[0]?.allowedPriceTypes, ['shelf']);
     assert.equal(api.getWatchlist('user-1').alerts.length, 2);
+    const updatedPriceAlerts = api.addWatchlistPriceAlert('user-1', {
+      productId: 'coffee',
+      targetPrice: 48,
+      favoriteStoresOnly: false,
+      allowedPriceTypes: ['shelf']
+    });
+    assert.equal(updatedPriceAlerts.trackedItemCount, 1);
+    assert.equal(updatedPriceAlerts.alertCount, 0);
+    assert.equal(api.getWatchlist('user-1').items.length, 1);
+    assert.equal(api.getWatchlist('user-1').items[0]?.targetPrice, 48);
     assert.deepEqual(api.getBasket('user-1').items[0], { productId: 'coffee', quantity: 2 });
     assert.equal(api.compareBasket('user-1').cheapestByProduct.total, 99.8);
     assert.equal(api.getBudgetSummary('user-1').weeklyBudget, 800);
     assert.equal(api.getIndex('stockholm-grocery-index')?.label, 'Stockholm Grocery Index');
+
+    const chainIndices = api.getChainPriceIndices();
+    assert.equal(chainIndices.generatedFrom, 8);
+    assert.deepEqual(chainIndices.categories, ['coffee', 'dairy']);
+    assert.deepEqual(chainIndices.chains.map((chain) => chain.chainId), ['willys', 'lidl', 'coop']);
+    assert.equal(chainIndices.chains[0]?.byCategory.find((row) => row.category === 'coffee')?.index, 96.66);
+
+    const categoryIndices = api.getCategoryPriceIndices();
+    assert.equal(categoryIndices.generatedFrom, 4);
+    assert.deepEqual(categoryIndices.indices.map((row) => row.category), ['coffee', 'dairy']);
+    assert.equal(categoryIndices.indices.find((row) => row.category === 'coffee')?.value, 71.39);
+    assert.equal(categoryIndices.indices.find((row) => row.category === 'dairy')?.productCount, 3);
+
+    const brandIndices = api.getBrandPriceIndices();
+    assert.equal(brandIndices.generatedFrom, 4);
+    assert.deepEqual(brandIndices.indices.map((row) => row.brandTier), ['national', 'standard_private_label']);
+    assert.equal(brandIndices.indices[0]?.value, 84.97);
+
+    const cheapestNow = api.getProductCheapestNow('coffee');
+    assert.equal(cheapestNow?.cheapest?.chain, 'willys');
+    assert.equal(cheapestNow?.cheapest?.packagePrice, 49.9);
+    assert.deepEqual(cheapestNow?.chainPrices.map((row) => row.chain), ['willys', 'lidl', 'coop']);
+    assert.equal(api.getProductCheapestNow('missing-product'), null);
 
     api.removeWatchlistItem('user-1', 'coffee');
     api.removeBasketItem('user-1', 'coffee');

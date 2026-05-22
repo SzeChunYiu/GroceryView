@@ -5,14 +5,93 @@ import { Test, type TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../src/app.module.js';
 import { configureApp } from '../src/configure-app.js';
+import { PostgresQueryExecutorService } from '../src/database/postgres-query-executor.service.js';
+
+class RecordingPriceHistoryExecutor {
+  calls: Array<{ sql: string; params: unknown[] }> = [];
+
+  isConfigured(): boolean {
+    return true;
+  }
+
+  async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
+    this.calls.push({ sql, params });
+    if (sql.includes('from products')) {
+      if (params[0] === 'missing-product') return [] as T[];
+      return [{
+        id: 'product-coffee',
+        slug: 'bryggkaffe-450g',
+        canonical_name: 'Bryggkaffe mellanrost 450 g'
+      }] as T[];
+    }
+    if (sql.includes('from observations')) {
+      return [
+        {
+          id: 'obs-coffee-new',
+          chain_id: 'chain-willys',
+          store_id: 'store-willys',
+          source_run_id: 'run-open-prices-2',
+          raw_record_id: 'raw-coffee-new',
+          retailer_product_ref: 'willys-coffee-450g',
+          price_type: 'shelf',
+          price: '49.90',
+          regular_price: '59.90',
+          unit_price: '110.89',
+          currency: 'SEK',
+          quantity: '450',
+          quantity_unit: 'g',
+          promotion_text: null,
+          promotion_starts_on: null,
+          promotion_ends_on: null,
+          member_required: false,
+          observed_at: '2026-05-19T09:00:00.000Z',
+          valid_from: null,
+          valid_until: null,
+          confidence: '0.9400',
+          provenance: { source: 'open_prices', rawSnapshotRef: 's3://raw/coffee-new.html' }
+        },
+        {
+          id: 'obs-coffee-old',
+          chain_id: 'chain-willys',
+          store_id: 'store-willys',
+          source_run_id: 'run-open-prices-1',
+          raw_record_id: 'raw-coffee-old',
+          retailer_product_ref: 'willys-coffee-450g',
+          price_type: 'shelf',
+          price: '59.90',
+          regular_price: null,
+          unit_price: '133.11',
+          currency: 'SEK',
+          quantity: '450',
+          quantity_unit: 'g',
+          promotion_text: null,
+          promotion_starts_on: null,
+          promotion_ends_on: null,
+          member_required: false,
+          observed_at: '2026-05-01T09:00:00.000Z',
+          valid_from: null,
+          valid_until: null,
+          confidence: '0.9100',
+          provenance: { source: 'open_prices', rawSnapshotRef: 's3://raw/coffee-old.html' }
+        }
+      ] as T[];
+    }
+    return [] as T[];
+  }
+}
 
 describe('GroceryView API app', () => {
   let app: INestApplication;
+  let priceHistoryExecutor: RecordingPriceHistoryExecutor;
 
   beforeEach(async () => {
+    priceHistoryExecutor = new RecordingPriceHistoryExecutor();
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule]
-    }).compile();
+    })
+      .overrideProvider(PostgresQueryExecutorService)
+      .useValue(priceHistoryExecutor)
+      .compile();
 
     app = moduleFixture.createNestApplication();
     configureApp(app);
@@ -38,9 +117,13 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/budget/categories']);
     assert.ok(docs.body.paths['/users/demo/ads/disclosure']);
     assert.ok(docs.body.paths['/users/demo/expiry-deals/radar']);
+    assert.ok(docs.body.paths['/deals/flyer-offers']);
     assert.ok(docs.body.paths['/health']);
     assert.ok(docs.body.paths['/users/demo/households/current']);
     assert.ok(docs.body.paths['/indices']);
+    assert.ok(docs.body.paths['/indices/chains']);
+    assert.ok(docs.body.paths['/indices/categories']);
+    assert.ok(docs.body.paths['/indices/brands']);
     assert.ok(docs.body.paths['/indices/{id}']);
     assert.ok(docs.body.paths['/market/overview']);
     assert.ok(docs.body.paths['/users/demo/loyalty/offers']);
@@ -51,6 +134,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/privacy/export']);
     assert.ok(docs.body.paths['/users/demo/privacy/deletion-plan']);
     assert.ok(docs.body.paths['/products']);
+    assert.ok(docs.body.paths['/products/{productId}/cheapest-now']);
     assert.ok(docs.body.paths['/products/{id}/terminal']);
     assert.ok(docs.body.paths['/products/{id}/spread']);
     assert.ok(docs.body.paths['/products/{id}/store-savings']);
@@ -59,6 +143,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/products/{id}/deal-score']);
     assert.ok(docs.body.paths['/products/{id}/equivalents']);
     assert.ok(docs.body.paths['/products/{id}/history']);
+    assert.ok(docs.body.paths['/products/{productId}/price-history']);
     assert.ok(docs.body.paths['/users/demo/receipts/review']);
     assert.ok(docs.body.paths['/stores']);
     assert.ok(docs.body.paths['/users/demo/basket/items/{productId}']);
@@ -66,10 +151,12 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/stores/{id}/coverage']);
     assert.ok(docs.body.paths['/stores/{id}/deal-summary']);
     assert.ok(docs.body.paths['/stores/{id}/deals']);
+    assert.ok(docs.body.paths['/stores/{id}/flyer-offers']);
     assert.ok(docs.body.paths['/users/demo/favorite-stores']);
     assert.ok(docs.body.paths['/users/demo/favorite-stores/{storeId}']);
     assert.ok(docs.body.paths['/users/demo/watchlist/{productId}']);
     assert.ok(docs.body.paths['/users/demo/watchlist/{productId}'].patch);
+    assert.ok(docs.body.paths['/users/demo/watchlist/price-alerts']);
     assert.ok(docs.body.paths['/users/demo/alerts/inbox']);
     assert.ok(docs.body.paths['/users/demo/basket/local-offers']);
     assert.ok(docs.body.paths['/users/demo/basket/recurring-digest']);
@@ -143,6 +230,19 @@ describe('GroceryView API app', () => {
     assert.equal(index.body.label, 'Stockholm Grocery Index');
     assert.equal(index.body.demo, true);
 
+    const chainIndices = await request(app.getHttpServer()).get('/indices/chains').expect(200);
+    assert.equal(chainIndices.body.generatedFrom, 8);
+    assert.equal(chainIndices.body.chains[0].chainId, 'willys');
+    assert.equal(chainIndices.body.demo, true);
+
+    const categoryIndices = await request(app.getHttpServer()).get('/indices/categories').expect(200);
+    assert.deepEqual(categoryIndices.body.indices.map((row: { category: string }) => row.category), ['coffee', 'dairy']);
+    assert.equal(categoryIndices.body.demo, true);
+
+    const brandIndices = await request(app.getHttpServer()).get('/indices/brands').expect(200);
+    assert.deepEqual(brandIndices.body.indices.map((row: { brandTier: string }) => row.brandTier), ['national', 'standard_private_label']);
+    assert.equal(brandIndices.body.demo, true);
+
     const products = await request(app.getHttpServer()).get('/products?q=coffee').expect(200);
     assert.equal(products.body[0].id, 'coffee');
     assert.equal(products.body[0].currentPrices[0].priceType, 'shelf');
@@ -168,9 +268,59 @@ describe('GroceryView API app', () => {
       ]
     );
 
+    const flyerOffers = await request(app.getHttpServer())
+      .get('/deals/flyer-offers?chain=willys&asOf=2026-05-20T12:00:00.000Z')
+      .expect(200);
+    assert.equal(flyerOffers.body.offerCount, 2);
+    assert.deepEqual(flyerOffers.body.stores.map((store: { storeId: string; offerCount: number }) => [store.storeId, store.offerCount]), [
+      ['willys-odenplan', 2]
+    ]);
+    assert.deepEqual(
+      flyerOffers.body.offers.map((offer: { offerId: string; productId: string; savings: number; sourceType: string }) => [
+        offer.offerId,
+        offer.productId,
+        offer.savings,
+        offer.sourceType
+      ]),
+      [
+        ['flyer-willys-odenplan-coffee-2026w21', 'coffee', 15, 'weekly_flyer'],
+        ['flyer-willys-odenplan-private-label-milk-2026w21', 'private-label-milk', 7, 'weekly_flyer']
+      ]
+    );
+    assert.equal(flyerOffers.body.demo, true);
+
+    const storeFlyerOffers = await request(app.getHttpServer())
+      .get('/stores/lidl-sveavagen/flyer-offers?asOf=2026-05-20T12:00:00.000Z')
+      .expect(200);
+    assert.equal(storeFlyerOffers.body.storeId, 'lidl-sveavagen');
+    assert.equal(storeFlyerOffers.body.bestOffer.productId, 'milk');
+    assert.equal(storeFlyerOffers.body.totalOneEachSavings, 3);
+    assert.equal(storeFlyerOffers.body.demo, true);
+
     const prices = await request(app.getHttpServer()).get('/products/coffee/prices').expect(200);
     assert.equal(prices.body[0].currency, 'SEK');
     assert.equal(prices.body[0].confidence, 'high');
+
+    const priceHistory = await request(app.getHttpServer())
+      .get('/products/bryggkaffe-450g/price-history?priceType=shelf&limit=5')
+      .expect(200);
+    assert.equal(priceHistory.body.productId, 'product-coffee');
+    assert.equal(priceHistory.body.productSlug, 'bryggkaffe-450g');
+    assert.equal(priceHistory.body.demo, undefined);
+    assert.deepEqual(priceHistory.body.points.map((point: { observationId: string }) => point.observationId), [
+      'obs-coffee-old',
+      'obs-coffee-new'
+    ]);
+    assert.equal(priceHistory.body.summary.latestPrice, 49.9);
+    assert.equal(priceHistory.body.summary.changeFromPrevious, -10);
+    assert.deepEqual(priceHistoryExecutor.calls.at(-1)?.params, ['product-coffee', 'shelf', null, null, 5]);
+    assert.match(priceHistoryExecutor.calls.at(-1)?.sql ?? '', /from observations/i);
+
+    const cheapestNow = await request(app.getHttpServer()).get('/products/coffee/cheapest-now').expect(200);
+    assert.equal(cheapestNow.body.cheapest.chain, 'willys');
+    assert.equal(cheapestNow.body.cheapest.packagePrice, 49.9);
+    assert.deepEqual(cheapestNow.body.chainPrices.map((row: { chain: string }) => row.chain), ['willys', 'lidl', 'coop']);
+    assert.equal(cheapestNow.body.demo, true);
 
     const terminal = await request(app.getHttpServer()).get('/products/coffee/terminal').expect(200);
     assert.equal(terminal.body.productId, 'coffee');
@@ -316,6 +466,18 @@ describe('GroceryView API app', () => {
     const watchlist = await request(app.getHttpServer()).get('/users/demo/watchlist').expect(200);
     assert.equal(watchlist.body.items[0].productId, 'coffee');
     assert.deepEqual(watchlist.body.items[0].allowedPriceTypes, ['shelf']);
+    const priceAlerts = await request(app.getHttpServer()).get('/users/demo/watchlist/price-alerts').expect(200);
+    assert.equal(priceAlerts.body.userId, 'demo');
+    assert.equal(priceAlerts.body.alertCount, 1);
+    assert.equal(priceAlerts.body.alerts[0].type, 'target_price');
+    assert.equal(priceAlerts.body.demo, true);
+    const createdPriceAlert = await request(app.getHttpServer())
+      .post('/users/demo/watchlist/price-alerts')
+      .send({ productId: 'coffee', targetPrice: 48, favoriteStoresOnly: false, allowedPriceTypes: ['shelf'] })
+      .expect(201);
+    assert.equal(createdPriceAlert.body.trackedItemCount, 1);
+    assert.equal(createdPriceAlert.body.alertCount, 0);
+    assert.equal(createdPriceAlert.body.demo, true);
     const watchlistUpdate = await request(app.getHttpServer())
       .patch('/users/demo/watchlist/coffee')
       .send({ targetPrice: 48, alertDealScoreAt: 85, favoriteStoresOnly: true, allowedPriceTypes: ['shelf', 'promotion'] })
@@ -654,6 +816,7 @@ describe('GroceryView API app', () => {
     await request(app.getHttpServer()).get('/products/missing-product/deal-score').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/equivalents').expect(404);
     await request(app.getHttpServer()).get('/products/missing-product/history').expect(404);
+    await request(app.getHttpServer()).get('/products/missing-product/price-history').expect(404);
     await request(app.getHttpServer()).patch('/users/demo/watchlist/missing-product').send({ targetPrice: 48 }).expect(404);
     await request(app.getHttpServer()).delete('/users/demo/watchlist/missing-product').expect(404);
   });

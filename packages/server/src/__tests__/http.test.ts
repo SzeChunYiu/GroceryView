@@ -294,6 +294,38 @@ describe('createHttpHandler', () => {
       ['butter', 'willys-odenplan']
     ]);
 
+    const flyerOffers = await handle(new Request('http://localhost/api/deals/flyer-offers?chain=willys&asOf=2026-05-20T12:00:00.000Z'));
+    assert.equal(flyerOffers.status, 200);
+    const flyerOffersBody = await json(flyerOffers) as {
+      offerCount: number;
+      stores: Array<{ storeId: string; offerCount: number; totalOneEachSavings: number }>;
+      offers: Array<{ offerId: string; productId: string; savings: number; sourceType: string; sourceRunId: string }>;
+      guardrails: string[];
+    };
+    assert.equal(flyerOffersBody.offerCount, 2);
+    assert.deepEqual(flyerOffersBody.stores.map((store) => [store.storeId, store.offerCount, store.totalOneEachSavings]), [
+      ['willys-odenplan', 2, 22]
+    ]);
+    assert.deepEqual(flyerOffersBody.offers.map((offer) => [offer.offerId, offer.productId, offer.savings, offer.sourceType]), [
+      ['flyer-willys-odenplan-coffee-2026w21', 'coffee', 15, 'weekly_flyer'],
+      ['flyer-willys-odenplan-private-label-milk-2026w21', 'private-label-milk', 7, 'weekly_flyer']
+    ]);
+    assert.match(flyerOffersBody.guardrails[0] ?? '', /validity window/i);
+
+    const storeFlyerOffers = await handle(new Request('http://localhost/api/stores/lidl-sveavagen/flyer-offers?asOf=2026-05-20T12:00:00.000Z'));
+    assert.equal(storeFlyerOffers.status, 200);
+    const storeFlyerOffersBody = await json(storeFlyerOffers) as {
+      storeId: string;
+      offerCount: number;
+      totalOneEachSavings: number;
+      bestOffer: { productId: string; sourceRunId: string };
+    };
+    assert.equal(storeFlyerOffersBody.storeId, 'lidl-sveavagen');
+    assert.equal(storeFlyerOffersBody.offerCount, 1);
+    assert.equal(storeFlyerOffersBody.totalOneEachSavings, 3);
+    assert.equal(storeFlyerOffersBody.bestOffer.productId, 'milk');
+    assert.equal(storeFlyerOffersBody.bestOffer.sourceRunId, 'source-run-lidl-flyer-2026-05-19');
+
     const storeDealSummary = await handle(new Request('http://localhost/api/stores/willys-odenplan/deal-summary'));
     assert.equal(storeDealSummary.status, 200);
     const storeDealSummaryBody = await json(storeDealSummary) as {
@@ -666,6 +698,10 @@ describe('createHttpHandler', () => {
     assert.equal(dealSummary.status, 404);
     assert.deepEqual(await json(dealSummary), { error: 'Store not found.' });
 
+    const flyerOffers = await handle(new Request('http://localhost/api/stores/missing-store/flyer-offers'));
+    assert.equal(flyerOffers.status, 404);
+    assert.deepEqual(await json(flyerOffers), { error: 'Store not found.' });
+
     const categoryCoverage = await handle(new Request('http://localhost/api/stores/missing-store/category-coverage'));
     assert.equal(categoryCoverage.status, 404);
     assert.deepEqual(await json(categoryCoverage), { error: 'Store not found.' });
@@ -729,6 +765,26 @@ describe('createHttpHandler', () => {
     };
     assert.deepEqual(watchlist.items[0]?.allowedPriceTypes, ['shelf']);
     assert.equal(watchlist.alerts.length, 2);
+
+    const priceAlerts = await json(await handle(new Request('http://localhost/api/watchlist/price-alerts?userId=user-1'))) as {
+      trackedItemCount: number;
+      alertCount: number;
+      alerts: Array<{ type: string; productId: string }>;
+      guardrails: string[];
+    };
+    assert.equal(priceAlerts.trackedItemCount, 1);
+    assert.equal(priceAlerts.alertCount, 0);
+    assert.deepEqual(priceAlerts.alerts, []);
+    assert.match(priceAlerts.guardrails[0] ?? '', /target price/i);
+
+    const updatedPriceAlerts = await handle(new Request('http://localhost/api/watchlist/price-alerts?userId=user-1', {
+      method: 'POST',
+      body: JSON.stringify({ productId: 'coffee', targetPrice: 50, favoriteStoresOnly: false, allowedPriceTypes: ['shelf'] })
+    }));
+    assert.equal(updatedPriceAlerts.status, 201);
+    const updatedPriceAlertsBody = await json(updatedPriceAlerts) as { trackedItemCount: number; alertCount: number };
+    assert.equal(updatedPriceAlertsBody.trackedItemCount, 1);
+    assert.equal(updatedPriceAlertsBody.alertCount, 1);
 
     const comparison = await json(await handle(new Request('http://localhost/api/basket/compare?userId=user-1', { method: 'POST' }))) as { cheapestByProduct: { total: number } };
     assert.equal(comparison.cheapestByProduct.total, 99.8);

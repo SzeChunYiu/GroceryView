@@ -1,7 +1,9 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patch, Post, Query } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { IsNumber, IsString, Min } from 'class-validator';
+import { IsArray, IsNumber, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 import { groceryApi } from '../demo-data.js';
+import { RealCatalogService } from '../real-catalog/real-catalog.service.js';
 
 class BasketItemDto {
   @IsString()
@@ -16,6 +18,18 @@ class BasketItemQuantityDto {
   @IsNumber()
   @Min(1)
   quantity!: number;
+}
+
+class CompareBasketRequestDto {
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => BasketItemDto)
+  items!: BasketItemDto[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  storeSlugs?: string[];
 }
 
 @ApiTags('baskets')
@@ -106,5 +120,30 @@ export class BasketsController {
       }
       throw error;
     }
+  }
+}
+
+@ApiTags('baskets')
+@Controller()
+export class RealBasketsController {
+  constructor(private readonly realCatalog: RealCatalogService) {}
+
+  @Post('baskets/compare')
+  @HttpCode(200)
+  @ApiOkResponse({ description: 'Compare an arbitrary basket using persisted latest price rows' })
+  compare(@Body() body: CompareBasketRequestDto) {
+    return this.realCatalog.compareBasket({ items: body.items, storeSlugs: body.storeSlugs });
+  }
+
+  @Get('users/:userId/basket/compare')
+  @ApiOkResponse({ description: 'Compare the latest saved user basket using persisted latest price rows' })
+  compareSaved(@Param('userId') userId: string, @Query('stores') stores?: string) {
+    return this.realCatalog.compareSavedBasket(
+      userId,
+      stores
+        ?.split(',')
+        .map((store) => store.trim())
+        .filter(Boolean)
+    );
   }
 }

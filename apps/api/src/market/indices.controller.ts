@@ -11,6 +11,24 @@ export class IndicesController {
     return groceryApi.getIndices().map((index) => ({ ...index, demo: true }));
   }
 
+  @Get('chains')
+  @ApiOkResponse({ description: 'Current chain price indices from observed product prices' })
+  chains() {
+    return { ...groceryApi.getChainPriceIndices(), demo: true };
+  }
+
+  @Get('categories')
+  @ApiOkResponse({ description: 'Category price indices from product price history and current prices' })
+  categories() {
+    return { ...groceryApi.getCategoryPriceIndices(), demo: true };
+  }
+
+  @Get('brands')
+  @ApiOkResponse({ description: 'Brand-tier price indices from product price history and current prices' })
+  brands() {
+    return { ...groceryApi.getBrandPriceIndices(), demo: true };
+  }
+
   @Get(':id')
   @ApiOkResponse({ description: 'Grocery index detail' })
   detail(@Param('id') id: string) {

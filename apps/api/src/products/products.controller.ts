@@ -1,14 +1,33 @@
 import { Controller, Get, NotFoundException, Param, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { allProducts, groceryApi } from '../demo-data.js';
+import { RealCatalogService } from '../real-catalog/real-catalog.service.js';
 
 @ApiTags('products')
 @Controller('products')
 export class ProductsController {
+  constructor(private readonly realCatalog: RealCatalogService) {}
+
   @Get()
   @ApiOkResponse({ description: 'Searchable product list' })
   list(@Query('q') query = '') {
     return allProducts(query);
+  }
+
+  @Get('search/faceted')
+  @ApiOkResponse({ description: 'Real faceted product search from persisted catalog and latest prices' })
+  facetedSearch(
+    @Query('q') q?: string,
+    @Query('category') category?: string,
+    @Query('brand') brand?: string,
+    @Query('chain') chain?: string,
+    @Query('store') store?: string,
+    @Query('priceType') priceType?: string,
+    @Query('minPrice') minPrice?: string,
+    @Query('maxPrice') maxPrice?: string,
+    @Query('limit') limit?: string
+  ) {
+    return this.realCatalog.facetedSearch({ q, category, brand, chain, store, priceType, minPrice, maxPrice, limit });
   }
 
   @Get(':id/terminal')

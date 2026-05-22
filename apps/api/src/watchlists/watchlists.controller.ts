@@ -50,6 +50,24 @@ class WatchlistPatchDto {
   allowedPriceTypes?: Array<(typeof allowedWatchlistPriceTypes)[number]>;
 }
 
+class WatchlistPriceAlertDto {
+  @IsString()
+  productId!: string;
+
+  @IsNumber()
+  @Min(0)
+  targetPrice!: number;
+
+  @IsOptional()
+  @IsBoolean()
+  favoriteStoresOnly?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @IsIn(allowedWatchlistPriceTypes, { each: true })
+  allowedPriceTypes?: Array<(typeof allowedWatchlistPriceTypes)[number]>;
+}
+
 function asProductNotFound(error: unknown) {
   if (error instanceof Error && /Unknown productId|Watchlist item not found/.test(error.message)) {
     throw new NotFoundException('Product not found');
@@ -72,6 +90,30 @@ export class WatchlistsController {
     const item = { ...body, favoriteStoresOnly: body.favoriteStoresOnly ?? false };
     groceryApi.addWatchlistItem('demo', item);
     return item;
+  }
+
+  @Get('price-alerts')
+  @ApiOkResponse({ description: 'Demo user active watchlist target-price alerts' })
+  priceAlerts() {
+    return { ...groceryApi.getWatchlistPriceAlerts('demo'), demo: true };
+  }
+
+  @Post('price-alerts')
+  @ApiCreatedResponse({ description: 'Watchlist target-price alert created' })
+  createPriceAlert(@Body() body: WatchlistPriceAlertDto) {
+    try {
+      return {
+        ...groceryApi.addWatchlistPriceAlert('demo', {
+          productId: body.productId,
+          targetPrice: body.targetPrice,
+          favoriteStoresOnly: body.favoriteStoresOnly,
+          allowedPriceTypes: body.allowedPriceTypes
+        }),
+        demo: true
+      };
+    } catch (error) {
+      asProductNotFound(error);
+    }
   }
 
   @Patch(':productId')

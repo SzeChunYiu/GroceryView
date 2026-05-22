@@ -2,6 +2,8 @@ import {
   buildPriceChartSeries,
   buildExpiryDealRadar,
   buildWatchlistAlerts,
+  calculateBrandTierIndices,
+  calculateChainPriceIndex,
   calculateDealScore,
   calculateFixedBasketIndex,
   compareBasketStrategies,
@@ -19,7 +21,11 @@ import {
   summarizeLocalOfferBasket,
   suggestDealBasedMeals,
   type BasketComparisonResult,
+  type BrandTierIndexSummary,
+  type BrandTierPriceObservation,
   type BudgetSummary,
+  type ChainPriceIndexSummary,
+  type ChainPriceObservation,
   type ExpiryDealRadar,
   type ExpiryDealReport,
   type LocalOfferBasketSummary,
@@ -83,6 +89,52 @@ export type ProductDetail = SearchableProduct & {
     discountDepthPercent: number;
     sourceConfidence: number;
   };
+};
+
+export type ProductCheapestNowChainPrice = {
+  chain: string;
+  storeId: string;
+  storeName: string;
+  packagePrice: number;
+  comparableUnitPrice: number;
+  comparableUnit: string;
+};
+
+export type ProductCheapestNow = {
+  productId: string;
+  productName: string;
+  category: string;
+  currency: 'SEK';
+  cheapest: ProductCheapestNowChainPrice | null;
+  chainPrices: ProductCheapestNowChainPrice[];
+  chainCount: number;
+  observedPriceCount: number;
+  lastObservedAt: string | null;
+  guardrails: string[];
+};
+
+export type CategoryPriceIndex = {
+  id: string;
+  category: string;
+  label: string;
+  value: number;
+  movementPercent: number;
+  productCount: number;
+  baseDate: string;
+  currentDate: string;
+};
+
+export type CategoryPriceIndexSummary = {
+  currency: 'SEK';
+  indices: CategoryPriceIndex[];
+  generatedFrom: number;
+  guardrails: string[];
+};
+
+export type BrandPriceIndexSummary = BrandTierIndexSummary & {
+  currency: 'SEK';
+  generatedFrom: number;
+  guardrails: string[];
 };
 
 export type CanonicalPriceType =
@@ -481,6 +533,58 @@ export type ProductHistoryConfidenceReport = {
   guardrails: string[];
 };
 
+export type ProductPriceHistoryPriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'estimated';
+
+export type ProductPriceHistoryObservationInput = {
+  observationId: string;
+  productId: string;
+  productSlug: string;
+  productName: string;
+  chainId: string;
+  storeId?: string;
+  sourceRunId?: string;
+  rawRecordId?: string;
+  retailerProductRef?: string;
+  priceType: ProductPriceHistoryPriceType;
+  price: number;
+  regularPrice?: number;
+  unitPrice: number;
+  currency: 'SEK';
+  quantity?: number;
+  quantityUnit?: string;
+  promotionText?: string;
+  promotionStartsOn?: string;
+  promotionEndsOn?: string;
+  memberRequired: boolean;
+  observedAt: string;
+  validFrom?: string;
+  validUntil?: string;
+  confidence: number;
+  provenance: Record<string, unknown>;
+};
+
+export type ProductPriceHistoryProductInput = {
+  productId: string;
+  productSlug: string;
+  productName: string;
+};
+
+export type ProductPriceHistoryPoint = ProductPriceHistoryObservationInput;
+
+export type ProductPriceHistoryReport = {
+  productId: string;
+  productSlug: string;
+  productName: string;
+  currency: 'SEK';
+  pointCount: number;
+  observedFrom: string | null;
+  observedTo: string | null;
+  priceTypes: ProductPriceHistoryPriceType[];
+  points: ProductPriceHistoryPoint[];
+  summary: PriceHistorySummary | null;
+  guardrails: string[];
+};
+
 export type ProductStoreSavingsRow = {
   storeId: string;
   storeName: string;
@@ -574,9 +678,90 @@ export type StoreDealSummaryReport = {
   guardrails: string[];
 };
 
+export type FlyerOfferPriceType = 'flyer' | 'member_flyer';
+
+export type FlyerOffer = {
+  offerId: string;
+  flyerId: string;
+  chain: string;
+  storeId: string;
+  storeName: string;
+  branchDistrict: string;
+  productId: string;
+  productName: string;
+  category: string;
+  regularPrice: number;
+  offerPrice: number;
+  savings: number;
+  discountPercent: number;
+  currency: 'SEK';
+  priceType: FlyerOfferPriceType;
+  validFrom: string;
+  validThrough: string;
+  observedAt: string;
+  sourceType: 'weekly_flyer';
+  sourceUrl: string;
+  sourceRunId: string;
+  confidence: number;
+  dealScore: number;
+  band: ReturnType<typeof scoreBand>;
+};
+
+export type FlyerOfferStoreSummary = {
+  storeId: string;
+  storeName: string;
+  chain: string;
+  offerCount: number;
+  totalOneEachSavings: number;
+  topOfferId: string;
+  topDealScore: number;
+};
+
+export type FlyerOfferReport = {
+  asOf: string;
+  filters: {
+    storeId?: string;
+    chain?: string;
+    category?: string;
+    productId?: string;
+  };
+  offerCount: number;
+  stores: FlyerOfferStoreSummary[];
+  offers: FlyerOffer[];
+  guardrails: string[];
+};
+
+export type StoreFlyerOfferReport = {
+  storeId: string;
+  storeName: string;
+  chain: string;
+  asOf: string;
+  offerCount: number;
+  categoryCount: number;
+  totalOneEachSavings: number;
+  bestOffer: FlyerOffer | null;
+  offers: FlyerOffer[];
+  guardrails: string[];
+};
+
 export type BasketItemRequest = {
   productId: string;
   quantity: number;
+};
+
+export type WatchlistPriceAlertRequest = {
+  productId: string;
+  targetPrice: number;
+  favoriteStoresOnly?: boolean;
+  allowedPriceTypes?: WatchlistPriceType[];
+};
+
+export type WatchlistPriceAlertReport = {
+  userId: string;
+  trackedItemCount: number;
+  alertCount: number;
+  alerts: WatchlistAlert[];
+  guardrails: string[];
 };
 
 export type UserBudgetPatch = {
@@ -739,6 +924,406 @@ export type NotificationInboxReport = {
   quietHoursWindow: string;
   guardrails: string[];
 };
+
+export type RealCatalogPriceType = 'shelf' | 'online' | 'member' | 'promotion' | 'receipt' | 'community' | 'estimated';
+
+export type RealCatalogSearchPriceRow = {
+  productId: string;
+  slug: string;
+  canonicalName: string;
+  brand?: string;
+  categoryPath: string[];
+  packageSize?: number;
+  packageUnit?: string;
+  comparableUnit: string;
+  imageUrl?: string;
+  observationId?: string;
+  price?: number;
+  unitPrice?: number;
+  currency?: string;
+  priceType?: RealCatalogPriceType;
+  confidence?: number;
+  observedAt?: string;
+  chainId?: string;
+  chainSlug?: string;
+  chainName?: string;
+  storeId?: string;
+  storeSlug?: string;
+  storeName?: string;
+};
+
+export type FacetedProductSearchFilters = {
+  query?: string;
+  categories?: string[];
+  brands?: string[];
+  chains?: string[];
+  stores?: string[];
+  priceTypes?: RealCatalogPriceType[];
+  minPrice?: number;
+  maxPrice?: number;
+  limit?: number;
+};
+
+export type FacetedProductSearchResult = {
+  query: string;
+  filters: Required<Pick<FacetedProductSearchFilters, 'categories' | 'brands' | 'chains' | 'stores' | 'priceTypes'>> & {
+    minPrice: number | null;
+    maxPrice: number | null;
+    limit: number;
+  };
+  count: number;
+  products: Array<{
+    productId: string;
+    slug: string;
+    canonicalName: string;
+    brand: string | null;
+    categoryPath: string[];
+    packageSize: number | null;
+    packageUnit: string | null;
+    comparableUnit: string;
+    imageUrl: string | null;
+    cheapestPrice: number | null;
+    currency: string;
+    currentPrices: Array<{
+      observationId: string;
+      price: number;
+      unitPrice: number;
+      currency: string;
+      priceType: RealCatalogPriceType;
+      confidence: number;
+      observedAt: string;
+      chainId: string;
+      chainSlug: string;
+      chainName: string;
+      storeId: string | null;
+      storeSlug: string | null;
+      storeName: string | null;
+    }>;
+  }>;
+  facets: {
+    categories: Array<{ value: string; count: number }>;
+    brands: Array<{ value: string; count: number }>;
+    chains: Array<{ value: string; label: string; count: number }>;
+    stores: Array<{ value: string; label: string; count: number }>;
+    priceTypes: Array<{ value: RealCatalogPriceType; count: number }>;
+    priceRange: { min: number | null; max: number | null };
+  };
+  evidence: {
+    pricedProductCount: number;
+    latestPriceCount: number;
+    sourceTables: ['products', 'latest_prices', 'chains', 'stores'];
+  };
+};
+
+export type RealBasketCompareItem = {
+  productId: string;
+  quantity: number;
+};
+
+export type RealBasketCompareInput = {
+  userId?: string;
+  items: RealBasketCompareItem[];
+  selectedStoreSlugs?: string[];
+  latestPrices: RealCatalogSearchPriceRow[];
+};
+
+export type RealBasketCompareResult = {
+  userId: string | null;
+  currency: 'SEK';
+  itemCount: number;
+  selectedStoreSlugs: string[];
+  strategies: Array<{
+    id: 'cheapest_across_selected' | 'all_at_one_store';
+    label: string;
+    total: number | null;
+    storeCount: number;
+    assignments: Array<{
+      productId: string;
+      slug: string;
+      productName: string;
+      quantity: number;
+      storeSlug: string | null;
+      storeName: string | null;
+      unitPrice: number | null;
+      lineTotal: number | null;
+      priceLabel: 'verified_latest_price' | 'missing_price';
+      observationId?: string;
+      observedAt?: string;
+      confidence?: number;
+    }>;
+    missingProductIds: string[];
+    warnings: string[];
+  }>;
+  missingProductIds: string[];
+  evidence: {
+    latestPriceCount: number;
+    sourceTables: ['basket_items', 'weekly_baskets', 'products', 'latest_prices', 'stores'];
+  };
+};
+
+function normalizedList(values: readonly string[] | undefined): string[] {
+  return [...new Set((values ?? []).map((value) => value.trim()).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+}
+
+function increment(map: Map<string, number>, key: string): void {
+  map.set(key, (map.get(key) ?? 0) + 1);
+}
+
+function sortedFacet(map: Map<string, number>): Array<{ value: string; count: number }> {
+  return [...map.entries()]
+    .map(([value, count]) => ({ value, count }))
+    .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value));
+}
+
+function money(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+export function buildFacetedProductSearch(input: {
+  rows: RealCatalogSearchPriceRow[];
+  filters?: FacetedProductSearchFilters;
+}): FacetedProductSearchResult {
+  const filters = input.filters ?? {};
+  const limit = Math.min(Math.max(filters.limit ?? 50, 1), 100);
+  const productMap = new Map<string, FacetedProductSearchResult['products'][number]>();
+  const categoryFacet = new Map<string, number>();
+  const brandFacet = new Map<string, number>();
+  const chainFacet = new Map<string, { label: string; count: number }>();
+  const storeFacet = new Map<string, { label: string; count: number }>();
+  const priceTypeFacet = new Map<RealCatalogPriceType, number>();
+  let minPrice: number | null = null;
+  let maxPrice: number | null = null;
+  let latestPriceCount = 0;
+
+  for (const row of input.rows) {
+    let product = productMap.get(row.productId);
+    if (!product) {
+      product = {
+        productId: row.productId,
+        slug: row.slug,
+        canonicalName: row.canonicalName,
+        brand: row.brand ?? null,
+        categoryPath: [...row.categoryPath],
+        packageSize: row.packageSize ?? null,
+        packageUnit: row.packageUnit ?? null,
+        comparableUnit: row.comparableUnit,
+        imageUrl: row.imageUrl ?? null,
+        cheapestPrice: null,
+        currency: row.currency ?? 'SEK',
+        currentPrices: []
+      };
+      productMap.set(row.productId, product);
+      for (const category of row.categoryPath) increment(categoryFacet, category);
+      if (row.brand) increment(brandFacet, row.brand);
+    }
+
+    if (
+      row.observationId &&
+      typeof row.price === 'number' &&
+      typeof row.unitPrice === 'number' &&
+      row.priceType &&
+      row.confidence !== undefined &&
+      row.observedAt &&
+      row.chainId &&
+      row.chainSlug &&
+      row.chainName
+    ) {
+      latestPriceCount += 1;
+      product.cheapestPrice = product.cheapestPrice === null ? row.price : Math.min(product.cheapestPrice, row.price);
+      minPrice = minPrice === null ? row.price : Math.min(minPrice, row.price);
+      maxPrice = maxPrice === null ? row.price : Math.max(maxPrice, row.price);
+      product.currentPrices.push({
+        observationId: row.observationId,
+        price: row.price,
+        unitPrice: row.unitPrice,
+        currency: row.currency ?? 'SEK',
+        priceType: row.priceType,
+        confidence: row.confidence,
+        observedAt: row.observedAt,
+        chainId: row.chainId,
+        chainSlug: row.chainSlug,
+        chainName: row.chainName,
+        storeId: row.storeId ?? null,
+        storeSlug: row.storeSlug ?? null,
+        storeName: row.storeName ?? null
+      });
+      const chain = chainFacet.get(row.chainSlug) ?? { label: row.chainName, count: 0 };
+      chain.count += 1;
+      chainFacet.set(row.chainSlug, chain);
+      if (row.storeSlug && row.storeName) {
+        const store = storeFacet.get(row.storeSlug) ?? { label: row.storeName, count: 0 };
+        store.count += 1;
+        storeFacet.set(row.storeSlug, store);
+      }
+      increment(priceTypeFacet, row.priceType);
+    }
+  }
+
+  const products = [...productMap.values()]
+    .map((product) => ({
+      ...product,
+      currentPrices: product.currentPrices.sort((a, b) => a.price - b.price || b.observedAt.localeCompare(a.observedAt))
+    }))
+    .sort((a, b) => {
+      if (a.cheapestPrice === null && b.cheapestPrice !== null) return 1;
+      if (a.cheapestPrice !== null && b.cheapestPrice === null) return -1;
+      if (a.cheapestPrice !== null && b.cheapestPrice !== null && a.cheapestPrice !== b.cheapestPrice) return a.cheapestPrice - b.cheapestPrice;
+      return a.canonicalName.localeCompare(b.canonicalName);
+    })
+    .slice(0, limit);
+
+  return {
+    query: filters.query?.trim() ?? '',
+    filters: {
+      categories: normalizedList(filters.categories),
+      brands: normalizedList(filters.brands),
+      chains: normalizedList(filters.chains),
+      stores: normalizedList(filters.stores),
+      priceTypes: [...(filters.priceTypes ?? [])].sort((a, b) => a.localeCompare(b)),
+      minPrice: filters.minPrice ?? null,
+      maxPrice: filters.maxPrice ?? null,
+      limit
+    },
+    count: products.length,
+    products,
+    facets: {
+      categories: sortedFacet(categoryFacet),
+      brands: sortedFacet(brandFacet),
+      chains: [...chainFacet.entries()]
+        .map(([value, facet]) => ({ value, label: facet.label, count: facet.count }))
+        .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label)),
+      stores: [...storeFacet.entries()]
+        .map(([value, facet]) => ({ value, label: facet.label, count: facet.count }))
+        .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label)),
+      priceTypes: [...priceTypeFacet.entries()]
+        .map(([value, count]) => ({ value, count }))
+        .sort((a, b) => b.count - a.count || a.value.localeCompare(b.value)),
+      priceRange: { min: minPrice, max: maxPrice }
+    },
+    evidence: {
+      pricedProductCount: products.filter((product) => product.currentPrices.length > 0).length,
+      latestPriceCount,
+      sourceTables: ['products', 'latest_prices', 'chains', 'stores']
+    }
+  };
+}
+
+export function buildRealBasketComparison(input: RealBasketCompareInput): RealBasketCompareResult {
+  const selectedStoreSlugs = normalizedList(input.selectedStoreSlugs);
+  const itemOrder = new Map(input.items.map((item, index) => [item.productId, index]));
+  const rowsByProduct = new Map<string, RealCatalogSearchPriceRow[]>();
+  const productNames = new Map<string, { slug: string; canonicalName: string }>();
+
+  for (const row of input.latestPrices) {
+    if (!itemOrder.has(row.productId)) continue;
+    productNames.set(row.productId, { slug: row.slug, canonicalName: row.canonicalName });
+    if (selectedStoreSlugs.length > 0 && (!row.storeSlug || !selectedStoreSlugs.includes(row.storeSlug))) continue;
+    if (!row.observationId || typeof row.price !== 'number') continue;
+    const rows = rowsByProduct.get(row.productId) ?? [];
+    rows.push(row);
+    rowsByProduct.set(row.productId, rows);
+  }
+
+  const missingProductIds = input.items.filter((item) => !rowsByProduct.has(item.productId)).map((item) => item.productId);
+  const cheapestAssignments = input.items.map((item) => {
+    const product = productNames.get(item.productId);
+    const prices = [...(rowsByProduct.get(item.productId) ?? [])].sort(
+      (a, b) => (a.price ?? Number.POSITIVE_INFINITY) - (b.price ?? Number.POSITIVE_INFINITY) || (a.storeName ?? '').localeCompare(b.storeName ?? '')
+    );
+    const best = prices[0];
+    return {
+      productId: item.productId,
+      slug: product?.slug ?? item.productId,
+      productName: product?.canonicalName ?? item.productId,
+      quantity: item.quantity,
+      storeSlug: best?.storeSlug ?? null,
+      storeName: best?.storeName ?? null,
+      unitPrice: best?.price ?? null,
+      lineTotal: best?.price === undefined ? null : money(best.price * item.quantity),
+      priceLabel: best ? ('verified_latest_price' as const) : ('missing_price' as const),
+      ...(best?.observationId ? { observationId: best.observationId } : {}),
+      ...(best?.observedAt ? { observedAt: best.observedAt } : {}),
+      ...(best?.confidence !== undefined ? { confidence: best.confidence } : {})
+    };
+  });
+
+  const storeSlugs = selectedStoreSlugs.length > 0 ? selectedStoreSlugs : normalizedList(input.latestPrices.map((row) => row.storeSlug ?? ''));
+  const completeStoreQuotes = storeSlugs
+    .map((storeSlug) => {
+      const assignments = input.items.map((item) => {
+        const product = productNames.get(item.productId);
+        const best = [...(rowsByProduct.get(item.productId) ?? [])]
+          .filter((row) => row.storeSlug === storeSlug)
+          .sort((a, b) => (a.price ?? Number.POSITIVE_INFINITY) - (b.price ?? Number.POSITIVE_INFINITY))[0];
+        return {
+          productId: item.productId,
+          slug: product?.slug ?? item.productId,
+          productName: product?.canonicalName ?? item.productId,
+          quantity: item.quantity,
+          storeSlug: best?.storeSlug ?? storeSlug,
+          storeName: best?.storeName ?? null,
+          unitPrice: best?.price ?? null,
+          lineTotal: best?.price === undefined ? null : money(best.price * item.quantity),
+          priceLabel: best ? ('verified_latest_price' as const) : ('missing_price' as const),
+          ...(best?.observationId ? { observationId: best.observationId } : {}),
+          ...(best?.observedAt ? { observedAt: best.observedAt } : {}),
+          ...(best?.confidence !== undefined ? { confidence: best.confidence } : {})
+        };
+      });
+      return {
+        storeSlug,
+        assignments,
+        missingProductIds: assignments.filter((assignment) => assignment.priceLabel === 'missing_price').map((assignment) => assignment.productId),
+        total: assignments.every((assignment) => assignment.lineTotal !== null)
+          ? money(assignments.reduce((sum, assignment) => sum + (assignment.lineTotal ?? 0), 0))
+          : null
+      };
+    })
+    .filter((quote) => quote.total !== null)
+    .sort((a, b) => (a.total ?? Number.POSITIVE_INFINITY) - (b.total ?? Number.POSITIVE_INFINITY));
+
+  const cheapestTotal = cheapestAssignments.every((assignment) => assignment.lineTotal !== null)
+    ? money(cheapestAssignments.reduce((sum, assignment) => sum + (assignment.lineTotal ?? 0), 0))
+    : null;
+  const bestSingleStore = completeStoreQuotes[0];
+
+  return {
+    userId: input.userId ?? null,
+    currency: 'SEK',
+    itemCount: input.items.length,
+    selectedStoreSlugs,
+    strategies: [
+      {
+        id: 'cheapest_across_selected',
+        label: 'Cheapest across selected stores',
+        total: cheapestTotal,
+        storeCount: new Set(cheapestAssignments.map((assignment) => assignment.storeSlug).filter(Boolean)).size,
+        assignments: cheapestAssignments,
+        missingProductIds,
+        warnings:
+          missingProductIds.length === 0
+            ? ['Basket totals use persisted latest_prices rows only.']
+            : ['Some basket items are missing persisted latest_prices rows for the selected stores.']
+      },
+      {
+        id: 'all_at_one_store',
+        label: 'Best single store',
+        total: bestSingleStore?.total ?? null,
+        storeCount: bestSingleStore ? 1 : 0,
+        assignments: bestSingleStore?.assignments ?? [],
+        missingProductIds: bestSingleStore?.missingProductIds ?? input.items.map((item) => item.productId),
+        warnings: bestSingleStore
+          ? ['Single-store quote uses persisted latest_prices rows only.']
+          : ['No selected store has persisted prices for every basket item.']
+      }
+    ],
+    missingProductIds,
+    evidence: {
+      latestPriceCount: input.latestPrices.filter((row) => row.observationId).length,
+      sourceTables: ['basket_items', 'weekly_baskets', 'products', 'latest_prices', 'stores']
+    }
+  };
+}
 
 const stores: Store[] = [
   { id: 'willys-odenplan', name: 'Willys Odenplan', chain: 'willys', district: 'Odenplan', address: 'Odenplan, Stockholm', confidence: 'high' },
@@ -941,19 +1526,68 @@ const loyaltyOffers: LoyaltyOffer[] = [
   }
 ];
 
-const index = calculateFixedBasketIndex({
-  id: 'stockholm-grocery-index',
-  label: 'Stockholm Grocery Index',
-  baseDate: '2026-01-01',
-  currentDate: '2026-05-19',
-  components: [
-    { productId: 'coffee', baseUnitPrice: 100, currentUnitPrice: 91.6, weight: 1 },
-    { productId: 'dairy', baseUnitPrice: 100, currentUnitPrice: 108.4, weight: 1 },
-    { productId: 'protein', baseUnitPrice: 100, currentUnitPrice: 102.1, weight: 1 },
-    { productId: 'budget-basket', baseUnitPrice: 100, currentUnitPrice: 96.8, weight: 1 },
-    { productId: 'private-label', baseUnitPrice: 100, currentUnitPrice: 94.2, weight: 1 }
-  ]
-});
+const flyerOfferRows = [
+  {
+    offerId: 'flyer-willys-odenplan-coffee-2026w21',
+    flyerId: 'willys-stockholm-2026w21',
+    storeId: 'willys-odenplan',
+    productId: 'coffee',
+    regularPrice: 64.9,
+    offerPrice: 49.9,
+    priceType: 'flyer' as const,
+    validFrom: '2026-05-19T00:00:00.000Z',
+    validThrough: '2026-05-25T21:59:59.000Z',
+    observedAt: '2026-05-19T06:30:00.000Z',
+    sourceUrl: 'https://www.willys.se/erbjudanden/stockholm/vecka-21',
+    sourceRunId: 'source-run-willys-flyer-2026-05-19',
+    confidence: 0.92
+  },
+  {
+    offerId: 'flyer-willys-odenplan-private-label-milk-2026w21',
+    flyerId: 'willys-stockholm-2026w21',
+    storeId: 'willys-odenplan',
+    productId: 'private-label-milk',
+    regularPrice: 19.9,
+    offerPrice: 12.9,
+    priceType: 'member_flyer' as const,
+    validFrom: '2026-05-19T00:00:00.000Z',
+    validThrough: '2026-05-25T21:59:59.000Z',
+    observedAt: '2026-05-19T06:30:00.000Z',
+    sourceUrl: 'https://www.willys.se/erbjudanden/stockholm/vecka-21',
+    sourceRunId: 'source-run-willys-flyer-2026-05-19',
+    confidence: 0.88
+  },
+  {
+    offerId: 'flyer-lidl-sveavagen-milk-2026w21',
+    flyerId: 'lidl-stockholm-2026w21',
+    storeId: 'lidl-sveavagen',
+    productId: 'milk',
+    regularPrice: 16.9,
+    offerPrice: 13.9,
+    priceType: 'flyer' as const,
+    validFrom: '2026-05-19T00:00:00.000Z',
+    validThrough: '2026-05-25T20:59:59.000Z',
+    observedAt: '2026-05-19T05:45:00.000Z',
+    sourceUrl: 'https://www.lidl.se/c/erbjudanden-stockholm/s10025521',
+    sourceRunId: 'source-run-lidl-flyer-2026-05-19',
+    confidence: 0.9
+  },
+  {
+    offerId: 'flyer-coop-odenplan-butter-2026w21',
+    flyerId: 'coop-stockholm-2026w21',
+    storeId: 'coop-odenplan',
+    productId: 'butter',
+    regularPrice: 59.9,
+    offerPrice: 54.9,
+    priceType: 'flyer' as const,
+    validFrom: '2026-05-19T00:00:00.000Z',
+    validThrough: '2026-05-25T21:59:59.000Z',
+    observedAt: '2026-05-19T07:10:00.000Z',
+    sourceUrl: 'https://www.coop.se/butiker-erbjudanden/coop/coop-odenplan/',
+    sourceRunId: 'source-run-coop-flyer-2026-05-19',
+    confidence: 0.84
+  }
+];
 
 function requireNonEmptyId(value: string, label: string) {
   if (value.trim().length === 0) {
@@ -1098,6 +1732,183 @@ function roundPercent(value: number): number {
 
 function roundPrice(value: number): number {
   return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
+function storeForId(storeId: string): Store | undefined {
+  return stores.find((store) => store.id === storeId);
+}
+
+function sortedHistory(product: ProductDetail) {
+  return [...product.history].sort((left, right) => Date.parse(left.date) - Date.parse(right.date));
+}
+
+function latestObservedAt(product: ProductDetail): string | null {
+  const latest = sortedHistory(product).at(-1);
+  return latest ? toIsoObservedAt(latest.date) : null;
+}
+
+function indexComponentFor(product: ProductDetail) {
+  const history = sortedHistory(product).filter((point) => Number.isFinite(point.price) && point.price > 0);
+  const first = history[0];
+  const current = bestPriceFor(product);
+  if (!first || !current) return null;
+  return {
+    productId: product.id,
+    baseUnitPrice: first.price,
+    currentUnitPrice: current.price,
+    weight: 1
+  };
+}
+
+function indexBaseDate(productsForIndex: ProductDetail[]): string {
+  return productsForIndex
+    .flatMap((product) => sortedHistory(product).map((point) => point.date))
+    .sort()[0] ?? 'unavailable';
+}
+
+function indexCurrentDate(productsForIndex: ProductDetail[]): string {
+  return productsForIndex
+    .flatMap((product) => sortedHistory(product).map((point) => point.date))
+    .sort()
+    .at(-1) ?? 'unavailable';
+}
+
+function buildStockholmGroceryIndex() {
+  const components = products
+    .map(indexComponentFor)
+    .filter((component): component is NonNullable<ReturnType<typeof indexComponentFor>> => component !== null);
+
+  return calculateFixedBasketIndex({
+    id: 'stockholm-grocery-index',
+    label: 'Stockholm Grocery Index',
+    baseDate: indexBaseDate(products),
+    currentDate: indexCurrentDate(products),
+    components
+  });
+}
+
+function comparableUnitBasis(product: ProductDetail): { quantity: number; unit: string } {
+  const match = product.unitPrice.match(/^(\d+(?:\.\d+)?)\s+SEK\/(.+)$/);
+  const referencePrice = product.currentPrices[0]?.price;
+  if (!match || referencePrice === undefined || referencePrice <= 0) {
+    return { quantity: 1, unit: 'package' };
+  }
+
+  const referenceUnitPrice = Number(match[1]);
+  if (!Number.isFinite(referenceUnitPrice) || referenceUnitPrice <= 0) {
+    return { quantity: 1, unit: 'package' };
+  }
+
+  return { quantity: referencePrice / referenceUnitPrice, unit: match[2]! };
+}
+
+function comparableUnitPrice(product: ProductDetail, packagePrice: number): number {
+  const { quantity } = comparableUnitBasis(product);
+  return roundPrice(packagePrice / quantity);
+}
+
+function cheapestByChain(product: ProductDetail): ProductCheapestNowChainPrice[] {
+  const byChain = new Map<string, ProductCheapestNowChainPrice>();
+  const { unit } = comparableUnitBasis(product);
+  for (const price of product.currentPrices) {
+    const store = storeForId(price.storeId);
+    if (!store) continue;
+    const row: ProductCheapestNowChainPrice = {
+      chain: store.chain,
+      storeId: price.storeId,
+      storeName: price.storeName,
+      packagePrice: roundPrice(price.price),
+      comparableUnitPrice: comparableUnitPrice(product, price.price),
+      comparableUnit: unit
+    };
+    const current = byChain.get(store.chain);
+    if (!current || row.packagePrice < current.packagePrice || (row.packagePrice === current.packagePrice && row.storeName.localeCompare(current.storeName) < 0)) {
+      byChain.set(store.chain, row);
+    }
+  }
+  return [...byChain.values()].sort((left, right) => left.packagePrice - right.packagePrice || left.chain.localeCompare(right.chain));
+}
+
+function chainIndexObservations(): ChainPriceObservation[] {
+  return products.flatMap((product) =>
+    product.currentPrices.flatMap((price) => {
+      const store = storeForId(price.storeId);
+      if (!store) return [];
+      return [{
+        chainId: store.chain,
+        category: product.category,
+        unitPrice: comparableUnitPrice(product, price.price)
+      }];
+    })
+  );
+}
+
+function buildCategoryPriceIndices(): CategoryPriceIndexSummary {
+  const byCategory = new Map<string, ProductDetail[]>();
+  for (const product of products) {
+    const current = byCategory.get(product.category) ?? [];
+    current.push(product);
+    byCategory.set(product.category, current);
+  }
+
+  const indices = [...byCategory.entries()].flatMap(([category, categoryProducts]) => {
+    const components = categoryProducts
+      .map(indexComponentFor)
+      .filter((component): component is NonNullable<ReturnType<typeof indexComponentFor>> => component !== null);
+    if (components.length === 0) return [];
+    const index = calculateFixedBasketIndex({
+      id: `${category}-category-price-index`,
+      label: `${category[0]?.toUpperCase() ?? ''}${category.slice(1)} Price Index`,
+      baseDate: indexBaseDate(categoryProducts),
+      currentDate: indexCurrentDate(categoryProducts),
+      components
+    });
+    return [{
+      id: index.id,
+      category,
+      label: index.label,
+      value: index.value,
+      movementPercent: index.movementPercent,
+      productCount: components.length,
+      baseDate: index.baseDate,
+      currentDate: index.currentDate
+    }];
+  }).sort((left, right) => left.value - right.value || left.category.localeCompare(right.category));
+
+  return {
+    currency: 'SEK',
+    indices,
+    generatedFrom: indices.reduce((sum, row) => sum + row.productCount, 0),
+    guardrails: [
+      'Category indices are calculated from recorded product history and current observed store prices.',
+      'Sparse categories remain product-count labeled instead of being expanded with synthetic rows.',
+      'Current category values use the cheapest currently observed store price for each product.'
+    ]
+  };
+}
+
+function buildBrandPriceIndices(): BrandPriceIndexSummary {
+  const observations = products.flatMap((product): BrandTierPriceObservation[] => {
+    const component = indexComponentFor(product);
+    if (!component) return [];
+    return [{
+      brandTier: product.brandTier,
+      category: product.id,
+      baseUnitPrice: component.baseUnitPrice,
+      currentUnitPrice: component.currentUnitPrice
+    }];
+  });
+  const summary = calculateBrandTierIndices(observations);
+  return {
+    ...summary,
+    currency: 'SEK',
+    generatedFrom: observations.length,
+    guardrails: [
+      'Brand indices are derived from product-level history and current observed store prices.',
+      'Private-label savings are only reported where a comparable national-brand product exists in the same component key.',
+      'No missing brand tiers are backfilled with estimated prices.'
+    ]
+  };
 }
 
 function range52WeekFrom(history: Array<{ price: number }>, bestPrice: StorePrice | null): { low: number; high: number } | null {
@@ -1319,6 +2130,78 @@ function productHistoryConfidenceFor(product: ProductDetail): ProductHistoryConf
       'History confidence explains whether a lowest-price claim can be used.',
       'Estimated history points block deal-alert confidence until confirmed by a source.',
       'Sparse or short windows stay labeled instead of implying a complete price history.'
+    ]
+  };
+}
+
+function assertFinitePriceHistoryNumber(value: number, field: string): void {
+  if (!Number.isFinite(value) || value < 0) throw new Error(`Invalid product price history ${field}.`);
+}
+
+function assertIsoDate(value: string, field: string): void {
+  if (Number.isNaN(Date.parse(value))) throw new Error(`Invalid product price history ${field}.`);
+}
+
+export function buildProductPriceHistoryReport(
+  observations: readonly ProductPriceHistoryObservationInput[]
+): ProductPriceHistoryReport | null {
+  if (observations.length === 0) return null;
+  const productId = observations[0]!.productId;
+  const productSlug = observations[0]!.productSlug;
+  const productName = observations[0]!.productName;
+
+  const points = observations.map((observation) => {
+    if (observation.productId !== productId) throw new Error('Product price history observations must belong to one product.');
+    if (observation.productSlug !== productSlug) throw new Error('Product price history observations must use one product slug.');
+    assertFinitePriceHistoryNumber(observation.price, 'price');
+    assertFinitePriceHistoryNumber(observation.unitPrice, 'unitPrice');
+    assertFinitePriceHistoryNumber(observation.confidence, 'confidence');
+    if (observation.regularPrice !== undefined) assertFinitePriceHistoryNumber(observation.regularPrice, 'regularPrice');
+    if (observation.quantity !== undefined) assertFinitePriceHistoryNumber(observation.quantity, 'quantity');
+    assertIsoDate(observation.observedAt, 'observedAt');
+    if (observation.validFrom) assertIsoDate(observation.validFrom, 'validFrom');
+    if (observation.validUntil) assertIsoDate(observation.validUntil, 'validUntil');
+    return observation;
+  }).sort((left, right) => {
+    const observedDelta = Date.parse(left.observedAt) - Date.parse(right.observedAt);
+    return observedDelta === 0 ? left.observationId.localeCompare(right.observationId) : observedDelta;
+  });
+
+  return {
+    productId,
+    productSlug,
+    productName,
+    currency: 'SEK',
+    pointCount: points.length,
+    observedFrom: points[0]?.observedAt ?? null,
+    observedTo: points.at(-1)?.observedAt ?? null,
+    priceTypes: [...new Set(points.map((point) => point.priceType))].sort(),
+    points,
+    summary: summarizePriceHistory(points.map((point) => ({ observedAt: point.observedAt, price: point.price }))),
+    guardrails: [
+      'Price history is built only from persisted observation rows for the selected product.',
+      'Member, promotion, estimated, receipt, and community rows remain explicitly labeled in the series.',
+      'Provenance identifiers stay attached so UI and audit flows can trace each point back to ingestion evidence.'
+    ]
+  };
+}
+
+export function buildEmptyProductPriceHistoryReport(product: ProductPriceHistoryProductInput): ProductPriceHistoryReport {
+  return {
+    productId: product.productId,
+    productSlug: product.productSlug,
+    productName: product.productName,
+    currency: 'SEK',
+    pointCount: 0,
+    observedFrom: null,
+    observedTo: null,
+    priceTypes: [],
+    points: [],
+    summary: null,
+    guardrails: [
+      'Price history is built only from persisted observation rows for the selected product.',
+      'No observations are returned when ingestion has not produced rows for the selected filters.',
+      'Missing history stays explicit instead of inferring movement from current store quotes.'
     ]
   };
 }
@@ -1993,6 +2876,128 @@ function storeDealSummaryFor(storeId: string): StoreDealSummaryReport {
   };
 }
 
+function flyerOfferFromRow(row: (typeof flyerOfferRows)[number]): FlyerOffer {
+  const product = products.find((candidate) => candidate.id === row.productId);
+  const store = stores.find((candidate) => candidate.id === row.storeId);
+  if (!product) throw new Error(`Unknown productId: ${row.productId}`);
+  if (!store) throw new Error(`Unknown storeId: ${row.storeId}`);
+  const savings = roundPrice(row.regularPrice - row.offerPrice);
+  return {
+    offerId: row.offerId,
+    flyerId: row.flyerId,
+    chain: store.chain,
+    storeId: store.id,
+    storeName: store.name,
+    branchDistrict: store.district,
+    productId: product.id,
+    productName: product.name,
+    category: product.category,
+    regularPrice: row.regularPrice,
+    offerPrice: row.offerPrice,
+    savings,
+    discountPercent: row.regularPrice > 0 ? roundPercent((savings / row.regularPrice) * 100) : 0,
+    currency: 'SEK',
+    priceType: row.priceType,
+    validFrom: row.validFrom,
+    validThrough: row.validThrough,
+    observedAt: row.observedAt,
+    sourceType: 'weekly_flyer',
+    sourceUrl: row.sourceUrl,
+    sourceRunId: row.sourceRunId,
+    confidence: row.confidence,
+    dealScore: product.dealScore,
+    band: scoreBand(product.dealScore)
+  };
+}
+
+function activeFlyerOffers(asOf: string): FlyerOffer[] {
+  const asOfMs = Date.parse(requireIsoTimestamp(asOf, 'asOf'));
+  return flyerOfferRows
+    .map(flyerOfferFromRow)
+    .filter((offer) => Date.parse(offer.validFrom) <= asOfMs && asOfMs <= Date.parse(offer.validThrough));
+}
+
+function flyerOfferReport(options: {
+  asOf?: string;
+  storeId?: string;
+  chain?: string;
+  category?: string;
+  productId?: string;
+} = {}): FlyerOfferReport {
+  const asOf = options.asOf ?? '2026-05-20T12:00:00.000Z';
+  if (options.storeId) requireKnownStore(options.storeId);
+  if (options.productId) requireKnownProduct(options.productId);
+  const chain = options.chain?.trim().toLowerCase();
+  const category = options.category?.trim().toLowerCase();
+  const offers = activeFlyerOffers(asOf)
+    .filter((offer) => !options.storeId || offer.storeId === options.storeId)
+    .filter((offer) => !chain || offer.chain === chain)
+    .filter((offer) => !category || offer.category.toLowerCase() === category)
+    .filter((offer) => !options.productId || offer.productId === options.productId)
+    .sort((left, right) =>
+      right.dealScore - left.dealScore ||
+      right.discountPercent - left.discountPercent ||
+      left.storeName.localeCompare(right.storeName) ||
+      left.productName.localeCompare(right.productName)
+    );
+  const storesById = new Map<string, FlyerOffer[]>();
+  for (const offer of offers) {
+    storesById.set(offer.storeId, [...(storesById.get(offer.storeId) ?? []), offer]);
+  }
+  const storesSummary = [...storesById.entries()].map(([storeId, storeOffers]) => {
+    const topOffer = storeOffers[0]!;
+    return {
+      storeId,
+      storeName: topOffer.storeName,
+      chain: topOffer.chain,
+      offerCount: storeOffers.length,
+      totalOneEachSavings: roundPrice(storeOffers.reduce((sum, offer) => sum + offer.savings, 0)),
+      topOfferId: topOffer.offerId,
+      topDealScore: topOffer.dealScore
+    };
+  }).sort((left, right) =>
+    right.topDealScore - left.topDealScore ||
+    right.totalOneEachSavings - left.totalOneEachSavings ||
+    left.storeName.localeCompare(right.storeName)
+  );
+
+  return {
+    asOf,
+    filters: {
+      ...(options.storeId ? { storeId: options.storeId } : {}),
+      ...(chain ? { chain } : {}),
+      ...(category ? { category } : {}),
+      ...(options.productId ? { productId: options.productId } : {})
+    },
+    offerCount: offers.length,
+    stores: storesSummary,
+    offers,
+    guardrails: [
+      'Flyer offers are active only inside their captured validity window.',
+      'Branch-level offers stay tied to a store, source run, and flyer URL before they can drive shopper action.',
+      'Member flyer prices remain labeled and never overwrite public shelf price history.'
+    ]
+  };
+}
+
+function storeFlyerOfferReport(storeId: string, asOf?: string): StoreFlyerOfferReport {
+  requireKnownStore(storeId);
+  const store = stores.find((candidate) => candidate.id === storeId)!;
+  const report = flyerOfferReport({ storeId, asOf });
+  return {
+    storeId,
+    storeName: store.name,
+    chain: store.chain,
+    asOf: report.asOf,
+    offerCount: report.offerCount,
+    categoryCount: new Set(report.offers.map((offer) => offer.category)).size,
+    totalOneEachSavings: roundPrice(report.offers.reduce((sum, offer) => sum + offer.savings, 0)),
+    bestOffer: report.offers[0] ?? null,
+    offers: report.offers,
+    guardrails: report.guardrails
+  };
+}
+
 export function createGroceryViewApi() {
   const favoriteStores = new Map<string, Set<string>>();
   const watchlists = new Map<string, WatchlistItem[]>();
@@ -2040,7 +3045,7 @@ export function createGroceryViewApi() {
             band: scoreBand(product.dealScore)
           };
         });
-      return { city: 'Stockholm', indices: [index], movers, topDeals };
+      return { city: 'Stockholm', indices: [buildStockholmGroceryIndex()], movers, topDeals };
     },
 
     getNutritionValueReport(metric: NutritionMetric = 'protein'): NutritionValueReport {
@@ -2333,6 +3338,14 @@ export function createGroceryViewApi() {
       return storeDealSummaryFor(storeId);
     },
 
+    getFlyerOffers(options: { asOf?: string; storeId?: string; chain?: string; category?: string; productId?: string } = {}): FlyerOfferReport {
+      return flyerOfferReport(options);
+    },
+
+    getStoreFlyerOffers(storeId: string, options: { asOf?: string } = {}): StoreFlyerOfferReport {
+      return storeFlyerOfferReport(storeId, options.asOf);
+    },
+
     getStorePriceCoverage(storeId: string): StorePriceCoverageReport {
       return buildStorePriceCoverage(storeId);
     },
@@ -2353,6 +3366,28 @@ export function createGroceryViewApi() {
 
     getProductPrices(id: string) {
       return sortPricesByValue(this.getProduct(id)?.currentPrices ?? []);
+    },
+
+    getProductCheapestNow(id: string): ProductCheapestNow | null {
+      const product = this.getProduct(id);
+      if (!product) return null;
+      const chainPrices = cheapestByChain(product);
+      return {
+        productId: product.id,
+        productName: product.name,
+        category: product.category,
+        currency: 'SEK',
+        cheapest: chainPrices[0] ?? null,
+        chainPrices,
+        chainCount: chainPrices.length,
+        observedPriceCount: product.currentPrices.length,
+        lastObservedAt: latestObservedAt(product),
+        guardrails: [
+          'Cheapest-now compares only current observed prices for this exact product.',
+          'Each chain contributes at most its cheapest currently observed store row.',
+          'Missing chains stay absent instead of being estimated from other chains or products.'
+        ]
+      };
     },
 
     getProductHistory(id: string) {
@@ -2523,6 +3558,44 @@ export function createGroceryViewApi() {
       const items = watchlists.get(userId) ?? [];
       const favoriteStoreIds = this.getFavoriteStores(userId).map((store) => store.id);
       return { items, alerts: buildWatchlistAlerts({ watchlist: items, products: productSnapshots(), favoriteStoreIds }) };
+    },
+
+    addWatchlistPriceAlert(userId: string, alert: WatchlistPriceAlertRequest): WatchlistPriceAlertReport {
+      requireNonEmptyId(userId, 'userId');
+      requireKnownProduct(alert.productId);
+      requirePositiveFinite(alert.targetPrice, 'targetPrice');
+      requireAllowedPriceTypes(alert.allowedPriceTypes);
+      const current = watchlists.get(userId) ?? [];
+      const existingIndex = current.findIndex((item) => item.productId === alert.productId);
+      const nextItem: WatchlistItem = {
+        ...(existingIndex >= 0 ? current[existingIndex]! : { productId: alert.productId }),
+        productId: alert.productId,
+        targetPrice: alert.targetPrice,
+        favoriteStoresOnly: alert.favoriteStoresOnly ?? current[existingIndex]?.favoriteStoresOnly ?? true,
+        ...(alert.allowedPriceTypes === undefined ? {} : { allowedPriceTypes: alert.allowedPriceTypes })
+      };
+      const next = existingIndex >= 0
+        ? current.map((item, index) => index === existingIndex ? nextItem : item)
+        : [...current, nextItem];
+      watchlists.set(userId, next);
+      return this.getWatchlistPriceAlerts(userId);
+    },
+
+    getWatchlistPriceAlerts(userId: string): WatchlistPriceAlertReport {
+      requireNonEmptyId(userId, 'userId');
+      const watchlist = this.getWatchlist(userId);
+      const alerts = watchlist.alerts.filter((alert) => alert.type === 'target_price');
+      return {
+        userId,
+        trackedItemCount: watchlist.items.filter((item) => item.targetPrice !== undefined).length,
+        alertCount: alerts.length,
+        alerts,
+        guardrails: [
+          'Price alerts require a user-defined target price and current eligible price evidence.',
+          'Favorite-store and allowed-price-type filters are applied before an alert is emitted.',
+          'Estimated prices are excluded unless the watcher explicitly allows estimated price types.'
+        ]
+      };
     },
 
     addBasketItem(userId: string, item: BasketItemRequest) {
@@ -2719,11 +3792,24 @@ export function createGroceryViewApi() {
       });
     },
 
+    getChainPriceIndices(): ChainPriceIndexSummary {
+      return calculateChainPriceIndex(chainIndexObservations());
+    },
+
+    getCategoryPriceIndices(): CategoryPriceIndexSummary {
+      return buildCategoryPriceIndices();
+    },
+
+    getBrandPriceIndices(): BrandPriceIndexSummary {
+      return buildBrandPriceIndices();
+    },
+
     getIndices() {
-      return [index];
+      return [buildStockholmGroceryIndex()];
     },
 
     getIndex(id: string) {
+      const index = buildStockholmGroceryIndex();
       return id === index.id ? index : null;
     }
   };
