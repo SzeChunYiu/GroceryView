@@ -75,6 +75,33 @@ describe('verified-data UI', () => {
   });
 
 
+  it('ships signed-in household plan controls without anonymous private rows', async () => {
+    const household = await read('src/app/household/page.tsx');
+    const actions = await read('src/components/household-plan-actions.tsx');
+    const server = await read('../../packages/server/src/index.ts');
+
+    assert.match(household, /HouseholdPlanActions/);
+    assert.match(actions, /'use client'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:accessToken'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:userId'/);
+    assert.match(actions, /Authorization: `Bearer \$\{accessToken\}`/);
+    assert.match(actions, /\/api\/households\/current\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /method: 'GET'/);
+    assert.match(actions, /method: 'PUT'/);
+    assert.match(actions, /householdId/);
+    assert.match(actions, /weeklyBudget/);
+    assert.match(actions, /approvalLimit/);
+    assert.match(actions, /members/);
+    assert.match(actions, /basketItems/);
+    assert.match(actions, /sharedFavoriteStoreIds/);
+    assert.match(actions, /Sign in first/);
+    assert.match(actions, /No anonymous household writes/);
+    assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);
+    assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
+    assert.match(server, /Household plan not found/);
+  });
+
+
   it('ships signed-in scanner upload and barcode processing controls without anonymous uploads', async () => {
     const scanner = await read('src/app/scanner/page.tsx');
     const actions = await read('src/components/scanner-upload-actions.tsx');

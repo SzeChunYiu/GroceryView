@@ -1,4 +1,5 @@
 import { Card, Eyebrow, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
+import { HouseholdPlanActions } from '@/components/household-plan-actions';
 import { formatPct, formatSek, sourceCoverage, topChainSpreads } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
@@ -49,6 +50,7 @@ export default function FeaturePage() {
   return (
     <PageShell>
       <NoVerifiedData route={route} title={`${titles[route]} has no private production records in this static snapshot`} />
+      <HouseholdPlanActions />
 
       <section className="mt-6 grid gap-4 md:grid-cols-3">
         {householdEvidence.map((item) => (
