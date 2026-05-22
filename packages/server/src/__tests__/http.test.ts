@@ -298,9 +298,17 @@ describe('createHttpHandler', () => {
     assert.equal(flyerOffers.status, 503);
     assert.deepEqual(await json(flyerOffers), { error: 'Flyer offers provider is not configured.' });
 
+    const discounts = await handle(new Request('http://localhost/api/deals/discounts?chain=willys&asOf=2026-05-20T12:00:00.000Z'));
+    assert.equal(discounts.status, 503);
+    assert.deepEqual(await json(discounts), { error: 'Discounts provider is not configured.' });
+
     const storeFlyerOffers = await handle(new Request('http://localhost/api/stores/lidl-sveavagen/flyer-offers?asOf=2026-05-20T12:00:00.000Z'));
     assert.equal(storeFlyerOffers.status, 503);
     assert.deepEqual(await json(storeFlyerOffers), { error: 'Store flyer offers provider is not configured.' });
+
+    const storeDiscounts = await handle(new Request('http://localhost/api/stores/lidl-sveavagen/discounts?asOf=2026-05-20T12:00:00.000Z'));
+    assert.equal(storeDiscounts.status, 503);
+    assert.deepEqual(await json(storeDiscounts), { error: 'Store discounts provider is not configured.' });
 
     const storeDealSummary = await handle(new Request('http://localhost/api/stores/willys-odenplan/deal-summary'));
     assert.equal(storeDealSummary.status, 200);
@@ -677,6 +685,10 @@ describe('createHttpHandler', () => {
     const flyerOffers = await handle(new Request('http://localhost/api/stores/missing-store/flyer-offers'));
     assert.equal(flyerOffers.status, 503);
     assert.deepEqual(await json(flyerOffers), { error: 'Store flyer offers provider is not configured.' });
+
+    const discounts = await handle(new Request('http://localhost/api/stores/missing-store/discounts'));
+    assert.equal(discounts.status, 503);
+    assert.deepEqual(await json(discounts), { error: 'Store discounts provider is not configured.' });
 
     const categoryCoverage = await handle(new Request('http://localhost/api/stores/missing-store/category-coverage'));
     assert.equal(categoryCoverage.status, 404);

@@ -457,6 +457,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/users/demo/budget/categories']);
     assert.ok(docs.body.paths['/users/demo/ads/disclosure']);
     assert.ok(docs.body.paths['/users/demo/expiry-deals/radar']);
+    assert.ok(docs.body.paths['/deals/discounts']);
     assert.ok(docs.body.paths['/deals/flyer-offers']);
     assert.ok(docs.body.paths['/health']);
     assert.ok(docs.body.paths['/users/demo/households/current']);
@@ -491,6 +492,7 @@ describe('GroceryView API app', () => {
     assert.ok(docs.body.paths['/stores/{id}/coverage']);
     assert.ok(docs.body.paths['/stores/{id}/deal-summary']);
     assert.ok(docs.body.paths['/stores/{id}/deals']);
+    assert.ok(docs.body.paths['/stores/{id}/discounts']);
     assert.ok(docs.body.paths['/stores/{id}/flyer-offers']);
     assert.ok(docs.body.paths['/users/demo/favorite-stores']);
     assert.ok(docs.body.paths['/users/demo/favorite-stores/{storeId}']);
@@ -650,6 +652,23 @@ describe('GroceryView API app', () => {
     assert.equal(storeFlyerOffers.body.totalOneEachSavings, 22);
     assert.equal(storeFlyerOffers.body.demo, undefined);
     assert.equal(priceHistoryExecutor.calls.some((call) => /from stores/i.test(call.sql) && /join chains/i.test(call.sql)), true);
+
+    const discounts = await request(app.getHttpServer())
+      .get('/deals/discounts?chain=willys&asOf=2026-05-20T12:00:00.000Z')
+      .expect(200);
+    assert.deepEqual(discounts.body.offers.map((offer: { offerId: string }) => offer.offerId), [
+      'obs-flyer-private-label-milk',
+      'obs-flyer-coffee'
+    ]);
+    assert.equal(discounts.body.offers[0].sourceType, 'weekly_flyer');
+    assert.equal(discounts.body.demo, undefined);
+
+    const storeDiscounts = await request(app.getHttpServer())
+      .get('/stores/willys-odenplan/discounts?asOf=2026-05-20T12:00:00.000Z')
+      .expect(200);
+    assert.equal(storeDiscounts.body.storeId, 'willys-odenplan');
+    assert.equal(storeDiscounts.body.offerCount, 2);
+    assert.equal(storeDiscounts.body.demo, undefined);
 
     const prices = await request(app.getHttpServer()).get('/products/coffee/prices').expect(200);
     assert.equal(prices.body[0].currency, 'SEK');
@@ -1370,7 +1389,9 @@ describe('GroceryView API real-only deal and alert endpoints', () => {
   });
 
   it('fails closed instead of serving demo flyer offers or price alerts without PostgreSQL', async () => {
+    await request(app.getHttpServer()).get('/deals/discounts').expect(503);
     await request(app.getHttpServer()).get('/deals/flyer-offers').expect(503);
+    await request(app.getHttpServer()).get('/stores/willys-odenplan/discounts').expect(503);
     await request(app.getHttpServer()).get('/stores/willys-odenplan/flyer-offers').expect(503);
     await request(app.getHttpServer()).get('/users/demo/watchlist/price-alerts').expect(503);
     await request(app.getHttpServer())

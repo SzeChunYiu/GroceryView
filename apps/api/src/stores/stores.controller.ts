@@ -39,6 +39,17 @@ export class StoresController {
     return report;
   }
 
+  @Get(':id/discounts')
+  @ApiOkResponse({ description: 'Active weekly discounts captured for one branch' })
+  async discounts(@Param('id') id: string, @Query('asOf') asOf?: string) {
+    if (!this.dealsService.isConfigured()) {
+      throw new ServiceUnavailableException('DATABASE_URL is required for real store discount data.');
+    }
+    const report = await this.dealsService.storeFlyerOffers(id, { asOf });
+    if (!report) throw new NotFoundException('Store not found');
+    return report;
+  }
+
   @Get(':id/coverage')
   @ApiOkResponse({ description: 'Verified shelf price coverage for one store' })
   coverage(@Param('id') id: string) {
