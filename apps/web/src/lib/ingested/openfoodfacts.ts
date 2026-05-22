@@ -1,9 +1,9 @@
 // AUTO-GENERATED from the official OpenFoodFacts world data export.
 // Source URL: https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz
 // Retrieved: 2026-05-22T10:51:26.620Z
-// Row count: 1580 real barcode+nutrition enrichment rows matched to existing ingested retailer products.
-// Candidate barcode count checked from current Willys/Hemkop/Coop/ICA reklamblad ingested rows: 2952. ICA reklamblad candidate barcodes: 346.
-// Export rows scanned: 4526744; candidate barcodes present in export: 1889; matched rows without usable nutrition/name: 309.
+// Row count: 1581 real barcode+nutrition enrichment rows matched to existing ingested retailer products.
+// Candidate barcode count checked from current Willys/Hemkop/Coop/ICA reklamblad ingested rows: 2953. ICA reklamblad candidate barcodes: 346.
+// Export rows scanned: 4526744; candidate barcodes present in export: 1890; matched rows without usable nutrition/name: 309.
 // No-match or nutrition-empty products were skipped.
 
 export type OpenFoodFactsNutritionPer100g = {
@@ -48,10 +48,10 @@ export type OpenFoodFactsIngestedProduct = {
 export const openFoodFactsSource = {
   "source": "openfoodfacts.org world data export barcode nutrition enrichment",
   "retrievedAt": "2026-05-22T10:51:26.620Z",
-  "rowCount": 1580,
-  "candidateBarcodeCount": 2952,
+  "rowCount": 1581,
+  "candidateBarcodeCount": 2953,
   "icaReklambladCandidateBarcodeCount": 346,
-  "matchedExportBarcodeCount": 1889,
+  "matchedExportBarcodeCount": 1890,
   "matchedWithoutNutritionCount": 309,
   "scannedExportRowCount": 4526744,
   "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz"
@@ -43753,6 +43753,42 @@ export const openFoodFactsProducts: OpenFoodFactsIngestedProduct[] = [
         "packageText": "400G",
         "sourceUrl": "https://proxy.api.coop.se/external/store/stores/250400?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
         "retrievedAt": "2026-05-22T10:32:37.171Z"
+      }
+    ]
+  },
+  {
+    "barcode": "7331044072627",
+    "name": "Tunnskivad Kalkonbröstfilé",
+    "brands": "Ingelsta",
+    "quantity": "",
+    "categories": [],
+    "labels": [],
+    "nutriscoreGrade": "unknown",
+    "nutritionPer100g": {
+      "energyKj": 493.1,
+      "energyKcal": 120,
+      "fat": 2.3,
+      "saturatedFat": 0.7,
+      "carbohydrates": 1.3,
+      "sugars": null,
+      "fiber": null,
+      "proteins": 22.7,
+      "salt": null,
+      "sodium": null
+    },
+    "imageUrl": "",
+    "productUrl": "http://world-en.openfoodfacts.org/product/7331044072627/tunnskivad-kalkonbrostfile-ingelsta",
+    "sourceUrl": "https://world.openfoodfacts.org/data/en.openfoodfacts.org.products.csv.gz#code=7331044072627",
+    "retrievedAt": "2026-05-22T10:51:26.620Z",
+    "retailerMatches": [
+      {
+        "chain": "coop",
+        "productCode": "7331044072627",
+        "name": "Kalkonbröstfilé Tunnskivad",
+        "brand": "Ingelsta Kalkon",
+        "packageText": "400g",
+        "sourceUrl": "https://proxy.api.coop.se/external/store/stores/133100?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+        "retrievedAt": "2026-05-22T10:38:22.011Z"
       }
     ]
   },
