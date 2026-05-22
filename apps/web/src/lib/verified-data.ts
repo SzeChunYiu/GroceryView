@@ -1322,6 +1322,30 @@ export const fulfillmentSlotsContract = {
   ]
 };
 
+
+export const loyaltyPriceChains = [
+  { chain: 'ICA', preferenceKey: 'ica_loyalty_prices', evidenceStatus: 'preference_only_until_account_offer_response' },
+  { chain: 'Willys', preferenceKey: 'willys_plus_prices', evidenceStatus: 'preference_only_until_account_offer_response' },
+  { chain: 'Coop', preferenceKey: 'coop_member_prices', evidenceStatus: 'preference_only_until_account_offer_response' },
+  { chain: 'Hemköp', preferenceKey: 'hemkop_member_prices', evidenceStatus: 'preference_only_until_account_offer_response' },
+  { chain: 'Lidl', preferenceKey: 'lidl_plus_prices', evidenceStatus: 'preference_only_until_account_offer_response' },
+  { chain: 'City Gross', preferenceKey: 'citygross_member_prices', evidenceStatus: 'preference_only_until_account_offer_response' }
+];
+
+export const loyaltyPricePreferenceContract = {
+  title: 'Loyalty price preferences',
+  endpoint: '/api/account/loyalty-price-preferences',
+  status: 'account_preference_contract',
+  chainToggles: loyaltyPriceChains,
+  savedFields: ['userId', 'chain', 'preferenceKey', 'enabled', 'updatedAt'],
+  guardrails: [
+    'No retailer credentials are stored by GroceryView for loyalty price preferences.',
+    'Preferences only tell GroceryView whether to include authenticated loyalty prices after the protected loyalty offer endpoint returns evidence.',
+    'Public pages must label authenticated loyalty prices as unavailable until a signed-in account response confirms eligibility.',
+    'Disabling a chain preference must hide member-only savings claims for that chain.'
+  ]
+};
+
 export const recurringBasketDigestContract = {
   endpoint: '/api/basket/recurring-digest',
   title: 'Recurring basket digest',
