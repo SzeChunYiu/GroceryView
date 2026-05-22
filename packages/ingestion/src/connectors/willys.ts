@@ -524,21 +524,35 @@ export async function fetchWillysProductsForAllStores(
     storeApiUrl: options.storeApiUrl
   });
   const rows: WillysStoreProduct[] = [];
-  for (const store of stores) {
-    const products = await fetchWillysProducts({
-      fetchImpl: options.fetchImpl,
-      queries: options.queries,
-      storeId: store.storeId,
-      maxRows: options.maxRowsPerStore ?? 24,
-      retrievedAt: options.retrievedAt
-    });
-    rows.push(...products.map((product) => ({
-      ...product,
-      storeId: store.storeId,
-      storeName: store.name,
-      city: store.city
-    })));
+  const failures: string[] = [];
+  const concurrency = 8;
+  for (let index = 0; index < stores.length; index += concurrency) {
+    const batch = stores.slice(index, index + concurrency);
+    const settled = await Promise.allSettled(batch.map(async (store) => {
+      const products = await fetchWillysProducts({
+        fetchImpl: options.fetchImpl,
+        queries: options.queries,
+        storeId: store.storeId,
+        maxRows: options.maxRowsPerStore ?? 24,
+        retrievedAt: options.retrievedAt
+      });
+      return products.map((product) => ({
+        ...product,
+        storeId: store.storeId,
+        storeName: store.name,
+        city: store.city
+      }));
+    }));
+    for (let offset = 0; offset < settled.length; offset += 1) {
+      const result = settled[offset]!;
+      if (result.status === 'fulfilled') {
+        rows.push(...result.value);
+      } else {
+        failures.push(`${batch[offset]?.storeId ?? 'unknown'}:${result.reason instanceof Error ? result.reason.message : String(result.reason)}`);
+      }
+    }
   }
+  if (rows.length === 0 && failures.length > 0) throw new Error(`Willys all-store product requests returned no usable branch products: ${failures[0]}`);
   return rows;
 }
 

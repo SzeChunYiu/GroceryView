@@ -2258,6 +2258,40 @@ describe('fetchWillysProductsForAllStores', () => {
       buildWillysSearchUrl('kaffe', '2268')
     ]);
   });
+
+  it('keeps Willys all-store ingestion moving when one branch product request fails', async () => {
+    const fetchImpl: typeof fetch = async (url) => {
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '2149', name: 'Willys Alingsås Hagaplan', address: { line1: 'Hagaplan 1', town: 'Alingsås', postalCode: '44131' }, onlineStore: true },
+          { storeId: '2268', name: 'Willys Avesta', address: { line1: 'Köpmangatan 1', town: 'Avesta', postalCode: '77430' }, onlineStore: true }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const storeId = new URL(String(url)).searchParams.get('store');
+      if (storeId === '2268') throw new Error('simulated Willys branch timeout');
+      return new Response(JSON.stringify({
+        results: [{
+          code: `willys-product-${storeId}`,
+          name: `Willys kaffe ${storeId}`,
+          manufacturer: 'Garant',
+          productLine2: '450 g',
+          priceValue: 70.88,
+          price: '70,88 kr'
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysProductsForAllStores({
+      fetchImpl,
+      maxStores: 2,
+      queries: ['kaffe'],
+      maxRowsPerStore: 1,
+      retrievedAt: '2026-05-22T13:39:00.000Z'
+    });
+
+    assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['2149', 70.88]]);
+  });
+
 });
 
 describe('fetchMatsparProducts', () => {
