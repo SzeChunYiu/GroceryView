@@ -9,12 +9,16 @@ import {
   buildProductCheapestNowReport,
   buildProductPriceHistoryReport,
   facetedProductSearchEndpoint,
+  productCheapestNowEndpoint,
   buildRealBrandPriceIndices,
   buildRealCategoryPriceIndices,
   buildRealChainPriceIndices,
   buildRealBasketComparison,
   createGroceryViewApi,
   productPriceHistoryEndpoint,
+  realBrandPriceIndicesEndpoint,
+  realCategoryPriceIndicesEndpoint,
+  realChainPriceIndicesEndpoint,
   productPriceHistoryPriceTypes,
   savedBasketCompareEndpoint,
   validatePriceObservationDto,
@@ -374,6 +378,14 @@ describe('createGroceryViewApi', () => {
   });
 
   it('builds cheapest-now reports from persisted latest price rows', () => {
+    assert.deepEqual(productCheapestNowEndpoint, {
+      method: 'GET',
+      controllerPath: 'products/:productId',
+      actionPath: 'cheapest-now',
+      path: '/products/:productId/cheapest-now',
+      pathParams: ['productId']
+    });
+
     const report = buildProductCheapestNowReport([
       {
         productId: 'product-milk',
@@ -451,6 +463,25 @@ describe('createGroceryViewApi', () => {
   });
 
   it('builds real market index reports from persisted current and historical price rows', () => {
+    assert.deepEqual(realChainPriceIndicesEndpoint, {
+      method: 'GET',
+      controllerPath: 'indices',
+      actionPath: 'chains',
+      path: '/indices/chains'
+    });
+    assert.deepEqual(realCategoryPriceIndicesEndpoint, {
+      method: 'GET',
+      controllerPath: 'indices',
+      actionPath: 'categories',
+      path: '/indices/categories'
+    });
+    assert.deepEqual(realBrandPriceIndicesEndpoint, {
+      method: 'GET',
+      controllerPath: 'indices',
+      actionPath: 'brands',
+      path: '/indices/brands'
+    });
+
     const rows = [
       {
         productId: 'product-coffee',
