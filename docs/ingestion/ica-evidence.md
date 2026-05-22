@@ -1,13 +1,13 @@
 # ICA ingestion evidence
 
 - Source: ICA public store-scoped promotions JSON
-- Store locator source: https://handla.ica.se/api/store/v1?latitude=59.3293&longitude=18.0686&customerType=B2C, https://handla.ica.se/api/store/v1?latitude=57.7089&longitude=11.9746&customerType=B2C, and https://handla.ica.se/api/store/v1?latitude=59.8586&longitude=17.6389&customerType=B2C
-- Store locator retrieved: 2026-05-22T11:42:44.645Z
+- Store locator source: https://handla.ica.se/api/store/v1?latitude=58.4108&longitude=15.6214&customerType=B2C, https://handla.ica.se/api/store/v1?latitude=56.0465&longitude=12.6945&customerType=B2C, https://handla.ica.se/api/store/v1?latitude=59.3293&longitude=18.0686&customerType=B2C, https://handla.ica.se/api/store/v1?latitude=57.7089&longitude=11.9746&customerType=B2C, and https://handla.ica.se/api/store/v1?latitude=59.8586&longitude=17.6389&customerType=B2C
+- Store locator retrieved: 2026-05-22T11:49:48.000Z
 - Region ID: 6ae1c52a-99a8-4b19-9464-dd01274df39d
-- Real rows fetched: 26400
+- Real rows fetched: 30900
 - Connector: packages/ingestion/src/connectors/ica.ts
 - Web wire: apps/web/src/lib/ingested/ica.ts
-- Live verification: all 88 source URLs returned parseable public promotions JSON via `curl -A "GroceryView/0.1"`/connector fetch on 2026-05-22, with 300 eligible rows per store.
+- Live verification: all 103 source URLs returned parseable public promotions JSON via `curl -A "GroceryView/0.1"`/connector fetch on 2026-05-22, with 300 eligible rows per store; this iteration added 15 Linkoping/Ostergotland and Helsingborg-area stores.
 
 ## Source URLs
 
@@ -100,6 +100,22 @@
 - Source URL (1004173 ICA Supermarket Favoriten, retrieved 2026-05-22T11:42:44.301Z, rows 300): https://handlaprivatkund.ica.se/stores/1004173/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 - Source URL (1004581 ICA Kvantum Mall of Scandinavia, retrieved 2026-05-22T11:42:44.645Z, rows 300): https://handlaprivatkund.ica.se/stores/1004581/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 
+- Source URL (1003586 ICA Supermarket Berga Centrum, Linköping, retrieved 2026-05-22T11:49:49.624Z, rows 300): https://handlaprivatkund.ica.se/stores/1003586/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003823 Maxi ICA Stormarknad Linköping, retrieved 2026-05-22T11:49:50.359Z, rows 300): https://handlaprivatkund.ica.se/stores/1003823/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004066 ICA Supermarket Rimforsa, retrieved 2026-05-22T11:49:50.740Z, rows 300): https://handlaprivatkund.ica.se/stores/1004066/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004546 ICA Supermarket Åtvidaberg, retrieved 2026-05-22T11:49:51.140Z, rows 300): https://handlaprivatkund.ica.se/stores/1004546/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003556 ICA Supermarket Eneby, retrieved 2026-05-22T11:49:51.549Z, rows 300): https://handlaprivatkund.ica.se/stores/1003556/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004539 ICA Nära Tjällmo handel, retrieved 2026-05-22T11:49:51.911Z, rows 300): https://handlaprivatkund.ica.se/stores/1004539/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004267 Maxi ICA Stormarknad Motala, retrieved 2026-05-22T11:49:52.258Z, rows 300): https://handlaprivatkund.ica.se/stores/1004267/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003690 ICA Kvantum Mirum Galleria, Norrköping, retrieved 2026-05-22T11:49:52.642Z, rows 300): https://handlaprivatkund.ica.se/stores/1003690/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1051010 Maxi ICA Stormarknad Norrköping, retrieved 2026-05-22T11:49:52.971Z, rows 300): https://handlaprivatkund.ica.se/stores/1051010/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003461 ICA Supermarket Smedby, Norrköping, retrieved 2026-05-22T11:49:53.343Z, rows 300): https://handlaprivatkund.ica.se/stores/1003461/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004043 ICA Nära Boxholm, retrieved 2026-05-22T11:49:53.765Z, rows 300): https://handlaprivatkund.ica.se/stores/1004043/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004592 ICA Supermarket Söderköping, retrieved 2026-05-22T11:49:54.103Z, rows 300): https://handlaprivatkund.ica.se/stores/1004592/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003580 ICA Supermarket Kisa, retrieved 2026-05-22T11:49:54.459Z, rows 300): https://handlaprivatkund.ica.se/stores/1003580/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1004084 Maxi ICA Stormarknad Helsingborg, retrieved 2026-05-22T11:49:54.892Z, rows 300): https://handlaprivatkund.ica.se/stores/1004084/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+- Source URL (1003937 Maxi ICA Stormarknad Hyllinge, retrieved 2026-05-22T11:49:55.247Z, rows 300): https://handlaprivatkund.ica.se/stores/1003937/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+
 Every emitted row came from a live store-scoped promotions response for the selected ICA store and includes the exact source URL plus retrieval timestamp. Rows preserve store account, region, ordinary price, unit price, promo price fields when ICA returned them, promotion description, and product detail URLs.
 
 ## Sample Retrieved Rows
@@ -116,3 +132,6 @@ Every emitted row came from a live store-scoped promotions response for the sele
 10. 1003723 ICA Supermarket Boström | 2142371 | Ätmogen Avokado 3-pack Klass 1 ICA | price=40.6 SEK | promo=17.5 SEK | https://handlaprivatkund.ica.se/stores/1003723/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 11. 1003723 ICA Supermarket Boström | 1024181 | Falukorv Klassikern 800g Scan | price=39.7 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1003723/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
 12. 1003723 ICA Supermarket Boström | 1319139 | Röd spetsig paprika 200g Klass 1 ICA | price=19.9 SEK | promo=15 SEK | https://handlaprivatkund.ica.se/stores/1003723/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+13. 1003586 ICA Supermarket Berga Centrum, Linköping | 2077461 | Babyplommontomater 500g Klass 1 ICA | price=37.9 SEK | promo=28 SEK | https://handlaprivatkund.ica.se/stores/1003586/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+14. 1003586 ICA Supermarket Berga Centrum, Linköping | 2142371 | Ätmogen Avokado 3-pack Klass 1 ICA | price=40.6 SEK | promo=17.5 SEK | https://handlaprivatkund.ica.se/stores/1003586/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
+15. 1003586 ICA Supermarket Berga Centrum, Linköping | 1024181 | Falukorv Klassikern 800g Scan | price=39.7 SEK | promo=  | https://handlaprivatkund.ica.se/stores/1003586/api/product-listing-pages/v1/pages/promotions?regionId=6ae1c52a-99a8-4b19-9464-dd01274df39d&includeAdditionalPageInfo=true&maxProductsToDecorate=300&maxPageSize=300
