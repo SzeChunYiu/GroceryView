@@ -1194,6 +1194,14 @@ export type FacetedProductSearchFilters = {
   limit?: number;
 };
 
+export const facetedProductSearchEndpoint = {
+  method: 'GET',
+  controllerPath: 'products',
+  actionPath: 'search/faceted',
+  path: '/products/search/faceted',
+  queryParams: ['q', 'category', 'brand', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'limit']
+} as const;
+
 export type FacetedProductSearchResult = {
   query: string;
   filters: Required<Pick<FacetedProductSearchFilters, 'categories' | 'brands' | 'chains' | 'stores' | 'priceTypes'>> & {
@@ -1249,6 +1257,23 @@ export type RealBasketCompareItem = {
   productId: string;
   quantity: number;
 };
+
+export const basketCompareEndpoint = {
+  method: 'POST',
+  controllerPath: '',
+  actionPath: 'baskets/compare',
+  path: '/baskets/compare',
+  bodyFields: ['items', 'storeSlugs']
+} as const;
+
+export const savedBasketCompareEndpoint = {
+  method: 'GET',
+  controllerPath: '',
+  actionPath: 'users/:userId/basket/compare',
+  path: '/users/:userId/basket/compare',
+  pathParams: ['userId'],
+  queryParams: ['stores']
+} as const;
 
 export type RealBasketCompareInput = {
   userId?: string;

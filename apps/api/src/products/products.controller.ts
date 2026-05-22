@@ -1,5 +1,6 @@
 import { Controller, Get, NotFoundException, Param, Query } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { facetedProductSearchEndpoint } from '@groceryview/api';
 import { allProducts, groceryApi } from '../demo-data.js';
 import { RealCatalogService } from '../real-catalog/real-catalog.service.js';
 
@@ -14,7 +15,7 @@ export class ProductsController {
     return allProducts(query);
   }
 
-  @Get('search/faceted')
+  @Get(facetedProductSearchEndpoint.actionPath)
   @ApiOkResponse({ description: 'Real faceted product search from persisted catalog and latest prices' })
   facetedSearch(
     @Query('q') q?: string,

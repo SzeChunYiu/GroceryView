@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, NotFoundException, Param, Patc
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { IsArray, IsBoolean, IsNumber, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { basketCompareEndpoint, savedBasketCompareEndpoint } from '@groceryview/api';
 import { groceryApi } from '../demo-data.js';
 import { RealCatalogService } from '../real-catalog/real-catalog.service.js';
 
@@ -273,14 +274,14 @@ export class BasketsController {
 export class RealBasketsController {
   constructor(private readonly realCatalog: RealCatalogService) {}
 
-  @Post('baskets/compare')
+  @Post(basketCompareEndpoint.actionPath)
   @HttpCode(200)
   @ApiOkResponse({ description: 'Compare an arbitrary basket using persisted latest price rows' })
   compare(@Body() body: CompareBasketRequestDto) {
     return this.realCatalog.compareBasket({ items: body.items, storeSlugs: body.storeSlugs });
   }
 
-  @Get('users/:userId/basket/compare')
+  @Get(savedBasketCompareEndpoint.actionPath)
   @ApiOkResponse({ description: 'Compare the latest saved user basket using persisted latest price rows' })
   compareSaved(@Param('userId') userId: string, @Query('stores') stores?: string) {
     return this.realCatalog.compareSavedBasket(

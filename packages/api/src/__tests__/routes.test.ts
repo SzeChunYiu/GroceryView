@@ -2,11 +2,13 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   assertPriceObservationDto,
+  basketCompareEndpoint,
   buildFacetedProductSearch,
   buildFlyerOfferReport,
   buildProductLatestPrices,
   buildProductCheapestNowReport,
   buildProductPriceHistoryReport,
+  facetedProductSearchEndpoint,
   buildRealBrandPriceIndices,
   buildRealCategoryPriceIndices,
   buildRealChainPriceIndices,
@@ -14,6 +16,7 @@ import {
   createGroceryViewApi,
   productPriceHistoryEndpoint,
   productPriceHistoryPriceTypes,
+  savedBasketCompareEndpoint,
   validatePriceObservationDto,
   type RealCatalogSearchPriceRow
 } from '../index.js';
@@ -182,6 +185,14 @@ describe('createGroceryViewApi', () => {
   });
 
   it('builds faceted search responses from persisted catalog and latest price rows', () => {
+    assert.deepEqual(facetedProductSearchEndpoint, {
+      method: 'GET',
+      controllerPath: 'products',
+      actionPath: 'search/faceted',
+      path: '/products/search/faceted',
+      queryParams: ['q', 'category', 'brand', 'chain', 'store', 'priceType', 'minPrice', 'maxPrice', 'limit']
+    });
+
     const result = buildFacetedProductSearch({
       rows: realRows,
       filters: { query: 'mjolk', categories: ['Dairy'], chains: ['willys'], limit: 10 }
@@ -222,6 +233,22 @@ describe('createGroceryViewApi', () => {
   });
 
   it('builds basket comparisons from latest price rows without estimated fallback prices', () => {
+    assert.deepEqual(basketCompareEndpoint, {
+      method: 'POST',
+      controllerPath: '',
+      actionPath: 'baskets/compare',
+      path: '/baskets/compare',
+      bodyFields: ['items', 'storeSlugs']
+    });
+    assert.deepEqual(savedBasketCompareEndpoint, {
+      method: 'GET',
+      controllerPath: '',
+      actionPath: 'users/:userId/basket/compare',
+      path: '/users/:userId/basket/compare',
+      pathParams: ['userId'],
+      queryParams: ['stores']
+    });
+
     const report = buildRealBasketComparison({
       userId: 'user-1',
       selectedStoreSlugs: ['willys-hemma-stockholm-torsplan', 'coop-odenplan'],
