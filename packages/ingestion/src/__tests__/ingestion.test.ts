@@ -35,6 +35,7 @@ import {
   fetchCoopProducts,
   fetchCoopStores,
   fetchCoopWeeklyDiscounts,
+  fetchCoopWeeklyDiscountsForAllStores,
   fetchHemkopProducts,
   fetchHemkopWeeklyDiscounts,
   fetchIcaDefaultStoreProducts,
@@ -46,6 +47,7 @@ import {
   fetchWillysProducts,
   fetchWillysStores,
   fetchWillysWeeklyDiscounts,
+  fetchWillysWeeklyDiscountsForAllStores,
   parseIcaReklambladOffers,
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
@@ -551,6 +553,69 @@ describe('fetchCoopWeeklyDiscounts', () => {
     assert.equal(rows[0]?.ordinaryPrice, 61.45);
     assert.equal(rows[0]?.offerPrice, 45);
     assert.equal(rows[1]?.flyerUrl, 'https://dr.coop.se/Butik/Stora-Coop-Bromma');
+  });
+
+  it('can expand Coop weekly discounts across the live store catalog', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url) === buildCoopStoresUrl()) {
+        return new Response(JSON.stringify({
+          stores: [
+            { ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', conceptName: 'Stora Coop', address: 'Rapsgatan 1b', city: 'Uppsala' },
+            { ledgerAccountNumber: '252700', name: 'Stora Coop Bromma', conceptName: 'Stora Coop', address: 'Ulvsundavägen 185', city: 'Bromma' }
+          ]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      if (String(url).includes('/stores/')) {
+        const storeId = String(url).includes('/252700') ? '252700' : '251300';
+        return new Response(JSON.stringify({
+          ledgerAccountNumber: storeId,
+          name: storeId === '252700' ? 'Stora Coop Bromma' : 'Stora Coop Boländerna',
+          city: storeId === '252700' ? 'Bromma' : 'Uppsala',
+          flyers: [{
+            startDate: '2026-05-18T00:00:00',
+            stopDate: '2026-05-24T23:59:59',
+            current: true,
+            pdfExists: true,
+            pdfUrl: `https://dr.coop.se/butik/${storeId}`,
+            isHemmaBilaga: false
+          }]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      return new Response(JSON.stringify({
+        results: {
+          items: [{
+            id: 'coop-catalog-promo',
+            ean: '7310865005168',
+            name: 'Smör Normalsaltat',
+            manufacturerName: 'Svenskt Smör från Arla',
+            packageSizeInformation: '500g',
+            salesPriceData: { b2cPrice: 61.45 },
+            onlinePromotions: [{ id: 'promo', message: 'Smör 45 kr/st', priceData: { b2cPrice: 45 } }]
+          }]
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopWeeklyDiscountsForAllStores({
+      fetchImpl,
+      includeStoreDetails: false,
+      maxStores: 2,
+      productQueries: ['Svenskt smör Arla 500 g'],
+      subscriptionKey: 'public-test-key',
+      storeApiSubscriptionKey: 'public-store-test-key',
+      retrievedAt: '2026-05-22T09:05:00.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildCoopStoresUrl(),
+      buildCoopStoreInfoUrl('251300'),
+      buildCoopSearchUrl('251300'),
+      buildCoopStoreInfoUrl('252700'),
+      buildCoopSearchUrl('252700')
+    ]);
+    assert.deepEqual(rows.map((row) => row.storeId), ['251300', '252700']);
   });
 });
 
@@ -1696,6 +1761,49 @@ describe('fetchWillysWeeklyDiscounts', () => {
       ['2110', 'shared-willys-promo'],
       ['2187', 'shared-willys-promo']
     ]);
+  });
+
+  it('can expand Willys weekly discounts across the live store catalog', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '2110', name: 'Willys Kungsbacka Hede', address: { line1: 'Tölöleden 3', town: 'Kungsbacka' } },
+          { storeId: '2187', name: 'Willys Oskarshamn Snickeriet', address: { line1: 'Snickerivägen 1', town: 'Oskarshamn' } }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const storeId = new URL(String(url)).searchParams.get('q') ?? 'unknown';
+      return new Response(JSON.stringify({
+        pagination: { numberOfPages: 1 },
+        results: [{
+          name: `Catalog Willys offer ${storeId}`,
+          priceNoUnit: '20',
+          displayVolume: '500g',
+          potentialPromotions: [{
+            code: `all-store-promo-${storeId}`,
+            mainProductCode: `all-store-product-${storeId}`,
+            name: `Catalog Willys offer ${storeId}`,
+            price: 15,
+            cartLabel: '15 kr/st'
+          }]
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysWeeklyDiscountsForAllStores({
+      fetchImpl,
+      maxStores: 2,
+      pageSize: 1,
+      retrievedAt: '2026-05-22T08:25:03.000Z'
+    });
+
+    assert.deepEqual(requestedUrls, [
+      buildWillysStoresUrl({ online: true }),
+      buildWillysWeeklyDiscountsUrl('2110', 1, 0),
+      buildWillysWeeklyDiscountsUrl('2187', 1, 0)
+    ]);
+    assert.deepEqual(rows.map((row) => row.storeId), ['2110', '2187']);
   });
 
   it('uses the configured Willys weekly store list by default', async () => {

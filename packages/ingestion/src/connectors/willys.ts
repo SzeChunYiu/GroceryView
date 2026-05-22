@@ -179,6 +179,11 @@ export type FetchWillysWeeklyDiscountsOptions = {
   retrievedAt?: string;
 };
 
+export type FetchWillysAllStoreWeeklyDiscountsOptions = Omit<FetchWillysWeeklyDiscountsOptions, 'storeId' | 'storeIds'> & {
+  storeApiUrl?: string;
+  maxStores?: number;
+};
+
 export type FetchWillysStoresOptions = {
   fetchImpl?: typeof fetch;
   online?: boolean;
@@ -338,6 +343,25 @@ export async function fetchWillysWeeklyDiscounts(
   }
 
   return rows;
+}
+
+export async function fetchWillysWeeklyDiscountsForAllStores(
+  options: FetchWillysAllStoreWeeklyDiscountsOptions = {}
+): Promise<WillysWeeklyDiscount[]> {
+  const stores = await fetchWillysStores({
+    fetchImpl: options.fetchImpl,
+    online: true,
+    maxRows: options.maxStores,
+    retrievedAt: options.retrievedAt,
+    storeApiUrl: options.storeApiUrl
+  });
+  return await fetchWillysWeeklyDiscounts({
+    fetchImpl: options.fetchImpl,
+    storeIds: stores.map((store) => store.storeId),
+    maxRows: options.maxRows ?? stores.length * 300,
+    pageSize: options.pageSize,
+    retrievedAt: options.retrievedAt
+  });
 }
 
 export function normalizeWillysStore(
