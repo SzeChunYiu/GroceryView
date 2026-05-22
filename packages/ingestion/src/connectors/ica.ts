@@ -79,6 +79,31 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1015001',
     storeName: 'Maxi ICA Stormarknad Bromma',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004309',
+    storeName: 'ICA Nära Annedal',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003898',
+    storeName: 'ICA Kvantum Tyresö',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003408',
+    storeName: 'Maxi ICA Stormarknad Barkarbystaden',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004407',
+    storeName: 'Maxi ICA Stormarknad Botkyrka',
+    regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1003777',
+    storeName: 'Maxi ICA Stormarknad Haninge',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
