@@ -75,6 +75,8 @@ export class CheapestNowService {
        from products
        left join latest_prices on latest_prices.product_id = products.id
         and latest_prices.price_type in ('shelf', 'online', 'member', 'promotion')
+        and latest_prices.price > 0
+        and latest_prices.unit_price > 0
        left join chains on chains.id = latest_prices.chain_id
        left join stores on stores.id = latest_prices.store_id
        where products.slug = $1 or products.id::text = $1

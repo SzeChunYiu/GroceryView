@@ -2165,10 +2165,13 @@ export function buildProductCheapestNowReport(rows: ProductCheapestNowPriceRow[]
   let observedPriceCount = 0;
 
   for (const row of rows) {
-    if (row.observedAt) observedAtValues.push(row.observedAt);
     if (
       row.price === undefined ||
       row.unitPrice === undefined ||
+      !Number.isFinite(row.price) ||
+      !Number.isFinite(row.unitPrice) ||
+      row.price <= 0 ||
+      row.unitPrice <= 0 ||
       !row.chainSlug ||
       !row.storeSlug ||
       !row.storeName
@@ -2177,6 +2180,7 @@ export function buildProductCheapestNowReport(rows: ProductCheapestNowPriceRow[]
     }
 
     observedPriceCount += 1;
+    if (row.observedAt) observedAtValues.push(row.observedAt);
     const candidate: ProductCheapestNowChainPrice = {
       chain: row.chainSlug,
       storeId: row.storeSlug,
@@ -2209,6 +2213,7 @@ export function buildProductCheapestNowReport(rows: ProductCheapestNowPriceRow[]
     lastObservedAt: observedAtValues.sort().at(-1) ?? null,
     guardrails: [
       'Cheapest-now rows are calculated only from persisted latest_prices observations for the requested product.',
+      'Rows with missing or non-positive package/unit prices are excluded instead of treated as current offers.',
       'Each chain contributes at most one current lowest package price, preserving the store that supplied it.',
       'No missing chain or product prices are filled with synthetic estimates.'
     ]
