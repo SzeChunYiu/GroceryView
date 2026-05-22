@@ -216,6 +216,16 @@ describe('verified-data UI', () => {
     assert.match(page, /gated feature readiness/);
   });
 
+  it('colors map store markers by chain index and highlights the cheapest nearby chain', async () => {
+    const route = await read('src/app/map/page.tsx');
+    assert.match(route, /calculateChainPriceIndex/);
+    assert.match(route, /buildChainPriceObservations/);
+    assert.match(route, /chainIndexByBrand/);
+    assert.match(route, /markerTone/);
+    assert.match(route, /cheapestChainNearMe/);
+    assert.match(route, /Cheapest chain near me/);
+  });
+
   it('surfaces verified OSM store brand coverage on the homepage', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const shell = await read('src/components/market-shell.tsx');
