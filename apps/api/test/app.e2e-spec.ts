@@ -82,6 +82,14 @@ class RecordingPriceHistoryExecutor {
     if (sql.includes('from favorite_stores')) {
       return [] as T[];
     }
+    if (sql.includes('from stores') && sql.includes('where stores.slug = $1')) {
+      if (params[0] === 'missing-store') return [] as T[];
+      return [{
+        store_slug: 'willys-odenplan',
+        store_name: 'Willys Odenplan',
+        chain_slug: 'willys'
+      }] as T[];
+    }
     if (sql.includes('from latest_prices') && sql.includes('latest_prices.price_type')) {
       return [
         {
@@ -491,12 +499,13 @@ describe('GroceryView API app', () => {
     assert.equal(flyerOffers.body.offers[0].sourceRunId, 'run-weekly-leaflet');
 
     const storeFlyerOffers = await request(app.getHttpServer())
-      .get('/stores/lidl-sveavagen/flyer-offers?asOf=2026-05-20T12:00:00.000Z')
+      .get('/stores/willys-odenplan/flyer-offers?asOf=2026-05-20T12:00:00.000Z')
       .expect(200);
-    assert.equal(storeFlyerOffers.body.storeId, 'lidl-sveavagen');
-    assert.equal(storeFlyerOffers.body.bestOffer.productId, 'milk');
-    assert.equal(storeFlyerOffers.body.totalOneEachSavings, 3);
-    assert.equal(storeFlyerOffers.body.demo, true);
+    assert.equal(storeFlyerOffers.body.storeId, 'willys-odenplan');
+    assert.equal(storeFlyerOffers.body.bestOffer.productId, 'private-label-milk');
+    assert.equal(storeFlyerOffers.body.totalOneEachSavings, 22);
+    assert.equal(storeFlyerOffers.body.demo, undefined);
+    assert.equal(priceHistoryExecutor.calls.some((call) => /from stores/i.test(call.sql) && /join chains/i.test(call.sql)), true);
 
     const prices = await request(app.getHttpServer()).get('/products/coffee/prices').expect(200);
     assert.equal(prices.body[0].currency, 'SEK');
@@ -1035,6 +1044,7 @@ describe('GroceryView API app', () => {
 
   it('returns 404 for missing store deals', async () => {
     await request(app.getHttpServer()).get('/stores/missing-store/deals').expect(404);
+    await request(app.getHttpServer()).get('/stores/missing-store/flyer-offers').expect(404);
     await request(app.getHttpServer()).get('/users/demo/basket/stores/missing-store/quote').expect(404);
     await request(app.getHttpServer()).post('/users/demo/favorite-stores').send({ storeId: 'missing-store' }).expect(404);
     await request(app.getHttpServer()).delete('/users/demo/favorite-stores/missing-store').expect(404);

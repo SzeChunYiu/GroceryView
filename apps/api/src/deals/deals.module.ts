@@ -6,6 +6,7 @@ import { DealsService } from './deals.service.js';
 @Module({
   imports: [DatabaseModule],
   controllers: [DealsController],
-  providers: [DealsService]
+  providers: [DealsService],
+  exports: [DealsService]
 })
 export class DealsModule {}

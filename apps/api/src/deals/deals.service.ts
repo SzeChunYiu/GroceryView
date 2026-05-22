@@ -2,7 +2,8 @@ import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import {
   buildFlyerOfferReport,
   type FlyerOfferObservationInput,
-  type FlyerOfferReport
+  type FlyerOfferReport,
+  type StoreFlyerOfferReport
 } from '@groceryview/api';
 import { PostgresQueryExecutorService } from '../database/postgres-query-executor.service.js';
 
@@ -34,6 +35,12 @@ type FlyerOfferSqlRow = {
   store_slug: string;
   store_name: string;
   store_city: string | null;
+};
+
+type StoreFlyerSqlRow = {
+  store_slug: string;
+  store_name: string;
+  chain_slug: string;
 };
 
 function iso(value: string | Date): string {
@@ -84,6 +91,10 @@ function mapRow(row: FlyerOfferSqlRow): FlyerOfferObservationInput {
 @Injectable()
 export class DealsService {
   constructor(private readonly postgres: PostgresQueryExecutorService) {}
+
+  isConfigured(): boolean {
+    return this.postgres.isConfigured();
+  }
 
   async flyerOffers(query: {
     asOf?: string;
@@ -156,5 +167,39 @@ export class DealsService {
       },
       observations: rows.map(mapRow)
     });
+  }
+
+  async storeFlyerOffers(storeId: string, query: { asOf?: string }): Promise<StoreFlyerOfferReport | null> {
+    if (!this.postgres.isConfigured()) {
+      throw new ServiceUnavailableException('DATABASE_URL is required for real flyer-offer data.');
+    }
+    const stores = await this.postgres.query<StoreFlyerSqlRow>(
+      `select stores.slug as store_slug,
+              stores.name as store_name,
+              chains.slug as chain_slug
+       from stores
+       join chains on chains.id = stores.chain_id
+       where stores.slug = $1`,
+      [storeId]
+    );
+    const store = stores[0];
+    if (!store) return null;
+
+    const report = await this.flyerOffers({ asOf: query.asOf, storeId });
+    return {
+      storeId: store.store_slug,
+      storeName: store.store_name,
+      chain: store.chain_slug,
+      asOf: report.asOf,
+      offerCount: report.offerCount,
+      categoryCount: new Set(report.offers.map((offer) => offer.category)).size,
+      totalOneEachSavings: report.offers.reduce(
+        (sum, offer) => Math.round((sum + offer.savings + Number.EPSILON) * 100) / 100,
+        0
+      ),
+      bestOffer: report.offers[0] ?? null,
+      offers: report.offers,
+      guardrails: report.guardrails
+    };
   }
 }
