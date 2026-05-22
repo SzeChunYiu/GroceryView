@@ -2,7 +2,7 @@
 
 > **Live status board — auto-generated, do not hand-edit.**
 > Regenerated from real signals (merged PRs, open PRs, GOAL.md, live prod HTML) by
-> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-22 09:50 UTC.
+> `.shared/grocery-readme-board.sh`. Last refresh: 2026-05-22 09:54 UTC.
 
 GroceryView turns grocery prices into a market: every product is a **ticker** with a
 price chart, chains/categories/brands have **indices**, deals get a **Buy/Wait**
@@ -13,7 +13,28 @@ Strategy + competitor teardown: [`GOAL.md`](GOAL.md) · [`COMPETITIVE-ANALYSIS.m
 
 - **Site:** [https://grocery-web-mu.vercel.app](https://grocery-web-mu.vercel.app) — `/` returns HTTP **200**
 - **Visible on homepage:** ~**20** store pages, ~**19** product pages
-- **Shipped `feat:`/`wire:` PRs to date:** **313**
+- **Shipped `feat:`/`wire:` PRs to date:** **312**
+
+## 🛒 What shoppers get (consumer value)
+
+The metrics a real shopper cares about — ✅ = core engine wired into the web app,
+🔻 = engine ready, surfacing in progress. Every figure traces to real data + a
+confidence indicator (never fabricated).
+
+- **💰 Save up to ~47% right now** — biggest cross-chain price gap currently shown on the homepage (the headline "why use this").
+- ✅ **Cheapest chain (Chain Price Index)** — who's cheapest, 100-centred, over time
+- ✅ **Cheapest store for *my* basket** — store basket coverage + cost
+- ✅ **Today's best deals / category deal leaders** — biggest real discounts now
+- ✅ **Your personal grocery inflation (CPI)** — how *your* basket's cost is trending
+- ✅ **Nutrition per krona** — most protein/calories per SEK
+- ✅ **Budget vs premium (brand-tier index)** — how much the store-brand saves
+- ✅ **Expiry / clearance deal radar** — cut waste, grab markdowns
+- ✅ **Watchlist price-drop alerts** — follow a product, get told when it falls
+- ✅ **Price-by-district map** — where shopping is cheaper near you
+
+**Consumer-metric roadmap (highest-value, not yet live):** Deal Score + Buy/Wait
+verdict · 52-week-low badge · price-drop movers board · data-freshness badge ·
+loyalty/member-price-adjusted basket (the feature *no* rival has).
 
 ## 🎯 Current sprint target
 
@@ -21,6 +42,8 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 
 ## ✅ Recently shipped (last 15 merged `feat:`/`wire:` PRs)
 
+- #775 feat(ingest): expand Axfood weekly flyer discounts
+- #774 feat(ingest): add Coop branch weekly discounts
 - #773 feat(persona): add family bulk unit prices
 - #771 feat(ingest): refresh OpenFoodFacts barcode nutrition
 - #769 feat(persona): add student deal recipes
@@ -34,13 +57,10 @@ Ship a **visibly populated Stockholm grocery price terminal** at
 - #756 feat(api): serve real store flyer offers
 - #755 feat(ingest): enrich retailer barcodes with OpenFoodFacts nutrition
 - #754 feat(api): serve real latest prices
-- #752 feat(web): refine chain index with matched basket
-- #753 feat(ingest): add Coop Bromma weekly discounts
 
 ## 🔄 In progress (open PRs)
 
-- #775 feat(ingest): expand Axfood weekly flyer discounts
-- #774 feat(ingest): add Coop branch weekly discounts
+- #777 feat(persona): add family meal planner
 - #745 test(ingest): cover Coop weekly discounts connector _(draft)_
 - #730 feat(ingest): deepen real grocery data sources
 
