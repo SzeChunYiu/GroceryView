@@ -9,6 +9,7 @@ import {
   categoryQualityMatrix,
   categorySummaries,
   dataFreshnessBadges,
+  digitalCatalogueOfferBoard,
   featuredStores,
   formatPct,
   formatSek,
@@ -173,6 +174,53 @@ export function MarketShell() {
             title="Homepage cards show pack price and jämförpris"
             intro="The homepage now uses the same adaptive total/per-unit card model as the product catalogue, with no hidden actual price."
           />
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-orange-200 bg-orange-50">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <Eyebrow>Flyer / digital-catalog ingestion</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">{digitalCatalogueOfferBoard.title}</h2>
+            <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+              The homepage now surfaces real ICA weekly-offer rows with e-magin flyer provenance. Offer price text, jämförpris, ordinary price, sourceUrl, and flyerPdfUrl are kept as source evidence instead of converting them into invented savings.
+            </p>
+          </div>
+          <div className="grid min-w-[18rem] grid-cols-2 gap-2 text-center">
+            <p className="rounded-2xl bg-white p-3 shadow-sm">
+              <span className="block text-2xl font-black text-orange-900">{digitalCatalogueOfferBoard.offerCount.toLocaleString('sv-SE')}</span>
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">offers</span>
+            </p>
+            <p className="rounded-2xl bg-white p-3 shadow-sm">
+              <span className="block text-2xl font-black text-orange-900">{digitalCatalogueOfferBoard.storeCount}</span>
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">stores</span>
+            </p>
+            <p className="rounded-2xl bg-white p-3 shadow-sm">
+              <span className="block text-2xl font-black text-orange-900">{digitalCatalogueOfferBoard.flyerCount}</span>
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">flyer PDFs</span>
+            </p>
+            <p className="rounded-2xl bg-white p-3 shadow-sm">
+              <span className="block text-2xl font-black text-orange-900">{digitalCatalogueOfferBoard.categoryCount}</span>
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-slate-500">categories</span>
+            </p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+          {digitalCatalogueOfferBoard.sampleOffers.slice(0, 6).map((offer) => (
+            <a className="rounded-2xl border border-orange-100 bg-white p-4 shadow-sm hover:border-orange-600" href={offer.flyerUrl} key={offer.code}>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-800">{offer.storeName}</p>
+              <h3 className="mt-2 text-lg font-black text-slate-950">{offer.productName}</h3>
+              <p className="mt-1 text-sm font-semibold text-slate-600">{offer.category} · {offer.eanCount} EANs</p>
+              <p className="mt-3 text-2xl font-black text-orange-900">{offer.priceText}</p>
+              <p className="mt-1 text-sm font-semibold text-slate-700">{offer.comparisonPrice} · {offer.regularPriceText}</p>
+              <p className="mt-3 text-xs font-bold text-slate-500">validTo {offer.validTo.slice(0, 10)} · Open e-magin flyer</p>
+            </a>
+          ))}
+        </div>
+        <div className="mt-4 grid gap-2 md:grid-cols-3">
+          {digitalCatalogueOfferBoard.guardrails.map((guardrail) => (
+            <p className="rounded-2xl bg-white/80 p-3 text-xs font-bold leading-5 text-orange-950" key={guardrail}>{guardrail}</p>
+          ))}
         </div>
       </Card>
 

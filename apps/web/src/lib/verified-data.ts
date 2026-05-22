@@ -1,6 +1,7 @@
 import { COMMODITIES, type Commodity, type ComparableUnit } from '@groceryview/catalog';
 import { calculateDealScore, compareCommodityUnitPrices, planRecurringBasketDigest, summarizeCategoryDealLeaders, summarizePriceHistory, type CommodityPriceObservation } from '@groceryview/core';
 import { axfoodProducts } from './axfood-products';
+import { icaReklambladOffers, icaReklambladSource } from './ingested/ica-reklamblad';
 import { openFoodFactsCatalog } from './openfoodfacts-catalog';
 import { matpriskollenOffers } from './ingested/matpriskollen';
 import { categoryLabels, pricedProducts } from './openprices-products';
@@ -296,6 +297,46 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
 });
 export const homepageAdaptiveProductCards = adaptiveProductCards.slice(0, 6);
 
+const digitalCatalogueSampleOffers = icaReklambladOffers
+  .filter((offer) => offer.priceText && offer.sourceUrl && offer.flyerUrl && offer.flyerPdfUrl)
+  .sort((a, b) =>
+    a.storeName.localeCompare(b.storeName, 'sv') ||
+    a.category.localeCompare(b.category, 'sv') ||
+    a.name.localeCompare(b.name, 'sv')
+  )
+  .slice(0, 6)
+  .map((offer) => ({
+    code: offer.code,
+    productName: [offer.brand, offer.name].filter(Boolean).join(' · '),
+    category: offer.category || 'Category not reported',
+    priceText: offer.priceText,
+    comparisonPrice: offer.comparisonPrice || 'Jämförpris not reported',
+    regularPriceText: offer.regularPriceText || 'Regular price not reported',
+    validTo: offer.validTo,
+    storeName: offer.storeName,
+    sourceUrl: offer.sourceUrl,
+    flyerUrl: offer.flyerUrl,
+    flyerPdfUrl: offer.flyerPdfUrl,
+    eanCount: offer.eans.length,
+    evidenceLabel: `${offer.storeName} · ${offer.availableOnline ? 'online + in-store' : offer.availableInStore ? 'in-store' : 'availability not reported'}`
+  }));
+
+export const digitalCatalogueOfferBoard = {
+  title: 'ICA e-magin weekly catalogue ingestion',
+  sourceLabel: icaReklambladSource.source,
+  retrievedAt: icaReklambladSource.retrievedAt,
+  offerCount: icaReklambladSource.rowCount,
+  storeCount: new Set(icaReklambladOffers.map((offer) => offer.storeName)).size,
+  categoryCount: new Set(icaReklambladOffers.map((offer) => offer.category).filter(Boolean)).size,
+  flyerCount: new Set(icaReklambladOffers.map((offer) => offer.flyerPdfUrl).filter(Boolean)).size,
+  sourceUrlCount: new Set(icaReklambladOffers.map((offer) => offer.sourceUrl).filter(Boolean)).size,
+  sampleOffers: digitalCatalogueSampleOffers,
+  guardrails: [
+    'Rows come from the generated ICA public weekly-offer export and retain sourceUrl plus flyerPdfUrl evidence.',
+    'Offer prices, comparison prices, and ordinary prices are rendered as retailer text; no hidden savings are invented.',
+    'Validity windows stay tied to the source validTo timestamp instead of claiming a live checkout price.'
+  ]
+};
 
 const offerReferenceDate = matpriskollenOffers
   .map((offer) => offer.retrievedAt.slice(0, 10))

@@ -591,6 +591,24 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces ICA e-magin digital-catalog offers from generated weekly offer rows', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+    const deals = await read('src/app/deals/page.tsx');
+
+    assert.match(verified, /icaReklambladOffers/);
+    assert.match(verified, /digitalCatalogueOfferBoard/);
+    assert.match(verified, /flyerPdfUrl/);
+    assert.match(verified, /sourceUrl/);
+    assert.match(shell, /Flyer \/ digital-catalog ingestion/);
+    assert.match(shell, /Open e-magin flyer/);
+    assert.match(shell, /offer price text, jämförpris, ordinary price/i);
+    assert.match(deals, /ICA e-magin catalogue offers/);
+    assert.match(deals, /real weekly offer rows/);
+    assert.match(deals, /flyerPdfUrl retained/);
+    assert.doesNotMatch(shell, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
 
 
   it('surfaces a retailer flyer validity calendar without unsupported tomorrow claims', async () => {
