@@ -9,6 +9,7 @@ import {
   buildProductPriceHistoryReport,
   buildRealBasketComparison,
   createGroceryViewApi,
+  productPriceHistoryPriceTypes,
   validatePriceObservationDto,
   type RealCatalogSearchPriceRow
 } from '../index.js';
@@ -86,6 +87,8 @@ describe('createGroceryViewApi', () => {
   ];
 
   it('builds product price-history reports from persisted observation inputs', () => {
+    assert.deepEqual(productPriceHistoryPriceTypes, ['shelf', 'online', 'member', 'promotion', 'receipt', 'community', 'estimated']);
+
     const report = buildProductPriceHistoryReport([
       {
         observationId: 'obs-coffee-new',
