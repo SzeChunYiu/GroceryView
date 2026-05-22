@@ -39,6 +39,7 @@ import {
   fetchCityGrossStores,
   fetchCoopPublicServiceAccess,
   fetchCoopProducts,
+  fetchCoopProductsForAllStores,
   fetchCoopStores,
   fetchCoopWeeklyDiscounts,
   fetchCoopWeeklyDiscountsForAllStores,
@@ -53,6 +54,7 @@ import {
   fetchMatpriskollenOffers,
   fetchMatsparProducts,
   fetchWillysProducts,
+  fetchWillysProductsForAllStores,
   fetchWillysStores,
   fetchWillysWeeklyDiscounts,
   fetchWillysWeeklyDiscountsForAllStores,
@@ -60,8 +62,10 @@ import {
   groceryCategoryCoicopMappings,
   groceryCategoryCoicopMappingsCanEmitStorePrices,
   GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL,
+  GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL,
   GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL,
+  GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL,
   GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL,
   ingestRetailerProduct,
   locatorFixturesCanAffectDealScore,
@@ -1638,6 +1642,110 @@ describe('fetchCityGrossProducts', () => {
   });
 });
 
+describe('fetchCoopProductsForAllStores', () => {
+  it('fans Coop branch product prices across the live store catalog', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url, init) => {
+      requestedUrls.push(String(url));
+      if (String(url) === 'https://www.coop.se/handla/') {
+        return new Response([
+          'window.coopSettings={',
+          '"personalizationApiUrl":"https://external.api.coop.se/personalization",',
+          '"personalizationApiSubscriptionKey":"coop-key",',
+          '"personalizationApiVersion":"v1",',
+          '"storeApiUrl":"https://proxy.api.coop.se/external/store/",',
+          '"storeApiSubscriptionKey":"store-key"',
+          '};'
+        ].join(''), { status: 200, headers: { 'content-type': 'text/html' } });
+      }
+      if (String(url).endsWith('/stores?api-version=v5')) {
+        return new Response(JSON.stringify({
+          stores: [
+            { ledgerAccountNumber: '251300' },
+            { ledgerAccountNumber: '016141' }
+          ]
+        }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      if (String(url).includes('/stores/251300?')) {
+        return new Response(JSON.stringify({ ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', city: 'Uppsala', address: 'Rapsgatan 1', postalCode: '75323' }), { status: 200 });
+      }
+      if (String(url).includes('/stores/016141?')) {
+        return new Response(JSON.stringify({ ledgerAccountNumber: '016141', name: 'Coop Stockholm', city: 'Stockholm', address: 'Sveavägen 1', postalCode: '11157' }), { status: 200 });
+      }
+      const body = JSON.parse(String(init?.body));
+      const storeId = new URL(String(url)).searchParams.get('store');
+      return new Response(JSON.stringify({
+        results: {
+          items: [{
+            id: `coop-product-${storeId}`,
+            ean: `731000000${storeId}`,
+            name: `Coop kaffe ${storeId}`,
+            manufacturerName: 'Coop',
+            packageSizeInformation: body.query,
+            salesPriceData: { b2cPrice: storeId === '251300' ? 39.9 : 42.9 }
+          }]
+        }
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchCoopProductsForAllStores({
+      fetchImpl,
+      maxStores: 2,
+      queries: ['kaffe'],
+      maxRowsPerStore: 1,
+      retrievedAt: '2026-05-22T13:38:00.000Z'
+    });
+
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['251300', 39.9], ['016141', 42.9]]);
+    assert.deepEqual(requestedUrls.filter((url) => url.includes('/search/products?')), [
+      buildCoopSearchUrl('251300'),
+      buildCoopSearchUrl('016141')
+    ]);
+  });
+});
+
+describe('fetchWillysProductsForAllStores', () => {
+  it('fans Willys branch product prices across the live store catalog using the store search parameter', async () => {
+    const requestedUrls: string[] = [];
+    const fetchImpl: typeof fetch = async (url) => {
+      requestedUrls.push(String(url));
+      if (String(url).includes('/axfood/rest/store')) {
+        return new Response(JSON.stringify([
+          { storeId: '2149', name: 'Willys Alingsås Hagaplan', address: { line1: 'Hagaplan 1', town: 'Alingsås', postalCode: '44131' }, onlineStore: true },
+          { storeId: '2268', name: 'Willys Avesta', address: { line1: 'Köpmangatan 1', town: 'Avesta', postalCode: '77430' }, onlineStore: true }
+        ]), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+      const storeId = new URL(String(url)).searchParams.get('store');
+      return new Response(JSON.stringify({
+        results: [{
+          code: `willys-product-${storeId}`,
+          name: `Willys kaffe ${storeId}`,
+          manufacturer: 'Garant',
+          productLine2: '450 g',
+          priceValue: storeId === '2149' ? 70.88 : 71.9,
+          price: storeId === '2149' ? '70,88 kr' : '71,90 kr'
+        }]
+      }), { status: 200, headers: { 'content-type': 'application/json' } });
+    };
+
+    const rows = await fetchWillysProductsForAllStores({
+      fetchImpl,
+      maxStores: 2,
+      queries: ['kaffe'],
+      maxRowsPerStore: 1,
+      retrievedAt: '2026-05-22T13:39:00.000Z'
+    });
+
+    assert.equal(rows.length, 2);
+    assert.deepEqual(rows.map((row) => [row.storeId, row.price]), [['2149', 70.88], ['2268', 71.9]]);
+    assert.deepEqual(requestedUrls.filter((url) => url.includes('/search?')), [
+      buildWillysSearchUrl('kaffe', '2149'),
+      buildWillysSearchUrl('kaffe', '2268')
+    ]);
+  });
+});
+
 describe('fetchMatsparProducts', () => {
   it('fetches public Matspar page data rows with price provenance', async () => {
     const requestedUrls: string[] = [];
@@ -3092,6 +3200,106 @@ describe('daily ingestion runner', () => {
     assert.equal(observationInsert?.params[2], 'store-db-2');
     assert.equal(observationInsert?.params[7], 45);
     assert.equal(observationInsert?.params[13], 'Max 2 köp/hushåll');
+  });
+
+  it('materializes native Willys all-store branch product prices into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T13:45:00.000Z',
+      connectors: [{
+        connectorId: 'willys-products-all-stores',
+        chainId: 'willys',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL}?queries=kaffe&maxStores=1&maxRowsPerStore=1`,
+        parserVersion: 'willys-products-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '2149', name: 'Willys Alingsås Hagaplan', address: 'Hagaplan 1', city: 'Alingsås' }]
+      }],
+      fetchImpl: async (url) => {
+        requestedUrls.push(String(url));
+        if (String(url).includes('/axfood/rest/store')) {
+          return new Response(JSON.stringify([
+            { storeId: '2149', name: 'Willys Alingsås Hagaplan', address: { line1: 'Hagaplan 1', town: 'Alingsås' }, onlineStore: true }
+          ]), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        return new Response(JSON.stringify({ results: [{
+          code: '101261204_ST',
+          name: 'Bryggkaffe Mellanrost',
+          manufacturer: 'Gevalia',
+          productLine2: '450g',
+          priceValue: 70.88,
+          price: '70,88 kr',
+          comparePrice: '157,51 kr/kg',
+          googleAnalyticsCategory: 'Kaffe'
+        }] }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls, [
+      buildWillysStoresUrl({ online: true }),
+      buildWillysSearchUrl('kaffe', '2149')
+    ]);
+    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+    assert.equal(observationInsert?.params[2], 'store-db-2');
+    assert.equal(observationInsert?.params[7], 70.88);
+  });
+
+  it('materializes native Coop all-store branch product prices into daily database observations', async () => {
+    const executor = new DailyIngestionExecutor();
+    const requestedUrls: string[] = [];
+    const result = await runDailyIngestion({
+      executor,
+      requestedAt: '2026-05-22T13:46:00.000Z',
+      connectors: [{
+        connectorId: 'coop-products-all-stores',
+        chainId: 'coop',
+        sourceType: 'official_api',
+        endpointUrl: `${GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL}?queries=kaffe&maxStores=1&maxRowsPerStore=1`,
+        parserVersion: 'coop-products-native-v1',
+        robotsTxtStatus: 'not_applicable',
+        legalReviewStatus: 'approved',
+        hasDataAgreement: true,
+        stores: [{ storeId: '251300', name: 'Stora Coop Boländerna', address: 'Rapsgatan 1', city: 'Uppsala' }]
+      }],
+      fetchImpl: async (url, init) => {
+        requestedUrls.push(String(url));
+        if (String(url) === 'https://www.coop.se/handla/') {
+          return new Response('"personalizationApiUrl":"https://external.api.coop.se/personalization","personalizationApiSubscriptionKey":"coop-key","personalizationApiVersion":"v1","storeApiUrl":"https://proxy.api.coop.se/external/store/","storeApiSubscriptionKey":"store-key"', { status: 200 });
+        }
+        if (String(url).endsWith('/stores?api-version=v5')) {
+          return new Response(JSON.stringify({ stores: [{ ledgerAccountNumber: '251300' }] }), { status: 200, headers: { 'content-type': 'application/json' } });
+        }
+        if (String(url).includes('/stores/251300?')) {
+          return new Response(JSON.stringify({ ledgerAccountNumber: '251300', name: 'Stora Coop Boländerna', city: 'Uppsala', address: 'Rapsgatan 1', postalCode: '75323' }), { status: 200 });
+        }
+        assert.equal(JSON.parse(String(init?.body)).query, 'kaffe');
+        return new Response(JSON.stringify({ results: { items: [{
+          id: '7340191174276',
+          ean: '7340191174276',
+          name: 'Kaffefilter Vit 1x4 100-pack',
+          manufacturerName: 'Coop',
+          packageSizeInformation: '100-pack',
+          salesPriceData: { b2cPrice: 19.5 }
+        }] } }), { status: 200, headers: { 'content-type': 'application/json' } });
+      }
+    });
+
+    assert.equal(result.status, 'succeeded');
+    assert.equal(result.acceptedCount, 1);
+    assert.deepEqual(requestedUrls.filter((url) => !url.includes('handla')), [
+      buildCoopStoresUrl(),
+      buildCoopStoreInfoUrl('251300'),
+      buildCoopSearchUrl('251300')
+    ]);
+    const observationInsert = executor.calls.find((call) => call.sql.includes('insert into observations'));
+    assert.equal(observationInsert?.params[2], 'store-db-2');
+    assert.equal(observationInsert?.params[7], 19.5);
   });
 
   it('materializes native Hemkop all-store weekly offers into daily database observations', async () => {

@@ -14,7 +14,9 @@ import {
   type CityGrossProduct
 } from './connectors/citygross.js';
 import {
+  fetchCoopProductsForAllStores,
   fetchCoopWeeklyDiscountsForAllStores,
+  type CoopStoreProduct,
   type CoopWeeklyDiscount
 } from './connectors/coop.js';
 import {
@@ -22,7 +24,9 @@ import {
   type HemkopWeeklyDiscount
 } from './connectors/hemkop.js';
 import {
+  fetchWillysProductsForAllStores,
   fetchWillysWeeklyDiscountsForAllStores,
+  type WillysStoreProduct,
   type WillysWeeklyDiscount
 } from './connectors/willys.js';
 
@@ -1607,6 +1611,25 @@ function willysWeeklyDiscountToDailyItem(row: WillysWeeklyDiscount): RetailerCon
   };
 }
 
+function willysStoreProductToDailyItem(row: WillysStoreProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `willys-${stableKeyPart(row.code)}`,
+    categoryId: stableKeyPart(row.category || 'willys-products'),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.price,
+    memberOnly: false,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
 function hemkopWeeklyDiscountToDailyItem(row: HemkopWeeklyDiscount): RetailerConnectorParsedProduct {
   const quantity = parseNativePackageText(row.packageText);
   const regularPrice = nativePriceFromText(row.regularPriceText);
@@ -1644,6 +1667,27 @@ function coopWeeklyDiscountToDailyItem(row: CoopWeeklyDiscount): RetailerConnect
     price: row.offerPrice,
     regularPrice: row.ordinaryPrice > row.offerPrice ? row.ordinaryPrice : undefined,
     promoText: row.offerMechanicText || row.offerPriceText || undefined,
+    memberOnly: row.medMeraRequired,
+    observedAt: row.retrievedAt,
+    sourceUrl: row.sourceUrl
+  };
+}
+
+function coopStoreProductToDailyItem(row: CoopStoreProduct): RetailerConnectorParsedProduct {
+  const quantity = parseNativePackageText(row.packageText);
+  return {
+    storeId: row.storeId,
+    retailerProductId: row.code,
+    rawName: row.name,
+    canonicalName: row.name,
+    productId: `coop-${stableKeyPart(row.ean || row.code)}`,
+    categoryId: stableKeyPart(row.category || 'coop-products'),
+    brand: row.brand || undefined,
+    packageSize: quantity.packageSize,
+    packageUnit: quantity.packageUnit,
+    price: row.promotionPrice ?? row.price,
+    regularPrice: row.promotionPrice !== null && row.price > row.promotionPrice ? row.price : undefined,
+    promoText: row.promotionText || undefined,
     memberOnly: row.medMeraRequired,
     observedAt: row.retrievedAt,
     sourceUrl: row.sourceUrl
@@ -1708,6 +1752,19 @@ export async function fetchDailyConnectorSnapshot(
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(willysWeeklyDiscountToDailyItem) });
   }
 
+  if (sourceUrl === GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchWillysProductsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
+      queries: dailyNativeStringListParam(url, 'queries'),
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(willysStoreProductToDailyItem) });
+  }
+
   if (sourceUrl === GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL}?`)) {
     const url = new URL(sourceUrl);
     const retrievedAt = options.retrievedAt ?? new Date().toISOString();
@@ -1735,6 +1792,24 @@ export async function fetchDailyConnectorSnapshot(
       retrievedAt
     });
     return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(coopWeeklyDiscountToDailyItem) });
+  }
+
+  if (sourceUrl === GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL}?`)) {
+    const url = new URL(sourceUrl);
+    const retrievedAt = options.retrievedAt ?? new Date().toISOString();
+    const rows = await fetchCoopProductsForAllStores({
+      fetchImpl: options.fetchImpl as unknown as typeof fetch | undefined,
+      maxStores: dailyNativeNumberParam(url, 'maxStores'),
+      maxRowsPerStore: dailyNativeNumberParam(url, 'maxRowsPerStore'),
+      queries: dailyNativeStringListParam(url, 'queries'),
+      includeStoreDetails: url.searchParams.has('includeStoreDetails')
+        ? url.searchParams.get('includeStoreDetails') === 'true'
+        : undefined,
+      subscriptionKey: url.searchParams.get('subscriptionKey') ?? undefined,
+      storeApiSubscriptionKey: url.searchParams.get('storeApiSubscriptionKey') ?? undefined,
+      retrievedAt
+    });
+    return dailyNativeSnapshotResult({ plan, retrievedAt, items: rows.map(coopStoreProductToDailyItem) });
   }
 
   if (sourceUrl === GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL || sourceUrl?.startsWith(`${GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL}?`)) {
@@ -2322,8 +2397,10 @@ export const requiredDailyIngestionChainIds = [
 ] as const;
 
 export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/willys/weekly-offers/all-stores';
+export const GROCERYVIEW_DAILY_WILLYS_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/willys/products/all-stores';
 export const GROCERYVIEW_DAILY_HEMKOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/hemkop/weekly-offers/all-stores';
 export const GROCERYVIEW_DAILY_COOP_ALL_STORE_WEEKLY_OFFERS_URL = 'groceryview://daily/coop/weekly-offers/all-stores';
+export const GROCERYVIEW_DAILY_COOP_ALL_STORE_PRODUCTS_URL = 'groceryview://daily/coop/products/all-stores';
 export const GROCERYVIEW_DAILY_CITY_GROSS_PUBLIC_PRODUCTS_URL = 'groceryview://daily/city-gross/public-products/all-stores';
 
 const requireForDailyIngestion = createRequire(import.meta.url);
