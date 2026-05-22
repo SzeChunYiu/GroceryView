@@ -14,6 +14,7 @@ describe('daily ingestion workflow', () => {
       'npm ci',
       'npm run test -w @groceryview/db',
       'npm run test -w @groceryview/ingestion',
+      'npm run --silent ops:daily-connectors',
       'npm run ops:validate-production-env',
       'node packages/ingestion/dist/index.js',
       '/api/readiness/postgres',
@@ -23,7 +24,8 @@ describe('daily ingestion workflow', () => {
       assert.match(workflow, new RegExp(command.replaceAll(' ', '\\s+').replaceAll('/', '\\/')));
     }
 
-    assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTORS_JSON/);
+    assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTORS_JSON=\$\(npm run --silent ops:daily-connectors\)/);
+    assert.doesNotMatch(workflow, /test -n "\$\{GROCERYVIEW_DAILY_CONNECTORS_JSON:-\}"/);
     assert.match(workflow, /CATALOG_COVERAGE_TARGETS_JSON/);
     assert.match(workflow, /connectorStoreCoverageCount/);
     assert.match(workflow, /coverageStoreCount/);

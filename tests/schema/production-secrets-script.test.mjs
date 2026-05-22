@@ -11,7 +11,6 @@ describe('production secret audit script', () => {
   it('tracks every secret needed by daily ingestion and runtime readiness', () => {
     for (const secret of [
       'DATABASE_URL',
-      'GROCERYVIEW_DAILY_CONNECTORS_JSON',
       'GROCERYVIEW_SERVER_URL',
       'METRICS_TOKEN',
       'AUTH_SECRET',
@@ -22,6 +21,7 @@ describe('production secret audit script', () => {
     ]) {
       assert.match(script, new RegExp(`['"]${secret}['"]`));
     }
+    assert.doesNotMatch(script, /['"]GROCERYVIEW_DAILY_CONNECTORS_JSON['"]/);
     assert.equal(pkg.scripts['ops:check-production-secrets'], 'node scripts/ops/check-production-secrets.mjs');
   });
 

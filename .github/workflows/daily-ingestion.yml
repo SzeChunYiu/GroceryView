@@ -38,11 +38,12 @@ jobs:
           NOTIFICATION_WEBHOOK_SECRET: ${{ secrets.NOTIFICATION_WEBHOOK_SECRET }}
           BILLING_WEBHOOK_SECRET: ${{ secrets.BILLING_WEBHOOK_SECRET }}
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
-          GROCERYVIEW_DAILY_CONNECTORS_JSON: ${{ secrets.GROCERYVIEW_DAILY_CONNECTORS_JSON }}
           GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
           CATALOG_COVERAGE_TARGETS_JSON: ${{ secrets.CATALOG_COVERAGE_TARGETS_JSON }}
         run: |
           set -euo pipefail
+          GROCERYVIEW_DAILY_CONNECTORS_JSON=$(npm run --silent ops:daily-connectors)
+          export GROCERYVIEW_DAILY_CONNECTORS_JSON
           npm run ops:validate-production-env \
             >/tmp/production-env-validation.json
           node <<'NODE'
@@ -60,13 +61,13 @@ jobs:
       - name: Run configured daily ingestion
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          GROCERYVIEW_DAILY_CONNECTORS_JSON: ${{ secrets.GROCERYVIEW_DAILY_CONNECTORS_JSON }}
         run: |
           set -euo pipefail
           test -n "${DATABASE_URL:-}"
-          test -n "${GROCERYVIEW_DAILY_CONNECTORS_JSON:-}"
           npm run build -w @groceryview/db
           npm run build -w @groceryview/ingestion
+          GROCERYVIEW_DAILY_CONNECTORS_JSON=$(npm run --silent ops:daily-connectors)
+          export GROCERYVIEW_DAILY_CONNECTORS_JSON
           node packages/ingestion/dist/index.js \
             >/tmp/daily-ingestion-result.json
           node -e "const body=require('/tmp/daily-ingestion-result.json'); if (body.status !== 'succeeded') { console.error(JSON.stringify(body)); process.exit(1); }"
