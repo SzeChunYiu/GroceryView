@@ -1536,6 +1536,43 @@ describe('fetchIcaProducts', () => {
     ]);
   });
 
+  it('limits ICA all-store promotion fetch concurrency so live branch coverage is not throttled', async () => {
+    let activeRequests = 0;
+    let maxActiveRequests = 0;
+    const stores = Array.from({ length: 12 }, (_, index) => ({
+      storeAccountId: `ica-store-${index}`,
+      storeName: `ICA Store ${index}`,
+      regionId: '6ae1c52a-99a8-4b19-9464-dd01274df39d'
+    }));
+
+    const rows = await fetchIcaDefaultStoreProducts({
+      retrievedAt: '2026-05-22T08:49:49.000Z',
+      maxRows: 1,
+      stores,
+      fetchImpl: async (url) => {
+        activeRequests += 1;
+        maxActiveRequests = Math.max(maxActiveRequests, activeRequests);
+        await new Promise((resolve) => setTimeout(resolve, 1));
+        const storeAccountId = String(url).match(/\/stores\/([^/]+)\//)?.[1] ?? 'unknown';
+        activeRequests -= 1;
+        return Response.json({
+          productGroups: [{
+            type: 'ON_OFFER',
+            decoratedProducts: [{
+              productId: `product-${storeAccountId}`,
+              retailerProductId: `retailer-${storeAccountId}`,
+              name: `Product ${storeAccountId}`,
+              price: { amount: 10, currency: 'SEK' }
+            }]
+          }]
+        });
+      }
+    });
+
+    assert.equal(rows.length, stores.length);
+    assert.ok(maxActiveRequests <= 8, `expected at most 8 in-flight ICA store requests, saw ${maxActiveRequests}`);
+  });
+
   it('keeps ICA batch ingestion alive when one regional store endpoint fails', async () => {
     const rows = await fetchIcaDefaultStoreProducts({
       retrievedAt: '2026-05-22T08:49:49.000Z',
@@ -3698,6 +3735,7 @@ class DailyIngestionExecutor implements QueryExecutor {
 
   async query<T>(sql: string, params: unknown[] = []) {
     this.calls.push({ sql, params });
+    if (sql.trim().toLowerCase() === 'set default_transaction_read_only=off') return [] as T[];
     if (sql.includes('insert into source_runs')) return [{ id: 'source-run-db-1' }] as T[];
     if (sql.includes('update source_runs')) return [{ id: params[0] }] as T[];
     if (sql.includes('from products') && sql.includes('barcode ~')) return [
@@ -3962,7 +4000,11 @@ describe('daily ingestion runner', () => {
     assert.equal(result.persistedRuns, 1);
     assert.equal(result.acceptedCount, 1);
     assert.equal(result.observationIds.length, 1);
+    const writeModeIndex = executor.calls.findIndex((call) => call.sql.trim().toLowerCase() === 'set default_transaction_read_only=off');
     const sourceRunInsert = executor.calls.find((call) => call.sql.includes('insert into source_runs'));
+    const sourceRunInsertIndex = executor.calls.findIndex((call) => call.sql.includes('insert into source_runs'));
+    assert.ok(writeModeIndex >= 0, 'daily persistence should reassert write mode before connector writes');
+    assert.ok(writeModeIndex < sourceRunInsertIndex, 'write mode must be reasserted before source_run persistence');
     assert.equal(sourceRunInsert?.params[0], 'official_api');
     assert.equal(sourceRunInsert?.params[1], 'willys-normalized-json');
     assert.deepEqual(JSON.parse(String(sourceRunInsert?.params[6])), {
@@ -3975,6 +4017,22 @@ describe('daily ingestion runner', () => {
       rejectedCount: 0
     });
     assert.equal(executor.calls.some((call) => call.sql.includes('insert into raw_records')), true);
+    const rawRecordInsert = executor.calls.find((call) => call.sql.includes('jsonb_to_recordset') && call.sql.includes('insert into raw_records'));
+    const rawRows = JSON.parse(String(rawRecordInsert?.params[1])) as Array<{ payload: Record<string, unknown> }>;
+    assert.equal('product' in rawRows[0]!.payload, false);
+    assert.deepEqual(Object.keys(rawRows[0]!.payload).sort(), [
+      'chainId',
+      'currency',
+      'observedAt',
+      'price',
+      'priceType',
+      'productId',
+      'regularPrice',
+      'retailerProductId',
+      'sourceUrl',
+      'storeId',
+      'unitPrice'
+    ]);
     assert.equal(executor.calls.some((call) => call.sql.includes('insert into observations')), true);
     const storeInsert = executor.calls.find((call) => call.sql.includes('insert into stores'));
     assert.equal(storeInsert?.params[0], 'willys-odenplan');

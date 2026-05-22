@@ -3237,6 +3237,7 @@ async function persistDailyConnectorOutput(input: {
   result: RetailerConnectorRunResult;
 }): Promise<Pick<DailyIngestionRunResult, 'sourceRunIds' | 'rawRecordIds' | 'observationIds' | 'acceptedCount' | 'rejectedCount'>> {
   const { executor, config, result } = input;
+  await executor.query('set default_transaction_read_only=off');
   const sourceWriter = createPostgresSourceRecordWriter(executor);
   const storesBySlug = new Map((config.stores ?? []).map((store) => [normalizeDailySlug(store.storeId), store]));
   const sourceRun = await sourceWriter.createSourceRun({
@@ -3575,10 +3576,17 @@ async function persistDailyConnectorOutput(input: {
     if (!productId) throw new Error(`Daily ingestion product batch did not return an id: ${accepted.product.id}`);
 
     const payload = {
-      product: accepted.product,
-      alias: accepted.alias,
-      priceObservation: accepted.priceObservation,
-      promotionObservation: accepted.promotionObservation
+      chainId: config.chainId,
+      productId: accepted.product.id,
+      retailerProductId: accepted.priceObservation.retailerProductId,
+      storeId: accepted.priceObservation.storeId,
+      priceType: accepted.priceObservation.priceType,
+      price: accepted.priceObservation.price,
+      unitPrice: accepted.priceObservation.unitPrice,
+      ...(accepted.priceObservation.regularPrice !== undefined ? { regularPrice: accepted.priceObservation.regularPrice } : {}),
+      currency: accepted.priceObservation.currency,
+      observedAt: accepted.priceObservation.observedAt,
+      sourceUrl: accepted.priceObservation.provenance.sourceUrl
     };
     const rawProvenance = {
       ...accepted.priceObservation.provenance,
