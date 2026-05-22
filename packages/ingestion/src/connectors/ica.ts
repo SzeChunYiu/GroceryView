@@ -59,6 +59,11 @@ export const DEFAULT_ICA_STORE_CONFIGS: readonly IcaStoreConfig[] = [
     storeAccountId: '1004228',
     storeName: 'ICA Supermarket Fältöversten',
     regionId: DEFAULT_ICA_REGION_ID
+  },
+  {
+    storeAccountId: '1004222',
+    storeName: 'ICA Kvantum Södermalm',
+    regionId: DEFAULT_ICA_REGION_ID
   }
 ];
 
