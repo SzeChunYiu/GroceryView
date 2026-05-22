@@ -12,6 +12,7 @@ const chainIndexSummary = calculateChainPriceIndex(buildChainPriceObservations()
 const chainIndexByBrand = new Map(chainIndexSummary.chains.map((chain) => [chain.chainId.toLowerCase(), chain]));
 const cheapestChainNearMe = chainIndexSummary.chains[0];
 const districtHeatOverlay = buildDistrictHeatOverlay();
+const regionalPriceStatisticsGate = buildRegionalPriceStatisticsGate();
 
 function normaliseBrand(brand: string) {
   const lower = brand.toLowerCase();
@@ -67,6 +68,53 @@ function buildDistrictHeatOverlay() {
     .slice(0, 12);
 }
 
+function buildRegionalCoverageRows(scope: 'city' | 'district') {
+  const cohorts = new Map<string, { totalStores: number; coveredStores: number; chains: Set<string> }>();
+  for (const store of storeUniverse) {
+    const label = scope === 'city' ? store.city || 'City not reported' : store.district || store.city || 'District not reported';
+    const current = cohorts.get(label) ?? { totalStores: 0, coveredStores: 0, chains: new Set<string>() };
+    current.totalStores += 1;
+    const chain = chainIndexByBrand.get(normaliseBrand(store.brand));
+    if (chain) {
+      current.coveredStores += 1;
+      current.chains.add(chain.chainId);
+    }
+    cohorts.set(label, current);
+  }
+
+  return [...cohorts.entries()]
+    .map(([label, row]) => ({
+      label,
+      totalStores: row.totalStores,
+      coveredStores: row.coveredStores,
+      chainCount: row.chains.size,
+      coverageShare: row.totalStores > 0 ? row.coveredStores / row.totalStores : 0,
+      statisticLabel: 'Not calculated',
+      detail: 'Coverage-only row: OSM locations and chain-index availability are visible, but no per-branch observations are attached to this region.'
+    }))
+    .sort((a, b) => b.coveredStores - a.coveredStores || b.totalStores - a.totalStores || a.label.localeCompare(b.label, 'sv'))
+    .slice(0, 6);
+}
+
+function buildRegionalPriceStatisticsGate() {
+  const cityPriceStatisticRows = buildRegionalCoverageRows('city');
+  const districtPriceStatisticRows = buildRegionalCoverageRows('district');
+
+  return {
+    title: 'Regional / district / city price statistics',
+    statusLabel: 'Not enough per-branch observations',
+    cityPriceStatisticRows,
+    districtPriceStatisticRows,
+    requiredEvidence: [
+      'per-branch observations for products or baskets inside each city, district, and kommun cohort',
+      'stable city/district/kommun mapping for every store row before regional statistics are compared',
+      'confidence/coverage thresholds that block sparse cohorts instead of ranking them as cheap or expensive'
+    ],
+    detail:
+      'No regional price statistic is calculated without per-branch observations. The map can show OSM coverage and chain-index proxies today, but city, district, and kommun price statistics stay withheld until branch-level price tape exists.'
+  };
+}
+
 export default function MapPage() {
   const visibleStores = storeUniverse.slice(0, 80);
   return (
@@ -117,6 +165,56 @@ export default function MapPage() {
               <p className="mt-3 text-xs font-semibold opacity-80">Coverage {formatPct(district.coverageShare * 100)} of OSM stores in district.</p>
             </div>
           ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-700">{regionalPriceStatisticsGate.title}</p>
+            <h2 className="mt-2 text-3xl font-black text-sky-950">Regional price statistics gate</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-sky-900">{regionalPriceStatisticsGate.detail}</p>
+          </div>
+          <div className="rounded-2xl bg-white/80 p-4 text-right">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-700">Status</p>
+            <p className="mt-2 text-2xl font-black text-sky-950">{regionalPriceStatisticsGate.statusLabel}</p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-4 lg:grid-cols-2">
+          <div className="rounded-2xl bg-white/85 p-4">
+            <h3 className="text-lg font-black text-sky-950">City statistics coverage</h3>
+            <div className="mt-3 grid gap-3">
+              {regionalPriceStatisticsGate.cityPriceStatisticRows.map((city) => (
+                <div className="rounded-2xl border border-sky-100 p-3" key={city.label}>
+                  <p className="font-black text-slate-950">{city.label}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{city.coveredStores} of {city.totalStores} stores chain-index covered · {city.chainCount} chains</p>
+                  <p className="mt-1 text-xs font-semibold text-slate-500">Coverage {formatPct(city.coverageShare * 100)} · statistic {city.statisticLabel}</p>
+                  <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">{city.detail}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-2xl bg-white/85 p-4">
+            <h3 className="text-lg font-black text-sky-950">District statistics coverage</h3>
+            <div className="mt-3 grid gap-3">
+              {regionalPriceStatisticsGate.districtPriceStatisticRows.map((district) => (
+                <div className="rounded-2xl border border-sky-100 p-3" key={district.label}>
+                  <p className="font-black text-slate-950">{district.label}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-700">{district.coveredStores} of {district.totalStores} stores chain-index covered · {district.chainCount} chains</p>
+                  <p className="mt-1 text-xs font-semibold text-slate-500">Coverage {formatPct(district.coverageShare * 100)} · statistic {district.statisticLabel}</p>
+                  <p className="mt-1 text-xs font-semibold leading-5 text-slate-500">{district.detail}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 rounded-2xl bg-white/85 p-4">
+          <p className="text-sm font-black text-sky-950">Required confidence/coverage before regional stats unlock</p>
+          <ul className="mt-2 list-disc space-y-2 pl-5 text-sm leading-6 text-sky-900">
+            {regionalPriceStatisticsGate.requiredEvidence.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
         </div>
       </Card>
 
