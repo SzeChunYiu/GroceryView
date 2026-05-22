@@ -326,7 +326,8 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_STORE_IDS = [
   '245080',
   '245050',
   '116385',
-  '116418'
+  '116418',
+  '135120'
 ] as const;
 export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'Färsk laxfilé Harbour',
@@ -363,7 +364,7 @@ export const DEFAULT_COOP_WEEKLY_DISCOUNT_QUERIES = [
   'fiskpinnar coop'
 ];
 const COOP_LUND_STADION_FLYER_STORE_IDS = ['105860', '105760', '105740', '105710', '105830', '105630', '105810'] as const;
-const COOP_KARLSKOGA_MATCHED_FLYER_STORE_IDS = ['163120'] as const;
+const COOP_AVENYN_MATCHED_FLYER_STORE_IDS = ['163120', '135120'] as const;
 const COOP_SMALL_STORE_MATCHED_FLYER_STORE_IDS = ['056313', '196231', '245080', '245050', '116385', '116418'] as const;
 export const DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS: readonly CoopFlyerOfferHint[] = [
   {
@@ -424,7 +425,7 @@ export const DEFAULT_COOP_WEEKLY_FLYER_OFFER_HINTS: readonly CoopFlyerOfferHint[
     offerUnitPriceText: '317.33 kr/kg',
     offerMechanicText: 'Torskryggfilé 3-pack-119:- /förp'
   },
-  ...coopFlyerOfferHints(COOP_KARLSKOGA_MATCHED_FLYER_STORE_IDS, [
+  ...coopFlyerOfferHints(COOP_AVENYN_MATCHED_FLYER_STORE_IDS, [
     ['Färsk laxfilé Harbour', '2383471000006', 149, 149, '149.00 kr/kilo', '149 kr/kg', true],
     ['Mini vattenmelon', '2317342100007', 20, 20, '20.00 kr/kilo', 'Medlemspris-Vattenmelon Mini-20:- /kg', true],
     ['Svenskt smör Arla 500 g', '7310865005168', 45, 90, '90.00 kr/kilo', 'Medlemspris-Smör 45 kr/st-1 för 45:-', true],
