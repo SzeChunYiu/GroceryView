@@ -19,7 +19,7 @@ Pick the highest unblocked P0/P1. Apply A1→A12 from the playbook. As soon as a
 | **P2** | Matdax | ❌ blocked | n/a | WordPress site, no product endpoint; receipt scans only (future). |
 | **P2** | 7-Eleven Sweden | ⏳ pending | per-store unlikely | reitanonline.se for delivery. |
 | **P2** | Direkten / Pressbyrån | ❌ blocked | n/a | No online catalog known. |
-| **P3** | OpenFoodFacts widen | 🟡 partial | n/a | Widen from priced subset to all 25,059 Swedish products for metadata-only catalog. |
+| **P3** | OpenFoodFacts widen | 🟡 partial | n/a | Metadata-only product surface now ships a guarded >=900-row slice via `apps/web/scripts/refresh-openfoodfacts-catalog.mjs`; live API reports ~25,090 Swedish products but repeated 503/page-cap behavior still blocks a durable all-products refresh. Next: switch to export/filter or other resilient bulk path before marking complete. |
 | **P3** | Konsumentverket reports | ⏳ pending | category-level | scb.se grocery price index; macro trend data. |
 | **P3** | Wayback Machine historical | ⏳ pending | per-snapshot | Walk web.archive.org snapshots of chain sites; build historical price series. |
 | **P3** | Pepesto unified API | ⏳ review | yes (commercial) | pepesto.com — paid; useful for cross-validation; review TOS first. |
