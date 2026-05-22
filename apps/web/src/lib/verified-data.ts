@@ -1,5 +1,5 @@
 import { COMMODITIES, type Commodity, type ComparableUnit } from '@groceryview/catalog';
-import { calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type CommodityPriceObservation, type ProductMatchInput } from '@groceryview/core';
+import { calculateDealScore, compareCommodityUnitPrices, planBasketTripCost, planDietarySubstitutionAssistant, planRecurringBasketDigest, recommendSmartSwaps, summarizeCategoryDealLeaders, summarizePriceHistory, type BrandTier, type CommodityPriceObservation, type ProductMatchInput } from '@groceryview/core';
 import { axfoodProducts } from './axfood-products';
 import { icaReklambladOffers, icaReklambladSource } from './ingested/ica-reklamblad';
 import { mathemProducts, mathemSource } from './ingested/mathem';
@@ -1544,6 +1544,63 @@ export const stockoutSubstitutionContract = {
     'No live store inventory or private household basket is bundled with this static build.',
     'No substitution is claimed as reserved, purchased, or automatically applied.',
     'No dietary suitability is inferred from browsing behavior or product names when required tags are missing.'
+  ]
+};
+
+export const dietarySubstitutionAssistantContract = {
+  endpoint: '/api/meals/dietary-substitutions',
+  title: 'Dietary substitution assistant',
+  status: 'core_planner_contract',
+  corePlanner: 'planDietarySubstitutionAssistant',
+  supportedIntents: ['dairy_free', 'gluten_free', 'vegan', 'halal', 'kosher', 'general'],
+  preferenceFields: [
+    'profileId',
+    'requiredDietaryTags',
+    'blockedDietaryTags',
+    'allergenAvoidanceTags',
+    'substitutionIntent',
+    'maxUnitPriceIncreasePercent'
+  ],
+  examplePlan: planDietarySubstitutionAssistant({
+    source: {
+      productId: 'milk-reference',
+      productName: 'Milk reference 1l',
+      category: 'milk',
+      packageSize: 1,
+      packageUnit: 'l',
+      unitPrice: 16.9,
+      dietaryTags: ['dairy'],
+      brandTier: 'national'
+    },
+    preference: {
+      profileId: 'signed-in-dietary-profile',
+      requiredDietaryTags: ['vegan', 'lactose_free'],
+      blockedDietaryTags: ['dairy'],
+      allergenAvoidanceTags: ['almond'],
+      substitutionIntent: 'dairy_free',
+      maxUnitPriceIncreasePercent: 20
+    },
+    candidates: [
+      {
+        productId: 'oat-drink-reference',
+        productName: 'Oat drink 1l',
+        category: 'dairy_substitute',
+        packageSize: 1,
+        packageUnit: 'l',
+        unitPrice: 18.9,
+        dietaryTags: ['vegan', 'lactose_free'],
+        allergenTags: ['oat'],
+        evidenceSource: 'verified label evidence',
+        observedAt: snapshot.retrievedLabel,
+        brandTier: 'national'
+      }
+    ]
+  }),
+  guardrails: [
+    'No dietary swap is auto-applied; every replacement requires signed-in shopper confirmation.',
+    'requiredDietaryTags and allergenAvoidanceTags are checked against verified label evidence before price is considered.',
+    'Medical or infant diet categories require professional confirmation and are blocked from automatic recommendations.',
+    'The assistant explains options only; it does not make nutrition, allergy, medical, checkout, or inventory claims.'
   ]
 };
 
