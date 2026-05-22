@@ -438,6 +438,9 @@ describe('verified-data UI', () => {
     assert.match(actions, /method: 'POST'/);
     assert.match(actions, /accept_community_report/);
     assert.match(actions, /dismiss_community_report/);
+    assert.match(actions, /needs_more_info/);
+    assert.match(actions, /Request more info/);
+    assert.match(actions, /status.*in_progress/);
     assert.match(actions, /reviewedByHuman: true/);
     assert.match(actions, /Sign in first/);
     assert.match(actions, /No anonymous price-report moderation/);
