@@ -9,6 +9,7 @@
     "moduleResolution": "NodeNext",
     "noEmit": false,
     "outDir": "dist",
+    "paths": {},
     "rootDir": ".",
     "sourceMap": true
   },
