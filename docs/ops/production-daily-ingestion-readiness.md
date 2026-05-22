@@ -47,11 +47,14 @@ branch-scoped before it writes `latest_prices`.
 
 ## Export live Coop/Willys branch metadata
 
-Coop and Willys branch ids are fetched from their public store catalogs:
+Branch ids are fetched from public/native store catalogs where available:
 
 - Willys: `https://www.willys.se/axfood/rest/store?online=true`
 - Coop: `https://proxy.api.coop.se/external/store/stores?api-version=v5`, with
   store details from `/stores/{ledgerAccountNumber}`
+- Lidl: `https://www.lidl.se/s/sv-SE/butiker/` store detail pages
+- City Gross: `https://www.citygross.se/api/v1/PageData/stores`
+- ICA: built from the checked-in ICA default store promotion configs
 
 Generate connector-ready `stores[]` snippets:
 
@@ -59,8 +62,14 @@ Generate connector-ready `stores[]` snippets:
 npm run ops:daily-connector-stores > /tmp/daily-connector-stores.json
 ```
 
-Use the `storesByChain.willys` and `storesByChain.coop` arrays in
-`GROCERYVIEW_DAILY_CONNECTORS_JSON` for those connectors.
+Generate the complete native daily connector JSON for
+`GROCERYVIEW_DAILY_CONNECTORS_JSON`:
+
+```bash
+npm run ops:daily-connectors > /tmp/groceryview-daily-connectors.json
+```
+
+Use the emitted JSON as the `GROCERYVIEW_DAILY_CONNECTORS_JSON` secret/value.
 
 ## Validate values before relying on cron
 
