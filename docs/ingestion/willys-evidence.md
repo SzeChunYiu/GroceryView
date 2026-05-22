@@ -99,3 +99,59 @@ Sample rows:
 3. 2500303258 | 2110 | Mozzarella | 2 för 20,00 | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
 4. 2500306014 | 2259 | Grön sparris 250g | 29,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2259&type=PERSONAL_GENERAL&page=0&size=100
 5. 2500306996 | 2259 | Lyxrosor 12-pack | 99,00/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2259&type=PERSONAL_GENERAL&page=0&size=100
+## Willys weekly discounts 36-store expansion 2026-05-22
+
+- Source: willys.se public Axfood campaign JSON
+- Store catalog source: https://www.willys.se/axfood/rest/store?online=true
+- Source URL pattern: https://www.willys.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
+- Retrieved: 2026-05-22T12:26:44.878Z
+- Store IDs: 2110, 2187, 2102, 2149, 2355, 2268, 2121, 2212, 2193, 2207, 2219, 2260, 2259, 2232, 2206, 2353, 2103, 2329, 2348, 2328, 2249, 2225, 2152, 2224, 2118, 2282, 2240, 2325, 2267, 2322, 2230, 2248, 2292, 2241, 2132, 2223
+- Real weekly discount rows fetched and wired: 7276
+- Source URLs fetched: 108
+- Web wire: apps/web/src/lib/ingested/willys.ts
+- Connector: packages/ingestion/src/connectors/willys.ts
+
+Per-store row counts:
+- 2110: 202 rows
+- 2187: 202 rows
+- 2102: 202 rows
+- 2149: 202 rows
+- 2355: 206 rows
+- 2268: 202 rows
+- 2121: 202 rows
+- 2212: 202 rows
+- 2193: 202 rows
+- 2207: 202 rows
+- 2219: 202 rows
+- 2260: 202 rows
+- 2259: 202 rows
+- 2232: 202 rows
+- 2206: 202 rows
+- 2353: 202 rows
+- 2103: 202 rows
+- 2329: 202 rows
+- 2348: 202 rows
+- 2328: 202 rows
+- 2249: 202 rows
+- 2225: 202 rows
+- 2152: 202 rows
+- 2224: 202 rows
+- 2118: 202 rows
+- 2282: 202 rows
+- 2240: 202 rows
+- 2325: 202 rows
+- 2267: 202 rows
+- 2322: 202 rows
+- 2230: 202 rows
+- 2248: 202 rows
+- 2292: 202 rows
+- 2241: 202 rows
+- 2132: 202 rows
+- 2223: 202 rows
+
+Sample rows:
+1. 2500306014 | 2110 | Grön sparris 250g | 29,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
+2. 2500306996 | 2110 | Lyxrosor 12-pack | 99,00/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
+3. 2500303258 | 2110 | Mozzarella | 2 för 20,00 | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
+4. 2500298388 | 2110 | Hushållspapper 12-pack, toalettpapper 18-pack | 59,90/st | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
+5. 2500301201 | 2110 | Läsk 6-pack | Välj & blanda! 3 för 89,00 +pant | 20/05-2026-24/05-2026 | https://www.willys.se/search/campaigns/offline?q=2110&type=PERSONAL_GENERAL&page=0&size=100
