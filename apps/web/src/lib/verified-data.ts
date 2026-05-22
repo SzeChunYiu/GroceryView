@@ -1158,6 +1158,143 @@ export const openFoodFactsCatalogPreview = [...openFoodFactsCatalog]
   .slice(0, 12);
 
 export const storeUniverse = osmStores;
+
+function normalizeStoreText(value: string) {
+  return value
+    .normalize('NFKD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function significantStoreTokens(value: string) {
+  return normalizeStoreText(value)
+    .split(' ')
+    .filter((token) => token.length > 3 && !['lidl', 'vagen', 'vag'].includes(token));
+}
+
+const lidlOfferGroupsByStore = Object.values(
+  lidlStoreOffers.reduce<Record<string, {
+    externalStoreId: string;
+    storeName: string;
+    city: string;
+    offers: typeof lidlStoreOffers;
+  }>>((ledger, offer) => {
+    const row = ledger[offer.storeId] ?? {
+      externalStoreId: offer.storeId,
+      storeName: offer.storeName,
+      city: offer.city,
+      offers: [] as typeof lidlStoreOffers
+    };
+    row.offers.push(offer);
+    ledger[offer.storeId] = row;
+    return ledger;
+  }, {})
+);
+
+function matchingOsmStoreForLidlGroup(group: (typeof lidlOfferGroupsByStore)[number]) {
+  const city = normalizeStoreText(group.city);
+  const groupHaystack = normalizeStoreText(`${group.externalStoreId} ${group.storeName}`);
+  const sameCityLidlStores = osmStores.filter((store) => store.brand === 'Lidl' && normalizeStoreText(store.city) === city);
+  const addressMatch = sameCityLidlStores.find((store) => {
+    const tokens = significantStoreTokens(`${store.name} ${store.address}`);
+    return tokens.some((token) => groupHaystack.includes(token));
+  });
+  return addressMatch ?? (sameCityLidlStores.length === 1 ? sameCityLidlStores[0] : null);
+}
+
+function average(values: number[]) {
+  return values.length > 0 ? values.reduce((sum, value) => sum + value, 0) / values.length : null;
+}
+
+function percentileRank(value: number, values: number[]) {
+  if (values.length === 0) return null;
+  const less = values.filter((candidate) => candidate < value).length;
+  const equal = values.filter((candidate) => candidate === value).length;
+  return roundSek(((less + equal / 2) / values.length) * 100);
+}
+
+function cheaperThanPct(value: number, values: number[]) {
+  if (values.length === 0) return null;
+  const higher = values.filter((candidate) => candidate > value).length;
+  return roundSek((higher / values.length) * 100);
+}
+
+const lidlStoreOfferSummaries = lidlOfferGroupsByStore
+  .map((group) => {
+    const regularPriceRatios = group.offers
+      .filter((offer) => typeof offer.regularPrice === 'number' && offer.regularPrice > 0)
+      .map((offer) => (offer.price / offer.regularPrice!) * 100);
+    const averageRelativeIndex = average(regularPriceRatios);
+    if (averageRelativeIndex === null) return null;
+    const averageOfferPrice = average(group.offers.map((offer) => offer.price)) ?? 0;
+    const averageRegularPrice = average(group.offers
+      .filter((offer) => typeof offer.regularPrice === 'number' && offer.regularPrice > 0)
+      .map((offer) => offer.regularPrice!));
+    return {
+      ...group,
+      matchedStore: matchingOsmStoreForLidlGroup(group),
+      averageOfferPrice: roundSek(averageOfferPrice),
+      averageRegularPrice: averageRegularPrice === null ? null : roundSek(averageRegularPrice),
+      averageRelativeIndex: roundSek(averageRelativeIndex),
+      regularPriceObservationCount: regularPriceRatios.length
+    };
+  })
+  .filter((summary): summary is Exclude<typeof summary, null> => summary !== null);
+
+const nationalLidlPriceIndices = lidlStoreOfferSummaries.map((summary) => summary.averageRelativeIndex);
+
+export const storePricePercentileRanks = lidlStoreOfferSummaries
+  .map((summary) => {
+    if (!summary.matchedStore) return null;
+    const kommun = summary.matchedStore.city || summary.matchedStore.district || summary.city;
+    const kommunPriceIndices = lidlStoreOfferSummaries
+      .filter((candidate) => (candidate.matchedStore?.city || candidate.matchedStore?.district || candidate.city) === kommun)
+      .map((candidate) => candidate.averageRelativeIndex);
+    const nationalPricePercentile = percentileRank(summary.averageRelativeIndex, nationalLidlPriceIndices);
+    const kommunPricePercentile = percentileRank(summary.averageRelativeIndex, kommunPriceIndices);
+    const cheaperThanNationalPct = cheaperThanPct(summary.averageRelativeIndex, nationalLidlPriceIndices);
+    const cheaperThanKommunPct = cheaperThanPct(summary.averageRelativeIndex, kommunPriceIndices);
+    return {
+      osmSlug: summary.matchedStore.slug,
+      externalStoreId: summary.externalStoreId,
+      chain: 'Lidl',
+      storeName: summary.matchedStore.name,
+      sourceStoreName: summary.storeName,
+      kommun,
+      kommunDerivedFrom: summary.matchedStore.city ? 'OSM city field matched to Lidl city' : 'OSM district fallback matched to Lidl city',
+      matchedPerBranchObservationCount: summary.offers.length,
+      regularPriceObservationCount: summary.regularPriceObservationCount,
+      nationalCohortSize: nationalLidlPriceIndices.length,
+      kommunCohortSize: kommunPriceIndices.length,
+      averageOfferPrice: summary.averageOfferPrice,
+      averageOfferPriceLabel: formatSek(summary.averageOfferPrice),
+      averageRegularPrice: summary.averageRegularPrice,
+      averageRegularPriceLabel: formatSek(summary.averageRegularPrice),
+      averageRelativeIndex: summary.averageRelativeIndex,
+      averageRelativeIndexLabel: formatPct(summary.averageRelativeIndex),
+      nationalPricePercentile,
+      nationalPricePercentileLabel: formatPct(nationalPricePercentile),
+      kommunPricePercentile,
+      kommunPricePercentileLabel: formatPct(kommunPricePercentile),
+      cheaperThanNationalPct,
+      cheaperThanNationalLabel: formatPct(cheaperThanNationalPct),
+      cheaperThanKommunPct,
+      cheaperThanKommunLabel: formatPct(cheaperThanKommunPct),
+      statusLabel: 'Ranked from per-branch Lidl offer observations',
+      confidenceLabel: summary.offers.length >= 30 && summary.regularPriceObservationCount >= 12 ? 'high confidence branch-offer coverage' : 'limited branch-offer coverage',
+      coverageLabel: `${summary.offers.length} per-branch Lidl offer observations; ${summary.regularPriceObservationCount} include regular-price baselines`,
+      source: 'lidlStoreOffers public branch offer rows'
+    };
+  })
+  .filter((rank): rank is Exclude<typeof rank, null> => rank !== null)
+  .sort((left, right) => left.nationalPricePercentile! - right.nationalPricePercentile!);
+
+export function storePricePercentileRankForStore(slug: string) {
+  return storePricePercentileRanks.find((rank) => rank.osmSlug === slug) ?? null;
+}
+
 export const featuredStores = [...osmStores]
   .filter((store) => store.address)
   .sort((a, b) => a.name.localeCompare(b.name, 'sv'))
