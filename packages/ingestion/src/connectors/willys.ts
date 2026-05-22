@@ -106,6 +106,7 @@ type AxfoodCampaignResponse = {
 export const WILLYS_SEARCH_BASE_URL = 'https://www.willys.se/search';
 export const WILLYS_WEEKLY_DISCOUNTS_BASE_URL = 'https://www.willys.se/search/campaigns/offline';
 export const DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_ID = '2110';
+export const DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS = ['2110', '2187', '2102'] as const;
 
 export const DEFAULT_WILLYS_SEARCH_QUERIES = [
   'makaroner',
@@ -204,8 +205,10 @@ export async function fetchWillysWeeklyDiscounts(
   const fetchImpl = options.fetchImpl ?? fetch;
   const storeIds = options.storeIds && options.storeIds.length > 0
     ? options.storeIds
-    : [options.storeId ?? DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_ID];
-  const maxRows = options.maxRows ?? 300;
+    : options.storeId
+      ? [options.storeId]
+      : DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS;
+  const maxRows = options.maxRows ?? storeIds.length * 300;
   const pageSize = options.pageSize ?? Math.min(maxRows, 100);
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: WillysWeeklyDiscount[] = [];
