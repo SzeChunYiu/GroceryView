@@ -2,6 +2,7 @@ import { Injectable, ServiceUnavailableException } from '@nestjs/common';
 import {
   buildEmptyProductPriceHistoryReport,
   buildProductPriceHistoryReport,
+  type ProductPriceHistoryEvidenceTable,
   type ProductPriceHistoryObservationInput,
   type ProductPriceHistoryPriceType,
   type ProductPriceHistoryReport
@@ -70,6 +71,8 @@ function provenanceRecord(value: Record<string, unknown> | string | null): Recor
   if (!value) return {};
   return typeof value === 'string' ? JSON.parse(value) as Record<string, unknown> : value;
 }
+
+const productPriceHistorySourceTables = ['products', 'observations', 'chains', 'stores'] as const satisfies readonly ProductPriceHistoryEvidenceTable[];
 
 @Injectable()
 export class PriceHistoryService {
@@ -148,7 +151,7 @@ export class PriceHistoryService {
         productId: product.id,
         productSlug: product.slug,
         productName: product.canonical_name
-      }, filter);
+      }, filter, { sourceTables: productPriceHistorySourceTables });
     }
 
     return buildProductPriceHistoryReport(rows.map((row): ProductPriceHistoryObservationInput => ({
@@ -185,6 +188,6 @@ export class PriceHistoryService {
       productId: product.id,
       productSlug: product.slug,
       productName: product.canonical_name
-    }, filter);
+    }, filter, { sourceTables: productPriceHistorySourceTables });
   }
 }

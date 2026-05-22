@@ -730,6 +730,17 @@ export type ProductPriceHistoryAppliedFilters = {
 
 export type ProductPriceHistoryPoint = ProductPriceHistoryObservationInput;
 
+export type ProductPriceHistoryEvidenceTable = 'products' | 'observations' | 'chains' | 'stores';
+
+export type ProductPriceHistoryEvidence = {
+  observationCount: number;
+  sourceTables: ProductPriceHistoryEvidenceTable[];
+};
+
+export type ProductPriceHistoryReportOptions = {
+  sourceTables?: readonly ProductPriceHistoryEvidenceTable[];
+};
+
 export type ProductPriceHistoryReport = {
   productId: string;
   productSlug: string;
@@ -742,6 +753,7 @@ export type ProductPriceHistoryReport = {
   priceTypes: ProductPriceHistoryPriceType[];
   points: ProductPriceHistoryPoint[];
   summary: PriceHistorySummary | null;
+  evidence: ProductPriceHistoryEvidence;
   guardrails: string[];
 };
 
@@ -2478,9 +2490,16 @@ function assertIsoDate(value: string, field: string): void {
   if (Number.isNaN(Date.parse(value))) throw new Error(`Invalid product price history ${field}.`);
 }
 
+const defaultProductPriceHistorySourceTables = ['products', 'observations', 'chains', 'stores'] as const satisfies readonly ProductPriceHistoryEvidenceTable[];
+
+function productPriceHistorySourceTables(options: ProductPriceHistoryReportOptions): ProductPriceHistoryEvidenceTable[] {
+  return [...(options.sourceTables ?? defaultProductPriceHistorySourceTables)];
+}
+
 export function buildProductPriceHistoryReport(
   observations: readonly ProductPriceHistoryObservationInput[],
-  filters: ProductPriceHistoryAppliedFilters = {}
+  filters: ProductPriceHistoryAppliedFilters = {},
+  options: ProductPriceHistoryReportOptions = {}
 ): ProductPriceHistoryReport | null {
   if (observations.length === 0) return null;
   const productId = observations[0]!.productId;
@@ -2516,6 +2535,10 @@ export function buildProductPriceHistoryReport(
     priceTypes: [...new Set(points.map((point) => point.priceType))].sort(),
     points,
     summary: summarizePriceHistory(points.map((point) => ({ observedAt: point.observedAt, price: point.price }))),
+    evidence: {
+      observationCount: points.length,
+      sourceTables: productPriceHistorySourceTables(options)
+    },
     guardrails: [
       'Price history is built only from persisted observation rows for the selected product.',
       'Member, promotion, estimated, receipt, and community rows remain explicitly labeled in the series.',
@@ -2526,7 +2549,8 @@ export function buildProductPriceHistoryReport(
 
 export function buildEmptyProductPriceHistoryReport(
   product: ProductPriceHistoryProductInput,
-  filters: ProductPriceHistoryAppliedFilters = {}
+  filters: ProductPriceHistoryAppliedFilters = {},
+  options: ProductPriceHistoryReportOptions = {}
 ): ProductPriceHistoryReport {
   return {
     productId: product.productId,
@@ -2540,6 +2564,10 @@ export function buildEmptyProductPriceHistoryReport(
     priceTypes: [],
     points: [],
     summary: null,
+    evidence: {
+      observationCount: 0,
+      sourceTables: productPriceHistorySourceTables(options)
+    },
     guardrails: [
       'Price history is built only from persisted observation rows for the selected product.',
       'No observations are returned when ingestion has not produced rows for the selected filters.',

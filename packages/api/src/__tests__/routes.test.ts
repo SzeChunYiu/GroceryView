@@ -130,6 +130,10 @@ describe('createGroceryViewApi', () => {
     ], { priceType: 'shelf', chain: 'willys', store: 'willys-odenplan', sourceRun: 'run-open-prices-1', minConfidence: 0.9, limit: 100 });
 
     assert.equal(report?.productSlug, 'bryggkaffe-450g');
+    assert.deepEqual(report?.evidence, {
+      observationCount: 2,
+      sourceTables: ['products', 'observations', 'chains', 'stores']
+    });
     assert.deepEqual(report?.points.map((point) => point.observationId), ['obs-coffee-old', 'obs-coffee-new']);
     assert.deepEqual(report?.points.at(-1), {
       observationId: 'obs-coffee-new',

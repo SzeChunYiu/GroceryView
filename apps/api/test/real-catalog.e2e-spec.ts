@@ -277,6 +277,10 @@ describe('real catalog API endpoints', () => {
       limit: 25
     });
     assert.equal(response.body.pointCount, 2);
+    assert.deepEqual(response.body.evidence, {
+      observationCount: 2,
+      sourceTables: ['products', 'observations', 'chains', 'stores']
+    });
     assert.deepEqual(response.body.points.map((point: { observationId: string }) => point.observationId), ['obs-milk-shelf', 'obs-milk-promo']);
     assert.equal(response.body.points[1].priceType, 'promotion');
     assert.equal(response.body.points[1].chainSlug, 'willys');
