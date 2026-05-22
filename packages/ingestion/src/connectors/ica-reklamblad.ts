@@ -77,7 +77,7 @@ export async function fetchIcaReklambladOffers(
   return parseIcaReklambladOffers(await response.text(), {
     sourceUrl,
     retrievedAt,
-    maxRows: options.maxRows ?? 75
+    maxRows: options.maxRows ?? 150
   });
 }
 
@@ -106,7 +106,7 @@ export function parseIcaReklambladOffers(
     }
     seenCodes.add(row.code);
     rows.push(row);
-    if (rows.length >= (context.maxRows ?? 75)) {
+    if (rows.length >= (context.maxRows ?? 150)) {
       return rows;
     }
   }

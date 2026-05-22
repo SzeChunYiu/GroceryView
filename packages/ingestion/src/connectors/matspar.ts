@@ -70,7 +70,7 @@ export function buildMatsparSearchUrl(query: string): string {
 export async function fetchMatsparProducts(options: FetchMatsparProductsOptions = {}): Promise<MatsparProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const queries = options.queries ?? DEFAULT_MATSPAR_SEARCH_QUERIES;
-  const maxRows = options.maxRows ?? 75;
+  const maxRows = options.maxRows ?? 150;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: MatsparProduct[] = [];
   const seenCodes = new Set<string>();
