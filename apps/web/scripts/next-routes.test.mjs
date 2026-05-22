@@ -47,7 +47,7 @@ describe('verified-data UI', () => {
   });
 
   it('makes unavailable private features fail closed instead of showing fabricated rows', async () => {
-    const featureRoutes = ['scanner','household','account','coupon-stacks','price-reports','shopping-trips','privacy'];
+    const featureRoutes = ['scanner','household','coupon-stacks','price-reports','shopping-trips','privacy'];
     const verified = await read('src/lib/verified-data.ts');
     assert.match(verified, /privateFeatureCopy/);
     assert.match(verified, /verifiedSurface/);
@@ -109,6 +109,30 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /NoVerifiedData/);
     assert.match(route, /@\/lib\/demo-data/);
     assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
+
+  it('surfaces account-bound saved baskets and favorite stores on the account route', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const account = await read('src/app/account/page.tsx');
+    const server = await read('../../packages/server/src/index.ts');
+    const schema = await read('../../db/schema.sql');
+
+    assert.match(verified, /export const accountSavedShoppingContract = /);
+    assert.match(verified, /\/api\/users\/\{userId\}\/favorite-stores/);
+    assert.match(verified, /weekly_baskets/);
+    assert.match(verified, /basket_items/);
+    assert.match(account, /accountSavedShoppingContract/);
+    assert.match(account, /Saved baskets & favorite stores/);
+    assert.match(account, /signed-in shoppers only/i);
+    assert.match(account, /favorite stores/);
+    assert.match(account, /weekly_baskets/);
+    assert.match(account, /basket_items/);
+    assert.match(server, /favorite-stores/);
+    assert.match(schema, /create table if not exists weekly_baskets/);
+    assert.match(schema, /create table if not exists basket_items/);
+    assert.doesNotMatch(account, /NoVerifiedData/);
+    assert.doesNotMatch(account, /@\/lib\/demo-data/);
   });
 
   it('surfaces the retailer handoff support matrix contract on the basket ideas route', async () => {
