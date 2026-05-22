@@ -87,12 +87,77 @@ const priceRows = [
   }
 ];
 
+const productRows = [
+  {
+    id: 'product-milk',
+    slug: 'standardmjolk-1l',
+    canonical_name: 'Standardmjolk 3% 1 l'
+  }
+];
+
+const priceHistoryRows = [
+  {
+    id: 'obs-milk-promo',
+    chain_id: 'chain-willys',
+    store_id: 'store-willys',
+    source_run_id: 'run-willys-2026-05-21',
+    raw_record_id: 'raw-milk-promo',
+    retailer_product_ref: 'willys-milk-1l',
+    price_type: 'promotion',
+    price: '13.90',
+    regular_price: '14.90',
+    unit_price: '13.9000',
+    currency: 'SEK',
+    quantity: '1',
+    quantity_unit: 'l',
+    promotion_text: 'Veckans pris',
+    promotion_starts_on: '2026-05-20T00:00:00.000Z',
+    promotion_ends_on: '2026-05-26T23:59:59.000Z',
+    member_required: false,
+    observed_at: '2026-05-21T09:00:00.000Z',
+    valid_from: '2026-05-20T00:00:00.000Z',
+    valid_until: '2026-05-26T23:59:59.000Z',
+    confidence: '0.9400',
+    provenance: { source: 'willys_feed', rawSnapshotRef: 's3://raw/willys/milk-promo.json' }
+  },
+  {
+    id: 'obs-milk-shelf',
+    chain_id: 'chain-coop',
+    store_id: 'store-coop',
+    source_run_id: 'run-coop-2026-05-10',
+    raw_record_id: 'raw-milk-shelf',
+    retailer_product_ref: 'coop-milk-1l',
+    price_type: 'shelf',
+    price: '15.50',
+    regular_price: null,
+    unit_price: '15.5000',
+    currency: 'SEK',
+    quantity: '1',
+    quantity_unit: 'l',
+    promotion_text: null,
+    promotion_starts_on: null,
+    promotion_ends_on: null,
+    member_required: false,
+    observed_at: '2026-05-10T08:00:00.000Z',
+    valid_from: null,
+    valid_until: null,
+    confidence: '0.9100',
+    provenance: { source: 'coop_feed', rawSnapshotRef: 's3://raw/coop/milk-shelf.json' }
+  }
+];
+
 class FakePostgresQueryExecutorService {
   calls: QueryCall[] = [];
+
+  isConfigured(): boolean {
+    return true;
+  }
 
   async query<T>(sql: string, params: unknown[] = []): Promise<T[]> {
     this.calls.push({ sql, params });
     if (sql.includes('from weekly_baskets')) return [{ product_id: 'product-milk', quantity: '2' }] as T[];
+    if (sql.includes('from observations')) return priceHistoryRows as T[];
+    if (sql.includes('where slug = $1 or id::text = $1')) return productRows as T[];
     return priceRows as T[];
   }
 }
@@ -123,6 +188,7 @@ describe('real catalog API endpoints', () => {
     const docs = await request(app.getHttpServer()).get('/api-json').expect(200);
 
     assert.ok(docs.body.paths['/products/search/faceted']);
+    assert.ok(docs.body.paths['/products/{productId}/price-history']);
     assert.ok(docs.body.paths['/baskets/compare']);
     assert.ok(docs.body.paths['/users/{userId}/basket/compare']);
   });
@@ -164,5 +230,35 @@ describe('real catalog API endpoints', () => {
     assert.equal(saved.body.userId, 'user-1');
     assert.equal(saved.body.itemCount, 1);
     assert.match(database.calls.find((call) => call.sql.includes('from weekly_baskets'))?.sql ?? '', /join basket_items/i);
+  });
+
+  it('serves product price history from persisted observation rows', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/products/standardmjolk-1l/price-history?priceType=promotion&from=2026-05-01T00:00:00.000Z&to=2026-05-31T23:59:59.000Z&limit=25')
+      .expect(200);
+
+    assert.equal(response.body.productId, 'product-milk');
+    assert.equal(response.body.productSlug, 'standardmjolk-1l');
+    assert.equal(response.body.pointCount, 2);
+    assert.deepEqual(response.body.points.map((point: { observationId: string }) => point.observationId), ['obs-milk-shelf', 'obs-milk-promo']);
+    assert.equal(response.body.points[1].priceType, 'promotion');
+    assert.equal(response.body.points[1].price, 13.9);
+    assert.equal(response.body.points[1].regularPrice, 14.9);
+    assert.equal(response.body.points[1].provenance.rawSnapshotRef, 's3://raw/willys/milk-promo.json');
+    assert.equal(response.body.summary.latestPrice, 13.9);
+    assert.equal('demo' in response.body, false);
+
+    const productLookup = database.calls.find((call) => call.sql.includes('where slug = $1 or id::text = $1'));
+    const observationsQuery = database.calls.find((call) => call.sql.includes('from observations'));
+    assert.deepEqual(productLookup?.params, ['standardmjolk-1l']);
+    assert.deepEqual(observationsQuery?.params, [
+      'product-milk',
+      'promotion',
+      '2026-05-01T00:00:00.000Z',
+      '2026-05-31T23:59:59.000Z',
+      25
+    ]);
+    assert.match(observationsQuery?.sql ?? '', /from observations/i);
+    assert.match(observationsQuery?.sql ?? '', /observed_at >=/i);
   });
 });
