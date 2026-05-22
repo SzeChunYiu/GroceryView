@@ -1,4 +1,4 @@
-import { summarizePriceHistory } from '@groceryview/core';
+import { calculateDealScore, summarizeCategoryDealLeaders, summarizePriceHistory } from '@groceryview/core';
 import { axfoodProducts } from './axfood-products';
 import { openFoodFactsCatalog } from './openfoodfacts-catalog';
 import { categoryLabels, pricedProducts } from './openprices-products';
@@ -85,6 +85,10 @@ function cheapestUnitBadge(unitPrice: number | null, peerUnitPrices: number[], u
   if (!Number.isFinite(average) || average <= unitPrice) return null;
   const advantage = ((average - unitPrice) / average) * 100;
   return `cheapest-per-unit · 🟢 -${formatPct(advantage)}/${unitLabel.replace('kr/', '')} vs chain avg`;
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
 }
 
 function dailyObservedPricePoints(product: (typeof pricedProducts)[number]) {
@@ -475,6 +479,37 @@ export const priceDropMoversBoard = pricedProducts
   .filter((mover) => mover.changeFromPrevious < 0)
   .sort((a, b) => a.changeFromPrevious - b.changeFromPrevious || b.observedCount - a.observedCount || a.productName.localeCompare(b.productName, 'sv'))
   .slice(0, 8);
+
+export const categoryDealLeaderCandidates = matchedChainProducts.map((product) => {
+  const sourceConfidence = clamp(product.inChains.length / 2, 0, 1);
+  const crossChainSpreadPercentile = clamp(100 - product.spreadPct * 2, 0, 100);
+  return {
+    productId: product.slug,
+    productName: product.name,
+    category: product.category,
+    storeName: product.lowestChain,
+    price: product.lowestPrice,
+    dealScore: calculateDealScore({
+      currentCityPercentile: crossChainSpreadPercentile,
+      knownPromoHistoryPercentile: crossChainSpreadPercentile,
+      equivalentUnitPricePercentile: product.inChains.length > 1 ? 0 : 50,
+      discountDepthPercent: product.spreadPct,
+      sourceConfidence
+    }),
+    sourceConfidence
+  };
+});
+
+export const categoryDealLeaders = summarizeCategoryDealLeaders({
+  candidates: categoryDealLeaderCandidates,
+  minimumSourceConfidence: 0.6
+}).map((leader) => ({
+  ...leader,
+  categorySlug: leader.category,
+  categoryLabel: labelFromSlug(leader.category),
+  productSlug: leader.productId,
+  evidenceLabel: `${leader.storeName} lowest · ${formatPct(leader.sourceConfidence * 100)} sourceConfidence · cross-chain spread derived`
+}));
 
 export const sourceCoverage = [
   {

@@ -5,6 +5,7 @@ import { mapChainIndexScores } from '@/lib/map-chain-index';
 import {
   chainSavingsLedger,
   chainCategoryCoverage,
+  categoryDealLeaders,
   categoryQualityMatrix,
   categorySummaries,
   dataFreshnessBadges,
@@ -181,6 +182,32 @@ export function MarketShell() {
               <p className="rounded-full bg-emerald-100 px-3 py-2 text-center text-sm font-black text-emerald-900">
                 {mover.isNewLow ? 'New observed low' : mover.legalCopy}
               </p>
+            </Link>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Today&apos;s best category deals</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Category leaders from verified cross-chain spreads</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-slate-600">
+            Calls summarizeCategoryDealLeaders with deal scores derived from visible Willys/Hemköp matched prices. Missing promo history stays covered by sourceConfidence labels.
+          </p>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {categoryDealLeaders.slice(0, 8).map((leader) => (
+            <Link
+              className="rounded-2xl border border-slate-200 bg-slate-50 p-4 hover:border-emerald-700"
+              href={`/categories/${leader.categorySlug}`}
+              key={`${leader.categorySlug}-${leader.productSlug}`}
+            >
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-emerald-800">{leader.categoryLabel}</p>
+              <p className="mt-2 font-black text-slate-950">{leader.productName}</p>
+              <p className="mt-3 text-2xl font-black text-emerald-800">{leader.signal}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-600">{leader.evidenceLabel}</p>
             </Link>
           ))}
         </div>
