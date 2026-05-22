@@ -332,6 +332,25 @@ describe('verified-data UI', () => {
   });
 
 
+  it('surfaces crowd price submissions with photo evidence and trust guardrails', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const priceReports = await read('src/app/price-reports/page.tsx');
+
+    assert.match(verified, /export const crowdPriceSubmissionContract/);
+    assert.match(verified, /planCommunityReportAbuseControls/);
+    assert.match(verified, /community_reporter_trust/);
+    assert.match(verified, /photoEvidence/);
+    assert.match(verified, /reportedPrice/);
+    assert.match(priceReports, /crowdPriceSubmissionContract/);
+    assert.match(priceReports, /Crowd price submissions/);
+    assert.match(priceReports, /photo/i);
+    assert.match(priceReports, /reportedPrice/);
+    assert.match(priceReports, /manual review/i);
+    assert.match(priceReports, /No anonymous price reports/);
+    assert.doesNotMatch(priceReports, /@\/lib\/demo-data|@\/components\/sample-data/);
+  });
+
+
   it('surfaces the retailer handoff support matrix contract on the basket ideas route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/basket-ideas/page.tsx');
