@@ -4,6 +4,12 @@
 // Store: 251300
 // Retrieved: 2026-05-21T01:29:42.710Z
 // Row count: 75 real product rows fetched from coop.se.
+//
+// Weekly discounts source URL: https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true
+// Weekly discounts flyer URL: https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna
+// Weekly discounts product search URL: https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1
+// Weekly discounts retrieved: 2026-05-22T08:24:18.000Z
+// Weekly discounts row count: 8 real current flyer discount rows for Stora Coop Boländerna, valid 2026-05-18 through 2026-05-24.
 
 export type CoopIngestedProduct = {
   code: string;
@@ -27,6 +33,32 @@ export type CoopIngestedProduct = {
   retrievedAt: string;
 };
 
+export type CoopIngestedWeeklyDiscount = {
+  code: string;
+  ean: string;
+  name: string;
+  brand: string;
+  packageText: string;
+  ordinaryPrice: number;
+  ordinaryPriceText: string;
+  offerPrice: number;
+  offerPriceText: string;
+  offerUnitPrice: number | null;
+  offerUnitPriceText: string;
+  offerMechanicText: string;
+  promotionId: string;
+  medMeraRequired: boolean;
+  storeId: string;
+  storeName: string;
+  region: string;
+  validFrom: string;
+  validTo: string;
+  flyerUrl: string;
+  productSearchUrl: string;
+  sourceUrl: string;
+  retrievedAt: string;
+};
+
 export const coopSource = {
   source: 'coop.se public personalization search API',
   retrievedAt: '2026-05-21T01:29:42.710Z',
@@ -35,6 +67,223 @@ export const coopSource = {
   storeId: '251300',
   sourceUrl: 'https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1'
 } as const;
+
+export const coopWeeklyDiscountSource = {
+  source: 'Coop public store API current flyer plus public personalization product search',
+  retrievedAt: '2026-05-22T08:24:18.000Z',
+  rowCount: 8,
+  storeId: '251300',
+  storeName: 'Stora Coop Boländerna',
+  region: 'Uppsala',
+  validFrom: '2026-05-18T00:00:00',
+  validTo: '2026-05-24T23:59:59',
+  sourceUrl: 'https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true',
+  flyerUrl: 'https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna',
+  productSearchUrl: 'https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1'
+} as const;
+
+export const coopWeeklyDiscounts: CoopIngestedWeeklyDiscount[] = [
+  {
+    "code": "2383471000006",
+    "ean": "2383471000006",
+    "name": "Laxfilé",
+    "brand": "Harbour",
+    "packageText": "1450 gram/bit ungefärlig vikt",
+    "ordinaryPrice": 259.32,
+    "ordinaryPriceText": "259.32 SEK",
+    "offerPrice": 149,
+    "offerPriceText": "149.00 SEK",
+    "offerUnitPrice": 149,
+    "offerUnitPriceText": "149.00 kr/kg",
+    "offerMechanicText": "149 kr/kg",
+    "promotionId": "v.21 DR 2026 Laxfilé",
+    "medMeraRequired": true,
+    "storeId": "251300",
+    "storeName": "Stora Coop Boländerna",
+    "region": "Uppsala",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T08:24:18.000Z"
+  },
+  {
+    "code": "2317342100007",
+    "ean": "2317342100007",
+    "name": "Vattenmelon Mini",
+    "brand": "",
+    "packageText": "2450 gram ungefärlig vikt",
+    "ordinaryPrice": 26.45,
+    "ordinaryPriceText": "26.45 SEK",
+    "offerPrice": 20,
+    "offerPriceText": "20.00 SEK",
+    "offerUnitPrice": 20,
+    "offerUnitPriceText": "20.00 kr/kg",
+    "offerMechanicText": "Medlemspris-Vattenmelon Mini-20:- /kg",
+    "promotionId": "016001_141239",
+    "medMeraRequired": true,
+    "storeId": "251300",
+    "storeName": "Stora Coop Boländerna",
+    "region": "Uppsala",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T08:24:18.000Z"
+  },
+  {
+    "code": "7310865005168",
+    "ean": "7310865005168",
+    "name": "Smör Normalsaltat",
+    "brand": "Svenskt Smör från Arla",
+    "packageText": "500g",
+    "ordinaryPrice": 61.45,
+    "ordinaryPriceText": "61.45 SEK",
+    "offerPrice": 45,
+    "offerPriceText": "45.00 SEK",
+    "offerUnitPrice": 90,
+    "offerUnitPriceText": "90.00 kr/kg",
+    "offerMechanicText": "Medlemspris-Smör 45 kr/st-1 för 45:-",
+    "promotionId": "016001_41099",
+    "medMeraRequired": true,
+    "storeId": "251300",
+    "storeName": "Stora Coop Boländerna",
+    "region": "Uppsala",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T08:24:18.000Z"
+  },
+  {
+    "code": "2340375400004",
+    "ean": "2340375400004",
+    "name": "Hushållsost",
+    "brand": "Arla®",
+    "packageText": "1100 gram/st ungefärlig vikt",
+    "ordinaryPrice": 114.5,
+    "ordinaryPriceText": "114.50 SEK",
+    "offerPrice": 74.9,
+    "offerPriceText": "74.90 SEK",
+    "offerUnitPrice": 74.9,
+    "offerUnitPriceText": "74.90 kr/kg",
+    "offerMechanicText": "Medlemspris-Hushållsost-74:90 /kg",
+    "promotionId": "016001_141234",
+    "medMeraRequired": true,
+    "storeId": "251300",
+    "storeName": "Stora Coop Boländerna",
+    "region": "Uppsala",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T08:24:18.000Z"
+  },
+  {
+    "code": "7340191179691",
+    "ean": "7340191179691",
+    "name": "Toalettpapper Nice & Soft 24-pack",
+    "brand": "Coop",
+    "packageText": "2332 G",
+    "ordinaryPrice": 124,
+    "ordinaryPriceText": "124.00 SEK",
+    "offerPrice": 99,
+    "offerPriceText": "99.00 SEK",
+    "offerUnitPrice": 42.45,
+    "offerUnitPriceText": "42.45 kr/kg",
+    "offerMechanicText": "Toalettpapper Nice & Soft 24-pack-99:- /st",
+    "promotionId": "016001_141210",
+    "medMeraRequired": false,
+    "storeId": "251300",
+    "storeName": "Stora Coop Boländerna",
+    "region": "Uppsala",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T08:24:18.000Z"
+  },
+  {
+    "code": "7300206718000",
+    "ean": "7300206718000",
+    "name": "Bacon 3-pack",
+    "brand": "Scan",
+    "packageText": "3x140g",
+    "ordinaryPrice": 40.65,
+    "ordinaryPriceText": "40.65 SEK",
+    "offerPrice": 37.9,
+    "offerPriceText": "37.90 SEK",
+    "offerUnitPrice": 90.24,
+    "offerUnitPriceText": "90.24 kr/kg",
+    "offerMechanicText": "Bacon 3-pack-37:90 /st",
+    "promotionId": "016001_141220",
+    "medMeraRequired": false,
+    "storeId": "251300",
+    "storeName": "Stora Coop Boländerna",
+    "region": "Uppsala",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T08:24:18.000Z"
+  },
+  {
+    "code": "7310865095466",
+    "ean": "7310865095466",
+    "name": "Grekisk yoghurt 10%",
+    "brand": "Arla Köket®",
+    "packageText": "1000 g",
+    "ordinaryPrice": 37.81,
+    "ordinaryPriceText": "37.81 SEK",
+    "offerPrice": 29.9,
+    "offerPriceText": "29.90 SEK",
+    "offerUnitPrice": 29.9,
+    "offerUnitPriceText": "29.90 kr/kg",
+    "offerMechanicText": "Grekisk yoghurt 10%-29:90 /st",
+    "promotionId": "016001_141197",
+    "medMeraRequired": false,
+    "storeId": "251300",
+    "storeName": "Stora Coop Boländerna",
+    "region": "Uppsala",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T08:24:18.000Z"
+  },
+  {
+    "code": "80508816",
+    "ean": "80508816",
+    "name": "Olivolja Classico",
+    "brand": "Monini",
+    "packageText": "750 ml",
+    "ordinaryPrice": 99.37,
+    "ordinaryPriceText": "99.37 SEK",
+    "offerPrice": 89,
+    "offerPriceText": "89.00 SEK",
+    "offerUnitPrice": 118.66,
+    "offerUnitPriceText": "118.66 kr/lit",
+    "offerMechanicText": "Olivolja Classico-89:- /st",
+    "promotionId": "016001_141147",
+    "medMeraRequired": false,
+    "storeId": "251300",
+    "storeName": "Stora Coop Boländerna",
+    "region": "Uppsala",
+    "validFrom": "2026-05-18T00:00:00",
+    "validTo": "2026-05-24T23:59:59",
+    "flyerUrl": "https://dr.coop.se/Butik/Stora-Coop-Uppsala-Bol%C3%A4nderna",
+    "productSearchUrl": "https://external.api.coop.se/personalization/search/products?store=251300&device=desktop&direct=true&api-version=v1",
+    "sourceUrl": "https://proxy.api.coop.se/external/store/stores/251300?api-version=v5&includeFlyers=true&onlyVisibleOpeningHours=true",
+    "retrievedAt": "2026-05-22T08:24:18.000Z"
+  }
+];
 
 export const coopProducts: CoopIngestedProduct[] = [
   {
