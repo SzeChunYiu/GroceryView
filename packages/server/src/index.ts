@@ -864,6 +864,16 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
       }
       if (method === 'GET' && path === '/api/stores') return jsonResponse(api.getStores());
 
+      if (method === 'GET' && path === '/api/deals/flyer-offers') {
+        return jsonResponse(api.getFlyerOffers({
+          asOf: url.searchParams.get('asOf') ?? undefined,
+          storeId: url.searchParams.get('storeId') ?? undefined,
+          chain: url.searchParams.get('chain') ?? undefined,
+          category: url.searchParams.get('category') ?? undefined,
+          productId: url.searchParams.get('productId') ?? undefined
+        }));
+      }
+
       if (method === 'GET' && path === '/api/account/subscription-access') {
         const user = userIdFrom(url);
         if (user instanceof Response) return user;
@@ -1108,6 +1118,13 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return jsonResponse(api.getStoreDealSummary(storeId));
       }
 
+      const storeFlyerOffersMatch = path.match(/^\/api\/stores\/([^/]+)\/flyer-offers$/);
+      if (method === 'GET' && storeFlyerOffersMatch) {
+        const storeId = decodeURIComponent(storeFlyerOffersMatch[1]);
+        if (!api.getStore(storeId)) return errorResponse(404, 'Store not found.');
+        return jsonResponse(api.getStoreFlyerOffers(storeId, { asOf: url.searchParams.get('asOf') ?? undefined }));
+      }
+
       const storePriceCoverageMatch = path.match(/^\/api\/stores\/([^/]+)\/price-coverage$/);
       if (method === 'GET' && storePriceCoverageMatch) {
         const storeId = decodeURIComponent(storePriceCoverageMatch[1]);
@@ -1233,6 +1250,23 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
             favoriteStoresOnly: typeof body.favoriteStoresOnly === 'boolean' ? body.favoriteStoresOnly : true
           });
           return jsonResponse(api.getWatchlist(user), { status: 201 });
+        }
+      }
+
+      if (path === '/api/watchlist/price-alerts') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        if (method === 'GET') return jsonResponse(api.getWatchlistPriceAlerts(user));
+        if (method === 'POST') {
+          const body = await readJson(request);
+          return jsonResponse(api.addWatchlistPriceAlert(user, {
+            productId: requiredString(body.productId, 'productId'),
+            targetPrice: requiredNumber(body.targetPrice, 'targetPrice'),
+            favoriteStoresOnly: typeof body.favoriteStoresOnly === 'boolean' ? body.favoriteStoresOnly : undefined,
+            allowedPriceTypes: optionalWatchlistPriceTypes(body.allowedPriceTypes)
+          }), { status: 201 });
         }
       }
 
@@ -1595,6 +1629,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/notifications/inbox': { get: protectedOperation('Get notification inbox delivery status, holds, suppressions, and alert guardrails.') },
       '/api/receipts/review': { get: protectedOperation('Get receipt review budget impact, match confidence, and writeback guardrails.') },
       '/api/categories/{category}/market': { get: publicOperation('Get category market report with current price, 1M move, 52-week range, and verified evidence.') },
+      '/api/deals/flyer-offers': { get: publicOperation('Get active weekly flyer offers by branch, chain, category, or product with source evidence.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
       '/api/billing/subscription-events': { post: billingWebhookOperation('Accept signed billing subscription events and persist entitlement updates.') },
@@ -1602,6 +1637,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/stores/{id}/category-coverage': { get: publicOperation('Get store price coverage grouped by product category.') },
       '/api/stores/{id}/deal-summary': { get: publicOperation('Get store deal summary with category leaders and score guardrails.') },
       '/api/stores/{id}/deals': { get: publicOperation('Get ranked in-store deals for one store.') },
+      '/api/stores/{id}/flyer-offers': { get: publicOperation('Get active weekly flyer offers captured for one branch.') },
       '/api/stores/{id}/price-coverage': { get: publicOperation('Get store catalog price coverage with missing product guardrails.') },
       '/api/products/search': { get: publicOperation('Search products.') },
       '/api/products/{id}': { get: publicOperation('Get product detail.') },
@@ -1638,6 +1674,10 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/watchlist/items/{productId}': {
         patch: protectedOperation('Update watchlist item.'),
         delete: protectedOperation('Remove watchlist item.')
+      },
+      '/api/watchlist/price-alerts': {
+        get: protectedOperation('Get active watchlist target-price alerts.'),
+        post: protectedOperation('Create or update a watchlist target-price alert.')
       },
       '/api/basket/current': { get: protectedOperation('Get current weekly basket.') },
       '/api/basket/items': { post: protectedOperation('Add basket item.') },

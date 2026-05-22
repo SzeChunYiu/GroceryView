@@ -9,6 +9,7 @@ import { BudgetsModule } from './budgets/budgets.module.js';
 import { CategoriesModule } from './categories/categories.module.js';
 import { validateEnvironment } from './config/env.schema.js';
 import { DatabaseModule } from './database/database.module.js';
+import { DealsModule } from './deals/deals.module.js';
 import { ExpiryDealsModule } from './expiry-deals/expiry-deals.module.js';
 import { HealthModule } from './health/health.module.js';
 import { HouseholdsModule } from './households/households.module.js';
@@ -30,6 +31,7 @@ import { WatchlistsModule } from './watchlists/watchlists.module.js';
     AccountModule,
     AdsModule,
     DatabaseModule,
+    DealsModule,
     ExpiryDealsModule,
     HealthModule,
     HouseholdsModule,

@@ -24,6 +24,7 @@ describe('buildOpenApiDocument', () => {
       '/api/budget/categories',
       '/api/budget/summary',
       '/api/categories/{category}/market',
+      '/api/deals/flyer-offers',
       '/api/expiry-deals/radar',
       '/api/health',
       '/api/households/current',
@@ -66,11 +67,13 @@ describe('buildOpenApiDocument', () => {
       '/api/stores/{id}/category-coverage',
       '/api/stores/{id}/deal-summary',
       '/api/stores/{id}/deals',
+      '/api/stores/{id}/flyer-offers',
       '/api/stores/{id}/price-coverage',
       '/api/users/{userId}/favorite-stores',
       '/api/users/{userId}/favorite-stores/{storeId}',
       '/api/watchlist',
       '/api/watchlist/items/{productId}',
+      '/api/watchlist/price-alerts',
       '/api/workers/notifications/run'
     ]);
 
@@ -91,6 +94,8 @@ describe('buildOpenApiDocument', () => {
     assert.deepEqual(doc.paths['/api/budget/categories'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/budget/categories'].patch?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/watchlist'].get?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/watchlist/price-alerts'].get?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/watchlist/price-alerts'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/households/current'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/households/current'].put?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/users/{userId}/favorite-stores/{storeId}'].delete?.security, [{ bearerAuth: [] }]);
@@ -142,6 +147,10 @@ describe('buildOpenApiDocument', () => {
     assert.match(doc.paths['/api/stores/{id}/category-coverage'].get?.summary ?? '', /category/i);
     assert.equal(doc.paths['/api/stores/{id}/deal-summary'].get?.security, undefined);
     assert.match(doc.paths['/api/stores/{id}/deal-summary'].get?.summary ?? '', /deal summary/i);
+    assert.equal(doc.paths['/api/stores/{id}/flyer-offers'].get?.security, undefined);
+    assert.match(doc.paths['/api/stores/{id}/flyer-offers'].get?.summary ?? '', /flyer offers/i);
+    assert.equal(doc.paths['/api/deals/flyer-offers'].get?.security, undefined);
+    assert.match(doc.paths['/api/deals/flyer-offers'].get?.summary ?? '', /flyer offers/i);
     assert.equal(doc.paths['/api/stores/{id}/price-coverage'].get?.security, undefined);
     assert.match(doc.paths['/api/stores/{id}/price-coverage'].get?.summary ?? '', /price coverage/i);
   });
