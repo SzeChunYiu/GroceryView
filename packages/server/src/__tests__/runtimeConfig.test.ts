@@ -23,17 +23,26 @@ class RecordingPgPool {
   private entitlementRow: unknown | null = null;
   private watchlistRows: Array<{
     product_id: string;
-    target_price: number;
-    alert_deal_score_at: null;
+    target_price: number | null;
+    alert_deal_score_at: number | null;
     favorite_stores_only: boolean;
     allowed_price_types: string[];
-  }> = [{
-    product_id: 'product-coffee',
-    target_price: 50,
-    alert_deal_score_at: null,
-    favorite_stores_only: true,
-    allowed_price_types: ['promotion']
-  }];
+  }> = [
+    {
+      product_id: 'product-coffee',
+      target_price: 50,
+      alert_deal_score_at: null,
+      favorite_stores_only: true,
+      allowed_price_types: ['promotion']
+    },
+    {
+      product_id: 'product-milk',
+      target_price: null,
+      alert_deal_score_at: 80,
+      favorite_stores_only: true,
+      allowed_price_types: ['promotion']
+    }
+  ];
 
   async query(text: string, values: unknown[] = []) {
     this.calls.push({ text, values });
