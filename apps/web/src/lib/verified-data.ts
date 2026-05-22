@@ -28,6 +28,30 @@ export const matchedChainProducts = axfoodProducts.filter((product) => product.i
 export const topChainSpreads = [...matchedChainProducts].sort((a, b) => b.spreadPct - a.spreadPct).slice(0, 18);
 export const freshestOpenPrices = [...pricedProducts].sort((a, b) => b.lastObservedAt.localeCompare(a.lastObservedAt)).slice(0, 18);
 export const productUniverse = [...topChainSpreads, ...freshestOpenPrices].slice(0, 36);
+export const immigrantFamiliarBrandSearch = productUniverse
+  .map((product) => {
+    const isChainProduct = 'lowestPrice' in product;
+    const reportedBrand = isChainProduct ? product.brand : product.brands || 'Brand not reported';
+    const verifiedPrice = isChainProduct ? product.lowestPrice : product.priceMedian;
+    const evidenceLabel = isChainProduct
+      ? `${product.inChains.length} Axfood chains`
+      : `${product.observationCount} OpenPrices observations`;
+
+    return {
+      reportedBrand,
+      productName: product.name,
+      verifiedProductSlug: product.slug,
+      categoryLabel: labelFromSlug(product.category),
+      searchTokens: [reportedBrand, product.name, labelFromSlug(product.category)]
+        .filter(Boolean)
+        .join(' · '),
+      evidenceLabel,
+      verifiedPrice
+    };
+  })
+  .filter((row) => row.reportedBrand !== 'Brand not reported')
+  .sort((a, b) => a.reportedBrand.localeCompare(b.reportedBrand, 'sv') || a.productName.localeCompare(b.productName, 'sv'))
+  .slice(0, 8);
 
 export const storeUniverse = osmStores;
 export const featuredStores = [...osmStores]
