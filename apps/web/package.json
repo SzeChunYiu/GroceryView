@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "build": "next build --webpack",
+    "build": "next build",
     "dev": "next dev",
     "test": "node --test scripts/*.test.mjs"
   },

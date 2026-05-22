@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { existsSync, readFileSync } from 'node:fs';
 
 const rootPackage = JSON.parse(readFileSync(new URL('../../package.json', import.meta.url), 'utf8'));
+const rootTsconfig = JSON.parse(readFileSync(new URL('../../tsconfig.json', import.meta.url), 'utf8'));
 const readPackage = (path) => JSON.parse(readFileSync(new URL(`../../${path}/package.json`, import.meta.url), 'utf8'));
 
 const packages = {
@@ -32,5 +33,25 @@ describe('workspace package scripts', () => {
     assert.match(rootPackage.scripts['ingest:generate-live'], /generate-live-retailer-ingested\.mjs/);
     assert.equal(existsSync(new URL('../../scripts/ingestion/verify-ingested-provenance.mjs', import.meta.url)), true);
     assert.equal(existsSync(new URL('../../scripts/ingestion/generate-live-retailer-ingested.mjs', import.meta.url)), true);
+  });
+
+  it('typechecks workspace imports against source entrypoints before build artifacts exist', () => {
+    const paths = rootTsconfig.compilerOptions.paths;
+    for (const workspace of [
+      'api',
+      'api-contracts',
+      'auth',
+      'catalog',
+      'core',
+      'db',
+      'ingestion',
+      'monetization',
+      'notifications',
+      'ops',
+      'scanning',
+      'server'
+    ]) {
+      assert.deepEqual(paths[`@groceryview/${workspace}`], [`packages/${workspace}/src/index.ts`]);
+    }
   });
 });
