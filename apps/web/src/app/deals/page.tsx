@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { expiryDealRadar, expiryDealRadarReports, kidsSnackLunchboxDeals, singlePortionDealFinder } from '@/lib/demo-data';
-import { offerExpiryReminderBoard } from '@/lib/verified-data';
+import { flyerValidityCalendar, offerExpiryReminderBoard } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -105,6 +105,34 @@ export default function DealsPage() {
             <li key={guardrail}>• {guardrail}</li>
           ))}
         </ul>
+      </Card>
+
+
+      <Card className="mt-6 border-cyan-200 bg-cyan-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-cyan-800">Flyer planning</p>
+        <h2 className="mt-2 text-2xl font-black">Flyer validity calendar</h2>
+        <p className="mt-2 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          Starts tomorrow is shown only when Matpriskollen validFrom has rows for {flyerValidityCalendar.tomorrowDate}. Current status: {flyerValidityCalendar.startsTomorrow ? 'verified starts tomorrow rows exist' : flyerValidityCalendar.unsupportedTomorrowClaim}.
+        </p>
+        <div className="mt-4 grid gap-3 lg:grid-cols-3">
+          {flyerValidityCalendar.validityDays.map((day) => (
+            <div className="rounded-2xl border border-cyan-200 bg-white p-4" key={day.date}>
+              <p className="text-lg font-black text-slate-950">{day.date}</p>
+              <div className="mt-3 grid gap-2 text-sm text-slate-700">
+                <p className="rounded-2xl bg-cyan-100 p-3 font-semibold">validFrom starts: {day.startingOfferCount}</p>
+                <p className="rounded-2xl bg-cyan-100 p-3 font-semibold">validTo endings: {day.endingOfferCount}</p>
+                <p className="rounded-2xl bg-cyan-100 p-3 font-semibold">stores covered: {day.storeCount}</p>
+              </div>
+              <ul className="mt-3 space-y-2 text-xs font-semibold text-slate-600">
+                {day.sample.map((offer) => (
+                  <li key={`${day.date}-${offer.store}-${offer.name}`}>
+                    {offer.store}: {offer.name} · {offer.priceText} · validFrom {offer.validFrom} · validTo {offer.validTo}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </Card>
 
       <Card className="mt-6 border-emerald-200 bg-emerald-50">

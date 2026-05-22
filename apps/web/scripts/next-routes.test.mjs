@@ -574,6 +574,22 @@ describe('verified-data UI', () => {
   });
 
 
+
+  it('surfaces a retailer flyer validity calendar without unsupported tomorrow claims', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/deals/page.tsx');
+
+    assert.match(verified, /flyerValidityCalendar/);
+    assert.match(verified, /validityDays/);
+    assert.match(verified, /startsTomorrow/);
+    assert.match(verified, /matpriskollenOffers/);
+    assert.match(route, /Flyer validity calendar/);
+    assert.match(route, /Starts tomorrow/);
+    assert.match(route, /unsupportedTomorrowClaim/);
+    assert.match(route, /validFrom/);
+    assert.match(route, /validTo/);
+  });
+
   it('surfaces a student single-portion deal finder using real deal ranking output', async () => {
     const source = await read('src/app/deals/page.tsx');
     assert.match(source, /singlePortionDealFinder/);

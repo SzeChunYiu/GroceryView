@@ -258,6 +258,60 @@ export const adaptiveProductCards: AdaptiveProductCard[] = productUniverse.map((
 });
 export const homepageAdaptiveProductCards = adaptiveProductCards.slice(0, 6);
 
+
+const offerReferenceDate = matpriskollenOffers
+  .map((offer) => offer.retrievedAt.slice(0, 10))
+  .sort()
+  .at(-1) ?? snapshot.retrievedLabel;
+
+function isoDatePlusOne(date: string) {
+  const parsed = new Date(`${date}T00:00:00.000Z`);
+  if (!Number.isFinite(parsed.getTime())) return '';
+  parsed.setUTCDate(parsed.getUTCDate() + 1);
+  return parsed.toISOString().slice(0, 10);
+}
+
+function summarizeValidityDay(date: string) {
+  const endingOffers = matpriskollenOffers.filter((offer) => offer.validTo.slice(0, 10) === date);
+  const startingOffers = matpriskollenOffers.filter((offer) => offer.validFrom.slice(0, 10) === date);
+  const stores = new Set([...endingOffers, ...startingOffers].map((offer) => offer.store));
+  const sample = [...endingOffers, ...startingOffers]
+    .sort((a, b) => a.store.localeCompare(b.store, 'sv') || a.name.localeCompare(b.name, 'sv'))
+    .slice(0, 3)
+    .map((offer) => ({
+      name: offer.name,
+      store: offer.store,
+      priceText: offer.priceText,
+      validFrom: offer.validFrom,
+      validTo: offer.validTo,
+      sourceUrl: offer.sourceUrl
+    }));
+
+  return {
+    date,
+    endingOfferCount: endingOffers.length,
+    startingOfferCount: startingOffers.length,
+    storeCount: stores.size,
+    sample
+  };
+}
+
+const validityDates = [...new Set(matpriskollenOffers.flatMap((offer) => [offer.validFrom.slice(0, 10), offer.validTo.slice(0, 10)]))]
+  .sort();
+const tomorrowDate = isoDatePlusOne(offerReferenceDate);
+const tomorrowStarts = matpriskollenOffers.filter((offer) => offer.validFrom.slice(0, 10) === tomorrowDate);
+
+export const flyerValidityCalendar = {
+  title: 'Flyer validity calendar',
+  referenceDate: offerReferenceDate,
+  tomorrowDate,
+  startsTomorrow: tomorrowStarts.length > 0,
+  unsupportedTomorrowClaim: tomorrowStarts.length === 0
+    ? `No Starts tomorrow claim: Matpriskollen validFrom has no ${tomorrowDate} rows in this snapshot.`
+    : null,
+  validityDays: validityDates.map(summarizeValidityDay).slice(0, 7)
+};
+
 export const offerExpiryReminderBoard = {
   title: 'Offer expiry reminders',
   source: 'Matpriskollen public offer validity windows',
