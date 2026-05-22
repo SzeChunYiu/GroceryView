@@ -51,7 +51,11 @@ export const ICA_REKLAMBLAD_OFFER_PAGE_URL = 'https://www.ica.se/erbjudanden/ica
 export const DEFAULT_ICA_REKLAMBLAD_OFFER_PAGE_URLS = [
   ICA_REKLAMBLAD_OFFER_PAGE_URL,
   'https://www.ica.se/erbjudanden/ica-kvantum-kista-1004587/',
-  'https://www.ica.se/erbjudanden/maxi-ica-stormarknad-solna-1003380/'
+  'https://www.ica.se/erbjudanden/maxi-ica-stormarknad-solna-1003380/',
+  'https://www.ica.se/erbjudanden/ica-kvantum-kungsholmen-1004599/',
+  'https://www.ica.se/erbjudanden/ica-supermarket-faltoversten-1004228/',
+  'https://www.ica.se/erbjudanden/ica-kvantum-sodermalm-1004222/',
+  'https://www.ica.se/erbjudanden/maxi-ica-stormarknad-bromma-1015001/'
 ] as const;
 export const EMAGIN_PDF_API_BASE_URL = 'https://api.e-magin.se/api/pdf/';
 
