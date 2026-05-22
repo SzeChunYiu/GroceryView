@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { studentBasicsBoard } from '@/lib/demo-data';
-import { basketImportExportContract, basketImportReviewContract, retailerBasketTransferContract, retailerHandoffContract } from '@/lib/verified-data';
+import { basketImportExportContract, basketImportReviewContract, retailerBasketTransferContract, retailerHandoffContract, stockoutSubstitutionContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -126,6 +126,37 @@ export default function BasketIdeasPage() {
             <p className="font-black text-slate-950">Static snapshot remains closed</p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
               {basketImportReviewContract.blockedInStaticSnapshot.map((blocker) => <li key={blocker}>{blocker}</li>)}
+            </ul>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-lime-200 bg-lime-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-lime-800">Missing item recovery</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Stockout substitutions: {stockoutSubstitutionContract.title}</h2>
+        <p className="mt-3 text-sm leading-6 text-slate-700">
+          When a saved basket line is out of stock, GroceryView can call <code className="rounded bg-white/80 px-1 py-0.5 text-lime-900">{stockoutSubstitutionContract.corePlanner}</code> through <code className="rounded bg-white/80 px-1 py-0.5 text-lime-900">{stockoutSubstitutionContract.endpoint}</code> to list verified in-stock replacements. Every option keeps <code className="rounded bg-white/80 px-1 py-0.5 text-lime-900">replacementAccepted=false</code> because substitutions are never auto-accepted.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-3">
+          <div>
+            <p className="font-black text-slate-950">Required inputs</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {stockoutSubstitutionContract.requiredInputs.map((input) => <li key={input}>{input}</li>)}
+            </ul>
+          </div>
+          <div>
+            <p className="font-black text-slate-950">acceptableSubstitutionPolicy</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              <li>minimumConfidence: {stockoutSubstitutionContract.acceptableSubstitutionPolicy.minimumConfidence}</li>
+              <li>price cap: {stockoutSubstitutionContract.acceptableSubstitutionPolicy.maxUnitPriceIncreasePercent}</li>
+              <li>dietaryTagsRequired: {stockoutSubstitutionContract.acceptableSubstitutionPolicy.dietaryTagsRequired.join(', ')}</li>
+              <li>blockedCategories: {stockoutSubstitutionContract.acceptableSubstitutionPolicy.blockedCategories.join(', ')}</li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-black text-slate-950">Shipped guardrails</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {[...stockoutSubstitutionContract.shippedBehaviors, ...stockoutSubstitutionContract.blockedInStaticSnapshot].map((behavior) => <li key={behavior}>{behavior}</li>)}
             </ul>
           </div>
         </div>

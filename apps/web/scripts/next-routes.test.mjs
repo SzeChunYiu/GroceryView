@@ -522,6 +522,24 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces verified stockout substitution options on the basket ideas route', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/basket-ideas/page.tsx');
+    const core = await read('../../packages/core/src/index.ts');
+
+    assert.match(core, /planStockoutSubstitutionOptions/);
+    assert.match(core, /StockoutSubstitutionPolicy/);
+    assert.match(verified, /stockoutSubstitutionContract/);
+    assert.match(verified, /acceptableSubstitutionPolicy/);
+    assert.match(verified, /dietaryTagsRequired/);
+    assert.match(route, /stockoutSubstitutionContract/);
+    assert.match(route, /Stockout substitutions/);
+    assert.match(route, /never auto-accepted/);
+    assert.match(route, /verified in-stock/);
+    assert.match(route, /dietaryTagsRequired/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
   it('surfaces baby and diaper price tracking alerts using the real watchlist engine', async () => {
     const source = await read('src/app/watchlist/page.tsx');
     assert.match(source, /babyDiaperPriceTracker/);

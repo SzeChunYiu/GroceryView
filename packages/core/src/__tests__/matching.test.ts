@@ -6,6 +6,7 @@ import {
   classifyProductMatch,
   compareCommodityUnitPrices,
   planCommunityReportAbuseControls,
+  planStockoutSubstitutionOptions,
   planHumanReviewAssignments,
   planHumanReviewQueue,
   recommendSmartSwaps,
@@ -90,6 +91,147 @@ describe('recommendSmartSwaps', () => {
     });
 
     assert.deepEqual(blocked, []);
+  });
+});
+
+describe('planStockoutSubstitutionOptions', () => {
+  it('offers verified in-stock substitutes for missing basket lines without auto-accepting them', () => {
+    const plan = planStockoutSubstitutionOptions({
+      basketLine: {
+        basketLineId: 'line:milk',
+        productId: 'arla-milk',
+        productName: 'Arla Mellanmjölk 1l',
+        category: 'milk',
+        packageSize: 1,
+        packageUnit: 'l',
+        brandTier: 'national',
+        unitPrice: 16.9,
+        requestedQuantity: 2,
+        status: 'out_of_stock'
+      },
+      acceptableSubstitutionPolicy: {
+        allowPrivateLabel: true,
+        minimumConfidence: 'medium',
+        maxUnitPriceIncreasePercent: 10,
+        blockedCategories: ['baby_formula'],
+        dietaryTagsRequired: ['lactose_free']
+      },
+      candidates: [
+        {
+          productId: 'garant-lactose-free-milk',
+          productName: 'Garant Laktosfri Mellanmjölk 1l',
+          category: 'milk',
+          packageSize: 1,
+          packageUnit: 'l',
+          brandTier: 'standard_private_label',
+          unitPrice: 15.9,
+          inStock: true,
+          source: 'willys-storefront',
+          observedAt: '2026-05-22T08:00:00.000Z',
+          dietaryTags: ['lactose_free']
+        },
+        {
+          productId: 'cheap-unknown-milk',
+          productName: 'Unknown milk 1l',
+          category: 'milk',
+          packageSize: 1,
+          packageUnit: 'l',
+          brandTier: 'budget_private_label',
+          unitPrice: 12.9,
+          inStock: false,
+          source: 'stale-cache',
+          observedAt: '2026-05-20T08:00:00.000Z',
+          dietaryTags: ['lactose_free']
+        },
+        {
+          productId: 'regular-milk',
+          productName: 'Regular milk 1l',
+          category: 'milk',
+          packageSize: 1,
+          packageUnit: 'l',
+          brandTier: 'national',
+          unitPrice: 14.9,
+          inStock: true,
+          source: 'coop-storefront',
+          observedAt: '2026-05-22T08:00:00.000Z',
+          dietaryTags: []
+        }
+      ]
+    });
+
+    assert.equal(plan.status, 'substitution_options');
+    assert.equal(plan.lineStatus, 'out_of_stock');
+    assert.deepEqual(plan.options.map((option) => ({
+      productId: option.productId,
+      replacementAccepted: option.replacementAccepted,
+      confidence: option.confidence,
+      priceDeltaPercent: option.priceDeltaPercent
+    })), [
+      {
+        productId: 'garant-lactose-free-milk',
+        replacementAccepted: false,
+        confidence: 'high',
+        priceDeltaPercent: -5.92
+      }
+    ]);
+    assert.deepEqual(plan.rejectedCandidates.map((candidate) => candidate.reason), [
+      'Candidate is not verified in stock.',
+      'Candidate is missing required dietary evidence: lactose_free.'
+    ]);
+    assert.match(plan.guardrails.join(' '), /never auto-accepted/i);
+  });
+
+  it('fails closed when the basket line is already available or no verified substitute clears policy', () => {
+    const available = planStockoutSubstitutionOptions({
+      basketLine: {
+        basketLineId: 'line:pasta',
+        productId: 'pasta',
+        productName: 'Pasta',
+        category: 'pasta',
+        packageSize: 500,
+        packageUnit: 'g',
+        brandTier: 'national',
+        unitPrice: 20,
+        requestedQuantity: 1,
+        status: 'available'
+      },
+      candidates: []
+    });
+
+    assert.equal(available.status, 'not_needed');
+
+    const blocked = planStockoutSubstitutionOptions({
+      basketLine: {
+        basketLineId: 'line:formula',
+        productId: 'formula-a',
+        productName: 'Baby formula',
+        category: 'baby_formula',
+        packageSize: 1,
+        packageUnit: 'piece',
+        brandTier: 'national',
+        unitPrice: 120,
+        requestedQuantity: 1,
+        status: 'out_of_stock'
+      },
+      candidates: [
+        {
+          productId: 'formula-b',
+          productName: 'Other formula',
+          category: 'baby_formula',
+          packageSize: 1,
+          packageUnit: 'piece',
+          brandTier: 'national',
+          unitPrice: 100,
+          inStock: true,
+          source: 'retailer',
+          observedAt: '2026-05-22T08:00:00.000Z'
+        }
+      ]
+    });
+
+    assert.equal(blocked.status, 'blocked');
+    assert.deepEqual(blocked.options, []);
+    assert.equal(blocked.rejectedCandidates[0]?.reason, 'Category should not be auto-substituted.');
   });
 });
 
