@@ -10,6 +10,11 @@ import {
   sourceRouteMap,
   storeBrandLedger
 } from '@/lib/verified-data';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/data-sources');
+}
 
 export const dynamic = 'force-static';
 

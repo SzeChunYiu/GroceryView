@@ -7,6 +7,11 @@ import {
   snapshot,
   sourceCoverage
 } from '@/lib/verified-data';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/openprices-depth');
+}
 
 export const dynamic = 'force-static';
 

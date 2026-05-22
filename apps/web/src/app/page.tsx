@@ -1,9 +1,10 @@
 import { MarketShell } from '@/components/market-shell';
+import { routeMetadata } from '@/lib/seo';
 
-export const metadata = {
-  title: 'GroceryView verified grocery snapshot',
-  description: 'Verified Sweden grocery price, product browsing, fresh OpenPrices observations, source route mapping, catalogue savings, map chain index signals, and gated feature readiness.'
-};
+export function generateMetadata() {
+  return routeMetadata('/');
+}
+
 
 export default function HomePage() {
   return <MarketShell />;

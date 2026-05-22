@@ -1,6 +1,11 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
 import { chainPriceRows, formatPct, formatSek, matchedChainProducts } from '@/lib/verified-data';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/unit-price-alerts');
+}
 
 export const dynamic = 'force-static';
 

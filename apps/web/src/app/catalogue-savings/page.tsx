@@ -8,6 +8,11 @@ import {
   matchedChainProducts,
   sourceCoverage
 } from '@/lib/verified-data';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/catalogue-savings');
+}
 
 export const dynamic = 'force-static';
 

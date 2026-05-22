@@ -2,6 +2,11 @@ import { calculateChainPriceIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { buildChainPriceObservations } from '@/lib/chain-index-data';
 import { formatPct, storeUniverse } from '@/lib/verified-data';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/map');
+}
 
 const chainIndexSummary = calculateChainPriceIndex(buildChainPriceObservations());
 const chainIndexByBrand = new Map(chainIndexSummary.chains.map((chain) => [chain.chainId.toLowerCase(), chain]));

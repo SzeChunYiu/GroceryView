@@ -1,6 +1,11 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, watchlistAlertBoard, watchlistAlertInputs } from '@/lib/demo-data';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/watchlist');
+}
 
 function priceSource(productId: string) {
   return watchlistAlertInputs.products.find((product) => product.productId === productId)?.source ?? 'visible price row';

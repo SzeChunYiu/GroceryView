@@ -2,6 +2,11 @@ import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { studentBasicsBoard } from '@/lib/demo-data';
 import { basketImportExportContract, basketImportReviewContract, retailerBasketTransferContract, retailerHandoffContract } from '@/lib/verified-data';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/basket-ideas');
+}
 
 function formatSek(value: number) {
   return new Intl.NumberFormat('sv-SE', { style: 'currency', currency: 'SEK', maximumFractionDigits: 2 }).format(value);

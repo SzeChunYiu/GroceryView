@@ -2,6 +2,11 @@ import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { ProductPriceCards } from '@/components/product-price-cards';
 import { adaptiveProductCards, formatSek, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, openFoodFactsCatalogPreview, openFoodFactsCatalogSummary, topChainSpreads, freshestOpenPrices } from '@/lib/verified-data';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/products');
+}
 
 export default function ProductsPage() {
   return (

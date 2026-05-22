@@ -8,6 +8,11 @@ import {
   sourceCoverage,
   topChainSpreads
 } from '@/lib/verified-data';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/chain-coverage');
+}
 
 export const dynamic = 'force-static';
 

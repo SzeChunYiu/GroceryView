@@ -5,6 +5,14 @@ import { Card, Eyebrow, PageShell } from '@/components/data-ui';
 import { axfoodProducts } from '@/lib/axfood-products';
 import { categoryLabels, pricedProducts } from '@/lib/openprices-products';
 import { categoryDealLeaderCandidates, categorySummaries, dataFreshnessBadges, formatPct, formatSek, labelFromSlug } from '@/lib/verified-data';
+import { metadataForCategory } from '@/lib/seo';
+
+export async function generateMetadata({ params }: Readonly<{ params: Promise<{ slug: string }> }>) {
+  const { slug } = await params;
+  const label = categoryLabels[slug];
+  if (!label) notFound();
+  return metadataForCategory({ slug, label });
+}
 
 export function generateStaticParams() { return categorySummaries.map((category) => ({ slug: category.slug })); }
 

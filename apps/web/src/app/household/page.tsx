@@ -1,5 +1,10 @@
 import { Card, Eyebrow, NoVerifiedData, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { formatPct, formatSek, sourceCoverage, topChainSpreads } from '@/lib/verified-data';
+import { routeMetadata } from '@/lib/seo';
+
+export function generateMetadata() {
+  return routeMetadata('/household');
+}
 
 const titles: Record<string, string> = {
   'weekly-basket': 'Weekly basket planner',
