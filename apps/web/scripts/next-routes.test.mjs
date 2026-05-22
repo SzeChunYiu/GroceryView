@@ -146,6 +146,10 @@ describe('verified-data UI', () => {
     assert.match(actions, /byteLength/);
     assert.match(actions, /private upload ticket/);
     assert.match(actions, /review work items/);
+    assert.match(actions, /navigator\.mediaDevices\.getUserMedia/);
+    assert.match(actions, /facingMode: \{ ideal: 'environment' \}/);
+    assert.match(actions, /Stop receipt camera/);
+    assert.match(actions, /Camera access stays local/);
     assert.match(actions, /Sign in first/);
     assert.match(actions, /No anonymous scan uploads/);
     assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);

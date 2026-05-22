@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useRef, useState } from 'react';
 
 type ScannerStatus = 'idle' | 'blocked' | 'loading' | 'ready' | 'error';
 type BrowserSession = { accessToken: string; userId: string };
@@ -21,6 +21,9 @@ export function ScannerUploadActions() {
   const [contentType, setContentType] = useState('image/jpeg');
   const [status, setStatus] = useState<ScannerStatus>('idle');
   const [message, setMessage] = useState('No anonymous scan uploads. Sign in first to request private upload tickets or process barcode scans.');
+  const [cameraReady, setCameraReady] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   function requireSession(): BrowserSession | null {
     const session = readSession();
@@ -55,6 +58,40 @@ export function ScannerUploadActions() {
       body: JSON.stringify({ scanId, kind: 'receipt', contentType, byteLength: Number(byteLength) })
     });
     await handleResponse(response, `Private upload ticket requested for ${scanId}.`);
+  }
+
+  async function startReceiptCamera() {
+    const session = requireSession();
+    if (!session) return;
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setStatus('error');
+      setMessage('Receipt camera is not available in this browser. No scan upload was started.');
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } } });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      setCameraReady(true);
+      setStatus('ready');
+      setMessage('Camera access stays local until a signed-in user requests a private upload ticket and submits a receipt image.');
+    } catch {
+      setStatus('error');
+      setMessage('Camera permission was denied or unavailable. No receipt image was uploaded.');
+    }
+  }
+
+  function stopReceiptCamera() {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    setCameraReady(false);
+    setStatus('idle');
+    setMessage('Receipt camera stopped. No anonymous scan uploads were sent.');
   }
 
   async function processBarcode(event: FormEvent<HTMLFormElement>) {
@@ -99,7 +136,26 @@ export function ScannerUploadActions() {
           <button className="mt-3 rounded-full bg-indigo-800 px-4 py-2 text-sm font-black text-white" disabled={!contentType.trim() || Number(byteLength) <= 0} type="submit">Request private upload ticket</button>
         </form>
 
-        <form className="rounded-2xl border border-slate-200 bg-slate-50 p-4" onSubmit={processBarcode}>
+        <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <h3 className="text-sm font-black text-slate-950">Receipt camera preview</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-600">
+            Start a local camera preview before requesting an upload ticket. Camera access stays local; GroceryView does not upload frames automatically.
+          </p>
+          <video
+            aria-label="Local receipt camera preview"
+            autoPlay
+            className="mt-3 aspect-video w-full rounded-2xl bg-slate-900"
+            muted
+            playsInline
+            ref={videoRef}
+          />
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button className="rounded-full bg-indigo-800 px-4 py-2 text-sm font-black text-white" onClick={startReceiptCamera} type="button">Start receipt camera</button>
+            <button className="rounded-full border border-slate-300 px-4 py-2 text-sm font-black text-slate-950" disabled={!cameraReady} onClick={stopReceiptCamera} type="button">Stop receipt camera</button>
+          </div>
+        </div>
+
+        <form className="rounded-2xl border border-slate-200 bg-slate-50 p-4 lg:col-span-2" onSubmit={processBarcode}>
           <label className="text-sm font-black text-slate-950" htmlFor="barcode-payload">Barcode payload</label>
           <input
             className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-950"
