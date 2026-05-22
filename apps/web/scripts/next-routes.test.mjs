@@ -135,6 +135,30 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(account, /@\/lib\/demo-data/);
   });
 
+  it('ships account mutation controls for signed-in favorite stores and basket items', async () => {
+    const account = await read('src/app/account/page.tsx');
+    const actions = await read('src/components/account-mutation-actions.tsx');
+
+    assert.match(account, /AccountMutationActions/);
+    assert.match(actions, /'use client'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:accessToken'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:userId'/);
+    assert.match(actions, /Authorization: `Bearer \$\{accessToken\}`/);
+    assert.match(actions, /\/api\/users\/\$\{encodeURIComponent\(userId\)\}\/favorite-stores/);
+    assert.match(actions, /method: 'POST'/);
+    assert.match(actions, /method: 'DELETE'/);
+    assert.match(actions, /\/api\/basket\/items/);
+    assert.match(actions, /productId/);
+    assert.match(actions, /quantity/);
+    assert.match(actions, /Compare saved basket/);
+    assert.match(actions, /\/api\/basket\/compare/);
+    assert.match(actions, /Sign in first/);
+    assert.match(actions, /No anonymous mutations/);
+    assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);
+    assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
+  });
+
+
   it('surfaces the retailer handoff support matrix contract on the basket ideas route', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/basket-ideas/page.tsx');
