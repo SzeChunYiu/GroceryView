@@ -1877,6 +1877,34 @@ export const sourceClaimLedger = sourceCoverage.map((source) => {
   };
 });
 
+export const commodityIngestionClassifierEvidence = {
+  title: 'Loose-item ingestion classifier',
+  status: 'ingestion_contract_ready',
+  taxonomyCount: COMMODITIES.length,
+  stapleCount: STAPLE_BASKET.length,
+  sourceConfidencePolicy: 'sourceConfidence <= 0.68 for commodity/alias matches even when retailer source confidence is higher',
+  example: {
+    rawName: 'Kvisttomat lösvikt',
+    productKindColumn: "product_kind='commodity'",
+    commodityId: 'commodity_id=tomato',
+    unitPrice: 'unit_price=39.90 kr/kg',
+    variant: 'variant=vine',
+    organicFlag: 'is_organic=false',
+    originCountry: 'origin_country=SE'
+  },
+  capturedColumns: [
+    "product_kind='commodity'",
+    'commodity_id resolved from COMMODITIES taxonomy slug before database UUID lookup',
+    'unit_price plus comparable kr/kg, kr/l, or kr/st evidence',
+    'variant, is_organic, origin_country'
+  ],
+  guardrails: [
+    'No-barcode sold-by-weight rows must set soldByWeight or productKind=commodity before fuzzy commodity resolution runs.',
+    'Unknown commodity aliases fail closed into rejection instead of creating a shopper-visible product.',
+    'Commodity/alias confidence is medium by design and stays below barcode confidence until human review approves broader mapping.'
+  ]
+};
+
 export const chainSavingsLedger = Object.values(
   matchedChainProducts.reduce<Record<string, {
     chain: string;

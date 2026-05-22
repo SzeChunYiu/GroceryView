@@ -2834,6 +2834,40 @@ describe('ingestRetailerProduct', () => {
     });
   });
 
+  it('classifies no-barcode sold-by-weight produce as a commodity with medium mapping confidence', () => {
+    const output = ingestRetailerProduct({
+      sourceType: 'retailer_online_page',
+      observedAt: '2026-05-22T09:00:00.000Z',
+      parserVersion: 'axfood-produce-v1',
+      rawSnapshotRef: 's3://groceryview-raw/willys/produce-2026-05-22.json',
+      sourceRunId: 'source-run-2026-05-22',
+      chainId: 'willys',
+      storeId: 'willys-odenplan',
+      retailerProductId: 'wil-kvisttomat-kg',
+      rawName: 'Kvisttomat lösvikt',
+      canonicalName: 'Kvisttomat lösvikt',
+      productId: 'willys-kvisttomat-kg',
+      categoryId: 'frukt-gront',
+      packageSize: 1,
+      packageUnit: 'kg',
+      price: 39.9,
+      sourceUrl: 'https://example.test/produce/tomato',
+      soldByWeight: true,
+      variant: 'vine',
+      isOrganic: false,
+      originCountry: 'SE'
+    });
+
+    assert.equal(output.product.productKind, 'commodity');
+    assert.equal(output.product.commodityId, 'tomato');
+    assert.equal(output.product.variant, 'vine');
+    assert.equal(output.product.isOrganic, false);
+    assert.equal(output.product.originCountry, 'SE');
+    assert.equal(output.alias.matchConfidence, 0.68);
+    assert.equal(output.priceObservation.confidenceScore, 0.68);
+    assert.equal(output.priceObservation.unitPrice, 39.9);
+  });
+
   it('rejects records that cannot preserve parser and raw snapshot provenance', () => {
     assert.throws(() => ingestRetailerProduct({
       sourceType: 'manual_user_report',

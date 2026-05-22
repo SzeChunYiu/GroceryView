@@ -2026,6 +2026,25 @@ ${seo}`;
     assert.match(route, /no branch-level prices|without implying branch-level prices/i);
   });
 
+  it('surfaces the commodity ingestion classifier contract on the data sources route', async () => {
+    const ingestion = await read('../../packages/ingestion/src/index.ts');
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/data-sources/page.tsx');
+
+    assert.match(ingestion, /soldByWeight/);
+    assert.match(ingestion, /productKind: 'commodity'/);
+    assert.match(ingestion, /commodityId: commodity\.slug/);
+    assert.match(ingestion, /originCountry/);
+    assert.match(ingestion, /Math\.min\(sourceConfidence, 0\.68\)/);
+    assert.match(verified, /export const commodityIngestionClassifierEvidence/);
+    assert.match(verified, /product_kind='commodity'/);
+    assert.match(verified, /sourceConfidence <= 0\.68/);
+    assert.match(route, /commodityIngestionClassifierEvidence/);
+    assert.match(route, /Loose-item ingestion classifier/);
+    assert.match(route, /product_kind='commodity'/);
+    assert.match(route, /origin_country/);
+  });
+
   it('surfaces verified OSM coverage on the store coverage route', async () => {
     const route = await read('src/app/store-coverage/page.tsx');
 
