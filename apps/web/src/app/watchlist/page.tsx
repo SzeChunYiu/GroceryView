@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { babyDiaperPriceTracker, budgetEssentialsPriceDropAlerts, watchlistAlertBoard, watchlistAlertInputs } from '@/lib/demo-data';
+import { priceAlertThresholdPreferenceContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -62,6 +63,30 @@ export default function WatchlistPage() {
             </Link>
           ))}
         </div>
+      </Card>
+
+
+      <Card className="mt-6 border-purple-200 bg-purple-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-purple-800">Account watchlist preferences</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight text-slate-950">Custom price alert thresholds</h2>
+        <p className="mt-3 max-w-3xl text-sm font-semibold leading-6 text-slate-700">
+          No anonymous thresholds are stored or applied. Signed-in shoppers can save targetPrice and dealScoreMinimum preferences, then GroceryView passes those values into buildWatchlistAlerts before planNotifications applies channel and quiet-hour rules.
+        </p>
+        <div className="mt-4 grid gap-3 lg:grid-cols-4">
+          {priceAlertThresholdPreferenceContract.thresholdTypes.map((threshold) => (
+            <div className="rounded-2xl border border-purple-200 bg-white p-4" key={threshold.key}>
+              <p className="text-lg font-black text-slate-950">{threshold.label}</p>
+              <p className="mt-1 text-xs font-bold text-slate-600">{threshold.key}</p>
+              <p className="mt-3 rounded-2xl bg-purple-100 p-3 text-sm font-semibold text-purple-950">{threshold.engineInput}</p>
+              <p className="mt-2 text-xs font-semibold text-slate-600">{threshold.storedValue}</p>
+            </div>
+          ))}
+        </div>
+        <ul className="mt-4 space-y-2 text-sm font-semibold text-slate-700">
+          {priceAlertThresholdPreferenceContract.guardrails.map((guardrail) => (
+            <li key={guardrail}>• {guardrail}</li>
+          ))}
+        </ul>
       </Card>
 
       <Card className="mt-6">
