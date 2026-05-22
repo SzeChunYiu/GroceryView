@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell, SourceCoverage, TopSpreads } from '@/components/data-ui';
 import { studentBasicsBoard } from '@/lib/demo-data';
-import { basketImportExportContract, basketImportReviewContract, retailerBasketTransferContract, retailerHandoffContract, stockoutSubstitutionContract } from '@/lib/verified-data';
+import { basketImportExportContract, basketImportReviewContract, retailerBasketTransferContract, retailerDeepLinkQualityContract, retailerHandoffContract, stockoutSubstitutionContract } from '@/lib/verified-data';
 import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
@@ -187,6 +187,34 @@ export default function BasketIdeasPage() {
             <p className="font-black text-slate-950">Shipped behavior</p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
               {retailerHandoffContract.shippedBehaviors.map((behavior) => <li key={behavior}>{behavior}</li>)}
+            </ul>
+          </div>
+        </div>
+      </Card>
+
+      <Card className="mt-6 border-sky-200 bg-sky-50">
+        <p className="text-sm font-black uppercase tracking-[0.2em] text-sky-800">Action reliability</p>
+        <h2 className="mt-2 text-2xl font-black tracking-tight">Deep-link quality scoring: {retailerDeepLinkQualityContract.title}</h2>
+        <p className="mt-3 text-sm leading-6 text-slate-700">
+          Before GroceryView promotes a retailer handoff, <code className="rounded bg-white/80 px-1 py-0.5 text-sky-900">{retailerDeepLinkQualityContract.corePlanner}</code> scores each product URL with verified URL, HTTP, and canonical product evidence. The score is an action reliability label, not checkout confirmation.
+        </p>
+        <div className="mt-4 grid gap-4 md:grid-cols-[0.8fr_1.2fr_1fr]">
+          <div>
+            <p className="font-black text-slate-950">Evidence fields</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {retailerDeepLinkQualityContract.evidenceFields.map((field) => <li key={field}>{field}</li>)}
+            </ul>
+          </div>
+          <div>
+            <p className="font-black text-slate-950">Quality labels</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {retailerDeepLinkQualityContract.qualityLabels.map((row) => <li key={row.label}><span className="font-bold">{row.label}</span>: {row.requirement}</li>)}
+            </ul>
+          </div>
+          <div>
+            <p className="font-black text-slate-950">Guardrails</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+              {retailerDeepLinkQualityContract.guardrails.map((guardrail) => <li key={guardrail}>{guardrail}</li>)}
             </ul>
           </div>
         </div>

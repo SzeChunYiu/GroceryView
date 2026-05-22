@@ -651,6 +651,39 @@ export type RetailerHandoffPlan = {
   guardrails: string[];
 };
 
+export type RetailerDeepLinkEvidence = {
+  productId: string;
+  productName: string;
+  productUrl?: string;
+  matched: boolean;
+  httpStatus?: number;
+  canonicalProductId?: string;
+  lastCheckedAt?: string;
+};
+
+export type RetailerDeepLinkQuality = 'verified' | 'unchecked' | 'broken' | 'mismatch' | 'missing';
+
+export type RetailerDeepLinkQualityRow = {
+  productId: string;
+  productName: string;
+  productUrl: string | null;
+  quality: RetailerDeepLinkQuality;
+  reason: string;
+  lastCheckedAt: string | null;
+};
+
+export type RetailerDeepLinkQualityReport = {
+  retailerId: string;
+  retailerName: string;
+  asOf: string;
+  status: 'ready' | 'limited' | 'blocked';
+  readyLinkCount: number;
+  brokenLinkCount: number;
+  unmatchedLineCount: number;
+  rows: RetailerDeepLinkQualityRow[];
+  guardrails: string[];
+};
+
 export type RetailerBasketTransferInput = RetailerHandoffInput & {
   transferEndpoint?: string;
   signedPayload?: string;
@@ -787,6 +820,96 @@ export function planRetailerHandoff(input: RetailerHandoffInput): RetailerHandof
       'Retailer handoff is an action aid, not checkout confirmation.',
       'Unsupported basket transfer falls back to copyable lists and product deep links.',
       'Missing product links remain visible and require shopper review before retailer handoff.'
+    ]
+  };
+}
+
+export function scoreRetailerDeepLinkQuality(input: {
+  retailerId: string;
+  retailerName: string;
+  asOf: string;
+  links: RetailerDeepLinkEvidence[];
+}): RetailerDeepLinkQualityReport {
+  requireNonBlank(input.retailerId, 'retailerId');
+  requireNonBlank(input.retailerName, 'retailerName');
+  requireNonBlank(input.asOf, 'asOf');
+
+  const rows = input.links.map((link): RetailerDeepLinkQualityRow => {
+    requireNonBlank(link.productId, 'productId');
+    requireNonBlank(link.productName, 'productName');
+
+    if (!link.matched || !link.productUrl?.trim()) {
+      return {
+        productId: link.productId,
+        productName: link.productName,
+        productUrl: link.productUrl?.trim() || null,
+        quality: 'missing',
+        reason: 'No verified retailer product URL is available for this basket line.',
+        lastCheckedAt: link.lastCheckedAt ?? null
+      };
+    }
+
+    if (link.canonicalProductId && link.canonicalProductId !== link.productId) {
+      return {
+        productId: link.productId,
+        productName: link.productName,
+        productUrl: link.productUrl.trim(),
+        quality: 'mismatch',
+        reason: 'Retailer canonical product id does not match the GroceryView product id.',
+        lastCheckedAt: link.lastCheckedAt ?? null
+      };
+    }
+
+    if (typeof link.httpStatus === 'number' && (link.httpStatus < 200 || link.httpStatus >= 400)) {
+      return {
+        productId: link.productId,
+        productName: link.productName,
+        productUrl: link.productUrl.trim(),
+        quality: 'broken',
+        reason: `Retailer link returned HTTP ${link.httpStatus}.`,
+        lastCheckedAt: link.lastCheckedAt ?? null
+      };
+    }
+
+    if (link.httpStatus === 200 && link.canonicalProductId === link.productId) {
+      return {
+        productId: link.productId,
+        productName: link.productName,
+        productUrl: link.productUrl.trim(),
+        quality: 'verified',
+        reason: 'Retailer URL resolved and canonical product evidence matches.',
+        lastCheckedAt: link.lastCheckedAt ?? null
+      };
+    }
+
+    return {
+      productId: link.productId,
+      productName: link.productName,
+      productUrl: link.productUrl.trim(),
+      quality: 'unchecked',
+      reason: 'Retailer URL is present but has not been recently verified with HTTP and canonical product evidence.',
+      lastCheckedAt: link.lastCheckedAt ?? null
+    };
+  });
+
+  const readyLinkCount = rows.filter((row) => row.quality === 'verified').length;
+  const brokenLinkCount = rows.filter((row) => row.quality === 'broken' || row.quality === 'mismatch').length;
+  const unmatchedLineCount = rows.filter((row) => row.quality === 'missing').length;
+  const status = readyLinkCount === rows.length && rows.length > 0 ? 'ready' : readyLinkCount > 0 && brokenLinkCount === 0 ? 'limited' : brokenLinkCount > 0 && readyLinkCount === 0 ? 'blocked' : 'limited';
+
+  return {
+    retailerId: input.retailerId,
+    retailerName: input.retailerName,
+    asOf: input.asOf,
+    status,
+    readyLinkCount,
+    brokenLinkCount,
+    unmatchedLineCount,
+    rows,
+    guardrails: [
+      'Deep-link quality measures whether GroceryView can send a shopper to a retailer product page, not checkout confirmation.',
+      'Broken, mismatched, or missing links must fall back to retailer app search or copy-list handoff.',
+      'Canonical product evidence is required before a link can be labeled verified.'
     ]
   };
 }

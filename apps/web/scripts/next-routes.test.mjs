@@ -540,6 +540,21 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces retailer deep-link quality scoring on the basket ideas route', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/basket-ideas/page.tsx');
+    const core = await read('../../packages/core/src/index.ts');
+
+    assert.match(core, /scoreRetailerDeepLinkQuality/);
+    assert.match(verified, /retailerDeepLinkQualityContract/);
+    assert.match(verified, /canonicalProductId/);
+    assert.match(route, /retailerDeepLinkQualityContract/);
+    assert.match(route, /Deep-link quality scoring/);
+    assert.match(route, /verified URL, HTTP, and canonical product evidence/);
+    assert.match(route, /not checkout confirmation/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
   it('surfaces baby and diaper price tracking alerts using the real watchlist engine', async () => {
     const source = await read('src/app/watchlist/page.tsx');
     assert.match(source, /babyDiaperPriceTracker/);
