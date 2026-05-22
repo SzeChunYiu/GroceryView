@@ -52,6 +52,24 @@ export const immigrantFamiliarBrandSearch = productUniverse
   .filter((row) => row.reportedBrand !== 'Brand not reported')
   .sort((a, b) => a.reportedBrand.localeCompare(b.reportedBrand, 'sv') || a.productName.localeCompare(b.productName, 'sv'))
   .slice(0, 8);
+export const immigrantImageFirstBrowsing = productUniverse
+  .filter((product) => Boolean(product.image))
+  .map((product) => {
+    const isChainProduct = 'lowestPrice' in product;
+    const reportedBrand = isChainProduct ? product.brand : product.brands || 'Brand not reported';
+    const verifiedPrice = isChainProduct ? product.lowestPrice : product.priceMedian;
+    return {
+      imageUrl: product.image,
+      visualAlt: `${product.name} package image`,
+      productName: product.name,
+      reportedBrand,
+      verifiedProductSlug: product.slug,
+      categoryLabel: labelFromSlug(product.category),
+      evidenceLabel: isChainProduct ? `${product.inChains.length} chain prices` : `${product.observationCount} observations`,
+      verifiedPrice
+    };
+  })
+  .slice(0, 10);
 
 export const storeUniverse = osmStores;
 export const featuredStores = [...osmStores]

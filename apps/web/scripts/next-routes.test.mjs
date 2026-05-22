@@ -333,6 +333,18 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces immigrant image-first browsing from verified product images', async () => {
+    const source = await read('src/app/products/page.tsx');
+    const verified = await read('src/lib/verified-data.ts');
+    assert.match(verified, /export const immigrantImageFirstBrowsing/);
+    assert.match(source, /immigrantImageFirstBrowsing/);
+    assert.match(source, /Image-first browsing/);
+    assert.match(source, /imageUrl/);
+    assert.match(source, /visualAlt/);
+    assert.match(source, /verifiedProductSlug/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('surfaces immigrant multilingual UI access in the public shell', async () => {
     const source = await read('src/components/market-shell.tsx');
     assert.match(source, /immigrantMultilingualUi/);

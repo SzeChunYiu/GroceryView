@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Card, Eyebrow, PageShell } from '@/components/data-ui';
-import { formatSek, formatPct, immigrantFamiliarBrandSearch, productUniverse, topChainSpreads, freshestOpenPrices } from '@/lib/verified-data';
+import { formatSek, formatPct, immigrantFamiliarBrandSearch, immigrantImageFirstBrowsing, productUniverse, topChainSpreads, freshestOpenPrices } from '@/lib/verified-data';
 
 export default function ProductsPage() {
   return (
@@ -30,6 +30,37 @@ export default function ProductsPage() {
               <div className="mt-3 flex items-center justify-between gap-2 text-xs font-black text-slate-700">
                 <span>{formatSek(brand.verifiedPrice)}</span>
                 <span>{brand.evidenceLabel}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </Card>
+      <Card className="mt-6 border-amber-200 bg-amber-50/70">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.24em] text-amber-800">Visual grocery discovery</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Image-first browsing</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              New shoppers can scan verified package photos first, then open the exact product page.
+              Every imageUrl comes from Axfood or OpenPrices product rows; missing images are excluded instead of replaced with fake packaging.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-amber-900 shadow-sm">{immigrantImageFirstBrowsing.length} verified images</p>
+        </div>
+        <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-5">
+          {immigrantImageFirstBrowsing.map((item) => (
+            <Link className="group overflow-hidden rounded-2xl border border-amber-100 bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-amber-700" href={`/products/${item.verifiedProductSlug}`} key={item.verifiedProductSlug}>
+              <div className="flex aspect-square items-center justify-center bg-white p-3">
+                <img alt={item.visualAlt} className="max-h-full max-w-full object-contain transition group-hover:scale-105" src={item.imageUrl ?? ''} />
+              </div>
+              <div className="border-t border-amber-100 p-3">
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-amber-800">{item.reportedBrand}</p>
+                <h3 className="mt-1 line-clamp-2 text-sm font-black text-slate-950">{item.productName}</h3>
+                <p className="mt-1 text-[0.7rem] font-semibold text-slate-500">{item.categoryLabel}</p>
+                <div className="mt-2 flex items-center justify-between gap-2 text-[0.7rem] font-black text-slate-700">
+                  <span>{formatSek(item.verifiedPrice)}</span>
+                  <span>{item.evidenceLabel}</span>
+                </div>
               </div>
             </Link>
           ))}
