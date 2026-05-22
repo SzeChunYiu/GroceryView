@@ -2,7 +2,7 @@
 // Mirrors the store fixtures in packages/ingestion/src/index.ts.
 // Real prices replace these as packages/ingestion connectors come online.
 
-import { buildExpiryDealRadar, buildWatchlistAlerts, calculatePersonalGroceryInflation, compareBasketStrategies, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeCategoryDealLeaders, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
+import { buildExpiryDealRadar, buildWatchlistAlerts, calculatePersonalGroceryInflation, compareBasketStrategies, planNotifications, planPantryReplenishment, rankDealOpportunities, rankNutritionPerKrona, suggestDealBasedMeals, summarizeBudget, summarizeCategoryDealLeaders, summarizeStoreBasketCoverage, type BasketComparisonInput, type HouseholdSnapshot, type PantryDeal, type PantryInventoryItem, type WatchlistItem, type WatchlistProductSnapshot } from '@groceryview/core';
 
 export const products = [
   {
@@ -2224,6 +2224,33 @@ export const householdSavings = {
 const parseSekAmount = (value: string): number => Number(value.replace(',', '.').match(/\d+(\.\d+)?/)?.[0] ?? 0);
 const parsePercentChange = (value: string): number => Number(value.replace('%', '').replace('+', ''));
 const categoryByTopDeal = new Map(categories.map((category) => [category.topDeal, category.name]));
+
+export const studentWeeklyBudgetInput = {
+  weeklyBudget: 550,
+  monthlyBudget: 2200,
+  estimatedBasketTotal: Math.round(weeklyBasket.reduce((sum, row) => sum + parseSekAmount(row.total), 0) * 100) / 100,
+  receiptTotalsThisWeek: [92.4, 128.8, 64.5],
+  receiptTotalsThisMonth: [421.2, 496.6, 285.7]
+};
+
+export const studentWeeklyBudgetTracker = {
+  persona: 'Students / young singles',
+  title: 'Weekly student budget',
+  summary: summarizeBudget(studentWeeklyBudgetInput),
+  plannedRows: weeklyBasket.map((row) => {
+    const product = products.find((candidate) => candidate.slug === row.slug);
+    return {
+      ...row,
+      name: product?.name ?? row.slug,
+      category: product ? (categoryByTopDeal.get(product.ticker) ?? 'Student staples') : 'Student staples',
+      plannedSpend: parseSekAmount(row.total)
+    };
+  }),
+  coverage: {
+    confidence: 'medium',
+    caveat: 'Uses visible weekly basket rows and receipt totals; unscanned cash purchases are not estimated.'
+  }
+};
 
 export const personalGroceryInflation = calculatePersonalGroceryInflation({
   baseDate: 'previous weekly basket',

@@ -195,6 +195,15 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(source, /NoVerifiedData/);
   });
 
+  it('surfaces a student weekly budget tracker using the real core budget summary', async () => {
+    const source = await read('src/app/savings-dashboard/page.tsx');
+    assert.match(source, /studentWeeklyBudgetTracker/);
+    assert.match(source, /summarizeBudget/);
+    assert.match(source, /Weekly student budget/);
+    assert.match(source, /weeklyRemainingAfterEstimate/);
+    assert.doesNotMatch(source, /NoVerifiedData/);
+  });
+
   it('uses a readable global shell and provenance surfaces across the app', async () => {
     const globals = await read('src/app/globals.css');
     const nav = await read('src/components/app-nav.tsx');
