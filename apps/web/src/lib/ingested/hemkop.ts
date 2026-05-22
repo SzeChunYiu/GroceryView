@@ -3,9 +3,9 @@
 // Retrieved: 2026-05-22T09:20:01.415Z
 // Row count: 150 real product rows fetched from hemkop.se search.
 // Weekly discount source URL pattern: https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100
-// Weekly discount source URLs: https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100; https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100; https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100; https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100; https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100; https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100; https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100; https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100; https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100
-// Weekly discount retrieved: 2026-05-22T10:16:45.360Z
-// Weekly discount row count: 744 real Axfood campaign rows fetched from hemkop.se for store IDs 4003, 4127, and 4190.
+// Weekly discount source URLs: https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100; https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100; https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100; https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100; https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100; https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100; https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100; https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100; https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100; https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100; https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100; https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100; https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100; https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100; https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100; https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100; https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100; https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100
+// Weekly discount retrieved: 2026-05-22T10:35:59.429Z
+// Weekly discount row count: 1492 real Axfood campaign rows fetched from hemkop.se for store IDs 4003, 4127, 4190, 4798, 4660, and 4775.
 
 export type HemkopIngestedProduct = {
   code: string;
@@ -2883,12 +2883,19 @@ export const hemkopProducts: HemkopIngestedProduct[] = [
 ];
 
 export const hemkopWeeklyDiscountSource = {
-  source: "hemkop.se public Axfood campaign JSON",
-  retrievedAt: "2026-05-22T10:16:45.360Z",
-  rowCount: 744,
-  storeIds: ["4003","4127","4190"],
-  sourceUrlPattern: "https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100",
-  sourceUrls: [
+  "source": "hemkop.se public Axfood campaign JSON",
+  "retrievedAt": "2026-05-22T10:35:59.429Z",
+  "rowCount": 1492,
+  "storeIds": [
+    "4003",
+    "4127",
+    "4190",
+    "4798",
+    "4660",
+    "4775"
+  ],
+  "sourceUrlPattern": "https://www.hemkop.se/search/campaigns/offline?q={storeId}&type=PERSONAL_GENERAL&page={page}&size=100",
+  "sourceUrls": [
     "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
     "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
     "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
@@ -2897,7 +2904,16 @@ export const hemkopWeeklyDiscountSource = {
     "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
     "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
     "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100"
+    "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
+    "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100"
   ]
 } as const;
 
@@ -2925,7 +2941,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112637939_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500303429",
@@ -2950,7 +2966,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311071330525_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298172",
@@ -2975,7 +2991,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298127",
@@ -3003,7 +3019,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500299506",
@@ -3031,7 +3047,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298024",
@@ -3059,7 +3075,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "swedish_bird"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298454",
@@ -3089,7 +3105,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298365",
@@ -3116,7 +3132,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298362",
@@ -3141,7 +3157,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427923_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298307",
@@ -3166,7 +3182,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005802_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298397",
@@ -3194,7 +3210,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298293",
@@ -3219,7 +3235,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130801709_C1R1_s07",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298020",
@@ -3249,7 +3265,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500303814",
@@ -3276,7 +3292,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298981",
@@ -3301,7 +3317,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06408432088933_C1R1_s07",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298200",
@@ -3326,7 +3342,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08001090291035_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298198",
@@ -3351,7 +3367,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216219570_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500299061",
@@ -3376,7 +3392,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865095466_C1C1_s06",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298115",
@@ -3404,7 +3420,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298083",
@@ -3429,7 +3445,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041062654_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298065",
@@ -3454,7 +3470,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240120189_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500297778",
@@ -3479,7 +3495,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391814009109_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298306",
@@ -3504,7 +3520,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083488511_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298048",
@@ -3532,7 +3548,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500303714",
@@ -3563,7 +3579,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500303868",
@@ -3588,7 +3604,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160020447_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307473",
@@ -3615,7 +3631,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307476",
@@ -3642,7 +3658,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500309494",
@@ -3667,7 +3683,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031135473_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298437",
@@ -3692,7 +3708,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05711953029912_C1C1_s07",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298399",
@@ -3720,7 +3736,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500299078",
@@ -3745,7 +3761,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03415581520927_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298803",
@@ -3770,7 +3786,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300330038104_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500302260",
@@ -3795,7 +3811,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04016241051035_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298135",
@@ -3820,7 +3836,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08710522882207_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298402",
@@ -3845,7 +3861,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216213837_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298400",
@@ -3873,7 +3889,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298080",
@@ -3898,7 +3914,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160020287_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298078",
@@ -3926,7 +3942,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298059",
@@ -3955,7 +3971,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307475",
@@ -3982,7 +3998,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307469",
@@ -4009,7 +4025,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307481",
@@ -4038,7 +4054,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307468",
@@ -4066,7 +4082,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307482",
@@ -4093,7 +4109,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164202",
@@ -4118,7 +4134,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043011834_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164203",
@@ -4146,7 +4162,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164204",
@@ -4174,7 +4190,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164205",
@@ -4199,7 +4215,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613035497641_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164206",
@@ -4228,7 +4244,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164207",
@@ -4257,7 +4273,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164208",
@@ -4285,7 +4301,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164209",
@@ -4310,7 +4326,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613033881824_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164210",
@@ -4339,7 +4355,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164211",
@@ -4368,7 +4384,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164212",
@@ -4393,7 +4409,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240076806_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164213",
@@ -4418,7 +4434,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310500040127_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164214",
@@ -4445,7 +4461,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164215",
@@ -4472,7 +4488,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164216",
@@ -4500,7 +4516,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164217",
@@ -4529,7 +4545,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164218",
@@ -4556,7 +4572,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164219",
@@ -4583,7 +4599,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164220",
@@ -4608,7 +4624,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07398818389985_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164221",
@@ -4635,7 +4651,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164222",
@@ -4660,7 +4676,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004416_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164223",
@@ -4685,7 +4701,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083455155_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164224",
@@ -4712,7 +4728,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164225",
@@ -4740,7 +4756,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164226",
@@ -4767,7 +4783,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164227",
@@ -4792,7 +4808,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04008429037894_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164228",
@@ -4817,7 +4833,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088692_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164229",
@@ -4842,7 +4858,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083467622_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164230",
@@ -4867,7 +4883,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088227_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164231",
@@ -4892,7 +4908,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088128_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164232",
@@ -4917,7 +4933,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088104_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164233",
@@ -4945,7 +4961,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164234",
@@ -4973,7 +4989,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164235",
@@ -4998,7 +5014,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300330035110_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164236",
@@ -5023,7 +5039,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311030712034_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164237",
@@ -5050,7 +5066,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164238",
@@ -5075,7 +5091,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612404501_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164239",
@@ -5100,7 +5116,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401000060_C1N1_s05",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164240",
@@ -5125,7 +5141,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401000367_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164241",
@@ -5152,7 +5168,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164242",
@@ -5179,7 +5195,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164243",
@@ -5204,7 +5220,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612404310_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164244",
@@ -5229,7 +5245,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083474088_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164245",
@@ -5254,7 +5270,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612513807_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164246",
@@ -5279,7 +5295,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401009551_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164247",
@@ -5304,7 +5320,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612501552_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164248",
@@ -5331,7 +5347,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164249",
@@ -5356,7 +5372,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181638695_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164250",
@@ -5387,7 +5403,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164251",
@@ -5415,7 +5431,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164252",
@@ -5443,7 +5459,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164253",
@@ -5473,7 +5489,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164254",
@@ -5503,7 +5519,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164255",
@@ -5531,7 +5547,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "corrosion"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164256",
@@ -5556,7 +5572,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05700417006804_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164257",
@@ -5581,7 +5597,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350136902_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164258",
@@ -5606,7 +5622,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05900951311505_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164259",
@@ -5631,7 +5647,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622201047764_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164260",
@@ -5656,7 +5672,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000057402376_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164261",
@@ -5681,7 +5697,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04009900390309_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164262",
@@ -5706,7 +5722,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083401633_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164263",
@@ -5731,7 +5747,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043003563_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164264",
@@ -5756,7 +5772,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531106368_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164265",
@@ -5781,7 +5797,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083483097_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164266",
@@ -5809,7 +5825,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164267",
@@ -5837,7 +5853,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164268",
@@ -5862,7 +5878,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531122757_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164269",
@@ -5887,7 +5903,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492785_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164270",
@@ -5912,7 +5928,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489358_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164271",
@@ -5937,7 +5953,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006489_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164272",
@@ -5962,7 +5978,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489051_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164273",
@@ -5987,7 +6003,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489372_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164274",
@@ -6012,7 +6028,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532151211_C1N1_s05",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164275",
@@ -6037,7 +6053,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350045591050_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164276",
@@ -6062,7 +6078,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471209_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164277",
@@ -6087,7 +6103,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000159528481_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164278",
@@ -6115,7 +6131,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164279",
@@ -6142,7 +6158,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164280",
@@ -6169,7 +6185,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164281",
@@ -6194,7 +6210,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083444616_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164282",
@@ -6222,7 +6238,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164283",
@@ -6247,7 +6263,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04002359021022_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164284",
@@ -6276,7 +6292,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164285",
@@ -6304,7 +6320,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164286",
@@ -6333,7 +6349,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164287",
@@ -6358,7 +6374,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083458507_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164288",
@@ -6383,7 +6399,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090389163_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164289",
@@ -6408,7 +6424,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711000379660_C1C0_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164290",
@@ -6435,7 +6451,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "crossed_ax"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164291",
@@ -6460,7 +6476,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350099111129_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164292",
@@ -6487,7 +6503,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164293",
@@ -6515,7 +6531,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164294",
@@ -6540,7 +6556,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08000070053465_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164295",
@@ -6570,7 +6586,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164296",
@@ -6595,7 +6611,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083443473_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164297",
@@ -6620,7 +6636,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083472299_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164298",
@@ -6647,7 +6663,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164299",
@@ -6672,7 +6688,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310034474_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164300",
@@ -6697,7 +6713,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041034293_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164362",
@@ -6722,7 +6738,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720608006656_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164363",
@@ -6747,7 +6763,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711000360521_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164364",
@@ -6772,7 +6788,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08004769254058_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164365",
@@ -6797,7 +6813,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083449499_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164366",
@@ -6822,7 +6838,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350035210114_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164367",
@@ -6847,7 +6863,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083459252_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164368",
@@ -6872,7 +6888,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083486920_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164369",
@@ -6897,7 +6913,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083443305_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164370",
@@ -6925,7 +6941,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164371",
@@ -6950,7 +6966,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068294082_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164372",
@@ -6978,7 +6994,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164373",
@@ -7003,7 +7019,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083450488_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164374",
@@ -7028,7 +7044,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427848_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164375",
@@ -7053,7 +7069,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130417405_C1R1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164376",
@@ -7078,7 +7094,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350006710704_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164377",
@@ -7103,7 +7119,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468070_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164378",
@@ -7128,7 +7144,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083487965_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164379",
@@ -7153,7 +7169,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350115940061_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164380",
@@ -7181,7 +7197,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164381",
@@ -7209,7 +7225,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164382",
@@ -7234,7 +7250,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612700092_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164383",
@@ -7259,7 +7275,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612121224_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164384",
@@ -7287,7 +7303,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164385",
@@ -7312,7 +7328,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083437212_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164387",
@@ -7337,7 +7353,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043007332_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164388",
@@ -7364,7 +7380,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164389",
@@ -7392,7 +7408,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164391",
@@ -7417,7 +7433,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083400087_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164392",
@@ -7445,7 +7461,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "flame"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164393",
@@ -7470,7 +7486,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043011827_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164394",
@@ -7495,7 +7511,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07318140009030_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164395",
@@ -7523,7 +7539,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164396",
@@ -7548,7 +7564,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436321_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164397",
@@ -7576,7 +7592,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164398",
@@ -7601,7 +7617,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083452468_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164399",
@@ -7626,7 +7642,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083452482_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164400",
@@ -7651,7 +7667,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083405679_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164403",
@@ -7678,7 +7694,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164404",
@@ -7706,7 +7722,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164301",
@@ -7731,7 +7747,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350029734329_C1C0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164302",
@@ -7756,7 +7772,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083446733_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164303",
@@ -7781,7 +7797,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350029733018_C1C0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164304",
@@ -7806,7 +7822,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310520022097_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164305",
@@ -7831,7 +7847,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083444388_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164306",
@@ -7856,7 +7872,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05701014078515_C1C0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164307",
@@ -7881,7 +7897,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391288643007_C1C0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164308",
@@ -7909,7 +7925,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164309",
@@ -7934,7 +7950,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391288322100_C1C0_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164310",
@@ -7961,7 +7977,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "crossed_ax"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164311",
@@ -7988,7 +8004,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164312",
@@ -8013,7 +8029,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031139280_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164313",
@@ -8038,7 +8054,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07315062257365_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164314",
@@ -8063,7 +8079,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300400122689_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164315",
@@ -8091,7 +8107,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164316",
@@ -8116,7 +8132,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427923_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164317",
@@ -8144,7 +8160,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164318",
@@ -8172,7 +8188,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164319",
@@ -8197,7 +8213,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083457197_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164320",
@@ -8222,7 +8238,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350126082835_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164321",
@@ -8250,7 +8266,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164322",
@@ -8275,7 +8291,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436222_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164323",
@@ -8300,7 +8316,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490590_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164324",
@@ -8325,7 +8341,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03858893421108_C1L0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164325",
@@ -8350,7 +8366,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090750697_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164326",
@@ -8375,7 +8391,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083430640_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164327",
@@ -8400,7 +8416,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340046080738_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164328",
@@ -8425,7 +8441,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451422_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164329",
@@ -8450,7 +8466,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083487484_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164330",
@@ -8475,7 +8491,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083464898_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164331",
@@ -8500,7 +8516,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083430688_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164332",
@@ -8527,7 +8543,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164333",
@@ -8552,7 +8568,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468391_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164334",
@@ -8580,7 +8596,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164335",
@@ -8605,7 +8621,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05411188110835_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164336",
@@ -8633,7 +8649,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "milk_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164337",
@@ -8658,7 +8674,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310470661803_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164338",
@@ -8683,7 +8699,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08719200284173_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164339",
@@ -8711,7 +8727,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164340",
@@ -8739,7 +8755,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164341",
@@ -8764,7 +8780,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083480263_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164342",
@@ -8791,7 +8807,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164343",
@@ -8816,7 +8832,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07392672001724_C1C1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164344",
@@ -8846,7 +8862,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164345",
@@ -8871,7 +8887,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090155539_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164346",
@@ -8896,7 +8912,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068291210_C1N1_s06",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164347",
@@ -8924,7 +8940,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164348",
@@ -8949,7 +8965,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489907_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164349",
@@ -8977,7 +8993,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164350",
@@ -9005,7 +9021,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164351",
@@ -9030,7 +9046,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447532_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164352",
@@ -9055,7 +9071,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08719200066748_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164353",
@@ -9080,7 +9096,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005727_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164354",
@@ -9105,7 +9121,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041018453_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164355",
@@ -9130,7 +9146,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043008551_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164356",
@@ -9155,7 +9171,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083402241_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164357",
@@ -9180,7 +9196,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612160841_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164358",
@@ -9205,7 +9221,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005789_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164359",
@@ -9230,7 +9246,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083426636_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164360",
@@ -9255,7 +9271,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07038010022449_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164361",
@@ -9280,7 +9296,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04004164009431_C1R1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164386",
@@ -9308,7 +9324,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164402",
@@ -9336,7 +9352,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164401",
@@ -9361,7 +9377,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042016052_S01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164502",
@@ -9390,7 +9406,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164503",
@@ -9415,7 +9431,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391290688409_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4003&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500303429",
@@ -9440,7 +9456,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311071330525_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298172",
@@ -9465,7 +9481,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298127",
@@ -9493,7 +9509,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500299506",
@@ -9521,7 +9537,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298024",
@@ -9549,7 +9565,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "swedish_bird"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298454",
@@ -9579,7 +9595,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298365",
@@ -9606,7 +9622,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298362",
@@ -9631,7 +9647,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427923_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298307",
@@ -9656,7 +9672,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005802_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298397",
@@ -9684,7 +9700,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298293",
@@ -9709,7 +9725,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130801709_C1R1_s07",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298020",
@@ -9739,7 +9755,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500303814",
@@ -9766,7 +9782,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298981",
@@ -9791,7 +9807,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06408432088933_C1R1_s07",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298200",
@@ -9816,7 +9832,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08001090291035_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298198",
@@ -9841,7 +9857,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216219570_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500299061",
@@ -9866,7 +9882,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865095466_C1C1_s06",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298115",
@@ -9894,7 +9910,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298083",
@@ -9919,7 +9935,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041062654_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298065",
@@ -9944,7 +9960,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240120189_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500297778",
@@ -9969,7 +9985,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391814009109_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298306",
@@ -9994,7 +10010,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083488511_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298048",
@@ -10022,7 +10038,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500303714",
@@ -10053,7 +10069,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307473",
@@ -10080,7 +10096,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307476",
@@ -10107,7 +10123,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298572",
@@ -10132,7 +10148,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06416453038288_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298437",
@@ -10157,7 +10173,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05711953029912_C1C1_s07",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298399",
@@ -10185,7 +10201,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500299078",
@@ -10210,7 +10226,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03415581520927_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298803",
@@ -10235,7 +10251,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300330038104_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500302260",
@@ -10260,7 +10276,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04016241051035_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298135",
@@ -10285,7 +10301,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08710522882207_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298400",
@@ -10313,7 +10329,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298080",
@@ -10338,7 +10354,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160020287_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298078",
@@ -10366,7 +10382,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298059",
@@ -10395,7 +10411,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307475",
@@ -10422,7 +10438,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307469",
@@ -10449,7 +10465,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307481",
@@ -10478,7 +10494,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307468",
@@ -10506,7 +10522,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307482",
@@ -10533,7 +10549,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164202",
@@ -10558,7 +10574,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043011834_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164203",
@@ -10586,7 +10602,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164204",
@@ -10614,7 +10630,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164205",
@@ -10639,7 +10655,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613035497641_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164206",
@@ -10668,7 +10684,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164207",
@@ -10697,7 +10713,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164208",
@@ -10725,7 +10741,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164209",
@@ -10750,7 +10766,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613033881824_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164210",
@@ -10779,7 +10795,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164211",
@@ -10808,7 +10824,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164212",
@@ -10833,7 +10849,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240076806_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164213",
@@ -10858,7 +10874,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310500040127_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164214",
@@ -10885,7 +10901,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164215",
@@ -10912,7 +10928,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164216",
@@ -10940,7 +10956,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164217",
@@ -10969,7 +10985,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164218",
@@ -10996,7 +11012,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164219",
@@ -11023,7 +11039,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164220",
@@ -11048,7 +11064,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07398818389985_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164221",
@@ -11075,7 +11091,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164222",
@@ -11100,7 +11116,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004416_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164223",
@@ -11125,7 +11141,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083455155_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164224",
@@ -11152,7 +11168,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164225",
@@ -11180,7 +11196,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164226",
@@ -11207,7 +11223,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164227",
@@ -11232,7 +11248,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04008429037894_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164228",
@@ -11257,7 +11273,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088692_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164229",
@@ -11282,7 +11298,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083467622_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164230",
@@ -11307,7 +11323,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088227_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164231",
@@ -11332,7 +11348,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088128_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164232",
@@ -11357,7 +11373,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088104_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164233",
@@ -11385,7 +11401,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164234",
@@ -11413,7 +11429,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164235",
@@ -11438,7 +11454,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300330035110_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164236",
@@ -11463,7 +11479,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311030712034_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164237",
@@ -11490,7 +11506,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164238",
@@ -11515,7 +11531,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612404501_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164239",
@@ -11540,7 +11556,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401000060_C1N1_s05",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164240",
@@ -11565,7 +11581,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401000367_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164241",
@@ -11592,7 +11608,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164242",
@@ -11619,7 +11635,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164243",
@@ -11644,7 +11660,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612404310_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164244",
@@ -11669,7 +11685,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083474088_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164245",
@@ -11694,7 +11710,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612513807_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164246",
@@ -11719,7 +11735,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401009551_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164247",
@@ -11744,7 +11760,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612501552_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164248",
@@ -11771,7 +11787,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164249",
@@ -11796,7 +11812,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181638695_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164250",
@@ -11827,7 +11843,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164251",
@@ -11855,7 +11871,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164252",
@@ -11883,7 +11899,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164253",
@@ -11913,7 +11929,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164254",
@@ -11943,7 +11959,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164255",
@@ -11971,7 +11987,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "corrosion"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164256",
@@ -11996,7 +12012,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05700417006804_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164257",
@@ -12021,7 +12037,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350136902_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164258",
@@ -12046,7 +12062,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05900951311505_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164259",
@@ -12071,7 +12087,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622201047764_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164260",
@@ -12096,7 +12112,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000057402376_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164261",
@@ -12121,7 +12137,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04009900390309_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164262",
@@ -12146,7 +12162,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083401633_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164263",
@@ -12171,7 +12187,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043003563_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164264",
@@ -12196,7 +12212,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531106368_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164265",
@@ -12221,7 +12237,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083483097_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164266",
@@ -12249,7 +12265,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164267",
@@ -12277,7 +12293,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164268",
@@ -12302,7 +12318,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531122757_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164269",
@@ -12327,7 +12343,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492785_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164270",
@@ -12352,7 +12368,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489358_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164271",
@@ -12377,7 +12393,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006489_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164272",
@@ -12402,7 +12418,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489051_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164273",
@@ -12427,7 +12443,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489372_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164274",
@@ -12452,7 +12468,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532151211_C1N1_s05",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164275",
@@ -12477,7 +12493,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350045591050_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164276",
@@ -12502,7 +12518,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471209_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164277",
@@ -12527,7 +12543,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000159528481_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164278",
@@ -12555,7 +12571,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164279",
@@ -12582,7 +12598,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164280",
@@ -12609,7 +12625,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164281",
@@ -12634,7 +12650,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083444616_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164282",
@@ -12662,7 +12678,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164283",
@@ -12687,7 +12703,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04002359021022_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164284",
@@ -12716,7 +12732,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164285",
@@ -12744,7 +12760,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164286",
@@ -12773,7 +12789,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164287",
@@ -12798,7 +12814,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083458507_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164288",
@@ -12823,7 +12839,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090389163_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164289",
@@ -12848,7 +12864,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711000379660_C1C0_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164290",
@@ -12875,7 +12891,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "crossed_ax"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164291",
@@ -12900,7 +12916,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350099111129_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164292",
@@ -12927,7 +12943,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164293",
@@ -12955,7 +12971,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164294",
@@ -12980,7 +12996,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08000070053465_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164295",
@@ -13010,7 +13026,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164296",
@@ -13035,7 +13051,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083443473_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164297",
@@ -13060,7 +13076,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083472299_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164298",
@@ -13087,7 +13103,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164299",
@@ -13112,7 +13128,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310034474_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164300",
@@ -13137,7 +13153,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041034293_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164362",
@@ -13162,7 +13178,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720608006656_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164363",
@@ -13187,7 +13203,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711000360521_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164364",
@@ -13212,7 +13228,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08004769254058_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164365",
@@ -13237,7 +13253,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083449499_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164366",
@@ -13262,7 +13278,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350035210114_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164367",
@@ -13287,7 +13303,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083459252_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164368",
@@ -13312,7 +13328,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083486920_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164369",
@@ -13337,7 +13353,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083443305_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164370",
@@ -13365,7 +13381,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164371",
@@ -13390,7 +13406,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068294082_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164372",
@@ -13418,7 +13434,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164373",
@@ -13443,7 +13459,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083450488_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164374",
@@ -13468,7 +13484,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427848_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164375",
@@ -13493,7 +13509,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130417405_C1R1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164376",
@@ -13518,7 +13534,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350006710704_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164377",
@@ -13543,7 +13559,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468070_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164378",
@@ -13568,7 +13584,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083487965_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164379",
@@ -13593,7 +13609,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350115940061_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164380",
@@ -13621,7 +13637,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164381",
@@ -13649,7 +13665,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164382",
@@ -13674,7 +13690,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612700092_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164383",
@@ -13699,7 +13715,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612121224_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164384",
@@ -13727,7 +13743,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164385",
@@ -13752,7 +13768,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083437212_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164387",
@@ -13777,7 +13793,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043007332_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164388",
@@ -13804,7 +13820,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164389",
@@ -13832,7 +13848,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164391",
@@ -13857,7 +13873,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083400087_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164392",
@@ -13885,7 +13901,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "flame"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164393",
@@ -13910,7 +13926,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043011827_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164394",
@@ -13935,7 +13951,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07318140009030_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164395",
@@ -13963,7 +13979,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164396",
@@ -13988,7 +14004,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436321_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164397",
@@ -14016,7 +14032,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164398",
@@ -14041,7 +14057,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083452468_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164399",
@@ -14066,7 +14082,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083452482_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164400",
@@ -14091,7 +14107,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083405679_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164403",
@@ -14118,7 +14134,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164404",
@@ -14146,7 +14162,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164301",
@@ -14171,7 +14187,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350029734329_C1C0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164302",
@@ -14196,7 +14212,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083446733_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164303",
@@ -14221,7 +14237,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350029733018_C1C0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164304",
@@ -14246,7 +14262,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310520022097_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164305",
@@ -14271,7 +14287,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083444388_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164306",
@@ -14296,7 +14312,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05701014078515_C1C0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164307",
@@ -14321,7 +14337,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391288643007_C1C0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164308",
@@ -14349,7 +14365,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164309",
@@ -14374,7 +14390,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391288322100_C1C0_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164310",
@@ -14401,7 +14417,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "crossed_ax"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164311",
@@ -14428,7 +14444,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164312",
@@ -14453,7 +14469,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031139280_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164313",
@@ -14478,7 +14494,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07315062257365_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164314",
@@ -14503,7 +14519,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300400122689_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164315",
@@ -14531,7 +14547,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164316",
@@ -14556,7 +14572,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427923_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164317",
@@ -14584,7 +14600,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164318",
@@ -14612,7 +14628,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164319",
@@ -14637,7 +14653,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083457197_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164320",
@@ -14662,7 +14678,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350126082835_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164321",
@@ -14690,7 +14706,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164322",
@@ -14715,7 +14731,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436222_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164323",
@@ -14740,7 +14756,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490590_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164324",
@@ -14765,7 +14781,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03858893421108_C1L0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164325",
@@ -14790,7 +14806,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090750697_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164326",
@@ -14815,7 +14831,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083430640_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164327",
@@ -14840,7 +14856,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340046080738_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164328",
@@ -14865,7 +14881,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451422_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164329",
@@ -14890,7 +14906,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083487484_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164330",
@@ -14915,7 +14931,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083464898_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164331",
@@ -14940,7 +14956,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083430688_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164332",
@@ -14967,7 +14983,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164333",
@@ -14992,7 +15008,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468391_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164334",
@@ -15020,7 +15036,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164335",
@@ -15045,7 +15061,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05411188110835_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164336",
@@ -15073,7 +15089,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "milk_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164337",
@@ -15098,7 +15114,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310470661803_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164338",
@@ -15123,7 +15139,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08719200284173_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164339",
@@ -15151,7 +15167,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164340",
@@ -15179,7 +15195,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164341",
@@ -15204,7 +15220,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083480263_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164342",
@@ -15231,7 +15247,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164343",
@@ -15256,7 +15272,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07392672001724_C1C1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164344",
@@ -15286,7 +15302,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164345",
@@ -15311,7 +15327,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090155539_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164346",
@@ -15336,7 +15352,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068291210_C1N1_s06",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164347",
@@ -15364,7 +15380,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164348",
@@ -15389,7 +15405,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489907_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164349",
@@ -15417,7 +15433,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164350",
@@ -15445,7 +15461,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164351",
@@ -15470,7 +15486,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447532_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164352",
@@ -15495,7 +15511,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08719200066748_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164353",
@@ -15520,7 +15536,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005727_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164354",
@@ -15545,7 +15561,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041018453_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164355",
@@ -15570,7 +15586,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043008551_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164356",
@@ -15595,7 +15611,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083402241_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164357",
@@ -15620,7 +15636,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612160841_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164358",
@@ -15645,7 +15661,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005789_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164359",
@@ -15670,7 +15686,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083426636_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164360",
@@ -15695,7 +15711,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07038010022449_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164361",
@@ -15720,7 +15736,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04004164009431_C1R1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164386",
@@ -15748,7 +15764,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164402",
@@ -15776,7 +15792,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164401",
@@ -15801,7 +15817,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042016052_S01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164502",
@@ -15830,7 +15846,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164503",
@@ -15855,7 +15871,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391290688409_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4127&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500303429",
@@ -15880,7 +15896,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311071330525_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298172",
@@ -15905,7 +15921,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298127",
@@ -15933,7 +15949,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500299506",
@@ -15961,7 +15977,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298024",
@@ -15989,7 +16005,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "swedish_bird"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298454",
@@ -16019,7 +16035,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298365",
@@ -16046,7 +16062,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298362",
@@ -16071,7 +16087,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427923_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298307",
@@ -16096,7 +16112,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005802_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298397",
@@ -16124,7 +16140,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298293",
@@ -16149,7 +16165,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130801709_C1R1_s07",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298020",
@@ -16179,7 +16195,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500303814",
@@ -16206,7 +16222,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298981",
@@ -16231,7 +16247,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06408432088933_C1R1_s07",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298200",
@@ -16256,7 +16272,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08001090291035_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298198",
@@ -16281,7 +16297,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216219570_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500299061",
@@ -16306,7 +16322,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865095466_C1C1_s06",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298115",
@@ -16334,7 +16350,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298083",
@@ -16359,7 +16375,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041062654_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298065",
@@ -16384,7 +16400,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240120189_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500297778",
@@ -16409,7 +16425,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391814009109_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298306",
@@ -16434,7 +16450,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083488511_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298048",
@@ -16462,7 +16478,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500303714",
@@ -16493,7 +16509,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500303868",
@@ -16518,7 +16534,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160020447_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307473",
@@ -16545,7 +16561,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307476",
@@ -16572,7 +16588,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500309494",
@@ -16597,7 +16613,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031135473_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298572",
@@ -16622,7 +16638,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06416453038288_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298437",
@@ -16647,7 +16663,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05711953029912_C1C1_s07",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298399",
@@ -16675,7 +16691,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500299078",
@@ -16700,7 +16716,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03415581520927_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298803",
@@ -16725,7 +16741,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300330038104_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500302260",
@@ -16750,7 +16766,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04016241051035_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298135",
@@ -16775,7 +16791,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08710522882207_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298402",
@@ -16800,7 +16816,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216213837_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298400",
@@ -16828,7 +16844,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298080",
@@ -16853,7 +16869,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160020287_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298078",
@@ -16881,7 +16897,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500298059",
@@ -16910,7 +16926,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307475",
@@ -16937,7 +16953,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307469",
@@ -16964,7 +16980,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307481",
@@ -16993,7 +17009,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307468",
@@ -17021,7 +17037,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "2500307482",
@@ -17048,7 +17064,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164202",
@@ -17073,7 +17089,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043011834_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164203",
@@ -17101,7 +17117,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164204",
@@ -17129,7 +17145,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164205",
@@ -17154,7 +17170,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613035497641_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164206",
@@ -17183,7 +17199,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164207",
@@ -17212,7 +17228,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164208",
@@ -17240,7 +17256,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164209",
@@ -17265,7 +17281,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613033881824_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164210",
@@ -17294,7 +17310,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164211",
@@ -17323,7 +17339,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164212",
@@ -17348,7 +17364,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240076806_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164213",
@@ -17373,7 +17389,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310500040127_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164214",
@@ -17400,7 +17416,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164215",
@@ -17427,7 +17443,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164216",
@@ -17455,7 +17471,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164217",
@@ -17484,7 +17500,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164218",
@@ -17511,7 +17527,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164219",
@@ -17538,7 +17554,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164220",
@@ -17563,7 +17579,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07398818389985_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164221",
@@ -17590,7 +17606,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164222",
@@ -17615,7 +17631,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004416_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164223",
@@ -17640,7 +17656,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083455155_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164224",
@@ -17667,7 +17683,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164225",
@@ -17695,7 +17711,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164226",
@@ -17722,7 +17738,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164227",
@@ -17747,7 +17763,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04008429037894_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164228",
@@ -17772,7 +17788,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088692_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164229",
@@ -17797,7 +17813,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083467622_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164230",
@@ -17822,7 +17838,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088227_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164231",
@@ -17847,7 +17863,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088128_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164232",
@@ -17872,7 +17888,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088104_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164233",
@@ -17900,7 +17916,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164234",
@@ -17928,7 +17944,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164235",
@@ -17953,7 +17969,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300330035110_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164236",
@@ -17978,7 +17994,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311030712034_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164237",
@@ -18005,7 +18021,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164238",
@@ -18030,7 +18046,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612404501_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164239",
@@ -18055,7 +18071,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401000060_C1N1_s05",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164240",
@@ -18080,7 +18096,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401000367_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164241",
@@ -18107,7 +18123,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164242",
@@ -18134,7 +18150,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164243",
@@ -18159,7 +18175,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612404310_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164244",
@@ -18184,7 +18200,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083474088_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164245",
@@ -18209,7 +18225,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612513807_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164246",
@@ -18234,7 +18250,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401009551_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164247",
@@ -18259,7 +18275,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612501552_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164248",
@@ -18286,7 +18302,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "no_pictogram"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164249",
@@ -18311,7 +18327,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181638695_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164250",
@@ -18342,7 +18358,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164251",
@@ -18370,7 +18386,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=0&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164252",
@@ -18398,7 +18414,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164253",
@@ -18428,7 +18444,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164254",
@@ -18458,7 +18474,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164255",
@@ -18486,7 +18502,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "corrosion"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164256",
@@ -18511,7 +18527,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05700417006804_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164257",
@@ -18536,7 +18552,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350136902_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164258",
@@ -18561,7 +18577,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05900951311505_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164259",
@@ -18586,7 +18602,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622201047764_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164260",
@@ -18611,7 +18627,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000057402376_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164261",
@@ -18636,7 +18652,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04009900390309_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164262",
@@ -18661,7 +18677,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083401633_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164263",
@@ -18686,7 +18702,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043003563_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164264",
@@ -18711,7 +18727,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531106368_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164265",
@@ -18736,7 +18752,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083483097_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164266",
@@ -18764,7 +18780,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164267",
@@ -18792,7 +18808,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164268",
@@ -18817,7 +18833,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531122757_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164269",
@@ -18842,7 +18858,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492785_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164270",
@@ -18867,7 +18883,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489358_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164271",
@@ -18892,7 +18908,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006489_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164272",
@@ -18917,7 +18933,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489051_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164273",
@@ -18942,7 +18958,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489372_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164274",
@@ -18967,7 +18983,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532151211_C1N1_s05",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164275",
@@ -18992,7 +19008,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350045591050_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164276",
@@ -19017,7 +19033,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471209_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164277",
@@ -19042,7 +19058,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000159528481_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164278",
@@ -19070,7 +19086,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164279",
@@ -19097,7 +19113,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164280",
@@ -19124,7 +19140,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164281",
@@ -19149,7 +19165,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083444616_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164282",
@@ -19177,7 +19193,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164283",
@@ -19202,7 +19218,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04002359021022_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164284",
@@ -19231,7 +19247,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164285",
@@ -19259,7 +19275,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164286",
@@ -19288,7 +19304,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164287",
@@ -19313,7 +19329,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083458507_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164288",
@@ -19338,7 +19354,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090389163_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164289",
@@ -19363,7 +19379,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711000379660_C1C0_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164290",
@@ -19390,7 +19406,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "crossed_ax"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164291",
@@ -19415,7 +19431,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350099111129_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164292",
@@ -19442,7 +19458,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164293",
@@ -19470,7 +19486,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164294",
@@ -19495,7 +19511,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08000070053465_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164295",
@@ -19525,7 +19541,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164296",
@@ -19550,7 +19566,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083443473_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164297",
@@ -19575,7 +19591,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083472299_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164298",
@@ -19602,7 +19618,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164299",
@@ -19627,7 +19643,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310034474_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164300",
@@ -19652,7 +19668,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041034293_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164362",
@@ -19677,7 +19693,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720608006656_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164363",
@@ -19702,7 +19718,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711000360521_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164364",
@@ -19727,7 +19743,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08004769254058_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164365",
@@ -19752,7 +19768,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083449499_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164366",
@@ -19777,7 +19793,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350035210114_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164367",
@@ -19802,7 +19818,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083459252_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164368",
@@ -19827,7 +19843,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083486920_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164369",
@@ -19852,7 +19868,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083443305_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164370",
@@ -19880,7 +19896,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164371",
@@ -19905,7 +19921,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068294082_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164372",
@@ -19933,7 +19949,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164373",
@@ -19958,7 +19974,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083450488_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164374",
@@ -19983,7 +19999,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427848_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164375",
@@ -20008,7 +20024,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130417405_C1R1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164376",
@@ -20033,7 +20049,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350006710704_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164377",
@@ -20058,7 +20074,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468070_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164378",
@@ -20083,7 +20099,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083487965_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164379",
@@ -20108,7 +20124,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350115940061_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164380",
@@ -20136,7 +20152,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164381",
@@ -20164,7 +20180,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164382",
@@ -20189,7 +20205,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612700092_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164383",
@@ -20214,7 +20230,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612121224_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164384",
@@ -20242,7 +20258,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164385",
@@ -20267,7 +20283,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083437212_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164387",
@@ -20292,7 +20308,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043007332_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164388",
@@ -20319,7 +20335,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "age_restricted_15"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164389",
@@ -20347,7 +20363,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164391",
@@ -20372,7 +20388,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083400087_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164392",
@@ -20400,7 +20416,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "flame"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164393",
@@ -20425,7 +20441,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043011827_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164394",
@@ -20450,7 +20466,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07318140009030_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164395",
@@ -20478,7 +20494,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164396",
@@ -20503,7 +20519,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436321_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164397",
@@ -20531,7 +20547,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164398",
@@ -20556,7 +20572,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083452468_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164399",
@@ -20581,7 +20597,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083452482_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164400",
@@ -20606,7 +20622,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083405679_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164403",
@@ -20633,7 +20649,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164404",
@@ -20661,7 +20677,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164301",
@@ -20686,7 +20702,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350029734329_C1C0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164302",
@@ -20711,7 +20727,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083446733_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164303",
@@ -20736,7 +20752,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350029733018_C1C0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164304",
@@ -20761,7 +20777,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310520022097_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164305",
@@ -20786,7 +20802,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083444388_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164306",
@@ -20811,7 +20827,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05701014078515_C1C0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164307",
@@ -20836,7 +20852,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391288643007_C1C0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164308",
@@ -20864,7 +20880,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164309",
@@ -20889,7 +20905,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391288322100_C1C0_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164310",
@@ -20916,7 +20932,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "crossed_ax"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164311",
@@ -20943,7 +20959,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164312",
@@ -20968,7 +20984,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031139280_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=1&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164313",
@@ -20993,7 +21009,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07315062257365_C1R0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164314",
@@ -21018,7 +21034,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300400122689_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164315",
@@ -21046,7 +21062,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164316",
@@ -21071,7 +21087,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427923_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164317",
@@ -21099,7 +21115,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164318",
@@ -21127,7 +21143,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164319",
@@ -21152,7 +21168,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083457197_C1N1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164320",
@@ -21177,7 +21193,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350126082835_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164321",
@@ -21205,7 +21221,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164322",
@@ -21230,7 +21246,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436222_C1C1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164323",
@@ -21255,7 +21271,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490590_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164324",
@@ -21280,7 +21296,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03858893421108_C1L0_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164325",
@@ -21305,7 +21321,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090750697_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164326",
@@ -21330,7 +21346,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083430640_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164327",
@@ -21355,7 +21371,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340046080738_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164328",
@@ -21380,7 +21396,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451422_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164329",
@@ -21405,7 +21421,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083487484_C1L1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164330",
@@ -21430,7 +21446,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083464898_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164331",
@@ -21455,7 +21471,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083430688_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164332",
@@ -21482,7 +21498,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164333",
@@ -21507,7 +21523,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468391_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164334",
@@ -21535,7 +21551,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164335",
@@ -21560,7 +21576,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05411188110835_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164336",
@@ -21588,7 +21604,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "milk_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164337",
@@ -21613,7 +21629,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310470661803_C1C1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164338",
@@ -21638,7 +21654,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08719200284173_C1L1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164339",
@@ -21666,7 +21682,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164340",
@@ -21694,7 +21710,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164341",
@@ -21719,7 +21735,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083480263_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164342",
@@ -21746,7 +21762,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "keyhole"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164343",
@@ -21771,7 +21787,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07392672001724_C1C1_s04",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164344",
@@ -21801,7 +21817,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "fairtrade_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164345",
@@ -21826,7 +21842,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090155539_C1L1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164346",
@@ -21851,7 +21867,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068291210_C1N1_s06",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164347",
@@ -21879,7 +21895,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "eu_ecological"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164348",
@@ -21904,7 +21920,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489907_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164349",
@@ -21932,7 +21948,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164350",
@@ -21960,7 +21976,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164351",
@@ -21985,7 +22001,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447532_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164352",
@@ -22010,7 +22026,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08719200066748_C1N1_s03",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164353",
@@ -22035,7 +22051,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005727_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164354",
@@ -22060,7 +22076,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041018453_C1L1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164355",
@@ -22085,7 +22101,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043008551_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164356",
@@ -22110,7 +22126,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083402241_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164357",
@@ -22135,7 +22151,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612160841_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164358",
@@ -22160,7 +22176,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005789_C1N1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164359",
@@ -22185,7 +22201,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083426636_C1C1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164360",
@@ -22210,7 +22226,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07038010022449_C1R1_s01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164361",
@@ -22235,7 +22251,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04004164009431_C1R1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164386",
@@ -22263,7 +22279,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164402",
@@ -22291,7 +22307,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "meat_from_sweden"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164401",
@@ -22316,7 +22332,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042016052_S01",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164502",
@@ -22345,7 +22361,7 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
       "environmental_facet"
     ],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   },
   {
     "code": "10010164503",
@@ -22370,6 +22386,19576 @@ export const hemkopWeeklyDiscounts: HemkopIngestedWeeklyDiscount[] = [
     "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391290688409_C1N1_s02",
     "labels": [],
     "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4190&type=PERSONAL_GENERAL&page=2&size=100",
-    "retrievedAt": "2026-05-22T10:16:45.360Z"
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500303429",
+    "productCode": "100168667_ST",
+    "name": "Lingongrova, Guldkorn",
+    "brand": "Pågen",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 19,
+    "priceText": "19 kr/st",
+    "comparePriceText": "38,00/kg",
+    "regularPriceText": "25.5",
+    "savePriceText": "Spara 6,50-11,23 kr",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "brod-och-kakor|brod|matbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311071330525_C1L1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298172",
+    "productCode": "101017249_ST",
+    "name": "Svenskt smör",
+    "brand": "Arla",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39.95,
+    "priceText": "39,95 kr/st",
+    "comparePriceText": "79,90/kg",
+    "regularPriceText": "64.3",
+    "savePriceText": "Spara 22,46 kr",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|smor-margarin-och-jast|smor-och-margarin",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298127",
+    "productCode": "101183319_ST",
+    "name": "Smörgåspålägg",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "116,67-175,00/kg",
+    "regularPriceText": "25.5",
+    "savePriceText": "Spara 15,44-23,00 kr",
+    "packageText": "80-120g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "kott-fagel-och-chark|palagg|skivat-palagg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041071748_C1N1_s03",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500299506",
+    "productCode": "101241262_ST",
+    "name": "Kaffe",
+    "brand": "Zoégas",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 59.95,
+    "priceText": "59,95 kr/st",
+    "comparePriceText": "133,22/kg",
+    "regularPriceText": "86.07",
+    "savePriceText": "Spara 10,98-26,17 kr",
+    "packageText": "450g",
+    "conditionText": "",
+    "redeemLimitText": "Max 2 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|kaffe|bryggkaffe",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310731101666_C1R1_s05",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298024",
+    "productCode": "101222356_ST",
+    "name": "Kycklinginnerfilé",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46.95,
+    "priceText": "46,95 kr/st",
+    "comparePriceText": "67,07/kg",
+    "regularPriceText": "62.97",
+    "savePriceText": "Spara 12,62 kr",
+    "packageText": "700g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fryst|kott-och-kyckling|kyckling-och-ovrig-fagel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083434723_C1C1_s03",
+    "labels": [
+      "swedish_flag",
+      "swedish_bird"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298454",
+    "productCode": "101251544_ST",
+    "name": "Styckglass",
+    "brand": "Sia Glass",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 10,
+    "priceText": "10 kr/st",
+    "comparePriceText": "10,00/st",
+    "regularPriceText": "22.7",
+    "savePriceText": "Spara 1,40-19,30 kr",
+    "packageText": "40-210ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fryst|glass|styckglass",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07312690117016_C1N1_s02",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298365",
+    "productCode": "100364008_ST",
+    "name": "Olivolja Classico",
+    "brand": "Zeta",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 66,
+    "priceText": "66 kr/st",
+    "comparePriceText": "132,00/l",
+    "regularPriceText": "89.91",
+    "savePriceText": "Spara 4,93-16,29 kr",
+    "packageText": "500ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|olja-och-vinager|olja",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350002400333_C1N1_s08",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298362",
+    "productCode": "101206348_ST",
+    "name": "Prosciutto Crudo",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "18 kr/st",
+    "comparePriceText": "225,00/kg",
+    "regularPriceText": "39.7",
+    "savePriceText": "Spara 19,80 kr",
+    "packageText": "80g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "kott-fagel-och-chark|medelhavschark",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427923_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298307",
+    "productCode": "101532475_ST",
+    "name": "Riven ost",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "18 kr/st",
+    "comparePriceText": "120,00/kg",
+    "regularPriceText": "24.55",
+    "savePriceText": "Spara 4,66-5,61 kr",
+    "packageText": "150g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005802_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298397",
+    "productCode": "101692668_ST",
+    "name": "Vannameiräkor",
+    "brand": "Leröy",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49.95,
+    "priceText": "49,95 kr/st",
+    "comparePriceText": "227,05/kg",
+    "regularPriceText": "75.66",
+    "savePriceText": "Spara 23,82 kr",
+    "packageText": "220g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fisk-och-skaldjur|skaldjur|farska-skaldjur",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07317370106588_C1N1_s01",
+    "labels": [
+      "asc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298293",
+    "productCode": "100638035_ST",
+    "name": "Start! Naturell",
+    "brand": "Lantmännen",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "28 kr/st",
+    "comparePriceText": "37,33/kg",
+    "regularPriceText": "37.8",
+    "savePriceText": "Spara 9,80 kr",
+    "packageText": "750g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|flingor-och-musli|musli-crunchy-och-granola",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130801709_C1R1_s07",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298020",
+    "productCode": "101229322_ST",
+    "name": "Tvättmedel, Sköljmedel",
+    "brand": "Fixa",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "0,40-0,95 kr/tvätt",
+    "regularPriceText": "32.95",
+    "savePriceText": "Spara 11,95 kr",
+    "packageText": "750g, 750ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "hem-och-hushall|tvatt|tvattmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436864_C1L1_s04",
+    "labels": [
+      "swan",
+      "warning",
+      "exclamation_mark",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500303814",
+    "productCode": "101291350_ST",
+    "name": "Hälsa",
+    "brand": "Östras",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "33,33/kg",
+    "regularPriceText": "34.97",
+    "savePriceText": "Spara 14,97 kr",
+    "packageText": "600g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "brod-och-kakor|brod|matbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07314320041029_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298200",
+    "productCode": "101264126_ST",
+    "name": "Tandkräm",
+    "brand": "Oral-B",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 16,
+    "priceText": "16 kr/st",
+    "comparePriceText": "213,33/l",
+    "regularPriceText": "32.95",
+    "savePriceText": "Spara 11,95-14,95 kr",
+    "packageText": "75ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "halsa-och-skonhet|munvard|tandkram",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08001090291035_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298198",
+    "productCode": "101542405_ST",
+    "name": "Schampo, Balsam",
+    "brand": "Head & Shoulders",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "30 kr/st",
+    "comparePriceText": "120,00-136,36/l",
+    "regularPriceText": "45.95",
+    "savePriceText": "Spara 8,95-17,95 kr",
+    "packageText": "220-250ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "halsa-och-skonhet|harvard|schampo",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216219570_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500299061",
+    "productCode": "101252347_ST",
+    "name": "Grekisk yoghurt",
+    "brand": "Arla",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "28 kr/st",
+    "comparePriceText": "28,00/kg",
+    "regularPriceText": "40.64",
+    "savePriceText": "Spara 5,07-8,86 kr",
+    "packageText": "1kg",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|matlagningsmejerier|matlagningsyoghurt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865095466_C1C1_s06",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298115",
+    "productCode": "101854360_ST",
+    "name": "Sprödbakad fiskfilé",
+    "brand": "Findus",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "35 kr/st",
+    "comparePriceText": "97,22/kg",
+    "regularPriceText": "44.43",
+    "savePriceText": "Spara 8,48 kr",
+    "packageText": "360g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fisk-och-skaldjur|fisk|fryst-fisk",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310500094465_C1N1_s01",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298083",
+    "productCode": "101135095_ST",
+    "name": "Pesto",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "100,00/kg",
+    "regularPriceText": "29.81",
+    "savePriceText": "Spara 8,34 kr",
+    "packageText": "200g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041062654_C1C1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298065",
+    "productCode": "101287807_ST",
+    "name": "Fryst vegetariskt",
+    "brand": "Anamma",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "33 kr/st",
+    "comparePriceText": "73,33-110,00/kg",
+    "regularPriceText": "47.27",
+    "savePriceText": "Spara 13,32-18,05 kr",
+    "packageText": "300-450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "vegetariskt|fryst-vegetariskt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240120189_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500297778",
+    "productCode": "101649567_ST",
+    "name": "Valnötter",
+    "brand": "Exotic snacks",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "25 kr/st",
+    "comparePriceText": "100,00/kg",
+    "regularPriceText": "47.27",
+    "savePriceText": "Tillfälligt klipp",
+    "packageText": "250g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391814009109_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298306",
+    "productCode": "101328356_ST",
+    "name": "Parmigiano Reggiano",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "33 kr/st",
+    "comparePriceText": "220,00/kg",
+    "regularPriceText": "47.27",
+    "savePriceText": "Spara 14,27 kr",
+    "packageText": "150g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "21/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083488511_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298048",
+    "productCode": "101245383_ST",
+    "name": "Crème fraiche",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22,
+    "priceText": "22 kr/st",
+    "comparePriceText": "44,00/l",
+    "regularPriceText": "33.02",
+    "savePriceText": "Spara 2,55-12,97 kr",
+    "packageText": "5dl",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "21/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|matlagningsmejerier|creme-fraiche",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083448638_C1N1_s06",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500303714",
+    "productCode": "101599080_ST",
+    "name": "Ekologisk blandfärs",
+    "brand": "Garant Eko",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 59.95,
+    "priceText": "59,95 kr/st",
+    "comparePriceText": "119,90/kg",
+    "regularPriceText": "75.77",
+    "savePriceText": "Spara 10,03 kr",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "kott-fagel-och-chark|kott|kottfars",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043011957_C1N1_s02",
+    "labels": [
+      "ecological",
+      "krav",
+      "swedish_flag",
+      "meat_from_sweden",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500303868",
+    "productCode": "101839908_ST",
+    "name": "Potatissallad",
+    "brand": "Rydbergs",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "35 kr/st",
+    "comparePriceText": "46,67/kg",
+    "regularPriceText": "47.27",
+    "savePriceText": "Spara 8,48 kr",
+    "packageText": "750g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fardigmat|gratang-och-roror|kramiga-sallader",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160020447_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307473",
+    "productCode": "100151933_ST",
+    "name": "Avokado",
+    "brand": "",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 5,
+    "priceText": "5 kr/st",
+    "comparePriceText": "ca 29,41/kg",
+    "regularPriceText": "13.78",
+    "savePriceText": "Spara 8,50 kr",
+    "packageText": "170g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "21/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|gronsaker|avokado",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042000662_C1N0_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307476",
+    "productCode": "100816306_ST",
+    "name": "Röd spetspaprika",
+    "brand": "",
+    "storeId": "4798",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 15,
+    "priceText": "15 kr/st",
+    "comparePriceText": "75,00/kg",
+    "regularPriceText": "22.1",
+    "savePriceText": "Spara 5,80 kr",
+    "packageText": "200g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|gronsaker|paprika",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042001683_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500309494",
+    "productCode": "101261444_ST",
+    "name": "Surdegsbröd",
+    "brand": "La Lorraine",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "25 kr/st",
+    "comparePriceText": "55,56/kg",
+    "regularPriceText": "37.8",
+    "savePriceText": "Spara 12,80 kr",
+    "packageText": "450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "brod-och-kakor|brod|baguetter-och-losbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031135473_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298572",
+    "productCode": "101269568_ST",
+    "name": "Tutti Frutti, Tyrkisk Peber",
+    "brand": "Fazer",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 13.95,
+    "priceText": "13,95 kr/st",
+    "comparePriceText": "77,50-93,00/kg",
+    "regularPriceText": "21.72",
+    "savePriceText": "Spara 4,93-5,87 kr",
+    "packageText": "150-180g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "godis-snacks-och-glass|godis|godispasar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06416453038288_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298437",
+    "productCode": "101240779_ST",
+    "name": "Färskost",
+    "brand": "Arla",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14.95,
+    "priceText": "14,95 kr/st",
+    "comparePriceText": "99,67/kg",
+    "regularPriceText": "20.77",
+    "savePriceText": "Spara 4,87 kr",
+    "packageText": "150g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|ost|farskost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05711953029912_C1C1_s07",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298399",
+    "productCode": "101845036_ST",
+    "name": "Barnmat",
+    "brand": "Hipp",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "60,00-78,95/kg",
+    "regularPriceText": "20.77",
+    "savePriceText": "Spara 2,08-12,58 kr",
+    "packageText": "190-250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "barn|barnmat-och-fruktdryck|barnmat-8-man",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04062300483064_C1N1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500299078",
+    "productCode": "101469546_ST",
+    "name": "Glass 4-pack",
+    "brand": "Häagen-Dazs",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49.95,
+    "priceText": "49,95 kr/st",
+    "comparePriceText": "12,49/st",
+    "regularPriceText": "59.57",
+    "savePriceText": "Tillfälligt klipp",
+    "packageText": "4x95ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fryst|glass|glasspaket",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03415581520927_C1C1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298803",
+    "productCode": "101250413_ST",
+    "name": "Kattmat",
+    "brand": "Mjau",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14.95,
+    "priceText": "14,95 kr/st",
+    "comparePriceText": "39,34-40,41/kg",
+    "regularPriceText": "18.95",
+    "savePriceText": "",
+    "packageText": "370-380g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "djur|katt|kattmat-vat",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300330038104_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500302260",
+    "productCode": "101719942_ST",
+    "name": "Mild kvarg",
+    "brand": "Arla",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 17.95,
+    "priceText": "17,95 kr/st",
+    "comparePriceText": "39,89/kg",
+    "regularPriceText": "25.08",
+    "savePriceText": "Spara 5,23 kr",
+    "packageText": "450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|kvarg-och-cottage-cheese-|kvarg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04016241051035_C1C1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298135",
+    "productCode": "101333968_ST",
+    "name": "Majonnäs, Dressing",
+    "brand": "Hellmann's",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.95,
+    "priceText": "24,95 kr/st",
+    "comparePriceText": "99,80-101,84/l",
+    "regularPriceText": "31.18",
+    "savePriceText": "Spara 1,50-5,28 kr",
+    "packageText": "245-250ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|kryddor-och-smaksattare|dressingar-och-majonnas-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08710522882207_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298402",
+    "productCode": "101800163_ST",
+    "name": "Bindor, Trosskydd",
+    "brand": "Always",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46.95,
+    "priceText": "46,95 kr/st",
+    "comparePriceText": "0,78-3,91/st",
+    "regularPriceText": "",
+    "savePriceText": "Spara 3,00-6,00 kr",
+    "packageText": "12-60-pack",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "halsa-och-skonhet|intimhygien|bindor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216213837_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298400",
+    "productCode": "100308301_ST",
+    "name": "Grillkorv",
+    "brand": "Scan",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 85,
+    "priceText": "2 för 85 kr",
+    "comparePriceText": "66,41-106,25/kg",
+    "regularPriceText": "52.0",
+    "savePriceText": "Spara 7,64-15,22 kr",
+    "packageText": "400-640g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "kott-fagel-och-chark|korv|grill-och-kryddkorv",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300207071005_C1N1_s04",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298080",
+    "productCode": "101829580_ST",
+    "name": "Mjukost",
+    "brand": "Fjällbrynt",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26.95,
+    "priceText": "26,95 kr/st",
+    "comparePriceText": "122,50/kg",
+    "regularPriceText": "35.91",
+    "savePriceText": "Spara 7,07 kr",
+    "packageText": "220g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|ost|mjukost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160020287_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298078",
+    "productCode": "101512430_ST",
+    "name": "Varmkorv",
+    "brand": "Lithells",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34.95,
+    "priceText": "34,95 kr/st",
+    "comparePriceText": "97,08/kg",
+    "regularPriceText": "43.48",
+    "savePriceText": "Spara 6,64 kr",
+    "packageText": "360g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "kott-fagel-och-chark|korv|varm-och-wienerkorv",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310628008894_C1L1_s02",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298059",
+    "productCode": "101225562_ST",
+    "name": "Havreflingor",
+    "brand": "Frebaco Kvarn",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "57,14/kg",
+    "regularPriceText": "26.02",
+    "savePriceText": "Spara 3,18-4,55 kr",
+    "packageText": "350g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|flingor-och-musli|flingor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07312560057404_C1R1_s06",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307475",
+    "productCode": "101174339_ST",
+    "name": "Förkokt majs",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "44,44/kg",
+    "regularPriceText": "24.72",
+    "savePriceText": "",
+    "packageText": "450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|gronsaker|ovriga-gronsaker",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042001461_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307469",
+    "productCode": "101209021_ST",
+    "name": "Jordgubbar",
+    "brand": "",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "28 kr/st",
+    "comparePriceText": "70,00/kg",
+    "regularPriceText": "57.8",
+    "savePriceText": "",
+    "packageText": "400g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|bar|farska-bar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042004943_C1L1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307481",
+    "productCode": "100594965_ST",
+    "name": "Svensk gurka",
+    "brand": "",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25 kr",
+    "comparePriceText": "ca 40,32/kg",
+    "regularPriceText": "17.93",
+    "savePriceText": "",
+    "packageText": "310g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|gronsaker|gurka",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042004691_C1N1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307468",
+    "productCode": "101283986_ST",
+    "name": "Rosor 10-pack",
+    "brand": "",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39.95,
+    "priceText": "39,95 kr/st",
+    "comparePriceText": "",
+    "regularPriceText": "49.95",
+    "savePriceText": "",
+    "packageText": "",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:58.000Z",
+    "category": "blommor-och-tillbehor|snittblommor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042013150_C1C0_s01",
+    "labels": [
+      "fairtrade",
+      "fairtrade_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307482",
+    "productCode": "101178320_ST",
+    "name": "Nektariner",
+    "brand": "",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29.95,
+    "priceText": "29,95 kr/st",
+    "comparePriceText": "59,90/kg",
+    "regularPriceText": "45.4",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|frukt|exotisk-frukt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042005896_C1R1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164202",
+    "productCode": "101594877_ST",
+    "name": "BLÖJPÅSE 2FÖR28",
+    "brand": "Minstingen",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.95",
+    "savePriceText": "",
+    "packageText": "50p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|barnvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043011834_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164203",
+    "productCode": "101260398_ST",
+    "name": "EKO BARNM. 3FÖR28",
+    "brand": "Minstingen",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "3 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "90g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|barnmat-och-fruktdryck|barnmat-5-6-man",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083453977_C1N1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164204",
+    "productCode": "101261711_ST",
+    "name": "EKO BARNM. 3FÖR34",
+    "brand": "Minstingen",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34,
+    "priceText": "3 för 34 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "120g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|grot-och-valling",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083453946_C1N1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164205",
+    "productCode": "101258703_ST",
+    "name": "FRUKTST 3FÖR25",
+    "brand": "Nestlé",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "3 för 25 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.36",
+    "savePriceText": "",
+    "packageText": "25g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|barnsnacks",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613035497641_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164206",
+    "productCode": "101314330_ST",
+    "name": "MINSTING 2FÖR165",
+    "brand": "Minstingen",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 165,
+    "priceText": "2 för 165 kr",
+    "comparePriceText": "",
+    "regularPriceText": "86.95",
+    "savePriceText": "",
+    "packageText": "50p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|blojor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083481826_C1N1_s04",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164207",
+    "productCode": "101353715_ST",
+    "name": "MINSTINGEN2FÖR175",
+    "brand": "Minstingen",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 175,
+    "priceText": "2 för 175 kr",
+    "comparePriceText": "",
+    "regularPriceText": "92.0",
+    "savePriceText": "",
+    "packageText": "42p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|blojor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492709_C1N1_s01",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164208",
+    "productCode": "101278144_ST",
+    "name": "M-SNACK 2FÖR18",
+    "brand": "Minstingen",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "2 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "20g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|barnsnacks",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083465871_C1N1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164209",
+    "productCode": "101202634_ST",
+    "name": "SMOOTHIE 3FÖR31",
+    "brand": "Nestlé",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 31,
+    "priceText": "3 för 31 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "90g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|barnmat-och-fruktdryck|barnmat-5-6-man",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613033881824_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164210",
+    "productCode": "101353358_ST",
+    "name": "VÅTSERV. 2FÖR30",
+    "brand": "Minstingen",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.95",
+    "savePriceText": "",
+    "packageText": "63p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|barnvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492471_C1N1_s01",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164211",
+    "productCode": "101353275_ST",
+    "name": "VÅTSERVET. 2FÖR24",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24,
+    "priceText": "2 för 24 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.95",
+    "savePriceText": "",
+    "packageText": "72p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|barnvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492488_C1N1_s01",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164212",
+    "productCode": "101094539_ST",
+    "name": "FELIX RÄTT 2FÖR80",
+    "brand": "Felix",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 80,
+    "priceText": "2 för 80 kr",
+    "comparePriceText": "",
+    "regularPriceText": "49.16",
+    "savePriceText": "",
+    "packageText": "380g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|portionsratter|enportioner",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240076806_C1L1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164213",
+    "productCode": "100127211_ST",
+    "name": "FINDUSRÄTT 2FÖR65",
+    "brand": "Findus",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "37.8",
+    "savePriceText": "",
+    "packageText": "400g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|portionsratter|enportioner",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310500040127_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164214",
+    "productCode": "101277258_ST",
+    "name": "FRYST BLÅB 2FÖR37",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.95",
+    "savePriceText": "",
+    "packageText": "225g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "frukt-och-gront|bar|frysta-bar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083465413_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164215",
+    "productCode": "101302035_ST",
+    "name": "FRYST HALLON 2F52",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 52,
+    "priceText": "2 för 52 kr",
+    "comparePriceText": "",
+    "regularPriceText": "28.34",
+    "savePriceText": "",
+    "packageText": "225g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "frukt-och-gront|bar|frysta-bar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083478321_C1L1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164216",
+    "productCode": "101259156_ST",
+    "name": "GLASS 2FÖR61",
+    "brand": "Dazzley",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 61,
+    "priceText": "2 för 61 kr",
+    "comparePriceText": "",
+    "regularPriceText": "35.91",
+    "savePriceText": "",
+    "packageText": "0,9l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|glass|glasspaket",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041081198_C1L1_s03",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164217",
+    "productCode": "101229946_ST",
+    "name": "GRÖNSAKER 2FÖR37",
+    "brand": "Garant Eko",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.66",
+    "savePriceText": "",
+    "packageText": "450g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|gronsaker|gronsaker-och-rotfrukter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083439513_C1N1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164218",
+    "productCode": "101667272_ST",
+    "name": "HACK GRÖNS 2FÖR25",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|gronsaker|gronsaker-och-rotfrukter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015092_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164219",
+    "productCode": "101174269_ST",
+    "name": "JORDGUBBAR 2FÖR33",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "225g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "frukt-och-gront|bar|frysta-bar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041060322_C1L1_s04",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164220",
+    "productCode": "101424647_ST",
+    "name": "LOHILO 2FÖR65",
+    "brand": "Lohilo",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "39.7",
+    "savePriceText": "",
+    "packageText": "0,35l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|glass|glasspaket",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07398818389985_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164221",
+    "productCode": "101264516_ST",
+    "name": "MANGO 2FÖR36",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "2 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "225g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "frukt-och-gront|bar|frysta-bar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083457036_C1L1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164222",
+    "productCode": "101502740_ST",
+    "name": "PASTABOWL 2FÖR70",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 70,
+    "priceText": "2 för 70 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "370g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|portionsratter|enportioner",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004416_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164223",
+    "productCode": "101261058_ST",
+    "name": "PIZZA 2FÖR55",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "32.13",
+    "savePriceText": "",
+    "packageText": "350g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|pizza-paj-och-piroger|pizza",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083455155_C1L1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164224",
+    "productCode": "101152404_ST",
+    "name": "SOJABÖNOR 2FÖR33",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|gronsaker|gronsaker-och-rotfrukter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041065075_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164225",
+    "productCode": "101544831_ST",
+    "name": "SURIMI 3FÖR28",
+    "brand": "Vici",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "3 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|fisk-och-skaldjur|skaldjur-och-havsdelikatesser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04770190161046_C1N1_s01",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164226",
+    "productCode": "101433526_ST",
+    "name": "WOKMIX 2FÖR42",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 42,
+    "priceText": "2 för 42 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.55",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|gronsaker|wok",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083499913_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164227",
+    "productCode": "101199266_ST",
+    "name": "DREAMIES 2FÖR35",
+    "brand": "Dreamies",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.95",
+    "savePriceText": "",
+    "packageText": "60g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04008429037894_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164228",
+    "productCode": "101603430_ST",
+    "name": "HUNDMAT 4FÖR45",
+    "brand": "Smart Pets",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 45,
+    "priceText": "4 för 45 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.95",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|hund|hundmat-vat",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088692_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164229",
+    "productCode": "101279773_ST",
+    "name": "HUNDPÅSAR 3FÖR29",
+    "brand": "First Price",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29,
+    "priceText": "3 för 29 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.95",
+    "savePriceText": "",
+    "packageText": "50p",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|hund|hundtillbehor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083467622_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164230",
+    "productCode": "101549503_ST",
+    "name": "HUNDTILLTUGG 2F32",
+    "brand": "Smart Pets",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "55g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|hund|hundgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088227_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164231",
+    "productCode": "101550213_ST",
+    "name": "KATTGODIS 2FÖR26",
+    "brand": "Smart Pets",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "2 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.95",
+    "savePriceText": "",
+    "packageText": "50g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088128_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164232",
+    "productCode": "101550348_ST",
+    "name": "KATTGODIS 2FÖR29",
+    "brand": "Smart Pets",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29,
+    "priceText": "2 för 29 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.95",
+    "savePriceText": "",
+    "packageText": "25g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088104_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164233",
+    "productCode": "101739618_ST",
+    "name": "KATTMOUSSE 4FÖR30",
+    "brand": "Smart Pets",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "4 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "9.95",
+    "savePriceText": "",
+    "packageText": "85g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattmat-vat",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041089002_C1C1_s01",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164234",
+    "productCode": "101547841_ST",
+    "name": "KATTPATE 3FÖR20",
+    "brand": "Smart Pets",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "3 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "9.5",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattmat-vat",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088029_C1N1_s01",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164235",
+    "productCode": "101242816_ST",
+    "name": "MJAU 4FÖR35",
+    "brand": "Mjau",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "4 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "9.95",
+    "savePriceText": "",
+    "packageText": "85g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattmat-vat",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300330035110_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164236",
+    "productCode": "101550616_ST",
+    "name": "PARTYPUFF 2FÖR32",
+    "brand": "Mjau",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.95",
+    "savePriceText": "",
+    "packageText": "60g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311030712034_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164237",
+    "productCode": "101175745_ST",
+    "name": "ENERGIDR.  2FÖR32",
+    "brand": "Monster Energy",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "50cl",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|sport-och-energidryck|energidryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05060166694777_C1N1_s01",
+    "labels": [
+      "age_restricted_15"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164238",
+    "productCode": "101705852_ST",
+    "name": "ISTE 3FÖR18",
+    "brand": "Premier",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "3 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "7.52",
+    "savePriceText": "",
+    "packageText": "33cl",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|saft-och-stilldrink|iste-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612404501_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164239",
+    "productCode": "100197136_ST",
+    "name": "LOKA 2FÖR20",
+    "brand": "Loka",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "1.5l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|vatten|vatten-stor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401000060_C1N1_s05",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164240",
+    "productCode": "100198260_ST",
+    "name": "LÄSK 2FÖR32",
+    "brand": "Champis",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.95",
+    "savePriceText": "",
+    "packageText": "1,5l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|lask|lask-stor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401000367_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164241",
+    "productCode": "101549387_ST",
+    "name": "POWERKI 2FÖR23",
+    "brand": "Powerking",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "50cl",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|sport-och-energidryck|energidryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612222389_C1N1_s01",
+    "labels": [
+      "age_restricted_15"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164242",
+    "productCode": "101175130_ST",
+    "name": "POWERKI 4FÖR24",
+    "brand": "Powerking",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24,
+    "priceText": "4 för 24 kr",
+    "comparePriceText": "",
+    "regularPriceText": "9.41",
+    "savePriceText": "",
+    "packageText": "25cl",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|sport-och-energidryck|energidryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612221351_C1C1_s01",
+    "labels": [
+      "age_restricted_15"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164243",
+    "productCode": "101607963_ST",
+    "name": "PREM LÄSK 4FÖR26",
+    "brand": "Premier",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "4 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "8.47",
+    "savePriceText": "",
+    "packageText": "33cl",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|lask|lask-liten",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612404310_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164244",
+    "productCode": "101290434_ST",
+    "name": "STILLDR 3FÖR33",
+    "brand": "Premier",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "3 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "3p/25cl",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|saft-och-stilldrink|stilldrink",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083474088_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164245",
+    "productCode": "101205991_ST",
+    "name": "VATTEN 2FÖR18",
+    "brand": "Premier",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "2 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.36",
+    "savePriceText": "",
+    "packageText": "1.5l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|vatten|vatten-stor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612513807_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164246",
+    "productCode": "101197310_ST",
+    "name": "ÖL / CIDER 3FÖR35",
+    "brand": "Mariestads",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "3 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "33cl",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|ol-cider-och-vin|alkoholfri-ol-och-lattol",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401009551_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164247",
+    "productCode": "101274593_ST",
+    "name": "ÖL ALKOFRI 4FÖR26",
+    "brand": "Emd Bräu",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "4 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "7.52",
+    "savePriceText": "",
+    "packageText": "33cl",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|ol-cider-och-vin|alkoholfri-ol-och-lattol",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612501552_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164248",
+    "productCode": "101239944_ST",
+    "name": "AJAX SPRAY 2FÖR65",
+    "brand": "Ajax",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "750ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|stad|rengoringsmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08718951039995_C1N1_s07",
+    "labels": [
+      "no_pictogram"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164249",
+    "productCode": "101698356_ST",
+    "name": "COMFORT 2FÖR68",
+    "brand": "Comfort",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 68,
+    "priceText": "2 för 68 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "762ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|tvatt|skoljmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181638695_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164250",
+    "productCode": "101261849_ST",
+    "name": "DISKTABLET 2FÖR75",
+    "brand": "Såklart",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 75,
+    "priceText": "2 för 75 kr",
+    "comparePriceText": "",
+    "regularPriceText": "45.95",
+    "savePriceText": "",
+    "packageText": "30p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|disk|maskindisk",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083459139_C1L1_s02",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "warning",
+      "exclamation_mark",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164251",
+    "productCode": "101353276_ST",
+    "name": "STÄDSERV. 2FÖR35",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.5",
+    "savePriceText": "",
+    "packageText": "70p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|stad|rengoringsmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492518_C1N1_s01",
+    "labels": [
+      "environmental_choice",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164252",
+    "productCode": "101475566_ST",
+    "name": "TOA/HUSPAP 2FÖR70",
+    "brand": "Fixa",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 70,
+    "priceText": "2 för 70 kr",
+    "comparePriceText": "",
+    "regularPriceText": "37.95",
+    "savePriceText": "",
+    "packageText": "4p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|toalett-och-hushallspapper|hushallspapper",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043002009_C1L1_s02",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164253",
+    "productCode": "101229322_ST",
+    "name": "TVÄTT/SKÖL 2FÖR58",
+    "brand": "Fixa",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 58,
+    "priceText": "2 för 58 kr",
+    "comparePriceText": "",
+    "regularPriceText": "32.95",
+    "savePriceText": "",
+    "packageText": "750g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|tvatt|tvattmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436864_C1L1_s04",
+    "labels": [
+      "swan",
+      "warning",
+      "exclamation_mark",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164254",
+    "productCode": "101815929_ST",
+    "name": "TVÄTTKAPSL 2FÖR79",
+    "brand": "Fixa",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 79,
+    "priceText": "2 för 79 kr",
+    "comparePriceText": "",
+    "regularPriceText": "44.95",
+    "savePriceText": "",
+    "packageText": "16p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|tvatt|tvattmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043024926_C1N1_s01",
+    "labels": [
+      "swan",
+      "warning",
+      "exclamation_mark",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164255",
+    "productCode": "101344145_ST",
+    "name": "WC-RENGÖR. 2FÖR35",
+    "brand": "Wc Bref",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "1p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|stad|luftfraschare",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05201395121737_C1N1_s01",
+    "labels": [
+      "danger",
+      "corrosion"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164256",
+    "productCode": "100275033_ST",
+    "name": "KICK KOLA 3FÖR14",
+    "brand": "Malaco",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14,
+    "priceText": "3 för 14 kr",
+    "comparePriceText": "",
+    "regularPriceText": "5.63",
+    "savePriceText": "",
+    "packageText": "19g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|godis|godispasar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05700417006804_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164257",
+    "productCode": "101545419_ST",
+    "name": "MALACO 2FÖR23",
+    "brand": "Malaco",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "90g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|godis|godispasar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350136902_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164258",
+    "productCode": "101545635_ST",
+    "name": "STYCKSAKER 3FÖR27",
+    "brand": "Snickers",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 27,
+    "priceText": "3 för 27 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "50g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|choklad|chokladkakor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05900951311505_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164259",
+    "productCode": "100059393_ST",
+    "name": "STYCKSAKER 3FÖR28",
+    "brand": "Marabou",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "3 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "46g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|choklad|chokladgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622201047764_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164260",
+    "productCode": "100017688_ST",
+    "name": "TOMS STÅNG 3FÖR11",
+    "brand": "Toms",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 11,
+    "priceText": "3 för 11 kr",
+    "comparePriceText": "",
+    "regularPriceText": "5.63",
+    "savePriceText": "",
+    "packageText": "27g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|godis|godispasar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000057402376_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164261",
+    "productCode": "100073340_ST",
+    "name": "TUGGUMMI 2FÖR33",
+    "brand": "Extra",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "29g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|tuggummi",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04009900390309_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164262",
+    "productCode": "101195056_ST",
+    "name": "ANSIKTSSER 2FÖR40",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 40,
+    "priceText": "2 för 40 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.95",
+    "savePriceText": "",
+    "packageText": "150p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|nasdukar-och-bomull",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083401633_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164263",
+    "productCode": "101499176_ST",
+    "name": "AVSMINK. 2FÖR24",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24,
+    "priceText": "2 för 24 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.95",
+    "savePriceText": "",
+    "packageText": "25st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|ansiktsvard-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043003563_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164264",
+    "productCode": "101354900_ST",
+    "name": "BARNÄNGEN 2FÖR40",
+    "brand": "Barnängen",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 40,
+    "priceText": "2 för 40 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.95",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|harvard|schampo",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531106368_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164265",
+    "productCode": "101318906_ST",
+    "name": "INTUITION 2FÖR32",
+    "brand": "Intuition",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.95",
+    "savePriceText": "",
+    "packageText": "14p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|intimhygien|bindor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083483097_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164266",
+    "productCode": "101578493_ST",
+    "name": "MEVVÅTSER2FÖR39",
+    "brand": "Mevolution",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.95",
+    "savePriceText": "",
+    "packageText": "30p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|nasdukar-och-bomull",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043010103_C1N1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164267",
+    "productCode": "101339951_ST",
+    "name": "PADS/PINN 2FÖR28",
+    "brand": "Mevolution",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.95",
+    "savePriceText": "",
+    "packageText": "200p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|nasdukar-och-bomull",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489235_C1L1_s02",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164268",
+    "productCode": "101662844_ST",
+    "name": "PALETTE 2FÖR115",
+    "brand": "Palette",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 115,
+    "priceText": "2 för 115 kr",
+    "comparePriceText": "",
+    "regularPriceText": "69.95",
+    "savePriceText": "",
+    "packageText": "1st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|harvard|harfarg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531122757_C1R1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164269",
+    "productCode": "101353772_ST",
+    "name": "PLÅSTER 2FÖR38",
+    "brand": "Mevolution",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 38,
+    "priceText": "2 för 38 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.95",
+    "savePriceText": "",
+    "packageText": "40p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "apotek-och-lakemedel|plaster|plaster-och-sarvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492785_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164270",
+    "productCode": "101339963_ST",
+    "name": "PUMPTVÅL 2FÖR26",
+    "brand": "Mevolution",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "2 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.95",
+    "savePriceText": "",
+    "packageText": "300ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|tval",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489358_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164271",
+    "productCode": "101542359_ST",
+    "name": "TANDKRÄM 2FÖR30",
+    "brand": "Mevolution",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.95",
+    "savePriceText": "",
+    "packageText": "125ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|munvard|tandkram",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006489_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164272",
+    "productCode": "101339860_ST",
+    "name": "TANDVÅRD 2FÖR39",
+    "brand": "Mevolution",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.95",
+    "savePriceText": "",
+    "packageText": "40p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|munvard|ovrig-munvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489051_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164273",
+    "productCode": "101339965_ST",
+    "name": "TVÅLREFILL 2FÖR38",
+    "brand": "Mevolution",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 38,
+    "priceText": "2 för 38 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.95",
+    "savePriceText": "",
+    "packageText": "750ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|tval",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489372_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164274",
+    "productCode": "101245841_ST",
+    "name": "EST NÖTMIX 2FÖR55",
+    "brand": "Estrella",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "34.02",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|notter-och-snacks",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532151211_C1N1_s05",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164275",
+    "productCode": "101226667_ST",
+    "name": "GÅRDSCHIPS 2FÖR46",
+    "brand": "Gårdschips",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "30.95",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|chips-och-ostbagar|chips",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350045591050_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164276",
+    "productCode": "101286110_ST",
+    "name": "POPCORN 2FÖR37",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "270g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|popcorn",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471209_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164277",
+    "productCode": "101300808_ST",
+    "name": "BEKIND 2FÖR35",
+    "brand": "Be-kind",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "40g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|traning-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000159528481_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164278",
+    "productCode": "101231766_ST",
+    "name": "BULJONG 2FÖR23",
+    "brand": "Garant Eko",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "6p/3l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|buljong",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083443251_C1L1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164279",
+    "productCode": "101250198_ST",
+    "name": "BÖN/LIN 2FÖR56",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 56,
+    "priceText": "2 för 56 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "800g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|bonor-och-baljvaxter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083450549_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164280",
+    "productCode": "101245204_ST",
+    "name": "BÖNOR 2FÖR20",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "380/230g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|bonor-och-baljvaxter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083446962_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164281",
+    "productCode": "101239059_ST",
+    "name": "CITRUSJ. 2FÖR17",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 17,
+    "priceText": "2 för 17 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "200ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|ovriga-smaksattare",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083444616_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164282",
+    "productCode": "100879239_ST",
+    "name": "CORNY 4FÖR34",
+    "brand": "Corny",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34,
+    "priceText": "4 för 34 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "50g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|halsokost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04011800563516_C1N1_s03",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164283",
+    "productCode": "101608101_ST",
+    "name": "DOLMIO 2FÖR47",
+    "brand": "Dolmio",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 47,
+    "priceText": "2 för 47 kr",
+    "comparePriceText": "",
+    "regularPriceText": "30.23",
+    "savePriceText": "",
+    "packageText": "450g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04002359021022_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164284",
+    "productCode": "101245190_ST",
+    "name": "EKOBÖNOR 3FÖR36",
+    "brand": "Garant Eko",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "3 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.09",
+    "savePriceText": "",
+    "packageText": "380/230g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|bonor-och-baljvaxter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447365_C1L1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164285",
+    "productCode": "101301595_ST",
+    "name": "EKO-PASTA 2FÖR32",
+    "brand": "Garant Eko",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083478024_C1N1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164286",
+    "productCode": "101285455_ST",
+    "name": "EKOTOMAT 3FÖR39",
+    "brand": "Garant Eko",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "3 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.04",
+    "savePriceText": "",
+    "packageText": "390g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|tomatkonserver",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083469619_C1L1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164287",
+    "productCode": "101267427_ST",
+    "name": "ELD. SÅS 2FÖR34",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34,
+    "priceText": "2 för 34 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "320ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|sas-och-smaksattare|sas",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083458507_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164288",
+    "productCode": "101290779_ST",
+    "name": "FUN LIGHT 2FÖR50",
+    "brand": "Fun Light",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 50,
+    "priceText": "2 för 50 kr",
+    "comparePriceText": "",
+    "regularPriceText": "29.95",
+    "savePriceText": "",
+    "packageText": "1l/10l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|lightdryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090389163_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164289",
+    "productCode": "101276700_ST",
+    "name": "GEV KAPSL. 2FÖR69",
+    "brand": "Gevalia",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 69,
+    "priceText": "2 för 69 kr",
+    "comparePriceText": "",
+    "regularPriceText": "41.95",
+    "savePriceText": "",
+    "packageText": "10p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|kapslar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711000379660_C1C0_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164290",
+    "productCode": "101260474_ST",
+    "name": "GF PASTA 2FÖR30",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.98",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|glutenfritt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083454332_C1N1_s01",
+    "labels": [
+      "crossed_ax"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164291",
+    "productCode": "101282537_ST",
+    "name": "GRANOLA 2FÖR73",
+    "brand": "Färsking",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 73,
+    "priceText": "2 för 73 kr",
+    "comparePriceText": "",
+    "regularPriceText": "51.95",
+    "savePriceText": "",
+    "packageText": "375g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|flingor-och-musli|musli-crunchy-och-granola",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350099111129_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164292",
+    "productCode": "101337368_ST",
+    "name": "GRÖTKOPP 2FÖR28",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.95",
+    "savePriceText": "",
+    "packageText": "65g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|flingor-och-musli|grot",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083488351_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164293",
+    "productCode": "101552965_ST",
+    "name": "KAFFE 2FÖR110",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 110,
+    "priceText": "2 för 110 kr",
+    "comparePriceText": "",
+    "regularPriceText": "60.52",
+    "savePriceText": "",
+    "packageText": "450g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|bryggkaffe",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043009312_C1L1_s01",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164294",
+    "productCode": "101345470_ST",
+    "name": "KAFFEKAPS. 2FÖR65",
+    "brand": "Lavazza",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "45.38",
+    "savePriceText": "",
+    "packageText": "10p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|kapslar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08000070053465_C1C1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164295",
+    "productCode": "101548831_ST",
+    "name": "KOKOSMJÖ/G 2FÖR33",
+    "brand": "Garant Eko",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.93",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|kokosmjolk-och-kokosgradde",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043008391_C1L1_s01",
+    "labels": [
+      "ecological",
+      "fairtrade",
+      "eu_ecological",
+      "fairtrade_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164296",
+    "productCode": "101231957_ST",
+    "name": "KOKOSMJÖLK 2FÖR28",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.95",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|kokosmjolk-och-kokosgradde",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083443473_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164297",
+    "productCode": "101287437_ST",
+    "name": "KOPPNUD 2FÖR18",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "2 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.95",
+    "savePriceText": "",
+    "packageText": "65g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|nudlar-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083472299_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164298",
+    "productCode": "101285406_ST",
+    "name": "KROSSTOMAT 3FÖR31",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 31,
+    "priceText": "3 för 31 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "390g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|tomatkonserver",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083469602_C1L1_s03",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164299",
+    "productCode": "101240310_ST",
+    "name": "KRYDDMIX 2FÖR33",
+    "brand": "Santa Maria",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.29",
+    "savePriceText": "",
+    "packageText": "30g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|ovrigt-asien",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310034474_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164300",
+    "productCode": "100724227_ST",
+    "name": "KRYDDOR 2FÖR33",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "50g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|kryddor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041034293_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164362",
+    "productCode": "101584097_ST",
+    "name": "LIP ISTE 2FÖR20",
+    "brand": "Lipton",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "50g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|te-och-chokladdryck|te",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720608006656_C1R1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164363",
+    "productCode": "101282044_ST",
+    "name": "LOR KAPS 3FÖR103",
+    "brand": "L'or",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 103,
+    "priceText": "3 för 103 kr",
+    "comparePriceText": "",
+    "regularPriceText": "46.95",
+    "savePriceText": "",
+    "packageText": "10p",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|kapslar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711000360521_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164364",
+    "productCode": "101607344_ST",
+    "name": "MUSETTI 3FÖR89",
+    "brand": "Musetti",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 89,
+    "priceText": "3 för 89 kr",
+    "comparePriceText": "",
+    "regularPriceText": "36.86",
+    "savePriceText": "",
+    "packageText": "10p",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|kapslar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08004769254058_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164365",
+    "productCode": "101244155_ST",
+    "name": "MÜSLIBAR 2FÖR32",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.93",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|halsokost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083449499_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164366",
+    "productCode": "101068130_ST",
+    "name": "NUDLAR 5FÖR23",
+    "brand": "Samyang Ramen",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "5 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "6.15",
+    "savePriceText": "",
+    "packageText": "85g",
+    "conditionText": "5 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|nudlar-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350035210114_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164367",
+    "productCode": "101267873_ST",
+    "name": "OLIVER 2FÖR37",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.61",
+    "savePriceText": "",
+    "packageText": "260/155g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|oliver-och-delikatesser|oliver",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083459252_C1C1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164368",
+    "productCode": "101332229_ST",
+    "name": "PASTA 3FÖR39",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "3 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.09",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083486920_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164369",
+    "productCode": "101231940_ST",
+    "name": "PASTASÅ 2FÖR42",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 42,
+    "priceText": "2 för 42 kr",
+    "comparePriceText": "",
+    "regularPriceText": "25.5",
+    "savePriceText": "",
+    "packageText": "400g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083443305_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164370",
+    "productCode": "101618323_ST",
+    "name": "POW BAR 2FÖR23",
+    "brand": "Powerking",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "40g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|traning-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612212113_C1N1_s02",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164371",
+    "productCode": "101274717_ST",
+    "name": "PRO.BAR2FÖR36",
+    "brand": "Propud",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "2 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.95",
+    "savePriceText": "",
+    "packageText": "55g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|traning-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068294082_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164372",
+    "productCode": "101201964_ST",
+    "name": "SNABBKAFFE 2FÖ119",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 119,
+    "priceText": "2 för 119 kr",
+    "comparePriceText": "",
+    "regularPriceText": "66.2",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|snabbkaffe",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083409738_C1N1_s02",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164373",
+    "productCode": "101251649_ST",
+    "name": "SNABBNUDL. 4FÖR17",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 17,
+    "priceText": "4 för 17 kr",
+    "comparePriceText": "",
+    "regularPriceText": "6.95",
+    "savePriceText": "",
+    "packageText": "85g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|nudlar-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083450488_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164374",
+    "productCode": "101207616_ST",
+    "name": "SOPPA 3FÖR18",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "3 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "7.09",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|soppor-och-kramer|soppa",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427848_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164375",
+    "productCode": "100148001_ST",
+    "name": "SPAGHE 2FÖR37",
+    "brand": "Kungsörnen",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.61",
+    "savePriceText": "",
+    "packageText": "1kg",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130417405_C1R1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164376",
+    "productCode": "101212270_ST",
+    "name": "SWEBAR 2FÖR35",
+    "brand": "Dalblads",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "25.95",
+    "savePriceText": "",
+    "packageText": "55g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|traning-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350006710704_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164377",
+    "productCode": "101284927_ST",
+    "name": "TACOCHI 2FÖR23",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.09",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|texmex|tacoskal-och-brod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468070_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164378",
+    "productCode": "101336767_ST",
+    "name": "TACOKRYDDA 2FÖR17",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 17,
+    "priceText": "2 för 17 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.36",
+    "savePriceText": "",
+    "packageText": "30g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|texmex|kryddmixer-och-saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083487965_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164379",
+    "productCode": "101345361_ST",
+    "name": "TACOSÅS 2FÖR52",
+    "brand": "El Taco Truck",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 52,
+    "priceText": "2 för 52 kr",
+    "comparePriceText": "",
+    "regularPriceText": "34.97",
+    "savePriceText": "",
+    "packageText": "200ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|texmex|kryddmixer-och-saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350115940061_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164380",
+    "productCode": "101118595_ST",
+    "name": "TE 2FÖR26",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "2 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.09",
+    "savePriceText": "",
+    "packageText": "20p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|te-och-chokladdryck|te",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041059739_C1L1_s02",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164381",
+    "productCode": "101301755_ST",
+    "name": "TONFISK 2FÖR37",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "25.95",
+    "savePriceText": "",
+    "packageText": "170g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|tonfisk-och-makrill",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083478215_C1C1_s02",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164382",
+    "productCode": "101250650_ST",
+    "name": "TORTILL 2FÖR23",
+    "brand": "Banderos",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "320g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|texmex|tacoskal-och-brod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612700092_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164383",
+    "productCode": "101498814_ST",
+    "name": "ÄGGNUDL 2FÖR20",
+    "brand": "Spicefield",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|nudlar-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612121224_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164384",
+    "productCode": "101583516_ST",
+    "name": "BAKPLÅTSP 2FÖR29",
+    "brand": "Fixa",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29,
+    "priceText": "2 för 29 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.95",
+    "savePriceText": "",
+    "packageText": "24p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|matforvaring",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006892_C1N1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164385",
+    "productCode": "101224680_ST",
+    "name": "BLOCKLJUS 2FÖR48",
+    "brand": "Fixa",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 48,
+    "priceText": "2 för 48 kr",
+    "comparePriceText": "",
+    "regularPriceText": "26.95",
+    "savePriceText": "",
+    "packageText": "st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|ljus",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083437212_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164387",
+    "productCode": "101550183_ST",
+    "name": "TVÄTTLAPP. 2FÖR45",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 45,
+    "priceText": "2 för 45 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "100p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|barnvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043007332_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164388",
+    "productCode": "101231351_ST",
+    "name": "NOCCO 2FÖR39",
+    "brand": "Nocco",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.95",
+    "savePriceText": "",
+    "packageText": "33cl",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|sport-och-energidryck|energidryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340131601008_C1N1_s04",
+    "labels": [
+      "age_restricted_15"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164389",
+    "productCode": "101362354_ST",
+    "name": "INTIMVÅTS. 2FÖR25",
+    "brand": "Mevolution",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "20p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083493805_C1N1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164391",
+    "productCode": "101187097_ST",
+    "name": "DISKBORSTE 2FÖR20",
+    "brand": "Fixa",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.5",
+    "savePriceText": "",
+    "packageText": "1p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|disk|disktillbehor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083400087_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164392",
+    "productCode": "101674992_ST",
+    "name": "GLASÖGONPUTS 2F35",
+    "brand": "Fixa",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.95",
+    "savePriceText": "",
+    "packageText": "30p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|klader|ovrigt-klader",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083476686_S01",
+    "labels": [
+      "warning",
+      "flame"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164393",
+    "productCode": "101594876_ST",
+    "name": "HANDSKAR 2FÖR18",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "2 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.95",
+    "savePriceText": "",
+    "packageText": "20p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043011827_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164394",
+    "productCode": "101308929_ST",
+    "name": "MATLÅDA 2FÖR30",
+    "brand": "Nordiska Plast",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.95",
+    "savePriceText": "",
+    "packageText": "st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|matforvaring",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07318140009030_C1L1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164395",
+    "productCode": "101499709_ST",
+    "name": "MUFFINFORM 2FÖR39",
+    "brand": "Fixa",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.95",
+    "savePriceText": "",
+    "packageText": "32p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|matforvaring",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043003389_C1L1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164396",
+    "productCode": "101224743_ST",
+    "name": "PÅSAR 2FÖR32",
+    "brand": "Fixa",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.95",
+    "savePriceText": "",
+    "packageText": "70p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|matforvaring",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436321_C1L1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164397",
+    "productCode": "101527021_ST",
+    "name": "SERVETTER 2FÖR40",
+    "brand": "Fixa",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 40,
+    "priceText": "2 för 40 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.95",
+    "savePriceText": "",
+    "packageText": "20p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|servetter-och-dukar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005277_C1N1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164398",
+    "productCode": "101255722_ST",
+    "name": "SOPPÅSE 2FÖR39",
+    "brand": "Fixa",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.95",
+    "savePriceText": "",
+    "packageText": "25st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|stad|stadutrustning",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083452468_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164399",
+    "productCode": "101255725_ST",
+    "name": "SOPPÅSE 2FÖR55",
+    "brand": "Fixa",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "33.95",
+    "savePriceText": "",
+    "packageText": "30l/25st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|stad|stadutrustning",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083452482_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164400",
+    "productCode": "101203406_ST",
+    "name": "PAJ 2FÖR55",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "30.23",
+    "savePriceText": "",
+    "packageText": "220g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|pizza-paj-och-piroger|paj-och-piroger",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083405679_C1L1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164403",
+    "productCode": "101298386_ST",
+    "name": "ELD RAPSOLJA",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.55,
+    "priceText": "24,55 kr/st",
+    "comparePriceText": "",
+    "regularPriceText": "24.55",
+    "savePriceText": "",
+    "packageText": "1l",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|olja-och-vinager|olja",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083477089_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164404",
+    "productCode": "101225898_ST",
+    "name": "TOALETTPAPP. 18-P",
+    "brand": "Fixa",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 109,
+    "priceText": "109 kr/st",
+    "comparePriceText": "",
+    "regularPriceText": "109.0",
+    "savePriceText": "",
+    "packageText": "18p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|toalett-och-hushallspapper|toalettpapper",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083434389_C1L1_s04",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164301",
+    "productCode": "100379332_ST",
+    "name": "BULLAR 4FÖR23",
+    "brand": "Dahls Bageri",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "4 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "45g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kondis-och-fika|kaffebrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350029734329_C1C0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164302",
+    "productCode": "101243975_ST",
+    "name": "DUOKAKOR 2FÖR28",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.04",
+    "savePriceText": "",
+    "packageText": "176g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kex-och-kakor|sota-kakor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083446733_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164303",
+    "productCode": "100380678_ST",
+    "name": "FRALLOR 4FÖR23",
+    "brand": "Dahls Bageri",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "4 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "70g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|brod|baguetter-och-losbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350029733018_C1C0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164304",
+    "productCode": "101599862_ST",
+    "name": "GÖT MATKEX 2FÖR25",
+    "brand": "Göteborgs Kex",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "74g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kex-och-kakor|kex",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310520022097_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164305",
+    "productCode": "101237094_ST",
+    "name": "HAMBRÖD 2FÖR42",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 42,
+    "priceText": "2 för 42 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|korv-och-hamburgerbrod|hamburgerbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083444388_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164306",
+    "productCode": "101544622_ST",
+    "name": "KAFFEBRÖD 2FÖR25",
+    "brand": "Bonjour",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kondis-och-fika|kaffebrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05701014078515_C1C0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164307",
+    "productCode": "100145647_ST",
+    "name": "KAFFEBRÖD 3FÖR27",
+    "brand": "Bonjour",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 27,
+    "priceText": "3 för 27 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kondis-och-fika",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391288643007_C1C0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164308",
+    "productCode": "101417664_ST",
+    "name": "KAKOR 2FÖR36",
+    "brand": "Dazzley",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "2 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kex-och-kakor|sota-kakor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041086391_C1N1_s03",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164309",
+    "productCode": "100127364_ST",
+    "name": "KAFFEBRÖD 3FÖR33",
+    "brand": "Bonjour",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "3 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391288322100_C1C0_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164310",
+    "productCode": "101344022_ST",
+    "name": "MAJSKAKA 2FÖR33",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "125g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|ris-och-majskakor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490552_C1N1_s01",
+    "labels": [
+      "crossed_ax"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164311",
+    "productCode": "100209178_ST",
+    "name": "MATBRÖD 2FÖR18",
+    "brand": "Bonjour",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "2 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.36",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|brod|baguetter-och-losbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391288850009_C1R1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164312",
+    "productCode": "101307647_ST",
+    "name": "MINIDONUTS 5FÖR23",
+    "brand": "La Lorraine",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "5 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "5.63",
+    "savePriceText": "",
+    "packageText": "20g",
+    "conditionText": "5 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kondis-och-fika|kaffebrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031139280_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164313",
+    "productCode": "101544623_ST",
+    "name": "VITLBAG 2FÖR23",
+    "brand": "Bonjour",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "175g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|brod|baguetter-och-losbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07315062257365_C1R0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164314",
+    "productCode": "100799575_ST",
+    "name": "WAS SANDW 3FÖR22",
+    "brand": "Wasa",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22,
+    "priceText": "3 för 22 kr",
+    "comparePriceText": "",
+    "regularPriceText": "9.41",
+    "savePriceText": "",
+    "packageText": "37g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|knackebrod-och-skorpor|knackebrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300400122689_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164315",
+    "productCode": "101290607_ST",
+    "name": "KRYDDKORV 2FÖR53",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 53,
+    "priceText": "2 för 53 kr",
+    "comparePriceText": "",
+    "regularPriceText": "32.13",
+    "savePriceText": "",
+    "packageText": "300g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|korv|grill-och-kryddkorv",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083474323_C1N1_s01",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164316",
+    "productCode": "101206348_ST",
+    "name": "PROSCIUTTO 2FÖR65",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "39.7",
+    "savePriceText": "",
+    "packageText": "80g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|medelhavschark",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427923_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164317",
+    "productCode": "101183319_ST",
+    "name": "PÅLÄGG 2FÖR39",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "25.5",
+    "savePriceText": "",
+    "packageText": "120g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|palagg|skivat-palagg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041071748_C1N1_s03",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164318",
+    "productCode": "101187496_ST",
+    "name": "SALAMI 2FÖR36",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "2 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.66",
+    "savePriceText": "",
+    "packageText": "80g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|palagg|skivat-palagg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041072905_C1N1_s02",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164319",
+    "productCode": "101264324_ST",
+    "name": "ÖLKORV 2FÖR20",
+    "brand": "Prime Patrol",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "40g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|korv|olkorv",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083457197_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164320",
+    "productCode": "101366819_ST",
+    "name": "MATJES 2FÖR38",
+    "brand": "Abba",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 38,
+    "priceText": "2 för 38 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.95",
+    "savePriceText": "",
+    "packageText": "215/125g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fisk-och-skaldjur|sill-ansjovis-och-sardiner|sill",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350126082835_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164321",
+    "productCode": "101781200_ST",
+    "name": "RÄKOR 2FÖR65",
+    "brand": "Fiskexporten",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fisk-och-skaldjur|skaldjur|farska-skaldjur",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04740173001775_C1R1_s01",
+    "labels": [
+      "asc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164322",
+    "productCode": "101224830_ST",
+    "name": "SÅSER 2FÖR35",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "200ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fisk-och-skaldjur|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436222_C1C1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164323",
+    "productCode": "101344156_ST",
+    "name": "TÅNGCAV 2FÖR37",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.24",
+    "savePriceText": "",
+    "packageText": "70g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fisk-och-skaldjur|kaviar-och-rom|fiskrom",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490590_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164324",
+    "productCode": "101406122_ST",
+    "name": "BUREK 2FÖR46",
+    "brand": "Km Bake",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "220g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|portionsratter|fardiga-ratter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03858893421108_C1L0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164325",
+    "productCode": "100261887_ST",
+    "name": "FELIX RULLP 2FÖ23",
+    "brand": "Felix",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|portionsratter|fardiga-ratter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090750697_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164326",
+    "productCode": "101212630_ST",
+    "name": "FÄRSK PAST 2FÖR33",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|farsk-pasta",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083430640_C1C1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164327",
+    "productCode": "101291166_ST",
+    "name": "JURESKOG 2FÖR45",
+    "brand": "Jureskog",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 45,
+    "priceText": "2 för 45 kr",
+    "comparePriceText": "",
+    "regularPriceText": "27.39",
+    "savePriceText": "",
+    "packageText": "230ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|sas-och-smaksattare|sas",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340046080738_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164328",
+    "productCode": "101347750_ST",
+    "name": "KEBABSÅS 2FÖR49",
+    "brand": "Schysst Käk",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49,
+    "priceText": "2 för 49 kr",
+    "comparePriceText": "",
+    "regularPriceText": "28.34",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|sas-och-smaksattare|sas",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451422_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164329",
+    "productCode": "101334258_ST",
+    "name": "REDORÄTTER 2FÖR84",
+    "brand": "Redo",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 84,
+    "priceText": "2 för 84 kr",
+    "comparePriceText": "",
+    "regularPriceText": "47.27",
+    "savePriceText": "",
+    "packageText": "400g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|portionsratter|fardiga-ratter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083487484_C1L1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164330",
+    "productCode": "101276691_ST",
+    "name": "SOPPA 2FÖR65",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "35.91",
+    "savePriceText": "",
+    "packageText": "450g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|portionsratter|fardiga-soppor-och-grytor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083464898_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164331",
+    "productCode": "101212667_ST",
+    "name": "TORTELL 2FÖR55",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "31.18",
+    "savePriceText": "",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|farsk-pasta",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083430688_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164332",
+    "productCode": "101358420_ST",
+    "name": "TOFU 2FÖR22",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22,
+    "priceText": "2 för 22 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "vegetariskt|tofu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083496905_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164333",
+    "productCode": "101277028_ST",
+    "name": "V.BACON 2FÖR41",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 41,
+    "priceText": "2 för 41 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.55",
+    "savePriceText": "",
+    "packageText": "120g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "vegetariskt|fryst-vegetariskt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468391_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164334",
+    "productCode": "101293702_ST",
+    "name": "SCHYSST K. 2FÖR89",
+    "brand": "Schysst Käk",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 89,
+    "priceText": "2 för 89 kr",
+    "comparePriceText": "",
+    "regularPriceText": "55.79",
+    "savePriceText": "",
+    "packageText": "275g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|kott|pannfardigt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451057_C1N1_s04",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164335",
+    "productCode": "101197313_ST",
+    "name": "ALPRO 2FÖR42",
+    "brand": "Alpro",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 42,
+    "priceText": "2 för 42 kr",
+    "comparePriceText": "",
+    "regularPriceText": "25.5",
+    "savePriceText": "",
+    "packageText": "1l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|vaxtbaserat|vaxtbaserad-dryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05411188110835_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164336",
+    "productCode": "101197644_ST",
+    "name": "BÄRRY 2FÖR20",
+    "brand": "Bärry",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.77",
+    "savePriceText": "",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311443210202_C1C1_s04",
+    "labels": [
+      "swedish_flag",
+      "milk_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164337",
+    "productCode": "101246038_ST",
+    "name": "EKS PUD 3FÖR24",
+    "brand": "Ekströms",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24,
+    "priceText": "3 för 24 kr",
+    "comparePriceText": "",
+    "regularPriceText": "8.95",
+    "savePriceText": "",
+    "packageText": "120g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|desserter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310470661803_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164338",
+    "productCode": "101599655_ST",
+    "name": "FLORA 2FÖR21",
+    "brand": "Flora",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 21,
+    "priceText": "2 för 21 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|vaxtbaserat|vaxtbaserad-matlagningsmejeri",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08719200284173_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164339",
+    "productCode": "101317693_ST",
+    "name": "HAVREDRYCK 2FÖR32",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.45",
+    "savePriceText": "",
+    "packageText": "1l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|vaxtbaserat|vaxtbaserad-dryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083480126_C1L1_s03",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164340",
+    "productCode": "101500849_ST",
+    "name": "HUMM 2FÖR46",
+    "brand": "Humm",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "28.34",
+    "savePriceText": "",
+    "packageText": "330ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|juice-och-fruktdryck|kyld-fruktdryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350092180221_C1C1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164341",
+    "productCode": "101328354_ST",
+    "name": "JUICE 2FÖR56",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 56,
+    "priceText": "2 för 56 kr",
+    "comparePriceText": "",
+    "regularPriceText": "33.95",
+    "savePriceText": "",
+    "packageText": "1l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|juice-och-fruktdryck|kyld-juice",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083480263_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164342",
+    "productCode": "101232098_ST",
+    "name": "KVARG 2FÖR27",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 27,
+    "priceText": "2 för 27 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.04",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|kvarg-och-cottage-cheese-|kvarg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083435539_C1L1_s03",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164343",
+    "productCode": "101224058_ST",
+    "name": "KVARG 3FÖR29",
+    "brand": "Lindahls",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29,
+    "priceText": "3 för 29 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.57",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07392672001724_C1C1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164344",
+    "productCode": "101237276_ST",
+    "name": "LÖFBERG 2FÖR35",
+    "brand": "Löfbergs",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.95",
+    "savePriceText": "",
+    "packageText": "230ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310050005171_C1N1_s05",
+    "labels": [
+      "ecological",
+      "fairtrade",
+      "eu_ecological",
+      "fairtrade_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164345",
+    "productCode": "100015029_ST",
+    "name": "MÅLT.DRYCK 4FÖR28",
+    "brand": "Bob",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "4 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "9.41",
+    "savePriceText": "",
+    "packageText": "2dl/1l",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|juice-och-fruktdryck|-ej-kyld-fruktdryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090155539_C1L1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164346",
+    "productCode": "101252611_ST",
+    "name": "PROPUD 2FÖR36",
+    "brand": "Propud",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "2 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "330ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068291210_C1N1_s06",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164347",
+    "productCode": "101708428_ST",
+    "name": "SKYR 2FÖR46",
+    "brand": "Dairy Food",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "27.95",
+    "savePriceText": "",
+    "packageText": "400g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|kvarg-och-cottage-cheese-|laktosfri-kvarg-och-cottage-cheese",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043018116_C1C1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164348",
+    "productCode": "101338211_ST",
+    "name": "SMOO/JUICE 2FÖR30",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.95",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489907_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164349",
+    "productCode": "101340616_ST",
+    "name": "VAL. PUDD. 2FÖR30",
+    "brand": "Valio",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.95",
+    "savePriceText": "",
+    "packageText": "180g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06408430407675_C1C1_s03",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164350",
+    "productCode": "101328964_ST",
+    "name": "VEGODRYCK 2FÖR30",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.93",
+    "savePriceText": "",
+    "packageText": "1l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|vaxtbaserat|vaxtbaserad-dryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083483981_C1L1_s03",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164351",
+    "productCode": "101244011_ST",
+    "name": "BURGAROST 2FÖR46",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "27.39",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447532_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164352",
+    "productCode": "101296686_ST",
+    "name": "CR BONJ 2FÖR26",
+    "brand": "Crème Bonjour",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "2 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.61",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|farskost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08719200066748_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164353",
+    "productCode": "101533198_ST",
+    "name": "FETAOST 2FÖR43",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 43,
+    "priceText": "2 för 43 kr",
+    "comparePriceText": "",
+    "regularPriceText": "25.45",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005727_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164354",
+    "productCode": "100568823_ST",
+    "name": "FÄRSKOST 2FÖR35",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|farskost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041018453_C1L1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164355",
+    "productCode": "101548123_ST",
+    "name": "GRILLOST 2FÖR35",
+    "brand": "Eldorado",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043008551_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164356",
+    "productCode": "101191889_ST",
+    "name": "HALLOUM 2FÖR55",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "33.07",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083402241_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164357",
+    "productCode": "101295235_ST",
+    "name": "MOZZARELL 3FÖR28",
+    "brand": "Fresca D´oro",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "3 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.77",
+    "savePriceText": "",
+    "packageText": "125g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612160841_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164358",
+    "productCode": "101532473_ST",
+    "name": "RIV OST 2FÖR41",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 41,
+    "priceText": "2 för 41 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.55",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005789_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164359",
+    "productCode": "101202735_ST",
+    "name": "SKIVAD OST 2FÖR52",
+    "brand": "Frischgold",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 52,
+    "priceText": "2 för 52 kr",
+    "comparePriceText": "",
+    "regularPriceText": "32.13",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|skivad-ost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083426636_C1C1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164360",
+    "productCode": "101458205_ST",
+    "name": "TINE OST 2FÖR46",
+    "brand": "Tine",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "32.95",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|skivad-ost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07038010022449_C1R1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164361",
+    "productCode": "101293162_ST",
+    "name": "TINE OST 2FÖR51",
+    "brand": "Tine",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 51,
+    "priceText": "2 för 51 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|skivad-ost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04004164009431_C1R1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164386",
+    "productCode": "101406133_ST",
+    "name": "BACON 2FÖR27",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 27,
+    "priceText": "2 för 27 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.61",
+    "savePriceText": "",
+    "packageText": "140g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|chark|bacon-och-stekflask",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083497346_C1N1_s02",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164402",
+    "productCode": "101351867_ST",
+    "name": "GAR LEVERPASTEJ",
+    "brand": "Garant",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 9.46,
+    "priceText": "9,46 kr/st",
+    "comparePriceText": "",
+    "regularPriceText": "9.46",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|palagg|pastej-och-pat-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492129_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164401",
+    "productCode": "101269302_ST",
+    "name": "BUBBIES 4FÖR70",
+    "brand": "",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 70,
+    "priceText": "4 för 70 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|glass|styckglass",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042016052_S01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164502",
+    "productCode": "101331728_ST",
+    "name": "BLOMJORD 2FÖR79",
+    "brand": "Fixa",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 79,
+    "priceText": "2 för 79 kr",
+    "comparePriceText": "",
+    "regularPriceText": "46.95",
+    "savePriceText": "",
+    "packageText": "18l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "blommor-och-tillbehor|jord",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083487118_C1N1_s01",
+    "labels": [
+      "ecological",
+      "krav",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164503",
+    "productCode": "101336010_ST",
+    "name": "PLANTERING 3F125",
+    "brand": "Rölunda Gård",
+    "storeId": "4798",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 125,
+    "priceText": "3 för 125 kr",
+    "comparePriceText": "",
+    "regularPriceText": "",
+    "savePriceText": "",
+    "packageText": "40l",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "blommor-och-tillbehor|jord",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391290688409_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4798&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500309493",
+    "productCode": "101291077_ST",
+    "name": "Läsk",
+    "brand": "Coca-Cola, Fanta, Sprite",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 6,
+    "priceText": "6 kr/st",
+    "comparePriceText": "18,18/l +pant",
+    "regularPriceText": "11.3",
+    "savePriceText": "Spara 4,36 kr",
+    "packageText": "33cl",
+    "conditionText": "",
+    "redeemLimitText": "Max 20 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "dryck|lask|lask-liten",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112637939_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500303429",
+    "productCode": "100168667_ST",
+    "name": "Lingongrova, Guldkorn",
+    "brand": "Pågen",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 19,
+    "priceText": "19 kr/st",
+    "comparePriceText": "38,00/kg",
+    "regularPriceText": "25.5",
+    "savePriceText": "Spara 6,50-11,23 kr",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "brod-och-kakor|brod|matbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311071330525_C1L1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298172",
+    "productCode": "101017249_ST",
+    "name": "Svenskt smör",
+    "brand": "Arla",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39.95,
+    "priceText": "39,95 kr/st",
+    "comparePriceText": "79,90/kg",
+    "regularPriceText": "64.3",
+    "savePriceText": "Spara 22,46 kr",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|smor-margarin-och-jast|smor-och-margarin",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298127",
+    "productCode": "101183319_ST",
+    "name": "Smörgåspålägg",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "116,67-175,00/kg",
+    "regularPriceText": "25.5",
+    "savePriceText": "Spara 15,44-23,00 kr",
+    "packageText": "80-120g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "kott-fagel-och-chark|palagg|skivat-palagg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041071748_C1N1_s03",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500299506",
+    "productCode": "101241262_ST",
+    "name": "Kaffe",
+    "brand": "Zoégas",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 59.95,
+    "priceText": "59,95 kr/st",
+    "comparePriceText": "133,22/kg",
+    "regularPriceText": "86.07",
+    "savePriceText": "Spara 10,98-26,17 kr",
+    "packageText": "450g",
+    "conditionText": "",
+    "redeemLimitText": "Max 2 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|kaffe|bryggkaffe",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310731101666_C1R1_s05",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298024",
+    "productCode": "101222356_ST",
+    "name": "Kycklinginnerfilé",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46.95,
+    "priceText": "46,95 kr/st",
+    "comparePriceText": "67,07/kg",
+    "regularPriceText": "62.97",
+    "savePriceText": "Spara 12,62 kr",
+    "packageText": "700g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fryst|kott-och-kyckling|kyckling-och-ovrig-fagel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083434723_C1C1_s03",
+    "labels": [
+      "swedish_flag",
+      "swedish_bird"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298454",
+    "productCode": "101251544_ST",
+    "name": "Styckglass",
+    "brand": "Sia Glass",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 10,
+    "priceText": "10 kr/st",
+    "comparePriceText": "10,00/st",
+    "regularPriceText": "22.7",
+    "savePriceText": "Spara 1,40-19,30 kr",
+    "packageText": "40-210ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fryst|glass|styckglass",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07312690117016_C1N1_s02",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298365",
+    "productCode": "100364008_ST",
+    "name": "Olivolja Classico",
+    "brand": "Zeta",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 66,
+    "priceText": "66 kr/st",
+    "comparePriceText": "132,00/l",
+    "regularPriceText": "89.91",
+    "savePriceText": "Spara 4,93-16,29 kr",
+    "packageText": "500ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|olja-och-vinager|olja",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350002400333_C1N1_s08",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298362",
+    "productCode": "101206348_ST",
+    "name": "Prosciutto Crudo",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "18 kr/st",
+    "comparePriceText": "225,00/kg",
+    "regularPriceText": "39.7",
+    "savePriceText": "Spara 19,80 kr",
+    "packageText": "80g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "kott-fagel-och-chark|medelhavschark",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427923_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298307",
+    "productCode": "101532475_ST",
+    "name": "Riven ost",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "18 kr/st",
+    "comparePriceText": "120,00/kg",
+    "regularPriceText": "24.55",
+    "savePriceText": "Spara 4,66-5,61 kr",
+    "packageText": "150g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005802_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298397",
+    "productCode": "101692668_ST",
+    "name": "Vannameiräkor",
+    "brand": "Leröy",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49.95,
+    "priceText": "49,95 kr/st",
+    "comparePriceText": "227,05/kg",
+    "regularPriceText": "75.66",
+    "savePriceText": "Spara 23,82 kr",
+    "packageText": "220g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fisk-och-skaldjur|skaldjur|farska-skaldjur",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07317370106588_C1N1_s01",
+    "labels": [
+      "asc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298293",
+    "productCode": "100638035_ST",
+    "name": "Start! Naturell",
+    "brand": "Lantmännen",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "28 kr/st",
+    "comparePriceText": "37,33/kg",
+    "regularPriceText": "37.8",
+    "savePriceText": "Spara 9,80 kr",
+    "packageText": "750g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|flingor-och-musli|musli-crunchy-och-granola",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130801709_C1R1_s07",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298020",
+    "productCode": "101229322_ST",
+    "name": "Tvättmedel, Sköljmedel",
+    "brand": "Fixa",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "0,40-0,95 kr/tvätt",
+    "regularPriceText": "32.95",
+    "savePriceText": "Spara 11,95 kr",
+    "packageText": "750g, 750ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "hem-och-hushall|tvatt|tvattmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436864_C1L1_s04",
+    "labels": [
+      "swan",
+      "warning",
+      "exclamation_mark",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500303814",
+    "productCode": "101291350_ST",
+    "name": "Hälsa",
+    "brand": "Östras",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "33,33/kg",
+    "regularPriceText": "34.97",
+    "savePriceText": "Spara 14,97 kr",
+    "packageText": "600g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "brod-och-kakor|brod|matbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07314320041029_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298981",
+    "productCode": "100300906_ST",
+    "name": "Vaniljyoghurt",
+    "brand": "Valio",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "20,00/kg",
+    "regularPriceText": "28.34",
+    "savePriceText": "Spara 6,97 kr",
+    "packageText": "1kg",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|yoghurt-och-filmjolk|smaksatt-yoghurt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06408432088933_C1R1_s07",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298200",
+    "productCode": "101264126_ST",
+    "name": "Tandkräm",
+    "brand": "Oral-B",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 16,
+    "priceText": "16 kr/st",
+    "comparePriceText": "213,33/l",
+    "regularPriceText": "32.95",
+    "savePriceText": "Spara 11,95-14,95 kr",
+    "packageText": "75ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "halsa-och-skonhet|munvard|tandkram",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08001090291035_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298198",
+    "productCode": "101542405_ST",
+    "name": "Schampo, Balsam",
+    "brand": "Head & Shoulders",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "30 kr/st",
+    "comparePriceText": "120,00-136,36/l",
+    "regularPriceText": "45.95",
+    "savePriceText": "Spara 8,95-17,95 kr",
+    "packageText": "220-250ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "halsa-och-skonhet|harvard|schampo",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216219570_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500299061",
+    "productCode": "101252347_ST",
+    "name": "Grekisk yoghurt",
+    "brand": "Arla",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "28 kr/st",
+    "comparePriceText": "28,00/kg",
+    "regularPriceText": "40.64",
+    "savePriceText": "Spara 5,07-8,86 kr",
+    "packageText": "1kg",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|matlagningsmejerier|matlagningsyoghurt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865095466_C1C1_s06",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298115",
+    "productCode": "101854360_ST",
+    "name": "Sprödbakad fiskfilé",
+    "brand": "Findus",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "35 kr/st",
+    "comparePriceText": "97,22/kg",
+    "regularPriceText": "44.43",
+    "savePriceText": "Spara 8,48 kr",
+    "packageText": "360g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fisk-och-skaldjur|fisk|fryst-fisk",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310500094465_C1N1_s01",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298083",
+    "productCode": "101135095_ST",
+    "name": "Pesto",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "100,00/kg",
+    "regularPriceText": "29.81",
+    "savePriceText": "Spara 8,34 kr",
+    "packageText": "200g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041062654_C1C1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298065",
+    "productCode": "101287807_ST",
+    "name": "Fryst vegetariskt",
+    "brand": "Anamma",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "33 kr/st",
+    "comparePriceText": "73,33-110,00/kg",
+    "regularPriceText": "47.27",
+    "savePriceText": "Spara 13,32-18,05 kr",
+    "packageText": "300-450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "vegetariskt|fryst-vegetariskt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240120189_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500297778",
+    "productCode": "101649567_ST",
+    "name": "Valnötter",
+    "brand": "Exotic snacks",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "25 kr/st",
+    "comparePriceText": "100,00/kg",
+    "regularPriceText": "47.27",
+    "savePriceText": "Tillfälligt klipp",
+    "packageText": "250g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391814009109_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298306",
+    "productCode": "101328356_ST",
+    "name": "Parmigiano Reggiano",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "33 kr/st",
+    "comparePriceText": "220,00/kg",
+    "regularPriceText": "47.27",
+    "savePriceText": "Spara 14,27 kr",
+    "packageText": "150g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "21/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083488511_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298048",
+    "productCode": "101245383_ST",
+    "name": "Crème fraiche",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22,
+    "priceText": "22 kr/st",
+    "comparePriceText": "44,00/l",
+    "regularPriceText": "33.02",
+    "savePriceText": "Spara 2,55-12,97 kr",
+    "packageText": "5dl",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "21/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|matlagningsmejerier|creme-fraiche",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083448638_C1N1_s06",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500303714",
+    "productCode": "101599080_ST",
+    "name": "Ekologisk blandfärs",
+    "brand": "Garant Eko",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 59.95,
+    "priceText": "59,95 kr/st",
+    "comparePriceText": "119,90/kg",
+    "regularPriceText": "75.77",
+    "savePriceText": "Spara 10,03 kr",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "kott-fagel-och-chark|kott|kottfars",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043011957_C1N1_s02",
+    "labels": [
+      "ecological",
+      "krav",
+      "swedish_flag",
+      "meat_from_sweden",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500303868",
+    "productCode": "101839908_ST",
+    "name": "Potatissallad",
+    "brand": "Rydbergs",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "35 kr/st",
+    "comparePriceText": "46,67/kg",
+    "regularPriceText": "47.27",
+    "savePriceText": "Spara 8,48 kr",
+    "packageText": "750g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fardigmat|gratang-och-roror|kramiga-sallader",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160020447_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307473",
+    "productCode": "100151933_ST",
+    "name": "Avokado",
+    "brand": "",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 5,
+    "priceText": "5 kr/st",
+    "comparePriceText": "ca 29,41/kg",
+    "regularPriceText": "13.89",
+    "savePriceText": "Spara 8,50 kr",
+    "packageText": "170g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "21/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|gronsaker|avokado",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042000662_C1N0_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307476",
+    "productCode": "100816306_ST",
+    "name": "Röd spetspaprika",
+    "brand": "",
+    "storeId": "4660",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 15,
+    "priceText": "15 kr/st",
+    "comparePriceText": "75,00/kg",
+    "regularPriceText": "23.1",
+    "savePriceText": "Spara 5,80 kr",
+    "packageText": "200g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|gronsaker|paprika",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042001683_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500309494",
+    "productCode": "101261444_ST",
+    "name": "Surdegsbröd",
+    "brand": "La Lorraine",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "25 kr/st",
+    "comparePriceText": "55,56/kg",
+    "regularPriceText": "37.8",
+    "savePriceText": "Spara 12,80 kr",
+    "packageText": "450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "brod-och-kakor|brod|baguetter-och-losbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031135473_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298572",
+    "productCode": "101269568_ST",
+    "name": "Tutti Frutti, Tyrkisk Peber",
+    "brand": "Fazer",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 13.95,
+    "priceText": "13,95 kr/st",
+    "comparePriceText": "77,50-93,00/kg",
+    "regularPriceText": "21.72",
+    "savePriceText": "Spara 4,93-5,87 kr",
+    "packageText": "150-180g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "godis-snacks-och-glass|godis|godispasar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06416453038288_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298437",
+    "productCode": "101240779_ST",
+    "name": "Färskost",
+    "brand": "Arla",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14.95,
+    "priceText": "14,95 kr/st",
+    "comparePriceText": "99,67/kg",
+    "regularPriceText": "20.77",
+    "savePriceText": "Spara 4,87 kr",
+    "packageText": "150g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|ost|farskost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05711953029912_C1C1_s07",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298399",
+    "productCode": "101845036_ST",
+    "name": "Barnmat",
+    "brand": "Hipp",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "60,00-78,95/kg",
+    "regularPriceText": "20.77",
+    "savePriceText": "Spara 2,08-12,58 kr",
+    "packageText": "190-250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "barn|barnmat-och-fruktdryck|barnmat-8-man",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04062300483064_C1N1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500299078",
+    "productCode": "101469546_ST",
+    "name": "Glass 4-pack",
+    "brand": "Häagen-Dazs",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49.95,
+    "priceText": "49,95 kr/st",
+    "comparePriceText": "12,49/st",
+    "regularPriceText": "59.57",
+    "savePriceText": "Tillfälligt klipp",
+    "packageText": "4x95ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fryst|glass|glasspaket",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03415581520927_C1C1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298803",
+    "productCode": "101250413_ST",
+    "name": "Kattmat",
+    "brand": "Mjau",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14.95,
+    "priceText": "14,95 kr/st",
+    "comparePriceText": "39,34-40,41/kg",
+    "regularPriceText": "18.95",
+    "savePriceText": "",
+    "packageText": "370-380g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "djur|katt|kattmat-vat",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300330038104_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500302260",
+    "productCode": "101719942_ST",
+    "name": "Mild kvarg",
+    "brand": "Arla",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 17.95,
+    "priceText": "17,95 kr/st",
+    "comparePriceText": "39,89/kg",
+    "regularPriceText": "25.08",
+    "savePriceText": "Spara 5,23 kr",
+    "packageText": "450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|kvarg-och-cottage-cheese-|kvarg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04016241051035_C1C1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298135",
+    "productCode": "101333968_ST",
+    "name": "Majonnäs, Dressing",
+    "brand": "Hellmann's",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.95,
+    "priceText": "24,95 kr/st",
+    "comparePriceText": "99,80-101,84/l",
+    "regularPriceText": "31.18",
+    "savePriceText": "Spara 1,50-5,28 kr",
+    "packageText": "245-250ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|kryddor-och-smaksattare|dressingar-och-majonnas-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08710522882207_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298402",
+    "productCode": "101800163_ST",
+    "name": "Bindor, Trosskydd",
+    "brand": "Always",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46.95,
+    "priceText": "46,95 kr/st",
+    "comparePriceText": "0,78-3,91/st",
+    "regularPriceText": "54.95",
+    "savePriceText": "Spara 3,00-6,00 kr",
+    "packageText": "12-60-pack",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "halsa-och-skonhet|intimhygien|bindor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216213837_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298400",
+    "productCode": "100308301_ST",
+    "name": "Grillkorv",
+    "brand": "Scan",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 85,
+    "priceText": "2 för 85 kr",
+    "comparePriceText": "66,41-106,25/kg",
+    "regularPriceText": "52.0",
+    "savePriceText": "Spara 7,64-15,22 kr",
+    "packageText": "400-640g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "kott-fagel-och-chark|korv|grill-och-kryddkorv",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300207071005_C1N1_s04",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298080",
+    "productCode": "101829580_ST",
+    "name": "Mjukost",
+    "brand": "Fjällbrynt",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26.95,
+    "priceText": "26,95 kr/st",
+    "comparePriceText": "122,50/kg",
+    "regularPriceText": "35.91",
+    "savePriceText": "Spara 7,07 kr",
+    "packageText": "220g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|ost|mjukost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160020287_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298078",
+    "productCode": "101512430_ST",
+    "name": "Varmkorv",
+    "brand": "Lithells",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34.95,
+    "priceText": "34,95 kr/st",
+    "comparePriceText": "97,08/kg",
+    "regularPriceText": "43.48",
+    "savePriceText": "Spara 6,64 kr",
+    "packageText": "360g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "kott-fagel-och-chark|korv|varm-och-wienerkorv",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310628008894_C1L1_s02",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298059",
+    "productCode": "101225562_ST",
+    "name": "Havreflingor",
+    "brand": "Frebaco Kvarn",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "57,14/kg",
+    "regularPriceText": "26.02",
+    "savePriceText": "Spara 3,18-4,55 kr",
+    "packageText": "350g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|flingor-och-musli|flingor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07312560057404_C1R1_s06",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307475",
+    "productCode": "101174339_ST",
+    "name": "Förkokt majs",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "44,44/kg",
+    "regularPriceText": "28.34",
+    "savePriceText": "",
+    "packageText": "450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|gronsaker|ovriga-gronsaker",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042001461_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307469",
+    "productCode": "101209021_ST",
+    "name": "Jordgubbar",
+    "brand": "",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "28 kr/st",
+    "comparePriceText": "70,00/kg",
+    "regularPriceText": "59.7",
+    "savePriceText": "",
+    "packageText": "400g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|bar|farska-bar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042004943_C1L1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307481",
+    "productCode": "100594965_ST",
+    "name": "Svensk gurka",
+    "brand": "",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25 kr",
+    "comparePriceText": "ca 40,32/kg",
+    "regularPriceText": "17.93",
+    "savePriceText": "",
+    "packageText": "310g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|gronsaker|gurka",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042004691_C1N1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307468",
+    "productCode": "101283986_ST",
+    "name": "Rosor 10-pack",
+    "brand": "",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39.95,
+    "priceText": "39,95 kr/st",
+    "comparePriceText": "",
+    "regularPriceText": "49.95",
+    "savePriceText": "",
+    "packageText": "",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:58.000Z",
+    "category": "blommor-och-tillbehor|snittblommor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042013150_C1C0_s01",
+    "labels": [
+      "fairtrade",
+      "fairtrade_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307482",
+    "productCode": "101178320_ST",
+    "name": "Nektariner",
+    "brand": "",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29.95,
+    "priceText": "29,95 kr/st",
+    "comparePriceText": "59,90/kg",
+    "regularPriceText": "47.8",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|frukt|exotisk-frukt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042005896_C1R1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164202",
+    "productCode": "101594877_ST",
+    "name": "BLÖJPÅSE 2FÖR28",
+    "brand": "Minstingen",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.95",
+    "savePriceText": "",
+    "packageText": "50p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|barnvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043011834_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164203",
+    "productCode": "101260398_ST",
+    "name": "EKO BARNM. 3FÖR28",
+    "brand": "Minstingen",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "3 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "90g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|barnmat-och-fruktdryck|barnmat-5-6-man",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083453977_C1N1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164204",
+    "productCode": "101261711_ST",
+    "name": "EKO BARNM. 3FÖR34",
+    "brand": "Minstingen",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34,
+    "priceText": "3 för 34 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "120g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|grot-och-valling",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083453946_C1N1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164205",
+    "productCode": "101258703_ST",
+    "name": "FRUKTST 3FÖR25",
+    "brand": "Nestlé",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "3 för 25 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.36",
+    "savePriceText": "",
+    "packageText": "25g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|barnsnacks",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613035497641_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164206",
+    "productCode": "101314330_ST",
+    "name": "MINSTING 2FÖR165",
+    "brand": "Minstingen",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 165,
+    "priceText": "2 för 165 kr",
+    "comparePriceText": "",
+    "regularPriceText": "86.95",
+    "savePriceText": "",
+    "packageText": "50p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|blojor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083481826_C1N1_s04",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164207",
+    "productCode": "101353715_ST",
+    "name": "MINSTINGEN2FÖR175",
+    "brand": "Minstingen",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 175,
+    "priceText": "2 för 175 kr",
+    "comparePriceText": "",
+    "regularPriceText": "92.0",
+    "savePriceText": "",
+    "packageText": "42p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|blojor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492709_C1N1_s01",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164208",
+    "productCode": "101278144_ST",
+    "name": "M-SNACK 2FÖR18",
+    "brand": "Minstingen",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "2 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "20g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|barnsnacks",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083465871_C1N1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164209",
+    "productCode": "101202634_ST",
+    "name": "SMOOTHIE 3FÖR31",
+    "brand": "Nestlé",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 31,
+    "priceText": "3 för 31 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "90g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|barnmat-och-fruktdryck|barnmat-5-6-man",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613033881824_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164210",
+    "productCode": "101353358_ST",
+    "name": "VÅTSERV. 2FÖR30",
+    "brand": "Minstingen",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.95",
+    "savePriceText": "",
+    "packageText": "63p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|barnvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492471_C1N1_s01",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164211",
+    "productCode": "101353275_ST",
+    "name": "VÅTSERVET. 2FÖR24",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24,
+    "priceText": "2 för 24 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.95",
+    "savePriceText": "",
+    "packageText": "72p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|barnvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492488_C1N1_s01",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164212",
+    "productCode": "101094539_ST",
+    "name": "FELIX RÄTT 2FÖR80",
+    "brand": "Felix",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 80,
+    "priceText": "2 för 80 kr",
+    "comparePriceText": "",
+    "regularPriceText": "49.16",
+    "savePriceText": "",
+    "packageText": "380g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|portionsratter|enportioner",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240076806_C1L1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164213",
+    "productCode": "100127211_ST",
+    "name": "FINDUSRÄTT 2FÖR65",
+    "brand": "Findus",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "37.8",
+    "savePriceText": "",
+    "packageText": "400g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|portionsratter|enportioner",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310500040127_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164214",
+    "productCode": "101277258_ST",
+    "name": "FRYST BLÅB 2FÖR37",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.61",
+    "savePriceText": "",
+    "packageText": "225g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "frukt-och-gront|bar|frysta-bar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083465413_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164215",
+    "productCode": "101302035_ST",
+    "name": "FRYST HALLON 2F52",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 52,
+    "priceText": "2 för 52 kr",
+    "comparePriceText": "",
+    "regularPriceText": "28.34",
+    "savePriceText": "",
+    "packageText": "225g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "frukt-och-gront|bar|frysta-bar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083478321_C1L1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164216",
+    "productCode": "101259156_ST",
+    "name": "GLASS 2FÖR61",
+    "brand": "Dazzley",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 61,
+    "priceText": "2 för 61 kr",
+    "comparePriceText": "",
+    "regularPriceText": "35.91",
+    "savePriceText": "",
+    "packageText": "0,9l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|glass|glasspaket",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041081198_C1L1_s03",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164217",
+    "productCode": "101229946_ST",
+    "name": "GRÖNSAKER 2FÖR37",
+    "brand": "Garant Eko",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.66",
+    "savePriceText": "",
+    "packageText": "450g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|gronsaker|gronsaker-och-rotfrukter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083439513_C1N1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164218",
+    "productCode": "101667272_ST",
+    "name": "HACK GRÖNS 2FÖR25",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.09",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|gronsaker|gronsaker-och-rotfrukter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015092_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164219",
+    "productCode": "101174269_ST",
+    "name": "JORDGUBBAR 2FÖR33",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "225g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "frukt-och-gront|bar|frysta-bar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041060322_C1L1_s04",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164220",
+    "productCode": "101424647_ST",
+    "name": "LOHILO 2FÖR65",
+    "brand": "Lohilo",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "39.7",
+    "savePriceText": "",
+    "packageText": "0,35l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|glass|glasspaket",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07398818389985_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164221",
+    "productCode": "101264516_ST",
+    "name": "MANGO 2FÖR36",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "2 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "225g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "frukt-och-gront|bar|frysta-bar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083457036_C1L1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164222",
+    "productCode": "101502740_ST",
+    "name": "PASTABOWL 2FÖR70",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 70,
+    "priceText": "2 för 70 kr",
+    "comparePriceText": "",
+    "regularPriceText": "37.8",
+    "savePriceText": "",
+    "packageText": "370g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|portionsratter|enportioner",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004416_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164223",
+    "productCode": "101261058_ST",
+    "name": "PIZZA 2FÖR55",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "32.13",
+    "savePriceText": "",
+    "packageText": "350g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|pizza-paj-och-piroger|pizza",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083455155_C1L1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164224",
+    "productCode": "101152404_ST",
+    "name": "SOJABÖNOR 2FÖR33",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|gronsaker|gronsaker-och-rotfrukter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041065075_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164225",
+    "productCode": "101544831_ST",
+    "name": "SURIMI 3FÖR28",
+    "brand": "Vici",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "3 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|fisk-och-skaldjur|skaldjur-och-havsdelikatesser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04770190161046_C1N1_s01",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164226",
+    "productCode": "101433526_ST",
+    "name": "WOKMIX 2FÖR42",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 42,
+    "priceText": "2 för 42 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.55",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|gronsaker|wok",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083499913_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164227",
+    "productCode": "101199266_ST",
+    "name": "DREAMIES 2FÖR35",
+    "brand": "Dreamies",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.95",
+    "savePriceText": "",
+    "packageText": "60g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04008429037894_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164228",
+    "productCode": "101603430_ST",
+    "name": "HUNDMAT 4FÖR45",
+    "brand": "Smart Pets",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 45,
+    "priceText": "4 för 45 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.95",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|hund|hundmat-vat",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088692_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164229",
+    "productCode": "101279773_ST",
+    "name": "HUNDPÅSAR 3FÖR29",
+    "brand": "First Price",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29,
+    "priceText": "3 för 29 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.95",
+    "savePriceText": "",
+    "packageText": "50p",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|hund|hundtillbehor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083467622_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164230",
+    "productCode": "101549503_ST",
+    "name": "HUNDTILLTUGG 2F32",
+    "brand": "Smart Pets",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.95",
+    "savePriceText": "",
+    "packageText": "55g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|hund|hundgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088227_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164231",
+    "productCode": "101550213_ST",
+    "name": "KATTGODIS 2FÖR26",
+    "brand": "Smart Pets",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "2 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.95",
+    "savePriceText": "",
+    "packageText": "50g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088128_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164232",
+    "productCode": "101550348_ST",
+    "name": "KATTGODIS 2FÖR29",
+    "brand": "Smart Pets",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29,
+    "priceText": "2 för 29 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.95",
+    "savePriceText": "",
+    "packageText": "25g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088104_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164233",
+    "productCode": "101739618_ST",
+    "name": "KATTMOUSSE 4FÖR30",
+    "brand": "Smart Pets",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "4 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "9.95",
+    "savePriceText": "",
+    "packageText": "85g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattmat-vat",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041089002_C1C1_s01",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164234",
+    "productCode": "101547841_ST",
+    "name": "KATTPATE 3FÖR20",
+    "brand": "Smart Pets",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "3 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "9.5",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattmat-vat",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088029_C1N1_s01",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164235",
+    "productCode": "101242816_ST",
+    "name": "MJAU 4FÖR35",
+    "brand": "Mjau",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "4 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "9.95",
+    "savePriceText": "",
+    "packageText": "85g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattmat-vat",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300330035110_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164236",
+    "productCode": "101550616_ST",
+    "name": "PARTYPUFF 2FÖR32",
+    "brand": "Mjau",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.95",
+    "savePriceText": "",
+    "packageText": "60g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311030712034_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164237",
+    "productCode": "101175745_ST",
+    "name": "ENERGIDR.  2FÖR32",
+    "brand": "Monster Energy",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "50cl",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|sport-och-energidryck|energidryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05060166694777_C1N1_s01",
+    "labels": [
+      "age_restricted_15"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164238",
+    "productCode": "101705852_ST",
+    "name": "ISTE 3FÖR18",
+    "brand": "Premier",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "3 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "7.52",
+    "savePriceText": "",
+    "packageText": "33cl",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|saft-och-stilldrink|iste-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612404501_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164239",
+    "productCode": "100197136_ST",
+    "name": "LOKA 2FÖR20",
+    "brand": "Loka",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "1.5l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|vatten|vatten-stor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401000060_C1N1_s05",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164240",
+    "productCode": "100198260_ST",
+    "name": "LÄSK 2FÖR32",
+    "brand": "Champis",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "1,5l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|lask|lask-stor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401000367_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164241",
+    "productCode": "101549387_ST",
+    "name": "POWERKI 2FÖR23",
+    "brand": "Powerking",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "50cl",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|sport-och-energidryck|energidryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612222389_C1N1_s01",
+    "labels": [
+      "age_restricted_15"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164242",
+    "productCode": "101175130_ST",
+    "name": "POWERKI 4FÖR24",
+    "brand": "Powerking",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24,
+    "priceText": "4 för 24 kr",
+    "comparePriceText": "",
+    "regularPriceText": "9.41",
+    "savePriceText": "",
+    "packageText": "25cl",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|sport-och-energidryck|energidryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612221351_C1C1_s01",
+    "labels": [
+      "age_restricted_15"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164243",
+    "productCode": "101607963_ST",
+    "name": "PREM LÄSK 4FÖR26",
+    "brand": "Premier",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "4 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "8.47",
+    "savePriceText": "",
+    "packageText": "33cl",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|lask|lask-liten",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612404310_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164244",
+    "productCode": "101290434_ST",
+    "name": "STILLDR 3FÖR33",
+    "brand": "Premier",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "3 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "3p/25cl",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|saft-och-stilldrink|stilldrink",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083474088_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164245",
+    "productCode": "101205991_ST",
+    "name": "VATTEN 2FÖR18",
+    "brand": "Premier",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "2 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.36",
+    "savePriceText": "",
+    "packageText": "1.5l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|vatten|vatten-stor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612513807_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164246",
+    "productCode": "101197310_ST",
+    "name": "ÖL / CIDER 3FÖR35",
+    "brand": "Mariestads",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "3 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "33cl",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|ol-cider-och-vin|alkoholfri-ol-och-lattol",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401009551_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164247",
+    "productCode": "101274593_ST",
+    "name": "ÖL ALKOFRI 4FÖR26",
+    "brand": "Emd Bräu",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "4 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "7.52",
+    "savePriceText": "",
+    "packageText": "33cl",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|ol-cider-och-vin|alkoholfri-ol-och-lattol",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612501552_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164248",
+    "productCode": "101239944_ST",
+    "name": "AJAX SPRAY 2FÖR65",
+    "brand": "Ajax",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "39.95",
+    "savePriceText": "",
+    "packageText": "750ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|stad|rengoringsmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08718951039995_C1N1_s07",
+    "labels": [
+      "no_pictogram"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164249",
+    "productCode": "101698356_ST",
+    "name": "COMFORT 2FÖR68",
+    "brand": "Comfort",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 68,
+    "priceText": "2 för 68 kr",
+    "comparePriceText": "",
+    "regularPriceText": "39.95",
+    "savePriceText": "",
+    "packageText": "762ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|tvatt|skoljmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181638695_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164250",
+    "productCode": "101261849_ST",
+    "name": "DISKTABLET 2FÖR75",
+    "brand": "Såklart",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 75,
+    "priceText": "2 för 75 kr",
+    "comparePriceText": "",
+    "regularPriceText": "45.95",
+    "savePriceText": "",
+    "packageText": "30p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|disk|maskindisk",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083459139_C1L1_s02",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "warning",
+      "exclamation_mark",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164251",
+    "productCode": "101353276_ST",
+    "name": "STÄDSERV. 2FÖR35",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.5",
+    "savePriceText": "",
+    "packageText": "70p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|stad|rengoringsmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492518_C1N1_s01",
+    "labels": [
+      "environmental_choice",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164252",
+    "productCode": "101475566_ST",
+    "name": "TOA/HUSPAP 2FÖR70",
+    "brand": "Fixa",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 70,
+    "priceText": "2 för 70 kr",
+    "comparePriceText": "",
+    "regularPriceText": "37.95",
+    "savePriceText": "",
+    "packageText": "4p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|toalett-och-hushallspapper|hushallspapper",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043002009_C1L1_s02",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164253",
+    "productCode": "101229322_ST",
+    "name": "TVÄTT/SKÖL 2FÖR58",
+    "brand": "Fixa",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 58,
+    "priceText": "2 för 58 kr",
+    "comparePriceText": "",
+    "regularPriceText": "32.95",
+    "savePriceText": "",
+    "packageText": "750g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|tvatt|tvattmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436864_C1L1_s04",
+    "labels": [
+      "swan",
+      "warning",
+      "exclamation_mark",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164254",
+    "productCode": "101815929_ST",
+    "name": "TVÄTTKAPSL 2FÖR79",
+    "brand": "Fixa",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 79,
+    "priceText": "2 för 79 kr",
+    "comparePriceText": "",
+    "regularPriceText": "44.95",
+    "savePriceText": "",
+    "packageText": "16p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|tvatt|tvattmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043024926_C1N1_s01",
+    "labels": [
+      "swan",
+      "warning",
+      "exclamation_mark",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164255",
+    "productCode": "101344145_ST",
+    "name": "WC-RENGÖR. 2FÖR35",
+    "brand": "Wc Bref",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "25.95",
+    "savePriceText": "",
+    "packageText": "1p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|stad|luftfraschare",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05201395121737_C1N1_s01",
+    "labels": [
+      "danger",
+      "corrosion"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164256",
+    "productCode": "100275033_ST",
+    "name": "KICK KOLA 3FÖR14",
+    "brand": "Malaco",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14,
+    "priceText": "3 för 14 kr",
+    "comparePriceText": "",
+    "regularPriceText": "5.63",
+    "savePriceText": "",
+    "packageText": "19g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|godis|godispasar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05700417006804_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164257",
+    "productCode": "101545419_ST",
+    "name": "MALACO 2FÖR23",
+    "brand": "Malaco",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "90g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|godis|godispasar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350136902_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164258",
+    "productCode": "101545635_ST",
+    "name": "STYCKSAKER 3FÖR27",
+    "brand": "Snickers",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 27,
+    "priceText": "3 för 27 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "50g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|choklad|chokladkakor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05900951311505_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164259",
+    "productCode": "100059393_ST",
+    "name": "STYCKSAKER 3FÖR28",
+    "brand": "Marabou",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "3 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "46g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|choklad|chokladgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622201047764_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164260",
+    "productCode": "100017688_ST",
+    "name": "TOMS STÅNG 3FÖR11",
+    "brand": "Toms",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 11,
+    "priceText": "3 för 11 kr",
+    "comparePriceText": "",
+    "regularPriceText": "5.63",
+    "savePriceText": "",
+    "packageText": "27g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|godis|godispasar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000057402376_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164261",
+    "productCode": "100073340_ST",
+    "name": "TUGGUMMI 2FÖR33",
+    "brand": "Extra",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "29g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|tuggummi",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04009900390309_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164262",
+    "productCode": "101195056_ST",
+    "name": "ANSIKTSSER 2FÖR40",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 40,
+    "priceText": "2 för 40 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.95",
+    "savePriceText": "",
+    "packageText": "150p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|nasdukar-och-bomull",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083401633_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164263",
+    "productCode": "101499176_ST",
+    "name": "AVSMINK. 2FÖR24",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24,
+    "priceText": "2 för 24 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.95",
+    "savePriceText": "",
+    "packageText": "25st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|ansiktsvard-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043003563_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164264",
+    "productCode": "101354900_ST",
+    "name": "BARNÄNGEN 2FÖR40",
+    "brand": "Barnängen",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 40,
+    "priceText": "2 för 40 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.95",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|harvard|schampo",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531106368_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164265",
+    "productCode": "101318906_ST",
+    "name": "INTUITION 2FÖR32",
+    "brand": "Intuition",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.95",
+    "savePriceText": "",
+    "packageText": "14p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|intimhygien|bindor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083483097_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164266",
+    "productCode": "101578493_ST",
+    "name": "MEVVÅTSER2FÖR39",
+    "brand": "Mevolution",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.95",
+    "savePriceText": "",
+    "packageText": "30p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|nasdukar-och-bomull",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043010103_C1N1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164267",
+    "productCode": "101339951_ST",
+    "name": "PADS/PINN 2FÖR28",
+    "brand": "Mevolution",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.95",
+    "savePriceText": "",
+    "packageText": "200p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|nasdukar-och-bomull",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489235_C1L1_s02",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164268",
+    "productCode": "101662844_ST",
+    "name": "PALETTE 2FÖR115",
+    "brand": "Palette",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 115,
+    "priceText": "2 för 115 kr",
+    "comparePriceText": "",
+    "regularPriceText": "69.95",
+    "savePriceText": "",
+    "packageText": "1st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|harvard|harfarg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531122757_C1R1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164269",
+    "productCode": "101353772_ST",
+    "name": "PLÅSTER 2FÖR38",
+    "brand": "Mevolution",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 38,
+    "priceText": "2 för 38 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.95",
+    "savePriceText": "",
+    "packageText": "40p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "apotek-och-lakemedel|plaster|plaster-och-sarvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492785_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164270",
+    "productCode": "101339963_ST",
+    "name": "PUMPTVÅL 2FÖR26",
+    "brand": "Mevolution",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "2 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.95",
+    "savePriceText": "",
+    "packageText": "300ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|tval",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489358_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164271",
+    "productCode": "101542359_ST",
+    "name": "TANDKRÄM 2FÖR30",
+    "brand": "Mevolution",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.95",
+    "savePriceText": "",
+    "packageText": "125ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|munvard|tandkram",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006489_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164272",
+    "productCode": "101339860_ST",
+    "name": "TANDVÅRD 2FÖR39",
+    "brand": "Mevolution",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.95",
+    "savePriceText": "",
+    "packageText": "40p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|munvard|ovrig-munvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489051_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164273",
+    "productCode": "101339965_ST",
+    "name": "TVÅLREFILL 2FÖR38",
+    "brand": "Mevolution",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 38,
+    "priceText": "2 för 38 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.95",
+    "savePriceText": "",
+    "packageText": "750ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|tval",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489372_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164274",
+    "productCode": "101245841_ST",
+    "name": "EST NÖTMIX 2FÖR55",
+    "brand": "Estrella",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "34.02",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|notter-och-snacks",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532151211_C1N1_s05",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164275",
+    "productCode": "101226667_ST",
+    "name": "GÅRDSCHIPS 2FÖR46",
+    "brand": "Gårdschips",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "29.29",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|chips-och-ostbagar|chips",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350045591050_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164276",
+    "productCode": "101286110_ST",
+    "name": "POPCORN 2FÖR37",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "270g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|popcorn",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471209_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164277",
+    "productCode": "101300808_ST",
+    "name": "BEKIND 2FÖR35",
+    "brand": "Be-kind",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "40g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|traning-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000159528481_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164278",
+    "productCode": "101231766_ST",
+    "name": "BULJONG 2FÖR23",
+    "brand": "Garant Eko",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "6p/3l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|buljong",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083443251_C1L1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164279",
+    "productCode": "101250198_ST",
+    "name": "BÖN/LIN 2FÖR56",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 56,
+    "priceText": "2 för 56 kr",
+    "comparePriceText": "",
+    "regularPriceText": "34.97",
+    "savePriceText": "",
+    "packageText": "800g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|bonor-och-baljvaxter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083450549_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164280",
+    "productCode": "101245204_ST",
+    "name": "BÖNOR 2FÖR20",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "380/230g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|bonor-och-baljvaxter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083446962_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164281",
+    "productCode": "101239059_ST",
+    "name": "CITRUSJ. 2FÖR17",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 17,
+    "priceText": "2 för 17 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "200ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|ovriga-smaksattare",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083444616_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164282",
+    "productCode": "100879239_ST",
+    "name": "CORNY 4FÖR34",
+    "brand": "Corny",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34,
+    "priceText": "4 för 34 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "50g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|halsokost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04011800563516_C1N1_s03",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164283",
+    "productCode": "101608101_ST",
+    "name": "DOLMIO 2FÖR47",
+    "brand": "Dolmio",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 47,
+    "priceText": "2 för 47 kr",
+    "comparePriceText": "",
+    "regularPriceText": "30.23",
+    "savePriceText": "",
+    "packageText": "450g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04002359021022_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164284",
+    "productCode": "101245190_ST",
+    "name": "EKOBÖNOR 3FÖR36",
+    "brand": "Garant Eko",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "3 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.09",
+    "savePriceText": "",
+    "packageText": "380/230g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|bonor-och-baljvaxter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447365_C1L1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164285",
+    "productCode": "101301595_ST",
+    "name": "EKO-PASTA 2FÖR32",
+    "brand": "Garant Eko",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083478024_C1N1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164286",
+    "productCode": "101285455_ST",
+    "name": "EKOTOMAT 3FÖR39",
+    "brand": "Garant Eko",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "3 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.04",
+    "savePriceText": "",
+    "packageText": "390g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|tomatkonserver",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083469619_C1L1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164287",
+    "productCode": "101267427_ST",
+    "name": "ELD. SÅS 2FÖR34",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34,
+    "priceText": "2 för 34 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "320ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|sas-och-smaksattare|sas",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083458507_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164288",
+    "productCode": "101290779_ST",
+    "name": "FUN LIGHT 2FÖR50",
+    "brand": "Fun Light",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 50,
+    "priceText": "2 för 50 kr",
+    "comparePriceText": "",
+    "regularPriceText": "26.97",
+    "savePriceText": "",
+    "packageText": "1l/10l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|lightdryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090389163_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164289",
+    "productCode": "101276700_ST",
+    "name": "GEV KAPSL. 2FÖR69",
+    "brand": "Gevalia",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 69,
+    "priceText": "2 för 69 kr",
+    "comparePriceText": "",
+    "regularPriceText": "39.7",
+    "savePriceText": "",
+    "packageText": "10p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|kapslar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711000379660_C1C0_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164290",
+    "productCode": "101260474_ST",
+    "name": "GF PASTA 2FÖR30",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.98",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|glutenfritt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083454332_C1N1_s01",
+    "labels": [
+      "crossed_ax"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164291",
+    "productCode": "101282537_ST",
+    "name": "GRANOLA 2FÖR73",
+    "brand": "Färsking",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 73,
+    "priceText": "2 för 73 kr",
+    "comparePriceText": "",
+    "regularPriceText": "46.32",
+    "savePriceText": "",
+    "packageText": "375g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|flingor-och-musli|musli-crunchy-och-granola",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350099111129_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164292",
+    "productCode": "101337368_ST",
+    "name": "GRÖTKOPP 2FÖR28",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.98",
+    "savePriceText": "",
+    "packageText": "65g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|flingor-och-musli|grot",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083488351_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164293",
+    "productCode": "101552965_ST",
+    "name": "KAFFE 2FÖR110",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 110,
+    "priceText": "2 för 110 kr",
+    "comparePriceText": "",
+    "regularPriceText": "60.52",
+    "savePriceText": "",
+    "packageText": "450g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|bryggkaffe",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043009312_C1L1_s01",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164294",
+    "productCode": "101345470_ST",
+    "name": "KAFFEKAPS. 2FÖR65",
+    "brand": "Lavazza",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "45.38",
+    "savePriceText": "",
+    "packageText": "10p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|kapslar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08000070053465_C1C1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164295",
+    "productCode": "101548831_ST",
+    "name": "KOKOSMJÖ/G 2FÖR33",
+    "brand": "Garant Eko",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.93",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|kokosmjolk-och-kokosgradde",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043008391_C1L1_s01",
+    "labels": [
+      "ecological",
+      "fairtrade",
+      "eu_ecological",
+      "fairtrade_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164296",
+    "productCode": "101231957_ST",
+    "name": "KOKOSMJÖLK 2FÖR28",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.04",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|kokosmjolk-och-kokosgradde",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083443473_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164297",
+    "productCode": "101287437_ST",
+    "name": "KOPPNUD 2FÖR18",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "2 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "65g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|nudlar-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083472299_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164298",
+    "productCode": "101285406_ST",
+    "name": "KROSSTOMAT 3FÖR31",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 31,
+    "priceText": "3 för 31 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "390g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|tomatkonserver",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083469602_C1L1_s03",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164299",
+    "productCode": "101240310_ST",
+    "name": "KRYDDMIX 2FÖR33",
+    "brand": "Santa Maria",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.29",
+    "savePriceText": "",
+    "packageText": "30g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|ovrigt-asien",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310034474_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164300",
+    "productCode": "100724227_ST",
+    "name": "KRYDDOR 2FÖR33",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "50g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|kryddor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041034293_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164362",
+    "productCode": "101584097_ST",
+    "name": "LIP ISTE 2FÖR20",
+    "brand": "Lipton",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "50g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|te-och-chokladdryck|te",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720608006656_C1R1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164363",
+    "productCode": "101282044_ST",
+    "name": "LOR KAPS 3FÖR103",
+    "brand": "L'or",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 103,
+    "priceText": "3 för 103 kr",
+    "comparePriceText": "",
+    "regularPriceText": "44.43",
+    "savePriceText": "",
+    "packageText": "10p",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|kapslar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711000360521_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164364",
+    "productCode": "101607344_ST",
+    "name": "MUSETTI 3FÖR89",
+    "brand": "Musetti",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 89,
+    "priceText": "3 för 89 kr",
+    "comparePriceText": "",
+    "regularPriceText": "36.86",
+    "savePriceText": "",
+    "packageText": "10p",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|kapslar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08004769254058_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164365",
+    "productCode": "101244155_ST",
+    "name": "MÜSLIBAR 2FÖR32",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.93",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|halsokost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083449499_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164366",
+    "productCode": "101068130_ST",
+    "name": "NUDLAR 5FÖR23",
+    "brand": "Samyang Ramen",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "5 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "6.15",
+    "savePriceText": "",
+    "packageText": "85g",
+    "conditionText": "5 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|nudlar-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350035210114_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164367",
+    "productCode": "101267873_ST",
+    "name": "OLIVER 2FÖR37",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.61",
+    "savePriceText": "",
+    "packageText": "260/155g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|oliver-och-delikatesser|oliver",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083459252_C1C1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164368",
+    "productCode": "101332229_ST",
+    "name": "PASTA 3FÖR39",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "3 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.09",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083486920_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164369",
+    "productCode": "101231940_ST",
+    "name": "PASTASÅ 2FÖR42",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 42,
+    "priceText": "2 för 42 kr",
+    "comparePriceText": "",
+    "regularPriceText": "25.5",
+    "savePriceText": "",
+    "packageText": "400g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083443305_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164370",
+    "productCode": "101618323_ST",
+    "name": "POW BAR 2FÖR23",
+    "brand": "Powerking",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "40g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|traning-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612212113_C1N1_s02",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164371",
+    "productCode": "101274717_ST",
+    "name": "PRO.BAR2FÖR36",
+    "brand": "Propud",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "2 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.66",
+    "savePriceText": "",
+    "packageText": "55g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|traning-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068294082_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164372",
+    "productCode": "101201964_ST",
+    "name": "SNABBKAFFE 2FÖ119",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 119,
+    "priceText": "2 för 119 kr",
+    "comparePriceText": "",
+    "regularPriceText": "66.2",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|snabbkaffe",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083409738_C1N1_s02",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164373",
+    "productCode": "101251649_ST",
+    "name": "SNABBNUDL. 4FÖR17",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 17,
+    "priceText": "4 för 17 kr",
+    "comparePriceText": "",
+    "regularPriceText": "5.63",
+    "savePriceText": "",
+    "packageText": "85g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|nudlar-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083450488_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164374",
+    "productCode": "101207616_ST",
+    "name": "SOPPA 3FÖR18",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "3 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "7.09",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|soppor-och-kramer|soppa",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427848_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164375",
+    "productCode": "100148001_ST",
+    "name": "SPAGHE 2FÖR37",
+    "brand": "Kungsörnen",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.61",
+    "savePriceText": "",
+    "packageText": "1kg",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130417405_C1R1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164376",
+    "productCode": "101212270_ST",
+    "name": "SWEBAR 2FÖR35",
+    "brand": "Dalblads",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.55",
+    "savePriceText": "",
+    "packageText": "55g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|traning-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350006710704_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164377",
+    "productCode": "101284927_ST",
+    "name": "TACOCHI 2FÖR23",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.09",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|texmex|tacoskal-och-brod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468070_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164378",
+    "productCode": "101336767_ST",
+    "name": "TACOKRYDDA 2FÖR17",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 17,
+    "priceText": "2 för 17 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.36",
+    "savePriceText": "",
+    "packageText": "30g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|texmex|kryddmixer-och-saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083487965_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164379",
+    "productCode": "101345361_ST",
+    "name": "TACOSÅS 2FÖR52",
+    "brand": "El Taco Truck",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 52,
+    "priceText": "2 för 52 kr",
+    "comparePriceText": "",
+    "regularPriceText": "34.97",
+    "savePriceText": "",
+    "packageText": "200ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|texmex|kryddmixer-och-saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350115940061_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164380",
+    "productCode": "101118595_ST",
+    "name": "TE 2FÖR26",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "2 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.09",
+    "savePriceText": "",
+    "packageText": "20p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|te-och-chokladdryck|te",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041059739_C1L1_s02",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164381",
+    "productCode": "101301755_ST",
+    "name": "TONFISK 2FÖR37",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.95",
+    "savePriceText": "",
+    "packageText": "170g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|tonfisk-och-makrill",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083478215_C1C1_s02",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164382",
+    "productCode": "101250650_ST",
+    "name": "TORTILL 2FÖR23",
+    "brand": "Banderos",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "320g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|texmex|tacoskal-och-brod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612700092_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164383",
+    "productCode": "101498814_ST",
+    "name": "ÄGGNUDL 2FÖR20",
+    "brand": "Spicefield",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|nudlar-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612121224_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164384",
+    "productCode": "101583516_ST",
+    "name": "BAKPLÅTSP 2FÖR29",
+    "brand": "Fixa",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29,
+    "priceText": "2 för 29 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.95",
+    "savePriceText": "",
+    "packageText": "24p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|matforvaring",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006892_C1N1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164385",
+    "productCode": "101224680_ST",
+    "name": "BLOCKLJUS 2FÖR48",
+    "brand": "Fixa",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 48,
+    "priceText": "2 för 48 kr",
+    "comparePriceText": "",
+    "regularPriceText": "26.95",
+    "savePriceText": "",
+    "packageText": "st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|ljus",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083437212_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164387",
+    "productCode": "101550183_ST",
+    "name": "TVÄTTLAPP. 2FÖR45",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 45,
+    "priceText": "2 för 45 kr",
+    "comparePriceText": "",
+    "regularPriceText": "25.95",
+    "savePriceText": "",
+    "packageText": "100p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|barnvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043007332_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164388",
+    "productCode": "101231351_ST",
+    "name": "NOCCO 2FÖR39",
+    "brand": "Nocco",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.97",
+    "savePriceText": "",
+    "packageText": "33cl",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|sport-och-energidryck|energidryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340131601008_C1N1_s04",
+    "labels": [
+      "age_restricted_15"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164389",
+    "productCode": "101362354_ST",
+    "name": "INTIMVÅTS. 2FÖR25",
+    "brand": "Mevolution",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.95",
+    "savePriceText": "",
+    "packageText": "20p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083493805_C1N1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164391",
+    "productCode": "101187097_ST",
+    "name": "DISKBORSTE 2FÖR20",
+    "brand": "Fixa",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.5",
+    "savePriceText": "",
+    "packageText": "1p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|disk|disktillbehor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083400087_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164392",
+    "productCode": "101674992_ST",
+    "name": "GLASÖGONPUTS 2F35",
+    "brand": "Fixa",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.95",
+    "savePriceText": "",
+    "packageText": "30p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|klader|ovrigt-klader",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083476686_S01",
+    "labels": [
+      "warning",
+      "flame"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164393",
+    "productCode": "101594876_ST",
+    "name": "HANDSKAR 2FÖR18",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "2 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.95",
+    "savePriceText": "",
+    "packageText": "20p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043011827_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164394",
+    "productCode": "101308929_ST",
+    "name": "MATLÅDA 2FÖR30",
+    "brand": "Nordiska Plast",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.95",
+    "savePriceText": "",
+    "packageText": "st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|matforvaring",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07318140009030_C1L1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164395",
+    "productCode": "101499709_ST",
+    "name": "MUFFINFORM 2FÖR39",
+    "brand": "Fixa",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.95",
+    "savePriceText": "",
+    "packageText": "32p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|matforvaring",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043003389_C1L1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164396",
+    "productCode": "101224743_ST",
+    "name": "PÅSAR 2FÖR32",
+    "brand": "Fixa",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.95",
+    "savePriceText": "",
+    "packageText": "70p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|matforvaring",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436321_C1L1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164397",
+    "productCode": "101527021_ST",
+    "name": "SERVETTER 2FÖR40",
+    "brand": "Fixa",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 40,
+    "priceText": "2 för 40 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.95",
+    "savePriceText": "",
+    "packageText": "20p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|servetter-och-dukar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005277_C1N1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164398",
+    "productCode": "101255722_ST",
+    "name": "SOPPÅSE 2FÖR39",
+    "brand": "Fixa",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.95",
+    "savePriceText": "",
+    "packageText": "25st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|stad|stadutrustning",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083452468_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164399",
+    "productCode": "101255725_ST",
+    "name": "SOPPÅSE 2FÖR55",
+    "brand": "Fixa",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "33.95",
+    "savePriceText": "",
+    "packageText": "30l/25st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|stad|stadutrustning",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083452482_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164400",
+    "productCode": "101203406_ST",
+    "name": "PAJ 2FÖR55",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "30.23",
+    "savePriceText": "",
+    "packageText": "220g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|pizza-paj-och-piroger|paj-och-piroger",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083405679_C1L1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164403",
+    "productCode": "101298386_ST",
+    "name": "ELD RAPSOLJA",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.55,
+    "priceText": "24,55 kr/st",
+    "comparePriceText": "",
+    "regularPriceText": "24.55",
+    "savePriceText": "",
+    "packageText": "1l",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|olja-och-vinager|olja",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083477089_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164404",
+    "productCode": "101225898_ST",
+    "name": "TOALETTPAPP. 18-P",
+    "brand": "Fixa",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 109,
+    "priceText": "109 kr/st",
+    "comparePriceText": "",
+    "regularPriceText": "109.0",
+    "savePriceText": "",
+    "packageText": "18p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|toalett-och-hushallspapper|toalettpapper",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083434389_C1L1_s04",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164301",
+    "productCode": "100379332_ST",
+    "name": "BULLAR 4FÖR23",
+    "brand": "Dahls Bageri",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "4 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "6.57",
+    "savePriceText": "",
+    "packageText": "45g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kondis-och-fika|kaffebrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350029734329_C1C0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164302",
+    "productCode": "101243975_ST",
+    "name": "DUOKAKOR 2FÖR28",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.04",
+    "savePriceText": "",
+    "packageText": "176g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kex-och-kakor|sota-kakor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083446733_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164303",
+    "productCode": "100380678_ST",
+    "name": "FRALLOR 4FÖR23",
+    "brand": "Dahls Bageri",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "4 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "6.57",
+    "savePriceText": "",
+    "packageText": "70g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|brod|baguetter-och-losbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350029733018_C1C0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164304",
+    "productCode": "101599862_ST",
+    "name": "GÖT MATKEX 2FÖR25",
+    "brand": "Göteborgs Kex",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "74g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kex-och-kakor|kex",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310520022097_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164305",
+    "productCode": "101237094_ST",
+    "name": "HAMBRÖD 2FÖR42",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 42,
+    "priceText": "2 för 42 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|korv-och-hamburgerbrod|hamburgerbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083444388_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164306",
+    "productCode": "101544622_ST",
+    "name": "KAFFEBRÖD 2FÖR25",
+    "brand": "Bonjour",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kondis-och-fika|kaffebrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05701014078515_C1C0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164307",
+    "productCode": "100145647_ST",
+    "name": "KAFFEBRÖD 3FÖR27",
+    "brand": "Bonjour",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 27,
+    "priceText": "3 för 27 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kondis-och-fika",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391288643007_C1C0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164308",
+    "productCode": "101417664_ST",
+    "name": "KAKOR 2FÖR36",
+    "brand": "Dazzley",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "2 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kex-och-kakor|sota-kakor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041086391_C1N1_s03",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164309",
+    "productCode": "100127364_ST",
+    "name": "KAFFEBRÖD 3FÖR33",
+    "brand": "Bonjour",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "3 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391288322100_C1C0_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164310",
+    "productCode": "101344022_ST",
+    "name": "MAJSKAKA 2FÖR33",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "125g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|ris-och-majskakor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490552_C1N1_s01",
+    "labels": [
+      "crossed_ax"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164311",
+    "productCode": "100209178_ST",
+    "name": "MATBRÖD 2FÖR18",
+    "brand": "Bonjour",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "2 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.36",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|brod|baguetter-och-losbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391288850009_C1R1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164312",
+    "productCode": "101307647_ST",
+    "name": "MINIDONUTS 5FÖR23",
+    "brand": "La Lorraine",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "5 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "5.63",
+    "savePriceText": "",
+    "packageText": "20g",
+    "conditionText": "5 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kondis-och-fika|kaffebrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031139280_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164313",
+    "productCode": "101544623_ST",
+    "name": "VITLBAG 2FÖR23",
+    "brand": "Bonjour",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "175g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|brod|baguetter-och-losbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07315062257365_C1R0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164314",
+    "productCode": "100799575_ST",
+    "name": "WAS SANDW 3FÖR22",
+    "brand": "Wasa",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22,
+    "priceText": "3 för 22 kr",
+    "comparePriceText": "",
+    "regularPriceText": "9.41",
+    "savePriceText": "",
+    "packageText": "37g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|knackebrod-och-skorpor|knackebrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300400122689_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164315",
+    "productCode": "101290607_ST",
+    "name": "KRYDDKORV 2FÖR53",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 53,
+    "priceText": "2 för 53 kr",
+    "comparePriceText": "",
+    "regularPriceText": "32.13",
+    "savePriceText": "",
+    "packageText": "300g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|korv|grill-och-kryddkorv",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083474323_C1N1_s01",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164316",
+    "productCode": "101206348_ST",
+    "name": "PROSCIUTTO 2FÖR65",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "39.7",
+    "savePriceText": "",
+    "packageText": "80g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|medelhavschark",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427923_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164317",
+    "productCode": "101183319_ST",
+    "name": "PÅLÄGG 2FÖR39",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "25.5",
+    "savePriceText": "",
+    "packageText": "120g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|palagg|skivat-palagg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041071748_C1N1_s03",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164318",
+    "productCode": "101187496_ST",
+    "name": "SALAMI 2FÖR36",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "2 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.66",
+    "savePriceText": "",
+    "packageText": "80g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|palagg|skivat-palagg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041072905_C1N1_s02",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164319",
+    "productCode": "101264324_ST",
+    "name": "ÖLKORV 2FÖR20",
+    "brand": "Prime Patrol",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "40g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|korv|olkorv",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083457197_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164320",
+    "productCode": "101366819_ST",
+    "name": "MATJES 2FÖR38",
+    "brand": "Abba",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 38,
+    "priceText": "2 för 38 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.61",
+    "savePriceText": "",
+    "packageText": "215/125g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fisk-och-skaldjur|sill-ansjovis-och-sardiner|sill",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350126082835_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164321",
+    "productCode": "101781200_ST",
+    "name": "RÄKOR 2FÖR65",
+    "brand": "Fiskexporten",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "40.64",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fisk-och-skaldjur|skaldjur|farska-skaldjur",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04740173001775_C1R1_s01",
+    "labels": [
+      "asc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164322",
+    "productCode": "101224830_ST",
+    "name": "SÅSER 2FÖR35",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "200ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fisk-och-skaldjur|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436222_C1C1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164323",
+    "productCode": "101344156_ST",
+    "name": "TÅNGCAV 2FÖR37",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.24",
+    "savePriceText": "",
+    "packageText": "70g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fisk-och-skaldjur|kaviar-och-rom|fiskrom",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490590_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164324",
+    "productCode": "101406122_ST",
+    "name": "BUREK 2FÖR46",
+    "brand": "Km Bake",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "28.34",
+    "savePriceText": "",
+    "packageText": "220g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|portionsratter|fardiga-ratter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03858893421108_C1L0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164325",
+    "productCode": "100261887_ST",
+    "name": "FELIX RULLP 2FÖ23",
+    "brand": "Felix",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|portionsratter|fardiga-ratter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090750697_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164326",
+    "productCode": "101212630_ST",
+    "name": "FÄRSK PAST 2FÖR33",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|farsk-pasta",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083430640_C1C1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164327",
+    "productCode": "101291166_ST",
+    "name": "JURESKOG 2FÖR45",
+    "brand": "Jureskog",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 45,
+    "priceText": "2 för 45 kr",
+    "comparePriceText": "",
+    "regularPriceText": "27.39",
+    "savePriceText": "",
+    "packageText": "230ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|sas-och-smaksattare|sas",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340046080738_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164328",
+    "productCode": "101347750_ST",
+    "name": "KEBABSÅS 2FÖR49",
+    "brand": "Schysst Käk",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49,
+    "priceText": "2 för 49 kr",
+    "comparePriceText": "",
+    "regularPriceText": "28.34",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|sas-och-smaksattare|sas",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451422_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164329",
+    "productCode": "101334258_ST",
+    "name": "REDORÄTTER 2FÖR84",
+    "brand": "Redo",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 84,
+    "priceText": "2 för 84 kr",
+    "comparePriceText": "",
+    "regularPriceText": "47.27",
+    "savePriceText": "",
+    "packageText": "400g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|portionsratter|fardiga-ratter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083487484_C1L1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164330",
+    "productCode": "101276691_ST",
+    "name": "SOPPA 2FÖR65",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "35.91",
+    "savePriceText": "",
+    "packageText": "450g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|portionsratter|fardiga-soppor-och-grytor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083464898_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164331",
+    "productCode": "101212667_ST",
+    "name": "TORTELL 2FÖR55",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "31.18",
+    "savePriceText": "",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|farsk-pasta",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083430688_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164332",
+    "productCode": "101358420_ST",
+    "name": "TOFU 2FÖR22",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22,
+    "priceText": "2 för 22 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "vegetariskt|tofu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083496905_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164333",
+    "productCode": "101277028_ST",
+    "name": "V.BACON 2FÖR41",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 41,
+    "priceText": "2 för 41 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.55",
+    "savePriceText": "",
+    "packageText": "120g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "vegetariskt|fryst-vegetariskt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468391_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164334",
+    "productCode": "101293702_ST",
+    "name": "SCHYSST K. 2FÖR89",
+    "brand": "Schysst Käk",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 89,
+    "priceText": "2 för 89 kr",
+    "comparePriceText": "",
+    "regularPriceText": "55.79",
+    "savePriceText": "",
+    "packageText": "275g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|kott|pannfardigt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451057_C1N1_s04",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164335",
+    "productCode": "101197313_ST",
+    "name": "ALPRO 2FÖR42",
+    "brand": "Alpro",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 42,
+    "priceText": "2 för 42 kr",
+    "comparePriceText": "",
+    "regularPriceText": "25.5",
+    "savePriceText": "",
+    "packageText": "1l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|vaxtbaserat|vaxtbaserad-dryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05411188110835_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164336",
+    "productCode": "101197644_ST",
+    "name": "BÄRRY 2FÖR20",
+    "brand": "Bärry",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.77",
+    "savePriceText": "",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311443210202_C1C1_s04",
+    "labels": [
+      "swedish_flag",
+      "milk_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164337",
+    "productCode": "101246038_ST",
+    "name": "EKS PUD 3FÖR24",
+    "brand": "Ekströms",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24,
+    "priceText": "3 för 24 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.88",
+    "savePriceText": "",
+    "packageText": "120g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|desserter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310470661803_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164338",
+    "productCode": "101599655_ST",
+    "name": "FLORA 2FÖR21",
+    "brand": "Flora",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 21,
+    "priceText": "2 för 21 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|vaxtbaserat|vaxtbaserad-matlagningsmejeri",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08719200284173_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164339",
+    "productCode": "101317693_ST",
+    "name": "HAVREDRYCK 2FÖR32",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.45",
+    "savePriceText": "",
+    "packageText": "1l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|vaxtbaserat|vaxtbaserad-dryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083480126_C1L1_s03",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164340",
+    "productCode": "101500849_ST",
+    "name": "HUMM 2FÖR46",
+    "brand": "Humm",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "28.34",
+    "savePriceText": "",
+    "packageText": "330ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|juice-och-fruktdryck|kyld-fruktdryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350092180221_C1C1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164341",
+    "productCode": "101328354_ST",
+    "name": "JUICE 2FÖR56",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 56,
+    "priceText": "2 för 56 kr",
+    "comparePriceText": "",
+    "regularPriceText": "31.18",
+    "savePriceText": "",
+    "packageText": "1l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|juice-och-fruktdryck|kyld-juice",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083480263_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164342",
+    "productCode": "101232098_ST",
+    "name": "KVARG 2FÖR27",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 27,
+    "priceText": "2 för 27 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.04",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|kvarg-och-cottage-cheese-|kvarg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083435539_C1L1_s03",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164343",
+    "productCode": "101224058_ST",
+    "name": "KVARG 3FÖR29",
+    "brand": "Lindahls",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29,
+    "priceText": "3 för 29 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.57",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07392672001724_C1C1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164344",
+    "productCode": "101237276_ST",
+    "name": "LÖFBERG 2FÖR35",
+    "brand": "Löfbergs",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.66",
+    "savePriceText": "",
+    "packageText": "230ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310050005171_C1N1_s05",
+    "labels": [
+      "ecological",
+      "fairtrade",
+      "eu_ecological",
+      "fairtrade_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164345",
+    "productCode": "100015029_ST",
+    "name": "MÅLT.DRYCK 4FÖR28",
+    "brand": "Bob",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "4 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "9.41",
+    "savePriceText": "",
+    "packageText": "2dl/1l",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|juice-och-fruktdryck|-ej-kyld-fruktdryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090155539_C1L1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164346",
+    "productCode": "101252611_ST",
+    "name": "PROPUD 2FÖR36",
+    "brand": "Propud",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "2 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "330ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068291210_C1N1_s06",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164347",
+    "productCode": "101708428_ST",
+    "name": "SKYR 2FÖR46",
+    "brand": "Dairy Food",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "26.45",
+    "savePriceText": "",
+    "packageText": "400g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|kvarg-och-cottage-cheese-|laktosfri-kvarg-och-cottage-cheese",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043018116_C1C1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164348",
+    "productCode": "101338211_ST",
+    "name": "SMOO/JUICE 2FÖR30",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.93",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489907_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164349",
+    "productCode": "101340616_ST",
+    "name": "VAL. PUDD. 2FÖR30",
+    "brand": "Valio",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "180g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06408430407675_C1C1_s03",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164350",
+    "productCode": "101328964_ST",
+    "name": "VEGODRYCK 2FÖR30",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.93",
+    "savePriceText": "",
+    "packageText": "1l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|vaxtbaserat|vaxtbaserad-dryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083483981_C1L1_s03",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164351",
+    "productCode": "101244011_ST",
+    "name": "BURGAROST 2FÖR46",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "27.39",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447532_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164352",
+    "productCode": "101296686_ST",
+    "name": "CR BONJ 2FÖR26",
+    "brand": "Crème Bonjour",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "2 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.61",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|farskost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08719200066748_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164353",
+    "productCode": "101533198_ST",
+    "name": "FETAOST 2FÖR43",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 43,
+    "priceText": "2 för 43 kr",
+    "comparePriceText": "",
+    "regularPriceText": "25.45",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005727_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164354",
+    "productCode": "100568823_ST",
+    "name": "FÄRSKOST 2FÖR35",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|farskost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041018453_C1L1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164355",
+    "productCode": "101548123_ST",
+    "name": "GRILLOST 2FÖR35",
+    "brand": "Eldorado",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043008551_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164356",
+    "productCode": "101191889_ST",
+    "name": "HALLOUM 2FÖR55",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "33.07",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083402241_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164357",
+    "productCode": "101295235_ST",
+    "name": "MOZZARELL 3FÖR28",
+    "brand": "Fresca D´oro",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "3 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.77",
+    "savePriceText": "",
+    "packageText": "125g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612160841_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164358",
+    "productCode": "101532473_ST",
+    "name": "RIV OST 2FÖR41",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 41,
+    "priceText": "2 för 41 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.55",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005789_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164359",
+    "productCode": "101202735_ST",
+    "name": "SKIVAD OST 2FÖR52",
+    "brand": "Frischgold",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 52,
+    "priceText": "2 för 52 kr",
+    "comparePriceText": "",
+    "regularPriceText": "32.13",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|skivad-ost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083426636_C1C1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164360",
+    "productCode": "101458205_ST",
+    "name": "TINE OST 2FÖR46",
+    "brand": "Tine",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "31.18",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|skivad-ost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07038010022449_C1R1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164361",
+    "productCode": "101293162_ST",
+    "name": "TINE OST 2FÖR51",
+    "brand": "Tine",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 51,
+    "priceText": "2 för 51 kr",
+    "comparePriceText": "",
+    "regularPriceText": "34.02",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|skivad-ost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04004164009431_C1R1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164386",
+    "productCode": "101406133_ST",
+    "name": "BACON 2FÖR27",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 27,
+    "priceText": "2 för 27 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.61",
+    "savePriceText": "",
+    "packageText": "140g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|chark|bacon-och-stekflask",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083497346_C1N1_s02",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164402",
+    "productCode": "101351867_ST",
+    "name": "GAR LEVERPASTEJ",
+    "brand": "Garant",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 9.46,
+    "priceText": "9,46 kr/st",
+    "comparePriceText": "",
+    "regularPriceText": "9.46",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|palagg|pastej-och-pat-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492129_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164401",
+    "productCode": "101269302_ST",
+    "name": "BUBBIES 4FÖR70",
+    "brand": "",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 70,
+    "priceText": "4 för 70 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|glass|styckglass",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042016052_S01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164502",
+    "productCode": "101331728_ST",
+    "name": "BLOMJORD 2FÖR79",
+    "brand": "Fixa",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 79,
+    "priceText": "2 för 79 kr",
+    "comparePriceText": "",
+    "regularPriceText": "46.95",
+    "savePriceText": "",
+    "packageText": "18l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "blommor-och-tillbehor|jord",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083487118_C1N1_s01",
+    "labels": [
+      "ecological",
+      "krav",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164503",
+    "productCode": "101336010_ST",
+    "name": "PLANTERING 3F125",
+    "brand": "Rölunda Gård",
+    "storeId": "4660",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 125,
+    "priceText": "3 för 125 kr",
+    "comparePriceText": "",
+    "regularPriceText": "49.95",
+    "savePriceText": "",
+    "packageText": "40l",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "blommor-och-tillbehor|jord",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391290688409_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4660&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500309493",
+    "productCode": "101291077_ST",
+    "name": "Läsk",
+    "brand": "Coca-Cola, Fanta, Sprite",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 6,
+    "priceText": "6 kr/st",
+    "comparePriceText": "18,18/l +pant",
+    "regularPriceText": "11.3",
+    "savePriceText": "Spara 4,36 kr",
+    "packageText": "33cl",
+    "conditionText": "",
+    "redeemLimitText": "Max 20 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "dryck|lask|lask-liten",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000112637939_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500303429",
+    "productCode": "100168667_ST",
+    "name": "Lingongrova, Guldkorn",
+    "brand": "Pågen",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 19,
+    "priceText": "19 kr/st",
+    "comparePriceText": "38,00/kg",
+    "regularPriceText": "25.5",
+    "savePriceText": "Spara 6,50-11,23 kr",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "brod-och-kakor|brod|matbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311071330525_C1L1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298172",
+    "productCode": "101017249_ST",
+    "name": "Svenskt smör",
+    "brand": "Arla",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39.95,
+    "priceText": "39,95 kr/st",
+    "comparePriceText": "79,90/kg",
+    "regularPriceText": "69.04",
+    "savePriceText": "Spara 22,46 kr",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|smor-margarin-och-jast|smor-och-margarin",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865005168_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298127",
+    "productCode": "101183319_ST",
+    "name": "Smörgåspålägg",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "116,67-175,00/kg",
+    "regularPriceText": "23.61",
+    "savePriceText": "Spara 15,44-23,00 kr",
+    "packageText": "80-120g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "kott-fagel-och-chark|palagg|skivat-palagg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041071748_C1N1_s03",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500299506",
+    "productCode": "101241262_ST",
+    "name": "Kaffe",
+    "brand": "Zoégas",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 59.95,
+    "priceText": "59,95 kr/st",
+    "comparePriceText": "133,22/kg",
+    "regularPriceText": "85.13",
+    "savePriceText": "Spara 10,98-26,17 kr",
+    "packageText": "450g",
+    "conditionText": "",
+    "redeemLimitText": "Max 2 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|kaffe|bryggkaffe",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310731101666_C1R1_s05",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298024",
+    "productCode": "101222356_ST",
+    "name": "Kycklinginnerfilé",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46.95,
+    "priceText": "46,95 kr/st",
+    "comparePriceText": "67,07/kg",
+    "regularPriceText": "62.25",
+    "savePriceText": "Spara 12,62 kr",
+    "packageText": "700g",
+    "conditionText": "",
+    "redeemLimitText": "Max 3 köp",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fryst|kott-och-kyckling|kyckling-och-ovrig-fagel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083434723_C1C1_s03",
+    "labels": [
+      "swedish_flag",
+      "swedish_bird"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298454",
+    "productCode": "101251544_ST",
+    "name": "Styckglass",
+    "brand": "Sia Glass",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 10,
+    "priceText": "10 kr/st",
+    "comparePriceText": "10,00/st",
+    "regularPriceText": "22.7",
+    "savePriceText": "Spara 1,40-19,30 kr",
+    "packageText": "40-210ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fryst|glass|styckglass",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07312690117016_C1N1_s02",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298365",
+    "productCode": "100364008_ST",
+    "name": "Olivolja Classico",
+    "brand": "Zeta",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 66,
+    "priceText": "66 kr/st",
+    "comparePriceText": "132,00/l",
+    "regularPriceText": "84.23",
+    "savePriceText": "Spara 4,93-16,29 kr",
+    "packageText": "500ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|olja-och-vinager|olja",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350002400333_C1N1_s08",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298362",
+    "productCode": "101206348_ST",
+    "name": "Prosciutto Crudo",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "18 kr/st",
+    "comparePriceText": "225,00/kg",
+    "regularPriceText": "39.7",
+    "savePriceText": "Spara 19,80 kr",
+    "packageText": "80g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "kott-fagel-och-chark|medelhavschark",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427923_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298307",
+    "productCode": "101532475_ST",
+    "name": "Riven ost",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "18 kr/st",
+    "comparePriceText": "120,00/kg",
+    "regularPriceText": "24.55",
+    "savePriceText": "Spara 4,66-5,61 kr",
+    "packageText": "150g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005802_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298397",
+    "productCode": "101692668_ST",
+    "name": "Vannameiräkor",
+    "brand": "Leröy",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49.95,
+    "priceText": "49,95 kr/st",
+    "comparePriceText": "227,05/kg",
+    "regularPriceText": "75.66",
+    "savePriceText": "Spara 23,82 kr",
+    "packageText": "220g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fisk-och-skaldjur|skaldjur|farska-skaldjur",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07317370106588_C1N1_s01",
+    "labels": [
+      "asc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298293",
+    "productCode": "100638035_ST",
+    "name": "Start! Naturell",
+    "brand": "Lantmännen",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "28 kr/st",
+    "comparePriceText": "37,33/kg",
+    "regularPriceText": "37.8",
+    "savePriceText": "Spara 9,80 kr",
+    "packageText": "750g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|flingor-och-musli|musli-crunchy-och-granola",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130801709_C1R1_s07",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298020",
+    "productCode": "101229322_ST",
+    "name": "Tvättmedel, Sköljmedel",
+    "brand": "Fixa",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "0,40-0,95 kr/tvätt",
+    "regularPriceText": "31.95",
+    "savePriceText": "Spara 11,95 kr",
+    "packageText": "750g, 750ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "hem-och-hushall|tvatt|tvattmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436864_C1L1_s04",
+    "labels": [
+      "swan",
+      "warning",
+      "exclamation_mark",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500303814",
+    "productCode": "101291350_ST",
+    "name": "Hälsa",
+    "brand": "Östras",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "33,33/kg",
+    "regularPriceText": "34.97",
+    "savePriceText": "Spara 14,97 kr",
+    "packageText": "600g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "brod-och-kakor|brod|matbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07314320041029_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298981",
+    "productCode": "100300906_ST",
+    "name": "Vaniljyoghurt",
+    "brand": "Valio",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "20,00/kg",
+    "regularPriceText": "27.39",
+    "savePriceText": "Spara 6,97 kr",
+    "packageText": "1kg",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|yoghurt-och-filmjolk|smaksatt-yoghurt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06408432088933_C1R1_s07",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298200",
+    "productCode": "101264126_ST",
+    "name": "Tandkräm",
+    "brand": "Oral-B",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 16,
+    "priceText": "16 kr/st",
+    "comparePriceText": "213,33/l",
+    "regularPriceText": "31.95",
+    "savePriceText": "Spara 11,95-14,95 kr",
+    "packageText": "75ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "halsa-och-skonhet|munvard|tandkram",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08001090291035_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298198",
+    "productCode": "101542405_ST",
+    "name": "Schampo, Balsam",
+    "brand": "Head & Shoulders",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "30 kr/st",
+    "comparePriceText": "120,00-136,36/l",
+    "regularPriceText": "44.95",
+    "savePriceText": "Spara 8,95-17,95 kr",
+    "packageText": "220-250ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "halsa-och-skonhet|harvard|schampo",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216219570_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500299061",
+    "productCode": "101252347_ST",
+    "name": "Grekisk yoghurt",
+    "brand": "Arla",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "28 kr/st",
+    "comparePriceText": "28,00/kg",
+    "regularPriceText": "38.75",
+    "savePriceText": "Spara 5,07-8,86 kr",
+    "packageText": "1kg",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|matlagningsmejerier|matlagningsyoghurt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310865095466_C1C1_s06",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298115",
+    "productCode": "101854360_ST",
+    "name": "Sprödbakad fiskfilé",
+    "brand": "Findus",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "35 kr/st",
+    "comparePriceText": "97,22/kg",
+    "regularPriceText": "44.43",
+    "savePriceText": "Spara 8,48 kr",
+    "packageText": "360g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fisk-och-skaldjur|fisk|fryst-fisk",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310500094465_C1N1_s01",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298083",
+    "productCode": "101135095_ST",
+    "name": "Pesto",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "100,00/kg",
+    "regularPriceText": "28.34",
+    "savePriceText": "Spara 8,34 kr",
+    "packageText": "200g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041062654_C1C1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298065",
+    "productCode": "101287807_ST",
+    "name": "Fryst vegetariskt",
+    "brand": "Anamma",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "33 kr/st",
+    "comparePriceText": "73,33-110,00/kg",
+    "regularPriceText": "46.32",
+    "savePriceText": "Spara 13,32-18,05 kr",
+    "packageText": "300-450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "vegetariskt|fryst-vegetariskt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240120189_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500297778",
+    "productCode": "101649567_ST",
+    "name": "Valnötter",
+    "brand": "Exotic snacks",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "25 kr/st",
+    "comparePriceText": "100,00/kg",
+    "regularPriceText": "47.27",
+    "savePriceText": "Tillfälligt klipp",
+    "packageText": "250g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391814009109_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298306",
+    "productCode": "101328356_ST",
+    "name": "Parmigiano Reggiano",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "33 kr/st",
+    "comparePriceText": "220,00/kg",
+    "regularPriceText": "47.27",
+    "savePriceText": "Spara 14,27 kr",
+    "packageText": "150g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "21/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083488511_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298048",
+    "productCode": "101245383_ST",
+    "name": "Crème fraiche",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22,
+    "priceText": "22 kr/st",
+    "comparePriceText": "44,00/l",
+    "regularPriceText": "32.07",
+    "savePriceText": "Spara 2,55-12,97 kr",
+    "packageText": "5dl",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "21/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|matlagningsmejerier|creme-fraiche",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083448638_C1N1_s06",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500303714",
+    "productCode": "101599080_ST",
+    "name": "Ekologisk blandfärs",
+    "brand": "Garant Eko",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 59.95,
+    "priceText": "59,95 kr/st",
+    "comparePriceText": "119,90/kg",
+    "regularPriceText": "74.82",
+    "savePriceText": "Spara 10,03 kr",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "kott-fagel-och-chark|kott|kottfars",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043011957_C1N1_s02",
+    "labels": [
+      "ecological",
+      "krav",
+      "swedish_flag",
+      "meat_from_sweden",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500303868",
+    "productCode": "101839908_ST",
+    "name": "Potatissallad",
+    "brand": "Rydbergs",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "35 kr/st",
+    "comparePriceText": "46,67/kg",
+    "regularPriceText": "45.38",
+    "savePriceText": "Spara 8,48 kr",
+    "packageText": "750g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fardigmat|gratang-och-roror|kramiga-sallader",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160020447_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307473",
+    "productCode": "100151933_ST",
+    "name": "Avokado",
+    "brand": "",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 5,
+    "priceText": "5 kr/st",
+    "comparePriceText": "ca 29,41/kg",
+    "regularPriceText": "13.78",
+    "savePriceText": "Spara 8,50 kr",
+    "packageText": "170g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "21/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|gronsaker|avokado",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042000662_C1N0_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307476",
+    "productCode": "100816306_ST",
+    "name": "Röd spetspaprika",
+    "brand": "",
+    "storeId": "4775",
+    "campaignType": "LOYALTY",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 15,
+    "priceText": "15 kr/st",
+    "comparePriceText": "75,00/kg",
+    "regularPriceText": "22.95",
+    "savePriceText": "Spara 5,80 kr",
+    "packageText": "200g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|gronsaker|paprika",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042001683_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500309494",
+    "productCode": "101261444_ST",
+    "name": "Surdegsbröd",
+    "brand": "La Lorraine",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "25 kr/st",
+    "comparePriceText": "55,56/kg",
+    "regularPriceText": "37.8",
+    "savePriceText": "Spara 12,80 kr",
+    "packageText": "450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "brod-och-kakor|brod|baguetter-och-losbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031135473_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298572",
+    "productCode": "101269568_ST",
+    "name": "Tutti Frutti, Tyrkisk Peber",
+    "brand": "Fazer",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 13.95,
+    "priceText": "13,95 kr/st",
+    "comparePriceText": "77,50-93,00/kg",
+    "regularPriceText": "21.72",
+    "savePriceText": "Spara 4,93-5,87 kr",
+    "packageText": "150-180g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "godis-snacks-och-glass|godis|godispasar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06416453038288_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298437",
+    "productCode": "101240779_ST",
+    "name": "Färskost",
+    "brand": "Arla",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14.95,
+    "priceText": "14,95 kr/st",
+    "comparePriceText": "99,67/kg",
+    "regularPriceText": "19.82",
+    "savePriceText": "Spara 4,87 kr",
+    "packageText": "150g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|ost|farskost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05711953029912_C1C1_s07",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298399",
+    "productCode": "101845036_ST",
+    "name": "Barnmat",
+    "brand": "Hipp",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "60,00-78,95/kg",
+    "regularPriceText": "19.82",
+    "savePriceText": "Spara 2,08-12,58 kr",
+    "packageText": "190-250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "barn|barnmat-och-fruktdryck|barnmat-8-man",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04062300483064_C1N1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500299078",
+    "productCode": "101469546_ST",
+    "name": "Glass 4-pack",
+    "brand": "Häagen-Dazs",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49.95,
+    "priceText": "49,95 kr/st",
+    "comparePriceText": "12,49/st",
+    "regularPriceText": "56.73",
+    "savePriceText": "Tillfälligt klipp",
+    "packageText": "4x95ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "fryst|glass|glasspaket",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03415581520927_C1C1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298803",
+    "productCode": "101250413_ST",
+    "name": "Kattmat",
+    "brand": "Mjau",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14.95,
+    "priceText": "14,95 kr/st",
+    "comparePriceText": "39,34-40,41/kg",
+    "regularPriceText": "17.95",
+    "savePriceText": "",
+    "packageText": "370-380g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "djur|katt|kattmat-vat",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300330038104_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500302260",
+    "productCode": "101719942_ST",
+    "name": "Mild kvarg",
+    "brand": "Arla",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 17.95,
+    "priceText": "17,95 kr/st",
+    "comparePriceText": "39,89/kg",
+    "regularPriceText": "24.13",
+    "savePriceText": "Spara 5,23 kr",
+    "packageText": "450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|kvarg-och-cottage-cheese-|kvarg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04016241051035_C1C1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298135",
+    "productCode": "101333968_ST",
+    "name": "Majonnäs, Dressing",
+    "brand": "Hellmann's",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.95,
+    "priceText": "24,95 kr/st",
+    "comparePriceText": "99,80-101,84/l",
+    "regularPriceText": "30.23",
+    "savePriceText": "Spara 1,50-5,28 kr",
+    "packageText": "245-250ml",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|kryddor-och-smaksattare|dressingar-och-majonnas-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08710522882207_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298402",
+    "productCode": "101800163_ST",
+    "name": "Bindor, Trosskydd",
+    "brand": "Always",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46.95,
+    "priceText": "46,95 kr/st",
+    "comparePriceText": "0,78-3,91/st",
+    "regularPriceText": "52.95",
+    "savePriceText": "Spara 3,00-6,00 kr",
+    "packageText": "12-60-pack",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "halsa-och-skonhet|intimhygien|bindor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08700216213837_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298400",
+    "productCode": "100308301_ST",
+    "name": "Grillkorv",
+    "brand": "Scan",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 85,
+    "priceText": "2 för 85 kr",
+    "comparePriceText": "66,41-106,25/kg",
+    "regularPriceText": "51.05",
+    "savePriceText": "Spara 7,64-15,22 kr",
+    "packageText": "400-640g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "kott-fagel-och-chark|korv|grill-och-kryddkorv",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300207071005_C1N1_s04",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298080",
+    "productCode": "101829580_ST",
+    "name": "Mjukost",
+    "brand": "Fjällbrynt",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26.95,
+    "priceText": "26,95 kr/st",
+    "comparePriceText": "122,50/kg",
+    "regularPriceText": "34.97",
+    "savePriceText": "Spara 7,07 kr",
+    "packageText": "220g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "mejeri-ost-och-agg|ost|mjukost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07313160020287_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298078",
+    "productCode": "101512430_ST",
+    "name": "Varmkorv",
+    "brand": "Lithells",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34.95,
+    "priceText": "34,95 kr/st",
+    "comparePriceText": "97,08/kg",
+    "regularPriceText": "42.54",
+    "savePriceText": "Spara 6,64 kr",
+    "packageText": "360g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "kott-fagel-och-chark|korv|varm-och-wienerkorv",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310628008894_C1L1_s02",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500298059",
+    "productCode": "101225562_ST",
+    "name": "Havreflingor",
+    "brand": "Frebaco Kvarn",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "57,14/kg",
+    "regularPriceText": "24.13",
+    "savePriceText": "Spara 3,18-4,55 kr",
+    "packageText": "350g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "skafferi|flingor-och-musli|flingor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07312560057404_C1R1_s06",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307475",
+    "productCode": "101174339_ST",
+    "name": "Förkokt majs",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "20 kr/st",
+    "comparePriceText": "44,44/kg",
+    "regularPriceText": "24.95",
+    "savePriceText": "",
+    "packageText": "450g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|gronsaker|ovriga-gronsaker",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042001461_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307469",
+    "productCode": "101209021_ST",
+    "name": "Jordgubbar",
+    "brand": "",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "28 kr/st",
+    "comparePriceText": "70,00/kg",
+    "regularPriceText": "39.95",
+    "savePriceText": "",
+    "packageText": "400g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|bar|farska-bar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042004943_C1L1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307481",
+    "productCode": "100594965_ST",
+    "name": "Svensk gurka",
+    "brand": "",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25 kr",
+    "comparePriceText": "ca 40,32/kg",
+    "regularPriceText": "15.0",
+    "savePriceText": "",
+    "packageText": "310g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|gronsaker|gurka",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042004691_C1N1_s01",
+    "labels": [
+      "swedish_flag",
+      "from_sweden",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307468",
+    "productCode": "101283986_ST",
+    "name": "Rosor 10-pack",
+    "brand": "",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39.95,
+    "priceText": "39,95 kr/st",
+    "comparePriceText": "",
+    "regularPriceText": "39.95",
+    "savePriceText": "",
+    "packageText": "",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:58.000Z",
+    "category": "blommor-och-tillbehor|snittblommor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042013150_C1C0_s01",
+    "labels": [
+      "fairtrade",
+      "fairtrade_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "2500307482",
+    "productCode": "101178320_ST",
+    "name": "Nektariner",
+    "brand": "",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29.95,
+    "priceText": "29,95 kr/st",
+    "comparePriceText": "59,90/kg",
+    "regularPriceText": "49.95",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "18/05-2026",
+    "endDate": "24/05-2026",
+    "validUntil": "2026-05-24T21:59:59.000Z",
+    "category": "frukt-och-gront|frukt|exotisk-frukt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042005896_C1R1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164202",
+    "productCode": "101594877_ST",
+    "name": "BLÖJPÅSE 2FÖR28",
+    "brand": "Minstingen",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.95",
+    "savePriceText": "",
+    "packageText": "50p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|barnvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043011834_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164203",
+    "productCode": "101260398_ST",
+    "name": "EKO BARNM. 3FÖR28",
+    "brand": "Minstingen",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "3 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.36",
+    "savePriceText": "",
+    "packageText": "90g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|barnmat-och-fruktdryck|barnmat-5-6-man",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083453977_C1N1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164204",
+    "productCode": "101261711_ST",
+    "name": "EKO BARNM. 3FÖR34",
+    "brand": "Minstingen",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34,
+    "priceText": "3 för 34 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "120g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|grot-och-valling",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083453946_C1N1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164205",
+    "productCode": "101258703_ST",
+    "name": "FRUKTST 3FÖR25",
+    "brand": "Nestlé",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "3 för 25 kr",
+    "comparePriceText": "",
+    "regularPriceText": "9.41",
+    "savePriceText": "",
+    "packageText": "25g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|barnsnacks",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613035497641_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164206",
+    "productCode": "101314330_ST",
+    "name": "MINSTING 2FÖR165",
+    "brand": "Minstingen",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 165,
+    "priceText": "2 för 165 kr",
+    "comparePriceText": "",
+    "regularPriceText": "84.95",
+    "savePriceText": "",
+    "packageText": "50p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|blojor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083481826_C1N1_s04",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164207",
+    "productCode": "101353715_ST",
+    "name": "MINSTINGEN2FÖR175",
+    "brand": "Minstingen",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 175,
+    "priceText": "2 för 175 kr",
+    "comparePriceText": "",
+    "regularPriceText": "89.0",
+    "savePriceText": "",
+    "packageText": "42p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|blojor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492709_C1N1_s01",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164208",
+    "productCode": "101278144_ST",
+    "name": "M-SNACK 2FÖR18",
+    "brand": "Minstingen",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "2 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "20g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|barnsnacks",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083465871_C1N1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164209",
+    "productCode": "101202634_ST",
+    "name": "SMOOTHIE 3FÖR31",
+    "brand": "Nestlé",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 31,
+    "priceText": "3 för 31 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "90g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|barnmat-och-fruktdryck|barnmat-5-6-man",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07613033881824_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164210",
+    "productCode": "101353358_ST",
+    "name": "VÅTSERV. 2FÖR30",
+    "brand": "Minstingen",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.95",
+    "savePriceText": "",
+    "packageText": "63p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|barnvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492471_C1N1_s01",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164211",
+    "productCode": "101353275_ST",
+    "name": "VÅTSERVET. 2FÖR24",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24,
+    "priceText": "2 för 24 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.95",
+    "savePriceText": "",
+    "packageText": "72p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|barnvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492488_C1N1_s01",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164212",
+    "productCode": "101094539_ST",
+    "name": "FELIX RÄTT 2FÖR80",
+    "brand": "Felix",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 80,
+    "priceText": "2 för 80 kr",
+    "comparePriceText": "",
+    "regularPriceText": "47.27",
+    "savePriceText": "",
+    "packageText": "380g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|portionsratter|enportioner",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310240076806_C1L1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164213",
+    "productCode": "100127211_ST",
+    "name": "FINDUSRÄTT 2FÖR65",
+    "brand": "Findus",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "37.8",
+    "savePriceText": "",
+    "packageText": "400g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|portionsratter|enportioner",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310500040127_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164214",
+    "productCode": "101277258_ST",
+    "name": "FRYST BLÅB 2FÖR37",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.66",
+    "savePriceText": "",
+    "packageText": "225g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "frukt-och-gront|bar|frysta-bar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083465413_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164215",
+    "productCode": "101302035_ST",
+    "name": "FRYST HALLON 2F52",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 52,
+    "priceText": "2 för 52 kr",
+    "comparePriceText": "",
+    "regularPriceText": "28.34",
+    "savePriceText": "",
+    "packageText": "225g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "frukt-och-gront|bar|frysta-bar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083478321_C1L1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164216",
+    "productCode": "101259156_ST",
+    "name": "GLASS 2FÖR61",
+    "brand": "Dazzley",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 61,
+    "priceText": "2 för 61 kr",
+    "comparePriceText": "",
+    "regularPriceText": "35.91",
+    "savePriceText": "",
+    "packageText": "0,9l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|glass|glasspaket",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041081198_C1L1_s03",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164217",
+    "productCode": "101229946_ST",
+    "name": "GRÖNSAKER 2FÖR37",
+    "brand": "Garant Eko",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "450g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|gronsaker|gronsaker-och-rotfrukter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083439513_C1N1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164218",
+    "productCode": "101667272_ST",
+    "name": "HACK GRÖNS 2FÖR25",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.09",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|gronsaker|gronsaker-och-rotfrukter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043015092_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164219",
+    "productCode": "101174269_ST",
+    "name": "JORDGUBBAR 2FÖR33",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "225g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "frukt-och-gront|bar|frysta-bar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041060322_C1L1_s04",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164220",
+    "productCode": "101424647_ST",
+    "name": "LOHILO 2FÖR65",
+    "brand": "Lohilo",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "37.8",
+    "savePriceText": "",
+    "packageText": "0,35l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|glass|glasspaket",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07398818389985_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164221",
+    "productCode": "101264516_ST",
+    "name": "MANGO 2FÖR36",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "2 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "225g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "frukt-och-gront|bar|frysta-bar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083457036_C1L1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164222",
+    "productCode": "101502740_ST",
+    "name": "PASTABOWL 2FÖR70",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 70,
+    "priceText": "2 för 70 kr",
+    "comparePriceText": "",
+    "regularPriceText": "37.8",
+    "savePriceText": "",
+    "packageText": "370g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|portionsratter|enportioner",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043004416_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164223",
+    "productCode": "101261058_ST",
+    "name": "PIZZA 2FÖR55",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "32.13",
+    "savePriceText": "",
+    "packageText": "350g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|pizza-paj-och-piroger|pizza",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083455155_C1L1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164224",
+    "productCode": "101152404_ST",
+    "name": "SOJABÖNOR 2FÖR33",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|gronsaker|gronsaker-och-rotfrukter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041065075_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164225",
+    "productCode": "101544831_ST",
+    "name": "SURIMI 3FÖR28",
+    "brand": "Vici",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "3 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|fisk-och-skaldjur|skaldjur-och-havsdelikatesser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04770190161046_C1N1_s01",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164226",
+    "productCode": "101433526_ST",
+    "name": "WOKMIX 2FÖR42",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 42,
+    "priceText": "2 för 42 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.61",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|gronsaker|wok",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083499913_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164227",
+    "productCode": "101199266_ST",
+    "name": "DREAMIES 2FÖR35",
+    "brand": "Dreamies",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.5",
+    "savePriceText": "",
+    "packageText": "60g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04008429037894_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164228",
+    "productCode": "101603430_ST",
+    "name": "HUNDMAT 4FÖR45",
+    "brand": "Smart Pets",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 45,
+    "priceText": "4 för 45 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.95",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|hund|hundmat-vat",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088692_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164229",
+    "productCode": "101279773_ST",
+    "name": "HUNDPÅSAR 3FÖR29",
+    "brand": "First Price",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29,
+    "priceText": "3 för 29 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.95",
+    "savePriceText": "",
+    "packageText": "50p",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|hund|hundtillbehor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083467622_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164230",
+    "productCode": "101549503_ST",
+    "name": "HUNDTILLTUGG 2F32",
+    "brand": "Smart Pets",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.95",
+    "savePriceText": "",
+    "packageText": "55g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|hund|hundgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088227_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164231",
+    "productCode": "101550213_ST",
+    "name": "KATTGODIS 2FÖR26",
+    "brand": "Smart Pets",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "2 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.95",
+    "savePriceText": "",
+    "packageText": "50g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088128_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164232",
+    "productCode": "101550348_ST",
+    "name": "KATTGODIS 2FÖR29",
+    "brand": "Smart Pets",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29,
+    "priceText": "2 för 29 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.95",
+    "savePriceText": "",
+    "packageText": "25g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088104_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164233",
+    "productCode": "101739618_ST",
+    "name": "KATTMOUSSE 4FÖR30",
+    "brand": "Smart Pets",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "4 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "8.95",
+    "savePriceText": "",
+    "packageText": "85g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattmat-vat",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041089002_C1C1_s01",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164234",
+    "productCode": "101547841_ST",
+    "name": "KATTPATE 3FÖR20",
+    "brand": "Smart Pets",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "3 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "8.95",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattmat-vat",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041088029_C1N1_s01",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164235",
+    "productCode": "101242816_ST",
+    "name": "MJAU 4FÖR35",
+    "brand": "Mjau",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "4 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "8.95",
+    "savePriceText": "",
+    "packageText": "85g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattmat-vat",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300330035110_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164236",
+    "productCode": "101550616_ST",
+    "name": "PARTYPUFF 2FÖR32",
+    "brand": "Mjau",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.95",
+    "savePriceText": "",
+    "packageText": "60g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "djur|katt|kattgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311030712034_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164237",
+    "productCode": "101175745_ST",
+    "name": "ENERGIDR.  2FÖR32",
+    "brand": "Monster Energy",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.82",
+    "savePriceText": "",
+    "packageText": "50cl",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|sport-och-energidryck|energidryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05060166694777_C1N1_s01",
+    "labels": [
+      "age_restricted_15"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164238",
+    "productCode": "101705852_ST",
+    "name": "ISTE 3FÖR18",
+    "brand": "Premier",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "3 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "7.52",
+    "savePriceText": "",
+    "packageText": "33cl",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|saft-och-stilldrink|iste-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612404501_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164239",
+    "productCode": "100197136_ST",
+    "name": "LOKA 2FÖR20",
+    "brand": "Loka",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "1.5l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|vatten|vatten-stor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401000060_C1N1_s05",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164240",
+    "productCode": "100198260_ST",
+    "name": "LÄSK 2FÖR32",
+    "brand": "Champis",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.82",
+    "savePriceText": "",
+    "packageText": "1,5l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|lask|lask-stor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401000367_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164241",
+    "productCode": "101549387_ST",
+    "name": "POWERKI 2FÖR23",
+    "brand": "Powerking",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "50cl",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|sport-och-energidryck|energidryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612222389_C1N1_s01",
+    "labels": [
+      "age_restricted_15"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164242",
+    "productCode": "101175130_ST",
+    "name": "POWERKI 4FÖR24",
+    "brand": "Powerking",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24,
+    "priceText": "4 för 24 kr",
+    "comparePriceText": "",
+    "regularPriceText": "9.41",
+    "savePriceText": "",
+    "packageText": "25cl",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|sport-och-energidryck|energidryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612221351_C1C1_s01",
+    "labels": [
+      "age_restricted_15"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164243",
+    "productCode": "101607963_ST",
+    "name": "PREM LÄSK 4FÖR26",
+    "brand": "Premier",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "4 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "7.52",
+    "savePriceText": "",
+    "packageText": "33cl",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|lask|lask-liten",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612404310_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164244",
+    "productCode": "101290434_ST",
+    "name": "STILLDR 3FÖR33",
+    "brand": "Premier",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "3 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "3p/25cl",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|saft-och-stilldrink|stilldrink",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083474088_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164245",
+    "productCode": "101205991_ST",
+    "name": "VATTEN 2FÖR18",
+    "brand": "Premier",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "2 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.36",
+    "savePriceText": "",
+    "packageText": "1.5l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|vatten|vatten-stor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612513807_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164246",
+    "productCode": "101197310_ST",
+    "name": "ÖL / CIDER 3FÖR35",
+    "brand": "Mariestads",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "3 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "33cl",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|ol-cider-och-vin|alkoholfri-ol-och-lattol",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310401009551_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164247",
+    "productCode": "101274593_ST",
+    "name": "ÖL ALKOFRI 4FÖR26",
+    "brand": "Emd Bräu",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "4 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "7.52",
+    "savePriceText": "",
+    "packageText": "33cl",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|ol-cider-och-vin|alkoholfri-ol-och-lattol",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612501552_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164248",
+    "productCode": "101239944_ST",
+    "name": "AJAX SPRAY 2FÖR65",
+    "brand": "Ajax",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "37.95",
+    "savePriceText": "",
+    "packageText": "750ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|stad|rengoringsmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08718951039995_C1N1_s07",
+    "labels": [
+      "no_pictogram"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164249",
+    "productCode": "101698356_ST",
+    "name": "COMFORT 2FÖR68",
+    "brand": "Comfort",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 68,
+    "priceText": "2 för 68 kr",
+    "comparePriceText": "",
+    "regularPriceText": "37.95",
+    "savePriceText": "",
+    "packageText": "762ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|tvatt|skoljmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720181638695_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164250",
+    "productCode": "101261849_ST",
+    "name": "DISKTABLET 2FÖR75",
+    "brand": "Såklart",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 75,
+    "priceText": "2 för 75 kr",
+    "comparePriceText": "",
+    "regularPriceText": "45.95",
+    "savePriceText": "",
+    "packageText": "30p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|disk|maskindisk",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083459139_C1L1_s02",
+    "labels": [
+      "swan",
+      "allergy_approved",
+      "warning",
+      "exclamation_mark",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=0&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164251",
+    "productCode": "101353276_ST",
+    "name": "STÄDSERV. 2FÖR35",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.95",
+    "savePriceText": "",
+    "packageText": "70p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|stad|rengoringsmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492518_C1N1_s01",
+    "labels": [
+      "environmental_choice",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164252",
+    "productCode": "101475566_ST",
+    "name": "TOA/HUSPAP 2FÖR70",
+    "brand": "Fixa",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 70,
+    "priceText": "2 för 70 kr",
+    "comparePriceText": "",
+    "regularPriceText": "36.95",
+    "savePriceText": "",
+    "packageText": "4p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|toalett-och-hushallspapper|hushallspapper",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043002009_C1L1_s02",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164253",
+    "productCode": "101229322_ST",
+    "name": "TVÄTT/SKÖL 2FÖR58",
+    "brand": "Fixa",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 58,
+    "priceText": "2 för 58 kr",
+    "comparePriceText": "",
+    "regularPriceText": "31.95",
+    "savePriceText": "",
+    "packageText": "750g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|tvatt|tvattmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436864_C1L1_s04",
+    "labels": [
+      "swan",
+      "warning",
+      "exclamation_mark",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164254",
+    "productCode": "101815929_ST",
+    "name": "TVÄTTKAPSL 2FÖR79",
+    "brand": "Fixa",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 79,
+    "priceText": "2 för 79 kr",
+    "comparePriceText": "",
+    "regularPriceText": "42.95",
+    "savePriceText": "",
+    "packageText": "16p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|tvatt|tvattmedel",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043024926_C1N1_s01",
+    "labels": [
+      "swan",
+      "warning",
+      "exclamation_mark",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164255",
+    "productCode": "101344145_ST",
+    "name": "WC-RENGÖR. 2FÖR35",
+    "brand": "Wc Bref",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.95",
+    "savePriceText": "",
+    "packageText": "1p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|stad|luftfraschare",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05201395121737_C1N1_s01",
+    "labels": [
+      "danger",
+      "corrosion"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164256",
+    "productCode": "100275033_ST",
+    "name": "KICK KOLA 3FÖR14",
+    "brand": "Malaco",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 14,
+    "priceText": "3 för 14 kr",
+    "comparePriceText": "",
+    "regularPriceText": "5.63",
+    "savePriceText": "",
+    "packageText": "19g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|godis|godispasar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05700417006804_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164257",
+    "productCode": "101545419_ST",
+    "name": "MALACO 2FÖR23",
+    "brand": "Malaco",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "90g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|godis|godispasar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310350136902_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164258",
+    "productCode": "101545635_ST",
+    "name": "STYCKSAKER 3FÖR27",
+    "brand": "Snickers",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 27,
+    "priceText": "3 för 27 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "50g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|choklad|chokladkakor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05900951311505_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164259",
+    "productCode": "100059393_ST",
+    "name": "STYCKSAKER 3FÖR28",
+    "brand": "Marabou",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "3 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "46g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|choklad|chokladgodis",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07622201047764_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164260",
+    "productCode": "100017688_ST",
+    "name": "TOMS STÅNG 3FÖR11",
+    "brand": "Toms",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 11,
+    "priceText": "3 för 11 kr",
+    "comparePriceText": "",
+    "regularPriceText": "5.63",
+    "savePriceText": "",
+    "packageText": "27g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|godis|godispasar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/00000057402376_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164261",
+    "productCode": "100073340_ST",
+    "name": "TUGGUMMI 2FÖR33",
+    "brand": "Extra",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "29g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|tuggummi",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04009900390309_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164262",
+    "productCode": "101195056_ST",
+    "name": "ANSIKTSSER 2FÖR40",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 40,
+    "priceText": "2 för 40 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.95",
+    "savePriceText": "",
+    "packageText": "150p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|nasdukar-och-bomull",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083401633_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164263",
+    "productCode": "101499176_ST",
+    "name": "AVSMINK. 2FÖR24",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24,
+    "priceText": "2 för 24 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.95",
+    "savePriceText": "",
+    "packageText": "25st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|ansiktsvard-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043003563_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164264",
+    "productCode": "101354900_ST",
+    "name": "BARNÄNGEN 2FÖR40",
+    "brand": "Barnängen",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 40,
+    "priceText": "2 för 40 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.95",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|harvard|schampo",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531106368_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164265",
+    "productCode": "101318906_ST",
+    "name": "INTUITION 2FÖR32",
+    "brand": "Intuition",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.95",
+    "savePriceText": "",
+    "packageText": "14p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|intimhygien|bindor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083483097_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164266",
+    "productCode": "101578493_ST",
+    "name": "MEVVÅTSER2FÖR39",
+    "brand": "Mevolution",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.95",
+    "savePriceText": "",
+    "packageText": "30p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|nasdukar-och-bomull",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043010103_C1N1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164267",
+    "productCode": "101339951_ST",
+    "name": "PADS/PINN 2FÖR28",
+    "brand": "Mevolution",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.95",
+    "savePriceText": "",
+    "packageText": "200p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|nasdukar-och-bomull",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489235_C1L1_s02",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164268",
+    "productCode": "101662844_ST",
+    "name": "PALETTE 2FÖR115",
+    "brand": "Palette",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 115,
+    "priceText": "2 för 115 kr",
+    "comparePriceText": "",
+    "regularPriceText": "66.95",
+    "savePriceText": "",
+    "packageText": "1st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|harvard|harfarg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07332531122757_C1R1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164269",
+    "productCode": "101353772_ST",
+    "name": "PLÅSTER 2FÖR38",
+    "brand": "Mevolution",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 38,
+    "priceText": "2 för 38 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.95",
+    "savePriceText": "",
+    "packageText": "40p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "apotek-och-lakemedel|plaster|plaster-och-sarvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492785_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164270",
+    "productCode": "101339963_ST",
+    "name": "PUMPTVÅL 2FÖR26",
+    "brand": "Mevolution",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "2 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.95",
+    "savePriceText": "",
+    "packageText": "300ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|tval",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489358_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164271",
+    "productCode": "101542359_ST",
+    "name": "TANDKRÄM 2FÖR30",
+    "brand": "Mevolution",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.95",
+    "savePriceText": "",
+    "packageText": "125ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|munvard|tandkram",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006489_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164272",
+    "productCode": "101339860_ST",
+    "name": "TANDVÅRD 2FÖR39",
+    "brand": "Mevolution",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.95",
+    "savePriceText": "",
+    "packageText": "40p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|munvard|ovrig-munvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489051_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164273",
+    "productCode": "101339965_ST",
+    "name": "TVÅLREFILL 2FÖR38",
+    "brand": "Mevolution",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 38,
+    "priceText": "2 för 38 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.95",
+    "savePriceText": "",
+    "packageText": "750ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|kroppsvard|tval",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489372_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164274",
+    "productCode": "101245841_ST",
+    "name": "EST NÖTMIX 2FÖR55",
+    "brand": "Estrella",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "33.07",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|notter-och-snacks",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310532151211_C1N1_s05",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164275",
+    "productCode": "101226667_ST",
+    "name": "GÅRDSCHIPS 2FÖR46",
+    "brand": "Gårdschips",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "28.34",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|chips-och-ostbagar|chips",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350045591050_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164276",
+    "productCode": "101286110_ST",
+    "name": "POPCORN 2FÖR37",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "270g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "godis-snacks-och-glass|popcorn",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083471209_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164277",
+    "productCode": "101300808_ST",
+    "name": "BEKIND 2FÖR35",
+    "brand": "Be-kind",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "40g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|traning-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05000159528481_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164278",
+    "productCode": "101231766_ST",
+    "name": "BULJONG 2FÖR23",
+    "brand": "Garant Eko",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "6p/3l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|buljong",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083443251_C1L1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164279",
+    "productCode": "101250198_ST",
+    "name": "BÖN/LIN 2FÖR56",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 56,
+    "priceText": "2 för 56 kr",
+    "comparePriceText": "",
+    "regularPriceText": "34.02",
+    "savePriceText": "",
+    "packageText": "800g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|bonor-och-baljvaxter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083450549_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164280",
+    "productCode": "101245204_ST",
+    "name": "BÖNOR 2FÖR20",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.83",
+    "savePriceText": "",
+    "packageText": "380/230g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|bonor-och-baljvaxter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083446962_C1L1_s02",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164281",
+    "productCode": "101239059_ST",
+    "name": "CITRUSJ. 2FÖR17",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 17,
+    "priceText": "2 för 17 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.36",
+    "savePriceText": "",
+    "packageText": "200ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|ovriga-smaksattare",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083444616_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164282",
+    "productCode": "100879239_ST",
+    "name": "CORNY 4FÖR34",
+    "brand": "Corny",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34,
+    "priceText": "4 för 34 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.36",
+    "savePriceText": "",
+    "packageText": "50g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|halsokost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04011800563516_C1N1_s03",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164283",
+    "productCode": "101608101_ST",
+    "name": "DOLMIO 2FÖR47",
+    "brand": "Dolmio",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 47,
+    "priceText": "2 för 47 kr",
+    "comparePriceText": "",
+    "regularPriceText": "27.39",
+    "savePriceText": "",
+    "packageText": "450g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04002359021022_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164284",
+    "productCode": "101245190_ST",
+    "name": "EKOBÖNOR 3FÖR36",
+    "brand": "Garant Eko",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "3 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "380/230g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|bonor-och-baljvaxter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447365_C1L1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164285",
+    "productCode": "101301595_ST",
+    "name": "EKO-PASTA 2FÖR32",
+    "brand": "Garant Eko",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.93",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083478024_C1N1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164286",
+    "productCode": "101285455_ST",
+    "name": "EKOTOMAT 3FÖR39",
+    "brand": "Garant Eko",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "3 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.09",
+    "savePriceText": "",
+    "packageText": "390g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|tomatkonserver",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083469619_C1L1_s02",
+    "labels": [
+      "ecological",
+      "eu_ecological",
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164287",
+    "productCode": "101267427_ST",
+    "name": "ELD. SÅS 2FÖR34",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 34,
+    "priceText": "2 för 34 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.82",
+    "savePriceText": "",
+    "packageText": "320ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|sas-och-smaksattare|sas",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083458507_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164288",
+    "productCode": "101290779_ST",
+    "name": "FUN LIGHT 2FÖR50",
+    "brand": "Fun Light",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 50,
+    "priceText": "2 för 50 kr",
+    "comparePriceText": "",
+    "regularPriceText": "26.97",
+    "savePriceText": "",
+    "packageText": "1l/10l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|lightdryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090389163_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164289",
+    "productCode": "101276700_ST",
+    "name": "GEV KAPSL. 2FÖR69",
+    "brand": "Gevalia",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 69,
+    "priceText": "2 för 69 kr",
+    "comparePriceText": "",
+    "regularPriceText": "37.8",
+    "savePriceText": "",
+    "packageText": "10p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|kapslar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711000379660_C1C0_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164290",
+    "productCode": "101260474_ST",
+    "name": "GF PASTA 2FÖR30",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.98",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|glutenfritt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083454332_C1N1_s01",
+    "labels": [
+      "crossed_ax"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164291",
+    "productCode": "101282537_ST",
+    "name": "GRANOLA 2FÖR73",
+    "brand": "Färsking",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 73,
+    "priceText": "2 för 73 kr",
+    "comparePriceText": "",
+    "regularPriceText": "44.43",
+    "savePriceText": "",
+    "packageText": "375g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|flingor-och-musli|musli-crunchy-och-granola",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350099111129_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164292",
+    "productCode": "101337368_ST",
+    "name": "GRÖTKOPP 2FÖR28",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.98",
+    "savePriceText": "",
+    "packageText": "65g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|flingor-och-musli|grot",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083488351_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164293",
+    "productCode": "101552965_ST",
+    "name": "KAFFE 2FÖR110",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 110,
+    "priceText": "2 för 110 kr",
+    "comparePriceText": "",
+    "regularPriceText": "59.57",
+    "savePriceText": "",
+    "packageText": "450g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|bryggkaffe",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043009312_C1L1_s01",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164294",
+    "productCode": "101345470_ST",
+    "name": "KAFFEKAPS. 2FÖR65",
+    "brand": "Lavazza",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "44.43",
+    "savePriceText": "",
+    "packageText": "10p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|kapslar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08000070053465_C1C1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164295",
+    "productCode": "101548831_ST",
+    "name": "KOKOSMJÖ/G 2FÖR33",
+    "brand": "Garant Eko",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.5",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|kokosmjolk-och-kokosgradde",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043008391_C1L1_s01",
+    "labels": [
+      "ecological",
+      "fairtrade",
+      "eu_ecological",
+      "fairtrade_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164296",
+    "productCode": "101231957_ST",
+    "name": "KOKOSMJÖLK 2FÖR28",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.61",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|kokosmjolk-och-kokosgradde",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083443473_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164297",
+    "productCode": "101287437_ST",
+    "name": "KOPPNUD 2FÖR18",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "2 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.36",
+    "savePriceText": "",
+    "packageText": "65g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|nudlar-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083472299_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164298",
+    "productCode": "101285406_ST",
+    "name": "KROSSTOMAT 3FÖR31",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 31,
+    "priceText": "3 för 31 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "390g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|tomatkonserver",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083469602_C1L1_s03",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164299",
+    "productCode": "101240310_ST",
+    "name": "KRYDDMIX 2FÖR33",
+    "brand": "Santa Maria",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.4",
+    "savePriceText": "",
+    "packageText": "30g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|ovrigt-asien",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311310034474_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164300",
+    "productCode": "100724227_ST",
+    "name": "KRYDDOR 2FÖR33",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "50g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|kryddor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041034293_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164362",
+    "productCode": "101584097_ST",
+    "name": "LIP ISTE 2FÖR20",
+    "brand": "Lipton",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "50g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|te-och-chokladdryck|te",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08720608006656_C1R1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164363",
+    "productCode": "101282044_ST",
+    "name": "LOR KAPS 3FÖR103",
+    "brand": "L'or",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 103,
+    "priceText": "3 för 103 kr",
+    "comparePriceText": "",
+    "regularPriceText": "43.48",
+    "savePriceText": "",
+    "packageText": "10p",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|kapslar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08711000360521_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164364",
+    "productCode": "101607344_ST",
+    "name": "MUSETTI 3FÖR89",
+    "brand": "Musetti",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 89,
+    "priceText": "3 för 89 kr",
+    "comparePriceText": "",
+    "regularPriceText": "35.91",
+    "savePriceText": "",
+    "packageText": "10p",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|kapslar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08004769254058_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164365",
+    "productCode": "101244155_ST",
+    "name": "MÜSLIBAR 2FÖR32",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "17.93",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|halsokost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083449499_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164366",
+    "productCode": "101068130_ST",
+    "name": "NUDLAR 5FÖR23",
+    "brand": "Samyang Ramen",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "5 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "5.63",
+    "savePriceText": "",
+    "packageText": "85g",
+    "conditionText": "5 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|nudlar-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350035210114_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164367",
+    "productCode": "101267873_ST",
+    "name": "OLIVER 2FÖR37",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.66",
+    "savePriceText": "",
+    "packageText": "260/155g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|oliver-och-delikatesser|oliver",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083459252_C1C1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164368",
+    "productCode": "101332229_ST",
+    "name": "PASTA 3FÖR39",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "3 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.09",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083486920_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164369",
+    "productCode": "101231940_ST",
+    "name": "PASTASÅ 2FÖR42",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 42,
+    "priceText": "2 för 42 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.61",
+    "savePriceText": "",
+    "packageText": "400g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083443305_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164370",
+    "productCode": "101618323_ST",
+    "name": "POW BAR 2FÖR23",
+    "brand": "Powerking",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "40g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|traning-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612212113_C1N1_s02",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164371",
+    "productCode": "101274717_ST",
+    "name": "PRO.BAR2FÖR36",
+    "brand": "Propud",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "2 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "55g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|traning-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068294082_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164372",
+    "productCode": "101201964_ST",
+    "name": "SNABBKAFFE 2FÖ119",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 119,
+    "priceText": "2 för 119 kr",
+    "comparePriceText": "",
+    "regularPriceText": "64.3",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kaffe|snabbkaffe",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083409738_C1N1_s02",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164373",
+    "productCode": "101251649_ST",
+    "name": "SNABBNUDL. 4FÖR17",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 17,
+    "priceText": "4 för 17 kr",
+    "comparePriceText": "",
+    "regularPriceText": "4.68",
+    "savePriceText": "",
+    "packageText": "85g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|nudlar-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083450488_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164374",
+    "productCode": "101207616_ST",
+    "name": "SOPPA 3FÖR18",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "3 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "7.09",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|soppor-och-kramer|soppa",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427848_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164375",
+    "productCode": "100148001_ST",
+    "name": "SPAGHE 2FÖR37",
+    "brand": "Kungsörnen",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "1kg",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|kryddor-och-smaksattare|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310130417405_C1R1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164376",
+    "productCode": "101212270_ST",
+    "name": "SWEBAR 2FÖR35",
+    "brand": "Dalblads",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.66",
+    "savePriceText": "",
+    "packageText": "55g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "halsa-och-skonhet|traning-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350006710704_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164377",
+    "productCode": "101284927_ST",
+    "name": "TACOCHI 2FÖR23",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|texmex|tacoskal-och-brod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468070_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164378",
+    "productCode": "101336767_ST",
+    "name": "TACOKRYDDA 2FÖR17",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 17,
+    "priceText": "2 för 17 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.36",
+    "savePriceText": "",
+    "packageText": "30g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|texmex|kryddmixer-och-saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083487965_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164379",
+    "productCode": "101345361_ST",
+    "name": "TACOSÅS 2FÖR52",
+    "brand": "El Taco Truck",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 52,
+    "priceText": "2 för 52 kr",
+    "comparePriceText": "",
+    "regularPriceText": "34.02",
+    "savePriceText": "",
+    "packageText": "200ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|texmex|kryddmixer-och-saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350115940061_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164380",
+    "productCode": "101118595_ST",
+    "name": "TE 2FÖR26",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "2 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.66",
+    "savePriceText": "",
+    "packageText": "20p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|te-och-chokladdryck|te",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041059739_C1L1_s02",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164381",
+    "productCode": "101301755_ST",
+    "name": "TONFISK 2FÖR37",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.95",
+    "savePriceText": "",
+    "packageText": "170g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|konserver-och-burkar|tonfisk-och-makrill",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083478215_C1C1_s02",
+    "labels": [
+      "msc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164382",
+    "productCode": "101250650_ST",
+    "name": "TORTILL 2FÖR23",
+    "brand": "Banderos",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "320g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|texmex|tacoskal-och-brod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612700092_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164383",
+    "productCode": "101498814_ST",
+    "name": "ÄGGNUDL 2FÖR20",
+    "brand": "Spicefield",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|asien|nudlar-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612121224_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164384",
+    "productCode": "101583516_ST",
+    "name": "BAKPLÅTSP 2FÖR29",
+    "brand": "Fixa",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29,
+    "priceText": "2 för 29 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.95",
+    "savePriceText": "",
+    "packageText": "24p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|matforvaring",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043006892_C1N1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164385",
+    "productCode": "101224680_ST",
+    "name": "BLOCKLJUS 2FÖR48",
+    "brand": "Fixa",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 48,
+    "priceText": "2 för 48 kr",
+    "comparePriceText": "",
+    "regularPriceText": "25.95",
+    "savePriceText": "",
+    "packageText": "st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|ljus",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083437212_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164387",
+    "productCode": "101550183_ST",
+    "name": "TVÄTTLAPP. 2FÖR45",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 45,
+    "priceText": "2 för 45 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.95",
+    "savePriceText": "",
+    "packageText": "100p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "barn|blojor|barnvard",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043007332_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164388",
+    "productCode": "101231351_ST",
+    "name": "NOCCO 2FÖR39",
+    "brand": "Nocco",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.05",
+    "savePriceText": "",
+    "packageText": "33cl",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|sport-och-energidryck|energidryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340131601008_C1N1_s04",
+    "labels": [
+      "age_restricted_15"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164389",
+    "productCode": "101362354_ST",
+    "name": "INTIMVÅTS. 2FÖR25",
+    "brand": "Mevolution",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.95",
+    "savePriceText": "",
+    "packageText": "20p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083493805_C1N1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164391",
+    "productCode": "101187097_ST",
+    "name": "DISKBORSTE 2FÖR20",
+    "brand": "Fixa",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.95",
+    "savePriceText": "",
+    "packageText": "1p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|disk|disktillbehor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083400087_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164392",
+    "productCode": "101674992_ST",
+    "name": "GLASÖGONPUTS 2F35",
+    "brand": "Fixa",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.95",
+    "savePriceText": "",
+    "packageText": "30p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|klader|ovrigt-klader",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083476686_S01",
+    "labels": [
+      "warning",
+      "flame"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164393",
+    "productCode": "101594876_ST",
+    "name": "HANDSKAR 2FÖR18",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "2 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.5",
+    "savePriceText": "",
+    "packageText": "20p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043011827_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164394",
+    "productCode": "101308929_ST",
+    "name": "MATLÅDA 2FÖR30",
+    "brand": "Nordiska Plast",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.95",
+    "savePriceText": "",
+    "packageText": "st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|matforvaring",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07318140009030_C1L1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164395",
+    "productCode": "101499709_ST",
+    "name": "MUFFINFORM 2FÖR39",
+    "brand": "Fixa",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.95",
+    "savePriceText": "",
+    "packageText": "32p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|matforvaring",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043003389_C1L1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164396",
+    "productCode": "101224743_ST",
+    "name": "PÅSAR 2FÖR32",
+    "brand": "Fixa",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.95",
+    "savePriceText": "",
+    "packageText": "70p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|matforvaring",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436321_C1L1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164397",
+    "productCode": "101527021_ST",
+    "name": "SERVETTER 2FÖR40",
+    "brand": "Fixa",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 40,
+    "priceText": "2 för 40 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.95",
+    "savePriceText": "",
+    "packageText": "20p",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|hem-och-inredning|servetter-och-dukar",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005277_C1N1_s01",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164398",
+    "productCode": "101255722_ST",
+    "name": "SOPPÅSE 2FÖR39",
+    "brand": "Fixa",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.95",
+    "savePriceText": "",
+    "packageText": "25st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|stad|stadutrustning",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083452468_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164399",
+    "productCode": "101255725_ST",
+    "name": "SOPPÅSE 2FÖR55",
+    "brand": "Fixa",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "33.95",
+    "savePriceText": "",
+    "packageText": "30l/25st",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|stad|stadutrustning",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083452482_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164400",
+    "productCode": "101203406_ST",
+    "name": "PAJ 2FÖR55",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "30.23",
+    "savePriceText": "",
+    "packageText": "220g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|pizza-paj-och-piroger|paj-och-piroger",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083405679_C1L1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164403",
+    "productCode": "101298386_ST",
+    "name": "ELD RAPSOLJA",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24.55,
+    "priceText": "24,55 kr/st",
+    "comparePriceText": "",
+    "regularPriceText": "24.55",
+    "savePriceText": "",
+    "packageText": "1l",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "skafferi|olja-och-vinager|olja",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083477089_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164404",
+    "productCode": "101225898_ST",
+    "name": "TOALETTPAPP. 18-P",
+    "brand": "Fixa",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 109,
+    "priceText": "109 kr/st",
+    "comparePriceText": "",
+    "regularPriceText": "109.0",
+    "savePriceText": "",
+    "packageText": "18p",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "hem-och-hushall|toalett-och-hushallspapper|toalettpapper",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083434389_C1L1_s04",
+    "labels": [
+      "swan",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164301",
+    "productCode": "100379332_ST",
+    "name": "BULLAR 4FÖR23",
+    "brand": "Dahls Bageri",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "4 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "6.57",
+    "savePriceText": "",
+    "packageText": "45g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kondis-och-fika|kaffebrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350029734329_C1C0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164302",
+    "productCode": "101243975_ST",
+    "name": "DUOKAKOR 2FÖR28",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "2 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.04",
+    "savePriceText": "",
+    "packageText": "176g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kex-och-kakor|sota-kakor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083446733_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164303",
+    "productCode": "100380678_ST",
+    "name": "FRALLOR 4FÖR23",
+    "brand": "Dahls Bageri",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "4 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "6.57",
+    "savePriceText": "",
+    "packageText": "70g",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|brod|baguetter-och-losbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350029733018_C1C0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164304",
+    "productCode": "101599862_ST",
+    "name": "GÖT MATKEX 2FÖR25",
+    "brand": "Göteborgs Kex",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "74g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kex-och-kakor|kex",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310520022097_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164305",
+    "productCode": "101237094_ST",
+    "name": "HAMBRÖD 2FÖR42",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 42,
+    "priceText": "2 för 42 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|korv-och-hamburgerbrod|hamburgerbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083444388_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164306",
+    "productCode": "101544622_ST",
+    "name": "KAFFEBRÖD 2FÖR25",
+    "brand": "Bonjour",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 25,
+    "priceText": "2 för 25 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kondis-och-fika|kaffebrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05701014078515_C1C0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164307",
+    "productCode": "100145647_ST",
+    "name": "KAFFEBRÖD 3FÖR27",
+    "brand": "Bonjour",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 27,
+    "priceText": "3 för 27 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.3",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kondis-och-fika",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391288643007_C1C0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164308",
+    "productCode": "101417664_ST",
+    "name": "KAKOR 2FÖR36",
+    "brand": "Dazzley",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "2 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kex-och-kakor|sota-kakor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041086391_C1N1_s03",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164309",
+    "productCode": "100127364_ST",
+    "name": "KAFFEBRÖD 3FÖR33",
+    "brand": "Bonjour",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "3 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391288322100_C1C0_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164310",
+    "productCode": "101344022_ST",
+    "name": "MAJSKAKA 2FÖR33",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "125g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|ris-och-majskakor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490552_C1N1_s01",
+    "labels": [
+      "crossed_ax"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164311",
+    "productCode": "100209178_ST",
+    "name": "MATBRÖD 2FÖR18",
+    "brand": "Bonjour",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 18,
+    "priceText": "2 för 18 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.36",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|brod|baguetter-och-losbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391288850009_C1R1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=1&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164312",
+    "productCode": "101307647_ST",
+    "name": "MINIDONUTS 5FÖR23",
+    "brand": "La Lorraine",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "5 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "5.63",
+    "savePriceText": "",
+    "packageText": "20g",
+    "conditionText": "5 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|kondis-och-fika|kaffebrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350031139280_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164313",
+    "productCode": "101544623_ST",
+    "name": "VITLBAG 2FÖR23",
+    "brand": "Bonjour",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "14.14",
+    "savePriceText": "",
+    "packageText": "175g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|brod|baguetter-och-losbrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07315062257365_C1R0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164314",
+    "productCode": "100799575_ST",
+    "name": "WAS SANDW 3FÖR22",
+    "brand": "Wasa",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22,
+    "priceText": "3 för 22 kr",
+    "comparePriceText": "",
+    "regularPriceText": "9.41",
+    "savePriceText": "",
+    "packageText": "37g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "brod-och-kakor|knackebrod-och-skorpor|knackebrod",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07300400122689_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164315",
+    "productCode": "101290607_ST",
+    "name": "KRYDDKORV 2FÖR53",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 53,
+    "priceText": "2 för 53 kr",
+    "comparePriceText": "",
+    "regularPriceText": "31.18",
+    "savePriceText": "",
+    "packageText": "300g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|korv|grill-och-kryddkorv",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083474323_C1N1_s01",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164316",
+    "productCode": "101206348_ST",
+    "name": "PROSCIUTTO 2FÖR65",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "39.7",
+    "savePriceText": "",
+    "packageText": "80g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|medelhavschark",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083427923_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164317",
+    "productCode": "101183319_ST",
+    "name": "PÅLÄGG 2FÖR39",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 39,
+    "priceText": "2 för 39 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.61",
+    "savePriceText": "",
+    "packageText": "120g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|palagg|skivat-palagg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041071748_C1N1_s03",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164318",
+    "productCode": "101187496_ST",
+    "name": "SALAMI 2FÖR36",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "2 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "80g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|palagg|skivat-palagg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041072905_C1N1_s02",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164319",
+    "productCode": "101264324_ST",
+    "name": "ÖLKORV 2FÖR20",
+    "brand": "Prime Patrol",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "40g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|korv|olkorv",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083457197_C1N1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164320",
+    "productCode": "101366819_ST",
+    "name": "MATJES 2FÖR38",
+    "brand": "Abba",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 38,
+    "priceText": "2 för 38 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.66",
+    "savePriceText": "",
+    "packageText": "215/125g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fisk-och-skaldjur|sill-ansjovis-och-sardiner|sill",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350126082835_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164321",
+    "productCode": "101781200_ST",
+    "name": "RÄKOR 2FÖR65",
+    "brand": "Fiskexporten",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "39.7",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fisk-och-skaldjur|skaldjur|farska-skaldjur",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04740173001775_C1R1_s01",
+    "labels": [
+      "asc_fish",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164322",
+    "productCode": "101224830_ST",
+    "name": "SÅSER 2FÖR35",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.82",
+    "savePriceText": "",
+    "packageText": "200ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fisk-och-skaldjur|saser",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083436222_C1C1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164323",
+    "productCode": "101344156_ST",
+    "name": "TÅNGCAV 2FÖR37",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 37,
+    "priceText": "2 för 37 kr",
+    "comparePriceText": "",
+    "regularPriceText": "22.24",
+    "savePriceText": "",
+    "packageText": "70g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fisk-och-skaldjur|kaviar-och-rom|fiskrom",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083490590_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164324",
+    "productCode": "101406122_ST",
+    "name": "BUREK 2FÖR46",
+    "brand": "Km Bake",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "28.34",
+    "savePriceText": "",
+    "packageText": "220g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|portionsratter|fardiga-ratter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/03858893421108_C1L0_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164325",
+    "productCode": "100261887_ST",
+    "name": "FELIX RULLP 2FÖ23",
+    "brand": "Felix",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 23,
+    "priceText": "2 för 23 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|portionsratter|fardiga-ratter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090750697_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164326",
+    "productCode": "101212630_ST",
+    "name": "FÄRSK PAST 2FÖR33",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 33,
+    "priceText": "2 för 33 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|farsk-pasta",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083430640_C1C1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164327",
+    "productCode": "101291166_ST",
+    "name": "JURESKOG 2FÖR45",
+    "brand": "Jureskog",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 45,
+    "priceText": "2 för 45 kr",
+    "comparePriceText": "",
+    "regularPriceText": "27.39",
+    "savePriceText": "",
+    "packageText": "230ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|sas-och-smaksattare|sas",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340046080738_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164328",
+    "productCode": "101347750_ST",
+    "name": "KEBABSÅS 2FÖR49",
+    "brand": "Schysst Käk",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 49,
+    "priceText": "2 för 49 kr",
+    "comparePriceText": "",
+    "regularPriceText": "27.39",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|sas-och-smaksattare|sas",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451422_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164329",
+    "productCode": "101334258_ST",
+    "name": "REDORÄTTER 2FÖR84",
+    "brand": "Redo",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 84,
+    "priceText": "2 för 84 kr",
+    "comparePriceText": "",
+    "regularPriceText": "47.27",
+    "savePriceText": "",
+    "packageText": "400g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|portionsratter|fardiga-ratter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083487484_C1L1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164330",
+    "productCode": "101276691_ST",
+    "name": "SOPPA 2FÖR65",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 65,
+    "priceText": "2 för 65 kr",
+    "comparePriceText": "",
+    "regularPriceText": "34.97",
+    "savePriceText": "",
+    "packageText": "450g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|portionsratter|fardiga-soppor-och-grytor",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083464898_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164331",
+    "productCode": "101212667_ST",
+    "name": "TORTELL 2FÖR55",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "31.18",
+    "savePriceText": "",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fardigmat|farsk-pasta",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083430688_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164332",
+    "productCode": "101358420_ST",
+    "name": "TOFU 2FÖR22",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 22,
+    "priceText": "2 för 22 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "vegetariskt|tofu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083496905_C1N1_s01",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164333",
+    "productCode": "101277028_ST",
+    "name": "V.BACON 2FÖR41",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 41,
+    "priceText": "2 för 41 kr",
+    "comparePriceText": "",
+    "regularPriceText": "23.61",
+    "savePriceText": "",
+    "packageText": "120g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "vegetariskt|fryst-vegetariskt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083468391_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164334",
+    "productCode": "101293702_ST",
+    "name": "SCHYSST K. 2FÖR89",
+    "brand": "Schysst Käk",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 89,
+    "priceText": "2 för 89 kr",
+    "comparePriceText": "",
+    "regularPriceText": "54.84",
+    "savePriceText": "",
+    "packageText": "275g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|kott|pannfardigt",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350090451057_C1N1_s04",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164335",
+    "productCode": "101197313_ST",
+    "name": "ALPRO 2FÖR42",
+    "brand": "Alpro",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 42,
+    "priceText": "2 för 42 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.55",
+    "savePriceText": "",
+    "packageText": "1l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|vaxtbaserat|vaxtbaserad-dryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/05411188110835_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164336",
+    "productCode": "101197644_ST",
+    "name": "BÄRRY 2FÖR20",
+    "brand": "Bärry",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 20,
+    "priceText": "2 för 20 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.83",
+    "savePriceText": "",
+    "packageText": "250g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311443210202_C1C1_s04",
+    "labels": [
+      "swedish_flag",
+      "milk_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164337",
+    "productCode": "101246038_ST",
+    "name": "EKS PUD 3FÖR24",
+    "brand": "Ekströms",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 24,
+    "priceText": "3 för 24 kr",
+    "comparePriceText": "",
+    "regularPriceText": "10.36",
+    "savePriceText": "",
+    "packageText": "120g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|desserter",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310470661803_C1C1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164338",
+    "productCode": "101599655_ST",
+    "name": "FLORA 2FÖR21",
+    "brand": "Flora",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 21,
+    "priceText": "2 för 21 kr",
+    "comparePriceText": "",
+    "regularPriceText": "13.2",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|vaxtbaserat|vaxtbaserad-matlagningsmejeri",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08719200284173_C1L1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164339",
+    "productCode": "101317693_ST",
+    "name": "HAVREDRYCK 2FÖR32",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 32,
+    "priceText": "2 för 32 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.45",
+    "savePriceText": "",
+    "packageText": "1l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|vaxtbaserat|vaxtbaserad-dryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083480126_C1L1_s03",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164340",
+    "productCode": "101500849_ST",
+    "name": "HUMM 2FÖR46",
+    "brand": "Humm",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "27.39",
+    "savePriceText": "",
+    "packageText": "330ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|juice-och-fruktdryck|kyld-fruktdryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350092180221_C1C1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164341",
+    "productCode": "101328354_ST",
+    "name": "JUICE 2FÖR56",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 56,
+    "priceText": "2 för 56 kr",
+    "comparePriceText": "",
+    "regularPriceText": "30.23",
+    "savePriceText": "",
+    "packageText": "1l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|juice-och-fruktdryck|kyld-juice",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083480263_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164342",
+    "productCode": "101232098_ST",
+    "name": "KVARG 2FÖR27",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 27,
+    "priceText": "2 för 27 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.09",
+    "savePriceText": "",
+    "packageText": "500g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|kvarg-och-cottage-cheese-|kvarg",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083435539_C1L1_s03",
+    "labels": [
+      "keyhole"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164343",
+    "productCode": "101224058_ST",
+    "name": "KVARG 3FÖR29",
+    "brand": "Lindahls",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 29,
+    "priceText": "3 för 29 kr",
+    "comparePriceText": "",
+    "regularPriceText": "11.97",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07392672001724_C1C1_s04",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164344",
+    "productCode": "101237276_ST",
+    "name": "LÖFBERG 2FÖR35",
+    "brand": "Löfbergs",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "21.72",
+    "savePriceText": "",
+    "packageText": "230ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310050005171_C1N1_s05",
+    "labels": [
+      "ecological",
+      "fairtrade",
+      "eu_ecological",
+      "fairtrade_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164345",
+    "productCode": "100015029_ST",
+    "name": "MÅLT.DRYCK 4FÖR28",
+    "brand": "Bob",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "4 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "8.99",
+    "savePriceText": "",
+    "packageText": "2dl/1l",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "dryck|juice-och-fruktdryck|-ej-kyld-fruktdryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07310090155539_C1L1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164346",
+    "productCode": "101252611_ST",
+    "name": "PROPUD 2FÖR36",
+    "brand": "Propud",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 36,
+    "priceText": "2 för 36 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.82",
+    "savePriceText": "",
+    "packageText": "330ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07350068291210_C1N1_s06",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164347",
+    "productCode": "101708428_ST",
+    "name": "SKYR 2FÖR46",
+    "brand": "Dairy Food",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "25.5",
+    "savePriceText": "",
+    "packageText": "400g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|kvarg-och-cottage-cheese-|laktosfri-kvarg-och-cottage-cheese",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043018116_C1C1_s01",
+    "labels": [
+      "ecological",
+      "eu_ecological"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164348",
+    "productCode": "101338211_ST",
+    "name": "SMOO/JUICE 2FÖR30",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.98",
+    "savePriceText": "",
+    "packageText": "250ml",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083489907_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164349",
+    "productCode": "101340616_ST",
+    "name": "VAL. PUDD. 2FÖR30",
+    "brand": "Valio",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "180g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|mellanmal-och-desserter|smamal-och-dricka-nu",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/06408430407675_C1C1_s03",
+    "labels": [
+      "rainforest_alliance",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164350",
+    "productCode": "101328964_ST",
+    "name": "VEGODRYCK 2FÖR30",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 30,
+    "priceText": "2 för 30 kr",
+    "comparePriceText": "",
+    "regularPriceText": "16.98",
+    "savePriceText": "",
+    "packageText": "1l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|vaxtbaserat|vaxtbaserad-dryck",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083483981_C1L1_s03",
+    "labels": [
+      "swedish_flag",
+      "from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164351",
+    "productCode": "101244011_ST",
+    "name": "BURGAROST 2FÖR46",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "26.45",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083447532_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164352",
+    "productCode": "101296686_ST",
+    "name": "CR BONJ 2FÖR26",
+    "brand": "Crème Bonjour",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 26,
+    "priceText": "2 för 26 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.61",
+    "savePriceText": "",
+    "packageText": "100g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|farskost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/08719200066748_C1N1_s03",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164353",
+    "productCode": "101533198_ST",
+    "name": "FETAOST 2FÖR43",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 43,
+    "priceText": "2 för 43 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.5",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005727_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164354",
+    "productCode": "100568823_ST",
+    "name": "FÄRSKOST 2FÖR35",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "19.82",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|farskost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311041018453_C1L1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164355",
+    "productCode": "101548123_ST",
+    "name": "GRILLOST 2FÖR35",
+    "brand": "Eldorado",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 35,
+    "priceText": "2 för 35 kr",
+    "comparePriceText": "",
+    "regularPriceText": "18.88",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043008551_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164356",
+    "productCode": "101191889_ST",
+    "name": "HALLOUM 2FÖR55",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 55,
+    "priceText": "2 för 55 kr",
+    "comparePriceText": "",
+    "regularPriceText": "33.07",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083402241_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164357",
+    "productCode": "101295235_ST",
+    "name": "MOZZARELL 3FÖR28",
+    "brand": "Fresca D´oro",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 28,
+    "priceText": "3 för 28 kr",
+    "comparePriceText": "",
+    "regularPriceText": "12.25",
+    "savePriceText": "",
+    "packageText": "125g",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07611612160841_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164358",
+    "productCode": "101532473_ST",
+    "name": "RIV OST 2FÖR41",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 41,
+    "priceText": "2 för 41 kr",
+    "comparePriceText": "",
+    "regularPriceText": "24.55",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|matlagningsost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311043005789_C1N1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164359",
+    "productCode": "101202735_ST",
+    "name": "SKIVAD OST 2FÖR52",
+    "brand": "Frischgold",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 52,
+    "priceText": "2 för 52 kr",
+    "comparePriceText": "",
+    "regularPriceText": "31.18",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|skivad-ost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083426636_C1C1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164360",
+    "productCode": "101458205_ST",
+    "name": "TINE OST 2FÖR46",
+    "brand": "Tine",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 46,
+    "priceText": "2 för 46 kr",
+    "comparePriceText": "",
+    "regularPriceText": "30.23",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|skivad-ost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07038010022449_C1R1_s01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164361",
+    "productCode": "101293162_ST",
+    "name": "TINE OST 2FÖR51",
+    "brand": "Tine",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 51,
+    "priceText": "2 för 51 kr",
+    "comparePriceText": "",
+    "regularPriceText": "33.07",
+    "savePriceText": "",
+    "packageText": "150g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "mejeri-ost-och-agg|ost|skivad-ost",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/04004164009431_C1R1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164386",
+    "productCode": "101406133_ST",
+    "name": "BACON 2FÖR27",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 27,
+    "priceText": "2 för 27 kr",
+    "comparePriceText": "",
+    "regularPriceText": "15.09",
+    "savePriceText": "",
+    "packageText": "140g",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|chark|bacon-och-stekflask",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083497346_C1N1_s02",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164402",
+    "productCode": "101351867_ST",
+    "name": "GAR LEVERPASTEJ",
+    "brand": "Garant",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 9.46,
+    "priceText": "9,46 kr/st",
+    "comparePriceText": "",
+    "regularPriceText": "9.46",
+    "savePriceText": "",
+    "packageText": "200g",
+    "conditionText": "",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "kott-fagel-och-chark|palagg|pastej-och-pat-",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083492129_C1L1_s01",
+    "labels": [
+      "swedish_flag",
+      "meat_from_sweden"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164401",
+    "productCode": "101269302_ST",
+    "name": "BUBBIES 4FÖR70",
+    "brand": "",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 70,
+    "priceText": "4 för 70 kr",
+    "comparePriceText": "",
+    "regularPriceText": "20.77",
+    "savePriceText": "",
+    "packageText": "",
+    "conditionText": "4 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "fryst|glass|styckglass",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07311042016052_S01",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164502",
+    "productCode": "101331728_ST",
+    "name": "BLOMJORD 2FÖR79",
+    "brand": "Fixa",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 79,
+    "priceText": "2 för 79 kr",
+    "comparePriceText": "",
+    "regularPriceText": "45.95",
+    "savePriceText": "",
+    "packageText": "18l",
+    "conditionText": "2 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "blommor-och-tillbehor|jord",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07340083487118_C1N1_s01",
+    "labels": [
+      "ecological",
+      "krav",
+      "environmental_facet"
+    ],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
+  },
+  {
+    "code": "10010164503",
+    "productCode": "101336010_ST",
+    "name": "PLANTERING 3F125",
+    "brand": "Rölunda Gård",
+    "storeId": "4775",
+    "campaignType": "GENERAL",
+    "promotionType": "MixMatchPricePromotion",
+    "price": 125,
+    "priceText": "3 för 125 kr",
+    "comparePriceText": "",
+    "regularPriceText": "59.95",
+    "savePriceText": "",
+    "packageText": "40l",
+    "conditionText": "3 för",
+    "redeemLimitText": "",
+    "startDate": "04/05-2026",
+    "endDate": "06/09-2026",
+    "validUntil": "",
+    "category": "blommor-och-tillbehor|jord",
+    "imageUrl": "https://assets.axfood.se/image/upload/f_auto,t_200/07391290688409_C1N1_s02",
+    "labels": [],
+    "sourceUrl": "https://www.hemkop.se/search/campaigns/offline?q=4775&type=PERSONAL_GENERAL&page=2&size=100",
+    "retrievedAt": "2026-05-22T10:35:59.429Z"
   }
 ];

@@ -106,7 +106,7 @@ type AxfoodCampaignResponse = {
 export const WILLYS_SEARCH_BASE_URL = 'https://www.willys.se/search';
 export const WILLYS_WEEKLY_DISCOUNTS_BASE_URL = 'https://www.willys.se/search/campaigns/offline';
 export const DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_ID = '2110';
-export const DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS = ['2110', '2187', '2102'] as const;
+export const DEFAULT_WILLYS_WEEKLY_DISCOUNTS_STORE_IDS = ['2110', '2187', '2102', '2149', '2355', '2268'] as const;
 
 export const DEFAULT_WILLYS_SEARCH_QUERIES = [
   'makaroner',
