@@ -705,6 +705,29 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(shell, /@\/components\/sample-data/);
   });
 
+  it('surfaces category deal leaders on the homepage and category routes using the real core summarizer', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const shell = await read('src/components/market-shell.tsx');
+    const categoryRoute = await read('src/app/categories/[slug]/page.tsx');
+
+    assert.match(verified, /summarizeCategoryDealLeaders/);
+    assert.match(verified, /calculateDealScore/);
+    assert.match(verified, /export const categoryDealLeaderCandidates = /);
+    assert.match(verified, /export const categoryDealLeaders = /);
+    assert.match(verified, /minimumSourceConfidence/);
+    assert.match(verified, /sourceConfidence/);
+    assert.match(shell, /categoryDealLeaders\.slice/);
+    assert.match(shell, /Today&apos;s best category deals/);
+    assert.match(shell, /leader\.categorySlug/);
+    assert.match(shell, /leader\.evidenceLabel/);
+    assert.match(categoryRoute, /categoryDealLeadersFor/);
+    assert.match(categoryRoute, /summarizeCategoryDealLeaders/);
+    assert.match(categoryRoute, /Category deal leaders/);
+    assert.match(categoryRoute, /sourceConfidence/);
+    assert.doesNotMatch(shell, /@\/lib\/demo-data/);
+    assert.doesNotMatch(categoryRoute, /@\/lib\/demo-data/);
+  });
+
   it('surfaces reusable data-freshness confidence badges across public routes', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const shell = await read('src/components/market-shell.tsx');
