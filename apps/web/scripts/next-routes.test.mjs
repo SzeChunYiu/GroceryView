@@ -289,6 +289,23 @@ describe('verified-data UI', () => {
     assert.match(server, /\/api\/account\/subscription-access/);
   });
 
+
+  it('surfaces account-safe loyalty price preference toggles by chain', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/coupon-stacks/page.tsx');
+
+    assert.match(verified, /loyaltyPricePreferenceContract/);
+    assert.match(verified, /loyaltyPriceChains/);
+    assert.match(verified, /ICA/);
+    assert.match(verified, /Willys/);
+    assert.match(route, /loyaltyPricePreferenceContract/);
+    assert.match(route, /Loyalty price preferences/);
+    assert.match(route, /No retailer credentials/);
+    assert.match(route, /chainToggles/);
+    assert.match(route, /authenticated loyalty prices/);
+    assert.doesNotMatch(route, /@\/components\/sample-data/);
+  });
+
   it('ships signed-in price-report human review controls without anonymous moderation', async () => {
     const priceReports = await read('src/app/price-reports/page.tsx');
     const actions = await read('src/components/price-report-review-actions.tsx');
