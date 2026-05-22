@@ -11,6 +11,7 @@ import {
   formatSek,
   freshestOpenPrices,
   openPriceObservationDepth,
+  priceDropMoversBoard,
   privateFeatureCopy,
   productUniverse,
   snapshot,
@@ -157,6 +158,45 @@ export function MarketShell() {
               </Link>
             );
           })}
+        </div>
+      </Card>
+
+      <Card className="mt-6">
+        <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+          <div>
+            <Eyebrow>Price-drop movers board</Eyebrow>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Observed products with the sharpest latest price drops</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-slate-600">
+            Movers are computed from OpenPrices daily observations with the shared history engine. The board says observed low only unless source coverage can prove a full-market low.
+          </p>
+        </div>
+        <div className="mt-5 divide-y divide-slate-200">
+          {priceDropMoversBoard.map((mover) => (
+            <Link
+              className="grid gap-3 py-4 transition hover:bg-emerald-50/70 md:grid-cols-[1fr_auto_auto]"
+              href={`/products/${mover.productSlug}`}
+              key={mover.productSlug}
+            >
+              <div>
+                <p className="font-black text-slate-950">{mover.productName}</p>
+                <p className="text-sm text-slate-600">
+                  {mover.categoryLabel} · {mover.observedCount.toLocaleString('sv-SE')} dated observations · {mover.latestObservedAt.slice(0, 10)}
+                </p>
+              </div>
+              <div className="text-left md:text-right">
+                <p className="font-black text-emerald-800">
+                  {formatSek(mover.latestPrice)} from {formatSek(mover.previousPrice)}
+                </p>
+                <p className="text-sm font-semibold text-slate-600">
+                  {formatSek(mover.changeFromPrevious)} · {formatPct(mover.changePercent)}
+                </p>
+              </div>
+              <p className="rounded-full bg-emerald-100 px-3 py-2 text-center text-sm font-black text-emerald-900">
+                {mover.isNewLow ? 'New observed low' : mover.legalCopy}
+              </p>
+            </Link>
+          ))}
         </div>
       </Card>
 
