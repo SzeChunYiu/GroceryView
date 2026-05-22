@@ -467,6 +467,92 @@ describe('runtime config', () => {
     }
   });
 
+  it('creates runtime billing portal sessions through the Stripe-compatible API without leaking secrets', async () => {
+    const calls: Array<{ url: string; init?: RequestInit }> = [];
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (async (url: string | URL | Request, init?: RequestInit) => {
+      calls.push({ url: String(url), init });
+      return new Response(JSON.stringify({
+        id: 'bps_live_runtime_bridge',
+        url: 'https://billing.stripe.com/p/session/bps_live_runtime_bridge'
+      }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' }
+      });
+    }) as typeof fetch;
+
+    const repository: RuntimePersistenceRepository = {
+      async getSubscriptionEntitlement(userId) {
+        if (userId !== 'user-1') return null;
+        return {
+          userId,
+          tier: 'premium',
+          plan: 'premium_monthly',
+          status: 'active',
+          currentPeriodEndsAt: '2026-06-22T00:00:00.000Z',
+          provider: 'stripe_compatible',
+          providerCustomerId: 'cus_runtime_portal',
+          providerSubscriptionId: 'sub_runtime_portal',
+          updatedAt: '2026-05-22T00:00:00.000Z'
+        };
+      },
+      async upsertSubscriptionEntitlement(entitlement) {
+        void entitlement;
+      },
+      async upsertBudget(userId, budget) {
+        void userId; void budget;
+      },
+      async getBudget(userId) {
+        void userId;
+        return null;
+      },
+      async getHumanReviewer() {
+        return null;
+      },
+      async listOpenHumanReviewAssignments() {
+        return [];
+      },
+      async saveHumanReviewAssignment(assignment) {
+        void assignment;
+      },
+      async upsertNotificationSuppression(suppression) {
+        void suppression;
+      }
+    };
+
+    try {
+      const handle = createRuntimeHttpHandler({
+        NODE_ENV: 'development',
+        AUTH_SECRET: 'runtime-auth-secret',
+        PUBLIC_WEB_URL: 'https://groceryview.example',
+        STRIPE_SECRET_KEY: 'sk_test_runtime_secret'
+      }, { repository });
+      const token = await createSessionToken({ userId: 'user-1', expiresAt: '2099-01-01T00:00:00.000Z' }, 'runtime-auth-secret');
+
+      const response = await handle(new Request('http://localhost/api/billing/portal-sessions?userId=user-1', {
+        method: 'POST',
+        headers: { authorization: `Bearer ${token}` }
+      }));
+      const responseBody = await response.json();
+
+      assert.equal(response.status, 201);
+      assert.deepEqual(responseBody, {
+        provider: 'stripe_compatible',
+        sessionId: 'bps_live_runtime_bridge',
+        portalUrl: 'https://billing.stripe.com/p/session/bps_live_runtime_bridge'
+      });
+      assert.equal(calls.length, 1);
+      assert.equal(calls[0]?.url, 'https://api.stripe.com/v1/billing_portal/sessions');
+      assert.match(calls[0]?.init?.headers instanceof Headers ? calls[0].init.headers.get('authorization') ?? '' : '', /^Basic /);
+      const encodedBody = calls[0]?.init?.body as URLSearchParams;
+      assert.equal(encodedBody.get('customer'), 'cus_runtime_portal');
+      assert.equal(encodedBody.get('return_url'), 'https://groceryview.example/account?billing=return');
+      assert.equal(JSON.stringify(responseBody).includes('sk_test_runtime_secret'), false);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
   it('wires repository-backed runtime sinks into account access and billing webhooks', async () => {
     let entitlement: SubscriptionEntitlementLookupRecord | null = null;
     let persistedBudget: { weeklyBudget: number; monthlyBudget: number } | null = null;

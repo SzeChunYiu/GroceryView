@@ -27,6 +27,7 @@ describe('buildOpenApiDocument', () => {
       '/api/basket/transfer/{retailerId}',
       '/api/basket/trip-cost',
       '/api/billing/checkout-sessions',
+      '/api/billing/portal-sessions',
       '/api/billing/subscription-events',
       '/api/budget',
       '/api/budget/categories',
@@ -99,6 +100,7 @@ describe('buildOpenApiDocument', () => {
     assert.match(doc.paths['/api/ads/disclosure'].get?.summary ?? '', /ad disclosure/i);
     assert.equal(doc.paths['/api/auth/session'].post?.security, undefined);
     assert.deepEqual(doc.paths['/api/billing/checkout-sessions'].post?.security, [{ bearerAuth: [] }]);
+    assert.deepEqual(doc.paths['/api/billing/portal-sessions'].post?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/billing/subscription-events'].post?.security, [{ billingWebhookSignature: [] }, { stripeWebhookSignature: [] }]);
     assert.deepEqual(doc.paths['/api/basket/comparison-report'].get?.security, [{ bearerAuth: [] }]);
     assert.deepEqual(doc.paths['/api/basket/fulfillment-slots/{retailerId}/{storeId}'].get?.security, [{ bearerAuth: [] }]);

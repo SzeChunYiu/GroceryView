@@ -130,6 +130,7 @@ export type AuthOptions = {
   };
   billingCheckoutPriceIds?: Partial<Record<SubscriptionPlan, string>>;
   billingCheckoutProvider?: BillingCheckoutProvider;
+  billingPortalProvider?: BillingPortalProvider;
   notificationMetricsToken?: string;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
   notificationWorkerRunner?: () => Promise<RepositoryNotificationWorkerCycleResult>;
@@ -241,6 +242,20 @@ export type BillingCheckoutProvider = {
   createCheckoutSession(request: Extract<SubscriptionCheckoutPlan, { status: 'ready' }>['checkoutRequest']): Promise<BillingCheckoutSession>;
 };
 
+export type BillingPortalRequest = {
+  customerReference: string;
+  returnUrl: string;
+};
+
+export type BillingPortalSession = {
+  sessionId: string;
+  portalUrl: string;
+};
+
+export type BillingPortalProvider = {
+  createPortalSession(request: BillingPortalRequest): Promise<BillingPortalSession>;
+};
+
 function createStripeCompatibleCheckoutProvider(secretKey: string): BillingCheckoutProvider {
   return {
     async createCheckoutSession(request) {
@@ -269,6 +284,34 @@ function createStripeCompatibleCheckoutProvider(secretKey: string): BillingCheck
       return {
         sessionId: requiredString(record.id, 'stripeCheckoutSession.id'),
         checkoutUrl: requiredString(record.url, 'stripeCheckoutSession.url')
+      };
+    }
+  };
+}
+
+function createStripeCompatiblePortalProvider(secretKey: string): BillingPortalProvider {
+  return {
+    async createPortalSession(request) {
+      const body = new URLSearchParams();
+      body.set('customer', request.customerReference);
+      body.set('return_url', request.returnUrl);
+
+      const response = await fetch('https://api.stripe.com/v1/billing_portal/sessions', {
+        method: 'POST',
+        headers: new Headers({
+          authorization: `Basic ${Buffer.from(`${secretKey}:`).toString('base64')}`,
+          'content-type': 'application/x-www-form-urlencoded'
+        }),
+        body
+      });
+      const payload = await response.json() as unknown;
+      if (!response.ok || payload === null || typeof payload !== 'object' || Array.isArray(payload)) {
+        throw new Error('Billing portal provider rejected the session request.');
+      }
+      const record = payload as Record<string, unknown>;
+      return {
+        sessionId: requiredString(record.id, 'stripeBillingPortalSession.id'),
+        portalUrl: requiredString(record.url, 'stripeBillingPortalSession.url')
       };
     }
   };
@@ -1464,6 +1507,39 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         }, { status: 201 });
       }
 
+      if (method === 'POST' && path === '/api/billing/portal-sessions') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        const entitlement = authOptions.subscriptionEntitlementRepository
+          ? await authOptions.subscriptionEntitlementRepository.getSubscriptionEntitlement(user)
+          : api.getSubscriptionEntitlement(user);
+        const providerCustomerId = entitlement && 'providerCustomerId' in entitlement && typeof entitlement.providerCustomerId === 'string'
+          ? entitlement.providerCustomerId
+          : undefined;
+        if (
+          !entitlement ||
+          entitlement.provider !== 'stripe_compatible' ||
+          !providerCustomerId ||
+          !['active', 'past_due'].includes(entitlement.status)
+        ) {
+          return errorResponse(503, 'Billing portal requires an active provider customer for this account.');
+        }
+        const publicWebUrl = authOptions.runtimeConfig?.publicWebUrl ?? process.env.PUBLIC_WEB_URL;
+        if (!publicWebUrl) return errorResponse(503, 'Billing portal return URL is not configured.');
+        if (!authOptions.billingPortalProvider) return errorResponse(503, 'Billing portal provider is not configured.');
+        const session = await authOptions.billingPortalProvider.createPortalSession({
+          customerReference: providerCustomerId,
+          returnUrl: `${publicWebUrl}/account?billing=return`
+        });
+        return jsonResponse({
+          provider: 'stripe_compatible',
+          sessionId: session.sessionId,
+          portalUrl: session.portalUrl
+        }, { status: 201 });
+      }
+
       if (method === 'GET' && path === '/api/metrics/notifications') {
         if (!authOptions.notificationMetricsToken) return errorResponse(503, 'Notification metrics token is not configured.');
         if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
@@ -2358,6 +2434,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
       '/api/billing/checkout-sessions': { post: protectedOperation('Create a provider-backed subscription checkout session for the signed-in account.') },
+      '/api/billing/portal-sessions': { post: protectedOperation('Create a provider-backed billing portal session for the signed-in account.') },
       '/api/billing/subscription-events': { post: billingWebhookOperation('Accept signed billing subscription events and persist entitlement updates.') },
       '/api/stores/{id}': { get: publicOperation('Get store profile.') },
       '/api/stores/{id}/category-coverage': { get: publicOperation('Get store price coverage grouped by product category.') },
@@ -2544,7 +2621,12 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     notificationWebhookSecret: config.notificationWebhookSecret,
     billingWebhookSecret: config.billingWebhookSecret,
     billingCheckoutPriceIds: config.stripePriceIds,
-    ...(config.stripeSecretKey ? { billingCheckoutProvider: createStripeCompatibleCheckoutProvider(config.stripeSecretKey) } : {}),
+    ...(config.stripeSecretKey
+      ? {
+          billingCheckoutProvider: createStripeCompatibleCheckoutProvider(config.stripeSecretKey),
+          billingPortalProvider: createStripeCompatiblePortalProvider(config.stripeSecretKey)
+        }
+      : {}),
     notificationMetricsToken: config.metricsToken,
     notificationMetricsProvider: options.notificationMetricsProvider,
     notificationWorkerRunner: options.notificationWorkerRunner,
