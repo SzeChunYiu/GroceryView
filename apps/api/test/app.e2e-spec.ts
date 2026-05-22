@@ -901,15 +901,21 @@ describe('GroceryView API app', () => {
       .post('/users/demo/watchlist')
       .send({ productId: 'coffee', targetPrice: 50, alertDealScoreAt: 80, allowedPriceTypes: ['shelf'] })
       .expect(201);
+    await request(app.getHttpServer())
+      .post('/users/demo/watchlist')
+      .send({ productId: 'milk', alertDealScoreAt: 80, allowedPriceTypes: ['shelf'] })
+      .expect(201);
     const watchlist = await request(app.getHttpServer()).get('/users/demo/watchlist').expect(200);
     assert.equal(watchlist.body.items[0].productId, 'coffee');
     assert.deepEqual(watchlist.body.items[0].allowedPriceTypes, ['shelf']);
     const priceAlerts = await request(app.getHttpServer()).get('/users/demo/watchlist/price-alerts').expect(200);
     assert.equal(priceAlerts.body.userId, 'demo');
+    assert.equal(priceAlerts.body.trackedItemCount, 1);
     assert.equal(priceAlerts.body.alertCount, 1);
     assert.equal(priceAlerts.body.alerts[0].type, 'target_price');
     assert.equal(priceAlerts.body.demo, undefined);
     assert.equal(priceHistoryExecutor.calls.some((call) => /from latest_prices/i.test(call.sql)), true);
+    await request(app.getHttpServer()).delete('/users/demo/watchlist/milk').expect(200);
     const createdPriceAlert = await request(app.getHttpServer())
       .post('/users/demo/watchlist/price-alerts')
       .send({ productId: 'coffee', targetPrice: 48, favoriteStoresOnly: false, allowedPriceTypes: ['shelf'] })

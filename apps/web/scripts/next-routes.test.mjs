@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { access, readFile } from 'node:fs/promises';
 
 const appFiles = [
   'src/app/page.tsx',
@@ -25,6 +25,15 @@ const appFiles = [
 
 async function read(relative) {
   return readFile(new URL(`../${relative}`, import.meta.url), 'utf8');
+}
+
+async function fileExists(relative) {
+  try {
+    await access(new URL(`../${relative}`, import.meta.url));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 describe('verified-data UI', () => {
@@ -236,6 +245,32 @@ describe('verified-data UI', () => {
     assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
   });
 
+
+
+  it('ships signed-in coupon and loyalty offer controls without anonymous savings claims', async () => {
+    const couponStacks = await read('src/app/coupon-stacks/page.tsx');
+    const actions = await read('src/components/coupon-loyalty-actions.tsx');
+    const server = await read('../../packages/server/src/index.ts');
+
+    assert.match(couponStacks, /CouponLoyaltyActions/);
+    assert.match(actions, /'use client'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:accessToken'/);
+    assert.match(actions, /sessionStorage\.getItem\('groceryview:userId'/);
+    assert.match(actions, /Authorization: `Bearer \$\{accessToken\}`/);
+    assert.match(actions, /\/api\/loyalty\/offers\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /\/api\/account\/subscription-access\?userId=\$\{encodeURIComponent\(userId\)\}/);
+    assert.match(actions, /method: 'GET'/);
+    assert.match(actions, /totalEligibleSavings/);
+    assert.match(actions, /requiresActionCount/);
+    assert.match(actions, /needs_coupon/);
+    assert.match(actions, /needs_membership/);
+    assert.match(actions, /Sign in first/);
+    assert.match(actions, /No anonymous coupon offers/);
+    assert.doesNotMatch(actions, /localStorage\.setItem\('groceryview:userId'/);
+    assert.doesNotMatch(actions, /demo-data|sample-data|mock session/i);
+    assert.match(server, /\/api\/loyalty\/offers/);
+    assert.match(server, /\/api\/account\/subscription-access/);
+  });
 
   it('surfaces the retailer handoff support matrix contract on the basket ideas route', async () => {
     const verified = await read('src/lib/verified-data.ts');
@@ -1241,6 +1276,35 @@ ${seo}`;
     assert.match(category, /categoryLabels/);
     assert.match(store, /metadataForStore/);
     assert.match(store, /findStore/);
+  });
+
+
+  it('ships dynamic product OG price images from verified price data', async () => {
+    const ogPath = 'src/app/products/[slug]/opengraph-image.tsx';
+    assert.equal(await fileExists(ogPath), true, 'product pages should expose a dynamic opengraph-image route');
+
+    const ogImage = await read(ogPath);
+    const seo = await read('src/lib/seo.ts');
+    const productRoute = await read('src/app/products/[slug]/page.tsx');
+
+    assert.match(ogImage, /ImageResponse/);
+    assert.match(ogImage, /from 'next\/og'/);
+    assert.match(ogImage, /export const size = \{ width: 1200, height: 630 \}/);
+    assert.match(ogImage, /export const contentType = 'image\/png'/);
+    assert.match(ogImage, /generateStaticParams/);
+    assert.match(ogImage, /productUniverse/);
+    assert.match(ogImage, /findProduct/);
+    assert.match(ogImage, /notFound/);
+    assert.match(ogImage, /chainPriceRows/);
+    assert.match(ogImage, /formatSek/);
+    assert.match(ogImage, /No synthetic prices/);
+    assert.match(ogImage, /Verified price signal/);
+    assert.doesNotMatch(ogImage, /@\/lib\/demo-data|@\/components\/sample-data/);
+
+    assert.match(seo, /opengraph-image/);
+    assert.match(seo, /openGraph:[\s\S]*images/);
+    assert.match(seo, /twitter:[\s\S]*images/);
+    assert.match(productRoute, /metadataForProduct/);
   });
 
   it('ships programmatic SEO landing pages from verified price spreads', async () => {

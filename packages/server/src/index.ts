@@ -732,9 +732,10 @@ async function queryWatchlistPriceAlertsFromPostgres(
   const favoriteStoreSlugs = favoriteStoreRows.length === 0 ? favoriteStoreIds : favoriteStoreRows.map((row) => row.store_slug);
   const products = await watchlistProductsFromPostgres(executor, watchlist);
   const alerts = buildWatchlistAlerts({ watchlist, products, favoriteStoreIds: favoriteStoreSlugs });
+  const targetPriceItemCount = watchlist.filter((item) => item.targetPrice !== undefined).length;
   return {
     userId,
-    trackedItemCount: watchlist.length,
+    trackedItemCount: targetPriceItemCount,
     alertCount: alerts.filter((alert) => alert.type === 'target_price').length,
     alerts: alerts.filter((alert) => alert.type === 'target_price'),
     guardrails: [

@@ -79,9 +79,10 @@ export class WatchlistsService {
     const items = await this.watchlistItems(userId);
     const alerts = await this.alertsFor(userId, items);
     const targetAlerts = alerts.filter((alert) => alert.type === 'target_price');
+    const targetPriceItemCount = items.filter((item) => item.targetPrice !== undefined).length;
     return {
       userId,
-      trackedItemCount: items.length,
+      trackedItemCount: targetPriceItemCount,
       alertCount: targetAlerts.length,
       alerts: targetAlerts,
       guardrails: [
