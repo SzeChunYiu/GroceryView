@@ -573,6 +573,79 @@ function priceTypicalRangeBandFor(product: NonNullable<ReturnType<typeof findPro
   };
 }
 
+function priceChangeEventLogFor(product: NonNullable<ReturnType<typeof findProduct>>) {
+  if ('lowestPrice' in product || product.observations.length < 2) {
+    return {
+      available: false,
+      title: 'Not enough dated observations',
+      priceChangeEvents: [],
+      observationCount: 0,
+      detail: 'Not enough dated observations exist to compare consecutive prices, so GroceryView withholds the price-change event log.'
+    };
+  }
+
+  const orderedPoints = product.observations
+    .map((observation) => ({
+      observedAt: observation.date,
+      observedTime: Date.parse(`${observation.date}T00:00:00.000Z`),
+      price: observation.price
+    }))
+    .filter((observation) => Number.isFinite(observation.observedTime) && Number.isFinite(observation.price))
+    .sort((a, b) => a.observedTime - b.observedTime);
+
+  if (orderedPoints.length < 2) {
+    return {
+      available: false,
+      title: 'Not enough dated observations',
+      priceChangeEvents: [],
+      observationCount: orderedPoints.length,
+      detail: 'Not enough dated observations have valid dates and prices, so GroceryView withholds the price-change event log.'
+    };
+  }
+
+  const priceChangeEvents = orderedPoints
+    .slice(1)
+    .map((point, index) => {
+      const previous = orderedPoints[index]!;
+      const delta = point.price - previous.price;
+      if (Math.abs(delta) < 0.01) return null;
+      const direction = delta < 0 ? 'dropped' : 'rose';
+      const absoluteDelta = Math.abs(delta);
+      const changePercent = previous.price > 0 ? (absoluteDelta / previous.price) * 100 : 0;
+      return {
+        observedAt: point.observedAt,
+        previousObservedAt: previous.observedAt,
+        direction,
+        fromPriceLabel: formatSek(previous.price),
+        toPriceLabel: formatSek(point.price),
+        changeValueLabel: formatSek(absoluteDelta),
+        changePercentLabel: formatPct(changePercent),
+        sentence: `Price ${direction} ${formatPct(changePercent)} on ${point.observedAt} from ${formatSek(previous.price)} to ${formatSek(point.price)}.`
+      };
+    })
+    .filter((event): event is NonNullable<typeof event> => event !== null)
+    .sort((a, b) => b.observedAt.localeCompare(a.observedAt))
+    .slice(0, 6);
+
+  if (priceChangeEvents.length === 0) {
+    return {
+      available: false,
+      title: 'No observed price changes',
+      priceChangeEvents,
+      observationCount: orderedPoints.length,
+      detail: 'Consecutive dated observations did not change price, so GroceryView does not invent a price-change event.'
+    };
+  }
+
+  return {
+    available: true,
+    title: 'price-change event log',
+    priceChangeEvents,
+    observationCount: orderedPoints.length,
+    detail: `Every event compares consecutive dated observations from the product's own price tape. No forecast or seasonal prediction is shown.`
+  };
+}
+
 function priceChartTerminalFor(product: NonNullable<ReturnType<typeof findProduct>>): PriceChartTerminalModel {
   const emptyWindows: PriceChartTerminalWindow[] = timeframeWindows.map((window) => ({
     label: window.label,
@@ -662,6 +735,7 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
   const priceHistoryRangeBadges = priceHistoryRangeBadgesFor(product);
   const priceVsUsualSignal = priceVsUsualSignalFor(product);
   const typicalRangeBand = priceTypicalRangeBandFor(product);
+  const priceChangeLog = priceChangeEventLogFor(product);
   const priceChartTerminal = priceChartTerminalFor(product);
   const freshnessBadge = dataFreshnessBadges.find((badge) => badge.sourceKind === (isChain ? 'axfood' : 'openprices')) ?? dataFreshnessBadges[0]!;
   const productJsonLd = productJsonLdFor(product);
@@ -819,6 +893,33 @@ export default async function ProductPage({ params }: Readonly<{ params: Promise
           <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-amber-950">{typicalRangeBand.detail}</p>
         )}
         <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{typicalRangeBand.detail}</p>
+      </Card>
+      <Card className="mt-6 overflow-hidden border-orange-200 bg-orange-50/80">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-black uppercase tracking-[0.22em] text-orange-800">price-change event log</p>
+            <h2 className="mt-2 text-2xl font-black text-slate-950">Observed price-change events</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
+              Compares consecutive dated observations only, then records the factual moves that dropped or rose. No forecast or seasonal prediction is shown.
+            </p>
+          </div>
+          <p className="rounded-full bg-white px-4 py-2 text-sm font-black text-orange-900">{priceChangeLog.observationCount} dated points</p>
+        </div>
+        {priceChangeLog.available ? (
+          <div className="mt-5 grid gap-3 lg:grid-cols-2">
+            {priceChangeLog.priceChangeEvents.map((event) => (
+              <div className="rounded-2xl bg-white/90 p-4 shadow-sm" key={`${event.previousObservedAt}-${event.observedAt}-${event.toPriceLabel}`}>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-orange-800">{event.direction} · {event.changePercentLabel}</p>
+                <p className="mt-2 text-lg font-black text-slate-950">{event.sentence}</p>
+                <p className="mt-2 text-sm font-semibold text-slate-600">{event.previousObservedAt} → {event.observedAt} · {event.fromPriceLabel} → {event.toPriceLabel}</p>
+                <p className="mt-2 text-xs font-black uppercase tracking-[0.16em] text-slate-500">changePercentLabel {event.changePercentLabel} · change {event.changeValueLabel}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mt-5 rounded-2xl bg-white/85 p-4 text-sm font-bold text-amber-950">{priceChangeLog.detail}</p>
+        )}
+        <p className="mt-4 text-xs font-semibold leading-5 text-slate-600">{priceChangeLog.detail}</p>
       </Card>
       <Card className="mt-6 border-indigo-200 bg-indigo-50/70">
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
