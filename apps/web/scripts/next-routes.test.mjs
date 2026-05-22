@@ -1017,6 +1017,28 @@ ${seo}`;
     assert.doesNotMatch(route, /@\/components\/sample-data/);
   });
 
+  it('surfaces a retailer browser overlay contract backed by the cheapest-now API', async () => {
+    const verified = await read('src/lib/verified-data.ts');
+    const route = await read('src/app/compare/page.tsx');
+    const overlay = await read('public/extension/retailer-overlay.js');
+    const server = await read('../../packages/server/src/index.ts');
+
+    assert.match(verified, /export const browserExtensionOverlayContract = /);
+    assert.match(verified, /\/extension\/retailer-overlay\.js/);
+    assert.match(verified, /\/api\/products\/\{productId\}\/cheapest-now/);
+    assert.match(route, /browserExtensionOverlayContract/);
+    assert.match(route, /Retailer browser overlay/);
+    assert.match(route, /data-groceryview-product-id/);
+    assert.match(overlay, /data-groceryview-product-id/);
+    assert.match(overlay, /\/api\/products\/\$\{encodeURIComponent\(productId\)\}\/cheapest-now/);
+    assert.match(overlay, /cheapest\.chain/);
+    assert.match(overlay, /confidence/);
+    assert.match(overlay, /No anonymous/);
+    assert.doesNotMatch(overlay, /sessionStorage|localStorage\.setItem|demo-data|sample-data/i);
+    assert.match(server, /cheapest-now/);
+    assert.match(server, /getProductCheapestNow/);
+  });
+
   it('surfaces a budget lowest price anywhere radar from matched chain prices', async () => {
     const verified = await read('src/lib/verified-data.ts');
     const route = await read('src/app/compare/page.tsx');
