@@ -735,6 +735,22 @@ ${seo}`;
     assert.match(route, /chain-index proxy/);
   });
 
+  it('surfaces a fail-closed regional price statistics gate on the map', async () => {
+    const route = await read('src/app/map/page.tsx');
+
+    assert.match(route, /regionalPriceStatisticsGate/);
+    assert.match(route, /buildRegionalPriceStatisticsGate/);
+    assert.match(route, /cityPriceStatisticRows/);
+    assert.match(route, /districtPriceStatisticRows/);
+    assert.match(route, /Regional \/ district \/ city price statistics/);
+    assert.match(route, /per-branch observations/);
+    assert.match(route, /No regional price statistic is calculated without per-branch observations/);
+    assert.match(route, /confidence\/coverage/);
+    assert.match(route, /storeUniverse/);
+    assert.doesNotMatch(route, /Math\.random/);
+    assert.doesNotMatch(route, /NoVerifiedData/);
+  });
+
   it('surfaces a fail-closed store price-percentile rank gate on store pages', async () => {
     const route = await read('src/app/stores/[slug]/page.tsx');
 
