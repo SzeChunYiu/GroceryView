@@ -17,6 +17,9 @@ describe('production secret audit script', () => {
       'PUBLIC_WEB_URL',
       'NOTIFICATION_WEBHOOK_SECRET',
       'BILLING_WEBHOOK_SECRET',
+      'STRIPE_SECRET_KEY',
+      'STRIPE_PRICE_PREMIUM_MONTHLY',
+      'STRIPE_PRICE_PREMIUM_YEARLY',
       'CATALOG_COVERAGE_TARGETS_JSON'
     ]) {
       assert.match(script, new RegExp(`['"]${secret}['"]`));

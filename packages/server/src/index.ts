@@ -37,12 +37,14 @@ import {
   type SourceRunHealthReport
 } from '@groceryview/db';
 import {
+  buildSubscriptionCheckoutPlan,
   buildSubscriptionAccessPolicy,
   parseStripeCompatibleSubscriptionEvent,
   processBillingSubscriptionEvent,
   type BillingSubscriptionEntitlementMutation,
   type BillingSubscriptionEvent,
   type BillingSubscriptionEventType,
+  type SubscriptionCheckoutPlan,
   type SubscriptionEntitlementSnapshot,
   type SubscriptionPlan
 } from '@groceryview/monetization';
@@ -126,6 +128,8 @@ export type AuthOptions = {
   billingSubscriptionSink?: {
     upsertSubscriptionEntitlement(entitlement: BillingSubscriptionEntitlementMutation): Promise<void>;
   };
+  billingCheckoutPriceIds?: Partial<Record<SubscriptionPlan, string>>;
+  billingCheckoutProvider?: BillingCheckoutProvider;
   notificationMetricsToken?: string;
   notificationMetricsProvider?: () => Promise<NotificationOperationsReport>;
   notificationWorkerRunner?: () => Promise<RepositoryNotificationWorkerCycleResult>;
@@ -228,6 +232,48 @@ const require = createRequire(import.meta.url);
 const jsonHeaders = { 'content-type': 'application/json; charset=utf-8' };
 const requiredDailyChainIds = ['ica', 'willys', 'coop', 'hemkop', 'lidl', 'city_gross'] as const;
 
+export type BillingCheckoutSession = {
+  sessionId: string;
+  checkoutUrl: string;
+};
+
+export type BillingCheckoutProvider = {
+  createCheckoutSession(request: Extract<SubscriptionCheckoutPlan, { status: 'ready' }>['checkoutRequest']): Promise<BillingCheckoutSession>;
+};
+
+function createStripeCompatibleCheckoutProvider(secretKey: string): BillingCheckoutProvider {
+  return {
+    async createCheckoutSession(request) {
+      const body = new URLSearchParams();
+      body.set('mode', 'subscription');
+      body.set('client_reference_id', request.customerReference);
+      body.set('line_items[0][price]', request.priceId);
+      body.set('line_items[0][quantity]', '1');
+      body.set('success_url', request.successUrl);
+      body.set('cancel_url', request.cancelUrl);
+      body.set('metadata[plan]', request.metadata.plan);
+
+      const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+        method: 'POST',
+        headers: new Headers({
+          authorization: `Basic ${Buffer.from(`${secretKey}:`).toString('base64')}`,
+          'content-type': 'application/x-www-form-urlencoded'
+        }),
+        body
+      });
+      const payload = await response.json() as unknown;
+      if (!response.ok || payload === null || typeof payload !== 'object' || Array.isArray(payload)) {
+        throw new Error('Billing checkout provider rejected the session request.');
+      }
+      const record = payload as Record<string, unknown>;
+      return {
+        sessionId: requiredString(record.id, 'stripeCheckoutSession.id'),
+        checkoutUrl: requiredString(record.url, 'stripeCheckoutSession.url')
+      };
+    }
+  };
+}
+
 function jsonResponse(body: unknown, init: ResponseInit = {}): Response {
   return new Response(JSON.stringify(body), {
     ...init,
@@ -259,6 +305,11 @@ function parseJsonObject(text: string): JsonRecord {
 function requiredString(value: unknown, field: string): string {
   if (typeof value !== 'string' || value.trim() === '') throw new Error(`${field} is required.`);
   return value;
+}
+
+function requiredSubscriptionPlan(value: unknown): SubscriptionPlan {
+  if (value === 'premium_monthly' || value === 'premium_yearly') return value;
+  throw new Error('plan must be premium_monthly or premium_yearly.');
 }
 
 function requiredScanKind(value: unknown): ScanUpload['kind'] {
@@ -1386,6 +1437,33 @@ export function createHttpHandler(api = createGroceryViewApi(), authOptions: Aut
         return jsonResponse(api.getSubscriptionAccess(user, (authOptions.now ?? new Date()).toISOString()));
       }
 
+      if (method === 'POST' && path === '/api/billing/checkout-sessions') {
+        const user = userIdFrom(url);
+        if (user instanceof Response) return user;
+        const authError = await authorizeUser(request, user);
+        if (authError) return authError;
+        const body = await readJson(request);
+        const plan = requiredSubscriptionPlan(body.plan);
+        const publicWebUrl = authOptions.runtimeConfig?.publicWebUrl ?? process.env.PUBLIC_WEB_URL;
+        const checkoutPlan = buildSubscriptionCheckoutPlan({
+          userId: user,
+          plan,
+          billingProviderConfigured: Boolean(authOptions.billingCheckoutProvider),
+          providerPriceId: authOptions.billingCheckoutPriceIds?.[plan],
+          successUrl: publicWebUrl ? `${publicWebUrl}/account?checkout=success&plan=${encodeURIComponent(plan)}` : undefined,
+          cancelUrl: publicWebUrl ? `${publicWebUrl}/account?checkout=cancel&plan=${encodeURIComponent(plan)}` : undefined
+        });
+        if (checkoutPlan.status !== 'ready') return errorResponse(503, checkoutPlan.reason);
+        if (!authOptions.billingCheckoutProvider) return errorResponse(503, 'Billing checkout provider is not configured.');
+        const session = await authOptions.billingCheckoutProvider.createCheckoutSession(checkoutPlan.checkoutRequest);
+        return jsonResponse({
+          provider: checkoutPlan.provider,
+          sessionId: session.sessionId,
+          checkoutUrl: session.checkoutUrl,
+          plan
+        }, { status: 201 });
+      }
+
       if (method === 'GET' && path === '/api/metrics/notifications') {
         if (!authOptions.notificationMetricsToken) return errorResponse(503, 'Notification metrics token is not configured.');
         if (!hasValidMetricsToken(request, authOptions.notificationMetricsToken)) {
@@ -2279,6 +2357,7 @@ export function buildOpenApiDocument(): OpenApiDocument {
       '/api/deals/flyer-offers': { get: publicOperation('Get active weekly flyer offers by branch, chain, category, or product with source evidence.') },
       '/api/stores': { get: publicOperation('List stores.') },
       '/api/account/subscription-access': { get: protectedOperation('Get subscription access policy for the signed-in account.') },
+      '/api/billing/checkout-sessions': { post: protectedOperation('Create a provider-backed subscription checkout session for the signed-in account.') },
       '/api/billing/subscription-events': { post: billingWebhookOperation('Accept signed billing subscription events and persist entitlement updates.') },
       '/api/stores/{id}': { get: publicOperation('Get store profile.') },
       '/api/stores/{id}/category-coverage': { get: publicOperation('Get store price coverage grouped by product category.') },
@@ -2375,6 +2454,8 @@ export type RuntimeConfig = {
   publicWebUrl?: string;
   notificationWebhookSecret?: string;
   billingWebhookSecret?: string;
+  stripeSecretKey?: string;
+  stripePriceIds?: Partial<Record<SubscriptionPlan, string>>;
   metricsToken?: string;
   catalogCoverageTargets?: Omit<CatalogCoverageInput, 'products'>;
 };
@@ -2436,6 +2517,10 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
   }
   validatePublicWebUrl(env.PUBLIC_WEB_URL);
   const catalogCoverageTargets = parseCatalogCoverageTargets(env.CATALOG_COVERAGE_TARGETS_JSON);
+  const stripePriceIds: Partial<Record<SubscriptionPlan, string>> = {
+    ...(env.STRIPE_PRICE_PREMIUM_MONTHLY ? { premium_monthly: env.STRIPE_PRICE_PREMIUM_MONTHLY } : {}),
+    ...(env.STRIPE_PRICE_PREMIUM_YEARLY ? { premium_yearly: env.STRIPE_PRICE_PREMIUM_YEARLY } : {})
+  };
   return {
     nodeEnv,
     port,
@@ -2444,6 +2529,8 @@ export function loadRuntimeConfig(env: Record<string, string | undefined>): Runt
     publicWebUrl: env.PUBLIC_WEB_URL,
     notificationWebhookSecret: env.NOTIFICATION_WEBHOOK_SECRET,
     billingWebhookSecret: env.BILLING_WEBHOOK_SECRET,
+    ...(env.STRIPE_SECRET_KEY ? { stripeSecretKey: env.STRIPE_SECRET_KEY } : {}),
+    ...(Object.keys(stripePriceIds).length > 0 ? { stripePriceIds } : {}),
     metricsToken: env.METRICS_TOKEN,
     ...(catalogCoverageTargets ? { catalogCoverageTargets } : {})
   };
@@ -2456,6 +2543,8 @@ export function buildRuntimeAuthOptions(config: RuntimeConfig, options: RuntimeH
     now: options.now,
     notificationWebhookSecret: config.notificationWebhookSecret,
     billingWebhookSecret: config.billingWebhookSecret,
+    billingCheckoutPriceIds: config.stripePriceIds,
+    ...(config.stripeSecretKey ? { billingCheckoutProvider: createStripeCompatibleCheckoutProvider(config.stripeSecretKey) } : {}),
     notificationMetricsToken: config.metricsToken,
     notificationMetricsProvider: options.notificationMetricsProvider,
     notificationWorkerRunner: options.notificationWorkerRunner,
