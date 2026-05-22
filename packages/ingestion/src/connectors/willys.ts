@@ -239,8 +239,30 @@ export const DEFAULT_WILLYS_SEARCH_QUERIES = [
   'banan',
   'kyckling',
   'ketchup',
-  'havregryn'
+  'havregryn',
+  'juice',
+  'flingor',
+  'mjol',
+  'olja',
+  'tomat',
+  'fisk',
+  'kottfars',
+  'korv',
+  'glass',
+  'choklad',
+  'frukt',
+  'gronsaker',
+  'godis',
+  'soppa',
+  'tacos',
+  'nudlar',
+  'falukorv',
+  'lax',
+  'tonfisk',
+  'gurka',
+  'paprika'
 ] as const;
+export const DEFAULT_WILLYS_PRODUCTS_MAX_ROWS = 500;
 
 export type FetchWillysProductsOptions = {
   fetchImpl?: typeof fetch;
@@ -335,7 +357,7 @@ export async function fetchWillysStores(options: FetchWillysStoresOptions = {}):
 export async function fetchWillysProducts(options: FetchWillysProductsOptions = {}): Promise<WillysProduct[]> {
   const fetchImpl = options.fetchImpl ?? fetch;
   const queries = options.queries ?? DEFAULT_WILLYS_SEARCH_QUERIES;
-  const maxRows = options.maxRows ?? 150;
+  const maxRows = options.maxRows ?? DEFAULT_WILLYS_PRODUCTS_MAX_ROWS;
   const retrievedAt = options.retrievedAt ?? new Date().toISOString();
   const rows: WillysProduct[] = [];
   const seenCodes = new Set<string>();
