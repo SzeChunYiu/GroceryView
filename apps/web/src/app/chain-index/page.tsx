@@ -2,8 +2,9 @@ import Link from 'next/link';
 import { calculateBrandTierIndices, calculateChainPriceIndex } from '@groceryview/core';
 import { Card, Eyebrow, PageShell, SourceCoverage } from '@/components/data-ui';
 import { buildBrandTierPriceObservations, buildChainPriceObservations, buildMatchedBasketChainPriceObservations } from '@/lib/chain-index-data';
+import { buildGroceryIndexTickerWidget } from '@/lib/grocery-index-widget';
 import { categorySummaries, formatPct, formatSek, freshFoodChainIndex, matchedChainProducts } from '@/lib/verified-data';
-import { routeMetadata, siteUrl } from '@/lib/seo';
+import { routeMetadata } from '@/lib/seo';
 
 export function generateMetadata() {
   return routeMetadata('/chain-index');
@@ -24,12 +25,7 @@ const widgetSourceConfidence = matchedBasketRefinedIndex.chains.reduce(
   { high: 0, medium: 0, low: 0 } as Record<'high' | 'medium' | 'low', number>
 );
 
-export const groceryIndexTickerWidget = {
-  route: '/widgets/grocery-index-ticker',
-  title: 'Embeddable Grocery Index ticker',
-  sourceConfidence: widgetSourceConfidence,
-  embedCode: `<iframe src="${siteUrl}/widgets/grocery-index-ticker" title="Grocery Index ticker" loading="lazy" width="100%" height="320"></iframe>`
-};
+const groceryIndexTickerWidget = buildGroceryIndexTickerWidget(widgetSourceConfidence);
 
 function tierTone(value: number) {
   if (value < 95) return 'text-emerald-800 bg-emerald-50';

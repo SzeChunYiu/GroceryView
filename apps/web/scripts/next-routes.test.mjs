@@ -2458,12 +2458,15 @@ ${seo}`;
   it('surfaces an embeddable Grocery Index ticker widget on chain-index', async () => {
     const route = await read('src/app/chain-index/page.tsx');
     const widgetRoute = await read('src/app/widgets/grocery-index-ticker/page.tsx');
+    const widgetContract = await read('src/lib/grocery-index-widget.ts');
     const seo = await read('src/lib/seo.ts');
 
     assert.match(route, /groceryIndexTickerWidget/);
-    assert.match(route, /Embeddable Grocery Index ticker/);
-    assert.match(route, /widgets\/grocery-index-ticker/);
-    assert.match(route, /iframe/);
+    assert.doesNotMatch(route, /export const groceryIndexTickerWidget/);
+    assert.match(widgetContract, /export const groceryIndexTickerWidget/);
+    assert.match(widgetContract, /Embeddable Grocery Index ticker/);
+    assert.match(widgetContract, /widgets\/grocery-index-ticker/);
+    assert.match(widgetContract, /iframe/);
     assert.match(widgetRoute, /calculateChainPriceIndex/);
     assert.match(widgetRoute, /buildChainPriceObservations/);
     assert.match(widgetRoute, /Grocery Index ticker/);
