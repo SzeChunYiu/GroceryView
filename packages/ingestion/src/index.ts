@@ -2995,7 +2995,17 @@ async function persistDailyConnectorOutput(input: {
            provenance
          )
          select $1, record_type, external_ref, observed_at, payload, payload_hash, provenance
-         from input
+         from (
+           select distinct on (payload_hash)
+             record_type,
+             external_ref,
+             observed_at,
+             payload,
+             payload_hash,
+             provenance
+           from input
+           order by payload_hash, observed_at desc nulls last, ordinal desc
+         ) raw_input
          on conflict (source_run_id, payload_hash) do update set
            record_type = excluded.record_type,
            external_ref = excluded.external_ref,
