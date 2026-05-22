@@ -22,6 +22,29 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Preflight required production configuration
+        env:
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          PUBLIC_WEB_URL: ${{ vars.PUBLIC_WEB_URL || secrets.PUBLIC_WEB_URL }}
+          NOTIFICATION_WEBHOOK_SECRET: ${{ secrets.NOTIFICATION_WEBHOOK_SECRET }}
+          BILLING_WEBHOOK_SECRET: ${{ secrets.BILLING_WEBHOOK_SECRET }}
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+          GROCERYVIEW_SERVER_URL: ${{ secrets.GROCERYVIEW_SERVER_URL }}
+          CATALOG_COVERAGE_TARGETS_JSON: ${{ secrets.CATALOG_COVERAGE_TARGETS_JSON }}
+        run: |
+          set -euo pipefail
+          missing=0
+          if [ -z "${AUTH_SECRET:-}" ]; then echo "missing production config: AUTH_SECRET" >&2; missing=1; fi
+          if [ -z "${DATABASE_URL:-}" ]; then echo "missing production config: DATABASE_URL" >&2; missing=1; fi
+          if [ -z "${PUBLIC_WEB_URL:-}" ]; then echo "missing production config: PUBLIC_WEB_URL" >&2; missing=1; fi
+          if [ -z "${NOTIFICATION_WEBHOOK_SECRET:-}" ]; then echo "missing production config: NOTIFICATION_WEBHOOK_SECRET" >&2; missing=1; fi
+          if [ -z "${BILLING_WEBHOOK_SECRET:-}" ]; then echo "missing production config: BILLING_WEBHOOK_SECRET" >&2; missing=1; fi
+          if [ -z "${METRICS_TOKEN:-}" ]; then echo "missing production config: METRICS_TOKEN" >&2; missing=1; fi
+          if [ -z "${GROCERYVIEW_SERVER_URL:-}" ]; then echo "missing production config: GROCERYVIEW_SERVER_URL" >&2; missing=1; fi
+          if [ -z "${CATALOG_COVERAGE_TARGETS_JSON:-}" ]; then echo "missing production config: CATALOG_COVERAGE_TARGETS_JSON" >&2; missing=1; fi
+          if [ "${missing}" -ne 0 ]; then exit 1; fi
+
       - name: Install
         run: npm ci
 

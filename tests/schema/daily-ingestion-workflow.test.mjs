@@ -9,6 +9,11 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /schedule:/);
     assert.match(workflow, /cron:\s*['"]\d+\s+\d+\s+\*\s+\*\s+\*['"]/);
     assert.match(workflow, /workflow_dispatch:/);
+    assert.match(workflow, /name: Preflight required production configuration/);
+    assert.ok(
+      workflow.indexOf('name: Preflight required production configuration') < workflow.indexOf('name: Install'),
+      'production config preflight must run before npm install and connector generation'
+    );
 
     for (const command of [
       'npm ci',
@@ -28,6 +33,18 @@ describe('daily ingestion workflow', () => {
     assert.match(workflow, /GROCERYVIEW_DAILY_CONNECTORS_JSON_FILE=\/tmp\/groceryview-daily-connectors\.json/);
     assert.doesNotMatch(workflow, /GROCERYVIEW_DAILY_CONNECTORS_JSON=\$\(npm run --silent ops:daily-connectors\)/);
     assert.doesNotMatch(workflow, /test -n "\$\{GROCERYVIEW_DAILY_CONNECTORS_JSON:-\}"/);
+    for (const requiredConfigName of [
+      'AUTH_SECRET',
+      'DATABASE_URL',
+      'PUBLIC_WEB_URL',
+      'NOTIFICATION_WEBHOOK_SECRET',
+      'BILLING_WEBHOOK_SECRET',
+      'METRICS_TOKEN',
+      'GROCERYVIEW_SERVER_URL',
+      'CATALOG_COVERAGE_TARGETS_JSON'
+    ]) {
+      assert.match(workflow, new RegExp(`missing production config: ${requiredConfigName}`));
+    }
     assert.match(workflow, /CATALOG_COVERAGE_TARGETS_JSON/);
     assert.match(workflow, /connectorStoreCoverageCount/);
     assert.match(workflow, /coverageStoreCount/);
